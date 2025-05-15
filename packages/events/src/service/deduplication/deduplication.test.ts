@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { DeduplicationConfig, EventIndex, getUUID } from '@opencrvs/commons'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
-import { DeduplicationConfig, getUUID } from '@opencrvs/commons'
-import { searchForDuplicates } from './deduplication'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
+import { encodeEventIndex } from '@events/service/indexing/utils'
+import { searchForDuplicates } from './deduplication'
 
 const LEGACY_BIRTH_DEDUPLICATION_RULES = {
   id: 'Legacy birth deduplication check',
@@ -155,11 +156,11 @@ export async function findDuplicates(
     index: getEventIndexName(),
     id: getUUID(),
     body: {
-      doc: {
+      doc: encodeEventIndex({
         id: getUUID(),
         transactionId: getUUID(),
-        data: existingComposition
-      },
+        declaration: existingComposition
+      } as unknown as EventIndex),
       doc_as_upsert: true
     },
     refresh: 'wait_for'
@@ -167,7 +168,7 @@ export async function findDuplicates(
 
   const results = await searchForDuplicates(
     {
-      data: newComposition,
+      declaration: newComposition,
       // Random field values that should not affect the search
       id: getUUID(),
       type: 'birth',
@@ -175,9 +176,13 @@ export async function findDuplicates(
       createdAt: '2025-01-01',
       createdBy: 'test',
       createdAtLocation: 'test',
+      updatedAtLocation: 'test',
       assignedTo: 'test',
-      modifiedAt: '2025-01-01',
-      updatedBy: 'test'
+      updatedAt: '2025-01-01',
+      updatedBy: 'test',
+      trackingId: 'TEST12',
+      updatedByUserRole: 'test',
+      flags: []
     },
     DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
   )
@@ -243,7 +248,7 @@ describe('deduplication tests', () => {
 
     const results = await searchForDuplicates(
       {
-        data: {},
+        declaration: {},
         // Random field values that should not affect the search
         id: '123-123-123-123',
         type: 'birth',
@@ -251,9 +256,13 @@ describe('deduplication tests', () => {
         createdAt: '2025-01-01',
         createdBy: 'test',
         createdAtLocation: 'test',
+        updatedAtLocation: 'test',
         assignedTo: 'test',
-        modifiedAt: '2025-01-01',
-        updatedBy: 'test'
+        updatedAt: '2025-01-01',
+        updatedBy: 'test',
+        trackingId: 'TEST12',
+        updatedByUserRole: 'test',
+        flags: []
       },
       DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
     )

@@ -44,13 +44,11 @@ export const up = async (db: Db, client: MongoClient) => {
       const tasksHistoryWithSystemCount =
         await getTotalTaskCountByCollectionName(db, 'Task_history')
 
-      // eslint-disable-next-line no-console
       console.log(
         `Migration - Task integration update with system object, total ${tasksWithSystemCount} tasks need to be processed`
       )
 
       for await (const task of tasksWithSystem) {
-        // eslint-disable-next-line no-console
         console.log(
           `Processed ${
             processTask + 1
@@ -83,12 +81,10 @@ export const up = async (db: Db, client: MongoClient) => {
         }
       }
 
-      // eslint-disable-next-line no-console
       console.log(
         `Migration - Task history integration update with system object, total ${tasksHistoryWithSystemCount} task history need to be processed`
       )
       for await (const task of tasksHistoryWithSystem) {
-        // eslint-disable-next-line no-console
         console.log(
           `Processed ${
             processTaskHistory + 1

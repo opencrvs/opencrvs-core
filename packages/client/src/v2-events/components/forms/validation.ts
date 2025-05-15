@@ -9,108 +9,78 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { MessageDescriptor } from 'react-intl'
-import { formatISO } from 'date-fns'
 import {
-  ConditionalParameters,
   FieldConfig,
-  validate
+  EventState,
+  omitHiddenPaginatedFields,
+  isPageVisible,
+  FormConfig,
+  omitHiddenFields,
+  runFieldValidations
 } from '@opencrvs/commons/client'
-import { ActionFormData } from '@opencrvs/commons'
-import { IValidationResult } from '@client/utils/validate'
-import { getConditionalActionsForField } from './utils'
 
-interface IFieldErrors {
-  errors: IValidationResult[]
+interface FieldErrors {
+  errors: {
+    message: MessageDescriptor
+  }[]
 }
 
 export interface Errors {
-  [fieldName: string]: IFieldErrors
+  [fieldName: string]: FieldErrors
 }
 
-function isFieldHidden(field: FieldConfig, params: ConditionalParameters) {
-  const hasShowRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'SHOW'
-  )
-  const validConditionals = getConditionalActionsForField(field, params)
-  const isVisible = !hasShowRule || validConditionals.includes('SHOW')
-  return !isVisible
-}
-
-function isFieldDisabled(field: FieldConfig, params: ConditionalParameters) {
-  const hasEnableRule = (field.conditionals ?? []).some(
-    (conditional) => conditional.type === 'ENABLE'
-  )
-  const validConditionals = getConditionalActionsForField(field, params)
-  const isEnabled = !hasEnableRule || validConditionals.includes('ENABLE')
-  return !isEnabled
-}
-
-function getValidationErrors(
-  field: FieldConfig,
-  values: ActionFormData,
-  requiredErrorMessage?: MessageDescriptor,
-  checkValidationErrorsOnly?: boolean
-) {
-  const conditionalParameters = {
-    $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
-  }
-
-  if (
-    isFieldHidden(field, conditionalParameters) ||
-    isFieldDisabled(field, conditionalParameters)
-  ) {
-    return {
-      errors: []
-    }
-  }
-
-  const validators = field.validation ? field.validation : []
-
-  // if (field.required && !checkValidationErrorsOnly) {
-  //   validators.push(required(requiredErrorMessage))
-  // } else if (isFieldButton(field)) {
-  //   const { trigger } = field.options
-  //   validators.push(httpErrorResponseValidator(trigger))
-  // } else if (field.validateEmpty) {
-  // } else if (!value && value !== 0) {
-  //   validators = []
-  // }
-
-  const validationResults = validators
-    .filter((validation) => {
-      return !validate(validation.validator, {
-        $form: values,
-        $now: formatISO(new Date(), { representation: 'date' })
-      })
-    })
-    .map((validation) => ({ message: validation.message }))
-
-  return {
-    errors: validationResults
-  }
-}
 export function getValidationErrorsForForm(
   fields: FieldConfig[],
-  values: ActionFormData,
-  requiredErrorMessage?: MessageDescriptor,
-  checkValidationErrorsOnly?: boolean
+  values: EventState
 ) {
-  return fields.reduce(
-    (errorsForAllFields: Errors, field) =>
+  return fields.reduce((errorsForAllFields: Errors, field) => {
+    if (
       // eslint-disable-next-line
       errorsForAllFields[field.id] &&
       errorsForAllFields[field.id].errors.length > 0
-        ? errorsForAllFields
-        : {
-            ...errorsForAllFields,
-            [field.id]: getValidationErrors(
-              field,
-              values,
-              requiredErrorMessage,
-              checkValidationErrorsOnly
-            )
-          },
-    {}
+    ) {
+      return errorsForAllFields
+    }
+
+    return {
+      ...errorsForAllFields,
+      [field.id]: runFieldValidations({ field, values })
+    }
+  }, {})
+}
+
+export function validationErrorsInActionFormExist({
+  formConfig,
+  form,
+  annotation,
+  reviewFields = []
+}: {
+  formConfig: FormConfig
+  form: EventState
+  annotation?: EventState
+  reviewFields?: FieldConfig[]
+}): boolean {
+  // We don't want to validate hidden fields
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
+
+  const visibleAnnotationFields = omitHiddenFields(
+    reviewFields,
+    annotation ?? {}
   )
+
+  const hasValidationErrors = formConfig.pages
+    .filter((page) => isPageVisible(page, form))
+    .some((page) => {
+      const fieldErrors = getValidationErrorsForForm(
+        page.fields,
+        formWithoutHiddenFields
+      )
+      return Object.values(fieldErrors).some((field) => field.errors.length > 0)
+    })
+
+  const hasAnnotationValidationErrors = Object.values(
+    getValidationErrorsForForm(reviewFields, visibleAnnotationFields)
+  ).some((field) => field.errors.length > 0)
+
+  return hasValidationErrors || hasAnnotationValidationErrors
 }

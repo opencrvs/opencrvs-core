@@ -11,107 +11,120 @@
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import {
-  EventIndex,
-  ActionDocument,
-  getAllFields,
-  SummaryConfig
+  EventDocument,
+  getCurrentEventState,
+  getAcceptedActions,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
 
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
-import { getInitialValues } from '@client/v2-events/components/forms/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-// eslint-disable-next-line no-restricted-imports
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { getUserIdsFromActions } from '@client/v2-events/utils'
+import {
+  flattenEventIndex,
+  getUserIdsFromActions,
+  getUsersFullName
+} from '@client/v2-events/utils'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
 import { ActionMenu } from './components/ActionMenu'
-import { EventOverviewProvider } from './EventOverviewContext'
+import {
+  EventOverviewProvider,
+  useEventOverviewContext
+} from './EventOverviewContext'
 
 /**
- * Based on packages/client/src/views/RecordAudit/RecordAudit.tsx
+ * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
  */
-
-function EventOverviewContainer() {
-  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvents, getEvent } = useEvents()
-  const { getUsers } = useUsers()
-
-  const [config] = useEventConfigurations()
-
-  const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
-  const [events] = getEvents.useSuspenseQuery()
-  const event = events.find((e) => e.id === params.eventId)
-
-  const userIds = getUserIdsFromActions(fullEvent.actions)
-  const [users] = getUsers.useSuspenseQuery(userIds)
-  const locations = useSelector(getLocations)
-
-  if (!event) {
-    return null
-  }
-
-  return (
-    <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview
-        event={event}
-        history={fullEvent.actions.filter((action) => !action.draft)}
-        summary={config.summary}
-      />
-    </EventOverviewProvider>
-  )
-}
 
 /**
  * Renders the event overview page, including the event summary and history.
  */
 function EventOverview({
   event,
-  summary,
-  history
+  onAction
 }: {
-  event: EventIndex
-  summary: SummaryConfig
-  history: ActionDocument[]
+  event: EventDocument
+  onAction: () => void
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const intl = useIntlFormatMessageWithFlattenedParams()
-  const initialValues = getInitialValues(getAllFields(eventConfiguration))
+  const eventIndex = getCurrentEventState(event)
+  const { trackingId, status, registrationNumber } = eventIndex
+  const { getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts()
+  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
+  const { getUser } = useEventOverviewContext()
+  const intl = useIntl()
 
-  const title = intl.formatMessage(summary.title.label, {
-    ...initialValues,
-    ...event.data
-  })
+  const assignedTo = eventIndex.assignedTo
+    ? getUsersFullName(getUser(eventIndex.assignedTo).name, intl.locale)
+    : null
 
-  const fallbackTitle = summary.title.emptyValueMessage
-    ? intl.formatMessage(summary.title.emptyValueMessage)
-    : ''
+  const { flags, ...flattenedEventIndex } = {
+    ...flattenEventIndex(eventWithDrafts),
+    // @TODO: Ask why these are defined outside of flatten index?
+    'event.trackingId': trackingId,
+    'event.status': status,
+    'event.registrationNumber': registrationNumber,
+    'event.assignedTo': assignedTo
+  }
+
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
+
+  const actions = getAcceptedActions(event)
+
   return (
     <Content
-      icon={() => <IconWithName name={''} status={'orange'} />}
+      icon={() => <IconWithName name={''} status={status} />}
       size={ContentSize.LARGE}
-      title={title || fallbackTitle}
+      title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
-      topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
+      topActionButtons={[
+        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />
+      ]}
     >
       <EventSummary
-        defaultValues={initialValues}
-        event={event}
-        summary={summary}
+        event={flattenedEventIndex}
+        eventConfiguration={eventConfiguration}
       />
-      <EventHistory history={history} />
+      <EventHistory history={actions} />
     </Content>
+  )
+}
+
+function EventOverviewContainer() {
+  const params = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
+  const { getEvent } = useEvents()
+  const { getUsers } = useUsers()
+
+  // Suspense query is not used here because we want to refetch when an event action is performed
+  const getEventQuery = getEvent.useQuery(params.eventId)
+  const fullEvent = getEventQuery.data
+
+  if (!fullEvent) {
+    return
+  }
+
+  const activeActions = getAcceptedActions(fullEvent)
+  const userIds = getUserIdsFromActions(activeActions)
+  const [users] = getUsers.useSuspenseQuery(userIds)
+  const locations = useSelector(getLocations)
+
+  return (
+    <EventOverviewProvider locations={locations} users={users}>
+      <EventOverview event={fullEvent} onAction={getEventQuery.refetch} />
+    </EventOverviewProvider>
   )
 }
 

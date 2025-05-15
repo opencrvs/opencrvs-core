@@ -10,10 +10,11 @@
  */
 
 import { initTRPC } from '@trpc/server'
-import { Context } from './middleware/middleware'
 import superjson from 'superjson'
+import { OpenApiMeta } from 'trpc-to-openapi'
+import { Context } from './middleware'
 
-export const t = initTRPC.context<Context>().create({
+export const t = initTRPC.context<Context>().meta<OpenApiMeta>().create({
   transformer: superjson
 })
 

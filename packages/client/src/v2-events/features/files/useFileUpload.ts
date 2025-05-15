@@ -20,6 +20,7 @@ async function uploadFile({
 }: {
   file: File
   transactionId: string
+  id: string
 }): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
@@ -69,13 +70,29 @@ function withPostfix(str: string, postfix: string) {
   return str + postfix
 }
 
-export function getFullURL(filename: string) {
+export function getFullUrl(filename: string) {
   const minioURL = window.config.MINIO_URL
   if (minioURL && typeof minioURL === 'string') {
     return new URL(filename, withPostfix(minioURL, '/')).toString()
   }
 
   throw new Error('MINIO_URL is not defined')
+}
+
+async function getPresignedUrl(
+  fileUri: string,
+  minioFolder = '/event-attachments/'
+) {
+  const url = `/api/presigned-url${minioFolder}` + fileUri
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
+
+  const res = await response.json()
+  return res
 }
 
 async function cacheFile(filename: string, file: File) {
@@ -94,12 +111,12 @@ async function cacheFile(filename: string, file: File) {
 
   const cache = await caches.open(cacheKey)
   return cache.put(
-    getFullURL(filename),
+    getFullUrl(filename),
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
   )
 }
 
-async function removeCached(filename: string) {
+export async function removeCached(filename: string) {
   const cacheKeys = await caches.keys()
   const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
 
@@ -112,7 +129,16 @@ async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getFullURL(filename))
+  return cache.delete(getFullUrl(filename))
+}
+
+export async function precacheFile(filename: string, minioFolder?: string) {
+  const presignedUrl = (await getPresignedUrl(filename, minioFolder))
+    .presignedURL
+  const response = await fetch(presignedUrl)
+  const blob = await response.blob()
+  const file = new File([blob], filename, { type: blob.type })
+  await cacheFile(filename, file)
 }
 
 queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
@@ -131,6 +157,7 @@ interface Options {
     originalFilename: string
     type: string
     filename: string
+    id: string
   }) => void
 }
 
@@ -138,7 +165,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   const upload = useMutation({
     mutationFn: uploadFile,
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, transactionId }) => {
+    onMutate: async ({ file, transactionId, id }) => {
       const extension = file.name.split('.').pop()
       const temporaryUrl = `${transactionId}.${extension}`
 
@@ -148,11 +175,9 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
         ...file,
         originalFilename: file.name,
         type: file.type,
-        filename: temporaryUrl
+        filename: temporaryUrl,
+        id
       })
-    },
-    onSuccess: (data) => {
-      void removeCached(data.url)
     }
   })
 
@@ -165,12 +190,25 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   })
 
   return {
-    getFullURL,
+    getFullUrl,
     deleteFile: (filename: string) => {
       return del.mutate({ filename })
     },
-    uploadFiles: (file: File) => {
-      return upload.mutate({ file, transactionId: uuid() })
+    /**
+     * Uploads a file with an optional identifier.
+     *
+     * @param {File} file - The file to be uploaded.
+     * @param {string} [id='default'] - An optional identifier for the file.
+     * This allows the caller to track the file when its upload completes.
+     *
+     * @returns {Promise} A promise representing the upload operation.
+     */
+    uploadFile: (file: File, id = 'default') => {
+      return upload.mutate({
+        file,
+        transactionId: uuid(),
+        id
+      })
     }
   }
 }

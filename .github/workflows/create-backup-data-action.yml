@@ -35,7 +35,7 @@ on:
 jobs:
   backup:
     environment: production
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       BACKUP_HOST: farajaland-${{ github.event.inputs.backup_environment }}.opencrvs.org
       SRC_HOST: farajaland.opencrvs.org

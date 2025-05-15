@@ -29,7 +29,7 @@ const intlEngish = createIntl(
 )
 const intlBangla = createIntl(
   {
-    locale: 'en',
+    locale: 'bn',
     messages: {}
   },
   cache
@@ -57,7 +57,7 @@ describe('draftUtils tests', () => {
             },
             intlEngish
           )
-        ).toBe('Hoque Mushraful')
+        ).toBe('Mushraful Hoque')
       })
       it('Returns child English name properly even though localed is Bangla', () => {
         expect(
@@ -77,7 +77,7 @@ describe('draftUtils tests', () => {
             },
             intlBangla
           )
-        ).toBe('Hoque Mushraful')
+        ).toBe('Mushraful Hoque')
       })
     })
     describe('Death event', () => {
@@ -120,7 +120,7 @@ describe('draftUtils tests', () => {
             },
             intlEngish
           )
-        ).toBe('Hoque Mushraful')
+        ).toBe('Mushraful Hoque')
       })
     })
   })

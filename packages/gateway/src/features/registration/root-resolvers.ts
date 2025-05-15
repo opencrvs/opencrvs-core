@@ -62,7 +62,8 @@ import {
   markNotADuplicate,
   rejectRegistration,
   confirmRegistration,
-  upsertRegistrationIdentifier
+  upsertRegistrationIdentifier,
+  updateField
 } from '@gateway/workflow/index'
 import { getRecordById } from '@gateway/records'
 import { SCOPES } from '@opencrvs/commons/authentication'
@@ -687,6 +688,15 @@ export const resolvers: GQLResolver = {
       } catch (error) {
         throw new Error(`Failed to confirm registration: ${error.message}`)
       }
+    },
+    async updateField(_, { id, details }, { headers: authHeader }) {
+      if (!hasRecordAccess(authHeader, id)) {
+        throw new Error('User does not have access to the record')
+      }
+
+      await updateField(id, authHeader, details)
+
+      return true
     }
   }
 }

@@ -11,6 +11,8 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { ActionType } from './ActionType'
+import { ActionStatus } from './ActionDocument'
 
 /**
  * Event statuses recognized by the system
@@ -21,12 +23,33 @@ export const EventStatus = {
   DECLARED: 'DECLARED',
   VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
-  CERTIFIED: 'CERTIFIED'
+  CERTIFIED: 'CERTIFIED',
+  REJECTED: 'REJECTED',
+  ARCHIVED: 'ARCHIVED'
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
+export const CustomFlags = {
+  CERTIFICATE_PRINTED: 'certificate-printed'
+} as const
+export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
+
+export const Flag = z
+  .string()
+  .regex(
+    new RegExp(
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
+    ),
+    'Flag must be in the format ActionType:ActionStatus (lowerCase)'
+  )
+  .or(z.nativeEnum(CustomFlags))
+
+export type Flag = z.infer<typeof Flag>
+
 export const eventStatuses = Object.values(EventStatus)
 export const EventStatuses = z.nativeEnum(EventStatus)
+
+export const ZodDate = z.string().date()
 
 /**
  * Event metadata exposed to client.
@@ -38,16 +61,46 @@ export const EventMetadata = z.object({
   type: z.string(),
   status: EventStatuses,
   createdAt: z.string().datetime(),
+  dateOfEvent: ZodDate.nullish(),
   createdBy: z.string(),
+  updatedByUserRole: z.string(),
   createdAtLocation: z.string(),
-  modifiedAt: z.string().datetime(),
-  assignedTo: z.string().nullable(),
-  updatedBy: z.string()
+  updatedAtLocation: z.string(),
+  updatedAt: z.string().datetime(),
+  assignedTo: z.string().nullish(),
+  updatedBy: z.string(),
+  trackingId: z.string(),
+  registrationNumber: z.string().nullish(),
+  flags: z.array(Flag)
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
 
 export type EventMetadataKeys = `event.${keyof EventMetadata}`
+
+/**
+ * This ensures `event.field()` takes a key from `EventMetadata`
+ */
+export const EventMetadataParameter = z.object({
+  $event: z.enum([
+    'id',
+    'type',
+    'status',
+    'createdAt',
+    'dateOfEvent',
+    'createdBy',
+    'updatedByUserRole',
+    'createdAtLocation',
+    'updatedAtLocation',
+    'updatedAt',
+    'assignedTo',
+    'updatedBy',
+    'trackingId',
+    'registrationNumber',
+    'flags'
+  ])
+})
+export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
 
 /**
  * Mapping of event metadata keys to translation configuration.
@@ -68,22 +121,37 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'Created',
     description: 'Created At'
   },
+  'event.dateOfEvent': {
+    id: 'event.dateOfEvent.label',
+    defaultMessage: 'Date of Event',
+    description: 'Date of Event'
+  },
   'event.createdAtLocation': {
     id: 'event.createdAtLocation.label',
     defaultMessage: 'Location',
     description: 'Created At Location'
+  },
+  'event.updatedAtLocation': {
+    id: 'event.updatedAtLocation.label',
+    defaultMessage: 'Location',
+    description: 'Updated At Location'
   },
   'event.createdBy': {
     id: 'event.createdBy.label',
     defaultMessage: 'Created By',
     description: 'Created By'
   },
+  'event.updatedByUserRole': {
+    id: 'event.updatedByUserRole.label',
+    defaultMessage: 'Updated By Role',
+    description: 'Updated By Role'
+  },
   'event.id': {
     id: 'event.id.label',
     defaultMessage: 'ID',
     description: 'ID'
   },
-  'event.modifiedAt': {
+  'event.updatedAt': {
     id: 'event.modifiedAt.label',
     defaultMessage: 'Updated',
     description: 'Modified At'
@@ -102,5 +170,20 @@ export const eventMetadataLabelMap: Record<
     id: 'event.updatedBy.label',
     defaultMessage: 'Updated By',
     description: 'Updated By'
+  },
+  'event.trackingId': {
+    id: 'event.trackingId.label',
+    defaultMessage: 'Tracking ID',
+    description: 'Tracking ID'
+  },
+  'event.registrationNumber': {
+    id: 'event.registrationNumber.label',
+    defaultMessage: 'Registration Number',
+    description: 'Registration Number'
+  },
+  'event.flags': {
+    id: 'event.flags.label',
+    defaultMessage: 'Flags',
+    description: 'Flags'
   }
 }

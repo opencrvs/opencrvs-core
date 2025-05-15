@@ -93,6 +93,7 @@ const getNextMessages = (
   return languages[language].messages
 }
 
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const intlReducer: LoopReducer<IntlState, any> = (
   state: IntlState = initialState,
   action: actions.Action | offlineActions.Action | IRoleLoadedAction

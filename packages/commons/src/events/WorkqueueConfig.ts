@@ -11,37 +11,47 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { EventStatuses } from './EventMetadata'
+import { Conditional } from './Conditional'
+import { QueryType } from './EventIndex'
+import { EventMetadataParameter } from './EventMetadata'
+import { event } from './event'
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
  */
 export const WorkqueueConfig = z
   .object({
-    id: z.string().describe('Unique identifier for workqueue.'),
-    title: TranslationConfig.describe(
-      'Title for workqueue, used in navigation and header.'
+    slug: z.string().describe('Determines the url of the workqueue.'),
+    name: TranslationConfig.describe(
+      'Title of the workflow (both in navigation and on the page)'
     ),
-    fields: z.array(
+    query: QueryType,
+    actions: z.array(
       z.object({
-        // @TODO: Improve typing by enforcing EventMetadataKeys and form page fields as possible values
-        id: z
-          .string()
-          .describe('Id of a field defined under form pages or system field.'),
-        label: TranslationConfig.optional()
+        type: z.string(),
+        conditionals: z.array(Conditional).optional()
       })
     ),
-    filters: z
+    columns: z
       .array(
-        z.object({
-          status: z
-            .array(EventStatuses)
-            .describe('Defines which statusese are included in the workqueue.')
-        })
+        z.object({ label: TranslationConfig, value: EventMetadataParameter })
       )
-      .describe('Filters to be applied to workqueue.')
+      .default([
+        {
+          label: {
+            id: 'workqueues.dateOfEvent',
+            defaultMessage: 'Date of Event',
+            description: 'Label for workqueue column: dateOfEvent'
+          },
+          value: event.field('dateOfEvent')
+        }
+      ])
   })
   .describe('Configuration for workqueue.')
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
 export type WorkqueueConfigInput = z.input<typeof WorkqueueConfig>
+
+export function defineWorkqueue(workqueues: WorkqueueConfigInput[]) {
+  return workqueues.map((workqueue) => WorkqueueConfig.parse(workqueue))
+}

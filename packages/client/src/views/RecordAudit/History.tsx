@@ -26,6 +26,7 @@ import { Box } from '@opencrvs/components/lib/icons/Box'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -54,7 +55,6 @@ const LargeGreyedInfo = styled.div`
   background-color: ${({ theme }) => theme.colors.grey200};
   max-width: 100%;
   border-radius: 4px;
-  margin: 15px 0px;
 `
 
 const NameAvatar = styled.div`
@@ -129,7 +129,7 @@ function getSystemType(type: string | undefined) {
   }
   return integrationMessages.healthSystem
 }
-
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
   if (
@@ -180,13 +180,16 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Text variant="h3" element="h3" color="copy">
-          {intl.formatMessage(constantsMessages.history)}
-        </Text>
-        <LargeGreyedInfo />
+        <Stack direction="column" alignItems="stretch" gap={16}>
+          <Text variant="h3" element="h3" color="copy">
+            {intl.formatMessage(constantsMessages.history)}
+          </Text>
+          <LargeGreyedInfo />
+        </Stack>
       </>
     )
   let allHistoryData = (draft.data.history || []) as unknown as {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     [key: string]: any
   }[]
   if (!allHistoryData.length && userDetails) {
@@ -361,29 +364,31 @@ export const GetHistory = ({
   return (
     <>
       <Divider />
-      <Text variant="h3" element="h3" color="copy">
-        {intl.formatMessage(constantsMessages.history)}
-      </Text>
-      <TableDiv>
-        <Table
-          id="task-history"
-          fixedWidth={1088}
-          noResultText=""
-          columns={columns}
-          content={historyData}
-          highlightRowOnMouseOver
-          pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
-        />
-        {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
-          <Pagination
-            currentPage={currentPageNumber}
-            totalPages={Math.ceil(
-              allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
-            )}
-            onPageChange={onPageChange}
+      <Stack direction="column" alignItems="stretch" gap={16}>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
+        <TableDiv>
+          <Table
+            id="task-history"
+            fixedWidth={1088}
+            noResultText=""
+            columns={columns}
+            content={historyData}
+            highlightRowOnMouseOver
+            pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
           />
-        )}
-      </TableDiv>
+          {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+            <Pagination
+              currentPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          )}
+        </TableDiv>
+      </Stack>
     </>
   )
 }

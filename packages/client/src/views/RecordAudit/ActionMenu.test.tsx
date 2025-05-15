@@ -2861,7 +2861,7 @@ describe('Unassign action', () => {
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
-    expect(component.find('h1').hostNodes().text()).toEqual('Unassign record?')
+    expect(component.find('h2').hostNodes().text()).toEqual('Unassign record?')
   })
 
   it('Does not have scope - assigned to someone else', async () => {
@@ -2912,7 +2912,7 @@ describe('Unassign action', () => {
     expect(status).toBe(ACTION_STATUS.ENABLED)
 
     node?.simulate('click')
-    expect(component.find('h1').hostNodes().text()).toEqual('Unassign record?')
+    expect(component.find('h2').hostNodes().text()).toEqual('Unassign record?')
   })
 
   it('Not assigned', async () => {

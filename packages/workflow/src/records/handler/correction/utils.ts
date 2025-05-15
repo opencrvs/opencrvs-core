@@ -113,6 +113,7 @@ export const updateFullUrl = <T extends Bundle>(
   transactionResponse.entry.forEach(
     ({ response: { status, location } }, id) => {
       if (status === '201') {
+        // eslint-disable-next-line @typescript-eslint/no-unused-expressions
         others[id].fullUrl &&
           replaceTmpURN(bundle, others[id].fullUrl, location)
         others[id].resource.id = urlReferenceToUUID(location)

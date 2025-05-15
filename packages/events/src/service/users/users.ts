@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
-import { ResolvedUser } from '@opencrvs/commons'
 import { ObjectId } from 'mongodb'
+import { ResolvedUser } from '@opencrvs/commons'
+import * as userMgntDb from '@events/storage/mongodb/user-mgnt'
 
 export const getUsersById = async (ids: string[]) => {
   const db = await userMgntDb.getClient()
@@ -24,7 +24,8 @@ export const getUsersById = async (ids: string[]) => {
     .collection<{
       _id: ObjectId
       name: ResolvedUser['name']
-      systemRole: string
+      role: string
+      signatureFilename?: string
     }>('users')
     .find({
       _id: {
@@ -38,6 +39,7 @@ export const getUsersById = async (ids: string[]) => {
   return results.map((user) => ({
     id: user._id.toString(),
     name: user.name,
-    systemRole: user.systemRole
+    role: user.role,
+    signatureFilename: user.signatureFilename
   }))
 }

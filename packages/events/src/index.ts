@@ -9,21 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-unassigned-import
 import '@opencrvs/commons/monitoring'
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('app-module-path').addPath(require('path').join(__dirname, '../'))
-
-import { appRouter } from './router/router'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { TRPCError } from '@trpc/server'
+import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
 import { getUser, logger } from '@opencrvs/commons'
+import { appRouter } from './router/router'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
-import { ensureIndexExists } from './service/indexing/indexing'
 import { getAnonymousToken } from './service/auth'
+import { ensureIndexExists } from './service/indexing/indexing'
+
+/* eslint-disable @typescript-eslint/no-require-imports */
+const path = require('path')
+const appModulePath = require('app-module-path')
+
+appModulePath.addPath(path.join(__dirname, '../'))
 
 const server = createHTTPServer({
   router: appRouter,
@@ -48,7 +50,7 @@ const server = createHTTPServer({
       })
     }
 
-    const { primaryOfficeId } = await getUser(
+    const { primaryOfficeId, role } = await getUser(
       env.USER_MANAGEMENT_URL,
       userId,
       token
@@ -57,13 +59,13 @@ const server = createHTTPServer({
     return {
       user: {
         id: userId,
-        primaryOfficeId
+        primaryOfficeId,
+        role
       },
       token: token
     }
   }
 })
-
 export async function main() {
   try {
     const configurations = await getEventConfigurations(
@@ -79,7 +81,7 @@ export async function main() {
       process.exit(1)
     }
     /*
-     * SIGUSR2 tells nodemon to restart the process with waiting for new file changes
+     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
      */
     setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
     return

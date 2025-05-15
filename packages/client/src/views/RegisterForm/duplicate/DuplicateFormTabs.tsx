@@ -163,6 +163,7 @@ export const DuplicateFormTabs = (props: IProps) => {
   const getFieldValueWithErrorMessage = (
     section: IFormSection,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     errorsOnField: any
   ) => {
     return (
@@ -212,47 +213,51 @@ export const DuplicateFormTabs = (props: IProps) => {
     return errorsOnField.length > 0
       ? getFieldValueWithErrorMessage(section, field, errorsOnField[0])
       : field.nestedFields && !Boolean(ignoreNestedFieldWrapping)
-      ? (
-          (data[section.id] &&
-            data[section.id][field.name] &&
-            (data[section.id][field.name] as IFormSectionData).value &&
-            field.nestedFields[
-              (data[section.id][field.name] as IFormSectionData).value as string
-            ]) ||
-          []
-        ).reduce((groupedValues, nestedField) => {
-          const errorsOnNestedField =
-            sectionErrors[section.id][field.name].nestedFields[
-              nestedField.name
-            ] || []
-          // Value of the parentField resembles with IFormData as a nested form
-          const nestedValue =
+        ? (
             (data[section.id] &&
               data[section.id][field.name] &&
-              renderValue(
-                data[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineData,
-                language
-              )) ||
-            ''
-          return (
-            <>
-              {groupedValues}
-              {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
-              {errorsOnNestedField.length > 0
-                ? getFieldValueWithErrorMessage(
-                    section,
-                    field,
-                    errorsOnNestedField[0]
-                  )
-                : nestedValue}
-            </>
+              (data[section.id][field.name] as IFormSectionData).value &&
+              field.nestedFields[
+                (data[section.id][field.name] as IFormSectionData)
+                  .value as string
+              ]) ||
+            []
+          ).reduce(
+            (groupedValues, nestedField) => {
+              const errorsOnNestedField =
+                sectionErrors[section.id][field.name].nestedFields[
+                  nestedField.name
+                ] || []
+              // Value of the parentField resembles with IFormData as a nested form
+              const nestedValue =
+                (data[section.id] &&
+                  data[section.id][field.name] &&
+                  renderValue(
+                    data[section.id][field.name] as IFormData,
+                    'nestedFields',
+                    nestedField,
+                    intl,
+                    offlineData,
+                    language
+                  )) ||
+                ''
+              return (
+                <>
+                  {groupedValues}
+                  {(errorsOnNestedField.length > 0 || nestedValue) && <br />}
+                  {errorsOnNestedField.length > 0
+                    ? getFieldValueWithErrorMessage(
+                        section,
+                        field,
+                        errorsOnNestedField[0]
+                      )
+                    : nestedValue}
+                </>
+              )
+            },
+            <>{value}</>
           )
-        }, <>{value}</>)
-      : value
+        : value
   }
 
   const getRenderableField = (
@@ -420,6 +425,7 @@ export const DuplicateFormTabs = (props: IProps) => {
   ) => {
     const draft = declaration
     const visitedTags: string[] = []
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const nestedItems: any[] = []
     // parent field
     nestedItems.push(
@@ -474,7 +480,9 @@ export const DuplicateFormTabs = (props: IProps) => {
     overriddenField: IFormField,
     sectionErrors: IErrorsBySection,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     items: any[],
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     item: any
   ) => {
     overriddenField.label =
@@ -530,8 +538,10 @@ export const DuplicateFormTabs = (props: IProps) => {
       offlineData,
       userDetails
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let tempItem: any
     return formSections.map((section) => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       let items: any[] = []
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -564,14 +574,14 @@ export const DuplicateFormTabs = (props: IProps) => {
                   declaration
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? getNestedPreviewField(
-                  section,
-                  group,
-                  field,
-                  errorsOnFields,
-                  declaration
-                )
-              : getSinglePreviewField(draft, section, field, errorsOnFields)
+                ? getNestedPreviewField(
+                    section,
+                    group,
+                    field,
+                    errorsOnFields,
+                    declaration
+                  )
+                : getSinglePreviewField(draft, section, field, errorsOnFields)
 
             overriddenFields.forEach((overriddenField) => {
               items = getOverRiddenPreviewField(

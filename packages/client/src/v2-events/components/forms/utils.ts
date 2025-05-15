@@ -8,159 +8,83 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IntlShape } from 'react-intl'
-import _ from 'lodash'
 import {
-  ActionFormData,
-  BaseField,
-  ConditionalParameters,
   FieldConfig,
   FieldType,
   FieldValue,
-  validate,
-  DateFieldValue,
-  TextFieldValue
+  SystemVariables,
+  isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
-import {
-  CheckboxFieldValue,
-  ParagraphFieldValue,
-  SelectFieldValue
-} from '@opencrvs/commons'
-import { DependencyInfo } from '@client/forms'
-import {
-  dateToString,
-  INITIAL_DATE_VALUE,
-  INITIAL_PARAGRAPH_VALUE,
-  INITIAL_RADIO_GROUP_VALUE,
-  INITIAL_TEXT_VALUE,
-  paragraphToString,
-  textToString
-} from '@client/v2-events/features/events/registered-fields'
-import { selectFieldToString } from '@client/v2-events/features/events/registered-fields/Select'
-import { selectCountryFieldToString } from '@client/v2-events/features/events/registered-fields/SelectCountry'
-import { ILocation } from '@client/v2-events/features/events/registered-fields/Location'
-import { checkboxToString } from '@client/v2-events/features/events/registered-fields/Checkbox'
+import { replacePlaceholders } from '@client/v2-events/utils'
 
-export function handleInitialValue(
-  field: FieldConfig,
-  formData: ActionFormData
-) {
-  const initialValue = field.initialValue
+/*
+ * Formik has a feature that automatically nests all form keys that have a dot in them.
+ * Because our form field ids can have dots in them, we temporarily transform those dots
+ * to a different character before passing the data to Formik. This function unflattens
+ */
+const FIELD_SEPARATOR = '____'
+const DOT_SEPARATOR = '.'
 
-  if (hasInitialValueDependencyInfo(initialValue)) {
-    return evalExpressionInFieldDefinition(initialValue.expression, {
-      $form: formData
+export function makeFormFieldIdFormikCompatible(fieldId: string) {
+  return fieldId.replaceAll(DOT_SEPARATOR, FIELD_SEPARATOR)
+}
+
+export function makeFormikFieldIdOpenCRVSCompatible(fieldId: string): string {
+  return fieldId.replaceAll(FIELD_SEPARATOR, DOT_SEPARATOR)
+}
+
+export function handleDefaultValue({
+  field,
+  systemVariables
+}: {
+  field: FieldConfig
+  systemVariables: SystemVariables
+}) {
+  const defaultValue = field.defaultValue
+
+  if (isFieldConfigDefaultValue(field.defaultValue)) {
+    return replacePlaceholders({
+      fieldType: field.type,
+      defaultValue,
+      systemVariables
     })
   }
 
-  return initialValue
+  return defaultValue
 }
 
-export function getConditionalActionsForField(
-  field: FieldConfig,
-  values: ConditionalParameters
-) {
-  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-  if (!field.conditionals) {
-    return []
-  }
-  return field.conditionals
-    .filter((conditional) => validate(conditional.conditional, values))
-    .map((conditional) => conditional.type)
+export interface Stringifiable {
+  toString(): string
 }
 
-export function evalExpressionInFieldDefinition(
-  expression: string,
-  /*
-   * These are used in the eval expression
-   */
-  { $form }: { $form: ActionFormData }
-) {
-  // eslint-disable-next-line no-eval
-  return eval(expression) as FieldValue
+export function formatDateFieldValue(value: string) {
+  return value
+    .split('-')
+    .map((d: string) => d.padStart(2, '0'))
+    .join('-')
 }
 
-export function hasInitialValueDependencyInfo(
-  value: BaseField['initialValue']
-): value is DependencyInfo {
-  return typeof value === 'object' && 'dependsOn' in value
-}
-
-export function getDependentFields(
+/**
+ *
+ * @param fields field config in OpenCRVS format (separated with `.`)
+ * @param values form values in formik format (separated with `FIELD_SEPARATOR`)
+ * @returns adds 0 before single digit days and months to make them 2 digit
+ * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
+ */
+export function makeDatesFormatted<T extends Record<string, FieldValue>>(
   fields: FieldConfig[],
-  fieldName: string
-): FieldConfig[] {
-  return fields.filter((field) => {
-    if (!field.initialValue) {
-      return false
-    }
-    if (!hasInitialValueDependencyInfo(field.initialValue)) {
-      return false
-    }
-    return field.initialValue.dependsOn.includes(fieldName)
-  })
-}
+  values: T
+): T {
+  return fields.reduce((acc, field) => {
+    const fieldId = field.id.replaceAll(DOT_SEPARATOR, FIELD_SEPARATOR)
 
-const initialValueMapping: Record<FieldType, FieldValue | null> = {
-  [FieldType.TEXT]: INITIAL_TEXT_VALUE,
-  [FieldType.DATE]: INITIAL_DATE_VALUE,
-  [FieldType.RADIO_GROUP]: INITIAL_RADIO_GROUP_VALUE,
-  [FieldType.PARAGRAPH]: INITIAL_PARAGRAPH_VALUE,
-  [FieldType.FILE]: null,
-  [FieldType.HIDDEN]: null,
-  [FieldType.BULLET_LIST]: null,
-  [FieldType.CHECKBOX]: null,
-  [FieldType.COUNTRY]: null,
-  [FieldType.LOCATION]: null,
-  [FieldType.SELECT]: null
-}
-
-export function getInitialValues(fields: FieldConfig[]) {
-  return fields.reduce((initialValues: Record<string, FieldValue>, field) => {
-    return {
-      ...initialValues,
-      [field.id]: initialValueMapping[field.type]
-    }
-  }, {})
-}
-
-export function fieldValueToString({
-  fieldConfig,
-  value,
-  intl,
-  locations
-}: {
-  fieldConfig: FieldConfig
-  value: FieldValue
-  intl: IntlShape
-  locations: { [locationId: string]: ILocation }
-}) {
-  switch (fieldConfig.type) {
-    case FieldType.DATE:
-      return dateToString(value as DateFieldValue)
-    case FieldType.TEXT:
-      return textToString(value as TextFieldValue)
-    case FieldType.PARAGRAPH:
-      return paragraphToString(value as ParagraphFieldValue)
-    case FieldType.CHECKBOX:
-      return checkboxToString(value as CheckboxFieldValue)
-    case FieldType.RADIO_GROUP:
-    case FieldType.SELECT:
-      return selectFieldToString(
-        value as SelectFieldValue,
-        fieldConfig.options,
-        intl
-      )
-    case FieldType.COUNTRY:
-      return selectCountryFieldToString(value as SelectFieldValue, intl)
-    case FieldType.LOCATION: {
-      let location
-      if (_.isString(value)) {
-        location = locations[value].name
+    if (field.type === FieldType.DATE && fieldId in values) {
+      const value = values[fieldId as keyof typeof values]
+      if (typeof value === 'string') {
+        const formattedDate = formatDateFieldValue(value)
+        return { ...acc, [fieldId]: formattedDate }
       }
-      return location ?? ''
     }
-    default:
-      throw new Error(`Field type ${fieldConfig.type} configuration missing.`)
-  }
+    return acc
+  }, values)
 }

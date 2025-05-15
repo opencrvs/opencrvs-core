@@ -15,6 +15,7 @@ import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use
 
 export function getDeathRegistrationSectionTransformer(
   transformedData: IFormData,
+  /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string
 ) {

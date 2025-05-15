@@ -9,69 +9,55 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 
-import { useNavigate } from 'react-router-dom'
-import { formatISO } from 'date-fns'
-import { validate, ActionType } from '@opencrvs/commons/client'
-import { type ActionConfig } from '@opencrvs/commons'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
+import { getScope } from '@client/profile/profileSelectors'
+import { useActionMenuItems } from './useActionMenuItems'
 
-export function ActionMenu({ eventId }: { eventId: string }) {
+export function ActionMenu({
+  eventId,
+  onAction
+}: {
+  eventId: string
+  onAction?: () => void
+}) {
   const intl = useIntl()
   const events = useEvents()
-  const navigate = useNavigate()
-  const authentication = useAuthentication()
+  const scopes = useSelector(getScope)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const eventState = useMemo(() => getCurrentEventState(event), [event])
 
-  function isActionVisible(action: ActionConfig) {
-    if (!action.allowedWhen) {
-      return true
-    }
-    const params = {
-      $event: event,
-      $user: authentication,
-      $now: formatISO(new Date(), { representation: 'date' })
-    }
-
-    return validate(action.allowedWhen, params)
-  }
+  const actionMenuItems = useActionMenuItems(eventState, scopes ?? [])
 
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger>
-          <PrimaryButton icon={() => <CaretDown />}>
+        <DropdownMenu.Trigger asChild>
+          <PrimaryButton
+            data-testid="action-dropdownMenu"
+            icon={() => <CaretDown />}
+          >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {configuration.actions.filter(isActionVisible).map((action) => {
+          {actionMenuItems.map((action) => {
             return (
               <DropdownMenu.Item
                 key={action.type}
-                onClick={() => {
-                  if (
-                    action.type === ActionType.CREATE ||
-                    action.type === ActionType.CUSTOM
-                  ) {
-                    alert(`Action ${action.type} is not implemented yet.`)
-                    return
-                  }
-
-                  navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
+                disabled={'disabled' in action ? action.disabled : false}
+                onClick={async () => {
+                  await action.onClick(event.id)
+                  onAction?.()
                 }}
               >
                 {intl.formatMessage(action.label)}

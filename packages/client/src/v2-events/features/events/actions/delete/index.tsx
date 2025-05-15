@@ -14,17 +14,24 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 
-export function DeleteEvent() {
+function DeleteEvent() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DELETE)
   const navigate = useNavigate()
   const events = useEvents()
-  const deleteEvent = events.deleteEvent
+  const deleteEvent = events.deleteEvent.useMutation()
 
   useEffect(() => {
     deleteEvent.mutate({ eventId })
     navigate(ROUTES.V2.path)
-  }, [deleteEvent, eventId, navigate])
+    // If you add deleteEvent to the dependencies, it will cause the delete
+    // to be called >1 times. This is because the deleteEvent contains updating data fields describing
+    // the state of the request
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return <div />
 }
+
+export const DeleteEventIndex = withSuspense(DeleteEvent)

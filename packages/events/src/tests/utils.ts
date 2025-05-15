@@ -9,33 +9,38 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { appRouter } from '@events/router/router'
-import { t } from '@events/router/trpc'
-import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import * as jwt from 'jsonwebtoken'
 import { Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
-import { CreatedUser, payloadGenerator } from './generators'
+import { t } from '@events/router/trpc'
+import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
-import { seeder } from '@events/tests/generators'
+import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 const { createCallerFactory } = t
 
-export function createTestClient(user: CreatedUser, scopes?: Scope[]) {
-  const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(user.id, scopes)
+export const TEST_USER_DEFAULT_SCOPES = [
+  SCOPES.RECORD_DECLARE,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_READ,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+  SCOPES.RECORD_DECLARATION_ARCHIVE,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_UNASSIGN_OTHERS,
+  SCOPES.SEARCH_BIRTH
+]
 
-  const caller = createCaller({
-    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
-    token
-  })
-  return caller
-}
-
-function createTestToken(userId: string, scopes?: Scope[]): TokenWithBearer {
+export function createTestToken(
+  userId: string,
+  scopes: Scope[]
+): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes ?? SCOPES.RECORD_SUBMIT_FOR_APPROVAL, sub: userId },
+    { scope: scopes, sub: userId },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -45,6 +50,24 @@ function createTestToken(userId: string, scopes?: Scope[]): TokenWithBearer {
   )
 
   return `Bearer ${token}`
+}
+
+export function createTestClient(
+  user: CreatedUser,
+  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTestToken(user.id, scopes)
+
+  const caller = createCaller({
+    user: {
+      id: user.id,
+      primaryOfficeId: user.primaryOfficeId,
+      role: user.role
+    },
+    token
+  })
+  return caller
 }
 
 /**

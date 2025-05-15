@@ -195,8 +195,8 @@ function getDeclarationIconColor(declaration: IDeclaration): string {
   return declaration.submissionStatus === SUBMISSION_STATUS.DRAFT
     ? 'purple'
     : declaration.registrationStatus
-    ? STATUSTOCOLOR[declaration.registrationStatus]
-    : 'orange'
+      ? STATUSTOCOLOR[declaration.registrationStatus]
+      : 'orange'
 }
 
 export const DeleteModal: React.FC<{

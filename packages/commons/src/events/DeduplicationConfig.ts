@@ -10,6 +10,8 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 const FieldReference = z.string()
 
@@ -92,11 +94,13 @@ export type OrOutput = {
 
 const And = z.object({
   type: z.literal('and'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   clauses: z.lazy(() => Clause.array())
 })
 
 const Or = z.object({
   type: z.literal('or'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   clauses: z.lazy(() => Clause.array())
 })
 
@@ -124,8 +128,8 @@ export type ClauseOutput =
  * Default assumption is that the ZodType is the input. Markers use default values, so we need to explicitly define output type, too.
  *
  */
-export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> =
-  z.lazy(() =>
+export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
+  .lazy(() =>
     z.discriminatedUnion('type', [
       And,
       Or,
@@ -135,6 +139,9 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> =
       DateDistanceMatcher
     ])
   )
+  .openapi({
+    ref: 'Clause'
+  })
 
 export type Clause = z.infer<typeof Clause>
 

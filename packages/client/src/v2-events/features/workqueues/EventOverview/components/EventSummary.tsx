@@ -11,48 +11,171 @@
 
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
-import { SummaryConfig } from '@opencrvs/commons/events'
-import { EventIndex, FieldValue } from '@opencrvs/commons/client'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
-
+import {
+  EventConfig,
+  getDeclarationFields,
+  areConditionsMet,
+  SummaryConfig
+} from '@opencrvs/commons/client'
+import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { Output } from '@client/v2-events/features/events/components/Output'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
+/**
+ * @returns default fields for the event summary
+ */
+function getDefaultFields(
+  eventLabel: TranslationConfig
+): SummaryConfig['fields'] {
+  return [
+    {
+      id: 'assignedTo',
+      label: {
+        id: 'v2.event.summary.assignedTo.label',
+        defaultMessage: 'Assigned to',
+        description: 'Assigned to label'
+      },
+      value: {
+        id: 'v2.event.summary.assignedTo.value',
+        defaultMessage: '{event.assignedTo}',
+        description: 'Assigned to value'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.assignedTo.empty',
+        defaultMessage: 'Not assigned',
+        description: 'Not assigned message'
+      }
+    },
+    {
+      id: 'status',
+      label: {
+        id: 'v2.event.summary.status.label',
+        defaultMessage: 'Status',
+        description: 'Status of the event'
+      },
+      value: {
+        id: 'v2.event.summary.status.value',
+        defaultMessage:
+          '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        description: 'Status of the event'
+      }
+    },
+    {
+      id: 'event',
+      label: {
+        id: 'v2.event.summary.event.label',
+        defaultMessage: 'Event',
+        description: 'Event label'
+      },
+      value: eventLabel
+    },
+    {
+      id: 'tracking-id',
+      label: {
+        id: 'v2.event.summary.trackingId.label',
+        defaultMessage: 'Tracking ID',
+        description: 'Tracking id label'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.trackingId.empty',
+        defaultMessage: 'No tracking ID',
+        description: 'No tracking ID message'
+      },
+      value: {
+        id: 'v2.event.summary.trackingId.value',
+        defaultMessage: '{event.trackingId}',
+        description: 'Tracking id value'
+      }
+    },
+    {
+      id: 'registrationNumber',
+      label: {
+        id: 'v2.event.summary.registrationNumber.label',
+        defaultMessage: 'Registration Number',
+        description: 'Registration Number label'
+      },
+      emptyValueMessage: {
+        id: 'v2.event.summary.registrationNumber.empty',
+        defaultMessage: 'No registration number',
+        description: 'No registration number message'
+      },
+      value: {
+        id: 'v2.event.summary.registrationNumber.value',
+        defaultMessage: '{event.registrationNumber}',
+        description: 'Registration number value'
+      }
+    }
+  ]
+}
+
 export function EventSummary({
   event,
-  summary,
-  defaultValues
+  eventConfiguration
 }: {
-  event: EventIndex
-  summary: SummaryConfig
-  defaultValues: Record<string, FieldValue>
+  event: Record<string, FieldValue | null>
+  eventConfiguration: EventConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const { toString } = useTransformer(event.type)
-  const data = toString(event.data)
+  const { summary, label } = eventConfiguration
+  const defaultFields = getDefaultFields(label)
+  const summaryPageFields = [...defaultFields, ...summary.fields]
+  const declarationFields = getDeclarationFields(eventConfiguration)
+
+  const fields = summaryPageFields.map((field) => {
+    if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
+      return null
+    }
+
+    if ('fieldId' in field) {
+      const config = declarationFields.find((f) => f.id === field.fieldId)
+      const value = event[field.fieldId] ?? undefined
+
+      if (!config) {
+        return null
+      }
+
+      return {
+        id: field.fieldId,
+        label: config.label,
+        emptyValueMessage: field.emptyValueMessage,
+        value: Output({
+          field: config,
+          showPreviouslyMissingValuesAsChanged: false,
+          value: value
+        })
+      }
+    }
+
+    return {
+      id: field.id,
+      label: field.label,
+      emptyValueMessage: field.emptyValueMessage,
+      value: intl.formatMessage(field.value, event)
+    }
+  })
 
   return (
     <>
       <Summary id="summary">
-        {summary.fields.map((field) => {
-          return (
-            <Summary.Row
-              key={field.id}
-              data-testid={field.id}
-              label={intl.formatMessage(field.label)}
-              placeholder={
-                field.emptyValueMessage &&
-                intl.formatMessage(field.emptyValueMessage)
-              }
-              value={intl.formatMessage(field.value, {
-                ...defaultValues,
-                ...data
-              })}
-            />
-          )
-        })}
+        {fields
+          .filter((f): f is NonNullable<typeof f> => f !== null)
+          .map((field) => {
+            return (
+              <Summary.Row
+                key={field.id}
+                data-testid={field.id}
+                label={intl.formatMessage(field.label)}
+                placeholder={
+                  field.emptyValueMessage &&
+                  intl.formatMessage(field.emptyValueMessage)
+                }
+                value={field.value}
+              />
+            )
+          })}
       </Summary>
     </>
   )

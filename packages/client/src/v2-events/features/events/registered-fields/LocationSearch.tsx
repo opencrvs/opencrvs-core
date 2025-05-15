@@ -10,11 +10,14 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { LocationFieldValue, FieldProps } from '@opencrvs/commons/client'
-// eslint-disable-next-line no-restricted-imports
-import { getFacilityLocations } from '@client/offline/selectors'
-import { ILocation } from './Location'
+import { FieldProps } from '@opencrvs/commons/client'
+import { getOfflineData } from '@client/offline/selectors'
+import { getListOfLocations } from '@client/utils/validate'
+import { generateLocations } from '@client/utils/locationUtils'
+import { Stringifiable } from '@client/v2-events/components/forms/utils'
+import { useResolveLocationFullName } from '@client/v2-events/utils'
 
 interface SearchLocation {
   id: string
@@ -22,51 +25,55 @@ interface SearchLocation {
   displayLabel: string
 }
 
-interface Facility extends ILocation {
-  type: 'HEALTH_FACILITY'
-  physicalType: 'Building'
+function useAdministrativeAreas(
+  searchableResource: ('locations' | 'facilities' | 'offices')[]
+) {
+  const offlineCountryConfig = useSelector(getOfflineData)
+  const intl = useIntl()
+  const locationList = generateLocations(
+    searchableResource.reduce((locations, resource) => {
+      return {
+        ...locations,
+        ...getListOfLocations(offlineCountryConfig, resource)
+      }
+    }, {}),
+    intl
+  )
+
+  return locationList
 }
 
-function toSearchOption(facility: Facility) {
-  return {
-    id: facility.id,
-    searchableText: facility.name,
-    displayLabel: facility.alias
-  }
-}
-
-function useAdminLocations(value?: LocationFieldValue) {
-  const locationMap = useSelector(getFacilityLocations)
-
-  const locations = Object.values(locationMap)
-  const initialLocation =
-    // @TODO: Should disappear when restarting. Otherwise ignore and let markus fix the thing
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    value && locationMap[value] ? toSearchOption(locationMap[value]) : undefined
-  const options = locations.map(toSearchOption)
-  return { options, initialLocation }
-}
-
-export function LocationSearch({
-  setFieldValue,
+function LocationSearchInput({
+  onChange,
   value,
+  searchableResource,
   ...props
-}: FieldProps<'LOCATION'> & {
-  setFieldValue: (name: string, val: LocationFieldValue | undefined) => void
-  value?: LocationFieldValue
+}: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
+  onChange: (val: string | undefined) => void
+  searchableResource: ('locations' | 'facilities' | 'offices')[]
+  value?: string
 }) {
-  const { options, initialLocation } = useAdminLocations()
+  const locationList = useAdministrativeAreas(searchableResource)
+  const selectedLocation = locationList.find(
+    (location) => location.id === value
+  )
 
   return (
     <LocationSearchComponent
       buttonLabel="Health facility"
-      locationList={options}
-      searchHandler={(location: SearchLocation) =>
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-        setFieldValue(props.id, location.id)
-      }
-      selectedLocation={initialLocation}
+      locationList={locationList}
+      searchHandler={(location: SearchLocation) => onChange(location.id)}
+      selectedLocation={selectedLocation}
       {...props}
     />
   )
+}
+
+function LocationSearchOutput({ value }: { value: Stringifiable }) {
+  return useResolveLocationFullName(value.toString())
+}
+
+export const LocationSearch = {
+  Input: LocationSearchInput,
+  Output: LocationSearchOutput
 }
