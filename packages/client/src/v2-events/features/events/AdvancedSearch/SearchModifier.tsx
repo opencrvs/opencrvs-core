@@ -12,9 +12,11 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import { stringify } from 'query-string'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
+import { filterEmptyValues } from '@client/v2-events/utils'
 
 const messagesToDefine = {
   edit: {
@@ -73,11 +75,15 @@ export function SearchModifierComponent({
         ))}
         <StyledLink
           font="bold14"
-          onClick={() =>
-            navigate(ROUTES.V2.ADVANCED_SEARCH.path, {
-              state: { searchParams, eventType }
+          onClick={() => {
+            const nonEmptyValues = filterEmptyValues({
+              ...searchParams,
+              eventType
             })
-          }
+            const serializedParams = stringify(nonEmptyValues)
+            const navigateTo = ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+            navigate(`${navigateTo}?${serializedParams.toString()}`)
+          }}
         >
           {intl.formatMessage(messages.edit)}
         </StyledLink>

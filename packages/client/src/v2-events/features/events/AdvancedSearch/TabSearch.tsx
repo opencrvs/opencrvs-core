@@ -188,7 +188,7 @@ export function TabSearch({
 
   const handleSearch = () => {
     const nonEmptyValues = filterEmptyValues(formValues)
-    const searchParams = stringify(nonEmptyValues, { arrayFormat: 'comma' })
+    const searchParams = stringify(nonEmptyValues)
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: enhancedEvent.id
     })
