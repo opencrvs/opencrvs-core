@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { Navigate, useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
@@ -19,13 +19,13 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
+import { TRPCClientError } from '@trpc/client'
 import {
   ActionType,
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SCOPES,
-  getCurrentEventState
+  SCOPES
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -35,7 +35,8 @@ import {
   Icon,
   ResponsiveModal,
   Spinner,
-  Stack
+  Stack,
+  Toast
 } from '@opencrvs/components'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -165,6 +166,7 @@ export function Review() {
   const userIds = getUserIdsFromActions(actions)
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
+  const [hasNotAssignedError, setHasNotAssignedError] = useState(false)
 
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
@@ -259,6 +261,13 @@ export function Review() {
         await handleCertify(fullEvent)
         navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {
+        if (
+          error instanceof TRPCClientError &&
+          error.data?.httpStatus === 409
+        ) {
+          setHasNotAssignedError(true)
+        }
+
         // TODO: add notification alert
         // eslint-disable-next-line no-console
         console.error(error)
@@ -286,6 +295,16 @@ export function Review() {
                 {intl.formatMessage(messages.onlineOnly)}
               </TooltipMessage>
             </ReactTooltip>
+          )}
+
+          {hasNotAssignedError && (
+            <Toast
+              id="not-assigned-error"
+              type="error"
+              onClose={() => setHasNotAssignedError(false)}
+            >
+              {'NOT ASSIGNED'}
+            </Toast>
           )}
 
           <Content
