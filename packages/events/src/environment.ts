@@ -18,7 +18,7 @@ import { cleanEnv, str, url } from 'envalid'
 export const env = cleanEnv(process.env, {
   EVENTS_MONGO_URL: url({ devDefault: 'mongodb://localhost/events' }),
   EVENTS_POSTGRES_URL: url({
-    devDefault: 'postgres://events_user:password@localhost:5432/events'
+    devDefault: 'postgres://events_app:app_password@localhost:5432/events'
   }),
   USER_MGNT_MONGO_URL: url({ devDefault: 'mongodb://localhost/user-mgnt' }),
   ES_URL: url({ devDefault: 'http://localhost:9200' }),

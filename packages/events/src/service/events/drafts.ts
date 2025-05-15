@@ -33,7 +33,7 @@ export async function createDraft(
   const db = await getClient()
 
   const draft = await db.one(sql.typeAlias('draft')`
-    INSERT INTO secure.event_action_drafts (
+    INSERT INTO event_action_drafts (
       event_id,
       transaction_id,
       action_type,
@@ -78,7 +78,7 @@ export async function getDraftsByUserId(createdBy: string) {
       declaration,
       annotations
     FROM
-      secure.event_action_drafts
+      event_action_drafts
     WHERE created_by = ${createdBy}
   `)
 
@@ -99,7 +99,7 @@ export async function getDraftsForAction(
       declaration,
       annotations
     FROM
-      secure.event_action_drafts
+      event_action_drafts
     WHERE
       event_id = ${eventId}
       AND created_by = ${createdBy}
@@ -112,6 +112,6 @@ export async function getDraftsForAction(
 export async function deleteDraftsByEventId(eventId: string) {
   const db = await getClient()
   await db.any(sql.typeAlias('void')`
-    DELETE FROM secure.event_action_drafts WHERE event_id = ${eventId}
+    DELETE FROM event_action_drafts WHERE event_id = ${eventId}
   `)
 }
