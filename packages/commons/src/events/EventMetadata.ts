@@ -143,7 +143,33 @@ export const EventMetadata = z.object({
 
 export type EventMetadata = z.infer<typeof EventMetadata>
 
-export type EventMetadataKeys = `event.${keyof EventMetadata}`
+export const EventMetadataKeys = z.enum([
+  'id',
+  'type',
+  'status',
+  'createdAt',
+  'dateOfEvent',
+  'createdBy',
+  'updatedByUserRole',
+  'createdAtLocation',
+  'updatedAtLocation',
+  'updatedAt',
+  'assignedTo',
+  'updatedBy',
+  'trackingId',
+  'legalStatuses',
+  'flags'
+])
+export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
+
+/**
+ * This ensures `event.field()` takes a key from `EventMetadata`
+ */
+export const EventMetadataParameter = z.object({
+  // @TODO: Reconcile with the event metadata definition. How could we derive one from the other?
+  $event: EventMetadataKeys
+})
+export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
 
 /**
  * Mapping of event metadata keys to translation configuration.
@@ -151,7 +177,7 @@ export type EventMetadataKeys = `event.${keyof EventMetadata}`
  * We need a way to know how to parse it.
  */
 export const eventMetadataLabelMap: Record<
-  Exclude<EventMetadataKeys, 'event.legalStatuses'>,
+  Exclude<`event.${EventMetadataKeys}`, 'event.legalStatuses'>,
   TranslationConfig
 > = {
   'event.assignedTo': {

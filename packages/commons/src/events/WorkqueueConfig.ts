@@ -12,6 +12,9 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
+import { QueryType } from './EventIndex'
+import { EventMetadataParameter } from './EventMetadata'
+import { event } from './event'
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
@@ -22,17 +25,27 @@ export const WorkqueueConfig = z
     name: TranslationConfig.describe(
       'Title of the workflow (both in navigation and on the page)'
     ),
-    /**
-     * Placeholder untill the following gets merged to develop
-     * https://github.com/opencrvs/opencrvs-core/blob/5fbe9854a88504a7a13fcc856b3e82594b70c38c/packages/commons/src/events/EventIndex.ts#L92-L93
-     */
-    query: z.string(),
+    query: QueryType,
     actions: z.array(
       z.object({
         type: z.string(),
         conditionals: z.array(Conditional).optional()
       })
-    )
+    ),
+    columns: z
+      .array(
+        z.object({ label: TranslationConfig, value: EventMetadataParameter })
+      )
+      .default([
+        {
+          label: {
+            id: 'workqueues.dateOfEvent',
+            defaultMessage: 'Date of Event',
+            description: 'Label for workqueue column: dateOfEvent'
+          },
+          value: event.field('dateOfEvent')
+        }
+      ])
   })
   .describe('Configuration for workqueue.')
 

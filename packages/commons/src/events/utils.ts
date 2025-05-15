@@ -201,7 +201,7 @@ export function createEmptyDraft(
       createdAt: new Date().toISOString(),
       createdBy: '@todo',
       createdAtLocation: '@todo',
-      status: ActionStatus.Requested,
+      status: ActionStatus.Accepted,
       transactionId: '@todo',
       createdByRole: '@todo'
     }

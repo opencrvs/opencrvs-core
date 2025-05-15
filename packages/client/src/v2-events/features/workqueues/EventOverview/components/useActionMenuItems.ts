@@ -197,8 +197,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     },
     [ActionType.UNASSIGN]: {
       label: actionLabels[ActionType.UNASSIGN],
-      onClick: (eventId: string) => {
-        events.actions.assignment.unassign.mutate({
+      onClick: async (eventId: string) => {
+        await events.actions.assignment.unassign.mutateAsync({
           eventId,
           transactionId: getUUID(),
           assignedTo: null
