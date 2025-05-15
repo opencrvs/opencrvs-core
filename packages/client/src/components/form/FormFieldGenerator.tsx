@@ -1167,7 +1167,7 @@ class FormSectionComponent extends React.Component<Props> {
                             setValues(updatedValues)
                           }
                         } as ILoaderButton)
-                        : field
+                      : field
 
           if (
             field.type === FETCH_BUTTON ||
@@ -1315,6 +1315,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <MemoizedLocationList field={field}>
