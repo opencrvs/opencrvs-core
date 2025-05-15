@@ -100,6 +100,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
    */
   const formValues = useEventFormData((state) => state.formValues)
   const annotation = useActionAnnotation((state) => state.annotation)
+  const clearForm = useEventFormData((state) => state.clear)
+  const clearAnnotation = useActionAnnotation((state) => state.clear)
 
   useEffect(() => {
     if (!formValues || !annotation) {
@@ -209,6 +211,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
        * staged drafts the user has for this event id and type
        */
       setLocalDraft(null)
+      clearForm()
+      clearAnnotation()
     }
 
     /*
