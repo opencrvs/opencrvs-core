@@ -11,6 +11,7 @@
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
+import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
@@ -28,7 +29,8 @@ import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import {
   flattenEventIndex,
-  getUserIdsFromActions
+  getUserIdsFromActions,
+  getUsersFullName
 } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
@@ -36,7 +38,10 @@ import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
 import { ActionMenu } from './components/ActionMenu'
-import { EventOverviewProvider } from './EventOverviewContext'
+import {
+  EventOverviewProvider,
+  useEventOverviewContext
+} from './EventOverviewContext'
 
 /**
  * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
@@ -45,24 +50,37 @@ import { EventOverviewProvider } from './EventOverviewContext'
 /**
  * Renders the event overview page, including the event summary and history.
  */
-function EventOverview({ event }: { event: EventDocument }) {
+function EventOverview({
+  event,
+  onAction
+}: {
+  event: EventDocument
+  onAction: () => void
+}) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event)
   const { trackingId, status, registrationNumber } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
   const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
+  const { getUser } = useEventOverviewContext()
+  const intl = useIntl()
+
+  const assignedTo = eventIndex.assignedTo
+    ? getUsersFullName(getUser(eventIndex.assignedTo).name, intl.locale)
+    : null
 
   const { flags, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // @TODO: Ask why these are defined outside of flatten index?
     'event.trackingId': trackingId,
     'event.status': status,
-    'event.registrationNumber': registrationNumber
+    'event.registrationNumber': registrationNumber,
+    'event.assignedTo': assignedTo
   }
 
   const { getEventTitle } = useEventTitle()
-  const { title } = getEventTitle(eventConfiguration, eventIndex)
+  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
   const actions = getAcceptedActions(event)
 
@@ -72,7 +90,9 @@ function EventOverview({ event }: { event: EventDocument }) {
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
-      topActionButtons={[<ActionMenu key={event.id} eventId={event.id} />]}
+      topActionButtons={[
+        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />
+      ]}
     >
       <EventSummary
         event={flattenedEventIndex}
@@ -88,7 +108,14 @@ function EventOverviewContainer() {
   const { getEvent } = useEvents()
   const { getUsers } = useUsers()
 
-  const [fullEvent] = getEvent.useSuspenseQuery(params.eventId)
+  // Suspense query is not used here because we want to refetch when an event action is performed
+  const getEventQuery = getEvent.useQuery(params.eventId)
+  const fullEvent = getEventQuery.data
+
+  if (!fullEvent) {
+    return
+  }
+
   const activeActions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(activeActions)
   const [users] = getUsers.useSuspenseQuery(userIds)
@@ -96,7 +123,7 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview event={fullEvent} />
+      <EventOverview event={fullEvent} onAction={getEventQuery.refetch} />
     </EventOverviewProvider>
   )
 }
