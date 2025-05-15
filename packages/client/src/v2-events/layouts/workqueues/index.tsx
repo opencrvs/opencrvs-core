@@ -14,6 +14,7 @@ import React from 'react'
 import { noop } from 'lodash'
 import { useNavigate } from 'react-router-dom'
 import { useIntl, defineMessages } from 'react-intl'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   AppBar,
   Button,
@@ -24,12 +25,13 @@ import {
   Stack
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { workqueues } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { Hamburger } from '@client/components/Header/Hamburger'
 import * as routes from '@client/navigation/routes'
+import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
+import { Hamburger } from '../sideBar/Hamburger'
+import { Navigation } from '../sideBar/Navigation'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -45,9 +47,17 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
   const allEvents = useEventConfigurations()
+  const workqueues = useWorkqueueConfigurations()
+
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+
+  if (!workqueueConfig) {
+    return null
+  }
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
@@ -105,13 +115,10 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
-          /**
-           * We need to revisit on how the workqueue is picked
-           * during 'workqueue' feature.
-           */
-          mobileTitle={intl.formatMessage(workqueues.all.title)}
+          mobileTitle={intl.formatMessage(workqueueConfig.name)}
         />
       }
+      navigation={<Navigation />}
       skipToContentText="skip"
     >
       {children}

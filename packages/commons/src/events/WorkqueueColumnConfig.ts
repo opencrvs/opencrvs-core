@@ -9,16 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { allWorkqueue } from './all'
-import { inReviewWorkqueue } from './readyForReview'
-import { registeredWorkqueue } from './readyToPrint'
-/** @knipignore */
-export { RootWorkqueueConfig, WorkQueueColumnConfig } from './WorkqueueConfig'
-/** @knipignore */
-export { defaultColumns } from './defaultColumns'
+import { z } from 'zod'
+import { TranslationConfig } from './TranslationConfig'
+import { EventMetadataParameter } from './EventMetadata'
 
-export const workqueues = {
-  all: allWorkqueue,
-  registered: registeredWorkqueue,
-  'in-review': inReviewWorkqueue
-}
+/**
+ * Configuration for column header and value of cell of workqueue.
+ */
+export const WorkqueueColumn = z.object({
+  label: TranslationConfig,
+  value: EventMetadataParameter
+})
+export type WorkqueueColumn = z.infer<typeof WorkqueueColumn>

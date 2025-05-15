@@ -9,51 +9,48 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TranslationConfig } from '../events/TranslationConfig'
-import { z } from 'zod'
+import { event } from './event'
+import { WorkqueueColumn } from './WorkqueueColumnConfig'
 
-export const WorkQueueColumnConfig = z.object({
-  id: z.string(),
-  label: TranslationConfig
-})
-
-/** @knipignore */
-export const defaultColumns = {
-  event: {
-    id: 'event',
+export const defaultWorkqueueColumns: WorkqueueColumn[] = [
+  {
+    label: {
+      defaultMessage: 'Title',
+      description: 'This is the label for the workqueue column',
+      id: 'workqueue.in-reveiw.column.title'
+    },
+    value: event.field('assignedTo') // ToDo
+  },
+  {
     label: {
       defaultMessage: 'Event',
       description: 'This is the label for the workqueue column',
       id: 'workqueue.default.column.event'
-    }
+    },
+    value: event.field('type')
   },
-  status: {
-    id: 'status',
+  {
     label: {
       defaultMessage: 'Status',
       description: 'This is the label for the workqueue column',
       id: 'workqueue.default.column.status'
-    }
+    },
+    value: event.field('status')
   },
-  createdAt: {
-    id: 'createdAt',
+  {
     label: {
       defaultMessage: 'Created',
       description: 'This is the label for the workqueue column',
       id: 'workqueue.default.column.createdAt'
-    }
+    },
+    value: event.field('createdAt')
   },
-
-  modifiedAt: {
-    id: 'modifiedAt',
+  {
     label: {
       defaultMessage: 'Modified',
       description: 'This is the label for the workqueue column',
       id: 'workqueue.default.column.modifiedAt'
-    }
+    },
+    value: event.field('updatedAt')
   }
-} as const
-
-export const DefaultColumnKeys = z.enum(
-  Object.keys(defaultColumns) as [string, ...string[]]
-)
+] as const

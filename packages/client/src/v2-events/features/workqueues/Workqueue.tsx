@@ -23,13 +23,11 @@ import {
 import { Link, useNavigate } from 'react-router-dom'
 import {
   applyDraftsToEventIndex,
-  defaultColumns,
+  defaultWorkqueueColumns,
   EventConfig,
   EventIndex,
   getOrThrow,
-  RootWorkqueueConfig,
-  workqueues,
-  WorkQueueColumnConfig
+  WorkqueueConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -52,6 +50,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 const messages = defineMessages({
@@ -114,7 +113,7 @@ function Workqueue({
   eventConfigs
 }: {
   events: EventIndex[]
-  workqueueConfig: RootWorkqueueConfig
+  workqueueConfig: WorkqueueConfig
   limit: number
   offset: number
   eventConfigs: EventConfig[]
@@ -182,7 +181,6 @@ function Workqueue({
       }
 
       const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
-      const titleColumnId = workqueueConfig.columns[0].id
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
           <IconWithName name={title} status={getEventStatus()} />
@@ -210,7 +208,7 @@ function Workqueue({
             status: getEventStatus()
           }
         ),
-        [titleColumnId]: isInOutbox ? (
+        name: isInOutbox ? (
           TitleColumn
         ) : (
           <TextButton
@@ -240,18 +238,13 @@ function Workqueue({
   }
 
   function getDefaultColumns(): Array<Column> {
-    return workqueueConfig.defaultColumns.map(
-      (column: string): Column => ({
-        label:
-          column in defaultColumns
-            ? intl.formatMessage(
-                defaultColumns[column as keyof typeof defaultColumns].label
-              )
-            : '',
+    return defaultWorkqueueColumns.map(
+      ({ label, value }): Column => ({
+        label: intl.formatMessage(label),
         width: 25,
-        key: column,
+        key: value.$event,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === column
+        isSorted: sortedCol === value.$event
       })
     )
   }
@@ -259,12 +252,12 @@ function Workqueue({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     const configuredColumns: Array<Column> = workqueueConfig.columns.map(
-      (column: WorkQueueColumnConfig) => ({
-        label: intl.formatMessage(column.label),
+      ({ label, value }) => ({
+        label: intl.formatMessage(label),
         width: 35,
-        key: column.id,
+        key: value.$event,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === column.id
+        isSorted: sortedCol === value.$event
       })
     )
 
@@ -291,7 +284,7 @@ function Workqueue({
       noContent={workqueue.length === 0}
       noResultText={'No results'}
       paginationId={currentPageNumber}
-      title={intl.formatMessage(workqueueConfig.title)}
+      title={intl.formatMessage(workqueueConfig.name)}
       totalPages={totalPages}
       onPageChange={(page) => setCurrentPageNumber(page)}
     >
@@ -324,17 +317,15 @@ export function WorkqueueContainer() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const { getEvents } = useEvents()
   const eventConfigs = useEventConfigurations()
+  const workqueues = useWorkqueueConfigurations()
 
-  const workqueueConfig =
-    workqueueSlug in workqueues
-      ? workqueues[workqueueSlug as keyof typeof workqueues]
-      : null
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+
+  const [events] = getEvents.useSuspenseQuery()
 
   if (!workqueueConfig) {
     return null
   }
-
-  const [events] = getEvents.useSuspenseQuery()
 
   return (
     <Workqueue

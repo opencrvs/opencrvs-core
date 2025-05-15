@@ -14,10 +14,10 @@ import styled, { useTheme } from 'styled-components'
 import { Link } from 'react-router-dom'
 import { mapKeys } from 'lodash'
 import {
-  defaultColumns,
   EventIndex,
   EventConfig,
-  workqueues
+  WorkqueueConfig,
+  defaultWorkqueueColumns
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -157,7 +157,7 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 interface Props {
-  workqueueConfig: (typeof workqueues)['all']
+  workqueueConfig: WorkqueueConfig
   eventConfig: EventConfig
   searchParams: Record<string, string>
   queryData: EventIndex[]
@@ -220,7 +220,6 @@ export const SearchResult = ({
           return doc.status
         }
 
-        const titleColumnId = workqueueConfig.columns[0].id
         const status = doc.status
 
         const title = flattenedIntl.formatMessage(eventConfig.title, doc)
@@ -240,7 +239,7 @@ export const SearchResult = ({
               status: getEventStatus()
             }
           ),
-          [titleColumnId]: isInOutbox ? (
+          [title]: isInOutbox ? (
             <IconWithName name={title} status={status} />
           ) : (
             <NondecoratedLink
@@ -256,18 +255,13 @@ export const SearchResult = ({
   }
 
   function getDefaultColumns(): Array<Column> {
-    return workqueueConfig.defaultColumns.map(
-      (column): Column => ({
-        label:
-          column in defaultColumns
-            ? intl.formatMessage(
-                defaultColumns[column as keyof typeof defaultColumns].label
-              )
-            : '',
+    return defaultWorkqueueColumns.map(
+      ({ label, value }): Column => ({
+        label: intl.formatMessage(label),
         width: 25,
-        key: column,
+        key: value.$event,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === column
+        isSorted: sortedCol === value.$event
       })
     )
   }
@@ -276,21 +270,21 @@ export const SearchResult = ({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     if (windowWidth > theme.grid.breakpoints.lg) {
-      return workqueueConfig.columns.map((column) => ({
-        label: intl.formatMessage(column.label),
+      return workqueueConfig.columns.map(({ label, value }) => ({
+        label: intl.formatMessage(label),
         width: 35,
-        key: column.id,
+        key: value.$event,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === column.id
+        isSorted: sortedCol === value.$event
       }))
     } else {
       return workqueueConfig.columns
-        .map((column) => ({
-          label: intl.formatMessage(column.label),
+        .map(({ label, value }) => ({
+          label: intl.formatMessage(label),
           width: 35,
-          key: column.id,
+          key: value.$event,
           sortFunction: onColumnClick,
-          isSorted: sortedCol === column.id
+          isSorted: sortedCol === value.$event
         }))
         .slice(0, 2)
     }

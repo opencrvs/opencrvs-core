@@ -12,17 +12,19 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { workqueues } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useWorkqueueConfigurations } from '../useWorkqueueConfiguration'
 import { SearchResult } from './SearchResult'
 import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
 
 export const SearchResultIndex = () => {
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
+  const workqueues = useWorkqueueConfigurations()
 
   const searchParams = parse(window.location.search, {
     arrayFormat: 'comma'
@@ -35,12 +37,8 @@ export const SearchResultIndex = () => {
     formattedSearchParams,
     ADVANCED_SEARCH_KEY
   )
-  const workqueueId = 'all'
-  const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
-      : null
 
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
   if (!workqueueConfig) {
     return null
   }
