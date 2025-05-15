@@ -43,7 +43,7 @@ import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { getScopes, parseScope, SCOPES } from '@opencrvs/commons/authentication'
 import { UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
@@ -329,6 +329,27 @@ export const resolvers: GQLResolver = {
         if (!isUnderJurisdiction) {
           throw new Error(
             'Cannot create or update user in offices not under jurisdiction'
+          )
+        }
+      }
+
+      if (user.role) {
+        const scopes = getScopes(authHeader)
+        const creatableRoleIds =
+          scopes
+            .map((rawScope) => parseScope(rawScope))
+            .find((parsedScope) => parsedScope?.type === 'user.create')?.options
+            ?.role ?? []
+
+        const editableRoleIds =
+          scopes
+            .map((rawScope) => parseScope(rawScope))
+            .find((parsedScope) => parsedScope?.type === 'user.edit')?.options
+            ?.role ?? []
+
+        if (![...creatableRoleIds, ...editableRoleIds].includes(user.role)) {
+          throw new Error(
+            `A user with role "${user.role}" can not be created or updated by this user`
           )
         }
       }

@@ -14,7 +14,7 @@ import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import { z } from 'zod'
 
-import { Scope, SCOPES } from './scopes'
+import { RawScopes, Scope, SCOPES } from './scopes'
 export { Scope, SCOPES, scopes, parseScope } from './scopes'
 
 /** All the scopes system/integration can be assigned to */
@@ -198,17 +198,21 @@ export interface ITokenPayload {
   scope: Scope[]
 }
 
-export function hasScope(authHeader: IAuthHeader, scope: Scope) {
+export function getScopes(authHeader: IAuthHeader): RawScopes[] {
   if (!authHeader || !authHeader.Authorization) {
-    return false
+    return []
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
-  return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
+  return tokenPayload.scope || []
+}
+
+export function hasScope(authHeader: IAuthHeader, scope: Scope) {
+  return getScopes(authHeader).includes(scope)
 }
 
 export function inScope(authHeader: IAuthHeader, scopes: Scope[]) {
-  const matchedScope = scopes.find((scope) => hasScope(authHeader, scope))
-  return !!matchedScope
+  const tokenScopes = getScopes(authHeader)
+  return scopes.some((scope) => tokenScopes.includes(scope))
 }
 
 export const getTokenPayload = (token: string): ITokenPayload => {
