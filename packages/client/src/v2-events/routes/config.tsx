@@ -51,12 +51,15 @@ export const routesConfig = {
         <TRPCProvider>
           <Outlet />
           <Debug />
-          <RedirectToWorkqueue />
         </TRPCProvider>
       </TRPCErrorBoundary>
     </NavigationHistoryProvider>
   ),
   children: [
+    {
+      element: <RedirectToWorkqueue />,
+      index: true
+    },
     workqueueRouter,
     {
       path: ROUTES.V2.EVENTS.VIEW.path,
