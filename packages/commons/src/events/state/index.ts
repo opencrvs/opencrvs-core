@@ -241,7 +241,6 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     updatedAt: declarationUpdateMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
     updatedBy: declarationUpdateMetadata.createdBy,
-    updatedAtLocation: event.updatedAtLocation,
     declaration,
     trackingId: event.trackingId,
     // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole

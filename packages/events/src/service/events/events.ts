@@ -355,7 +355,7 @@ export async function addAction(
     action.type === ActionType.REGISTER
       ? {
           registeredAt: now,
-          registeredAtLocation: updatedAtLocation
+          registeredAtLocation: createdAtLocation
         }
       : {}
 

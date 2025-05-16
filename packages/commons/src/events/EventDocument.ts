@@ -23,7 +23,6 @@ export const EventDocument = z
     updatedAt: z.string().datetime(),
     registeredAt: z.string().datetime().optional(), // search based on registeration date
     registeredAtLocation: z.string().optional(), // search based on registeration location
-    updatedAtLocation: z.string(),
     actions: z.array(Action),
     trackingId: z.string()
   })
