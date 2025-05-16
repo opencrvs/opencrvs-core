@@ -16,7 +16,8 @@ import {
   EventIndex,
   DeduplicationConfig,
   Clause,
-  ClauseOutput
+  ClauseOutput,
+  FieldValue
 } from '@opencrvs/commons/events'
 import {
   getOrCreateClient,
@@ -34,6 +35,17 @@ function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   configuration: ClauseOutput
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
+  // @TODO: When implementing deduplication revisit this. For now, we just want to use the right types for es.
+  const isPrimitiveQueryValue = (
+    value: FieldValue
+  ): value is string | number => {
+    return (
+      typeof value === 'string' ||
+      typeof value === 'number' ||
+      typeof value === 'boolean'
+    )
+  }
+
   const matcherFieldWithoutData =
     configuration.type !== 'and' &&
     configuration.type !== 'or' &&
@@ -71,10 +83,16 @@ function generateElasticsearchQuery(
       }
     case 'fuzzy': {
       const encodedFieldId = encodeFieldId(configuration.fieldId)
+
+      const fieldValue = eventIndex.declaration[encodedFieldId]
+      if (!isPrimitiveQueryValue(fieldValue)) {
+        return null
+      }
+
       return {
         match: {
           [declarationReference(encodedFieldId)]: {
-            query: eventIndex.declaration[encodedFieldId],
+            query: fieldValue,
             fuzziness: configuration.options.fuzziness,
             boost: configuration.options.boost
           }
@@ -83,10 +101,14 @@ function generateElasticsearchQuery(
     }
     case 'strict': {
       const encodedFieldId = encodeFieldId(configuration.fieldId)
+      const fieldValue = eventIndex.declaration[encodedFieldId]
+      if (!isPrimitiveQueryValue(fieldValue)) {
+        return null
+      }
+
       return {
         match_phrase: {
-          [declarationReference(encodedFieldId)]:
-            eventIndex.declaration[encodedFieldId] || ''
+          [declarationReference(encodedFieldId)]: fieldValue.toString()
         }
       }
     }

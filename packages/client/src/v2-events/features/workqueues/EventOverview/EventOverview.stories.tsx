@@ -144,7 +144,8 @@ export const WithRejectedAction: Story = {
                   transactionId: getUUID(),
                   createdAt: new Date().toISOString(),
                   createdBy: '123',
-                  createdAtLocation: '123'
+                  createdAtLocation: '123',
+                  createdByRole: 'LOCAL_REGISTRAR'
                 }
               ])
             }
