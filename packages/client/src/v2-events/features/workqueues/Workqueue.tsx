@@ -197,7 +197,7 @@ function Workqueue({
 
       return {
         ...flattenEventIndex(event),
-        event: intl.formatMessage(eventConfig.label),
+        type: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
         updatedAt: formattedDuration(new Date(event.updatedAt)),
 
