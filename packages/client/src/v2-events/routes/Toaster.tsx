@@ -9,7 +9,7 @@ import { MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { Button } from '@opencrvs/components/lib/buttons'
 import { Icon } from '@opencrvs/components/lib/Icon'
-
+import { family } from '@opencrvs/components/lib/fonts'
 export enum ToastKey {
   NOT_ASSIGNED_ERROR = 'v2.errors.notAssigned'
 }
@@ -23,7 +23,8 @@ const availableToasts: Record<ToastKey, MessageDescriptor> = {
 }
 
 const Message = styled.span`
-  padding: 0 1rem;
+  margin: 0 1rem;
+  font-family: ${family};
 `
 
 // TODO CIHAN: fix font
@@ -44,7 +45,10 @@ export function Toaster() {
   }
 
   return (
-    <ReactHotToaster position="bottom-center" toastOptions={{ duration: 6000 }}>
+    <ReactHotToaster
+      position="bottom-center"
+      toastOptions={{ duration: 6000, style: { maxWidth: '30rem' } }}
+    >
       {(t) => (
         <ToastBar toast={t}>
           {({ icon, message }) => {
@@ -52,11 +56,6 @@ export function Toaster() {
               <>
                 {icon}
                 <Message>{getMessage(message)}</Message>
-                {t.type !== 'loading' && (
-                  <Button onClick={() => toast.dismiss(t.id)}>
-                    <Icon color="primary" name="Close" size="large" />
-                  </Button>
-                )}
               </>
             )
           }}
