@@ -141,7 +141,7 @@ export const eventRouter = router({
           eventId: event.id,
           createdBy: ctx.user.id,
           createdByRole: ctx.user.role,
-          updatedAtLocation: ctx.user.primaryOfficeId,
+          createdAtLocation: ctx.user.primaryOfficeId,
           token: ctx.token,
           transactionId: getUUID(),
           status: ActionStatus.Accepted
@@ -164,6 +164,7 @@ export const eventRouter = router({
     create: publicProcedure.input(DraftInput).mutation(async (options) => {
       const eventId = options.input.eventId
       await getEventById(eventId)
+
       return createDraft(options.input, {
         eventId,
         createdBy: options.ctx.user.id,
@@ -193,7 +194,7 @@ export const eventRouter = router({
             input: options.input,
             createdBy: options.ctx.user.id,
             createdByRole: options.ctx.user.role,
-            updatedAtLocation: options.ctx.user.primaryOfficeId,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token
           })
         }),
@@ -205,7 +206,7 @@ export const eventRouter = router({
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdByRole: options.ctx.user.role,
-            updatedAtLocation: options.ctx.user.primaryOfficeId,
+            createdAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -230,7 +231,7 @@ export const eventRouter = router({
             eventId: input.eventId,
             createdBy: ctx.user.id,
             createdByRole: ctx.user.role,
-            updatedAtLocation: ctx.user.primaryOfficeId,
+            createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId,
             status: ActionStatus.Accepted
@@ -253,7 +254,7 @@ export const eventRouter = router({
             eventId: input.eventId,
             createdBy: ctx.user.id,
             createdByRole: ctx.user.role,
-            updatedAtLocation: ctx.user.primaryOfficeId,
+            createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId
           })
@@ -276,7 +277,7 @@ export const eventRouter = router({
             eventId: input.eventId,
             createdBy: ctx.user.id,
             createdByRole: ctx.user.role,
-            updatedAtLocation: ctx.user.primaryOfficeId,
+            createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId
           })

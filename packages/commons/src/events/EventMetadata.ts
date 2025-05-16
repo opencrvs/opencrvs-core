@@ -51,6 +51,46 @@ export const EventStatuses = z.nativeEnum(EventStatus)
 
 export const ZodDate = z.string().date()
 
+export const ActionCreationMetadata = z.object({
+  createdAt: z
+    .string()
+    .datetime()
+    .describe('The timestamp when the action request was created.'),
+  createdBy: z
+    .string()
+    .describe('ID of the user who created the action request.'),
+  createdAtLocation: z
+    .string()
+    .describe('Location of the user who created the action request.'),
+  acceptedAt: z
+    .string()
+    .datetime()
+    .describe('Timestamp when the action request was accepted.'),
+  createdByRole: z
+    .string()
+    .describe('Role of the user at the time of action request creation.')
+})
+
+export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>
+
+export const RegistrationCreationMetadata = ActionCreationMetadata.extend({
+  registrationNumber: z
+    .string()
+    .describe(
+      'Registration number of the event. Always present for accepted registrations.'
+    )
+})
+
+export type RegistrationCreationMetadata = z.infer<
+  typeof RegistrationCreationMetadata
+>
+
+// @TODO: In the future REVOKE should be added to the list of statuses
+export const LegalStatuses = z.object({
+  [EventStatus.DECLARED]: ActionCreationMetadata.nullish(),
+  [EventStatus.REGISTERED]: RegistrationCreationMetadata.nullish()
+})
+
 /**
  * Event metadata exposed to client.
  *
@@ -59,48 +99,77 @@ export const ZodDate = z.string().date()
 export const EventMetadata = z.object({
   id: z.string(),
   title: z.string(),
-  type: z.string(),
+  type: z
+    .string()
+    .describe('The type of event, such as birth, death, or marriage.'),
   status: EventStatuses,
-  createdAt: z.string().datetime(),
+  legalStatuses: LegalStatuses.describe(
+    'Metadata related to the legal registration of the event, such as who registered it and when.'
+  ),
+  createdAt: z
+    .string()
+    .datetime()
+    .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
-  createdBy: z.string(),
-  updatedByUserRole: z.string(),
-  createdAtLocation: z.string(),
-  updatedAtLocation: z.string(),
-  updatedAt: z.string().datetime(),
-  assignedTo: z.string().nullish(),
-  updatedBy: z.string(),
-  trackingId: z.string(),
-  registrationNumber: z.string().nullish(),
+  createdBy: z.string().describe('ID of the user who created the event.'),
+  updatedByUserRole: z
+    .string()
+    .describe('Role of the user who last updated the declaration.'),
+  createdAtLocation: z
+    .string()
+    .describe('Location of the user who created the event.'),
+  updatedAtLocation: z
+    .string()
+    .nullish()
+    .describe('Location of the user who last updated the declaration.'),
+  updatedAt: z
+    .string()
+    .datetime()
+    .describe('Timestamp of the most recent declaration update.'),
+  assignedTo: z
+    .string()
+    .nullish()
+    .describe('ID of the user currently assigned to the event.'),
+  updatedBy: z
+    .string()
+    .nullish()
+    .describe('ID of the user who last updated the declaration.'),
+  trackingId: z
+    .string()
+    .describe(
+      'System-generated tracking ID used by informants or registrars to look up the event.'
+    ),
   flags: z.array(Flag)
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
 
-export type EventMetadataKeys = `event.${keyof EventMetadata}`
+export const EventMetadataKeys = z.enum([
+  'id',
+  'title',
+  'type',
+  'status',
+  'createdAt',
+  'dateOfEvent',
+  'createdBy',
+  'updatedByUserRole',
+  'createdAtLocation',
+  'updatedAtLocation',
+  'updatedAt',
+  'assignedTo',
+  'updatedBy',
+  'trackingId',
+  'legalStatuses',
+  'flags'
+])
+export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
 
 /**
  * This ensures `event.field()` takes a key from `EventMetadata`
  */
 export const EventMetadataParameter = z.object({
-  $event: z.enum([
-    'id',
-    'title',
-    'type',
-    'status',
-    'createdAt',
-    'dateOfEvent',
-    'createdBy',
-    'updatedByUserRole',
-    'createdAtLocation',
-    'updatedAtLocation',
-    'updatedAt',
-    'assignedTo',
-    'updatedBy',
-    'trackingId',
-    'registrationNumber',
-    'flags'
-  ])
+  // @TODO: Reconcile with the event metadata definition. How could we derive one from the other?
+  $event: EventMetadataKeys
 })
 export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
 
@@ -110,7 +179,7 @@ export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
  * We need a way to know how to parse it.
  */
 export const eventMetadataLabelMap: Record<
-  EventMetadataKeys,
+  Exclude<`event.${EventMetadataKeys}`, 'event.legalStatuses'>,
   TranslationConfig
 > = {
   'event.assignedTo': {
@@ -182,11 +251,6 @@ export const eventMetadataLabelMap: Record<
     id: 'event.trackingId.label',
     defaultMessage: 'Tracking ID',
     description: 'Tracking ID'
-  },
-  'event.registrationNumber': {
-    id: 'event.registrationNumber.label',
-    defaultMessage: 'Registration Number',
-    description: 'Registration Number'
   },
   'event.flags': {
     id: 'event.flags.label',
