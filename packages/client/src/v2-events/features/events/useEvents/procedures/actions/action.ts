@@ -18,7 +18,6 @@ import { TRPCClientError } from '@trpc/client'
 import {
   ActionType,
   EventDocument,
-  FieldValue,
   getCurrentEventState,
   omitHiddenAnnotationFields,
   omitHiddenPaginatedFields
