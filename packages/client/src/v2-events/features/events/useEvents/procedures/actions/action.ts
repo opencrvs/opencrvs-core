@@ -175,12 +175,14 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
 })
 
 setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
-  ...commonOptions,
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.assignment.unassign
   ),
   retry: (_, error: TRPCClientError<AppRouter>) =>
     error.data?.httpStatus !== 403,
+  retryDelay: 10000,
+  onSuccess: cleanUpOnUnassign,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.UNASSIGN
   }
