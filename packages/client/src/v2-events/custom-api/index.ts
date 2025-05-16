@@ -110,6 +110,7 @@ export async function registerOnValidate(variables: {
   annotation?: EventState
 }) {
   const { eventId, declaration, annotation } = variables
+
   await trpcClient.event.actions.validate.request.mutate({
     declaration,
     annotation,
