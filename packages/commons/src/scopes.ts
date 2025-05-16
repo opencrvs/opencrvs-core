@@ -232,6 +232,20 @@ const ConfigurableScopes = z.discriminatedUnion('type', [
   EditUserScope
 ])
 
+type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
+
+export function findScope(
+  scopes: string[],
+  scopeType: ConfigurableScopes['type']
+) {
+  return scopes
+    .map((rawScope) => parseScope(rawScope))
+    .find(
+      (parsedScope): parsedScope is ConfigurableScopes =>
+        parsedScope?.type === scopeType
+    )
+}
+
 export function parseScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
   if (maybeLiteralScope.success) {

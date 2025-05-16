@@ -36,7 +36,7 @@ import { gqlToDraftTransformer } from '@client/transformer'
 import { GET_USER, SEARCH_USERS } from '@client/user/queries'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { parseScope } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
 import { UserRole } from '@client/utils/gateway'
 
 import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
@@ -405,16 +405,10 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const { loggedInUserScopes, userRoles } = action.payload
 
       const creatableRoleIds =
-        loggedInUserScopes
-          .map((rawScope) => parseScope(rawScope))
-          .find((parsedScope) => parsedScope?.type === 'user.create')?.options
-          ?.role ?? []
+        findScope(loggedInUserScopes, 'user.create')?.options?.role ?? []
 
       const editableRoleIds =
-        loggedInUserScopes
-          .map((rawScope) => parseScope(rawScope))
-          .find((parsedScope) => parsedScope?.type === 'user.edit')?.options
-          ?.role ?? []
+        findScope(loggedInUserScopes, 'user.edit')?.options?.role ?? []
 
       const allowedRoleIds = [...creatableRoleIds, ...editableRoleIds]
 

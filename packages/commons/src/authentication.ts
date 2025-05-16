@@ -15,7 +15,7 @@ import { Nominal } from './nominal'
 import { z } from 'zod'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
-export { Scope, SCOPES, scopes, parseScope } from './scopes'
+export * from './scopes'
 
 /** All the scopes system/integration can be assigned to */
 export const SYSTEM_INTEGRATION_SCOPES = {
