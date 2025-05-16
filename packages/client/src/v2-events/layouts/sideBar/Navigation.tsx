@@ -31,7 +31,7 @@ import { ROUTES } from '@client/v2-events/routes'
 
 const SCREEN_LOCK = 'screenLock'
 
-function getSettingsAndLogout({
+function GetSettingsAndLogout({
   menuCollapse,
   intl
 }: {
@@ -112,7 +112,7 @@ export const Navigation = ({
           ))}
       </NavigationGroup>
       <NavigationGroup>
-        {getSettingsAndLogout({ menuCollapse, intl })}
+        <GetSettingsAndLogout intl={intl} menuCollapse={menuCollapse} />
       </NavigationGroup>
     </LeftNavigation>
   )
