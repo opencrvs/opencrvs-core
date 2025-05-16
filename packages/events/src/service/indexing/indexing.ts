@@ -13,6 +13,8 @@ import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
 import { z } from 'zod'
 import {
+  ActionCreationMetadata,
+  RegistrationCreationMetadata,
   AddressFieldValue,
   EventConfig,
   EventDocument,
@@ -189,7 +191,38 @@ export async function createIndex(
             properties: formFieldsToDataMapping(formFields)
           },
           trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' },
+          legalStatuses: {
+            type: 'object',
+            properties: {
+              [EventStatus.DECLARED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
+              [EventStatus.REGISTERED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' },
+                  registrationNumber: { type: 'keyword' }
+                } satisfies Record<
+                  keyof RegistrationCreationMetadata,
+                  estypes.MappingProperty
+                >
+              }
+            }
+          },
           flags: { type: 'keyword' }
         } satisfies EventIndexMapping
       }

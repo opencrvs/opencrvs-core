@@ -16,7 +16,8 @@ import {
   ActionBase,
   ActionDocument,
   ActionUpdate,
-  ActionStatus
+  ActionStatus,
+  EventState
 } from './ActionDocument'
 import {
   ArchiveActionInput,
@@ -63,7 +64,7 @@ function fieldConfigsToActionPayload(fields: FieldConfig[]) {
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType
-) {
+): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
@@ -155,8 +156,7 @@ export const eventPayloadGenerator = {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByRole: '@todo',
-          createdAtLocation: '@todo',
-          updatedAtLocation: '@todo'
+          createdAtLocation: '@todo'
         }
       } satisfies Draft,
       input
@@ -423,13 +423,12 @@ export function generateActionDocument({
     createdBy: getUUID(),
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
-    createdAtLocation: 'TODO',
-    updatedAtLocation: 'TODO',
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
-    ...defaults,
     status: ActionStatus.Accepted,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    ...defaults
   } satisfies ActionBase
 
   switch (action) {
@@ -494,8 +493,7 @@ export function generateEventDocument({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     updatedAt: new Date(Date.now() - 1000).toISOString(),
-    dateOfEvent: configuration.dateOfEvent,
-    updatedAtLocation: getUUID()
+    dateOfEvent: configuration.dateOfEvent
   }
 }
 
@@ -599,6 +597,7 @@ export const eventQueryDataGenerator = (
   updatedBy: overrides.updatedBy ?? getUUID(),
   updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
   flags: [],
+  legalStatuses: overrides.legalStatuses ?? {},
   declaration: overrides.declaration ?? getRandomApplicant(),
   trackingId: overrides.trackingId ?? getTrackingId()
 })

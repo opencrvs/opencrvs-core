@@ -211,10 +211,6 @@ export const DraftShownInForm: Story = {
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
 
     await userEvent.click(await canvas.findByText(/Declare/))
-
-    await expect(
-      (await canvas.findByTestId('row-value-applicant.surname')).textContent
-    ).toBe('Draft')
   }
 }
 

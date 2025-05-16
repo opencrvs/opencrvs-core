@@ -29,7 +29,8 @@ import {
   getOrThrow,
   RootWorkqueueConfig,
   workqueues,
-  WorkQueueColumnConfig
+  WorkQueueColumnConfig,
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -151,9 +152,11 @@ function Workqueue({
      * This is necessary to show the most up to date information in the workqueue.
      */
     .map((event) =>
-      applyDraftsToEventIndex(
-        event,
-        drafts.filter((d) => d.eventId === event.id)
+      deepDropNulls(
+        applyDraftsToEventIndex(
+          event,
+          drafts.filter((d) => d.eventId === event.id)
+        )
       )
     )
     .map((event) => {

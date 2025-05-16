@@ -21,7 +21,6 @@ export const EventDocument = z
     dateOfEvent: z.object({ fieldId: z.string() }).optional(),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
-    updatedAtLocation: z.string(),
     actions: z.array(Action),
     trackingId: z.string()
   })
