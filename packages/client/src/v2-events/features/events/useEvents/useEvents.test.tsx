@@ -62,7 +62,6 @@ const createHandler = trpcHandler(async ({ request }) => {
     trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
-    updatedAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
     actions: [
       {
         type: ActionType.CREATE,

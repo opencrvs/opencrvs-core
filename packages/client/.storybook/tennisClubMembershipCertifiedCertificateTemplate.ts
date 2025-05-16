@@ -14,19 +14,19 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
   <g clip-path="url(#clip0_5_2)">
     <path d="M583 0H0V842H583V0Z" fill="white" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="426.352">{{ $formatDate (lookup $state "modifiedAt") "dd MMMM yyyy"}}</tspan>
+      <tspan x="62" y="426.352">{{ $lookup $metadata "modifiedAt"}}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="413.552">Date of certification&#10;</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="460.352">Imbobo District Office, Chiwala State, Farajaland</tspan>
+      <tspan x="62" y="460.352">{{$lookup $metadata "createdAtLocation.location"}}, {{$lookup $metadata "createdAtLocation.country"}}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="447.552">Place of certification&#10;</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="494.104">{{ lookup $state "id" }}</tspan>
+      <tspan x="62" y="494.104">{{ $lookup $metadata "id" }}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="482.104">Application ID</tspan>
@@ -35,7 +35,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M309.793 475.396L505.999 476.321" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="366.248" y="489.656">
-       Registrar {{ $findUserById (lookup $state "updatedBy") "name"}}
+       Registrar {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.name'}}
       </tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
@@ -50,11 +50,11 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M50 700H535" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <path d="M50 184H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="#C86E00" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
-      <tspan x="215.483" y="199.76">No. {{ lookup $state "registrationNumber" }}</tspan>
+      <tspan x="215.483" y="199.76">No. {{ $lookup $metadata 'legalStatuses.REGISTERED.registrationNumber' }}</tspan>
     </text>
     <path d="M50 206H534" stroke="#C86E00" stroke-width="2" stroke-linecap="round" />
     <text fill="black" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="bold" letter-spacing="0em">
-      <tspan x="70" y="229.76">Membership etails</tspan>
+      <tspan x="70" y="229.76">Membership details</tspan>
     </text>
     <path d="M70 233.5H514" stroke="#ECECEC" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
@@ -68,7 +68,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask0_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="247.708">{{ lookup $declaration "applicant.firstname" }} {{ lookup $declaration "applicant.surname" }}</tspan>
+        <tspan x="312" y="247.708">{{ $lookup $declaration "applicant.firstname" }} {{ $lookup $declaration "applicant.surname" }}</tspan>
       </text>
     </g>
     <path d="M70 253.5H514" stroke="#ECECEC" />
@@ -83,7 +83,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask1_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="267.708">{{ lookup $declaration "applicant.dob"  }}</tspan>
+        <tspan x="312" y="267.708">{{ $lookup $declaration "applicant.dob"  }}</tspan>
       </text>
     </g>
     <path d="M70 273.5H514" stroke="#ECECEC" />
@@ -99,7 +99,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask2_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="287.708">{{ lookup $declaration "recommender.firstname"  }} {{ lookup $declaration "recommender.surname"  }}</tspan>
+        <tspan x="312" y="287.708">{{ $lookup $declaration "recommender.firstname"  }} {{ $lookup $declaration "recommender.surname"  }}</tspan>
       </text>
     </g>
     <path d="M70 293.5H514" stroke="#ECECEC" />
@@ -155,7 +155,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </g>
     <path d="M53 514H537V513H53V514Z" fill="#ECECEC" />
   </g>
-  <image id="image0_5_2"  x="362.248" y="400.656" width="100" height="100" xlink:href="{{ $findUserById (lookup $state 'updatedBy') 'signatureFilename'}}" />
+  <image id="image0_5_2"  x="362.248" y="400.656" width="100" height="100" xlink:href="{{ $lookup $metadata 'updatedBy.signature'}}" />
   <defs>
     <pattern id="pattern0_5_2" patternContentUnits="objectBoundingBox" width="1" height="1">
       <use xlink:href="#image0_5_2" />
