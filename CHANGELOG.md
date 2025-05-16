@@ -4,7 +4,7 @@
 
 ### New features
 
-- **Redis (Valkey) password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
+- **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
 
 ## 1.8.0 Release candidate
 
