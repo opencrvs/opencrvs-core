@@ -11,9 +11,10 @@
 
 import { z, ZodType } from 'zod'
 import { EventMetadata } from './EventMetadata'
+import { EventState } from './ActionDocument'
 
 export const EventIndex = EventMetadata.extend({
-  declaration: z.record(z.string(), z.any())
+  declaration: EventState
 })
 
 export const EventSearchIndex = z.record(z.string(), z.any()).and(

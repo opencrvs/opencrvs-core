@@ -488,7 +488,6 @@ describe('"event" conditionals', () => {
         createdAt: now,
         updatedAt: now,
         dateOfEvent: { fieldId: 'child.dob' },
-        updatedAtLocation: '123456',
         actions: [
           {
             id: '1234',
