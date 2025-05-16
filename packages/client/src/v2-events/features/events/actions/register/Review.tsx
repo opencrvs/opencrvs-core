@@ -10,6 +10,7 @@
  */
 
 import React from 'react'
+import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
@@ -40,7 +41,6 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { reviewMessages } from '../messages'
-import { useNotAssignedErrorToast } from '../useNotAssignedErrorToast'
 
 function getTranslations(hasErrors: boolean) {
   const state = hasErrors ? 'incomplete' : ('complete' as const)
@@ -65,9 +65,6 @@ export function Review() {
   const registerMutation = events.actions.register
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-
-  const { onPossibleNotAssignedError, NotAssignedErrorToast } =
-    useNotAssignedErrorToast(event.trackingId)
 
   const previousAnnotation = getActionAnnotation({
     event,
@@ -144,16 +141,12 @@ export function Review() {
       )
     })
     if (confirmedRegistration) {
-      try {
-        await registerMutation.mutateAsync({
-          eventId,
-          declaration: form,
-          transactionId: uuid(),
-          annotation
-        })
-      } catch (e) {
-        onPossibleNotAssignedError(e)
-      }
+      registerMutation.mutate({
+        eventId,
+        declaration: form,
+        transactionId: uuid(),
+        annotation
+      })
 
       goToHome()
     }
@@ -166,26 +159,22 @@ export function Review() {
     if (confirmedRejection) {
       const { rejectAction, message, isDuplicate } = confirmedRejection
 
-      try {
-        if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-          events.actions.reject.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: { message }
-          })
-        }
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: { message }
+        })
+      }
 
-        if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-          events.actions.archive.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: { message, isDuplicate }
-          })
-        }
-      } catch (e) {
-        onPossibleNotAssignedError(e)
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: { message, isDuplicate }
+        })
       }
 
       goToHome()
@@ -227,7 +216,6 @@ export function Review() {
         {modal}
       </ReviewComponent.Body>
       {saveAndExitModal}
-      <NotAssignedErrorToast />
     </FormLayout>
   )
 }

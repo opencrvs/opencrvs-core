@@ -40,8 +40,8 @@ import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitMod
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { useNotAssignedErrorToast } from '../useNotAssignedErrorToast'
 import { useReviewActionConfig } from './useReviewActionConfig'
+
 /**
  *
  * Preview of event to be validated.
@@ -55,9 +55,6 @@ export function Review() {
   const { goToHome } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
-
-  const { onPossibleNotAssignedError, NotAssignedErrorToast } =
-    useNotAssignedErrorToast(event.trackingId)
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
 
@@ -144,11 +141,7 @@ export function Review() {
     })
 
     if (confirmedValidation) {
-      try {
-        await reviewActionConfiguration.onConfirm(eventId)
-      } catch (e) {
-        onPossibleNotAssignedError(e)
-      }
+      reviewActionConfiguration.onConfirm(eventId)
 
       goToHome()
     }
@@ -161,26 +154,22 @@ export function Review() {
     if (confirmedRejection) {
       const { rejectAction, message, isDuplicate } = confirmedRejection
 
-      try {
-        if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
-          events.actions.reject.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: { message }
-          })
-        }
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: { message }
+        })
+      }
 
-        if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
-          events.actions.archive.mutate({
-            eventId,
-            declaration: {},
-            transactionId: uuid(),
-            annotation: { message, isDuplicate }
-          })
-        }
-      } catch (e) {
-        onPossibleNotAssignedError(e)
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: { message, isDuplicate }
+        })
       }
 
       goToHome()
@@ -222,7 +211,6 @@ export function Review() {
         {modal}
       </ReviewComponent.Body>
       {saveAndExitModal}
-      <NotAssignedErrorToast />
     </FormLayout>
   )
 }
