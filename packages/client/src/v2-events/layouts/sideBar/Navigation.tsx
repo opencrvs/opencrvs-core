@@ -30,6 +30,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
 import { removeUserDetails } from '@client/utils/userUtils'
+import { constantsMessages } from '@client/v2-events/messages'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -52,10 +53,12 @@ export const Navigation = ({
   const scopes = useSelector(getScope)
   const navigate = useNavigate()
 
+  const runningVer = String(localStorage.getItem('running-version'))
+
   return (
     <LeftNavigation
-      applicationName="ToDo"
-      applicationVersion="ToDo"
+      applicationName={intl.formatMessage(constantsMessages.applicationName)} // @todo Should come from country config
+      applicationVersion={runningVer}
       avatar={() => userInfo && userInfo.avatar}
       name={userInfo && userInfo.name}
       navigationWidth={navigationWidth}
