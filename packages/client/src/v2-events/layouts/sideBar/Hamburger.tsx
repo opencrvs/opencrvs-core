@@ -29,7 +29,7 @@ export function Hamburger() {
     setShowMenu((prevState) => !prevState)
   }
   let name = ''
-  if (userDetails && userDetails.name) {
+  if (userDetails?.name) {
     const nameObj = getIndividualNameObj(userDetails.name, language)
     name = nameObj
       ? `${String(nameObj.firstNames)} ${String(nameObj.familyName)}`
