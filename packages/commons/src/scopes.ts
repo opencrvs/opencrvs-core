@@ -220,7 +220,31 @@ const CreateUserScope = z.object({
   })
 })
 
-const ConfigurableScopes = z.discriminatedUnion('type', [CreateUserScope])
+const EditUserScope = z.object({
+  type: z.literal('user.edit'),
+  options: z.object({
+    role: z.array(z.string())
+  })
+})
+
+const ConfigurableScopes = z.discriminatedUnion('type', [
+  CreateUserScope,
+  EditUserScope
+])
+
+type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
+
+export function findScope(
+  scopes: string[],
+  scopeType: ConfigurableScopes['type']
+) {
+  return scopes
+    .map((rawScope) => parseScope(rawScope))
+    .find(
+      (parsedScope): parsedScope is ConfigurableScopes =>
+        parsedScope?.type === scopeType
+    )
+}
 
 export function parseScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
