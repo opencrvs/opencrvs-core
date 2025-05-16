@@ -17,7 +17,6 @@ import {
 } from 'react-hot-toast'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { family } from '@opencrvs/components/lib/fonts'
 
 export enum ToastKey {
   NOT_ASSIGNED_ERROR = 'v2.errors.notAssigned'
@@ -33,7 +32,7 @@ const availableToasts: Record<ToastKey, MessageDescriptor> = {
 
 const Message = styled.span`
   margin: 0 1rem;
-  font-family: ${family};
+  font-family: ${({ theme }) => theme.fontFamily};
 `
 
 export function Toaster() {
