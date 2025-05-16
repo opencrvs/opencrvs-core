@@ -260,6 +260,7 @@ describe('getCurrentEventState()', () => {
     const state = getCurrentEventState(event)
 
     expect(state).toStrictEqual({
+      title: 'ToDo',
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
       createdAtLocation: createAction.createdAtLocation,
@@ -366,6 +367,7 @@ describe('getCurrentEventState()', () => {
     const state = getCurrentEventState(event)
 
     expect(state).toStrictEqual({
+      title: 'ToDo',
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
       createdAtLocation: createAction.createdAtLocation,
