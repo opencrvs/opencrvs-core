@@ -22,12 +22,13 @@ import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/Navigat
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
 import { Scope } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
-import { redirectToAuthentication } from '@client/profile/profileActions'
 import { getScope } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
+import { removeToken } from '@client/utils/authUtils'
+import { removeUserDetails } from '@client/utils/userUtils'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -96,7 +97,9 @@ export const Navigation = ({
           label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
           onClick={async () => {
             await storage.removeItem(SCREEN_LOCK)
-            redirectToAuthentication()
+            removeToken()
+            await removeUserDetails()
+            window.location.assign(window.config.LOGIN_URL) // how to preserve language
           }}
         />
       </NavigationGroup>
