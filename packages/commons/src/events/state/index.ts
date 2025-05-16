@@ -223,10 +223,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const dateOfEvent =
     ZodDate.safeParse(
-      event.dateOfEvent?.fieldId
-        ? declaration[event.dateOfEvent.fieldId]
-        : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
-    ).data ?? null
+      event.dateOfEvent?.fieldId ? declaration[event.dateOfEvent.fieldId] : null
+    ).data ?? event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
 
   return deepDropNulls({
     id: event.id,
