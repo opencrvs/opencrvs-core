@@ -11,7 +11,7 @@
 
 import { Action } from './ActionDocument'
 import { ActionType } from './ActionType'
-import { findLastAssignmentAction } from './utils'
+import { findLastAssignmentAction, getMixedPath } from './utils'
 
 const commonAction = {
   status: 'Requested' as const,
@@ -20,8 +20,7 @@ const commonAction = {
   createdBy: 'user-id-1',
   createdByRole: 'user-role-1',
   createdAtLocation: 'location-id-1',
-  transactionId: 'transaction-id-1',
-  updatedAtLocation: 'location-id-2'
+  transactionId: 'transaction-id-1'
 }
 
 const testCases: { actions: Action[]; expected: Action | undefined }[] = [
@@ -130,5 +129,87 @@ describe('findLastAssignmentAction', () => {
       const result = findLastAssignmentAction(actions)
       expect(result).toEqual(expected)
     })
+  })
+})
+
+describe('getMixedPath', () => {
+  const cases = [
+    {
+      description: 'Simple flat dotted key',
+      obj: { 'user.name': 'Alice' },
+      path: 'user.name',
+      expected: 'Alice'
+    },
+    {
+      description: 'Simple nested key',
+      obj: { user: { name: 'Alice' } },
+      path: 'user.name',
+      expected: 'Alice'
+    },
+    {
+      description: 'Mixed: top-level dotted, then nested',
+      obj: {
+        'user.profile': {
+          age: 30
+        }
+      },
+      path: 'user.profile.age',
+      expected: 30
+    },
+    {
+      description: 'Mixed: nested then dotted',
+      obj: {
+        user: {
+          'profile.age': 30
+        }
+      },
+      path: 'user.profile.age',
+      expected: 30
+    },
+    {
+      description: 'Deep mixed nesting and compound keys',
+      obj: {
+        'user.profile': {
+          name: {
+            'first.name': {
+              markus: 'markus'
+            }
+          }
+        }
+      },
+      path: 'user.profile.name.first.name.markus',
+      expected: 'markus'
+    },
+    {
+      description: 'Array access with index',
+      obj: {
+        users: [{ name: 'Alice' }, { name: 'Bob' }]
+      },
+      path: 'users.1.name',
+      expected: 'Bob'
+    },
+    {
+      description: 'Compound key contains array index',
+      obj: {
+        'users.1.name': 'Charlie'
+      },
+      path: 'users.1.name',
+      expected: 'Charlie'
+    },
+    {
+      description: 'Fallback to default value on missing path',
+      obj: {
+        user: {
+          name: 'Alice'
+        }
+      },
+      path: 'user.age',
+      defaultValue: 99,
+      expected: 99
+    }
+  ]
+
+  test.each(cases)('$description', ({ obj, path, defaultValue, expected }) => {
+    expect(getMixedPath(obj, path, defaultValue)).toEqual(expected)
   })
 })

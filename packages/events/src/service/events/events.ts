@@ -187,7 +187,6 @@ export async function createEvent({
     transactionId,
     createdAt: now,
     updatedAt: now,
-    updatedAtLocation: createdAtLocation,
     trackingId,
     actions: [
       {
@@ -276,7 +275,7 @@ export async function addAction(
     createdBy,
     createdByRole,
     token,
-    updatedAtLocation,
+    createdAtLocation,
     status
   }: {
     eventId: string
@@ -285,7 +284,7 @@ export async function addAction(
     /**
      * The location where the action was created. This is used for auditing purposes.
      */
-    updatedAtLocation: string
+    createdAtLocation: string
     token: string
     transactionId: string
     status: ActionStatus
@@ -330,7 +329,7 @@ export async function addAction(
             createdBy,
             createdByRole,
             createdAt: now,
-            updatedAtLocation,
+            createdAtLocation,
             id: getUUID(),
             status
           }
@@ -347,7 +346,7 @@ export async function addAction(
     createdBy,
     createdByRole,
     createdAt: now,
-    updatedAtLocation,
+    createdAtLocation,
     id: actionId,
     status: status
   }
@@ -373,9 +372,9 @@ export async function addAction(
             createdBy,
             createdByRole,
             createdAt: now,
-            updatedAtLocation,
+            createdAtLocation,
             id: actionId,
-            status: status
+            status
           }
         },
         $set: { updatedAt: now }

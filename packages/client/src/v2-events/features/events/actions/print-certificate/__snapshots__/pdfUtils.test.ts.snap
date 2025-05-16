@@ -1,0 +1,44 @@
+// Vitest Snapshot v1
+
+exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
+{
+  "assignedTo": {
+    "name": "Joseph Musonda",
+    "signature": "",
+  },
+  "createdAt": "1 February 2000",
+  "createdAtLocation": {
+    "country": "Farajaland",
+    "district": "Embe",
+    "location": "HQ Office",
+    "province": "Pualula",
+  },
+  "createdBy": {
+    "name": "Joseph Musonda",
+    "signature": "",
+  },
+  "dateOfEvent": "1 February 2000",
+  "flags": [],
+  "id": "seabeast-clad-stad-elia-oleocellosis",
+  "legalStatuses": {
+    "DECLARED": null,
+    "REGISTERED": null,
+  },
+  "modifiedAt": "2 February 2000",
+  "status": "REGISTERED",
+  "trackingId": "B77FF6",
+  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "updatedAt": "2 February 2000",
+  "updatedAtLocation": {
+    "country": "Farajaland",
+    "district": "Embe",
+    "location": "HQ Office",
+    "province": "Pualula",
+  },
+  "updatedBy": {
+    "name": "Joseph Musonda",
+    "signature": "",
+  },
+  "updatedByUserRole": "FIELD_AGENT",
+}
+`;

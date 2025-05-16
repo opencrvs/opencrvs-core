@@ -15,7 +15,391 @@ import { getUUID } from '../../uuid'
 import { ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
-import { generateActionDocument } from '../test.utils'
+import { EventStatus } from '../EventMetadata'
+import { generateActionDocument, generateEventDocument } from '../test.utils'
+import { EventIndex } from '../EventIndex'
+
+/* eslint-disable max-lines */
+
+describe('getCurrentEventState()', () => {
+  test('Sets legalStatuses when event has been declared and registered', () => {
+    const event = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
+    })
+
+    const state = getCurrentEventState(event)
+
+    expect(state.legalStatuses[EventStatus.DECLARED]).toEqual({
+      createdAt: event.actions[1].createdAt,
+      createdBy: event.actions[1].createdBy,
+      createdAtLocation: event.actions[1].createdAtLocation,
+      createdByRole: event.actions[1].createdByRole,
+      acceptedAt: event.actions[1].createdAt
+    })
+
+    expect(state.legalStatuses[EventStatus.REGISTERED]).toEqual({
+      createdAt: event.actions[2].createdAt,
+      createdBy: event.actions[2].createdBy,
+      createdAtLocation: event.actions[2].createdAtLocation,
+      createdByRole: event.actions[2].createdByRole,
+      acceptedAt: event.actions[2].createdAt
+    })
+  })
+
+  test('legalStatuses are not set when actions are not accepted', () => {
+    const actions = [
+      ActionType.CREATE,
+      ActionType.DECLARE,
+      ActionType.REGISTER
+    ].map((action) =>
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action,
+        defaults: {
+          status: ActionStatus.Requested
+        }
+      })
+    )
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      actions,
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+
+      updatedAt: new Date(Date.now()).toISOString(),
+      dateOfEvent: tennisClubMembershipEvent.dateOfEvent
+    }
+
+    const state = getCurrentEventState(event)
+
+    expect(state.legalStatuses[EventStatus.DECLARED]).toBe(undefined)
+
+    expect(state.legalStatuses[EventStatus.REGISTERED]).toBe(undefined)
+  })
+
+  test('legalStatuses are shown when requests have been accepted async', () => {
+    const actions = [
+      generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.CREATE
+      }),
+      ...[ActionType.DECLARE, ActionType.REGISTER].flatMap((action, i) => [
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action,
+          defaults: {
+            status: ActionStatus.Requested,
+            // While running tests we need to make sure that the timestamps are different. Using current date causes false positives.
+            createdAt: `2023-01-01T00:0${i}:00.000Z`
+          }
+        }),
+        generateActionDocument({
+          configuration: tennisClubMembershipEvent,
+          action,
+          defaults: {
+            status: ActionStatus.Accepted,
+            createdAt: `2023-01-01T00:0${i + 1}:00.000Z`
+          }
+        })
+      ])
+    ]
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      actions,
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+
+      updatedAt: new Date(Date.now()).toISOString(),
+      dateOfEvent: tennisClubMembershipEvent.dateOfEvent
+    }
+
+    const state = getCurrentEventState(event)
+
+    const declareRequest = actions.find(
+      (action) =>
+        action.type === ActionType.DECLARE &&
+        action.status === ActionStatus.Requested
+    )
+
+    const declareAccept = actions.find(
+      (action) =>
+        action.type === ActionType.DECLARE &&
+        action.status === ActionStatus.Accepted
+    )
+
+    const registerRequest = actions.find(
+      (action) =>
+        action.type === ActionType.REGISTER &&
+        action.status === ActionStatus.Requested
+    )
+
+    const registerAccept = actions.find(
+      (action) =>
+        action.type === ActionType.REGISTER &&
+        action.status === ActionStatus.Accepted
+    )
+
+    expect(state.legalStatuses[EventStatus.DECLARED]).toEqual({
+      createdAt: declareRequest?.createdAt,
+      createdBy: declareRequest?.createdBy,
+      createdAtLocation: declareRequest?.createdAtLocation,
+      createdByRole: declareRequest?.createdByRole,
+      acceptedAt: declareAccept?.createdAt
+    })
+
+    expect(state.legalStatuses[EventStatus.REGISTERED]).toEqual({
+      createdAt: registerRequest?.createdAt,
+      createdBy: registerRequest?.createdBy,
+      createdAtLocation: registerRequest?.createdAtLocation,
+      createdByRole: registerRequest?.createdByRole,
+      acceptedAt: registerAccept?.createdAt
+    })
+  })
+
+  test('Sets timestamps correctly when legal statuses were accepted async', () => {
+    // NOTE: Values are not important, just the fact that right one is set. Using human-readable values for clarity
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-01-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdAtLocation: 'location1',
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    // Same person created the event and declared it
+    const declareRequestAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Requested,
+        createdAt: '2023-02-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdAtLocation: 'location1',
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    // 3rd party API accepted declaration async
+    const declareAcceptAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-03-01T00:00:00.000Z',
+        createdBy: 'computer1',
+        createdAtLocation: 'location2',
+        createdByRole: '3RD_PARTY_API'
+      }
+    })
+    // Validate accepted directly by 3rd party API. Single action created.
+    const validateAcceptAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.VALIDATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-04-01T00:00:00.000Z',
+        createdBy: 'user2',
+        createdAtLocation: 'location3',
+        createdByRole: 'REGISTRATION_AGENT'
+      }
+    })
+
+    const registerRequestAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REGISTER,
+      defaults: {
+        status: ActionStatus.Requested,
+        createdAt: '2023-05-01T00:00:00.000Z',
+        createdBy: 'user3',
+        createdAtLocation: 'location4',
+        createdByRole: 'LOCAL_REGISTRAR'
+      }
+    })
+
+    const registerAcceptAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REGISTER,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-06-01T00:00:00.000Z',
+        createdBy: 'computer2',
+        createdAtLocation: 'location5',
+        createdByRole: '3RD_PARTY_API',
+        registrationNumber: '123456789'
+      }
+    })
+
+    const actions = [
+      createAction,
+      declareRequestAction,
+      declareAcceptAction,
+      validateAcceptAction,
+      registerRequestAction,
+      registerAcceptAction
+    ]
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      actions,
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      dateOfEvent: tennisClubMembershipEvent.dateOfEvent
+    }
+
+    const state = getCurrentEventState(event)
+
+    expect(state).toStrictEqual({
+      createdAt: createAction.createdAt,
+      createdBy: createAction.createdBy,
+      createdAtLocation: createAction.createdAtLocation,
+      updatedAt: registerRequestAction.createdAt,
+      updatedBy: registerRequestAction.createdBy,
+      id: event.id,
+      type: event.type,
+      trackingId: event.trackingId,
+      status: EventStatus.REGISTERED,
+      updatedByUserRole: registerRequestAction.createdByRole,
+      updatedAtLocation: registerRequestAction.createdAtLocation,
+      declaration: deepDropNulls(declareRequestAction.declaration),
+      flags: [],
+      legalStatuses: {
+        [EventStatus.DECLARED]: {
+          createdAt: declareRequestAction.createdAt,
+          createdBy: declareRequestAction.createdBy,
+          createdAtLocation: declareRequestAction.createdAtLocation,
+          createdByRole: declareRequestAction.createdByRole,
+          acceptedAt: declareAcceptAction.createdAt
+        },
+        [EventStatus.REGISTERED]: {
+          createdAt: registerRequestAction.createdAt,
+          createdBy: registerRequestAction.createdBy,
+          createdAtLocation: registerRequestAction.createdAtLocation,
+          acceptedAt: registerAcceptAction.createdAt,
+          createdByRole: registerRequestAction.createdByRole,
+          // @ts-expect-error -- We do not have sufficient types for this in generator
+          registrationNumber: registerAcceptAction.registrationNumber
+        }
+      }
+    } satisfies EventIndex)
+  })
+
+  test('Sets timestamps correctly when legal statuses were accepted immediately', () => {
+    // NOTE: Values are not important, just the fact that right one is set. Using human-readable values for clarity
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-01-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdAtLocation: 'location1',
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    // Same person created the event and declared it
+    const declareAcceptAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-02-01T00:00:00.000Z',
+        createdBy: 'user1',
+        createdAtLocation: 'location1',
+        createdByRole: 'FIELD_AGENT'
+      }
+    })
+
+    const validateAcceptAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.VALIDATE,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-04-01T00:00:00.000Z',
+        createdBy: 'user2',
+        createdAtLocation: 'location3',
+        createdByRole: 'REGISTRATION_AGENT'
+      }
+    })
+
+    const registerAcceptAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.REGISTER,
+      defaults: {
+        status: ActionStatus.Accepted,
+        createdAt: '2023-05-01T00:00:00.000Z',
+        createdBy: 'user3',
+        createdAtLocation: 'location4',
+        createdByRole: 'LOCAL_REGISTRAR',
+        registrationNumber: '123456789'
+      }
+    })
+
+    const actions = [
+      createAction,
+      declareAcceptAction,
+      validateAcceptAction,
+      registerAcceptAction
+    ]
+
+    const event = {
+      trackingId: getUUID(),
+      type: tennisClubMembershipEvent.id,
+      actions,
+      createdAt: new Date(Date.now()).toISOString(),
+      id: getUUID(),
+      updatedAt: new Date(Date.now()).toISOString(),
+      dateOfEvent: tennisClubMembershipEvent.dateOfEvent
+    }
+
+    const state = getCurrentEventState(event)
+
+    expect(state).toStrictEqual({
+      createdAt: createAction.createdAt,
+      createdBy: createAction.createdBy,
+      createdAtLocation: createAction.createdAtLocation,
+      updatedAt: registerAcceptAction.createdAt,
+      updatedBy: registerAcceptAction.createdBy,
+      id: event.id,
+      type: event.type,
+      trackingId: event.trackingId,
+      status: EventStatus.REGISTERED,
+      updatedByUserRole: registerAcceptAction.createdByRole,
+      updatedAtLocation: registerAcceptAction.createdAtLocation,
+      declaration: deepDropNulls(declareAcceptAction.declaration),
+      flags: [],
+      legalStatuses: {
+        [EventStatus.DECLARED]: {
+          createdAt: declareAcceptAction.createdAt,
+          createdBy: declareAcceptAction.createdBy,
+          createdAtLocation: declareAcceptAction.createdAtLocation,
+          acceptedAt: declareAcceptAction.createdAt,
+          createdByRole: declareAcceptAction.createdByRole
+        },
+        [EventStatus.REGISTERED]: {
+          createdAt: registerAcceptAction.createdAt,
+          createdBy: registerAcceptAction.createdBy,
+          createdAtLocation: registerAcceptAction.createdAtLocation,
+          acceptedAt: registerAcceptAction.createdAt,
+          createdByRole: registerAcceptAction.createdByRole,
+          // @ts-expect-error -- We do not have sufficient types for this in generator
+          registrationNumber: registerAcceptAction.registrationNumber
+        }
+      }
+    } satisfies EventIndex)
+  })
+})
 
 describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
@@ -26,7 +410,6 @@ describe('correction requests', () => {
       createdAt: '2025-01-23T02:21:38.343Z',
       updatedAt: '2025-01-23T02:21:42.230Z',
       dateOfEvent: { fieldId: 'child.dob' },
-      updatedAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
       actions: [
         {
           type: 'CREATE',
@@ -85,7 +468,6 @@ describe('correction requests', () => {
       createdAt: '2025-01-23T02:21:38.343Z',
       updatedAt: '2025-01-23T02:21:42.230Z',
       dateOfEvent: { fieldId: 'child.dob' },
-      updatedAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
       actions: [
         {
           type: 'CREATE',
@@ -207,7 +589,6 @@ describe('address state transitions', () => {
       actions,
       id: getUUID(),
       updatedAt: new Date().toISOString(),
-      updatedAtLocation: getUUID(),
       dateOfEvent: { fieldId: 'child.dob' }
     })
 
@@ -240,7 +621,6 @@ describe('address state transitions', () => {
       actions,
       id: getUUID(),
       updatedAt: new Date().toISOString(),
-      updatedAtLocation: getUUID(),
       dateOfEvent: { fieldId: 'child.dob' }
     })
 
