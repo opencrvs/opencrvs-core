@@ -22,7 +22,7 @@
     "build:clean": "rm -rf build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook",
+    "test-storybook": "test-storybook --maxWorkers=2",
     "test-storybook:watch": "test-storybook --watch",
     "chromatic": "chromatic --exit-zero-on-changes --only-changed"
   },
