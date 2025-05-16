@@ -98,6 +98,7 @@ export const LegalStatuses = z.object({
  */
 export const EventMetadata = z.object({
   id: z.string(),
+  title: z.string(),
   type: z
     .string()
     .describe('The type of event, such as birth, death, or marriage.'),
@@ -145,6 +146,7 @@ export type EventMetadata = z.infer<typeof EventMetadata>
 
 export const EventMetadataKeys = z.enum([
   'id',
+  'title',
   'type',
   'status',
   'createdAt',
@@ -184,6 +186,11 @@ export const eventMetadataLabelMap: Record<
     id: 'event.assignedTo.label',
     defaultMessage: 'Assigned To',
     description: 'Assigned To'
+  },
+  'event.title': {
+    id: 'event.title.label',
+    defaultMessage: 'Title',
+    description: 'Title'
   },
   'event.createdAt': {
     id: 'event.createdAt.label',

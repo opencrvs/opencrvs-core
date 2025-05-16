@@ -34,6 +34,7 @@ import { DeclarationAction } from '@client/v2-events/features/events/components/
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
+import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { ROUTES } from './routes'
 
 /**
@@ -55,6 +56,10 @@ export const routesConfig = {
     </NavigationHistoryProvider>
   ),
   children: [
+    {
+      element: <RedirectToWorkqueue />,
+      index: true
+    },
     workqueueRouter,
     {
       path: ROUTES.V2.EVENTS.VIEW.path,

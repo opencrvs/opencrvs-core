@@ -8,17 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { useSuspenseQuery } from '@tanstack/react-query'
+import { useTRPC } from '@client/v2-events/trpc'
 
-import { allWorkqueue } from './all'
-import { inReviewWorkqueue } from './readyForReview'
-import { registeredWorkqueue } from './readyToPrint'
-/** @knipignore */
-export { RootWorkqueueConfig, WorkQueueColumnConfig } from './WorkqueueConfig'
-/** @knipignore */
-export { defaultColumns } from './defaultColumns'
-
-export const workqueues = {
-  all: allWorkqueue,
-  registered: registeredWorkqueue,
-  'in-review': inReviewWorkqueue
+/**
+ * @returns a list of workqueue configurations
+ */
+export function useWorkqueueConfigurations() {
+  const trpc = useTRPC()
+  const config = useSuspenseQuery(trpc.event.workqueue.get.queryOptions()).data
+  return config
 }

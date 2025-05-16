@@ -8,16 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './search'
 
-export * from './events'
-export * from './scopes'
-export * from './documents'
-export * from './uuid'
-export * from './utils'
+import { z } from 'zod'
+import { TranslationConfig } from './TranslationConfig'
+import { EventMetadataParameter } from './EventMetadata'
 
-export * from './conditionals/validate'
-export { DEFAULT_ROLES_DEFINITION } from './authentication'
-export * from './fixtures'
-
-export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
+/**
+ * Configuration for column header and value of cell of workqueue.
+ */
+export const WorkqueueColumn = z.object({
+  label: TranslationConfig,
+  value: EventMetadataParameter
+})
+export type WorkqueueColumn = z.infer<typeof WorkqueueColumn>

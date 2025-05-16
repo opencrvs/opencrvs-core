@@ -18,6 +18,7 @@ import {
 
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
+  title: 'John Doe',
   type: 'TENNIS_CLUB_MEMBERSHIP',
   trackingId: 'TEST12',
   status: 'CREATED',
