@@ -111,11 +111,16 @@ function getSectionFields(
     )
 
     const combinedFields = [...metadataFields, ...advancedSearchFields]
-    const modifiedFields = combinedFields.map((f) => ({
-      ...f,
-      required: false as const, // advanced search fields need not be required
-      defaultValue: undefined // advanced search fields need no default or initial value
-    }))
+    const modifiedFields = combinedFields.map((f) => {
+      const fieldSearchConfig = advancedSearchSections
+        .flatMap((a) => a.fields)
+        .find((a) => a.fieldId === f.id)
+      return {
+        ...f,
+        required: false as const,
+        conditionals: fieldSearchConfig?.conditionals ?? f.conditionals
+      }
+    })
 
     return (
       <Accordion
@@ -188,7 +193,7 @@ export function TabSearch({
 
   const handleSearch = () => {
     const nonEmptyValues = filterEmptyValues(formValues)
-    const searchParams = stringify(nonEmptyValues, { arrayFormat: 'comma' })
+    const searchParams = stringify(nonEmptyValues)
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: enhancedEvent.id
     })

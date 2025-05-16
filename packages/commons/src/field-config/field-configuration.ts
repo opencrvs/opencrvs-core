@@ -9,56 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { FieldConditional } from 'src/events'
+import { createSearchConfigs } from '../searchConfigs'
+
 /**
  * Returns configuration options for the field.
  */
-export function createFieldConfigs(fieldId: string) {
+export function createFieldConfigs(
+  fieldId: string,
+  options: { conditionals?: FieldConditional[] }
+) {
   const baseField = {
     fieldId,
-    fieldType: 'field' as const
+    fieldType: 'field' as const,
+    ...options
   }
 
-  return {
-    /**
-     * Creates a range configuration for the specified field.
-     *
-     * @returns An object containing the field ID and a configuration object with a type of 'range'.
-     *
-     * @example field('age').range()
-     * // {
-     * //   fieldId: 'age',
-     * //   config: { type: 'range' }
-     * // }
-     */
-    range: () => ({
-      ...baseField,
-      config: { type: 'range' as const }
-    }),
-    /**
-     * Creates a configuration for exact matching of the specified field.
-     * @returns  An object containing the field ID and a configuration object with a type of 'exact'.
-     * @example field('dob').exact()
-     * // {
-     * //   fieldId: 'dob',
-     * //   config: { type: 'exact' }
-     * // }
-     */
-    exact: () => ({
-      ...baseField,
-      config: { type: 'exact' as const }
-    }),
-    /**
-     * Creates a configuration for fuzzy matching of the specified field.
-     * @returns  An object containing the field ID and a configuration object with a type of 'exact'.
-     * @example field('name').fuzzy()
-     * // {
-     * //   fieldId: 'name',
-     * //   config: { type: 'fuzzy' }
-     * // }
-     */
-    fuzzy: () => ({
-      ...baseField,
-      config: { type: 'fuzzy' as const }
-    })
-  }
+  return createSearchConfigs(baseField)
 }

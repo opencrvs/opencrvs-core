@@ -12,9 +12,15 @@ import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
+import { stringify } from 'query-string'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
+import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
+import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { useEventConfigurations } from '../useEventConfiguration'
+import { getDefaultSearchFields } from './utils'
 
 const messagesToDefine = {
   edit: {
@@ -39,7 +45,10 @@ const SearchParamContainer = styled.div`
   }
 `
 
-function convertPathToLabel(path: string): string {
+function convertPathToLabel(path?: string): string {
+  if (!path) {
+    return ''
+  }
   if (!path.includes('.')) {
     return path.charAt(0).toUpperCase() + path.slice(1)
   }
@@ -58,12 +67,73 @@ export function SearchModifierComponent({
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
-  const eventSearchParamLabel = `${intl.formatMessage(constantsMessages.event)} : ${convertPathToLabel(eventType)}`
-  const searchParamLabels = Object.entries(searchParams).map(
-    ([key, value]) => `${convertPathToLabel(key)} : ${value}`
+
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+
+  const eventConfigurations = useEventConfigurations()
+  const eventConfig = eventConfigurations.find(
+    (config) => config.id === eventType
+  )
+  if (!eventConfig) {
+    return null
+  }
+  const stringifyForm = getFormDataStringifier(intl, locations)
+
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
+  const declarationSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([key, value]) => {
+      return declarationFieldConfigs.some((field) => field.id === key)
+    })
   )
 
-  const allSearchParamLabels = [eventSearchParamLabel, ...searchParamLabels]
+  const searchParamsResolved = stringifyForm(
+    declarationFieldConfigs,
+    declarationSearchParams
+  )
+
+  const declarationSearchParamLabels = Object.keys(searchParamsResolved)
+    .map((key) => {
+      const field = declarationFieldConfigs.find((f) => f.id === key)
+      if (!field) {
+        return null
+      }
+      const prefix = key.split('.').slice(0, -1) + ' '
+      return `${convertPathToLabel(prefix)}${intl.formatMessage(field.label)}: ${searchParamsResolved[key]}`
+    })
+    .filter(Boolean)
+
+  const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
+    ([key, x]) => getDefaultSearchFields(x)
+  )
+  const eventSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([key, value]) => {
+      return eventFieldConfigs.some((field) => field.id === key)
+    })
+  )
+
+  const eventSearchParamsResolved = stringifyForm(
+    eventFieldConfigs,
+    eventSearchParams
+  )
+
+  const eventSearchParamLabels = Object.keys(eventSearchParamsResolved)
+    .map((key) => {
+      const field = eventFieldConfigs.find((f) => f.id === key)
+      if (!field) {
+        return null
+      }
+      return `${intl.formatMessage(field.label)}: ${eventSearchParamsResolved[key]}`
+    })
+    .filter(Boolean)
+
+  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)} : ${convertPathToLabel(eventType)}`
+
+  const allSearchParamLabels = [
+    eventParamLabel,
+    ...eventSearchParamLabels,
+    ...declarationSearchParamLabels
+  ]
 
   return (
     <>
@@ -73,11 +143,15 @@ export function SearchModifierComponent({
         ))}
         <StyledLink
           font="bold14"
-          onClick={() =>
-            navigate(ROUTES.V2.ADVANCED_SEARCH.path, {
-              state: { searchParams, eventType }
+          onClick={() => {
+            const nonEmptyValues = filterEmptyValues({
+              ...searchParams,
+              eventType
             })
-          }
+            const serializedParams = stringify(nonEmptyValues)
+            const navigateTo = ROUTES.V2.ADVANCED_SEARCH.buildPath({})
+            navigate(`${navigateTo}?${serializedParams.toString()}`)
+          }}
         >
           {intl.formatMessage(messages.edit)}
         </StyledLink>

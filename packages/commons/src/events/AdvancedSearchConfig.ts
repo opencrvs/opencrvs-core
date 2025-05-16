@@ -11,6 +11,7 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { SelectOption } from './FieldConfig'
+import { FieldConditional } from './Conditional'
 
 const MatchType = z.enum(['fuzzy', 'exact', 'range'])
 
@@ -18,7 +19,9 @@ const BaseField = z.object({
   config: z.object({
     type: MatchType.describe('Determines the type of field')
   }),
-  options: z.array(SelectOption).optional()
+  options: z.array(SelectOption).optional(),
+  // If we ever need to override default field conditionals in advanced search
+  conditionals: z.array(FieldConditional).default([]).optional()
 })
 
 export const FieldConfigSchema = BaseField.extend({
@@ -26,7 +29,13 @@ export const FieldConfigSchema = BaseField.extend({
   fieldType: z.literal('field')
 })
 
-export const EventFieldId = z.enum(['trackingId', 'status'])
+export const EventFieldId = z.enum([
+  'trackingId',
+  'status',
+  'registeredAt',
+  'registeredAtLocation',
+  'updatedAt'
+])
 export type EventFieldId = z.infer<typeof EventFieldId>
 
 export const EventFieldConfigSchema = BaseField.extend({

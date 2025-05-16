@@ -351,12 +351,24 @@ export async function addAction(
     status: status
   }
 
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
+  const registerInfo =
+    action.type === ActionType.REGISTER
+      ? {
+          registeredAt: now,
+          registeredAtLocation: createdAtLocation
+        }
+      : {}
+
+  await db.collection<EventDocument>('events').updateOne(
+    { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
+    {
+      $push: { actions: action },
+      $set: {
+        updatedAt: now,
+        ...registerInfo
+      }
+    }
+  )
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
     await db.collection<EventDocument>('events').updateOne(

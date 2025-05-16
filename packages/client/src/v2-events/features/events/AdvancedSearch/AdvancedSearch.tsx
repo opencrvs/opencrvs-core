@@ -10,7 +10,7 @@
  */
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useLocation } from 'react-router-dom'
+import { parse } from 'query-string'
 import {
   Content,
   ContentSize,
@@ -39,8 +39,9 @@ const messages = defineMessages(messagesToDefine)
 export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
-  const location = useLocation()
-  const { searchParams = {}, eventType = '' } = location.state || {}
+  const { eventType = '', ...searchParams } = parse(
+    window.location.search
+  ) as Record<string, string>
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0

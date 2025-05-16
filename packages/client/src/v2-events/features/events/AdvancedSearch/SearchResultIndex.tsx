@@ -24,9 +24,7 @@ export const SearchResultIndex = () => {
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = parse(window.location.search, {
-    arrayFormat: 'comma'
-  }) as Record<string, string>
+  const searchParams = parse(window.location.search) as Record<string, string>
 
   const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
 

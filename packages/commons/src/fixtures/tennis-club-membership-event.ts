@@ -19,6 +19,7 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
+import { event } from '../events/event'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -1317,7 +1318,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'This is what this event is referred as in the system',
         id: 'v2.event.tennis-club-membership.search'
       },
-      fields: [field('applicant.dob').exact()]
+      fields: [field('applicant.dob').exact(), event('registeredAt').exact()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM

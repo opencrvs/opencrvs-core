@@ -88,6 +88,35 @@ function buildClause(clause: QueryExpression) {
     })
   }
 
+  if (clause.registeredAt) {
+    if (clause.registeredAt.type === 'exact') {
+      must.push({ term: { registeredAt: clause.registeredAt.term } })
+    } else {
+      must.push({
+        range: {
+          registeredAt: {
+            gte: clause.registeredAt.gte,
+            lte: clause.registeredAt.lte
+          }
+        }
+      })
+    }
+  }
+  if (clause.registeredAtLocation) {
+    if (clause.registeredAtLocation.type === 'exact') {
+      must.push({
+        term: { registeredAtLocation: clause.registeredAtLocation.term }
+      })
+    } else {
+      must.push({
+        geo_distance: {
+          distance: '10km',
+          location: clause.registeredAtLocation.location
+        }
+      })
+    }
+  }
+
   if (clause.createdAt) {
     if (clause.createdAt.type === 'exact') {
       must.push({ term: { createdAt: clause.createdAt.term } })

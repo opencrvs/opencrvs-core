@@ -61,9 +61,47 @@ const defaultSearchFieldGenerator: Record<
   EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
+  [EventFieldId.enum.registeredAtLocation]: (_) => ({
+    id: 'event.registeredAtLocation',
+    type: FieldType.OFFICE,
+    label: {
+      defaultMessage: 'Place of registration',
+      description: 'Label for place of registration field',
+      id: 'v2.advancedSearch.registeredAtLocation'
+    },
+    helperText: {
+      defaultMessage: 'Search for a province, district or registration office',
+      description: 'Helper text for place of registration field',
+      id: 'v2.advancedSearch.registeredAtLocation.helperText'
+    }
+  }),
+  [EventFieldId.enum.registeredAt]: (_) => ({
+    id: 'event.registeredAt',
+    type: FieldType.DATE_RANGE,
+    label: {
+      defaultMessage: 'Date of registration',
+      description: 'Label for date of registration field',
+      id: 'v2.advancedSearch.registeredAt'
+    }
+  }),
+  [EventFieldId.enum.updatedAt]: (config) => ({
+    id: 'event.updatedAt',
+    type: FieldType.SELECT,
+    label: {
+      defaultMessage: 'Time period',
+      description: 'Label for date of update field',
+      id: 'v2.advancedSearch.updatedAt'
+    },
+    helperText: {
+      defaultMessage: 'Period of time since the record status changed',
+      description: 'Helper text for date of update field',
+      id: 'v2.advancedSearch.updatedAt.helperText'
+    },
+    options: config.options ?? []
+  }),
   [EventFieldId.enum.trackingId]: (_) => ({
     id: 'event.trackingId',
-    type: 'TEXT',
+    type: FieldType.TEXT,
     label: {
       defaultMessage: 'Tracking ID',
       description: 'Label for tracking ID field',
@@ -72,7 +110,7 @@ const defaultSearchFieldGenerator: Record<
   }),
   [EventFieldId.enum.status]: (config) => ({
     id: 'event.status',
-    type: 'SELECT',
+    type: FieldType.SELECT,
     label: {
       defaultMessage: 'Status of record',
       description: 'Label for status field',
@@ -218,16 +256,18 @@ export function buildDataCondition(
   const advancedSearch = eventConfig.advancedSearch
 
   // Flatten all fields into a single list of search keys
-  const searchKeys = advancedSearch.flatMap((section) =>
-    section.fields.map((field) => ({
-      fieldId: field.fieldId,
-      config: field.config, // assuming field structure has a `config` prop
-      fieldType: field.fieldType,
-      fieldConfig: eventConfig.declaration.pages
-        .flatMap((page) => page.fields)
-        .find((f) => f.id === field.fieldId)
-    }))
-  )
+  const searchKeys = advancedSearch
+    .flatMap((section) =>
+      section.fields.map((field) => ({
+        fieldId: field.fieldId,
+        config: field.config, // assuming field structure has a `config` prop
+        fieldType: field.fieldType,
+        fieldConfig: eventConfig.declaration.pages
+          .flatMap((page) => page.fields)
+          .find((f) => f.id === field.fieldId)
+      }))
+    )
+    .filter((f) => Object.keys(flat).includes(f.fieldId)) // Filter out fields not present in the flat object
 
   return buildDataConditionFromSearchKeys(searchKeys, flat)
 }

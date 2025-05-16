@@ -11,19 +11,25 @@
 
 import { createFieldConditionals } from '../conditionals/conditionals'
 import { createFieldConfigs } from '../field-config/field-configuration'
+import { FieldConditional } from './Conditional'
 
 /**
  * Entry point for defining conditional logic or configuration for a form field.
  * @param fieldId - The ID of the field to define rules or config for.
  * @returns An object combining conditional methods and configuration builders.
  */
-export function field(fieldId: string) {
+export function field(
+  fieldId: string,
+  options: {
+    conditionals?: FieldConditional[]
+  } = {}
+) {
   return {
     /**
      * @private Internal property used for field reference tracking.
      */
     _fieldId: fieldId,
     ...createFieldConditionals(fieldId),
-    ...createFieldConfigs(fieldId)
+    ...createFieldConfigs(fieldId, options)
   }
 }
