@@ -19,7 +19,7 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
-import { defineWorkqueue } from 'src/events'
+import { defineWorkqueue } from '../events'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
