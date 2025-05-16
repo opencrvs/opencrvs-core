@@ -28,6 +28,7 @@ import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
+import * as routes from '@client/navigation/routes'
 import { removeUserDetails } from '@client/utils/userUtils'
 
 const SCREEN_LOCK = 'screenLock'
@@ -87,7 +88,7 @@ export const Navigation = ({
           isSelected={false}
           label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.settings])}
           onClick={() => {
-            alert('clicked setting')
+            navigate(routes.SETTINGS)
             menuCollapse && menuCollapse()
           }}
         />
