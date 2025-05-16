@@ -18,7 +18,7 @@ import {
 import { joinValues } from '@client/v2-events/utils'
 import { Text } from '@client/v2-events/features/events/registered-fields'
 
-type Props = FieldProps<typeof FieldType.NAME> & {
+interface Props {
   onChange: (newValue: NameFieldValue) => void
   value?: NameFieldUpdateValue
 }

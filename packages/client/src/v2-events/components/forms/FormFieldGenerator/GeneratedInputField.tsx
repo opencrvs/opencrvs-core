@@ -163,9 +163,6 @@ export const GeneratedInputField = React.memo(
       return (
         <InputField {...field.inputFieldProps}>
           <Name.Input
-            id={fieldDefinition.id}
-            label={fieldDefinition.label}
-            type={'NAME'}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />

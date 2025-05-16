@@ -108,7 +108,7 @@ const messagesToDefine = {
     description: 'Search menu advanced search type'
   },
   placeHolderText: {
-    id: 'home.header.searchTool.placeholder',
+    id: 'v2.home.header.searchTool.placeholder',
     defaultMessage:
       'Search for a tracking ID, name, registration number, national ID, phone number or email',
     description: 'Search tool placeholder'
