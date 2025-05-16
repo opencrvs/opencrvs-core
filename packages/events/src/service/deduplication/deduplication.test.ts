@@ -172,6 +172,7 @@ export async function findDuplicates(
       // Random field values that should not affect the search
       id: getUUID(),
       type: 'birth',
+      title: 'Danny Doe',
       status: 'CREATED',
       createdAt: '2025-01-01',
       createdBy: 'test',
@@ -251,6 +252,7 @@ describe('deduplication tests', () => {
         declaration: {},
         // Random field values that should not affect the search
         id: '123-123-123-123',
+        title: 'Danny Doe',
         type: 'birth',
         status: 'CREATED',
         createdAt: '2025-01-01',
