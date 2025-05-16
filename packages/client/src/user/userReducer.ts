@@ -36,7 +36,7 @@ import { gqlToDraftTransformer } from '@client/transformer'
 import { GET_USER, SEARCH_USERS } from '@client/user/queries'
 import { IUserAuditForm, userAuditForm } from '@client/user/user-audit'
 import { getToken, getTokenPayload } from '@client/utils/authUtils'
-import { SCOPES } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
 import { UserRole } from '@client/utils/gateway'
 
 import type { GQLQuery } from '@client/utils/gateway-deprecated-do-not-use'
@@ -408,18 +408,13 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
     case ROLES_LOADED:
       const { loggedInUserScopes, userRoles } = action.payload
 
-      const roleScopes = (role: string) =>
-        userRoles.find(({ id }) => id === role)?.scopes ?? []
+      const creatableRoleIds =
+        findScope(loggedInUserScopes, 'user.create')?.options?.role ?? []
 
-      const canCreateOrUpdateAll = [
-        SCOPES.USER_CREATE,
-        SCOPES.USER_UPDATE
-      ].some((scope) => loggedInUserScopes.includes(scope))
+      const editableRoleIds =
+        findScope(loggedInUserScopes, 'user.edit')?.options?.role ?? []
 
-      const canCreateOrUpdateJurisdiction = [
-        SCOPES.USER_CREATE_MY_JURISDICTION,
-        SCOPES.USER_UPDATE_MY_JURISDICTION
-      ].some((scope) => loggedInUserScopes.includes(scope))
+      const allowedRoleIds = [...creatableRoleIds, ...editableRoleIds]
 
       const form = deserializeForm(getCreateUserForm(), validators)
 
@@ -433,16 +428,7 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
             return {
               ...field,
               options: userRoles
-                .filter(
-                  ({ id }) =>
-                    canCreateOrUpdateAll ||
-                    (canCreateOrUpdateJurisdiction &&
-                      !roleScopes(id).some((scope) =>
-                        (
-                          [SCOPES.USER_CREATE, SCOPES.USER_UPDATE] as string[]
-                        ).includes(scope)
-                      ))
-                )
+                .filter(({ id }) => allowedRoleIds.includes(id))
                 .map((role) => ({
                   value: role.id,
                   label: role.label

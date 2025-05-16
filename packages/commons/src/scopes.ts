@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod'
+
 export const SCOPES = {
   // TODO v1.8 legacy scopes
   NATLSYSADMIN: 'natlsysadmin',
@@ -137,6 +139,159 @@ export const SCOPES = {
   USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
-export type Scope = (typeof SCOPES)[keyof typeof SCOPES]
+const LiteralScopes = z.union([
+  z.literal(SCOPES.NATLSYSADMIN),
+  z.literal(SCOPES.BYPASSRATELIMIT),
+  z.literal(SCOPES.DECLARE),
+  z.literal(SCOPES.REGISTER),
+  z.literal(SCOPES.VALIDATE),
+  z.literal(SCOPES.DEMO),
+  z.literal(SCOPES.CERTIFY),
+  z.literal(SCOPES.PERFORMANCE),
+  z.literal(SCOPES.SYSADMIN),
+  z.literal(SCOPES.TEAMS),
+  z.literal(SCOPES.CONFIG),
+  z.literal(SCOPES.WEBHOOK),
+  z.literal(SCOPES.NATIONALID),
+  z.literal(SCOPES.NOTIFICATION_API),
+  z.literal(SCOPES.RECORDSEARCH),
+  z.literal(SCOPES.RECORD_DECLARE_BIRTH),
+  z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
+  z.literal(SCOPES.RECORD_DECLARE_DEATH),
+  z.literal(SCOPES.RECORD_DECLARE_DEATH_MY_JURISDICTION),
+  z.literal(SCOPES.RECORD_DECLARE_MARRIAGE),
+  z.literal(SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION),
+  z.literal(SCOPES.RECORD_SUBMIT_INCOMPLETE),
+  z.literal(SCOPES.RECORD_SUBMIT_FOR_REVIEW),
+  z.literal(SCOPES.RECORD_UNASSIGN_OTHERS),
+  z.literal(SCOPES.RECORD_SUBMIT_FOR_APPROVAL),
+  z.literal(SCOPES.RECORD_SUBMIT_FOR_UPDATES),
+  z.literal(SCOPES.RECORD_DECLARATION_EDIT),
+  z.literal(SCOPES.RECORD_REVIEW_DUPLICATES),
+  z.literal(SCOPES.RECORD_DECLARATION_ARCHIVE),
+  z.literal(SCOPES.RECORD_DECLARATION_REINSTATE),
+  z.literal(SCOPES.RECORD_REGISTER),
+  z.literal(SCOPES.RECORD_EXPORT_RECORDS),
+  z.literal(SCOPES.RECORD_DECLARATION_PRINT),
+  z.literal(SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS),
+  z.literal(SCOPES.RECORD_REGISTRATION_PRINT),
+  z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
+  z.literal(SCOPES.RECORD_PRINT_CERTIFIED_COPIES),
+  z.literal(SCOPES.RECORD_BULK_PRINT_CERTIFIED_COPIES),
+  z.literal(SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES),
+  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION),
+  z.literal(SCOPES.RECORD_REGISTRATION_CORRECT),
+  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REVOCATION),
+  z.literal(SCOPES.RECORD_REGISTRATION_REVOKE),
+  z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REINSTATEMENT),
+  z.literal(SCOPES.RECORD_REGISTRATION_REINSTATE),
+  z.literal(SCOPES.RECORD_CONFIRM_REGISTRATION),
+  z.literal(SCOPES.RECORD_REJECT_REGISTRATION),
+  z.literal(SCOPES.SEARCH_BIRTH_MY_JURISDICTION),
+  z.literal(SCOPES.SEARCH_BIRTH),
+  z.literal(SCOPES.SEARCH_DEATH_MY_JURISDICTION),
+  z.literal(SCOPES.SEARCH_DEATH),
+  z.literal(SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION),
+  z.literal(SCOPES.SEARCH_MARRIAGE),
+  z.literal(SCOPES.RECORD_READ),
+  z.literal(SCOPES.RECORD_READ_AUDIT),
+  z.literal(SCOPES.RECORD_READ_COMMENTS),
+  z.literal(SCOPES.RECORD_CREATE_COMMENTS),
+  z.literal(SCOPES.PROFILE_UPDATE),
+  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
+  z.literal(SCOPES.PERFORMANCE_READ),
+  z.literal(SCOPES.PERFORMANCE_READ_DASHBOARDS),
+  z.literal(SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
+  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS),
+  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
+  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
+  z.literal(SCOPES.USER_READ),
+  z.literal(SCOPES.USER_READ_MY_OFFICE),
+  z.literal(SCOPES.USER_READ_MY_JURISDICTION),
+  z.literal(SCOPES.USER_READ_ONLY_MY_AUDIT),
+  z.literal(SCOPES.USER_CREATE),
+  z.literal(SCOPES.USER_CREATE_MY_JURISDICTION),
+  z.literal(SCOPES.USER_UPDATE),
+  z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
+  z.literal(SCOPES.CONFIG_UPDATE_ALL),
+  z.literal(SCOPES.USER_DATA_SEEDING)
+])
 
+const rawConfigurableScopeRegex =
+  /^([a-zA-Z]+\.[a-zA-Z]+)\[((?:\w+=\w+(?:\|\w+)*)(:?,\w+=\w+(?:\|\w+)*)*)\]$/
+
+const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
+
+const CreateUserScope = z.object({
+  type: z.literal('user.create'),
+  options: z.object({
+    role: z.array(z.string())
+  })
+})
+
+const EditUserScope = z.object({
+  type: z.literal('user.edit'),
+  options: z.object({
+    role: z.array(z.string())
+  })
+})
+
+const ConfigurableScopes = z.discriminatedUnion('type', [
+  CreateUserScope,
+  EditUserScope
+])
+
+type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
+
+export function findScope(
+  scopes: string[],
+  scopeType: ConfigurableScopes['type']
+) {
+  return scopes
+    .map((rawScope) => parseScope(rawScope))
+    .find(
+      (parsedScope): parsedScope is ConfigurableScopes =>
+        parsedScope?.type === scopeType
+    )
+}
+
+export function parseScope(scope: string) {
+  const maybeLiteralScope = LiteralScopes.safeParse(scope)
+  if (maybeLiteralScope.success) {
+    return {
+      type: maybeLiteralScope.data
+    }
+  }
+  const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
+  if (maybeConfigurableScope.success) {
+    const rawScope = maybeConfigurableScope.data
+    const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
+    const options = rawOptions.split(',').reduce((acc, option) => {
+      const [key, value] = option.split('=')
+      acc[key] = value.split('|')
+      return acc
+    }, {} as Record<string, string[]>)
+    const parsedScope = {
+      type,
+      options
+    }
+    const result = ConfigurableScopes.safeParse(parsedScope)
+    if (result.success) {
+      return result.data
+    }
+  }
+  return undefined
+}
+
+/*
+ * @deprecated
+ * scopes are configurable so all possible
+ * values can't be retrieved anymore
+ */
 export const scopes: Scope[] = Object.values(SCOPES)
+
+export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
+export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
+
+// for backwards compatibility
+export type Scope = RawScopes

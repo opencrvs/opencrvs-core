@@ -648,7 +648,7 @@ interface ISimpleDocumentUploaderFormField extends IFormFieldBase {
   allowedDocType?: string[]
 }
 
-interface ILocationSearchInputFormField extends IFormFieldBase {
+export interface ILocationSearchInputFormField extends IFormFieldBase {
   type: typeof LOCATION_SEARCH_INPUT
   searchableResource: Array<
     Extract<keyof IOfflineData, 'facilities' | 'locations' | 'offices'>
@@ -701,6 +701,7 @@ export interface ILoaderButton extends IFormFieldBase {
 interface ITimeFormFIeld extends IFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
+  use12HourFormat?: boolean
 }
 
 export interface ISignatureFormField extends IFormFieldBase {
@@ -1260,6 +1261,7 @@ interface I18nHeading3Field extends Ii18nFormFieldBase {
 interface Ii18nTimeFormField extends Ii18nFormFieldBase {
   type: typeof TIME
   ignorePlaceHolder?: boolean
+  use12HourFormat?: boolean
 }
 
 interface Ii18nSignatureField extends Ii18nFormFieldBase {

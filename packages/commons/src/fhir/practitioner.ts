@@ -86,7 +86,7 @@ export function getPractitionerContactDetails(practitioner: Practitioner) {
 
 export const getUserRoleFromHistory = (
   practitionerRoleHistory: PractitionerRoleHistory[],
-  lastModified: string
+  timePoint: string
 ) => {
   const practitionerRoleHistorySorted = practitionerRoleHistory.sort((a, b) => {
     if (a.meta?.lastUpdated === b.meta?.lastUpdated) {
@@ -104,12 +104,15 @@ export const getUserRoleFromHistory = (
     )
   })
 
-  const result = practitionerRoleHistorySorted.find(
-    (it) =>
-      it?.meta?.lastUpdated &&
-      lastModified &&
-      it?.meta?.lastUpdated <= lastModified!
-  )
+  /*
+   * Find the the first history entry that was added before the
+   * given point in time or take the earliest entry if none found
+   */
+  const result =
+    practitionerRoleHistorySorted.find(
+      (it) =>
+        it?.meta?.lastUpdated && timePoint && it?.meta?.lastUpdated <= timePoint
+    ) ?? practitionerRoleHistorySorted.at(-1)
 
   const targetCode = result?.code?.find((element) => {
     return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'

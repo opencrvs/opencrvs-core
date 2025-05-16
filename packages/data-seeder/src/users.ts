@@ -15,7 +15,7 @@ import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { joinURL } from '@opencrvs/commons'
-import { Scope, scopes } from '@opencrvs/commons/authentication'
+import { parseScope } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
@@ -31,7 +31,7 @@ const RoleSchema = z.array(
     }),
     scopes: z.array(
       z.string().refine(
-        (scope) => scopes.includes(scope as Scope),
+        (scope) => Boolean(parseScope(scope)),
         (invalidScope) => ({
           message: `invalid scope "${invalidScope}" found\n`
         })

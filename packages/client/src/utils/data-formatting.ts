@@ -90,9 +90,9 @@ export function getLocalisedName(
 ): string {
   return intl
     .formatMessage(constantsMessages.humanName, {
-      firstName: nameObject.firstNames,
-      middleName: nameObject.middleName,
-      lastName: nameObject.familyName
+      firstName: nameObject?.firstNames,
+      middleName: nameObject?.middleName,
+      lastName: nameObject?.familyName
     })
     .replace(/\s+/g, ' ') // Remove extra spaces
     .trim()
