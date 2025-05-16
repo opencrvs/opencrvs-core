@@ -31,38 +31,6 @@ import { ROUTES } from '@client/v2-events/routes'
 
 const SCREEN_LOCK = 'screenLock'
 
-function GetSettingsAndLogout({
-  menuCollapse,
-  intl
-}: {
-  menuCollapse?: () => void
-  intl: IntlShape
-}) {
-  return (
-    <>
-      <NavigationItem
-        icon={() => <SettingsNavigation />}
-        id={`navigation_${WORKQUEUE_TABS.settings}`}
-        isSelected={false}
-        label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.settings])}
-        onClick={() => {
-          alert('clicked setting')
-          menuCollapse && menuCollapse()
-        }}
-      />
-      <NavigationItem
-        icon={() => <LogoutNavigation />}
-        id={`navigation_${WORKQUEUE_TABS.logout}`}
-        label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
-        onClick={async () => {
-          await storage.removeItem(SCREEN_LOCK)
-          redirectToAuthentication()
-        }}
-      />
-    </>
-  )
-}
-
 export const Navigation = ({
   menuCollapse,
   navigationWidth,
@@ -112,7 +80,25 @@ export const Navigation = ({
           ))}
       </NavigationGroup>
       <NavigationGroup>
-        <GetSettingsAndLogout intl={intl} menuCollapse={menuCollapse} />
+        <NavigationItem
+          icon={() => <SettingsNavigation />}
+          id={`navigation_${WORKQUEUE_TABS.settings}`}
+          isSelected={false}
+          label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.settings])}
+          onClick={() => {
+            alert('clicked setting')
+            menuCollapse && menuCollapse()
+          }}
+        />
+        <NavigationItem
+          icon={() => <LogoutNavigation />}
+          id={`navigation_${WORKQUEUE_TABS.logout}`}
+          label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
+          onClick={async () => {
+            await storage.removeItem(SCREEN_LOCK)
+            redirectToAuthentication()
+          }}
+        />
       </NavigationGroup>
     </LeftNavigation>
   )
