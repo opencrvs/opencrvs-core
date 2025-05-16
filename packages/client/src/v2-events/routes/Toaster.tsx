@@ -27,8 +27,6 @@ const Message = styled.span`
   font-family: ${family};
 `
 
-// TODO CIHAN: fix font
-
 export function Toaster() {
   const { formatMessage } = useIntl()
 

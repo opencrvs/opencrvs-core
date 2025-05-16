@@ -143,8 +143,7 @@ export function Review() {
     if (confirmedValidation) {
       reviewActionConfiguration.onConfirm(eventId)
 
-      // TODO CIHAN:
-      // goToHome()
+      goToHome()
     }
   }
 
