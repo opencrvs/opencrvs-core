@@ -2,14 +2,12 @@ import React from 'react'
 import {
   Toaster as ReactHotToaster,
   Renderable,
-  ToastBar,
-  toast
+  ToastBar
 } from 'react-hot-toast'
 import { MessageDescriptor, useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { Button } from '@opencrvs/components/lib/buttons'
-import { Icon } from '@opencrvs/components/lib/Icon'
 import { family } from '@opencrvs/components/lib/fonts'
+
 export enum ToastKey {
   NOT_ASSIGNED_ERROR = 'v2.errors.notAssigned'
 }
