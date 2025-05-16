@@ -24,7 +24,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
     "DECLARED": null,
     "REGISTERED": null,
   },
-  "modifiedAt": "15 May 2025",
+  "modifiedAt": "2 February 2000",
   "status": "REGISTERED",
   "trackingId": "B77FF6",
   "type": "TENNIS_CLUB_MEMBERSHIP",
