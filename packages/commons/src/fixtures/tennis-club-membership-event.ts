@@ -19,6 +19,7 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
+import { defineWorkqueue } from 'src/events'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -1322,3 +1323,16 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
+
+export const WorkqueueFixture = defineWorkqueue([
+  {
+    slug: 'in-progress',
+    name: {
+      id: 'workqueues.inProgress.title',
+      defaultMessage: 'In progress',
+      description: 'Title of in progress workqueue'
+    },
+    query: { eventType: tennisClubMembershipEvent.id },
+    actions: []
+  }
+])
