@@ -11,8 +11,8 @@
 
 import format from 'date-fns/format'
 import * as React from 'react'
-import { defineMessages, useIntl } from 'react-intl'
-import { DateValue } from '@opencrvs/commons/client'
+import { defineMessages, IntlShape, useIntl } from 'react-intl'
+import { DatetimeValue, DateValue } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
@@ -83,7 +83,22 @@ function DateOutput({ value }: { value?: string }) {
   return value ?? ''
 }
 
+function stringify(intl: IntlShape, value?: string) {
+  // We should allow parsing valid datetimes into the configured date format.
+  const parsed = DateValue.or(DatetimeValue).safeParse(value)
+
+  if (parsed.success) {
+    return format(
+      new Date(parsed.data),
+      intl.formatMessage(messages.dateFormat)
+    )
+  }
+
+  return value ?? ''
+}
+
 export const DateField = {
   Input: DateInput,
-  Output: DateOutput
+  Output: DateOutput,
+  stringify: stringify
 }
