@@ -239,7 +239,7 @@ export const SearchResult = ({
               status: getEventStatus()
             }
           ),
-          [title]: isInOutbox ? (
+          title: isInOutbox ? (
             <IconWithName name={title} status={status} />
           ) : (
             <NondecoratedLink
@@ -306,7 +306,7 @@ export const SearchResult = ({
       }`}
     >
       <Workqueue
-        columns={getColumns().concat(getDefaultColumns())}
+        columns={[...getDefaultColumns(), ...getColumns()]}
         content={transformData(queryData)}
         hideLastBorder={true}
       />

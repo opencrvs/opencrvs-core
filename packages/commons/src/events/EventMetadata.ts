@@ -58,6 +58,7 @@ export const ZodDate = z.string().date()
  */
 export const EventMetadata = z.object({
   id: z.string(),
+  title: z.string(),
   type: z.string(),
   status: EventStatuses,
   createdAt: z.string().datetime(),
@@ -84,6 +85,7 @@ export type EventMetadataKeys = `event.${keyof EventMetadata}`
 export const EventMetadataParameter = z.object({
   $event: z.enum([
     'id',
+    'title',
     'type',
     'status',
     'createdAt',
@@ -115,6 +117,11 @@ export const eventMetadataLabelMap: Record<
     id: 'event.assignedTo.label',
     defaultMessage: 'Assigned To',
     description: 'Assigned To'
+  },
+  'event.title': {
+    id: 'event.title.label',
+    defaultMessage: 'Title',
+    description: 'Title'
   },
   'event.createdAt': {
     id: 'event.createdAt.label',

@@ -247,6 +247,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
   return deepDropNulls({
     id: event.id,
     type: event.type,
+    title: 'ToDo',
     status: getStatusFromActions(event.actions),
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,

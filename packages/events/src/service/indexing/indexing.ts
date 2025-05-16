@@ -164,6 +164,7 @@ export async function createIndex(
       mappings: {
         properties: {
           id: { type: 'keyword' },
+          title: { type: 'keyword' },
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },

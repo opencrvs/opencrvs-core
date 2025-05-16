@@ -70,6 +70,7 @@ export type QueryInputType = BaseInput | QueryMap
 const QueryExpression = z
   .object({
     type: z.literal('and'),
+    title: z.string(),
     eventType: z.string(),
     status: z.optional(z.union([AnyOf, Exact])),
     createdAt: z.optional(DateCondition),

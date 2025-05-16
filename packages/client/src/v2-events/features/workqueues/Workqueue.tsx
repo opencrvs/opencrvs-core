@@ -196,7 +196,7 @@ function Workqueue({
         ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
-        modifiedAt: formattedDuration(new Date(event.updatedAt)),
+        updatedAt: formattedDuration(new Date(event.updatedAt)),
 
         status: intl.formatMessage(
           {
@@ -208,7 +208,7 @@ function Workqueue({
             status: getEventStatus()
           }
         ),
-        name: isInOutbox ? (
+        title: isInOutbox ? (
           TitleColumn
         ) : (
           <TextButton
@@ -261,7 +261,7 @@ function Workqueue({
       })
     )
 
-    const allColumns = configuredColumns.concat(getDefaultColumns())
+    const allColumns = [...getDefaultColumns(), ...configuredColumns]
 
     if (width > theme.grid.breakpoints.lg) {
       return allColumns

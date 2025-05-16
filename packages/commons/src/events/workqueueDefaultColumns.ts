@@ -19,7 +19,7 @@ export const defaultWorkqueueColumns: WorkqueueColumn[] = [
       description: 'This is the label for the workqueue column',
       id: 'workqueue.in-reveiw.column.title'
     },
-    value: event.field('assignedTo') // ToDo
+    value: event.field('title')
   },
   {
     label: {
@@ -31,26 +31,10 @@ export const defaultWorkqueueColumns: WorkqueueColumn[] = [
   },
   {
     label: {
-      defaultMessage: 'Status',
-      description: 'This is the label for the workqueue column',
-      id: 'workqueue.default.column.status'
-    },
-    value: event.field('status')
-  },
-  {
-    label: {
-      defaultMessage: 'Created',
-      description: 'This is the label for the workqueue column',
-      id: 'workqueue.default.column.createdAt'
-    },
-    value: event.field('createdAt')
-  },
-  {
-    label: {
-      defaultMessage: 'Modified',
+      defaultMessage: 'Last updated',
       description: 'This is the label for the workqueue column',
       id: 'workqueue.default.column.modifiedAt'
     },
     value: event.field('updatedAt')
   }
-] as const
+]
