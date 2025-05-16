@@ -15,7 +15,8 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  SummaryConfig
+  SummaryConfig,
+  EventIndex
 } from '@opencrvs/commons/client'
 import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'

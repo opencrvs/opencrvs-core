@@ -23,7 +23,9 @@ export type ActionUpdate = z.infer<typeof ActionUpdate>
 /**
  * EventState is an aggregate of all the actions that have been applied to event data.
  */
-export type EventState = Record<string, FieldValue>
+
+export const EventState = z.record(z.string(), FieldValue)
+export type EventState = z.infer<typeof EventState>
 
 export const ActionStatus = {
   Requested: 'Requested',
@@ -41,8 +43,7 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string().optional(),
-  updatedAtLocation: z.string().optional(),
+  createdAtLocation: z.string(),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
@@ -177,10 +178,7 @@ export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,
-  annotation: true,
-  createdBy: true,
-  createdByRole: true,
-  createdAtLocation: true
+  annotation: true
 }).merge(
   z.object({
     type: z.enum(ConfirmableActions),
