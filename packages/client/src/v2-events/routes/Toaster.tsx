@@ -31,8 +31,9 @@ const availableToasts: Record<ToastKey, MessageDescriptor> = {
 }
 
 const Message = styled.span`
+  ${({ theme }) => theme.fonts.reg16}
   margin: 0 1rem;
-  font-family: ${({ theme }) => theme.fontFamily};
+  padding: 0 1rem;
 `
 
 export function Toaster() {
