@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { BannerType, IFormFieldValue } from '@client/forms'
+import { BannerType, IFormFieldValue, IFormSectionData } from '@client/forms'
 import { useIntl } from 'react-intl'
 import { Banner, Button, Text, ResponsiveModal } from '@opencrvs/components'
 import { messages } from '@client/i18n/messages/views/id-verification'
@@ -59,11 +59,13 @@ const ConfirmationModal: React.FC<{
 export const IDVerificationBanner = ({
   type,
   idFieldName,
-  setFieldValue
+  setFieldValue,
+  form
 }: {
   type: BannerType
   setFieldValue: (name: string, value: IFormFieldValue) => void
   idFieldName: string
+  form: IFormSectionData
 }) => {
   const intl = useIntl()
   const [modal, openModal] = useModal()

@@ -26,7 +26,12 @@ import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import { useParams } from 'react-router-dom'
 import { useDeclaration } from '@client/declarations/selectors'
-import { writeDeclaration } from '@client/declarations'
+import {
+  writeDeclaration,
+  writeDeclarationByUserWithoutStateUpdate
+} from '@client/declarations'
+import { merge } from 'lodash'
+import { FormSectionComponent } from './FormFieldGenerator'
 
 export const LinkButtonField = ({
   fields,
@@ -56,13 +61,46 @@ export const LinkButtonField = ({
   const trigger = fields.find(
     (f) => f.name === fieldDefinition.options.callback.trigger
   )!
-  const onChange: Parameters<typeof useHttp>[1] = ({
+  const { declarationId = '', pageId: section } = useParams()
+  const declaration = useDeclaration(declarationId)
+  const dispatch = useDispatch()
+  const userId = useSelector(getUserDetails)?.id
+  const onChange: Parameters<typeof useHttp>[1] = async ({
     data,
     error,
     loading
   }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
     if (data || error) {
+      if (section && declaration && userId) {
+        /**
+         * As we are redirecting to a new page with window.location.replace and
+         * this pushes a new entry to the browser's history stack, when the user
+         * clicks the back button and returns to the form, the app reloads, the state of the form
+         * will be lost. To avoid this, we are updating the declaration in the
+         * store with the updated values of the form fields. This will ensure that
+         * the form state is preserved when the user returns to the form after
+         * clicking the back button.
+         * The user experience can be seen here:
+         * https://github.com/opencrvs/opencrvs-core/issues/9096#issuecomment-2804381010
+         * @todo we should improve this user experience
+         */
+        const updatedFormData =
+          FormSectionComponent.getUpdatedValuesAfterDependentFieldEvaluation(
+            form,
+            fields,
+            trigger.name,
+            { loading, data, error } as IFormFieldValue,
+            { config, draft, user }
+          )
+        writeDeclarationByUserWithoutStateUpdate(userId, {
+          ...declaration,
+          data: {
+            ...declaration.data,
+            [section]: merge(declaration.data[section], updatedFormData)
+          }
+        })
+      }
       // remove query parameters from the URL after successful or failed callback request
       const url = new URL(window.location.href)
       url.search = '' // Remove all query parameters
@@ -71,9 +109,6 @@ export const LinkButtonField = ({
   }
 
   const hasCallbackRequestBeenMade = useRef(false)
-  const { declarationId = '' } = useParams()
-  const declaration = useDeclaration(declarationId)
-  const dispatch = useDispatch()
 
   const { call } = useHttp<string>(
     trigger as IHttpFormField,
@@ -113,12 +148,14 @@ export const LinkButtonField = ({
         if (declaration) {
           dispatch(
             writeDeclaration(declaration, () => {
-              window.location.href = evalExpressionInFieldDefinition(
-                '`' + decodeURIComponent(to) + '`',
-                form,
-                config,
-                draft,
-                user
+              window.location.replace(
+                evalExpressionInFieldDefinition(
+                  '`' + decodeURIComponent(to) + '`',
+                  form,
+                  config,
+                  draft,
+                  user
+                )
               )
             })
           )
