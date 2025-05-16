@@ -251,6 +251,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     createdAt: event.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
+    registeredAt: event.registeredAt,
+    registeredAtLocation: event.registeredAtLocation,
     updatedAt: latestAction.createdAt,
     assignedTo: getAssignedUserFromActions(activeActions),
     updatedBy: latestAction.createdBy,

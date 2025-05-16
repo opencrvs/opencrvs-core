@@ -74,6 +74,8 @@ const QueryExpression = z
     status: z.optional(z.union([AnyOf, Exact])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
+    registeredAt: z.optional(DateCondition),
+    registeredAtLocation: z.optional(z.union([Within, Exact])),
     createAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     createdBy: z.optional(Exact),
