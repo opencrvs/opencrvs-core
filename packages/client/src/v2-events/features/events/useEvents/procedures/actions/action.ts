@@ -14,8 +14,8 @@ import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
-import { TRPCClientError } from '@trpc/client'
 import { toast } from 'react-hot-toast'
+import { TRPCClientError } from '@trpc/client'
 import {
   ActionType,
   EventDocument,
@@ -42,6 +42,7 @@ import {
   queryClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
+import { ToastKey } from '@client/v2-events/routes/Toaster'
 
 function retryUnlessConflict(_: unknown, error: TRPCClientError<AppRouter>) {
   return error.data?.httpStatus !== 409
@@ -49,8 +50,7 @@ function retryUnlessConflict(_: unknown, error: TRPCClientError<AppRouter>) {
 
 function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
   if (error.data?.httpStatus === 409) {
-    console.log('ERRORI CIHAN')
-    toast.error('ERRORI CIHAN')
+    toast.error(ToastKey.NOT_ASSIGNED_ERROR)
   }
 }
 
