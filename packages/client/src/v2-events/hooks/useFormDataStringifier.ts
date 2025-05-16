@@ -18,6 +18,7 @@ import {
   isCountryFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,
+  isOfficeFieldType,
   isLocationFieldType,
   isRadioGroupFieldType
 } from '@opencrvs/commons/client'
@@ -44,7 +45,8 @@ export function stringifySimpleField(intl: IntlShape, locations: Location[]) {
     if (
       isLocationFieldType(field) ||
       isAdministrativeAreaFieldType(field) ||
-      isFacilityFieldType(field)
+      isFacilityFieldType(field) ||
+      isOfficeFieldType(field)
     ) {
       // Since all of the above field types are actually locations
       return AdministrativeArea.stringify(locations, field.value)
