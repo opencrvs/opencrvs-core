@@ -34447,8 +34447,6 @@ components:
           format: date-time
         registeredAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         actions:
           type: array
           items:
@@ -34463,7 +34461,11 @@ components:
                   createdAt:
                     type: string
                     format: date-time
-                  updatedAtLocation:
+                  createdBy:
+                    type: string
+                  createdByRole:
+                    type: string
+                  createdAtLocation:
                     type: string
                   status:
                     type: string
@@ -34484,6 +34486,9 @@ components:
                   - id
                   - transactionId
                   - createdAt
+                  - createdBy
+                  - createdByRole
+                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -34493,7 +34498,6 @@ components:
         - type
         - createdAt
         - updatedAt
-        - updatedAtLocation
         - actions
         - trackingId
     ActionDocument:
@@ -34845,8 +34849,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum:
@@ -34866,6 +34868,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -35182,8 +35185,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -35199,6 +35200,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -35515,8 +35517,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -35532,6 +35532,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     MarkAsDuplicateAction:
@@ -35848,8 +35849,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -35865,6 +35864,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -36181,8 +36181,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -36198,6 +36196,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     NotifiedAction:
@@ -36514,8 +36513,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -36531,6 +36528,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -36847,8 +36845,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -36866,6 +36862,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -37182,8 +37179,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -37199,6 +37194,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -37515,8 +37511,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -37534,6 +37528,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -37851,8 +37846,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -37868,6 +37861,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -38184,8 +38178,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -38203,6 +38195,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
         - requestId
@@ -38520,8 +38513,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -38539,6 +38530,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
         - requestId
@@ -38856,8 +38848,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -38875,6 +38865,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -39192,8 +39183,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -39209,6 +39198,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -39525,8 +39515,6 @@ components:
                   - district2
         createdAtLocation:
           type: string
-        updatedAtLocation:
-          type: string
         status:
           type: string
           enum: *a21
@@ -39542,6 +39530,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
+        - createdAtLocation
         - status
         - type
     ActionInput:
