@@ -10,14 +10,16 @@
  */
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import styled, { useTheme } from 'styled-components'
-import { Link, useNavigate } from 'react-router-dom'
+import { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
 import { mapKeys } from 'lodash'
 import {
   EventIndex,
   EventConfig,
   defaultWorkqueueColumns,
-  WorkqueueColumn
+  WorkqueueColumn,
+  deepDropNulls,
+  applyDraftsToEventIndex
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -30,7 +32,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import { SearchModifierComponent } from './SearchModifier'
@@ -58,11 +59,6 @@ const COLUMNS = {
   REGISTRATION_NO: 'registrationNumber',
   NONE: 'none'
 } as const
-
-const NondecoratedLink = styled(Link)`
-  text-decoration: none;
-  color: 'primary';
-`
 
 interface Column {
   label?: string
@@ -203,76 +199,90 @@ export const SearchResultComponent = ({
   }
 
   const transformData = (eventData: EventIndex[]) => {
-    return eventData
-      .map((event) => {
-        const eventConfig = eventConfigs.find(({ id }) => id === event.type)
-        if (!eventConfig) {
-          throw new Error(
-            'Event configuration not found for event:' + event.type
+    return (
+      eventData
+        /*
+         * Apply pending drafts to the event index.
+         * This is necessary to show the most up to date information in the workqueue.
+         */
+        .map((event) =>
+          deepDropNulls(
+            applyDraftsToEventIndex(
+              event,
+              drafts.filter((d) => d.eventId === event.id)
+            )
           )
-        }
-        const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
-        const { declaration, ...rest } = event
-
-        return {
-          ...rest,
-          useFallbackTitle,
-          title,
-          label: eventConfig.label,
-          ...mapKeys(declaration, (_, key) => `${key}`)
-        }
-      })
-      .map((doc) => {
-        const isInOutbox = outbox.some(
-          (outboxEvent) => outboxEvent.id === doc.id
         )
-        const isInDrafts = drafts.some((draft) => draft.id === doc.id)
-
-        const getEventStatus = () => {
-          if (isInOutbox) {
-            return 'OUTBOX'
+        .map((event) => {
+          const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+          if (!eventConfig) {
+            throw new Error(
+              'Event configuration not found for event:' + event.type
+            )
           }
-          if (isInDrafts) {
-            return 'DRAFT'
+          const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
+          const { declaration, ...rest } = event
+
+          return {
+            ...rest,
+            useFallbackTitle,
+            title,
+            label: eventConfig.label,
+            ...mapKeys(declaration, (_, key) => `${key}`)
           }
-          return doc.status
-        }
-
-        const status = doc.status
-
-        return {
-          ...doc,
-          type: intl.formatMessage(doc.label),
-          createdAt: formattedDuration(new Date(doc.createdAt)),
-          updatedAt: formattedDuration(new Date(doc.updatedAt)),
-          status: intl.formatMessage(
-            {
-              id: `v2.events.status`,
-              defaultMessage:
-                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
-            },
-            {
-              status: getEventStatus()
-            }
-          ),
-          title: isInOutbox ? (
-            <IconWithName name={doc.title} status={status} />
-          ) : (
-            <TextButton
-              color={doc.useFallbackTitle ? 'red' : 'primary'}
-              onClick={() => {
-                return navigate(
-                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                    eventId: doc.id
-                  })
-                )
-              }}
-            >
-              <IconWithName name={doc.title} status={status} />
-            </TextButton>
+        })
+        .map((doc) => {
+          const isInOutbox = outbox.some(
+            (outboxEvent) => outboxEvent.id === doc.id
           )
-        }
-      })
+          const isInDrafts = drafts.some((draft) => draft.id === doc.id)
+
+          const getEventStatus = () => {
+            if (isInOutbox) {
+              return 'OUTBOX'
+            }
+            if (isInDrafts) {
+              return 'DRAFT'
+            }
+            return doc.status
+          }
+
+          const status = doc.status
+
+          return {
+            ...doc,
+            type: intl.formatMessage(doc.label),
+            createdAt: formattedDuration(new Date(doc.createdAt)),
+            updatedAt: formattedDuration(new Date(doc.updatedAt)),
+            status: intl.formatMessage(
+              {
+                id: `v2.events.status`,
+                defaultMessage:
+                  '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
+              },
+              {
+                status: getEventStatus()
+              }
+            ),
+            title: isInOutbox ? (
+              <IconWithName name={doc.title} status={status} />
+            ) : (
+              <TextButton
+                color={doc.useFallbackTitle ? 'red' : 'primary'}
+                onClick={() => {
+                  return navigate(
+                    ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                      eventId: doc.id
+                    })
+                  )
+                }}
+              >
+                <IconWithName name={doc.title} status={status} />
+              </TextButton>
+            )
+          }
+        })
+    )
   }
 
   function getDefaultColumns(): Array<Column> {
