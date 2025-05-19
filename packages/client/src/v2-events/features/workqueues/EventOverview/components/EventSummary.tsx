@@ -140,7 +140,7 @@ export function EventSummary({
 
       return {
         id: field.fieldId,
-        // If a custom lable is configured, use it. Otherwise, by default, use the label from the original form field.
+        // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
         value: Output({
