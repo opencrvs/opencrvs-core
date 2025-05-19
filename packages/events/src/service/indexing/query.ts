@@ -76,15 +76,15 @@ function buildClause(clause: QueryExpression) {
 
   if (clause.status) {
     if (clause.status.type === 'anyOf') {
-      must.push({ terms: { status: clause.status.terms } })
+      must.push({ terms: { 'status.keyword': clause.status.terms } })
     } else {
-      must.push({ term: { status: clause.status.term } })
+      must.push({ term: { 'status.keyword': clause.status.term } })
     }
   }
 
   if (clause.trackingId) {
     must.push({
-      term: { trackingId: clause.trackingId.term }
+      term: { 'trackingId.keyword': clause.trackingId.term }
     })
   }
 
