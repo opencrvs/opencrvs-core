@@ -227,7 +227,6 @@ function buildDataConditionFromSearchKeys(
     ) => {
       const fieldIdEdited = fieldType === 'event' ? `event.${fieldId}` : fieldId
       const value = formatValue(rawInput, fieldIdEdited, fieldConfig)
-
       if (fieldIdEdited === 'event.status' && value === 'ALL') {
         const transformedKey = fieldIdEdited.replace(/\./g, '____')
         result[transformedKey] = buildConditionForStatus()
@@ -255,19 +254,26 @@ export function buildDataCondition(
 ): QueryInputType {
   const advancedSearch = eventConfig.advancedSearch
 
-  // Flatten all fields into a single list of search keys
-  const searchKeys = advancedSearch
-    .flatMap((section) =>
-      section.fields.map((field) => ({
-        fieldId: field.fieldId,
-        config: field.config, // assuming field structure has a `config` prop
-        fieldType: field.fieldType,
-        fieldConfig: eventConfig.declaration.pages
-          .flatMap((page) => page.fields)
-          .find((f) => f.id === field.fieldId)
-      }))
-    )
-    .filter((f) => Object.keys(flat).includes(f.fieldId)) // Filter out fields not present in the flat object
+  const defaultMetadataSearchFields = advancedSearch.flatMap((section) =>
+    getDefaultSearchFields(section)
+  )
 
-  return buildDataConditionFromSearchKeys(searchKeys, flat)
+  // Flatten all fields into a single list of search keys
+  const allFields = advancedSearch.flatMap((section) => section.fields)
+
+  const searchKeys = allFields.map((field) => ({
+    fieldId: field.fieldId,
+    config: field.config, // assuming field structure has a `config` prop
+    fieldType: field.fieldType,
+    fieldConfig:
+      eventConfig.declaration.pages
+        .flatMap((page) => page.fields)
+        .find((f) => f.id === field.fieldId) ||
+      defaultMetadataSearchFields.find((f) => f.id === field.fieldId)
+  }))
+  const filteredSearchKeys = searchKeys.filter((searchKey) =>
+    Object.keys(flat).some((key) => key.includes(searchKey.fieldId))
+  )
+
+  return buildDataConditionFromSearchKeys(filteredSearchKeys, flat)
 }

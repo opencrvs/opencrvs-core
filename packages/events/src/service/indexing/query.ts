@@ -90,11 +90,15 @@ function buildClause(clause: QueryExpression) {
 
   if (clause.registeredAt) {
     if (clause.registeredAt.type === 'exact') {
-      must.push({ term: { registeredAt: clause.registeredAt.term } })
+      must.push({
+        term: {
+          'legalStatuses.REGISTERED.createdAt.keyword': clause.registeredAt.term
+        }
+      })
     } else {
       must.push({
         range: {
-          registeredAt: {
+          'legalStatuses.REGISTERED.createdAt': {
             gte: clause.registeredAt.gte,
             lte: clause.registeredAt.lte
           }
@@ -105,13 +109,9 @@ function buildClause(clause: QueryExpression) {
   if (clause.registeredAtLocation) {
     if (clause.registeredAtLocation.type === 'exact') {
       must.push({
-        term: { registeredAtLocation: clause.registeredAtLocation.term }
-      })
-    } else {
-      must.push({
-        geo_distance: {
-          distance: '10km',
-          location: clause.registeredAtLocation.location
+        term: {
+          'legalStatuses.REGISTERED.createdAtLocation.keyword':
+            clause.registeredAtLocation.term
         }
       })
     }

@@ -351,21 +351,12 @@ export async function addAction(
     status: status
   }
 
-  const registerInfo =
-    action.type === ActionType.REGISTER
-      ? {
-          registeredAt: now,
-          registeredAtLocation: createdAtLocation
-        }
-      : {}
-
   await db.collection<EventDocument>('events').updateOne(
     { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
     {
       $push: { actions: action },
       $set: {
-        updatedAt: now,
-        ...registerInfo
+        updatedAt: now
       }
     }
   )

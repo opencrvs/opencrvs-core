@@ -127,7 +127,7 @@ export function SearchModifierComponent({
     })
     .filter(Boolean)
 
-  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)} : ${convertPathToLabel(eventType)}`
+  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventType)}`
 
   const allSearchParamLabels = [
     eventParamLabel,
