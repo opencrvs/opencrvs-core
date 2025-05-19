@@ -34442,11 +34442,6 @@ components:
         updatedAt:
           type: string
           format: date-time
-        registeredAt:
-          type: string
-          format: date-time
-        registeredAtLocation:
-          type: string
         actions:
           type: array
           items:
