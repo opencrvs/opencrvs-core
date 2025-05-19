@@ -93,57 +93,69 @@ function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
   }
 }
 
-function getSectionFields(
-  event: EventConfig,
-  handleFieldChange: (fieldId: string, value: FieldValue) => void,
-  intl: IntlShape,
+function SectionFields({
+  event,
+  handleFieldChange,
+  fieldValues
+}: {
+  event: EventConfig
+  handleFieldChange: (fieldId: string, value: FieldValue) => void
   fieldValues?: Record<string, string>
-) {
+}) {
+  const intl = useIntl()
   const advancedSearchSections = event.advancedSearch
   const allUniqueFields = getAllUniqueFields(event)
-  return advancedSearchSections.map((section) => {
-    const metadataFields = getDefaultSearchFields(section)
-    const advancedSearchFieldId = section.fields.map(
-      (f: { fieldId: string }) => f.fieldId
-    )
-    const advancedSearchFields: Inferred[] = allUniqueFields.filter(
-      (field: Inferred) => advancedSearchFieldId.includes(field.id)
-    )
 
-    const combinedFields = [...metadataFields, ...advancedSearchFields]
-    const modifiedFields = combinedFields.map((f) => {
-      const fieldSearchConfig = advancedSearchSections
-        .flatMap((a) => a.fields)
-        .find((a) => a.fieldId === f.id)
-      return {
-        ...f,
-        required: false as const,
-        conditionals: fieldSearchConfig?.conditionals ?? f.conditionals
-      }
-    })
+  return (
+    <>
+      {advancedSearchSections.map((section) => {
+        const metadataFields = getDefaultSearchFields(section)
+        const advancedSearchFieldId = section.fields.map(
+          (f: { fieldId: string }) => f.fieldId
+        )
+        const advancedSearchFields: Inferred[] = allUniqueFields.filter(
+          (field: Inferred) => advancedSearchFieldId.includes(field.id)
+        )
 
-    return (
-      <Accordion
-        key={section.title.id}
-        expand={true}
-        label={intl.formatMessage(section.title)}
-        labelForHideAction={intl.formatMessage(messages.hide)}
-        labelForShowAction={intl.formatMessage(messages.show)}
-        name={section.title.id}
-      >
-        <FormFieldGenerator
-          fields={modifiedFields}
-          id={section.title.id}
-          initialValues={fieldValues}
-          onChange={(updatedValues) => {
-            Object.entries(updatedValues).forEach(([fieldId, value]) => {
-              handleFieldChange(fieldId, value)
-            })
-          }}
-        />
-      </Accordion>
-    )
-  })
+        const combinedFields = [...metadataFields, ...advancedSearchFields]
+        const modifiedFields = combinedFields.map((f) => {
+          const fieldSearchConfig = advancedSearchSections
+            .flatMap((a) => a.fields)
+            .find((a) => a.fieldId === f.id)
+          return {
+            ...f,
+            required: false as const,
+            conditionals: fieldSearchConfig?.conditionals ?? f.conditionals
+          }
+        })
+        const hasFieldValue = modifiedFields.some((field) =>
+          fieldValues?.hasOwnProperty(field.id)
+        )
+
+        return (
+          <Accordion
+            key={section.title.id}
+            expand={hasFieldValue}
+            label={intl.formatMessage(section.title)}
+            labelForHideAction={intl.formatMessage(messages.hide)}
+            labelForShowAction={intl.formatMessage(messages.show)}
+            name={section.title.id}
+          >
+            <FormFieldGenerator
+              fields={modifiedFields}
+              id={section.title.id}
+              initialValues={fieldValues}
+              onChange={(updatedValues) => {
+                Object.entries(updatedValues).forEach(([fieldId, value]) => {
+                  handleFieldChange(fieldId, value)
+                })
+              }}
+            />
+          </Accordion>
+        )
+      })}
+    </>
+  )
 }
 
 export function TabSearch({
@@ -172,7 +184,6 @@ export function TabSearch({
   }, [currentEvent])
 
   const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(currentEvent)
-
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({
       ...prev,
@@ -182,13 +193,6 @@ export function TabSearch({
 
   const advancedSearchFieldErrors = flattenFieldErrors(
     getAdvancedSearchFieldErrors(enhancedEvent, formValues)
-  )
-
-  const SectionFields = getSectionFields(
-    enhancedEvent,
-    handleFieldChange,
-    intl,
-    fieldValues
   )
 
   const handleSearch = () => {
@@ -204,25 +208,25 @@ export function TabSearch({
   const hasEnoughParams =
     Object.entries(filterEmptyValues(formValues)).length >= MIN_PARAMS_TO_SEARCH
 
-  const Search = (
-    <SearchButton
-      key="search"
-      fullWidth
-      disabled={!hasEnoughParams || advancedSearchFieldErrors.length > 0}
-      id="search"
-      size="large"
-      type="primary"
-      onClick={handleSearch}
-    >
-      <Icon name={'MagnifyingGlass'} />
-      {intl.formatMessage(messages.search)}
-    </SearchButton>
-  )
-
   return (
     <>
-      {SectionFields}
-      {Search}
+      <SectionFields
+        event={enhancedEvent as EventConfig}
+        fieldValues={fieldValues}
+        handleFieldChange={handleFieldChange}
+      />
+      <SearchButton
+        key="search"
+        fullWidth
+        disabled={!hasEnoughParams || advancedSearchFieldErrors.length > 0}
+        id="search"
+        size="large"
+        type="primary"
+        onClick={handleSearch}
+      >
+        <Icon name={'MagnifyingGlass'} />
+        {intl.formatMessage(messages.search)}
+      </SearchButton>
     </>
   )
 }
