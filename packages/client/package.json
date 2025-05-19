@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/client",
-  "version": "0.2.5",
+  "version": "0.2.6",
   "description": "OpenCRVS client application",
   "license": "MPL-2.0",
   "private": true,
