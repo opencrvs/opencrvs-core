@@ -43,7 +43,9 @@ import {
   EventConfig,
   getDeclarationFields,
   isNameFieldType,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  isPhoneFieldType,
+  isIdFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { NameFieldValue } from '@opencrvs/commons/client'
@@ -163,6 +165,34 @@ export const GeneratedInputField = React.memo(
       return (
         <InputField {...field.inputFieldProps}>
           <Name.Input
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isPhoneFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            type="text"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isIdFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            type="text"
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />

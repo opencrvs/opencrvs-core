@@ -34,7 +34,9 @@ import {
   TextField,
   NumberField,
   DataField,
-  NameField
+  NameField,
+  PhoneField,
+  IdField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -305,6 +307,20 @@ export const isNameFieldType = (field: {
   value: FieldValue
 }): field is { value: NameFieldValue; config: NameField } => {
   return field.config.type === FieldType.NAME
+}
+
+export const isPhoneFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: PhoneField } => {
+  return field.config.type === FieldType.PHONE
+}
+
+export const isIdFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: IdField } => {
+  return field.config.type === FieldType.ID
 }
 
 export const isTextAreaFieldType = (field: {
