@@ -22,7 +22,7 @@ export interface ISelectOption {
   disabled?: boolean
 }
 
-export interface IStyledSelectProps extends Props<ISelectOption> {
+interface IStyledSelectProps extends Props<ISelectOption> {
   id: string
   error?: boolean
   touched?: boolean
@@ -156,8 +156,7 @@ function getSelectedOption(
   return null
 }
 
-export interface ISelectProps
-  extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
+interface ISelectProps extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
   onChange: (value: string) => void
   value: string
   searchableLength?: number

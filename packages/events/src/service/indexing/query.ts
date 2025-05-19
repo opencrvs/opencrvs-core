@@ -92,7 +92,7 @@ function buildClause(clause: QueryExpression) {
     if (clause.registeredAt.type === 'exact') {
       must.push({
         term: {
-          'legalStatuses.REGISTERED.createdAt.keyword': clause.registeredAt.term
+          'legalStatuses.REGISTERED.createdAt': clause.registeredAt.term
         }
       })
     } else {

@@ -360,7 +360,6 @@ export async function getIndexedEvents(userId: string) {
 
 export async function getIndex(eventParams: QueryType) {
   const esClient = getOrCreateClient()
-
   if ('type' in eventParams && eventParams.type === 'or') {
     const { clauses } = eventParams
     // eslint-disable-next-line no-console
