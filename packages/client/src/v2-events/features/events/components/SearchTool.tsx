@@ -12,6 +12,7 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { stringify } from 'query-string'
 import { ClearText } from '@opencrvs/components/src/icons'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/src/Icon'
@@ -137,7 +138,15 @@ export const SearchTool = () => {
 
   const search = (e: React.FormEvent) => {
     e.preventDefault()
-    return searchParam && alert(`Searching for: ${searchParam}`)
+    const stringifiedSearchParams = stringify(
+      { keys: searchParam },
+      {
+        arrayFormat: 'comma',
+        skipEmptyString: true
+      }
+    )
+    const navigateTo = ROUTES.V2.SEARCH.buildPath({})
+    navigate(`${navigateTo}?${stringifiedSearchParams.toString()}`)
   }
 
   return (

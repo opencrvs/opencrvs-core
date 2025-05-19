@@ -10,7 +10,7 @@
  */
 
 import React from 'react'
-import { Outlet, RouteObject } from 'react-router-dom'
+import { Outlet, RouteObject, Routes } from 'react-router-dom'
 
 import { ActionType } from '@opencrvs/commons/client'
 import { Debug } from '@client/v2-events/features/debug/debug'
@@ -34,6 +34,7 @@ import { DeclarationAction } from '@client/v2-events/features/events/components/
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
+import { QuickSearchIndex } from '../features/events/components/QuickSearchIndex'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -180,6 +181,14 @@ export const routesConfig = {
       element: (
         <WorkqueueLayout>
           <SearchResult />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.SEARCH.path,
+      element: (
+        <WorkqueueLayout>
+          <QuickSearchIndex />
         </WorkqueueLayout>
       )
     }

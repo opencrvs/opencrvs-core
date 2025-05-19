@@ -17,7 +17,8 @@ import {
   defaultColumns,
   EventIndex,
   EventConfig,
-  workqueues
+  workqueues,
+  WorkQueueTypes
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -157,14 +158,12 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 interface Props {
-  workqueueConfig: (typeof workqueues)['all']
   eventConfig: EventConfig
   searchParams: Record<string, string>
   queryData: EventIndex[]
 }
 
 export const SearchResult = ({
-  workqueueConfig,
   eventConfig,
   searchParams,
   queryData
@@ -197,6 +196,9 @@ export const SearchResult = ({
     setSortedCol(newSortedCol)
     setSortOrder(newSortOrder)
   }
+
+  const workqueueId = 'all' satisfies WorkQueueTypes
+  const workqueueConfig = workqueues[workqueueId as WorkQueueTypes]
 
   const transformData = (eventData: EventIndex[]) => {
     return eventData

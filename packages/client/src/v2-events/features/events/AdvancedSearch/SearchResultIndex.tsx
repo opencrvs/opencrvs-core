@@ -12,7 +12,6 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { workqueues } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -35,22 +34,12 @@ export const SearchResultIndex = () => {
     formattedSearchParams,
     ADVANCED_SEARCH_KEY
   )
-  const workqueueId = 'all'
-  const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
-      : null
-
-  if (!workqueueConfig) {
-    return null
-  }
 
   return (
     <SearchResult
       eventConfig={eventConfig}
       queryData={queryData}
       searchParams={searchParams}
-      workqueueConfig={workqueueConfig}
     />
   )
 }
