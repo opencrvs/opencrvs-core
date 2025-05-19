@@ -1076,6 +1076,18 @@ describe('User root resolvers', () => {
       )}`
     }
 
+    const authHeaderDataSeeder = {
+      Authorization: `Bearer ${jwt.sign(
+        { scope: [SCOPES.USER_DATA_SEEDING] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )}`
+    }
     const authHeaderSysAdminWithoutSuppliedRole = {
       Authorization: `Bearer ${jwt.sign(
         { scope: [SCOPES.USER_CREATE, 'user.create[role=REGISTRATION_AGENT]'] },
@@ -1148,6 +1160,28 @@ describe('User root resolvers', () => {
         {},
         { user },
         { headers: authHeaderSysAdmin }
+      )
+
+      expect(response).toEqual({
+        username: 'someUser123'
+      })
+    })
+
+    it('allows creating user for data seeder', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'someUser123'
+        }),
+        { status: 201 }
+      )
+
+      const response = await resolvers.Mutation!.createOrUpdateUser(
+        {},
+        { user },
+        { headers: authHeaderDataSeeder }
       )
 
       expect(response).toEqual({
