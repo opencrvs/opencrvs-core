@@ -27,7 +27,10 @@ const Field = BaseField.extend({
     'Summary field value. Can utilise values defined in configuration and EventMetadata'
   ),
   label: TranslationConfig,
-  emptyValueMessage: TranslationConfig.optional()
+  emptyValueMessage: TranslationConfig.optional(),
+  customLabel: TranslationConfig.optional().describe(
+    "By default, the configured field's label is used. This can be overridden by providing a custom label."
+  )
 }).describe('Custom configured field')
 
 export const SummaryConfig = z
