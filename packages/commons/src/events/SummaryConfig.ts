@@ -18,7 +18,10 @@ const BaseField = z.object({
 })
 
 const ReferenceField = BaseField.extend({
-  fieldId: z.string()
+  fieldId: z.string(),
+  label: TranslationConfig.optional().describe(
+    "By default, the configured field's label is used. This can be overridden by providing a custom label."
+  )
 }).describe('Field directly referencing event data with field id')
 
 const Field = BaseField.extend({
@@ -27,10 +30,7 @@ const Field = BaseField.extend({
     'Summary field value. Can utilise values defined in configuration and EventMetadata'
   ),
   label: TranslationConfig,
-  emptyValueMessage: TranslationConfig.optional(),
-  customLabel: TranslationConfig.optional().describe(
-    "By default, the configured field's label is used. This can be overridden by providing a custom label."
-  )
+  emptyValueMessage: TranslationConfig.optional()
 }).describe('Custom configured field')
 
 export const SummaryConfig = z
