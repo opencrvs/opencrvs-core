@@ -288,6 +288,25 @@ export function compileSvg({
     Handlebars.registerHelper(helperName, helper)
   }
 
+  /* Handlebars helper for splitting a string by a separator and returning the first part and the rest of the string as an array.
+   * This is used for location fields, which we received for example in format 'Bombwe Health Post, Ilanga, Sulaka, Farajaland',
+   * but wish to display as two rows on certificate:
+   * 1. Bombwe Health Post
+   * 2. Ilanga, Sulaka, Farajaland
+   *
+   * This could have been achieved by modifying the LocationSearch Output to return the location as an array or such,
+   * but this seemed like a simpler solution considering other uses of location fields.
+   *  */
+  Handlebars.registerHelper(
+    '$splitFirstFromString',
+    function (str: string, separator: string) {
+      const parts = str.split(separator)
+      return parts.length > 1
+        ? [parts[0], parts.slice(1).join(', ').trim()]
+        : parts
+    }
+  )
+
   /**
    * Handlebars helper: $lookup
    *
