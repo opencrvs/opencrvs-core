@@ -221,10 +221,16 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  const dateOfEvent =
-    ZodDate.safeParse(
-      event.dateOfEvent?.fieldId ? declaration[event.dateOfEvent.fieldId] : null
-    ).data ?? event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+  let dateOfEvent
+
+  if (event.dateOfEvent) {
+    const parsedDate = ZodDate.safeParse(declaration[event.dateOfEvent.fieldId])
+    if (parsedDate.success) {
+      dateOfEvent = parsedDate.data
+    }
+  } else {
+    dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+  }
 
   return deepDropNulls({
     id: event.id,
