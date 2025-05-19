@@ -140,7 +140,8 @@ export function EventSummary({
 
       return {
         id: field.fieldId,
-        label: config.label,
+        // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
+        label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
         value: Output({
           field: config,
@@ -163,20 +164,18 @@ export function EventSummary({
       <Summary id="summary">
         {fields
           .filter((f): f is NonNullable<typeof f> => f !== null)
-          .map((field) => {
-            return (
-              <Summary.Row
-                key={field.id}
-                data-testid={field.id}
-                label={intl.formatMessage(field.label)}
-                placeholder={
-                  field.emptyValueMessage &&
-                  intl.formatMessage(field.emptyValueMessage)
-                }
-                value={field.value}
-              />
-            )
-          })}
+          .map((field) => (
+            <Summary.Row
+              key={field.id}
+              data-testid={field.id}
+              label={intl.formatMessage(field.label)}
+              placeholder={
+                field.emptyValueMessage &&
+                intl.formatMessage(field.emptyValueMessage)
+              }
+              value={field.value}
+            />
+          ))}
       </Summary>
     </>
   )
