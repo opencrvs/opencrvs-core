@@ -183,7 +183,11 @@ export async function eventNotificationHandler(
 
     await sendBundleToHearth({
       ...updatedBundle,
-      entry: updatedBundle.entry
+      entry: updatedBundle.entry.filter(
+        (entry) =>
+          entry.resource.resourceType === 'Composition' ||
+          entry.resource.resourceType === 'Task'
+      )
     })
     await indexBundle(updatedBundle, token)
 
