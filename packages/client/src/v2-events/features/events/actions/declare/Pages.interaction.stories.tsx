@@ -17,7 +17,8 @@ import {
   ActionType,
   Draft,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  WorkqueueFixture
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -105,6 +106,9 @@ export const SaveAndExit: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
+          }),
+          tRPCMsw.event.workqueue.get.query(() => {
+            return WorkqueueFixture
           })
         ]
       }

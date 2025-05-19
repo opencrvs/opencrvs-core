@@ -20,7 +20,10 @@ import {
   tennisClubMembershipEventDocument
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  tennisClubMembershipEvent,
+  WorkqueueFixture
+} from '@opencrvs/commons/client'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -1138,6 +1141,9 @@ export const handlers = {
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
+    }),
+    tRPCMsw.event.workqueue.get.query(() => {
+      return WorkqueueFixture
     })
   ],
   locations: [
