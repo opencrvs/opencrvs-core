@@ -15,15 +15,14 @@ import {
   ActionDocument,
   ActionStatus,
   ActionUpdate,
-  EventState,
-  RegisterAction
+  EventState
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import * as _ from 'lodash'
-import { deepMerge, findActiveDrafts, isWriteAction } from '../utils'
+import { deepMerge, findActiveDrafts } from '../utils'
+import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -79,7 +78,7 @@ function getFlagsFromActions(actions: Action[]): Flag[] {
   )
 
   const flags = Object.entries(actionStatus)
-    .filter(([type, status]) => status !== ActionStatus.Accepted)
+    .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
       const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
       return flag satisfies Flag
@@ -103,25 +102,6 @@ function getFlagsFromActions(actions: Action[]): Flag[] {
   }
 
   return flags
-}
-
-function getLastUpdatedByUserRoleFromActions(actions: Array<Action>) {
-  const actionsWithRoles = actions
-    .filter(
-      (action) =>
-        !isWriteAction(action.type) && action.status !== ActionStatus.Rejected
-    )
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
-
-  const lastAction = actionsWithRoles.at(-1)
-
-  if (!lastAction) {
-    throw new Error(
-      'Should never happen, at least CREATE action should be present'
-    )
-  }
-
-  return ActionDocument.parse(lastAction).createdByRole
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
@@ -216,6 +196,14 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
     (a): a is ActionDocument => a.status === ActionStatus.Accepted
   )
 }
+
+export const DEFAULT_DATE_OF_EVENT_PROPERTY =
+  'createdAt' satisfies keyof EventDocument
+
+/**
+ * @returns the current state of the event based on the actions taken.
+ * @see EventIndex for the description of the returned object.
+ */
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -225,40 +213,37 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const activeActions = getAcceptedActions(event)
-  const latestAction = activeActions[activeActions.length - 1]
+  const acceptedActions = getAcceptedActions(event)
 
-  const registrationAction = activeActions.find(
-    (a): a is RegisterAction =>
-      a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted
+  const declarationUpdateMetadata = getDeclarationActionUpdateMetadata(
+    event.actions
   )
 
-  const registrationNumber = registrationAction?.registrationNumber ?? null
+  const declaration = aggregateActionDeclarations(acceptedActions)
 
-  const declaration = aggregateActionDeclarations(activeActions)
-
-  let dateOfEvent: string | null = event.createdAt.split('T')[0]
-
-  if (event.dateOfEvent) {
-    const parsedDate = ZodDate.safeParse(declaration[event.dateOfEvent.fieldId])
-    dateOfEvent = parsedDate.success ? parsedDate.data : null
-  }
+  const dateOfEvent =
+    ZodDate.safeParse(
+      event.dateOfEvent?.fieldId
+        ? declaration[event.dateOfEvent.fieldId]
+        : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
+    ).data ?? null
 
   return deepDropNulls({
     id: event.id,
     type: event.type,
     status: getStatusFromActions(event.actions),
-    createdAt: event.createdAt,
+    legalStatuses: getLegalStatuses(event.actions),
+    createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
-    createdAtLocation: creationAction.createdAtLocation ?? '', // @todo remove using empty string
-    updatedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(activeActions),
-    updatedBy: latestAction.createdBy,
-    updatedAtLocation: event.updatedAtLocation,
+    createdAtLocation: creationAction.createdAtLocation,
+    updatedAt: declarationUpdateMetadata.createdAt,
+    assignedTo: getAssignedUserFromActions(acceptedActions),
+    updatedBy: declarationUpdateMetadata.createdBy,
+    updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
-    registrationNumber,
-    updatedByUserRole: getLastUpdatedByUserRoleFromActions(event.actions),
+    // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
+    updatedByUserRole: declarationUpdateMetadata.createdByRole,
     dateOfEvent,
     flags: getFlagsFromActions(event.actions)
   })
