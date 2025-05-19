@@ -136,22 +136,7 @@ export const SCOPES = {
   CONFIG_UPDATE_ALL: 'config.update:all',
 
   // data seeding
-  USER_DATA_SEEDING: 'user.data-seeding',
-
-  /**
-   * Workqueue scopes - determine which workqueues are visible to users
-   */
-  WORKQUEUE_ASSIGNED_TO_YOU: 'workqueues.assigned-to-you',
-  WORKQUEUE_RECENT: 'workqueues.recent',
-  WORKQUEUE_REQUIRES_COMPLETION: 'workqueues.requires-completion',
-  WORKQUEUE_SENT_FOR_REVIEW: 'workqueues.sent-for-review',
-  WORKQUEUE_IN_REVIEW: 'workqueues.in-review',
-  WORKQUEUE_IN_REVIEW_ALL: 'workqueues.in-review-all',
-  WORKQUEUE_REQUIRES_UPDATES: 'workqueues.requires-updates',
-  WORKQUEUE_SENT_FOR_APPROVAL: 'workqueues.sent-for-approval',
-  WORKQUEUE_IN_EXTERNAL_VALIDATION: 'workqueues.in-external-validation',
-  WORKQUEUE_READY_TO_PRINT: 'workqueues.ready-to-print',
-  WORKQUEUE_READY_TO_ISSUE: 'workqueues.ready-to-issue'
+  USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
 const LiteralScopes = z.union([
@@ -233,7 +218,7 @@ const LiteralScopes = z.union([
 ])
 
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z]+\.[a-zA-Z]+)\[((?:\w+=\w+(?:\|\w+)*)(:?,\w+=\w+(?:\|\w+)*)*)\]$/
+  /^([a-zA-Z]+)\[((?:\w+=[\w-]+(?:\|[\w-]+)*)(:?,[\w-]+=[\w-]+(?:\|[\w-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -251,21 +236,29 @@ const EditUserScope = z.object({
   })
 })
 
+const WorkqueueScope = z.object({
+  type: z.literal('workqueue'),
+  options: z.object({
+    id: z.array(z.string())
+  })
+})
+
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
-  EditUserScope
+  EditUserScope,
+  WorkqueueScope
 ])
 
 type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
-export function findScope(
+export function findScope<t extends ConfigurableScopes['type']>(
   scopes: string[],
-  scopeType: ConfigurableScopes['type']
+  scopeType: t
 ) {
   return scopes
     .map((rawScope) => parseScope(rawScope))
     .find(
-      (parsedScope): parsedScope is ConfigurableScopes =>
+      (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: t }> =>
         parsedScope?.type === scopeType
     )
 }
@@ -281,11 +274,14 @@ export function parseScope(scope: string) {
   if (maybeConfigurableScope.success) {
     const rawScope = maybeConfigurableScope.data
     const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
-    const options = rawOptions.split(',').reduce((acc, option) => {
-      const [key, value] = option.split('=')
-      acc[key] = value.split('|')
-      return acc
-    }, {} as Record<string, string[]>)
+    const options = rawOptions.split(',').reduce(
+      (acc, option) => {
+        const [key, value] = option.split('=')
+        acc[key] = value.split('|')
+        return acc
+      },
+      {} as Record<string, string[]>
+    )
     const parsedScope = {
       type,
       options

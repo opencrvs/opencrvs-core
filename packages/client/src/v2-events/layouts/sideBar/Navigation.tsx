@@ -20,7 +20,7 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { Scope } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
@@ -54,6 +54,8 @@ export const Navigation = ({
   const navigate = useNavigate()
 
   const runningVer = String(localStorage.getItem('running-version'))
+  const availableWorkqueues =
+    findScope(scopes ?? [], 'workqueue')?.options.id ?? []
 
   return (
     <LeftNavigation
@@ -66,7 +68,7 @@ export const Navigation = ({
     >
       <NavigationGroup>
         {workqueues
-          .filter(({ slug }) => scopes?.includes(`workqueues.${slug}` as Scope))
+          .filter(({ slug }) => availableWorkqueues.includes(slug))
           .map(({ name, slug }) => (
             <NavigationItem
               key={slug}

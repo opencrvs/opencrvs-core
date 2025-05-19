@@ -12,7 +12,7 @@
 import React, { useEffect } from 'react'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { Scope } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
 import { Loader } from '@opencrvs/components'
 import { getScope } from '@client/profile/profileSelectors'
 import { ROUTES } from '@client/v2-events/routes'
@@ -24,8 +24,11 @@ export const RedirectToWorkqueue = () => {
   const navigate = useNavigate()
 
   useEffect(() => {
+    const availableWorkqueues =
+      findScope(scopes ?? [], 'workqueue')?.options.id ?? []
+
     const firstWorkqueue = workqueues.find(({ slug }) =>
-      scopes?.includes(`workqueues.${slug}` as Scope)
+      availableWorkqueues.includes(slug)
     )
 
     if (firstWorkqueue) {

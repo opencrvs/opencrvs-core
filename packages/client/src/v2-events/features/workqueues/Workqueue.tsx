@@ -13,12 +13,14 @@ import React from 'react'
 
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { defaultThirdColumn } from '@opencrvs/commons/client'
+import { useSelector } from 'react-redux'
+import { defaultThirdColumn, findScope } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
+import { getScope } from '@client/profile/profileSelectors'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 import {
   SearchResultComponent,
@@ -30,6 +32,7 @@ export function WorkqueueContainer() {
   const eventConfigs = useEventConfigurations()
   const workqueues = useWorkqueueConfigurations()
   const { searchEvent, getEvents } = useEvents()
+  const scopes = useSelector(getScope)
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
@@ -38,8 +41,15 @@ export function WorkqueueContainer() {
   const [events2] = getEvents.useSuspenseQuery()
 
   if (!workqueueConfig) {
-    return null
+    throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
+  const availableWorkqueues =
+    findScope(scopes ?? [], 'workqueue')?.options.id ?? []
+
+  if (!availableWorkqueues.includes(workqueueSlug)) {
+    throw new Error(`Workqueue ${workqueueSlug} is not available for this user`)
+  }
+
   const query = workqueueConfig.query
   const events = searchEvent.useSuspenseQuery(query).concat(events2) // to fix
 
