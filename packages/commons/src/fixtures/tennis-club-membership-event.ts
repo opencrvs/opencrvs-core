@@ -980,6 +980,9 @@ export const tennisClubMembershipEvent = defineConfig({
           description: 'Label for surname',
           id: 'v2.event.tennis-club-membership.summary.field.surname.label'
         }
+      },
+      {
+        fieldId: 'applicant.email'
       }
     ]
   },
