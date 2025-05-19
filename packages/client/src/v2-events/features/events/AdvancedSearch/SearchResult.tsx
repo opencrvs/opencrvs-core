@@ -11,7 +11,7 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import styled, { useTheme } from 'styled-components'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { mapKeys } from 'lodash'
 import {
   EventIndex,
@@ -21,9 +21,10 @@ import {
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
-  Workqueue,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  Workqueue
 } from '@opencrvs/components/lib/Workqueue'
+import { Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -31,6 +32,7 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useEventTitle } from '../useEvents/useEventTitle'
 import { SearchModifierComponent } from './SearchModifier'
 
 const SORT_ORDER = {
@@ -173,9 +175,10 @@ export const SearchResultComponent = ({
   queryData: EventIndex[]
 }) => {
   const intl = useIntl()
-  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+  const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
+  const { getEventTitle } = useEventTitle()
 
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -202,15 +205,24 @@ export const SearchResultComponent = ({
   const transformData = (eventData: EventIndex[]) => {
     return eventData
       .map((event) => {
+        const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+        if (!eventConfig) {
+          throw new Error(
+            'Event configuration not found for event:' + event.type
+          )
+        }
+        const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
         const { declaration, ...rest } = event
-        return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
+
+        return {
+          ...rest,
+          useFallbackTitle,
+          title,
+          label: eventConfig.label,
+          ...mapKeys(declaration, (_, key) => `${key}`)
+        }
       })
       .map((doc) => {
-        const eventConfig = eventConfigs.find(({ id }) => id === doc.type)
-        if (!eventConfig) {
-          throw new Error('Event configuration not found for event:' + doc.type)
-        }
-
         const isInOutbox = outbox.some(
           (outboxEvent) => outboxEvent.id === doc.id
         )
@@ -228,13 +240,11 @@ export const SearchResultComponent = ({
 
         const status = doc.status
 
-        const title = flattenedIntl.formatMessage(eventConfig.title, doc)
-
         return {
           ...doc,
-          event: intl.formatMessage(eventConfig.label),
+          type: intl.formatMessage(doc.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
-          modifiedAt: formattedDuration(new Date(doc.updatedAt)),
+          updatedAt: formattedDuration(new Date(doc.updatedAt)),
           status: intl.formatMessage(
             {
               id: `v2.events.status`,
@@ -246,15 +256,20 @@ export const SearchResultComponent = ({
             }
           ),
           title: isInOutbox ? (
-            <IconWithName name={title} status={status} />
+            <IconWithName name={doc.title} status={status} />
           ) : (
-            <NondecoratedLink
-              to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                eventId: doc.id
-              })}
+            <TextButton
+              color={doc.useFallbackTitle ? 'red' : 'primary'}
+              onClick={() => {
+                return navigate(
+                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                    eventId: doc.id
+                  })
+                )
+              }}
             >
-              <IconWithName name={title} status={status} />
-            </NondecoratedLink>
+              <IconWithName name={doc.title} status={status} />
+            </TextButton>
           )
         }
       })
