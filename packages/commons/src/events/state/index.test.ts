@@ -273,6 +273,7 @@ describe('getCurrentEventState()', () => {
       updatedByUserRole: registerRequestAction.createdByRole,
       updatedAtLocation: registerRequestAction.createdAtLocation,
       declaration: deepDropNulls(declareRequestAction.declaration),
+      dateOfEvent: event.createdAt.split('T')[0],
       flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
@@ -380,6 +381,7 @@ describe('getCurrentEventState()', () => {
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration),
+      dateOfEvent: event.createdAt.split('T')[0],
       flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
