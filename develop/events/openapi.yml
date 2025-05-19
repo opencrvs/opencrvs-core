@@ -217,6 +217,25 @@ components:
                         default: *a1
                       fieldId:
                         type: string
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                            description: The identifier of the translation referred in translation CSV files
+                          defaultMessage:
+                            type: string
+                            description: Default translation message
+                          description:
+                            type: string
+                            description: Describe the translation for a translator to be able to identify
+                              it.
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                        description: By default, the configured field's label is used. This can be
+                          overridden by providing a custom label.
                     required:
                       - fieldId
                     description: Field directly referencing event data with field id
