@@ -183,7 +183,7 @@ export async function eventNotificationHandler(
 
     await sendBundleToHearth({
       ...updatedBundle,
-      entry: [{ resource: task }]
+      entry: updatedBundle.entry
     })
     await indexBundle(updatedBundle, token)
 
