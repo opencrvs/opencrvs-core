@@ -48,7 +48,7 @@ const mockSearchParams = {
 export const DefaultSearchResult: Story = {
   name: 'Default Search Result',
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: [
       eventQueryDataGenerator({
         declaration: {
@@ -61,7 +61,7 @@ export const DefaultSearchResult: Story = {
       })
     ],
     searchParams: mockSearchParams,
-    workqueueConfig: WorkqueueFixture[0]
+    columns: WorkqueueFixture[0].columns
   }
 }
 
@@ -71,18 +71,18 @@ export const SearchResultWithMultipleItems: Story = {
     chromatic: { disableSnapshot: true }
   },
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
     searchParams: { status: EventStatus.REGISTERED },
-    workqueueConfig: WorkqueueFixture[0]
+    columns: WorkqueueFixture[0].columns
   }
 }
 export const NoSearchResult: Story = {
   name: 'No Search Result',
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: [],
     searchParams: mockSearchParams,
-    workqueueConfig: WorkqueueFixture[0]
+    columns: WorkqueueFixture[0].columns
   }
 }
