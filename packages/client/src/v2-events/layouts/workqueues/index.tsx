@@ -30,6 +30,7 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import * as routes from '@client/navigation/routes'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
+import { advancedSearchMessages } from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
 import { Hamburger } from '../sideBar/Hamburger'
 import { Navigation } from '../sideBar/Navigation'
 
@@ -54,10 +55,6 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const workqueues = useWorkqueueConfigurations()
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
-
-  if (!workqueueConfig) {
-    return null
-  }
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
@@ -115,7 +112,9 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
-          mobileTitle={intl.formatMessage(workqueueConfig.name)}
+          mobileTitle={intl.formatMessage(
+            workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
+          )}
         />
       }
       navigation={<Navigation />}

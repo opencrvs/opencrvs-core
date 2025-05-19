@@ -14,7 +14,21 @@ import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
 import { QueryType } from './EventIndex'
 import { event } from './event'
-import { WorkqueueColumn } from './WorkqueueColumnConfig'
+import {
+  defineWorkqueueColumns,
+  WorkqueueColumn
+} from './WorkqueueColumnConfig'
+
+export const defaultThirdColumn = defineWorkqueueColumns([
+  {
+    label: {
+      id: 'workqueues.dateOfEvent',
+      defaultMessage: 'Date of Event',
+      description: 'Label for workqueue column: dateOfEvent'
+    },
+    value: event.field('dateOfEvent')
+  }
+])
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
@@ -32,16 +46,7 @@ export const WorkqueueConfig = z
         conditionals: z.array(Conditional).optional()
       })
     ),
-    columns: z.array(WorkqueueColumn).default([
-      {
-        label: {
-          id: 'workqueues.dateOfEvent',
-          defaultMessage: 'Date of Event',
-          description: 'Label for workqueue column: dateOfEvent'
-        },
-        value: event.field('dateOfEvent')
-      }
-    ])
+    columns: z.array(WorkqueueColumn).default(defaultThirdColumn)
   })
   .describe('Configuration for workqueue.')
 

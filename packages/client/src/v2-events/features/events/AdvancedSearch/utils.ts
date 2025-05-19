@@ -16,7 +16,8 @@ import {
   FieldValue,
   QueryInputType,
   SearchField,
-  EventFieldId
+  EventFieldId,
+  QueryType
 } from '@opencrvs/commons/client'
 import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
@@ -230,4 +231,36 @@ export function buildDataCondition(
   )
 
   return buildDataConditionFromSearchKeys(searchKeys, flat)
+}
+
+export function toQueryType(
+  eventType: string,
+  searchParams: QueryInputType,
+  type: 'and' | 'or'
+): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (key.startsWith('event')) {
+      const strippedKey = key.replace(/^event____/, '')
+      topLevelFields[strippedKey] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  const queryExpression: QueryType = {
+    type: 'and',
+    eventType,
+    ...topLevelFields,
+    data: dataFields
+  }
+
+  return type === 'and'
+    ? queryExpression
+    : {
+        type: 'or',
+        clauses: [queryExpression]
+      }
 }

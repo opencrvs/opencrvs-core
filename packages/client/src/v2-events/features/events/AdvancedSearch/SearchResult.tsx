@@ -16,8 +16,8 @@ import { mapKeys } from 'lodash'
 import {
   EventIndex,
   EventConfig,
-  WorkqueueConfig,
-  defaultWorkqueueColumns
+  defaultWorkqueueColumns,
+  WorkqueueColumn
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -140,7 +140,7 @@ function changeSortedColumn(
   }
 }
 
-const messagesToDefine = {
+export const searchResultMessages = {
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
@@ -154,27 +154,28 @@ const messagesToDefine = {
   }
 }
 
-const messages = defineMessages(messagesToDefine)
+const messages = defineMessages(searchResultMessages)
 
 interface Props {
-  workqueueConfig: WorkqueueConfig
-  eventConfig: EventConfig
+  columns: WorkqueueColumn[]
+  eventConfigs: EventConfig[]
   searchParams: Record<string, string>
   queryData: EventIndex[]
 }
 
-export const SearchResult = ({
-  workqueueConfig,
-  eventConfig,
-  searchParams,
-  queryData
-}: Props) => {
+export const SearchResultComponent = ({
+  columns,
+  queryData,
+  eventConfigs
+}: {
+  columns: WorkqueueColumn[]
+  eventConfigs: EventConfig[]
+  queryData: EventIndex[]
+}) => {
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
-  const total = queryData.length
-  const noResultText = intl.formatMessage(messages.noResult)
 
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -205,6 +206,11 @@ export const SearchResult = ({
         return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
       })
       .map((doc) => {
+        const eventConfig = eventConfigs.find(({ id }) => id === doc.type)
+        if (!eventConfig) {
+          throw new Error('Event configuration not found for event:' + doc.type)
+        }
+
         const isInOutbox = outbox.some(
           (outboxEvent) => outboxEvent.id === doc.id
         )
@@ -270,7 +276,7 @@ export const SearchResult = ({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     if (windowWidth > theme.grid.breakpoints.lg) {
-      return workqueueConfig.columns.map(({ label, value }) => ({
+      return columns.map(({ label, value }) => ({
         label: intl.formatMessage(label),
         width: 35,
         key: value.$event,
@@ -278,7 +284,7 @@ export const SearchResult = ({
         isSorted: sortedCol === value.$event
       }))
     } else {
-      return workqueueConfig.columns
+      return columns
         .map(({ label, value }) => ({
           label: intl.formatMessage(label),
           width: 35,
@@ -289,6 +295,24 @@ export const SearchResult = ({
         .slice(0, 2)
     }
   }
+  return (
+    <Workqueue
+      columns={[...getDefaultColumns(), ...getColumns()]}
+      content={transformData(queryData)}
+      hideLastBorder={true}
+    />
+  )
+}
+
+export const SearchResult = ({
+  columns,
+  eventConfigs,
+  searchParams,
+  queryData
+}: Props) => {
+  const intl = useIntl()
+  const total = queryData.length
+  const noResultText = intl.formatMessage(messages.noResult)
 
   return (
     <WQContentWrapper
@@ -297,7 +321,7 @@ export const SearchResult = ({
       noResultText={noResultText}
       tabBarContent={
         <SearchModifierComponent
-          eventType={eventConfig.id}
+          eventType={eventConfigs[0].id}
           searchParams={searchParams}
         />
       }
@@ -305,10 +329,10 @@ export const SearchResult = ({
         ' (' + total + ')'
       }`}
     >
-      <Workqueue
-        columns={[...getDefaultColumns(), ...getColumns()]}
-        content={transformData(queryData)}
-        hideLastBorder={true}
+      <SearchResultComponent
+        columns={columns}
+        eventConfigs={eventConfigs}
+        queryData={queryData}
       />
     </WQContentWrapper>
   )

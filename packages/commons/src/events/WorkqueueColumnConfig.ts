@@ -21,3 +21,12 @@ export const WorkqueueColumn = z.object({
   value: EventMetadataParameter
 })
 export type WorkqueueColumn = z.infer<typeof WorkqueueColumn>
+export type WorkqueueColumnInput = z.infer<typeof WorkqueueColumn>
+
+export function defineWorkqueueColumns(
+  workqueueColumns: WorkqueueColumnInput[]
+) {
+  return workqueueColumns.map((workqueueColumn) =>
+    WorkqueueColumn.parse(workqueueColumn)
+  )
+}

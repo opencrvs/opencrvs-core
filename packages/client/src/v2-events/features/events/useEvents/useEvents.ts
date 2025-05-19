@@ -24,38 +24,6 @@ import {
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
 
-function toQueryType(
-  eventType: string,
-  searchParams: QueryInputType,
-  type: 'and' | 'or'
-): QueryType {
-  const topLevelFields: Record<string, unknown> = {}
-  const dataFields: Record<string, unknown> = {}
-
-  Object.entries(searchParams).forEach(([key, value]) => {
-    if (key.startsWith('event')) {
-      const strippedKey = key.replace(/^event____/, '')
-      topLevelFields[strippedKey] = value
-    } else {
-      dataFields[key] = value
-    }
-  })
-
-  const queryExpression: QueryType = {
-    type: 'and',
-    eventType,
-    ...topLevelFields,
-    data: dataFields
-  }
-
-  return type === 'and'
-    ? queryExpression
-    : {
-        type: 'or',
-        clauses: [queryExpression]
-      }
-}
-
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
@@ -73,28 +41,16 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     searchEvent: {
-      useQuery: (
-        eventType: string,
-        searchParams: QueryInputType,
-        queryType: 'and' | 'or'
-      ) => {
-        const input = toQueryType(eventType, searchParams, queryType)
-
+      useQuery: (query: QueryType) => {
         return useQuery({
-          ...trpc.event.search.queryOptions(input),
-          queryKey: trpc.event.search.queryKey(input)
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query)
         })
       },
-      useSuspenseQuery: (
-        eventType: string,
-        searchParams: QueryInputType,
-        queryType: 'and' | 'or'
-      ) => {
-        const input = toQueryType(eventType, searchParams, queryType)
-
+      useSuspenseQuery: (query: QueryType) => {
         return useSuspenseQuery({
-          ...trpc.event.search.queryOptions(input),
-          queryKey: trpc.event.search.queryKey(input)
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query)
         }).data
       }
     },
