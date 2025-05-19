@@ -35,6 +35,7 @@ import { NavigationHistoryProvider } from '@client/v2-events/components/Navigati
 import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
 import { ROUTES } from './routes'
+import { Toaster } from './Toaster'
 
 /**
  * Configuration for the routes of the v2-events feature.
@@ -50,6 +51,7 @@ export const routesConfig = {
         <TRPCProvider>
           <Outlet />
           <Debug />
+          <Toaster />
         </TRPCProvider>
       </TRPCErrorBoundary>
     </NavigationHistoryProvider>
