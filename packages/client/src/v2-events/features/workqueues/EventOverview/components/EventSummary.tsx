@@ -146,7 +146,7 @@ export function EventSummary({
         value: Output({
           field: config,
           showPreviouslyMissingValuesAsChanged: false,
-          value: value
+          value
         })
       }
     }
