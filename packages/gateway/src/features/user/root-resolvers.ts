@@ -43,7 +43,12 @@ import { validateAttachments } from '@gateway/utils/validators'
 import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
-import { findScope, getScopes, SCOPES } from '@opencrvs/commons/authentication'
+import {
+  findScope,
+  getScopes,
+  hasScope,
+  SCOPES
+} from '@opencrvs/commons/authentication'
 import { UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
@@ -333,7 +338,7 @@ export const resolvers: GQLResolver = {
         }
       }
 
-      if (user.role) {
+      if (user.role && !hasScope(authHeader, SCOPES.USER_DATA_SEEDING)) {
         const scopes = getScopes(authHeader)
         const creatableRoleIds =
           findScope(scopes, 'user.create')?.options?.role ?? []
