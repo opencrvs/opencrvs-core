@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { QueryExpression, QueryType, User } from 'src/events'
+import { QueryExpression, QueryType, User } from '../../../events'
 import {
   CountryConfigQueryType,
   SerializedQueryExpression
