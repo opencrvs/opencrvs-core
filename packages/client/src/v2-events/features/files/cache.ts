@@ -17,7 +17,11 @@ import {
   FileFieldWithOptionValue,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { precacheFile, removeCached } from './useFileUpload'
+import {
+  EVENT_ATTACHMENTS_DIRECTORY,
+  precacheFile,
+  removeCached
+} from './useFileUpload'
 
 export function getFileNames(
   actions: ActionDocument[] | Draft['action'][]
@@ -45,7 +49,11 @@ export async function cacheFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
   const fileNames = getFileNames(actions)
 
-  return Promise.all(fileNames.map(async (filename) => precacheFile(filename)))
+  return Promise.all(
+    fileNames.map(async (filename) =>
+      precacheFile(filename, EVENT_ATTACHMENTS_DIRECTORY)
+    )
+  )
 }
 
 export async function removeCachedFiles(eventDocument: EventDocument) {

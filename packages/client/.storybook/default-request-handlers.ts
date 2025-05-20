@@ -21,18 +21,8 @@ import {
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { ensureCacheExists } from '@client/v2-events/cache'
 
-async function ensureCacheExists(cacheName: string) {
-  const cacheNames = await caches.keys()
-  if (!cacheNames.includes(cacheName)) {
-    await caches.open(cacheName)
-    // eslint-disable-next-line no-console
-    console.log(`Cache "${cacheName}" created.`)
-  } else {
-    // eslint-disable-next-line no-console
-    console.log(`Cache "${cacheName}" already exists.`)
-  }
-}
 const FAKE_CACHE_NAME = 'workbox-runtime'
 ensureCacheExists(FAKE_CACHE_NAME)
 
