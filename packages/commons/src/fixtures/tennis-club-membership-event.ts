@@ -1326,6 +1326,7 @@ export const WorkqueueFixture = defineWorkqueue([
       description: 'Title of in progress workqueue'
     },
     query: { eventType: tennisClubMembershipEvent.id },
-    actions: []
+    actions: [],
+    icon: 'Draft'
   }
 ])

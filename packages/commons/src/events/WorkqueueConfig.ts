@@ -18,6 +18,7 @@ import {
   WorkqueueColumn
 } from './WorkqueueColumnConfig'
 import { CountryConfigQueryType } from './CountryConfigQueryInput'
+import { AvailableIcons } from '../icons'
 
 export const defaultThirdColumn = defineWorkqueueColumns([
   {
@@ -46,7 +47,8 @@ export const WorkqueueConfig = z
         conditionals: z.array(Conditional).optional()
       })
     ),
-    columns: z.array(WorkqueueColumn).default(defaultThirdColumn)
+    columns: z.array(WorkqueueColumn).default(defaultThirdColumn),
+    icon: AvailableIcons
   })
   .describe('Configuration for workqueue.')
 

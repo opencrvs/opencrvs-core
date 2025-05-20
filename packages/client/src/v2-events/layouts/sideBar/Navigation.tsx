@@ -69,11 +69,11 @@ export const Navigation = ({
       <NavigationGroup>
         {workqueues
           .filter(({ slug }) => availableWorkqueues.includes(slug))
-          .map(({ name, slug }) => (
+          .map(({ name, slug, icon }) => (
             <NavigationItem
               key={slug}
               count={7}
-              icon={() => <Icon name="PaperPlaneTilt" size="small" />} // ToDo
+              icon={() => <Icon name={icon} size="small" />}
               id={`navigation_workqueue_${slug}`}
               isSelected={slug === workqueueSlug}
               label={intl.formatMessage(name)}

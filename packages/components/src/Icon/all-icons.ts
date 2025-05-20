@@ -89,6 +89,8 @@ export {
   Sun,
   DeviceTabletCamera,
   Globe,
-  Fingerprint
+  Fingerprint,
+  PushPin,
+  Timer
 } from 'phosphor-react'
 export * from './custom-icons'
