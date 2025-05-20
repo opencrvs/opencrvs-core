@@ -15,13 +15,23 @@ import { injectIntl, useIntl } from 'react-intl'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { IStoreState } from '@client/store'
 import { messages } from '@client/i18n/messages/views/config'
-import { Content, ContentSize, FormTabs, Frame } from '@opencrvs/components'
+import {
+  Content,
+  ContentSize,
+  ErrorText,
+  FormTabs,
+  Frame
+} from '@opencrvs/components'
 import { FormFieldGenerator } from '@client/components/form/FormFieldGenerator'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { createAdvancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
 import { createAdvancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import {
+  buttonMessages,
+  constantsMessages,
+  errorMessages
+} from '@client/i18n/messages'
 import { messages as advancedSearchFormMessages } from '@client/i18n/messages/views/advancedSearchForm'
 import { getAdvancedSearchParamsState as AdvancedSearchParamsSelector } from '@client/search/advancedSearch/advancedSearchSelectors'
 import { setAdvancedSearchParam } from '@client/search/advancedSearch/actions'
@@ -52,6 +62,10 @@ enum TabId {
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
+`
+
+const ErrorTextWrapper = styled.div`
+  padding-top: 20px;
 `
 
 export const isAdvancedSearchFormValid = (value: IAdvancedSearchFormState) => {
@@ -119,6 +133,8 @@ const BirthSection: React.FC<BirthSectionProps> = ({
     birthSearchInformantSection
   } = advancedSearchBirthSections
 
+  const [showWarningMessage, setShowWarningMessage] = useState(false)
+
   const intl = useIntl()
   const navigate = useNavigate()
   const advancedSearchParamsState = useSelector(AdvancedSearchParamsSelector)
@@ -139,7 +155,7 @@ const BirthSection: React.FC<BirthSectionProps> = ({
     )
   )
 
-  const isDisabled = !isAdvancedSearchFormValid(formState)
+  const isFormNotValid = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
 
   const accordionShowingLabel = intl.formatMessage(
@@ -307,24 +323,36 @@ const BirthSection: React.FC<BirthSectionProps> = ({
         />
       </Accordion>
 
+      {showWarningMessage && !isAdvancedSearchFormValid(formState) && (
+        <ErrorTextWrapper id="error-wrapper">
+          <ErrorText id="error-text">{`${intl.formatMessage(
+            errorMessages.searchParamCountError
+          )}`}</ErrorText>
+        </ErrorTextWrapper>
+      )}
+
       <SearchButton
         id="search"
         key="search"
         type="primary"
         fullWidth
         size="large"
-        disabled={isDisabled}
+        disabled={false}
         onClick={() => {
-          dispatch(
-            setAdvancedSearchParam({
-              ...transformAdvancedSearchLocalStateToStoreData(
-                formState,
-                offlineData
-              ),
-              event: 'birth'
-            })
-          )
-          navigate(routes.ADVANCED_SEARCH_RESULT)
+          if (isFormNotValid) {
+            setShowWarningMessage(true)
+          } else {
+            dispatch(
+              setAdvancedSearchParam({
+                ...transformAdvancedSearchLocalStateToStoreData(
+                  formState,
+                  offlineData
+                ),
+                event: 'birth'
+              })
+            )
+            navigate(routes.ADVANCED_SEARCH_RESULT)
+          }
         }}
       >
         {' '}
@@ -359,7 +387,9 @@ const DeathSection: React.FC<DeathSectionProps> = ({
     )
   )
 
-  const isDisable = !isAdvancedSearchFormValid(formState)
+  const [showWarningMessage, setShowWarningMessage] = useState(false)
+
+  const isFormNotValid = !isAdvancedSearchFormValid(formState)
   const dispatch = useDispatch()
   const accordionShowingLabel = intl.formatMessage(
     advancedSearchFormMessages.show
@@ -492,25 +522,37 @@ const DeathSection: React.FC<DeathSectionProps> = ({
         />
       </Accordion>
 
+      {showWarningMessage && !isAdvancedSearchFormValid(formState) && (
+        <ErrorTextWrapper id="error-wrapper">
+          <ErrorText id="error-text">{`${intl.formatMessage(
+            errorMessages.searchParamCountError
+          )}`}</ErrorText>
+        </ErrorTextWrapper>
+      )}
+
       <SearchButton
         id="search"
         key="search"
         type="primary"
         size="large"
         fullWidth
-        disabled={isDisable}
+        disabled={false}
         onClick={() => {
-          dispatch(
-            setAdvancedSearchParam({
-              ...transformAdvancedSearchLocalStateToStoreData(
-                formState,
-                offlineData
-              ),
-              event: 'death'
-            })
-          )
+          if (isFormNotValid) {
+            setShowWarningMessage(true)
+          } else {
+            dispatch(
+              setAdvancedSearchParam({
+                ...transformAdvancedSearchLocalStateToStoreData(
+                  formState,
+                  offlineData
+                ),
+                event: 'death'
+              })
+            )
 
-          navigate(routes.ADVANCED_SEARCH_RESULT)
+            navigate(routes.ADVANCED_SEARCH_RESULT)
+          }
         }}
       >
         {' '}
