@@ -19,7 +19,10 @@ import {
   inScope,
   Scope
 } from '@opencrvs/commons'
-import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
+import {
+  UserRequestContext,
+  MiddlewareOptions
+} from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
 
 /**
@@ -51,7 +54,7 @@ export function requiresAnyOfScopes(scopes: Scope[]) {
 /**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
 export const requireAssignment = experimental_standaloneMiddleware<{
   input: ActionInputWithType | DeleteActionInput
-  ctx: Context
+  ctx: UserRequestContext
 }>().create(async ({ next, ctx, input }) => {
   const event = await getEventById(input.eventId)
   if (

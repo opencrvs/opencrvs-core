@@ -14,7 +14,7 @@ import '@opencrvs/commons/monitoring'
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
 import { TRPCError } from '@trpc/server'
 import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
-import { getUser, logger } from '@opencrvs/commons'
+import { getSystem, getUser, logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
@@ -49,20 +49,34 @@ const server = createHTTPServer({
         code: 'UNAUTHORIZED'
       })
     }
+    try {
+      const { primaryOfficeId, role } = await getUser(
+        env.USER_MANAGEMENT_URL,
+        userId,
+        token
+      )
 
-    const { primaryOfficeId, role } = await getUser(
-      env.USER_MANAGEMENT_URL,
-      userId,
-      token
-    )
+      return {
+        user: {
+          id: userId,
+          primaryOfficeId,
+          role
+        },
+        token: token
+      }
+    } catch (error) {
+      if (!(await getSystem(env.USER_MANAGEMENT_URL, userId, token))) {
+        throw error
+      }
 
-    return {
-      user: {
-        id: userId,
-        primaryOfficeId,
-        role
-      },
-      token: token
+      return {
+        user: {
+          id: userId,
+          role: 'SYSTEM',
+          primaryOfficeId: ''
+        },
+        token: token
+      }
     }
   }
 })
