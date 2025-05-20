@@ -119,9 +119,9 @@ function SectionFields({
 
         const combinedFields = [...metadataFields, ...advancedSearchFields]
         const modifiedFields = combinedFields.map((f) => {
-          const fieldSearchConfig = advancedSearchSections
-            .flatMap((a) => a.fields)
-            .find((a) => a.fieldId === f.id)
+          const fieldSearchConfig = section.fields.find(
+            (a) => a.fieldId === f.id
+          )
           return {
             ...f,
             required: false as const,

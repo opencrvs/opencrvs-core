@@ -58,23 +58,23 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
         error && touched
           ? theme.colors.negative
           : disabled
-          ? theme.colors.grey300
-          : theme.colors.copy};
+            ? theme.colors.grey300
+            : theme.colors.copy};
     &:hover {
       border: 1.5px solid
         ${({ error, touched, disabled, theme }) =>
           error && touched
             ? theme.colors.negative
             : disabled
-            ? theme.colors.grey300
-            : theme.colors.copy};
+              ? theme.colors.grey300
+              : theme.colors.copy};
       outline: 0.5px solid
         ${({ error, touched, disabled, theme }) =>
           error && touched
             ? theme.colors.negative
             : disabled
-            ? theme.colors.grey300
-            : theme.colors.copy};
+              ? theme.colors.grey300
+              : theme.colors.copy};
     }
     &:focus {
       outline: 0.5px solid ${({ theme }) => theme.colors.grey600};
@@ -156,7 +156,8 @@ function getSelectedOption(
   return null
 }
 
-interface ISelectProps extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
+export interface ISelectProps
+  extends Omit<IStyledSelectProps, 'value' | 'onChange'> {
   onChange: (value: string) => void
   value: string
   searchableLength?: number
