@@ -10,7 +10,7 @@
  */
 
 import { DraftInput } from '@opencrvs/commons/events'
-
+import { UUID } from '@opencrvs/commons'
 import { getClient, sql } from '@events/storage/postgres/events'
 
 export async function createDraft(
@@ -22,7 +22,7 @@ export async function createDraft(
     createdAtLocation,
     transactionId
   }: {
-    eventId: string
+    eventId: UUID
     createdBy: string
     createdByRole: string
     createdAtLocation: string
@@ -33,30 +33,33 @@ export async function createDraft(
   const db = await getClient()
 
   const draft = await db.one(sql.typeAlias('draft')`
-    INSERT INTO event_action_drafts (
-      event_id,
-      transaction_id,
-      action_type,
-      declaration,
-      annotations,
-      created_by,
-      created_by_role,
-      created_at_location
-    )
-    VALUES (
-      ${eventId},
-      ${transactionId},
-      ${input.type},
-      ${sql.jsonb(input.declaration)},
-      ${sql.jsonb(input.annotation)},
-      ${createdBy},
-      ${createdByRole},
-      ${createdAtLocation}
-    )
+    INSERT INTO
+      event_action_drafts (
+        event_id,
+        transaction_id,
+        action_type,
+        declaration,
+        annotations,
+        created_by,
+        created_by_role,
+        created_at_location
+      )
+    VALUES
+      (
+        ${eventId},
+        ${transactionId},
+        ${input.type},
+        ${sql.jsonb(input.declaration)},
+        ${sql.jsonb(input.annotation)},
+        ${createdBy},
+        ${createdByRole},
+        ${createdAtLocation}
+      )
     ON CONFLICT (transaction_id) DO UPDATE
-    SET declaration = EXCLUDED.declaration,
-        annotations = EXCLUDED.annotations,
-        created_at = now()
+    SET
+      declaration = EXCLUDED.declaration,
+      annotations = EXCLUDED.annotations,
+      created_at = now()
     RETURNING
       id,
       event_id AS "eventId",
@@ -79,14 +82,15 @@ export async function getDraftsByUserId(createdBy: string) {
       annotations
     FROM
       event_action_drafts
-    WHERE created_by = ${createdBy}
+    WHERE
+      created_by = ${createdBy}
   `)
 
   return [...drafts]
 }
 
 export async function getDraftsForAction(
-  eventId: string,
+  eventId: UUID,
   createdBy: string,
   actionType: string
 ) {
@@ -109,9 +113,11 @@ export async function getDraftsForAction(
   return [...drafts]
 }
 
-export async function deleteDraftsByEventId(eventId: string) {
+export async function deleteDraftsByEventId(eventId: UUID) {
   const db = await getClient()
   await db.any(sql.typeAlias('void')`
-    DELETE FROM event_action_drafts WHERE event_id = ${eventId}
+    DELETE FROM event_action_drafts
+    WHERE
+      event_id = ${eventId}
   `)
 }
