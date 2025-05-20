@@ -289,12 +289,12 @@ export function compileSvg({
   }
 
   /* Handlebars helper for splitting a string by a separator and returning the first part and the rest of the string as an array.
-   * This is used for location fields, which we received for example in format 'Bombwe Health Post, Ilanga, Sulaka, Farajaland',
+   * This is used for location fields, which we receive for example in format 'Bombwe Health Post, Ilanga, Sulaka, Farajaland',
    * but wish to display as two rows on certificate:
    * 1. Bombwe Health Post
    * 2. Ilanga, Sulaka, Farajaland
    *
-   * This could have been achieved by modifying the LocationSearch Output to return the location as an array or such,
+   * This could have been achieved by modifying the LocationSearch Output to return the location as an object or array or such,
    * but this seemed like a simpler solution considering other uses of location fields.
    *  */
   Handlebars.registerHelper(
