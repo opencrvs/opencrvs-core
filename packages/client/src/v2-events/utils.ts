@@ -12,7 +12,6 @@ import { uniq, isString, get, uniqBy } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
-import _ from 'lodash'
 import {
   ResolvedUser,
   ActionDocument,
@@ -30,7 +29,6 @@ import {
 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
 import { countries } from '@client/utils/countries'
-import { AdminStructure, Facility, CRVSOffice } from '@client/offline/reducer'
 
 /**
  *

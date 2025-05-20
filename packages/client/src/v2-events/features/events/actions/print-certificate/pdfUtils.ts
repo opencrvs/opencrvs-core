@@ -24,7 +24,6 @@ import type {
 import pdfMake from 'pdfmake/build/pdfmake'
 import { Location } from '@events/service/locations/locations'
 import { isEqual } from 'lodash'
-import _ from 'lodash'
 import {
   EventState,
   User,
