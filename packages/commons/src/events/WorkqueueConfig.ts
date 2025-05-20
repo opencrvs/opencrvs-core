@@ -12,12 +12,12 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
-import { QueryType } from './EventIndex'
 import { event } from './event'
 import {
   defineWorkqueueColumns,
   WorkqueueColumn
 } from './WorkqueueColumnConfig'
+import { CountryConfigQueryType } from './CountryConfigQueryInput'
 
 export const defaultThirdColumn = defineWorkqueueColumns([
   {
@@ -39,7 +39,7 @@ export const WorkqueueConfig = z
     name: TranslationConfig.describe(
       'Title of the workflow (both in navigation and on the page)'
     ),
-    query: QueryType,
+    query: CountryConfigQueryType,
     actions: z.array(
       z.object({
         type: z.string(),

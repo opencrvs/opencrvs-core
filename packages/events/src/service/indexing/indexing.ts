@@ -396,6 +396,28 @@ export async function getIndex(eventParams: QueryType) {
     )
 
     return events
+  } else {
+    if (Object.values(eventParams).length === 0) {
+      throw new Error('No search params provided')
+    }
+
+    const query = buildElasticQueryFromSearchPayload(eventParams)
+
+    const response = await esClient.search<EncodedEventIndex>({
+      index: getEventAliasName(),
+      size: DEFAULT_SIZE,
+      request_cache: false,
+      query
+    })
+
+    const events = z.array(EventIndex).parse(
+      response.hits.hits
+        .map((hit) => hit._source)
+        .filter((event): event is EncodedEventIndex => event !== undefined)
+        .map((event) => decodeEventIndex(event))
+    )
+
+    return events
   }
 
   return []

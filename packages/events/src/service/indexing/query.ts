@@ -88,6 +88,12 @@ function buildClause(clause: QueryExpression) {
     })
   }
 
+  if (clause.assignedTo) {
+    must.push({
+      term: { assignedTo: clause.assignedTo.term }
+    })
+  }
+
   if (clause.createdAt) {
     if (clause.createdAt.type === 'exact') {
       must.push({ term: { createdAt: clause.createdAt.term } })

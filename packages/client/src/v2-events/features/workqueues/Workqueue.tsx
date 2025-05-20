@@ -14,13 +14,17 @@ import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
-import { defaultThirdColumn, findScope } from '@opencrvs/commons/client'
+import {
+  defaultThirdColumn,
+  findScope,
+  rootDesirializer
+} from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
-import { getScope } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 import {
   SearchResultComponent,
@@ -33,12 +37,11 @@ export function WorkqueueContainer() {
   const workqueues = useWorkqueueConfigurations()
   const { searchEvent, getEvents } = useEvents()
   const scopes = useSelector(getScope)
+  const user = useSelector(getUserDetails)
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
   const intl = useIntl()
-
-  const [events2] = getEvents.useSuspenseQuery()
 
   if (!workqueueConfig) {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
@@ -51,7 +54,10 @@ export function WorkqueueContainer() {
   }
 
   const query = workqueueConfig.query
-  const events = searchEvent.useSuspenseQuery(query).concat(events2) // to fix
+
+  const deSerializedQuery = rootDesirializer(query, user)
+
+  const events = searchEvent.useSuspenseQuery(deSerializedQuery)
 
   return (
     <WQContentWrapper
