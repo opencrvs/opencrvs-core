@@ -186,7 +186,7 @@ export function replacePlaceholders({
 const ROOT_LOCATION_ID = '0'
 
 type LocationObject = Record<
-  'FACILITY' | 'COUNTRY' | 'DISTRICT' | 'STATE',
+  'FACILITY' | 'DISTRICT' | 'STATE' | 'COUNTRY',
   string
 >
 
