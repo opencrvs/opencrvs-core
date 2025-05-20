@@ -12,33 +12,26 @@
 import { z, ZodType } from 'zod'
 import { SerializedUserField } from './serializers/user/serializer'
 
-const Fuzzy = z.object({
-  type: z.literal('fuzzy'),
-  term: z.union([z.string(), SerializedUserField])
-})
-const Exact = z.object({
+const SerializableExact = z.object({
   type: z.literal('exact'),
   term: z.union([z.string(), SerializedUserField])
 })
+
+const Fuzzy = z.object({ type: z.literal('fuzzy'), term: z.string() })
+const Exact = z.object({ type: z.literal('exact'), term: z.string() })
 const AnyOf = z.object({
   type: z.literal('anyOf'),
-  terms: z.array(z.union([z.string(), SerializedUserField]))
+  terms: z.array(z.string())
 })
 
 const Range = z.object({
   type: z.literal('range'),
-  gte: z.union([z.string(), SerializedUserField]),
-  lte: z.union([z.string(), SerializedUserField])
+  gte: z.string(),
+  lte: z.string()
 })
-const Not = z.object({
-  type: z.literal('not'),
-  term: z.union([z.string(), SerializedUserField])
-})
+const Not = z.object({ type: z.literal('not'), term: z.string() })
 
-const Within = z.object({
-  type: z.literal('within'),
-  location: z.union([z.string(), SerializedUserField])
-})
+const Within = z.object({ type: z.literal('within'), location: z.string() })
 
 const DateCondition = z.union([Exact, Range])
 
@@ -51,7 +44,7 @@ const QueryInput: ZodType = z.lazy(() =>
   ])
 )
 
-const QueryExpression = z
+export const SerializedQueryExpression = z
   .object({
     type: z.literal('and'),
     title: z.string(),
@@ -61,7 +54,7 @@ const QueryExpression = z
     updatedAt: z.optional(DateCondition),
     createAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
-    assignedTo: z.optional(Exact),
+    assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
@@ -72,13 +65,15 @@ const QueryExpression = z
 
 const Or = z.object({
   type: z.literal('or'),
-  clauses: z.array(QueryExpression)
+  clauses: z.array(SerializedQueryExpression)
 })
 
-type QueryExpression = z.infer<typeof QueryExpression>
+export type SerializedQueryExpression = z.infer<
+  typeof SerializedQueryExpression
+>
 
 export const CountryConfigQueryType = z.discriminatedUnion('type', [
-  QueryExpression,
+  SerializedQueryExpression,
   Or
 ])
 export type CountryConfigQueryType = z.infer<typeof CountryConfigQueryType>

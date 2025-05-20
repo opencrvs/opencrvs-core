@@ -15,4 +15,4 @@ export const serialize = {
   user: userSerializer
 }
 
-export * from './user/deserializer'
+export { deserializeQuery } from './user/deserializer'

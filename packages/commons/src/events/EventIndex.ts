@@ -68,7 +68,7 @@ type QueryMap = {
 // where each key can be a string and the value can be either a base input or another query map.
 export type QueryInputType = BaseInput | QueryMap
 
-const QueryExpression = z
+export const QueryExpression = z
   .object({
     type: z.literal('and'),
     title: z.string(),

@@ -9,41 +9,51 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-//fix types
+import { QueryExpression, QueryType, User } from 'src/events'
+import {
+  CountryConfigQueryType,
+  SerializedQueryExpression
+} from 'src/events/CountryConfigQueryInput'
+import { SerializedUserField } from './serializer'
 
-import { User } from 'src/events'
-import { z } from 'zod'
-
-export const SerializedUserField = z.object({
-  $userField: z.enum(['id', 'name', 'role', 'signatureFilename'])
-})
-
-export type SerializedUserField = z.infer<typeof SerializedUserField>
-
-export function userDeSerializer(
-  serializedUserField: SerializedUserField,
+function userDeSerializer(
+  serializedUserField: SerializedUserField | string,
   user: User
-) {
-  return user[serializedUserField.$userField]
+): string {
+  if (typeof serializedUserField === 'string') {
+    return serializedUserField
+  }
+  if (serializedUserField.$userField === 'id') {
+    return user[serializedUserField.$userField]
+  }
+  return 'ToDo'
 }
 
-export const isSerializedUserField = (obj: any): obj is SerializedUserField => {
-  return '$userField' in obj
+function deserializeQueryExpression(
+  expression: SerializedQueryExpression,
+  user: User
+): QueryExpression {
+  return {
+    ...expression,
+    assignedTo: expression.assignedTo && {
+      ...expression.assignedTo,
+      term: userDeSerializer(expression.assignedTo.term, user)
+    }
+  }
 }
 
-export function rootDesirializer(input: any, user: User): any {
-  if (Array.isArray(input)) {
-    return input.map((item) => rootDesirializer(item, user))
-  }
-  if (typeof input === 'object' && input !== null) {
-    if (isSerializedUserField(input)) {
-      return userDeSerializer(input, user)
+export function deserializeQuery(
+  query: CountryConfigQueryType,
+  user: User
+): QueryType {
+  if (query.type === 'or') {
+    return {
+      type: 'or',
+      clauses: query.clauses.map((clause) =>
+        deserializeQueryExpression(clause, user)
+      )
     }
-    const deserializedObject: any = {}
-    for (const key in input) {
-      deserializedObject[key] = rootDesirializer(input[key], user)
-    }
-    return deserializedObject
+  } else {
+    return deserializeQueryExpression(query, user)
   }
-  return input
 }

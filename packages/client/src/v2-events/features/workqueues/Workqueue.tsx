@@ -17,7 +17,7 @@ import { useSelector } from 'react-redux'
 import {
   defaultThirdColumn,
   findScope,
-  rootDesirializer
+  deserializeQuery
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -53,9 +53,7 @@ export function WorkqueueContainer() {
     throw new Error(`Workqueue ${workqueueSlug} is not available for this user`)
   }
 
-  const query = workqueueConfig.query
-
-  const deSerializedQuery = rootDesirializer(query, user)
+  const deSerializedQuery = deserializeQuery(workqueueConfig.query, user)
 
   const events = searchEvent.useSuspenseQuery(deSerializedQuery)
 
