@@ -8,10 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, mapKeys, uniqBy } from 'lodash'
+import { uniq, isString, get, uniqBy } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
+import _ from 'lodash'
 import {
   ResolvedUser,
   ActionDocument,
@@ -25,11 +26,11 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   getDeclarationFields,
-  SystemVariables,
-  EventState
+  SystemVariables
 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
 import { countries } from '@client/utils/countries'
+import { AdminStructure, Facility, CRVSOffice } from '@client/offline/reducer'
 
 /**
  *
@@ -183,6 +184,47 @@ export function replacePlaceholders({
 
 /** Does not have parent */
 const ROOT_LOCATION_ID = '0'
+
+type LocationObject = Record<
+  'FACILITY' | 'COUNTRY' | 'DISTRICT' | 'STATE',
+  string
+>
+
+export function useResolveLocationToObject(
+  locationId: string | undefined,
+  obj: Partial<LocationObject> = {}
+): Partial<LocationObject> {
+  const locations = useSelector(getLocations)
+  const intl = useIntl()
+
+  if (!locationId) {
+    return obj
+  }
+
+  const location = locations[locationId]
+
+  if (!location) {
+    if (locationId === ROOT_LOCATION_ID) {
+      const country = countries.find(
+        (c) => c.value === window.config.COUNTRY
+      )?.label
+
+      const countryName = country ? intl.formatMessage(country) : ''
+
+      return { ...obj, COUNTRY: countryName }
+    }
+
+    return obj
+  }
+
+  const partOf = location.partOf.split('/')[1]
+  const key = location.jurisdictionType || 'FACILITY'
+
+  return useResolveLocationToObject(partOf, {
+    ...obj,
+    [key]: location.name
+  })
+}
 
 /** Given location id, returns full name of the location by resolving the hierarchy values all the way to country name. */
 export function useResolveLocationFullName(

@@ -24,7 +24,7 @@ import type {
 import pdfMake from 'pdfmake/build/pdfmake'
 import { Location } from '@events/service/locations/locations'
 import { isEqual } from 'lodash'
-
+import _ from 'lodash'
 import {
   EventState,
   User,
@@ -34,12 +34,17 @@ import {
   getMixedPath,
   EventMetadata,
   EventStatus,
-  DEFAULT_DATE_OF_EVENT_PROPERTY
+  DEFAULT_DATE_OF_EVENT_PROPERTY,
+  FieldConfig,
+  isFacilityFieldType
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import { getUsersFullName } from '@client/v2-events/utils'
+import {
+  getUsersFullName,
+  useResolveLocationToObject
+} from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 
 interface FontFamilyTypes {
@@ -249,6 +254,28 @@ function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
+/*
+  Turns certain field values into objects which we can access in the template.
+ * For example, we want to access facility location fields with specific object keys instead of plain strings.
+ */
+function objectifyFormData(formFields: FieldConfig[], values: EventState) {
+  return Object.keys(values).reduce((acc: Record<string, unknown>, key) => {
+    const fieldConfig = formFields.find((field) => field.id === key)
+    if (!fieldConfig) {
+      throw new Error(`Field ${key} not found in form config`)
+    }
+
+    const value = values[key]
+    const field = { config: fieldConfig, value }
+
+    if (isFacilityFieldType(field)) {
+      acc[key] = useResolveLocationToObject(value?.toString())
+    }
+
+    return acc
+  }, {})
+}
+
 export function compileSvg({
   templateString,
   $metadata,
@@ -288,25 +315,6 @@ export function compileSvg({
     Handlebars.registerHelper(helperName, helper)
   }
 
-  /* Handlebars helper for splitting a string by a separator and returning the first part and the rest of the string as an array.
-   * This is used for location fields, which we receive for example in format 'Bombwe Health Post, Ilanga, Sulaka, Farajaland',
-   * but wish to display as two rows on certificate:
-   * 1. Bombwe Health Post
-   * 2. Ilanga, Sulaka, Farajaland
-   *
-   * This could have been achieved by modifying the LocationSearch Output to return the location as an object or array or such,
-   * but this seemed like a simpler solution considering other uses of location fields.
-   *  */
-  Handlebars.registerHelper(
-    '$splitFirstFromString',
-    function (str: string, separator: string) {
-      const parts = str.split(separator)
-      return parts.length > 1
-        ? [parts[0], parts.slice(1).join(', ').trim()]
-        : parts
-    }
-  )
-
   /**
    * Handlebars helper: $lookup
    *
@@ -323,11 +331,16 @@ export function compileSvg({
    */
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
     const stringifyDeclaration = getFormDataStringifier(intl, locations)
+    const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
 
-    const resolvedDeclaration = stringifyDeclaration(
-      config.declaration.pages.flatMap((x) => x.fields),
-      $declaration
-    )
+    // Sometimes we want to access certain fields as specific object keys instead of plain strings.
+    // For example, we want to access birthLocation as an object with keys FACILITY, DISTRICT, STATE, COUNTRY.
+    const asObjects = objectifyFormData(fieldConfigs, $declaration)
+
+    const resolvedDeclaration = {
+      ...stringifyDeclaration(fieldConfigs, $declaration),
+      asObjects
+    }
 
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
