@@ -322,10 +322,10 @@ export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
   return !childBirthDate
     ? { message: messages.required }
     : childBirthDate &&
-      isAValidDateFormat(childBirthDate) &&
-      isDateNotInFuture(childBirthDate)
-    ? undefined
-    : { message: messages.isValidBirthDate }
+        isAValidDateFormat(childBirthDate) &&
+        isDateNotInFuture(childBirthDate)
+      ? undefined
+      : { message: messages.isValidBirthDate }
 }
 
 export const isValidParentsBirthDate =
