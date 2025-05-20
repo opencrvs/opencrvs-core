@@ -26,6 +26,7 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
+      - GATEWAY_URL_INTERNAL=http://gateway:7070
   dashboards:
     image: opencrvs/ocrvs-dashboards:${VERSION}
     #platform: linux/amd64
@@ -36,15 +37,6 @@ services:
     depends_on:
       - base
 
-  components:
-    image: opencrvs/ocrvs-components:${VERSION}
-    #platform: linux/amd64
-    build:
-      context: .
-      dockerfile: ./packages/components/Dockerfile
-    restart: unless-stopped
-    depends_on:
-      - base
   login:
     image: opencrvs/ocrvs-login:${VERSION}
     #platform: linux/amd64
@@ -56,6 +48,7 @@ services:
       - base
     environment:
       - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
+
   gateway:
     image: opencrvs/ocrvs-gateway:${VERSION}
     #platform: linux/amd64
@@ -66,10 +59,12 @@ services:
     depends_on:
       - base
     environment:
+      - HOST=0.0.0.0
       - REDIS_HOST=redis
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - CONFIG_TOKEN_EXPIRY_SECONDS=604800
       - NODE_ENV=development
+      - EVENTS_URL=http://events:5555/
       - FHIR_URL=http://hearth:3447/fhir
       - USER_MANAGEMENT_URL=http://user-mgnt:3030/
       - SEARCH_URL=http://search:9090/
@@ -83,6 +78,24 @@ services:
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
+
+  events:
+    image: opencrvs/ocrvs-events:${VERSION}
+    #platform: linux/amd64
+    build:
+      context: .
+      dockerfile: ./packages/events/Dockerfile
+    restart: unless-stopped
+    depends_on:
+      - base
+    environment:
+      - EVENTS_MONGO_URL=mongodb://mongo1/events
+      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
+      - ES_URL=http://elasticsearch:9200
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
+      - DOCUMENTS_URL=http://documents:9050
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030
+      - AUTH_URL=http://auth:4040
   # User facing services
   workflow:
     image: opencrvs/ocrvs-workflow:${VERSION}
@@ -104,6 +117,7 @@ services:
       - FHIR_URL=http://hearth:3447/fhir
       - WEBHOOKS_URL=http://webhooks:2525/
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - AUTH_URL=http://auth:4040
       - COUNTRY=${COUNTRY:-bgd} # PEN_TEST change to gbr
   search:
     image: opencrvs/ocrvs-search:${VERSION}
@@ -172,6 +186,7 @@ services:
       - CONFIG_SMS_CODE_EXPIRY_SECONDS=600
       - NOTIFICATION_SERVICE_URL=http://notification:2020/
       - METRICS_URL=http://metrics:1050
+      - COUNTRY_CONFIG_URL_INTERNAL=http://countryconfig:3040
   user-mgnt:
     image: opencrvs/ocrvs-user-mgnt:${VERSION}
     #platform: linux/amd64
@@ -188,6 +203,8 @@ services:
       - METRICS_URL=http://metrics:1050
       - FHIR_URL=http://hearth:3447/fhir
       - APPLICATION_CONFIG_URL=http://config:2021/
+      - COUNTRY_CONFIG_URL=http://countryconfig:3040
+      - DOCUMENTS_URL=http://documents:9050
   webhooks:
     image: opencrvs/ocrvs-webhooks:${VERSION}
     #platform: linux/amd64
@@ -218,6 +235,7 @@ services:
       - COUNTRY=${COUNTRY:-bgd}
       - HOST=0.0.0.0
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
+      - USER_MANAGEMENT_URL=http://user-mgnt:3030/
   config:
     image: opencrvs/ocrvs-config:${VERSION}
     #platform: linux/amd64

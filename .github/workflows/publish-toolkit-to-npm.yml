@@ -1,0 +1,67 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Publish toolkit to NPM registry
+on:
+  workflow_dispatch:
+    inputs:
+      branch_name:
+        description: Branch to publish from
+        default: develop
+        required: true
+  push:
+    branches:
+      - develop
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+          registry-url: 'https://registry.npmjs.org/'
+
+      - name: Check if version exists on npm
+        id: check-version
+        run: |
+          PACKAGE_VERSION=$(node -p "require('./package.json').version")
+          if npm view @opencrvs/toolkit@$PACKAGE_VERSION > /dev/null 2>&1; then
+            echo "Version $PACKAGE_VERSION already exists on npm."
+            echo "version-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "Version $PACKAGE_VERSION does not exist on npm."
+            echo "version-exists=false" >> $GITHUB_OUTPUT
+          fi
+        working-directory: packages/toolkit
+
+      - name: Install dependencies
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: yarn install
+        working-directory: packages/toolkit
+
+      - name: Build
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: yarn build:all
+        working-directory: packages/toolkit
+
+      - name: Authenticate to npm
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
+        working-directory: packages/toolkit
+
+      - name: Publish to npm
+        if: steps.check-version.outputs.version-exists == 'false'
+        run: npm publish --access public
+        working-directory: packages/toolkit
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

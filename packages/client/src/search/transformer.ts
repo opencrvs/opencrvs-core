@@ -12,32 +12,36 @@ import { ITaskHistory } from '@client/declarations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { getLocalisedName } from '@client/utils/data-formatting'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { HumanName, SearchEventsQuery } from '@client/utils/gateway'
+import {
+  EventSearchSet,
+  EventType,
+  HumanName,
+  SearchEventsQuery
+} from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,
-  GQLEventSearchSet,
   GQLMarriageEventSearchSet,
   GQLRegStatus
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { IntlShape } from 'react-intl'
 
 export const isBirthEvent = (
-  req: GQLEventSearchSet
+  req: EventSearchSet
 ): req is GQLBirthEventSearchSet => {
-  return req.type === 'Birth'
+  return req.type === EventType.Birth
 }
 
 export const isDeathEvent = (
-  req: GQLEventSearchSet
+  req: EventSearchSet
 ): req is GQLDeathEventSearchSet => {
-  return req.type === 'Death'
+  return req.type === EventType.Death
 }
 
 export const isMarriageEvent = (
-  reg: GQLEventSearchSet
+  reg: EventSearchSet
 ): reg is GQLMarriageEventSearchSet => {
-  return reg.type === 'Marriage'
+  return reg.type === EventType.Marriage
 }
 
 export const transformData = (
@@ -50,8 +54,8 @@ export const transformData = (
   }
 
   return data.results
-    .filter((req): req is GQLEventSearchSet => req !== null)
-    .map((reg: GQLEventSearchSet) => {
+    .filter((req): req is EventSearchSet => req !== null)
+    .map((reg: EventSearchSet) => {
       let birthReg
       let deathReg
       let marriageReg

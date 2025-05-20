@@ -9,45 +9,40 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
+import { AugmentedRequest } from '@apollo/datasource-rest'
+import { APPLICATION_CONFIG_URL } from '@gateway/constants'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
+import { UUID } from '@opencrvs/commons'
 import {
   Location,
   Saved,
   findResourceFromBundleById
 } from '@opencrvs/commons/types'
-import { UUID } from '@opencrvs/commons'
-import { RESTDataSource, RequestOptions } from 'apollo-datasource-rest'
-import { APPLICATION_CONFIG_URL } from '@gateway/constants'
 
-export default class LocationsAPI extends RESTDataSource {
-  constructor() {
-    super()
-    this.baseURL = APPLICATION_CONFIG_URL
+export default class LocationsAPI extends OpenCRVSRESTDataSource {
+  override baseURL = APPLICATION_CONFIG_URL
+
+  override willSendRequest(
+    _path: string,
+    request: AugmentedRequest
+  ): void | Promise<void> {
+    super.willSendRequest(_path, request)
+    request.headers['Content-Type'] = 'application/fhir+json'
   }
 
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
-    }
-    request.headers.set('Content-Type', 'application/fhir+json')
-  }
-
-  getLocation(id: string): Promise<Saved<Location>> {
-    if (this.context.record) {
-      const inBundle = findResourceFromBundleById<Saved<Location>>(
-        this.context.record,
-        id
-      )
+  async getLocation(id: string): Promise<Saved<Location>> {
+    const record = this.context.dataSources.recordsAPI.fetchRecord()
+    if (record) {
+      const inBundle = findResourceFromBundleById<Saved<Location>>(record, id)
       if (inBundle) {
-        return Promise.resolve(inBundle)
+        return inBundle
       }
     }
 
-    return this.get(`/locations/${id}`)
+    return this.get<Saved<Location>>(`locations/${id}`)
   }
 
-  getHierarchy(id: UUID): Promise<Array<Saved<Location>>> {
-    return this.get(`/locations/${id}/hierarchy`)
+  async getHierarchy(id: UUID): Promise<Array<Saved<Location>>> {
+    return this.get<Array<Saved<Location>>>(`locations/${id}/hierarchy`)
   }
 }

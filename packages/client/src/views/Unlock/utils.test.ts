@@ -34,7 +34,7 @@ describe('Unlock page loads Properly', () => {
       Promise.resolve(indexedDB[key])
     )
 
-    storage.setItem = vi.fn(
+    storage.setItem = vi.fn<[string]>(
       // @ts-ignore
       async (key: string, value: string) => (indexedDB[key] = value)
     )

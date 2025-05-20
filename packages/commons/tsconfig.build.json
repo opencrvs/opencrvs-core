@@ -4,6 +4,7 @@
     "node_modules",
     "build",
     "test/setupJest.ts",
+    "src/client.ts",
     "src/**/*.test.ts"
   ]
 }

@@ -9,44 +9,55 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IFormData } from '@client/forms'
-import { Event } from '@client/utils/gateway'
-import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 import { transformStatusData } from '@client/forms/register/mappings/query/utils'
+import { EventType } from '@client/utils/gateway'
+import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use'
 
 export function getDeathRegistrationSectionTransformer(
   transformedData: IFormData,
   queryData: any,
-  _sectionId: string
+  sectionId: string
 ) {
-  if (!transformedData['registration']) {
-    transformedData['registration'] = {}
+  if (!transformedData[sectionId]) {
+    transformedData[sectionId] = {}
   }
 
-  if (queryData['registration'].id) {
-    transformedData['registration']._fhirID = queryData['registration'].id
+  if (queryData[sectionId].id) {
+    transformedData[sectionId]._fhirID = queryData[sectionId].id
   }
-  if (queryData['registration'].trackingId) {
-    transformedData['registration'].trackingId =
-      queryData['registration'].trackingId
+  if (queryData[sectionId].trackingId) {
+    transformedData[sectionId].trackingId = queryData[sectionId].trackingId
   }
 
-  if (queryData['registration'].registrationNumber) {
-    transformedData['registration'].registrationNumber =
-      queryData['registration'].registrationNumber
+  if (queryData[sectionId].registrationNumber) {
+    transformedData[sectionId].registrationNumber =
+      queryData[sectionId].registrationNumber
+  }
+
+  if (queryData[sectionId].type && queryData[sectionId].type === 'DEATH') {
+    transformedData[sectionId].type = EventType.Death
+  }
+
+  if (queryData[sectionId].status) {
+    transformStatusData(
+      transformedData,
+      queryData[sectionId].status as GQLRegWorkflow[],
+      sectionId
+    )
   }
 
   if (
-    queryData['registration'].type &&
-    queryData['registration'].type === 'DEATH'
+    Array.isArray(queryData[sectionId].certificates) &&
+    queryData[sectionId].certificates.length > 0
   ) {
-    transformedData['registration'].type = Event.Death
-  }
-
-  if (queryData['registration'].status) {
-    transformStatusData(
-      transformedData,
-      queryData['registration'].status as GQLRegWorkflow[],
-      'registration'
-    )
+    const currentCertificate =
+      queryData[sectionId].certificates[
+        queryData[sectionId].certificates.length - 1
+      ]
+    if (currentCertificate?.collector?.relationship === 'PRINT_IN_ADVANCE') {
+      transformedData[sectionId].certificates = [
+        { certificateTemplateId: currentCertificate.certificateTemplateId }
+      ]
+    }
   }
 }

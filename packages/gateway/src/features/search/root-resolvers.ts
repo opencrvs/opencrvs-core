@@ -17,20 +17,19 @@ import {
 } from '@gateway/features/user/utils'
 import { GQLResolver } from '@gateway/graphql/schema'
 import { Options } from '@hapi/boom'
-import { ISearchCriteria, postAdvancedSearch } from './utils'
-import { fetchRegistrationForDownloading } from '@gateway/workflow/index'
-import { ApolloError } from 'apollo-server-hapi'
+import {
+  transformSearchParams,
+  ISearchCriteria,
+  postAdvancedSearch
+} from './utils'
+import { retrieveRecord } from '@gateway/workflow/index'
+import { SCOPES } from '@opencrvs/commons/authentication'
+import { RateLimitError } from '@gateway/rate-limit'
+import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 
 type ApiResponse<T> = {
   body: T
   statusCode: number
-}
-
-export class RateLimitError extends ApolloError {
-  constructor(message: string) {
-    super(message, 'DAILY_QUOTA_EXCEEDED')
-    Object.defineProperty(this, 'name', { value: 'DailyQuotaExceeded' })
-  }
 }
 
 // Complete definition of the Search response
@@ -86,27 +85,58 @@ export const resolvers: GQLResolver = {
         sort = 'desc',
         sortBy
       },
-      { headers: authHeader }
+      { headers: authHeader, dataSources }
     ) {
-      const searchCriteria: ISearchCriteria = {
-        sort,
-        parameters: advancedSearchParameters
-      }
-      // Only registrar, registration agent & field agent should be able to search user
       if (
         !inScope(authHeader, [
-          'register',
-          'validate',
-          'certify',
-          'declare',
-          'recordsearch'
+          SCOPES.SEARCH_BIRTH,
+          SCOPES.SEARCH_DEATH,
+          SCOPES.SEARCH_MARRIAGE,
+          SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
+          SCOPES.SEARCH_DEATH_MY_JURISDICTION,
+          SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
+          SCOPES.RECORDSEARCH
         ])
-      ) {
-        return await Promise.reject(
-          new Error(
-            'Advanced search is only allowed for registrar, registration agent & field agent'
-          )
-        )
+      )
+        return {
+          totalItems: 0,
+          results: []
+        }
+
+      // TODO: refactor this concept to avoid calling the dataSource.usersAPI
+      const userIdentifier = getTokenPayload(authHeader.Authorization).sub
+      let user
+      let system
+
+      const isExternalAPI = hasScope(authHeader, SCOPES.RECORDSEARCH)
+
+      if (isExternalAPI) {
+        system = await getSystem({ systemId: userIdentifier }, authHeader)
+      } else {
+        user = await dataSources.usersAPI.getUserById(userIdentifier!)
+      }
+
+      const office = user
+        ? await dataSources.locationsAPI.getLocation(user.primaryOfficeId)
+        : undefined
+      const officeLocationId = office
+        ? office.partOf?.reference &&
+          resourceIdentifierToUUID(office.partOf.reference)
+        : undefined
+
+      if (user && !officeLocationId) {
+        throw new Error('User office not found')
+      }
+
+      const transformedSearchParams = transformSearchParams(
+        getTokenPayload(authHeader.Authorization).scope,
+        advancedSearchParameters,
+        officeLocationId ?? ''
+      )
+
+      const searchCriteria: ISearchCriteria = {
+        sort,
+        parameters: transformedSearchParams
       }
 
       if (count) {
@@ -127,11 +157,7 @@ export const resolvers: GQLResolver = {
         }))
       }
 
-      const isExternalAPI = hasScope(authHeader, 'recordsearch')
-      if (isExternalAPI) {
-        const payload = getTokenPayload(authHeader.Authorization)
-        const system = await getSystem({ systemId: payload.sub }, authHeader)
-
+      if (isExternalAPI && system) {
         const getTotalRequest = await getMetrics(
           '/advancedSearch',
           {},
@@ -146,12 +172,14 @@ export const resolvers: GQLResolver = {
 
         if ((searchResult?.statusCode ?? 0) >= 400) {
           const errMsg = searchResult as Options<string>
-          return await Promise.reject(new Error(errMsg.message))
+          throw new Error(errMsg.message)
         }
 
-        ;(searchResult.body.hits.hits || []).forEach(async (hit) => {
-          await fetchRegistrationForDownloading(hit._id, authHeader)
-        })
+        await Promise.all(
+          (searchResult.body.hits.hits || []).map((hit) =>
+            retrieveRecord(hit._id, authHeader)
+          )
+        )
 
         if (searchResult.body.hits.total.value) {
           await postMetrics('/advancedSearch', {}, authHeader)
@@ -175,10 +203,10 @@ export const resolvers: GQLResolver = {
         )
 
         if (!hasAtLeastOneParam) {
-          return await Promise.reject(new Error('There is no param to search '))
+          throw new Error('There is no param to search ')
         }
 
-        searchCriteria.parameters = { ...advancedSearchParameters }
+        searchCriteria.parameters = { ...transformedSearchParams }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
           await postAdvancedSearch(authHeader, searchCriteria)
@@ -200,12 +228,8 @@ export const resolvers: GQLResolver = {
       },
       { headers: authHeader }
     ) {
-      if (!inScope(authHeader, ['sysadmin', 'register', 'validate'])) {
-        return await Promise.reject(
-          new Error(
-            'User does not have a sysadmin or register or validate scope'
-          )
-        )
+      if (!inScope(authHeader, [SCOPES.PERFORMANCE_READ])) {
+        throw new Error('User does not have enough scope')
       }
 
       const searchCriteria: ISearchCriteria = {

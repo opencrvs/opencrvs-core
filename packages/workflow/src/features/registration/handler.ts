@@ -25,9 +25,9 @@ import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
 export interface EventRegistrationPayload {
   trackingId: string
   registrationNumber: string
-  error: string
-  compositionId: string
-  childIdentifiers?: {
+  error?: string
+  comment?: string
+  identifiers?: {
     type: SupportedPatientIdentifierCode
     value: string
   }[]
@@ -38,7 +38,8 @@ export async function markEventAsRegisteredCallbackHandler(
   h: Hapi.ResponseToolkit
 ) {
   const token = getToken(request)
-  const { registrationNumber, error, childIdentifiers, compositionId } =
+  const compositionId = request.params.id
+  const { registrationNumber, error, comment, identifiers } =
     request.payload as EventRegistrationPayload
 
   if (error) {
@@ -60,7 +61,8 @@ export async function markEventAsRegisteredCallbackHandler(
     savedRecord,
     registrationNumber,
     token,
-    childIdentifiers
+    comment,
+    identifiers
   )
   const event = getEventType(bundle)
 

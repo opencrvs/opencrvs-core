@@ -49,15 +49,15 @@ export const messages = {
     description: 'User details section',
     id: 'form.section.userDetails'
   },
-  firstNameEn: {
-    defaultMessage: 'First name',
-    description: 'English first name',
-    id: 'form.field.label.firstNameEN'
+  firstName: {
+    defaultMessage: "User's first name",
+    description: "User's English first name",
+    id: 'form.field.label.userFirstName'
   },
-  lastNameEn: {
-    defaultMessage: 'Last name',
-    description: 'English last name',
-    id: 'form.field.label.lastNameEN'
+  lastName: {
+    defaultMessage: "User's surname",
+    description: "User's English surname",
+    id: 'form.field.label.userSurname'
   },
   phoneNumber: {
     defaultMessage: 'Phone number',
@@ -68,11 +68,6 @@ export const messages = {
     defaultMessage: 'Email',
     description: 'Input label for email address',
     id: 'form.field.label.email'
-  },
-  NID: {
-    defaultMessage: 'NID',
-    description: 'National ID',
-    id: 'form.field.label.NID'
   },
   accountDetails: {
     defaultMessage: 'Account details',
@@ -88,11 +83,6 @@ export const messages = {
     defaultMessage: 'Type',
     description: 'Label for type of event in work queue list item',
     id: 'constants.type'
-  },
-  systemRole: {
-    defaultMessage: 'System Role',
-    description: 'Label for system role input in user creation',
-    id: 'constants.user.systemRole'
   },
   role: {
     defaultMessage: 'Role',

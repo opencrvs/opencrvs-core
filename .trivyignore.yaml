@@ -39,16 +39,6 @@ vulnerabilities:
     statement: Dashboards vulns (java libs)
   - id: CVE-2022-1471
     statement: Dashboards vulns (java libs)
-  - id: CVE-2024-25710
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
-  - id: CVE-2024-26308
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
-  - id: CVE-2024-22201
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
-  - id: CVE-2023-36478
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
-  - id: CVE-2024-21634
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.49
   - id: CVE-2024-4068
     statement: Transitive dependency of jest and msw. Not running in production. Likely fixed by upgrading.
   - id: CVE-2024-37890
@@ -57,9 +47,3 @@ vulnerabilities:
     statement: Transitive dependency of react-router 5.3.4. Only affects client-side code ocrvs-7682
   - id: CVE-2024-47068
     statement: Transitive dependency of Vite. Not run in production and there is currently no fix.
-  - id: CVE-2024-7254
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.50 ocrvs-6607
-  - id: CVE-2024-41909
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.50 ocrvs-6607
-  - id: CVE-2024-22871
-    statement: Metabase v0.46 vulnerability, fixed in Metabase v0.50 ocrvs-6607

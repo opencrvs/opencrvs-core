@@ -8,34 +8,21 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export const HOST = process.env.HOST || 'localhost'
-export const PORT = process.env.PORT || 3030
-export const MONGO_URL =
-  process.env.MONGO_URL || 'mongodb://localhost/user-mgnt'
-export const NOTIFICATION_SERVICE_URL =
-  process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:2020/'
-export const APPLICATION_CONFIG_URL =
-  process.env.APPLICATION_CONFIG_URL || 'http://localhost:2021/'
-export const CERT_PUBLIC_KEY_PATH =
-  (process.env.CERT_PUBLIC_KEY_PATH as string) ||
-  '../../.secrets/public-key.pem'
-export const SENTRY_DSN = process.env.SENTRY_DSN
-export const QA_ENV = process.env.QA_ENV || false
-export const RECORD_SEARCH_QUOTA =
-  Number(process.env.RECORD_SEARCH_QUOTA) || 2000
 
-export const FHIR_URL = process.env.FHIR_URL || 'http://localhost:3447/fhir'
+import { env } from './environment'
+
 export const DEFAULT_TIMEOUT = 600000
-export const METRICS_URL = process.env.METRICS_URL || 'http://localhost:1050'
 
-export const NATIONAL_ID_OIDP_BASE_URL =
-  process.env.NATIONAL_ID_OIDP_BASE_URL || null // e.g. https://api.esignet.io/v1/idp
+export const HOST = env.HOST
+export const PORT = env.PORT
+export const MONGO_URL = env.MONGO_URL
+export const NOTIFICATION_SERVICE_URL = env.NOTIFICATION_SERVICE_URL
+export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL
+export const DOCUMENTS_URL = env.DOCUMENTS_URL
+export const CERT_PUBLIC_KEY_PATH = env.CERT_PUBLIC_KEY_PATH
+export const SENTRY_DSN = env.SENTRY_DSN
+export const QA_ENV = env.QA_ENV
+export const RECORD_SEARCH_QUOTA = env.RECORD_SEARCH_QUOTA
 
-export const NATIONAL_ID_OIDP_CLIENT_ID =
-  process.env.NATIONAL_ID_OIDP_CLIENT_ID || null
-
-export const NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS =
-  process.env.NATIONAL_ID_OIDP_ESSENTIAL_CLAIMS || null // e.g. given_name,family_name
-
-export const NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS =
-  process.env.NATIONAL_ID_OIDP_VOLUNTARY_CLAIMS || null
+export const FHIR_URL = env.FHIR_URL
+export const METRICS_URL = env.METRICS_URL

@@ -28,7 +28,6 @@ enum SystemType {
 }
 
 enum IntegratingSystemType {
-  MOSIP
   OTHER
 }
 

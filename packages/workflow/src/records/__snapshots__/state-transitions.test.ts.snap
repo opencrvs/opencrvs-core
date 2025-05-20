@@ -1,116 +1,116 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`functions that take record from one state to another * -> correction requested should be defined: changed resources 1`] = `
-Array [
-  Object {
-    "businessStatus": Object {
-      "coding": Array [
-        Object {
+[
+  {
+    "businessStatus": {
+      "coding": [
+        {
           "code": "CORRECTION_REQUESTED",
           "system": "http://opencrvs.org/specs/reg-status",
         },
       ],
     },
-    "code": Object {
-      "coding": Array [
-        Object {
+    "code": {
+      "coding": [
+        {
           "code": "BIRTH",
           "system": "http://opencrvs.org/specs/types",
         },
       ],
     },
-    "encounter": Object {
+    "encounter": {
       "reference": "STATIC",
     },
-    "extension": Array [
-      Object {
+    "extension": [
+      {
         "url": "http://opencrvs.org/specs/extension/informants-signature",
         "valueString": "/ocrvs/c647d125-68ee-4794-b320-d472aadd8c09.png",
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/contact-person-phone-number",
         "valueString": "+260745645645",
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/contact-person-email",
         "valueString": "informant@example.com",
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/timeLoggedMS",
         "valueInteger": 0,
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/paymentDetails",
-        "valueReference": Object {
+        "valueReference": {
           "reference": "STATIC",
         },
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/noSupportingDocumentationRequired",
         "valueBoolean": true,
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/requestingIndividual",
         "valueString": "MOTHER",
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/hasShowedVerifiedDocument",
         "valueBoolean": true,
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/regLastUser",
-        "valueReference": Object {
+        "valueReference": {
           "reference": "Practitioner/7dc24408-d409-4ec0-bd9d-4a5aa817dcab",
         },
       },
-      Object {
+      {
         "url": "http://opencrvs.org/specs/extension/regLastOffice",
-        "valueReference": Object {
+        "valueReference": {
           "reference": "Location/61e07903-bf3c-4bd9-9b20-6cf0e3bb982c",
         },
       },
     ],
-    "focus": Object {
+    "focus": {
       "reference": "Composition/c5811d36-934d-40f9-94b4-15194d562e45",
     },
     "id": "8dae3f40-70f8-4463-aae1-fd56aec0c8ee",
-    "identifier": Array [
-      Object {
+    "identifier": [
+      {
         "system": "http://opencrvs.org/specs/id/draft-id",
         "value": "03d087a0-1e20-4443-aca3-d48461d4d597",
       },
-      Object {
+      {
         "system": "http://opencrvs.org/specs/id/birth-tracking-id",
         "value": "BF6W25K",
       },
-      Object {
+      {
         "system": "http://opencrvs.org/specs/id/birth-registration-number",
         "value": "2023BF6W25K",
       },
     ],
-    "input": Array [],
+    "input": [],
     "intent": "proposal",
     "lastModified": "STATIC",
-    "note": Array [
-      Object {
+    "note": [
+      {
         "text": "Both mother and father were present",
       },
-      Object {
+      {
         "text": "Note",
       },
     ],
-    "output": Array [],
-    "reason": Object {
-      "extension": Array [
-        Object {
+    "output": [],
+    "reason": {
+      "extension": [
+        {
           "url": "http://opencrvs.org/specs/extension/otherReason",
           "valueString": "Other reason",
         },
       ],
       "text": "OTHER",
     },
-    "requester": Object {
-      "agent": Object {
+    "requester": {
+      "agent": {
         "reference": "Practitioner/7dc24408-d409-4ec0-bd9d-4a5aa817dcab",
       },
     },
@@ -121,37 +121,37 @@ Array [
 `;
 
 exports[`functions that take record from one state to another * -> correction requested should be defined: new resources 1`] = `
-Array [
-  Object {
-    "detail": Array [
-      Object {
-        "amount": Object {
+[
+  {
+    "detail": [
+      {
+        "amount": {
           "value": 100,
         },
         "date": "2021-08-10T10:00:00.000Z",
-        "type": Object {
-          "coding": Array [
-            Object {
+        "type": {
+          "coding": [
+            {
               "code": "MANUAL",
             },
           ],
         },
       },
     ],
-    "outcome": Object {
-      "coding": Array [
-        Object {
+    "outcome": {
+      "coding": [
+        {
           "code": "COMPLETED",
         },
       ],
     },
     "resourceType": "PaymentReconciliation",
     "status": "active",
-    "total": Object {
+    "total": {
       "value": 100,
     },
   },
-  Object {
+  {
     "resourceType": "Encounter",
     "status": "finished",
   },

@@ -57,7 +57,7 @@ export default defineConfig(({ mode }) => {
       srcDir: 'src/',
       filename: 'src-sw.ts',
       devOptions: {
-        enabled: false,
+        enabled: true,
         type: 'module',
         navigateFallback: 'index.html'
       }
@@ -90,19 +90,35 @@ export default defineConfig(({ mode }) => {
     },
     resolve: {
       alias: {
-        crypto: 'crypto-js'
+        crypto: 'crypto-js',
+        '@opencrvs/commons/build/dist/authentication':
+          '@opencrvs/commons/authentication'
       }
     },
-    plugins: [htmlPlugin(), react(), tsconfigPaths(), VitePWAPlugin()],
+    plugins: [
+      htmlPlugin(),
+      react({
+        babel: {
+          plugins: [
+            [
+              'babel-plugin-styled-components',
+              {
+                displayName: true,
+                fileName: false
+              }
+            ]
+          ]
+        }
+      }),
+      tsconfigPaths(),
+      VitePWAPlugin()
+    ],
     test: {
       environment: 'jsdom',
       setupFiles: './src/setupTests.ts',
       testTimeout: 60000,
       hookTimeout: 60000,
-      globals: true,
-      coverage: {
-        reporter: ['text', 'json', 'html']
-      }
+      globals: true
     },
     server: {
       // to get the manifest.json and images from country-config during development time
@@ -119,6 +135,11 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:3040',
           changeOrigin: true,
           rewrite: (path) => path.replace(/^\/api\/countryconfig/, '')
+        },
+        '/api/': {
+          target: 'http://localhost:7070',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api/, '')
         }
       }
     }

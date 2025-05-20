@@ -8,33 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { IAuthHeader, logger } from '@opencrvs/commons'
+import { IAuthHeader, logger, UUID } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   ISystemModelData,
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
-import * as decode from 'jwt-decode'
+import decode from 'jwt-decode'
 import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
-import { GQLUserInput } from '@gateway/graphql/schema'
-import { SysAdminAccessMap } from '@gateway/features/role/utils'
+import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
+import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
-  scope: string[]
+  scope: Scope[]
+  /** The record ID that the token has access to */
+  recordId?: UUID
 }
-
-export type scopeType =
-  | 'register'
-  | 'validate'
-  | 'recordsearch'
-  | 'certify'
-  | 'declare'
-  | 'sysadmin'
-  | 'performance'
 
 export async function getUser(
   body: { [key: string]: string | undefined },
@@ -49,22 +42,6 @@ export async function getUser(
     }
   })
   return await res.json()
-}
-
-export function canAssignRole(
-  loggedInUserScope: Scope[],
-  userToSave: GQLUserInput
-) {
-  let roleFilter: keyof typeof SysAdminAccessMap
-  if (loggedInUserScope.includes('natlsysadmin')) {
-    roleFilter = 'NATIONAL_SYSTEM_ADMIN'
-  } else if (loggedInUserScope.includes('sysadmin')) {
-    roleFilter = 'LOCAL_SYSTEM_ADMIN'
-  } else {
-    throw Error('Create user is only allowed for sysadmin/natlsysadmin')
-  }
-
-  return SysAdminAccessMap[roleFilter]?.includes(userToSave.systemRole)
 }
 
 export async function getSystem(
@@ -100,11 +77,24 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
   }
 }
 
+export function scopesInclude(
+  scopes:
+    | Scope[]
+    | undefined /* @todo remove undefined variant and make scope a required field for users */,
+  scope: Scope
+) {
+  if (!scopes) {
+    return false
+  }
+  return scopes.includes(scope)
+}
+
 export function hasScope(authHeader: IAuthHeader, scope: Scope) {
   if (!authHeader || !authHeader.Authorization) {
     return false
   }
   const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+
   return (tokenPayload.scope && tokenPayload.scope.indexOf(scope) > -1) || false
 }
 
@@ -133,6 +123,11 @@ export const getTokenPayload = (token: string): ITokenPayload => {
   return decoded
 }
 
+export const hasRecordAccess = (authHeader: IAuthHeader, recordId: string) => {
+  const tokenPayload = getTokenPayload(authHeader.Authorization.split(' ')[1])
+  return tokenPayload.recordId === recordId
+}
+
 export const getUserId = (authHeader: IAuthHeader): string => {
   if (!authHeader || !authHeader.Authorization) {
     throw new Error(`getUserId: Error occurred during token decode`)
@@ -141,7 +136,27 @@ export const getUserId = (authHeader: IAuthHeader): string => {
   return tokenPayload.sub
 }
 
+export function getUserFromHeader(header: IAuthHeader) {
+  const userId = getUserId(header)
+  return getUser({ userId }, header)
+}
+
 export function getFullName(user: IUserModelData, language: string) {
   const localName = user.name.find((name) => name.use === language)
   return `${localName?.given.join(' ') || ''} ${localName?.family || ''}`.trim()
+}
+
+export async function isOfficeUnderJurisdiction(
+  officeId: UUID,
+  otherOfficeId: UUID
+) {
+  const officeLocation = await fetchLocation(officeId)
+  const parentLocationId =
+    officeLocation.partOf &&
+    resourceIdentifierToUUID(officeLocation.partOf.reference)
+  if (!parentLocationId) {
+    return false
+  }
+  const otherOfficeHierarchy = await fetchLocationHierarchy(otherOfficeId)
+  return otherOfficeHierarchy.map(({ id }) => id).includes(parentLocationId)
 }

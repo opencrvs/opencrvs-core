@@ -9,25 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 // eslint-disable-next-line import/no-relative-parent-imports
-import { DOCUMENTS_URL } from '../../constants'
-import { RequestOptions, RESTDataSource } from 'apollo-datasource-rest'
+import { AugmentedRequest } from '@apollo/datasource-rest'
+import { DOCUMENTS_URL } from '@gateway/constants'
+import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 
-export default class MinioAPI extends RESTDataSource {
-  constructor() {
-    super()
-    this.baseURL = `${DOCUMENTS_URL}/presigned-url`
-  }
+export default class MinioAPI extends OpenCRVSRESTDataSource {
+  override baseURL = `${DOCUMENTS_URL}`
 
-  protected willSendRequest(request: RequestOptions): void | Promise<void> {
-    const { headers } = this.context
-    const headerKeys = Object.keys(headers)
-    for (const each of headerKeys) {
-      request.headers.set(each, headers[each])
-    }
-    request.headers.set('Content-Type', 'application/fhir+json')
+  override willSendRequest(
+    _path: string,
+    request: AugmentedRequest
+  ): void | Promise<void> {
+    super.willSendRequest(_path, request)
+    request.headers['Content-Type'] = 'application/fhir+json'
   }
 
   getStaticData(fileUri: string) {
-    return this.get(`${fileUri}`)
+    return this.get(`/presigned-url${fileUri}`)
   }
 }

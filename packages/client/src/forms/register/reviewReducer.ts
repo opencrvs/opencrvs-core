@@ -28,7 +28,7 @@ export type IReviewFormState =
       }
     }
 
-export const initialState: IReviewFormState = {
+const initialState: IReviewFormState = {
   state: 'LOADING',
   reviewForm: null
 }

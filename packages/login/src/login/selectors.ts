@@ -67,14 +67,6 @@ export function selectApplicationName(store: IStoreState) {
   return getKey(store, 'config').APPLICATION_NAME
 }
 
-export function selectImageToObjectFit(store: IStoreState) {
-  if (getKey(store, 'config').LOGIN_BACKGROUND?.imageFit) {
-    return getKey(store, 'config').LOGIN_BACKGROUND?.imageFit
-  } else {
-    return getKey(store, 'config').LOGIN_BACKGROUND?.imageFit
-  }
-}
-
 export const getStepOneDetails = (
   store: IStoreState
 ): LoginState['authenticationDetails'] => getKey(store, 'authenticationDetails')

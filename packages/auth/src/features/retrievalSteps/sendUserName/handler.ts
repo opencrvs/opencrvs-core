@@ -20,8 +20,8 @@ import {
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
 import { logger } from '@opencrvs/commons'
-import { PRODUCTION } from '@auth/constants'
-import { postUserActionToMetrics } from '@auth/features/authenticate/service'
+import { postUserActionToMetrics } from '@auth/metrics'
+import { env } from '@auth/environment'
 
 interface IPayload {
   nonce: string
@@ -47,7 +47,7 @@ export default async function sendUserNameHandler(
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
-  if (!PRODUCTION || isDemoUser) {
+  if (!env.isProd || isDemoUser) {
     logger.info(
       `Sending a verification SMS,
         ${JSON.stringify({

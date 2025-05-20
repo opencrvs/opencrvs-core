@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { PRODUCTION, QA_ENV } from '@config/config/constants'
+import { env } from '@config/environment'
 import { subMinutes } from 'date-fns'
 
 const registrations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
@@ -100,7 +100,7 @@ const registrations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
     },
     {
       $addFields: {
-        allTasks: { $concatArrays: ['$task', '$task_history'] }
+        allTasks: { $concatArrays: ['$task_history', '$task'] }
       }
     },
     {
@@ -485,7 +485,7 @@ const declarations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
     {
       $match: {
         'meta.lastUpdated': { $gte: lastUpdatedAt },
-        'extension.url': 'http://opencrvs.org/specs/extension/requestCorrection'
+        'extension.url': 'http://opencrvs.org/specs/extension/makeCorrection'
       }
     },
     {
@@ -616,6 +616,8 @@ const declarations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
     { $unwind: '$state' },
     {
       $project: {
+        _id: 0,
+        id: '$meta.versionId',
         gender: '$child.gender',
         reason: '$reason.text',
         extensions: '$extensions',
@@ -631,7 +633,7 @@ const declarations = ({ lastUpdatedAt }: { lastUpdatedAt: string }) => ({
     {
       $merge: {
         into: { db: 'performance', coll: 'corrections' },
-        on: '_id',
+        on: 'id',
         whenMatched: 'replace',
         whenNotMatched: 'insert'
       }
@@ -772,7 +774,7 @@ const populationEstimatesPerDay = () => ({
   ]
 })
 
-const REFRESH_AFTER_IN_MINUTE = PRODUCTION && !QA_ENV ? 1440 : 5
+const REFRESH_AFTER_IN_MINUTE = env.isProd && !env.QA_ENV ? 1440 : 5
 
 export function defaultQueries() {
   const lastUpdatedAt = subMinutes(

@@ -49,9 +49,11 @@ import {
   resourceToBundleEntry,
   toHistoryResource,
   TaskHistory,
-  RejectedRecord
+  RejectedRecord,
+  SupportedPatientIdentifierCode,
+  PractitionerRole
 } from '@opencrvs/commons/types'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
   REG_NUMBER_SYSTEM,
   SECTION_CODE
@@ -61,7 +63,7 @@ import {
   setupLastRegOffice,
   setupLastRegUser,
   updatePatientIdentifierWithRN,
-  validateDeceasedDetails
+  upsertPatientIdentifiers
 } from '@workflow/features/registration/fhir/fhir-bundle-modifier'
 import { EventRegistrationPayload } from '@workflow/features/registration/handler'
 import { ASSIGNED_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
@@ -104,9 +106,12 @@ import {
   withPractitionerDetails,
   mergeChangedResourcesIntoRecord,
   createReinstateTask,
-  mergeBundles
+  mergeBundles,
+  getPractitionerRoleFromToken,
+  createRetrieveTask
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
+import { tokenExchangeHandler } from './token-exchange-handler'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -293,13 +298,15 @@ export async function toUpdated(
 export async function toViewed<T extends ValidRecord>(
   record: T,
   token: string
-): Promise<T> {
+) {
   const previousTask: SavedTask = getTaskFromSavedBundle(record)
   const viewedTask = await createViewTask(previousTask, token)
 
   const taskHistoryEntry = resourceToBundleEntry(
     toHistoryResource(previousTask)
   ) as SavedBundleEntry<TaskHistory>
+
+  const practitionerRoleEntry = await getPractitionerRoleFromToken(token)
 
   const filteredEntries = record.entry.filter(
     (e) => e.resource.resourceType !== 'Task'
@@ -316,28 +323,125 @@ export async function toViewed<T extends ValidRecord>(
         )[0].fullUrl,
         resource: viewedTask
       },
-      taskHistoryEntry
+      taskHistoryEntry,
+      /*  PractitionerRole resource is saved in the bundle
+      since PractitionerRole is fetched from bundle
+      in the resolvers during readying history of a record */
+      practitionerRoleEntry
     ]
   } as T
 
-  return viewedRecord
+  const viewedRecordWithSpecificEntries: Bundle = {
+    ...viewedRecord,
+    entry: [
+      {
+        fullUrl: record.entry.filter(
+          (e) => e.resource.resourceType === 'Task'
+        )[0].fullUrl,
+        resource: viewedTask
+      }
+    ]
+  }
+
+  return { viewedRecord, viewedRecordWithSpecificEntries }
+}
+
+export function toIdentifierUpserted<T extends ValidRecord>(
+  record: T,
+  identifiers: {
+    type: SupportedPatientIdentifierCode
+    value: string
+  }[]
+): T {
+  const task = getTaskFromSavedBundle(record)
+  const event = getTaskEventType(task)
+  const composition = getComposition(record)
+  const patientWithUpsertedIdentifier = upsertPatientIdentifiers(
+    record,
+    composition,
+    SECTION_CODE[event],
+    identifiers
+  )
+  const filteredEntry = record.entry.filter(
+    (e) =>
+      !patientWithUpsertedIdentifier
+        .map((patient) => patient.id)
+        .includes(e.resource.id)
+  )
+  return {
+    ...record,
+    entry: [
+      ...filteredEntry,
+      ...patientWithUpsertedIdentifier.map((resource) => ({
+        ...record.entry.find((e) => e.resource.id === resource.id),
+        resource
+      }))
+    ]
+  }
 }
 
 export async function toDownloaded(
   record: ValidRecord,
-  token: string,
-  extensionUrl:
-    | 'http://opencrvs.org/specs/extension/regDownloaded'
-    | 'http://opencrvs.org/specs/extension/regAssigned'
+  token: string
 ): Promise<{
   downloadedRecord: ValidRecord
-  downloadedRecordWithTaskOnly: Bundle<SavedTask>
+  downloadedBundleWithResources: Bundle<SavedTask | PractitionerRole>
 }> {
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerDetails = createDownloadTask(
-    previousTask,
-    extensionUrl
+  const taskWithoutPractitionerDetails = createDownloadTask(previousTask)
+  const [downloadedTask, practitionerDetailsBundle] =
+    await withPractitionerDetails(taskWithoutPractitionerDetails, token)
+
+  // TaskHistory is added to the bundle to show audit history via gateway type resolvers in frontend
+  const taskHistoryEntry = resourceToBundleEntry(
+    toHistoryResource(previousTask)
+  ) as SavedBundleEntry<TaskHistory>
+
+  const filteredEntriesWithoutTask = record.entry.filter(
+    (entry) => entry.resource.id !== previousTask.id
   )
+  const newTaskEntry = {
+    fullUrl: record.entry.find(
+      (entry) => entry.resource.id === previousTask.id
+    )!.fullUrl,
+    resource: downloadedTask
+  }
+
+  /*
+    When a user tries to access a record for the first time,
+    practitionerRoleBundle is necessary to create the history of the record
+  */
+  const practitionerRoleEntry = await getPractitionerRoleFromToken(token)
+  const updatedBundle = {
+    ...record,
+    entry: [
+      ...filteredEntriesWithoutTask,
+      newTaskEntry,
+      taskHistoryEntry,
+      practitionerRoleEntry
+    ]
+  }
+
+  const downloadedRecord = mergeBundles(
+    updatedBundle,
+    practitionerDetailsBundle
+  ) as ValidRecord
+
+  const downloadedBundleWithResources: Bundle<SavedTask> = {
+    resourceType: 'Bundle',
+    type: 'document',
+    entry: [{ resource: downloadedTask }]
+  }
+
+  return { downloadedRecord, downloadedBundleWithResources }
+}
+
+export async function toRetrieved(
+  record: ValidRecord,
+  token: string
+): Promise<[ValidRecord, Bundle<SavedTask>]> {
+  const previousTask = getTaskFromSavedBundle(record)
+  const taskWithoutPractitionerDetails = createRetrieveTask(previousTask)
   const [downloadedTask, practitionerDetailsBundle] =
     await withPractitionerDetails(taskWithoutPractitionerDetails, token)
 
@@ -361,18 +465,18 @@ export async function toDownloaded(
     entry: [...filteredEntriesWithoutTask, newTaskEntry, taskHistoryEntry]
   }
 
-  const downloadedRecord = mergeBundles(
+  const retrievedRecord = mergeBundles(
     updatedBundle,
     practitionerDetailsBundle
   ) as ValidRecord
 
-  const downloadedRecordWithTaskOnly: Bundle<SavedTask> = {
+  const changedResources: Bundle<SavedTask> = {
     resourceType: 'Bundle',
     type: 'document',
     entry: [{ resource: downloadedTask }]
   }
 
-  return { downloadedRecord, downloadedRecordWithTaskOnly }
+  return [retrievedRecord, changedResources]
 }
 
 export async function toRejected(
@@ -449,8 +553,17 @@ export async function initiateRegistration(
   token: string
 ): Promise<WaitingForValidationRecord | RejectedRecord> {
   try {
+    const composition = getComposition(record)
+    const recordSpecificToken = await tokenExchangeHandler(
+      token,
+      headers,
+      composition.id
+    )
+    headers.authorization = `Bearer ${recordSpecificToken.access_token}`
     await invokeRegistrationValidation(record, headers)
   } catch (error) {
+    logger.error(error)
+
     const statusReason: fhir3.CodeableConcept = {
       text: REG_NUMBER_GENERATION_FAILED
     }
@@ -464,11 +577,14 @@ export async function toRegistered(
   record: WaitingForValidationRecord,
   registrationNumber: EventRegistrationPayload['registrationNumber'],
   token: string,
-  childIdentifiers?: EventRegistrationPayload['childIdentifiers']
+  comment?: string,
+  identifiers?: EventRegistrationPayload['identifiers']
 ): Promise<RegisteredRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const registeredTaskWithoutPractitionerExtensions =
-    createRegisterTask(previousTask)
+  const registeredTaskWithoutPractitionerExtensions = createRegisterTask(
+    previousTask,
+    comment
+  )
 
   const [registeredTask, practitionerResourcesBundle] =
     await withPractitionerDetails(
@@ -497,10 +613,10 @@ export async function toRegistered(
     value: registrationNumber as RegistrationNumber
   })
 
-  if (event === EVENT_TYPE.BIRTH && childIdentifiers) {
+  if (event === EVENT_TYPE.BIRTH && identifiers) {
     // For birth event patients[0] is child and it should
     // already be initialized with the RN identifier
-    childIdentifiers.forEach((childIdentifier) => {
+    identifiers.forEach((childIdentifier) => {
       const previousIdentifier = patientsWithRegNumber[0].identifier!.find(
         ({ type }) => type?.coding?.[0].code === childIdentifier.type
       )
@@ -520,16 +636,6 @@ export async function toRegistered(
         previousIdentifier.value = childIdentifier.value
       }
     })
-  }
-
-  if (event === EVENT_TYPE.DEATH) {
-    /** using first patient because for death event there is only one patient */
-    patientsWithRegNumber[0] = await validateDeceasedDetails(
-      patientsWithRegNumber[0],
-      {
-        Authorization: request.headers.authorization
-      }
-    )
   }
 
   const patientIds = patientsWithRegNumber.map((p) => p.id)
@@ -942,7 +1048,10 @@ export async function toCertified(
   certificateDetails: CertifyInput
 ): Promise<CertifiedRecord> {
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerExtensions = createCertifiedTask(previousTask)
+  const taskWithoutPractitionerExtensions = createCertifiedTask(
+    previousTask,
+    certificateDetails.certificateTemplateId
+  )
 
   const [certifiedTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
@@ -956,12 +1065,18 @@ export async function toCertified(
     record
   )
 
+  const practitionerReference = findExtension(
+    'http://opencrvs.org/specs/extension/regLastUser',
+    certifiedTask.extension
+  )!.valueReference.reference
+
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
-    certificateDetails.data
+    practitionerReference,
+    certificateDetails.certificateTemplateId
   )
 
   const certificateSection: CompositionSection = {
@@ -1021,8 +1136,14 @@ export async function toIssued(
   eventType: EVENT_TYPE,
   certificateDetails: IssueInput
 ): Promise<IssuedRecord> {
+  const [paymentReconciliation] = createPaymentResources(
+    certificateDetails.payment
+  )
   const previousTask = getTaskFromSavedBundle(record)
-  const taskWithoutPractitionerExtensions = createIssuedTask(previousTask)
+  const taskWithoutPractitionerExtensions = createIssuedTask(
+    previousTask,
+    paymentReconciliation
+  )
 
   const [issuedTask, practitionerResourcesBundle] =
     await withPractitionerDetails(taskWithoutPractitionerExtensions, token)
@@ -1036,15 +1157,14 @@ export async function toIssued(
     record
   )
 
-  const [paymentEntry] = createPaymentResources(certificateDetails.payment)
-
   const documentReferenceEntry = createDocumentReferenceEntryForCertificate(
     temporaryDocumentReferenceId,
     temporaryRelatedPersonId,
     eventType,
     certificateDetails.hasShowedVerifiedDocument,
     undefined,
-    paymentEntry.fullUrl
+    certificateDetails.certificateTemplateId,
+    paymentReconciliation.fullUrl
   )
 
   const certificateSection: CompositionSection = {
@@ -1097,7 +1217,7 @@ export async function toIssued(
       { resource: compositionWithCertificateSection },
       { resource: issuedTask },
       ...relatedPersonEntries,
-      paymentEntry,
+      paymentReconciliation,
       documentReferenceEntry
     ]
   }

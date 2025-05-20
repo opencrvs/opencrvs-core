@@ -22,6 +22,7 @@ import {
 } from '@opencrvs/commons/types'
 import { updateBirthRegistrationPayload } from '@test/mocks/updateBirthRecord'
 import { READY_FOR_REVIEW_BIRTH_RECORD } from '@test/mocks/records/readyForReview'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 describe('Register record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -37,7 +38,7 @@ describe('Register record endpoint', () => {
 
   it('returns OK for a correctly authenticated user rejecting a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['register'] },
+      { scope: [SCOPES.RECORD_REGISTER] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
@@ -107,7 +108,7 @@ describe('Register record endpoint', () => {
 
   it('returns OK for a correctly authenticated user registering a birth declaration', async () => {
     const token = jwt.sign(
-      { scope: ['register'] },
+      { scope: [SCOPES.RECORD_CONFIRM_REGISTRATION] },
       readFileSync('./test/cert.key'),
       {
         algorithm: 'RS256',
@@ -124,6 +125,13 @@ describe('Register record endpoint', () => {
           return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
         }
       )
+    )
+
+    // Notification endpoint mockcall
+    mswServer.use(
+      rest.get('http://localhost:3040/record-notification', (_, res, ctx) => {
+        return res(ctx.json({}))
+      })
     )
 
     // Mock response from hearth
@@ -159,10 +167,9 @@ describe('Register record endpoint', () => {
 
     const response = await server.server.inject({
       method: 'POST',
-      url: '/confirm/registration',
+      url: '/records/7c3af302-08c9-41af-8701-92de9a71a3e4/confirm',
       payload: {
-        registrationNumber: '1234',
-        compositionId: '7c3af302-08c9-41af-8701-92de9a71a3e4'
+        registrationNumber: '1234'
       },
       headers: {
         Authorization: `Bearer ${token}`

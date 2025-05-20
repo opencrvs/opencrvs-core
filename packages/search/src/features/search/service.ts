@@ -13,6 +13,7 @@ import { ISearchCriteria, SortOrder } from '@search/features/search/types'
 import { advancedQueryBuilder } from '@search/features/search/utils'
 import { logger } from '@opencrvs/commons'
 import { OPENCRVS_INDEX_NAME } from '@search/constants'
+import { SearchRequest } from '@elastic/elasticsearch/lib/api/types'
 
 export const DEFAULT_SIZE = 10
 
@@ -24,19 +25,23 @@ export async function formatSearchParams(
     createdBy = '',
     from = 0,
     size = DEFAULT_SIZE,
-    sortColumn = 'dateOfDeclaration',
+    sortColumn,
     sortBy,
     parameters
   } = searchPayload
 
-  const sort = sortBy ?? [
-    {
-      [sortColumn]: {
+  const sort = []
+
+  if (sortBy) {
+    sort.push(...sortBy)
+  } else if (sortColumn) {
+    sort.push({
+      [sortColumn === 'name' ? 'name.keyword' : sortColumn]: {
         order: searchPayload.sort ?? SortOrder.ASC,
         unmapped_type: 'keyword'
       }
-    }
-  ]
+    })
+  }
   const query = await advancedQueryBuilder(
     parameters,
     createdBy,
@@ -47,11 +52,9 @@ export async function formatSearchParams(
     index: OPENCRVS_INDEX_NAME,
     from,
     size,
-    body: {
-      query,
-      sort
-    }
-  }
+    query,
+    sort
+  } satisfies SearchRequest
 }
 
 export const advancedSearch = async (

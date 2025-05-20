@@ -2,8 +2,10 @@
   "ignore": [
     "**/*.@(editorconfig|md|log|lock|patch|prettierrc|gitignore|eslintignore|stylelintrc|csv|gz|geojson|woff2|woff|xml|yarnrc|yarn-integrity|ttf|map|pdf|snap|dockerignore|jsonc|idea|env|info|key|pub|cjs|sql)",
     ".husky",
+    "**/*.ipynb",
     ".git",
     ".github/DISCUSSION_TEMPLATE/Installation.yml",
+    ".github/CODEOWNERS",
     ".idea",
     "**/patches",
     ".secrets",
@@ -42,7 +44,9 @@
     "packages/dashboards/*.jar",
     "packages/dashboards/plugins/*.jar",
     "packages/dashboards/data/metabase/*.db",
-    "packages/client/dev-dist"
+    "packages/client/dev-dist",
+    "packages/toolkit/.npmignore",
+    "packages/toolkit/tsconfig.tsbuildinfo"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

@@ -12,7 +12,7 @@ import { useIntl } from 'react-intl'
 
 import { buttonMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
-import { System, WebhookPermission, Event } from '@client/utils/gateway'
+import { System, WebhookPermission, EventType } from '@client/utils/gateway'
 import { CheckboxGroup, FormTabs, ResponsiveModal } from '@opencrvs/components'
 import { Button } from '@opencrvs/components/lib/Button'
 import React, { useState } from 'react'
@@ -39,10 +39,10 @@ export function WebhookModal({
   setBirthPermissions
 }: ISystemProps) {
   const intl = useIntl()
-  const [selectedTab, setSelectedTab] = useState(Event.Birth)
+  const [selectedTab, setSelectedTab] = useState(EventType.Birth)
 
-  const checkboxHandler = (permissions: string[], event: Event) => {
-    event === Event.Birth
+  const checkboxHandler = (permissions: string[], event: EventType) => {
+    event === EventType.Birth
       ? setBirthPermissions({ event, permissions })
       : setDeathPermissions({ event, permissions })
   }
@@ -73,18 +73,18 @@ export function WebhookModal({
           <FormTabs
             sections={[
               {
-                id: Event.Birth,
+                id: EventType.Birth,
                 title: intl.formatMessage(integrationMessages.birth)
               },
               {
-                id: Event.Death,
+                id: EventType.Death,
                 title: intl.formatMessage(integrationMessages.death)
               }
             ]}
             activeTabId={selectedTab}
-            onTabClick={(tabId: Event) => setSelectedTab(tabId)}
+            onTabClick={(tabId: EventType) => setSelectedTab(tabId)}
           />
-          {selectedTab === Event.Birth ? (
+          {selectedTab === EventType.Birth ? (
             <>
               <CheckboxGroup
                 id="test-checkbox-group1"
@@ -121,7 +121,7 @@ export function WebhookModal({
                 name="test-checkbox-group1"
                 value={birthPermissions && birthPermissions.permissions}
                 onChange={(permissions) => {
-                  checkboxHandler(permissions, Event.Birth)
+                  checkboxHandler(permissions, EventType.Birth)
                 }}
               />
             </>
@@ -158,7 +158,7 @@ export function WebhookModal({
                 name="test-checkbox-group1"
                 value={deathPermissions && deathPermissions.permissions}
                 onChange={(permissions) => {
-                  checkboxHandler(permissions, Event.Death)
+                  checkboxHandler(permissions, EventType.Death)
                 }}
               />
             </>

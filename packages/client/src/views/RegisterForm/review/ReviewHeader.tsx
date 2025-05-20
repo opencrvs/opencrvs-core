@@ -41,7 +41,7 @@ const TitleContainer = styled.div`
 `
 const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h2}
-  overflow-wrap: break-word;
+  overflow-wrap: anywhere;
 `
 export const ReviewHeader = (props: IReviewHeaderProps) => {
   const { id, logoSource, title, subject } = props

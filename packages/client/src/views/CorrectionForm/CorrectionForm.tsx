@@ -11,7 +11,11 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
-import { Redirect, RouteComponentProps } from 'react-router'
+import { Navigate } from 'react-router-dom'
+import {
+  RouteComponentProps,
+  withRouter
+} from '@client/components/WithRouterProps'
 import { IDeclaration, modifyDeclaration } from '@client/declarations'
 import {
   CorrectorForm,
@@ -20,26 +24,16 @@ import {
 import { CorrectionSection } from '@client/forms'
 import { CorrectionReasonForm } from './CorrectionReasonForm'
 import { CorrectionSummary } from './CorrectionSummary'
-import { Spinner } from '@opencrvs/components/lib/Spinner'
-import styled from 'styled-components'
 import { TimeMounted } from '@client/components/TimeMounted'
 import { HOME } from '@client/navigation/routes'
-
-const SpinnerWrapper = styled.div`
-  height: 80vh;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-`
+import { LoadingSpinner } from '@client/components/DraftLoadingSpinner'
 
 type IProps = IStateProps & IDispatchProps
 
 function CorrectionFormComponent({ sectionId, declaration, ...props }: IProps) {
   const { modifyDeclaration } = props
   if (!declaration) {
-    return <Redirect to={HOME} />
+    return <Navigate to={HOME} />
   }
 
   const logTime = (timeMs: number) => {
@@ -49,11 +43,7 @@ function CorrectionFormComponent({ sectionId, declaration, ...props }: IProps) {
   }
 
   if (declaration.writingDraft) {
-    return (
-      <SpinnerWrapper>
-        <Spinner id="draft_write_loading" />
-      </SpinnerWrapper>
-    )
+    return <LoadingSpinner />
   }
 
   return (
@@ -81,8 +71,8 @@ function FormSection({
   }
 }
 
-function mapStateToProps(state: IStoreState, props: IRouteProps) {
-  const { declarationId, pageId: sectionId } = props.match.params
+function mapStateToProps(state: IStoreState, props: RouteComponentProps) {
+  const { declarationId, pageId: sectionId } = props.router.match.params
   const declaration = state.declarationsState.declarations.find(
     ({ id }) => id === declarationId
   )
@@ -99,14 +89,9 @@ type IDispatchProps = {
   modifyDeclaration: typeof modifyDeclaration
 }
 
-type IRouteProps = RouteComponentProps<{
-  declarationId: string
-  pageId: string
-}>
-
-export const CorrectionForm = connect<
-  IStateProps,
-  IDispatchProps,
-  IRouteProps,
-  IStoreState
->(mapStateToProps, { modifyDeclaration })(CorrectionFormComponent)
+export const CorrectionForm = withRouter(
+  connect<IStateProps, IDispatchProps, RouteComponentProps, IStoreState>(
+    mapStateToProps,
+    { modifyDeclaration }
+  )(CorrectionFormComponent)
+)

@@ -1,7 +1,7 @@
 {
   "description": "OpenCRVS core workspace",
   "license": "MPL-2.0",
-  "version": "1.6.5",
+  "version": "1.7.2",
   "private": true,
   "os": [
     "darwin",
@@ -33,15 +33,15 @@
     "build:image": "export VERSION=`git log -1 --pretty=format:%h` && docker build --build-arg VERSION=${VERSION} -t opencrvs-build . && unset VERSION",
     "build:clean": "lerna run build:clean",
     "check:license": "license-check-and-add check -f license-config.json",
-    "seed:dev": "ACTIVATE_USERS=true lerna run seed --stream --scope @opencrvs/data-seeder",
-    "seed:prod": "lerna run seed --stream --scope @opencrvs/data-seeder",
+    "seed:dev": "NODE_ENV=development lerna run seed --stream --scope @opencrvs/data-seeder",
+    "seed:prod": "NODE_ENV=production lerna run seed --stream --scope @opencrvs/data-seeder",
     "add:license": "license-check-and-add add -f license-config.json",
-    "build:components": "lerna run build --scope @opencrvs/components"
+    "build:components": "lerna run build --scope @opencrvs/components",
+    "debug": "bash debug-service-in-chrome.sh"
   },
   "devDependencies": {
     "@types/dotenv": "^6.1.0",
     "concurrently": "^8.0.0",
-    "js-yaml": "^3.13.1",
     "husky": "^9.1.6",
     "lerna": "^8.0.0",
     "lint-staged": "^15.2.10",

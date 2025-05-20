@@ -112,11 +112,7 @@ const StyledInput = styled.input<ICustomProps>`
   }
 `
 
-export interface IRef {
-  focusField: () => void
-}
-
-export const TextInput = React.forwardRef<IRef, ITextInputProps>(
+export const TextInput = React.forwardRef<HTMLInputElement, ITextInputProps>(
   (
     {
       focusInput,
@@ -130,31 +126,6 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
     },
     ref
   ) => {
-    const $element = React.useRef<HTMLInputElement>(null)
-
-    function focusField(): void {
-      /*
-       * Needs to be run on the next tick
-       * so that 'value' prop has enough time to flow back here
-       * if the focusInput prop is called right after keydown
-       */
-      setTimeout(() => {
-        if ($element.current) {
-          $element.current.focus()
-        }
-      })
-    }
-
-    React.useImperativeHandle(ref, () => ({
-      focusField
-    }))
-
-    React.useEffect(() => {
-      if (focusInput) {
-        focusField()
-      }
-    }, [focusInput])
-
     return (
       <StyledInputContainer
         touched={otherProps.touched}
@@ -163,7 +134,8 @@ export const TextInput = React.forwardRef<IRef, ITextInputProps>(
       >
         {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
         <StyledInput
-          ref={$element}
+          ref={ref}
+          autoFocus={focusInput}
           name={otherProps.id}
           {...otherProps}
           autoComplete={

@@ -56,7 +56,6 @@ import {
   WITNESS_ONE_CODE,
   WITNESS_TWO_CODE,
   findCompositionSection,
-  findExtension,
   getComposition,
   isObservation,
   isURLReference,
@@ -69,14 +68,9 @@ import {
   isHealthFacility,
   PartialBy
 } from '../../types'
-import {
-  DOWNLOADED_EXTENSION_URL,
-  EVENT_TYPE,
-  FHIR_OBSERVATION_CATEGORY_URL,
-  MAKE_CORRECTION_EXTENSION_URL
-} from './constants'
+import { EVENT_TYPE, FHIR_OBSERVATION_CATEGORY_URL } from '../constants'
 
-export function findCompositionSectionInBundle<T extends Bundle>(
+function findCompositionSectionInBundle<T extends Bundle>(
   code: CompositionSectionCode,
   fhirBundle: T
 ) {
@@ -119,7 +113,7 @@ export function selectOrCreatePersonResource<T extends CompositionSectionCode>(
 
 export function selectOrCreateEncounterResource(
   fhirBundle: Bundle,
-  context: any,
+  context: { event: EVENT_TYPE },
   isCorrection?: boolean
 ): Encounter {
   let sectionCode: CompositionSectionEncounterReference
@@ -207,7 +201,7 @@ export function selectOrCreateObservationResource(
   )
 }
 
-export function updateObservationInfo(
+function updateObservationInfo(
   observation: Observation,
   categoryCode: string,
   categoryDescription: string,
@@ -240,58 +234,7 @@ export function updateObservationInfo(
   return observation
 }
 
-export function selectObservationResource(
-  observationCode: string,
-  fhirBundle: Bundle
-): Observation | undefined {
-  let observation
-  fhirBundle.entry.forEach((entry) => {
-    if (
-      !entry ||
-      !entry.resource ||
-      entry.resource.resourceType === 'Observation'
-    ) {
-      const observationEntry = entry.resource as Observation
-      const obCoding =
-        observationEntry.code &&
-        observationEntry.code.coding &&
-        observationEntry.code.coding.find(
-          (obCode) => obCode.code === observationCode
-        )
-      if (obCoding) {
-        observation = observationEntry
-      }
-    }
-  })
-
-  return observation
-}
-
-export async function removeObservationResource(
-  observationCode: string,
-  fhirBundle: Bundle
-) {
-  fhirBundle.entry.forEach((entry, index) => {
-    if (
-      !entry ||
-      !entry.resource ||
-      entry.resource.resourceType === 'Observation'
-    ) {
-      const observationEntry = entry.resource as Observation
-      const obCoding =
-        observationEntry.code &&
-        observationEntry.code.coding &&
-        observationEntry.code.coding.find(
-          (obCode) => obCode.code === observationCode
-        )
-      if (obCoding) {
-        fhirBundle.entry.splice(index, 1)
-      }
-    }
-  })
-}
-
-export function createObservationResource(
+function createObservationResource(
   sectionCode: CompositionSectionCode,
   fhirBundle: Bundle,
   context: any
@@ -755,20 +698,16 @@ export function setQuestionnaireItem(
   }
 }
 
-export function setArrayPropInResourceObject<
-  T extends Resource,
-  L extends keyof T
->(resource: T, label: L, value: Array<{}>, propName: string) {
+function setArrayPropInResourceObject<T extends Resource, L extends keyof T>(
+  resource: T,
+  label: L,
+  value: Array<{}>,
+  propName: string
+) {
   if (!resource[label]) {
     resource[label] = {} as T[L]
   }
   resource[label][propName as keyof T[L]] = value as T[L][keyof T[L]]
-}
-
-export function getDownloadedExtensionStatus(task: Task) {
-  const extension =
-    task.extension && findExtension(DOWNLOADED_EXTENSION_URL, task.extension)
-  return extension?.valueString
 }
 
 export function getMaritalStatusCode(fieldValue: string) {
@@ -815,11 +754,4 @@ export function setInformantReference<T extends CompositionSectionCode>(
       ? urlReferenceToResourceIdentifier(personEntry.fullUrl)
       : personEntry.fullUrl
   }
-}
-
-export function hasRequestCorrectionExtension(task: Task) {
-  const extension =
-    task.extension &&
-    findExtension(MAKE_CORRECTION_EXTENSION_URL, task.extension)
-  return extension
 }

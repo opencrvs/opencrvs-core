@@ -104,7 +104,8 @@ describe('verify time logged by practitioner handler', () => {
       fixtures.savedLocation({
         id: 'uuid2' as UUID,
         partOf: {
-          reference: 'Location/94429795-0a09-4de8-8e1e-dssdr323'
+          reference:
+            'Location/94429795-0a09-4de8-8e1e-dssdr323' as `Location/${UUID}`
         }
       })
     ]

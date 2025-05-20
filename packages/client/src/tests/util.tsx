@@ -8,8 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { App } from '@client/App'
-import { Event, SystemRoleType, Status } from '@client/utils/gateway'
+import {
+  Scope,
+  SCOPES,
+  DEFAULT_ROLES_DEFINITION
+} from '@opencrvs/commons/client'
+import { EventType, Status, FetchUserQuery } from '@client/utils/gateway'
 import { UserDetails } from '@client/utils/userUtils'
 import { getRegisterForm } from '@client/forms/register/declaration-selectors'
 import { getReviewForm } from '@client/forms/register/review-selectors'
@@ -21,57 +25,111 @@ import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContaine
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { join } from 'path'
 import {
-  configure,
-  mount,
-  ReactWrapper,
-  shallow,
-  MountRendererProps
-} from 'enzyme'
-import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
-import { readFileSync } from 'fs'
-import { graphql, print } from 'graphql'
-import * as jwt from 'jsonwebtoken'
-import * as React from 'react'
-import {
-  ApolloProvider,
-  NetworkStatus,
   ApolloClient,
-  InMemoryCache,
   ApolloLink,
+  ApolloProvider,
+  InMemoryCache,
+  NetworkStatus,
   Observable
 } from '@apollo/client'
 import { MockedProvider } from '@apollo/client/testing'
+import { App, routesConfig } from '@client/App'
+import { setUserDetails } from '@client/profile/profileActions'
+import Adapter from '@wojtekmaj/enzyme-adapter-react-17'
+import {
+  configure,
+  mount,
+  MountRendererProps,
+  ReactWrapper,
+  shallow
+} from 'enzyme'
+import { readFileSync } from 'fs'
+import { graphql, print } from 'graphql'
+import { createLocation, createMemoryHistory } from 'history'
+import * as jwt from 'jsonwebtoken'
+import { stringify } from 'query-string'
+import * as React from 'react'
 import { IntlShape } from 'react-intl'
 import { Provider } from 'react-redux'
 import { AnyAction, Store } from 'redux'
 import { waitForElement } from './wait-for-element'
-import { setUserDetails } from '@client/profile/profileActions'
-import { createLocation, createMemoryHistory, History } from 'history'
-import { stringify } from 'query-string'
-import { match as Match } from 'react-router'
-import { ConnectedRouter } from 'connected-react-router'
-import { mockOfflineData } from './mock-offline-data'
-import { Section, SubmissionAction } from '@client/forms'
+
 import { SUBMISSION_STATUS } from '@client/declarations'
 import { vi } from 'vitest'
-import { getSystemRolesQuery } from '@client/forms/user/query/queries'
+import { getUserRolesQuery } from '@client/forms/user/query/queries'
 import { createOrUpdateUserMutation } from '@client/forms/user/mutation/mutations'
 import { draftToGqlTransformer } from '@client/transformer'
+import { Section, SubmissionAction } from '@client/forms'
 import { deserializeFormSection } from '@client/forms/deserializer/deserializer'
 import * as builtInValidators from '@client/utils/validate'
+import * as actions from '@client/profile/profileActions'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
+import { mockOfflineData } from './mock-offline-data'
 
-export const registerScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWdpc3RlciIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU0MjY4ODc3MCwiZXhwIjoxNTQzMjkzNTcwLCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI1YmVhYWY2MDg0ZmRjNDc5MTA3ZjI5OGMifQ.ElQd99Lu7WFX3L_0RecU_Q7-WZClztdNpepo7deNHqzro-Cog4WLN7RW3ZS5PuQtMaiOq1tCb-Fm3h7t4l4KDJgvC11OyT7jD6R2s2OleoRVm3Mcw5LPYuUVHt64lR_moex0x_bCqS72iZmjrjS-fNlnWK5zHfYAjF2PWKceMTGk6wnI9N49f6VwwkinJcwJi6ylsjVkylNbutQZO0qTc7HRP-cBfAzNcKD37FqTRNpVSvHdzQSNcs7oiv3kInDN5aNa2536XSd3H-RiKR9hm9eID9bSIJgFIGzkWRd5jnoYxT70G0t03_mTVnDnqPXDtyI-lmerx24Ost0rQLUNIg'
-export const registrationClerkScopeToken =
-  'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJ2YWxpZGF0ZSIsImNlcnRpZnkiLCJkZW1vIl0sImlhdCI6MTU3ODMwNzgzOSwiZXhwIjoxNTc4OTEyNjM5LCJhdWQiOlsib3BlbmNydnM6YXV0aC11c2VyIiwib3BlbmNydnM6dXNlci1tZ250LXVzZXIiLCJvcGVuY3J2czpoZWFydGgtdXNlciIsIm9wZW5jcnZzOmdhdGV3YXktdXNlciIsIm9wZW5jcnZzOm5vdGlmaWNhdGlvbi11c2VyIiwib3BlbmNydnM6d29ya2Zsb3ctdXNlciIsIm9wZW5jcnZzOnNlYXJjaC11c2VyIiwib3BlbmNydnM6bWV0cmljcy11c2VyIiwib3BlbmNydnM6cmVzb3VyY2VzLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNWRmYmE5NDYxMTEyNTliZDBjMzhhY2JhIn0.CFUy-L414-8MLf6pjA8EapK6qN1yYN6Y0ywcg1GtWhRxSWnT0Kw9d2OOK_IVFBAqTXLROQcwHYnXC2r6Ka53MB14HUZ39H7HrOTFURCYknYGIeGmyFpBjoXUj4yc95_f1FCpW6fQReBMnSIzUwlUGcxK-ttitSLfQebPFaVosM6kQpKd-n5g6cg6eS9hsYzxVme9kKkrxy5HRkxjNe8VfXEheKGqpRHxLGP7bo1bIhw8BWto9kT2kxm0NLkWzbqhxKyVrk8cEdcFiIAbUt6Fzjcx_uVPvLnJPNQAkZEO3AdqbZDFuvmBQWCf2Z6l9c8fYuWRD4SA5tBCcIKzUcalEg'
 export const validToken =
   'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJpYXQiOjE1MzMxOTUyMjgsImV4cCI6MTU0MzE5NTIyNywiYXVkIjpbImdhdGV3YXkiXSwic3ViIjoiMSJ9.G4KzkaIsW8fTkkF-O8DI0qESKeBI332UFlTXRis3vJ6daisu06W5cZsgYhmxhx_n0Q27cBYt2OSOnjgR72KGA5IAAfMbAJifCul8ib57R4VJN8I90RWqtvA0qGjV-sPndnQdmXzCJx-RTumzvr_vKPgNDmHzLFNYpQxcmQHA-N8li-QHMTzBHU4s9y8_5JOCkudeoTMOd_1021EDAQbrhonji5V1EOSY2woV5nMHhmq166I1L0K_29ngmCqQZYi1t6QBonsIowlXJvKmjOH5vXHdCCJIFnmwHmII4BK-ivcXeiVOEM_ibfxMWkAeTRHDshOiErBFeEvqd6VWzKvbKAH0UY-Rvnbh4FbprmO4u4_6Yd2y2HnbweSo-v76dVNcvUS0GFLFdVBt0xTay-mIeDy8CKyzNDOWhmNUvtVi9mhbXYfzzEkwvi9cWwT1M8ZrsWsvsqqQbkRCyBmey_ysvVb5akuabenpPsTAjiR8-XU2mdceTKqJTwbMU5gz-8fgulbTB_9TNJXqQlH7tyYXMWHUY3uiVHWg2xgjRiGaXGTiDgZd01smYsxhVnPAddQOhqZYCrAgVcT1GBFVvhO7CC-rhtNlLl21YThNNZNpJHsCgg31WA9gMQ_2qAJmw2135fAyylO8q7ozRUvx46EezZiPzhCkPMeELzLhQMEIqjo'
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
 export const inValidImageB64String =
   'wee7dfaKGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
-export const natlSysAdminToken =
-  'Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJzeXNhZG1pbiIsIm5hdGxzeXNhZG1pbiIsImRlbW8iXSwiaWF0IjoxNjQ5NjU3MTM4LCJleHAiOjE2NTAyNjE5MzgsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiXSwiaXNzIjoib3BlbmNydnM6YXV0aC1zZXJ2aWNlIiwic3ViIjoiNjIyZjgxYjQyY2Q1MzdiZjkxZGFhMTBiIn0.MojnxjSVja4VkS5ufVtpJHmiqQqngW3Zb6rHv4MqKwqSgHptjta1A-1xdpkfadxr0pVIYTh-rhKP93LPCTfThkA01oW8qgkUr0t_02cgJ5KLe1B3R5QFJ9i1IzLye9yOeakfpbtnk67cwJ2r4KTJMxj5BWucdPGK8ifZRBdDrt9HsTtcDOutgLmEp2VnxLvc2eAEmoBBp6mRZ8lOYIRei5UHfaROCk0vdwjLchiqQWH9GE8hxU3RIA1jpzshd3_TC4G0rvuIXnBGf9VQaH-gkNW7a44xLVHhdENxAsGTdyeSHRC83wbeoUZkuOFQpF8Iz-8SbLEQfmipdzeBAsBgWg'
+
+export const SYSTEM_ADMIN_DEFAULT_SCOPES = [
+  SCOPES.CONFIG_UPDATE_ALL,
+  SCOPES.USER_CREATE,
+  SCOPES.USER_READ,
+  SCOPES.USER_UPDATE,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS
+] satisfies Scope[]
+
+export const REGISTRAR_DEFAULT_SCOPES = [
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_REVIEW_DUPLICATES,
+  SCOPES.RECORD_DECLARATION_ARCHIVE,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_REGISTER,
+  SCOPES.RECORD_REGISTRATION_CORRECT,
+  SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+  SCOPES.RECORD_EXPORT_RECORDS,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+  SCOPES.RECORD_CREATE_COMMENTS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE
+] satisfies Scope[]
+
+export const REGISTRATION_AGENT_DEFAULT_SCOPES = [
+  SCOPES.RECORD_DECLARE_BIRTH,
+  SCOPES.RECORD_DECLARE_DEATH,
+  SCOPES.RECORD_DECLARE_MARRIAGE,
+  SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
+  SCOPES.RECORD_SUBMIT_FOR_UPDATES,
+  SCOPES.RECORD_DECLARATION_ARCHIVE,
+  SCOPES.RECORD_DECLARATION_REINSTATE,
+  SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
+  SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS,
+  SCOPES.RECORD_EXPORT_RECORDS,
+  SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+  SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES,
+  SCOPES.RECORD_CREATE_COMMENTS,
+  SCOPES.PERFORMANCE_READ,
+  SCOPES.PERFORMANCE_READ_DASHBOARDS,
+  SCOPES.ORGANISATION_READ_LOCATIONS,
+  SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE,
+  SCOPES.SEARCH_BIRTH,
+  SCOPES.SEARCH_DEATH,
+  SCOPES.SEARCH_MARRIAGE
+] satisfies Scope[]
 
 export const ACTION_STATUS_MAP = {
   [SubmissionAction.SUBMIT_FOR_REVIEW]: SUBMISSION_STATUS.READY_TO_SUBMIT,
@@ -92,16 +150,6 @@ export const ACTION_STATUS_MAP = {
   [SubmissionAction.REJECT_CORRECTION]:
     SUBMISSION_STATUS.READY_TO_REQUEST_CORRECTION
 } as const
-
-export const validateScopeToken = jwt.sign(
-  { scope: ['validate'] },
-  readFileSync('./test/cert.key'),
-  {
-    algorithm: 'RS256',
-    issuer: 'opencrvs:auth-service',
-    audience: 'opencrvs:gateway-user'
-  }
-)
 
 export function flushPromises() {
   return new Promise((resolve) => setImmediate(resolve))
@@ -144,17 +192,20 @@ export function waitForReady(app: ReactWrapper) {
 }
 
 export async function createTestApp(
-  config = { waitUntilOfflineCountryConfigLoaded: true }
+  config = { waitUntilOfflineCountryConfigLoaded: true },
+  initialEntries?: string[]
 ) {
-  const { store, history } = await createTestStore()
+  const { store } = await createTestStore()
+  const router = createMemoryRouter(routesConfig, { initialEntries })
+
   const app = mount(
-    <App store={store} history={history} client={createGraphQLClient()} />
+    <App store={store} router={router} client={createGraphQLClient()} />
   )
 
   if (config.waitUntilOfflineCountryConfigLoaded) {
     await waitForReady(app)
   }
-  return { history, app, store }
+  return { app, store, router }
 }
 
 interface ITestView {
@@ -218,7 +269,7 @@ export const selectOption = (
   return input.find('.react-select__control')
 }
 
-export const eventAddressData = {
+const eventAddressData = {
   country: 'FAR',
   state: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
   district: '852b103f-2fe0-4871-a323-51e51c6d9198',
@@ -238,7 +289,7 @@ export const eventAddressData = {
   internationalPostalCode: ''
 }
 
-export const primaryAddressData = {
+const primaryAddressData = {
   primaryAddress: '',
   countryPrimary: 'FAR',
   statePrimary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -252,7 +303,7 @@ export const primaryAddressData = {
   addressLine5Primary: 'my village'
 }
 
-export const secondaryAddressData = {
+const secondaryAddressData = {
   secondaryAddress: '',
   countrySecondary: 'FAR',
   stateSecondary: 'bac22b09-1260-4a59-a5b9-c56c43ae889c',
@@ -266,7 +317,7 @@ export const secondaryAddressData = {
   addressLine5Secondary: ''
 }
 
-export const primaryInternationalAddressLines = {
+const primaryInternationalAddressLines = {
   internationalStatePrimary: 'ujggiu',
   internationalDistrictPrimary: 'iuoug',
   internationalCityPrimary: '',
@@ -276,7 +327,7 @@ export const primaryInternationalAddressLines = {
   internationalPostalCodePrimary: ''
 }
 
-export const secondaryInternationalAddressLines = {
+const secondaryInternationalAddressLines = {
   internationalStateSecondary: 'ugou',
   internationalDistrictSecondary: 'iugoug',
   internationalCitySecondary: '',
@@ -300,15 +351,12 @@ export const userDetails: UserDetails = {
     },
     { use: 'bn', firstNames: '', familyName: '' }
   ],
-  systemRole: SystemRoleType.FieldAgent,
   role: {
-    _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-    labels: [
-      {
-        lang: 'en',
-        label: 'ENTREPENEUR'
-      }
-    ]
+    label: {
+      defaultMessage: 'Field Agent',
+      description: 'Name for user role Field Agent',
+      id: 'userRole.fieldAgent'
+    }
   },
   mobile: '01677701431',
   primaryOffice: {
@@ -318,7 +366,7 @@ export const userDetails: UserDetails = {
     status: 'active'
   },
   localRegistrar: {
-    role: 'LOCAL_REGISTRAR' as SystemRoleType,
+    role: 'LOCAL_REGISTRAR',
     signature: {
       data: `data:image/png;base64,${validImageB64String}`,
       type: 'image/png'
@@ -370,7 +418,13 @@ export const mockUserResponse = {
           }
         ]
       },
-      systemRole: 'LOCAL_REGISTRAR',
+      role: {
+        label: {
+          id: 'userRoles.localRegistar',
+          defaultMessage: 'Local Registrar',
+          description: 'Label for local registrar'
+        }
+      },
       practitionerId: '9202fa3c-7eb7-4898-bea5-5895f7f99534'
     }
   }
@@ -386,7 +440,13 @@ export const mockLocalSysAdminUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_SYSTEM_ADMIN',
+      role: {
+        label: {
+          id: 'userRoles.localSystemAdmin',
+          defaultMessage: 'Local System Admin',
+          description: 'Label for local system admin'
+        }
+      },
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -420,7 +480,11 @@ export const mockRegistrarUserResponse = {
         status: 'active',
         __typename: 'Location'
       },
-      systemRole: 'LOCAL_REGISTRAR',
+      label: {
+        defaultMessage: 'Local Registrar',
+        description: 'Name for user role Local Registrar',
+        id: 'userRole.localRegistrar'
+      },
       signature: {
         data: `data:image/png;base64,${validImageB64String}`,
         type: 'image/png'
@@ -444,7 +508,7 @@ export const mockRegistrarUserResponse = {
   }
 }
 
-export function appendStringToKeys(
+function appendStringToKeys(
   obj: Record<string, any>,
   appendString: string
 ): Record<string, any> {
@@ -538,7 +602,6 @@ export const mockDeclarationData = {
   },
   registration: {
     informantsSignature: 'data:image/png;base64,abcd',
-
     registrationNumber: '201908122365BDSS0SE1',
     regStatus: {
       type: 'REGISTERED',
@@ -547,7 +610,7 @@ export const mockDeclarationData = {
       officeAddressLevel3: 'Gazipur',
       officeAddressLevel4: 'Dhaka'
     },
-    certificates: [{}]
+    certificates: [{ certificateTemplateId: 'birth-certificate' }]
   },
   documents: {}
 }
@@ -647,7 +710,8 @@ export const mockDeathDeclarationData = {
         collector: {
           type: 'MOTHER'
         },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'death-certificate'
       }
     ]
   }
@@ -676,7 +740,8 @@ export const mockMarriageDeclarationData = {
         collector: {
           type: 'BRIDE'
         },
-        hasShowedVerifiedDocument: true
+        hasShowedVerifiedDocument: true,
+        certificateTemplateId: 'marriage-certificate'
       }
     ]
   },
@@ -768,6 +833,7 @@ export const mockBirthRegistrationSectionData = {
           data: 'BASE64 data'
         }
       },
+      certificateTemplateId: 'birth-certificate',
       hasShowedVerifiedDocument: true
     }
   ]
@@ -795,33 +861,112 @@ export const mockDeathRegistrationSectionData = {
         iDType: 'PASSPORT',
         iD: '123456789'
       },
-      hasShowedVerifiedDocument: true
+      hasShowedVerifiedDocument: true,
+      certificateTemplateId: 'death-certificate'
     }
   ]
 }
 
 const mockFetchCertificatesTemplatesDefinition = [
   {
-    id: '12313546',
-    event: Event.Birth,
-    status: 'ACTIVE',
-    svgCode:
-      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="209.884" y="549.336">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="210" y="445.552">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Died on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of death&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="211" y="384.004">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfDeath}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Death Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
-    svgDateCreated: '1640696680593',
-    svgDateUpdated: '1644326332088',
-    svgFilename: 'oCRVS_DefaultZambia_Death_v1.svg',
-    user: '61d42359f1a2c25ea01beb4b'
+    id: 'birth-certificate',
+    event: 'birth' as EventType,
+    label: {
+      id: 'certificates.birth.certificate',
+      defaultMessage: 'Birth Certificate',
+      description: 'The label for a birth certificate'
+    },
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
+    },
+    isDefault: true,
+    svgUrl: '/api/countryconfig/certificates/birth-certificate.svg',
+    svg: '<svg></svg>',
+    fonts: {
+      'Noto Sans': {
+        normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+        italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+      }
+    }
   },
   {
-    id: '25313546',
-    event: Event.Death,
-    status: 'ACTIVE',
-    svgCode:
-      '<svg width="420" height="595" viewBox="0 0 420 595" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">\n<rect width="420" height="595" fill="white"/>\n<rect x="16.5" y="16.5" width="387" height="562" stroke="#D7DCDE"/>\n<path d="M138.429 511.629H281.571" stroke="#F4F4F4" stroke-width="1.22857" stroke-linecap="square" stroke-linejoin="round"/>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="526.552" text-anchor="middle">{registrarName}&#x2028;</tspan><tspan x="50%" y="538.552" text-anchor="middle">({role}) &#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="549.336" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="300" letter-spacing="0px"><tspan x="50%" y="445.552" text-anchor="middle">&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="429.552" text-anchor="middle">This event was registered at {registrationLocation}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="308.828" text-anchor="middle">{eventDate}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="287.69" text-anchor="middle">Was born on&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="345.69" text-anchor="middle">Place of birth&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="500" letter-spacing="0px"><tspan x="50%" y="384.004" text-anchor="middle">&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="367.828" text-anchor="middle">{placeOfBirth}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="0px"><tspan x="50%" y="245.828" text-anchor="middle">{informantName}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="10" font-weight="300" letter-spacing="0px"><tspan x="50%" y="224.69" text-anchor="middle">This is to certify that&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" font-weight="600" letter-spacing="1px"><tspan x="50%" y="145.828" text-anchor="middle">{registrationNumber}&#10;</tspan></text>\n<text fill="#35495D" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="12" letter-spacing="0px"><tspan x="50%" y="127.828" text-anchor="middle">Birth Registration No&#10;</tspan></text>\n<text fill="#292F33" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0px"><tspan x="50%" y="170.104" text-anchor="middle">Date of issuance of certificate:  {certificateDate}</tspan></text>\n<line x1="44.9985" y1="403.75" x2="377.999" y2="401.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<line x1="44.9985" y1="189.75" x2="377.999" y2="187.75" stroke="#D7DCDE" stroke-width="0.5"/>\n<rect x="188" y="51" width="46.7463" height="54" fill="url(#pattern0)"/>\n<defs>\n<pattern id="pattern0" patternContentUnits="objectBoundingBox" width="1" height="1">\n<use xlink:href="#image0_43_3545" transform="translate(0 -0.000358256) scale(0.0005)"/>\n</pattern>\n<image id="image0_43_3545" width="2000" height="2312" xlink:href="{countryLogo}"/>\n</defs>\n</svg>\n',
-    svgDateCreated: '1640696804785',
-    svgDateUpdated: '1643885502999',
-    svgFilename: 'oCRVS_DefaultZambia_Birth_v1.svg',
-    user: '61d42359f1a2c25ea01beb4b'
+    id: 'birth-certificate-copy',
+    event: 'birth' as EventType,
+    label: {
+      id: 'certificates.birth-certificate-copy',
+      defaultMessage: 'Birth Certificate certified copy',
+      description: 'The label for a birth certificate'
+    },
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
+    },
+    isDefault: false,
+    svgUrl: '/api/countryconfig/certificates/birth-certificate-copy.svg',
+    svg: '<svg></svg>',
+    fonts: {
+      'Noto Sans': {
+        normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+        italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+      }
+    }
+  },
+  {
+    id: 'death-certificate',
+    event: 'death' as EventType,
+    label: {
+      id: 'certificates.death.certificate',
+      defaultMessage: 'Death Certificate',
+      description: 'The label for a death certificate'
+    },
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
+    },
+    isDefault: true,
+    svgUrl: '/api/countryconfig/certificates/death-certificate.svg',
+    svg: '<svg></svg>',
+    fonts: {
+      'Noto Sans': {
+        normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+        italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+      }
+    }
+  },
+  {
+    id: 'marriage-certificate',
+    event: 'marriage' as EventType,
+    label: {
+      id: 'certificates.marriage.certificate',
+      defaultMessage: 'Marriage Certificate',
+      description: 'The label for a marriage certificate'
+    },
+    fee: {
+      onTime: 0,
+      late: 5.5,
+      delayed: 15
+    },
+    isDefault: true,
+    svgUrl: '/api/countryconfig/certificates/marriage-certificate.svg',
+    svg: '<svg></svg>',
+    fonts: {
+      'Noto Sans': {
+        normal: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bold: '/api/countryconfig/fonts/NotoSans-Bold.ttf',
+        italics: '/api/countryconfig/fonts/NotoSans-Regular.ttf',
+        bolditalics: '/api/countryconfig/fonts/NotoSans-Regular.ttf'
+      }
+    }
   }
 ]
 
@@ -847,24 +992,37 @@ export const mockOfflineDataDispatch = {
 }
 
 export async function createTestStore() {
-  const { store, history } = createStore()
+  const { store } = createStore()
   store.dispatch(offlineDataReady(mockOfflineDataDispatch))
   await flushPromises() // This is to resolve the `referenceApi.importValidators()` promise
-  return { store, history }
+  return { store }
 }
 
 export async function createTestComponent(
   node: React.ReactElement<ITestView>,
   {
     store,
-    history,
     graphqlMocks,
-    apolloClient
+    apolloClient,
+    initialEntries,
+    path = '*'
   }: {
     store: AppStore
-    history: History
     graphqlMocks?: MockedProvider['props']['mocks']
     apolloClient?: ApolloClient<any>
+    initialEntries?:
+      | string[]
+      | {
+          pathname: string
+          state: Record<
+            string,
+            | string
+            | boolean
+            | number
+            | Record<string, string | boolean | number>
+          >
+        }[]
+    path?: string
   },
   options?: MountRendererProps
 ) {
@@ -889,22 +1047,38 @@ export async function createTestComponent(
       </MockedProvider>
     )
   }
+  const router = createMemoryRouter(
+    [
+      {
+        path,
+        element: node
+      }
+    ],
+    { initialEntries }
+  )
 
-  function PropProxy(props: Record<string, any>) {
+  function PropProxy() {
     return withGraphQL(
       <Provider store={store}>
-        <ConnectedRouter noInitialPop={true} history={history}>
-          <I18nContainer>
-            <ThemeProvider theme={getTheme()}>
-              <node.type {...node.props} {...props} />
-            </ThemeProvider>
-          </I18nContainer>
-        </ConnectedRouter>
+        <I18nContainer>
+          <ThemeProvider theme={getTheme()}>
+            <RouterProvider router={router} />
+          </ThemeProvider>
+        </I18nContainer>
       </Provider>
     )
   }
 
-  return mount(<PropProxy {...node.props} />, options)
+  return { component: mount(<PropProxy />, options), router }
+}
+
+/**
+ * Create a test component with the given node and store.
+ * Returns component route
+ */
+export type TestComponentWithRouteMock = {
+  component: ReactWrapper<{}, {}>
+  router: Awaited<ReturnType<typeof createTestComponent>>['router']
 }
 
 export const getFileFromBase64String = (
@@ -934,10 +1108,11 @@ export const getFileFromBase64String = (
 
 export async function goToSection(component: ReactWrapper, nth: number) {
   for (let i = 0; i < nth; i++) {
+    await flushPromises()
     await waitForElement(component, '#next_section')
     component.find('#next_section').hostNodes().simulate('click')
     await flushPromises()
-    await component.update()
+    component.update()
   }
 }
 
@@ -961,20 +1136,25 @@ export async function goToMotherSection(component: ReactWrapper) {
   await waitForElement(component, '#form_section_id_mother-view-group')
 }
 
+export async function goToChildSection(component: ReactWrapper) {
+  await goToSection(component, 1)
+  await waitForElement(component, '#form_section_id_child-view-group')
+}
+
 export async function getRegisterFormFromStore(
   store: Store<IStoreState, AnyAction>,
-  event: Event
+  event: EventType
 ) {
-  await store.dispatch(setOfflineData(userDetails))
+  store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getRegisterForm(state)[event]
 }
 
 export async function getReviewFormFromStore(
   store: Store<IStoreState, AnyAction>,
-  event: Event
+  event: EventType
 ) {
-  await store.dispatch(setOfflineData(userDetails))
+  store.dispatch(setOfflineData(userDetails))
   const state = store.getState()
   return getReviewForm(state)![event]
 }
@@ -1000,15 +1180,12 @@ export function loginAsFieldAgent(store: AppStore) {
           userMgntUserID: '5eba726866458970cf2e23c2',
           practitionerId: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
           mobile: '+8801711111111',
-          systemRole: SystemRoleType.FieldAgent,
           role: {
-            _id: '778464c0-08f8-4fb7-8a37-b86d1efc462a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'CHA'
-              }
-            ]
+            label: {
+              id: 'userRoles.CHA',
+              defaultMessage: 'CHA',
+              description: 'CHA'
+            }
           },
           status: Status.Active,
           name: [
@@ -1032,7 +1209,7 @@ export function loginAsFieldAgent(store: AppStore) {
                 familyName: 'Ashraful'
               }
             ],
-            role: SystemRoleType.LocalRegistrar,
+            role: 'LOCAL_REGISTRAR',
             signature: undefined
           }
         }
@@ -1065,7 +1242,7 @@ export function createRouterProps<
   if (search) {
     location.search = stringify(search)
   }
-  const match: Match<Params> = {
+  const match = {
     isExact: false,
     path,
     url: path,
@@ -1077,365 +1254,138 @@ export function createRouterProps<
 
 export const mockRoles = {
   data: {
-    getSystemRoles: [
-      {
-        id: '63c7ebee48dc29888b5b020d',
-        value: 'FIELD_AGENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c279',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Health Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Professionnel de Santé',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27a',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Police Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Agent de Police',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27b',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Social Worker',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Travailleur Social',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          },
-          {
-            _id: '63ef9466f708ea080777c27c',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Leader',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Leader Local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b020e',
-        value: 'REGISTRATION_AGENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27d',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Registration Agent',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: "Agent d'enregistrement",
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b020f',
-        value: 'LOCAL_REGISTRAR',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27e',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local Registrar',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0210',
-        value: 'LOCAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c27f',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Local System Admin',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système local',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0211',
-        value: 'NATIONAL_SYSTEM_ADMIN',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c280',
-            labels: [
-              {
-                lang: 'en',
-                label: 'National System Admin',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Administrateur système national',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0212',
-        value: 'PERFORMANCE_MANAGEMENT',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c281',
-            labels: [
-              {
-                lang: 'en',
-                label: 'Performance Manager',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Gestion des performances',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      },
-      {
-        id: '63c7ebee48dc29888b5b0213',
-        value: 'NATIONAL_REGISTRAR',
-        roles: [
-          {
-            _id: '63ef9466f708ea080777c282',
-            labels: [
-              {
-                lang: 'en',
-                label: 'National Registrar',
-                __typename: 'RoleLabel'
-              },
-              {
-                lang: 'fr',
-                label: 'Registraire national',
-                __typename: 'RoleLabel'
-              }
-            ],
-            __typename: 'Role'
-          }
-        ],
-        __typename: 'SystemRole'
-      }
-    ]
+    getUserRoles: DEFAULT_ROLES_DEFINITION
   }
 }
 
 export const mockFetchRoleGraphqlOperation = {
   request: {
-    query: getSystemRolesQuery,
+    query: getUserRolesQuery,
     variables: {}
   },
   result: {
     data: {
-      getSystemRoles: [
+      getUserRoles: [
         {
-          value: 'FIELD_AGENT',
-          roles: [
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Healthcare Worker'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Professionnel de Santé'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Police Officer'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Agent de Police'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Social Worker'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Travailleur Social'
-                }
-              ]
-            },
-            {
-              labels: [
-                {
-                  lang: 'en',
-                  label: 'Local Leader'
-                },
-                {
-                  lang: 'fr',
-                  label: 'Leader Local'
-                }
-              ]
-            }
-          ],
-          active: true
+          id: 'HOSPITAL',
+          label: {
+            defaultMessage: 'Field Agent in a Hospital',
+            description: 'Name for user role Field Agent',
+            id: 'userRole.hospitalFieldAgent'
+          },
+          scopes: [SCOPES.RECORD_DECLARE_BIRTH]
         },
         {
-          value: 'REGISTRATION_AGENT',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Registration Agent'
-            },
-            {
-              lang: 'fr',
-              label: "Agent d'enregistrement"
-            }
-          ],
-          active: true
+          id: 'FIELD_AGENT',
+          label: {
+            defaultMessage: 'Field Agent',
+            description: 'Name for user role Field Agent',
+            id: 'userRole.fieldAgent'
+          },
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
-          value: 'LOCAL_REGISTRAR',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Local Registrar'
-            },
-            {
-              lang: 'fr',
-              label: 'Registraire local'
-            }
-          ],
-          active: true
+          id: 'POLICE_OFFICER',
+          label: {
+            defaultMessage: 'Police Officer',
+            description: 'Name for user role Police Officer',
+            id: 'userRole.policeOfficer'
+          },
+          scopes: [SCOPES.RECORD_DECLARE_DEATH]
         },
         {
-          value: 'LOCAL_SYSTEM_ADMIN',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Local System_admin'
-            },
-            {
-              lang: 'fr',
-              label: 'Administrateur système local'
-            }
-          ],
-          active: true
+          id: 'SOCIAL_WORKER',
+          label: {
+            defaultMessage: 'Social Worker',
+            description: 'Name for user role Social Worker',
+            id: 'userRole.socialWorker'
+          },
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
-          value: 'NATIONAL_SYSTEM_ADMIN',
-          roles: [
-            {
-              lang: 'en',
-              label: 'National System_admin'
-            },
-            {
-              lang: 'fr',
-              label: 'Administrateur système national'
-            }
-          ],
-          active: true
+          id: 'HEALTHCARE_WORKER',
+          label: {
+            defaultMessage: 'Healthcare Worker',
+            description: 'Name for user role Healthcare Worker',
+            id: 'userRole.healthcareWorker'
+          },
+          scopes: [SCOPES.SEARCH_BIRTH]
         },
         {
-          value: 'PERFORMANCE_MANAGEMENT',
-          roles: [
-            {
-              lang: 'en',
-              label: 'Performance Management'
-            },
-            {
-              lang: 'fr',
-              label: 'Gestion des performances'
-            }
-          ],
-          active: true
+          id: 'LOCAL_LEADER',
+          label: {
+            defaultMessage: 'Local Leader',
+            description: 'Name for user role Local Leader',
+            id: 'userRole.localLeader'
+          },
+          scopes: [SCOPES.SEARCH_MARRIAGE]
         },
         {
-          value: 'NATIONAL_REGISTRAR',
-          roles: [
-            {
-              lang: 'en',
-              label: 'National Registrar'
-            },
-            {
-              lang: 'fr',
-              label: 'Registraire national'
-            }
-          ],
-          active: true
+          id: 'REGISTRATION_AGENT',
+          label: {
+            defaultMessage: 'Registration Agent',
+            description: 'Name for user role Registration Agent',
+            id: 'userRole.registrationAgent'
+          },
+          scopes: [
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+          ]
+        },
+        {
+          id: 'LOCAL_REGISTRAR',
+          label: {
+            defaultMessage: 'Local Registrar',
+            description: 'Name for user role Local Registrar',
+            id: 'userRole.localRegistrar'
+          },
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES
+          ]
+        },
+        {
+          id: 'LOCAL_SYSTEM_ADMIN',
+          label: {
+            defaultMessage: 'Local System Admin',
+            description: 'Name for user role Local System Admin',
+            id: 'userRole.localSystemAdmin'
+          },
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        },
+        {
+          id: 'NATIONAL_SYSTEM_ADMIN',
+          label: {
+            defaultMessage: 'National System Admin',
+            description: 'Name for user role National System Admin',
+            id: 'userRole.nationalSystemAdmin'
+          },
+          scopes: [SCOPES.CONFIG_UPDATE_ALL]
+        },
+        {
+          id: 'PERFORMANCE_MANAGER',
+          label: {
+            defaultMessage: 'Performance Manager',
+            description: 'Name for user role Performance Manager',
+            id: 'userRole.performanceManager'
+          },
+          scopes: [SCOPES.PERFORMANCE_READ]
+        },
+        {
+          id: 'NATIONAL_REGISTRAR',
+          label: {
+            defaultMessage: 'National Registrar',
+            description: 'Name for user role National Registrar',
+            id: 'userRole.nationalRegistrar'
+          },
+          scopes: [
+            SCOPES.RECORD_REGISTER,
+            SCOPES.PERFORMANCE_READ,
+            SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES,
+            SCOPES.CONFIG_UPDATE_ALL,
+            SCOPES.ORGANISATION_READ_LOCATIONS
+          ]
         }
       ]
     }
@@ -1446,15 +1396,12 @@ export const mockCompleteFormData = {
   accountDetails: '',
   assignedRegistrationOffice: '',
   device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  familyName: 'Hossain',
+  firstName: 'Jeff',
   nid: '123456789',
   phoneNumber: '01662132132',
   email: 'jeff.hossain@gmail.com',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'FIELD_AGENT',
   role: 'HOSPITAL',
   userDetails: '',
   username: ''
@@ -1600,7 +1547,7 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'firstNamesEng',
+                      name: 'firstNames',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English first name',
@@ -1622,12 +1569,12 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'familyNameEng',
+                      name: 'familyName',
                       type: 'TEXT',
                       label: {
                         defaultMessage: 'English last name',
                         description: 'English last name',
-                        id: 'form.field.label.lastNameEN'
+                        id: 'form.field.label.userSurname'
                       },
                       required: true,
                       initialValue: '',
@@ -1666,33 +1613,6 @@ export const mockUserGraphqlOperation = {
                       }
                     },
                     {
-                      name: 'nid',
-                      type: 'TEXT',
-                      label: {
-                        defaultMessage: 'NID',
-                        description: 'National ID',
-                        id: 'form.field.label.NID'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [
-                        {
-                          operation: 'validIDNumber',
-                          parameters: ['NATIONAL_ID']
-                        }
-                      ],
-                      mapping: {
-                        mutation: {
-                          operation: 'fieldToIdentifierWithTypeTransformer',
-                          parameters: ['NATIONAL_ID']
-                        },
-                        query: {
-                          operation: 'identifierWithTypeToFieldTransformer',
-                          parameters: ['NATIONAL_ID']
-                        }
-                      }
-                    },
-                    {
                       name: 'accountDetails',
                       type: 'FIELD_GROUP_TITLE',
                       label: {
@@ -1703,19 +1623,6 @@ export const mockUserGraphqlOperation = {
                       required: false,
                       initialValue: '',
                       validator: []
-                    },
-                    {
-                      name: 'systemRole',
-                      type: 'SELECT_WITH_OPTIONS',
-                      label: {
-                        defaultMessage: 'Role',
-                        description: 'Role label',
-                        id: 'constants.role'
-                      },
-                      required: true,
-                      initialValue: '',
-                      validator: [],
-                      options: []
                     },
                     {
                       name: 'role',
@@ -1729,10 +1636,7 @@ export const mockUserGraphqlOperation = {
                       required: true,
                       initialValue: '',
                       validator: [],
-                      dynamicOptions: {
-                        dependency: 'systemRole',
-                        options: {}
-                      }
+                      dynamicOptions: {}
                     },
                     {
                       name: 'device',
@@ -1759,7 +1663,7 @@ export const mockUserGraphqlOperation = {
                     {
                       action: 'hide',
                       expression:
-                        'values.systemRole!=="LOCAL_REGISTRAR" && values.systemRole!=="REGISTRATION_AGENT"'
+                        "!values.scopes?.includes('profile.electronic-signature')"
                     }
                   ],
                   fields: [
@@ -1822,16 +1726,13 @@ export const mockDataWithRegistarRoleSelected = {
   accountDetails: '',
   assignedRegistrationOffice: '',
   device: '',
-  familyName: 'হোসেন',
-  familyNameEng: 'Hossain',
-  firstNames: 'Jeff',
-  firstNamesEng: 'Jeff',
+  familyName: 'Hossain',
+  firstName: 'Jeff',
   email: 'jeff@gmail.com',
   nid: '101488192',
   phoneNumber: '01662132132',
   registrationOffice: '895cc945-94a9-4195-9a29-22e9310f3385',
-  systemRole: 'LOCAL_REGISTRAR',
-  role: 'SECRETARY',
+  role: 'LOCAL_REGISTRAR',
   userDetails: '',
   username: '',
   signature: {
@@ -1844,3 +1745,45 @@ export {
   mockOfflineData,
   mockOfflineLocationsWithHierarchy
 } from './mock-offline-data'
+
+export function fetchUserMock(officeId: string): FetchUserQuery {
+  return {
+    getUser: {
+      id: '123',
+      userMgntUserID: '123',
+      primaryOffice: {
+        id: officeId
+      },
+      name: [
+        {
+          use: 'en',
+          firstNames: 'Mohammad',
+          familyName: 'Ashraful'
+        }
+      ],
+      status: Status.Active,
+      practitionerId: '4651d1cc-6072-4e34-bf20-b583f421a9f1',
+      creationDate: '1701241360173',
+      role: {
+        label: {
+          id: 'userRoles.localSystemAdmin',
+          defaultMessage: 'Local System Admin',
+          description: 'Label for local system admin'
+        }
+      }
+    }
+  }
+}
+
+export function setScopes(scope: Scope[], store: AppStore) {
+  const token = jwt.sign({ scope: scope }, readFileSync('./test/cert.key'), {
+    algorithm: 'RS256',
+    issuer: 'opencrvs:auth-service',
+    audience: 'opencrvs:gateway-user'
+  })
+  window.history.replaceState({}, '', '?token=' + token)
+
+  return store.dispatch({
+    type: actions.CHECK_AUTH
+  })
+}

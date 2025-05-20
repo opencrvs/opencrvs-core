@@ -26,7 +26,8 @@ describe('verify document uploader handler', () => {
     {
       algorithm: 'RS256',
       issuer: 'opencrvs:auth-service',
-      audience: 'opencrvs:documents-user'
+      audience: 'opencrvs:documents-user',
+      subject: '123123'
     }
   )
 

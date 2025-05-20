@@ -19,12 +19,14 @@ import { auditEvent } from '@workflow/records/audit'
 import { isRejected } from '@opencrvs/commons/types'
 import { validateRequest } from '@workflow/utils/index'
 import * as z from 'zod'
+import { SCOPES } from '@opencrvs/commons/authentication'
 
 export const registerRoute = createRoute({
   method: 'POST',
   path: '/records/{recordId}/register',
   allowedStartStates: ['READY_FOR_REVIEW', 'VALIDATED'],
   action: 'WAITING_VALIDATION',
+  allowedScopes: [SCOPES.RECORD_REGISTER],
   includeHistoryResources: true,
   handler: async (request, record) => {
     const token = getToken(request)

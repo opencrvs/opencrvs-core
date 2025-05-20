@@ -14,7 +14,8 @@ import { ReactWrapper } from 'enzyme'
 import {
   createTestComponent,
   createTestStore,
-  resizeWindow
+  resizeWindow,
+  TestComponentWithRouteMock
 } from '@client/tests/util'
 import { InExternalValidationTab } from './InExternalValidationTab'
 import * as jwt from 'jsonwebtoken'
@@ -23,14 +24,14 @@ import { checkAuth } from '@client/profile/profileActions'
 import type { GQLBirthEventSearchSet } from '@client/utils/gateway-deprecated-do-not-use'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { Workqueue } from '@opencrvs/components/lib/Workqueue'
-import { History } from 'history'
 import { vi, Mock } from 'vitest'
+import { EventType } from '@client/utils/gateway'
 
 const EVENT_CREATION_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
 const SEND_FOR_VALIDATION_TIME = 1582912800000 // Fri Feb 28 2020 20:00:00 GMT+0200 (Eastern European Standard Time)
 
 const registerScopeToken = jwt.sign(
-  { scope: ['register'] },
+  { scope: ['record.register'] },
   readFileSync('./test/cert.key'),
   {
     algorithm: 'RS256',
@@ -42,7 +43,7 @@ const getItem = window.localStorage.getItem as Mock
 
 const birthEventSearchSet: GQLBirthEventSearchSet = {
   id: '956281c9-1f47-4c26-948a-970dd23c4094',
-  type: 'Birth',
+  type: EventType.Birth,
   registration: {
     status: 'WAITING_VALIDATION',
     contactNumber: '01622688231',
@@ -71,24 +72,24 @@ const birthEventSearchSet: GQLBirthEventSearchSet = {
 
 describe('Registrar home external validation tab tests', () => {
   let component: ReactWrapper<{}, {}>
-  let history: History<any>
+  let componentRouter: TestComponentWithRouteMock['router']
 
   beforeEach(async () => {
     const SECONDARY_TIME = 1583322631424 // Wed Mar 04 2020 13:50:31 GMT+0200 (Eastern European Standard Time)
     Date.now = vi.fn(() => SECONDARY_TIME)
-    const { store: testStore, history: testHistory } = await createTestStore()
+    const { store: testStore } = await createTestStore()
     getItem.mockReturnValue(registerScopeToken)
     testStore.dispatch(checkAuth())
 
-    const testComponent = await createTestComponent(
+    const { component: testComponent, router } = await createTestComponent(
       // @ts-ignore
       <InExternalValidationTab
         queryData={{ data: { totalItems: 1, results: [birthEventSearchSet] } }}
       />,
-      { store: testStore, history: testHistory }
+      { store: testStore }
     )
     component = testComponent
-    history = testHistory
+    componentRouter = router
   })
 
   it('renders data', async () => {
@@ -108,7 +109,7 @@ describe('Registrar home external validation tab tests', () => {
     const dataRow = tableElement.find('#name_0').hostNodes()
     dataRow.simulate('click')
     component.update()
-    expect(history.location.pathname).toContain('record-audit')
+    expect(componentRouter.state.location.pathname).toContain('record-audit')
   })
 
   describe('On devices with small viewport', () => {
@@ -122,7 +123,7 @@ describe('Registrar home external validation tab tests', () => {
       const dataRow = tableElement.find('#name_0').hostNodes()
       dataRow.simulate('click')
       component.update()
-      expect(history.location.pathname).toContain('record-audit')
+      expect(componentRouter.state.location.pathname).toContain('record-audit')
     })
   })
 })

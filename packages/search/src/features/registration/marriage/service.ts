@@ -45,7 +45,8 @@ import {
   EVENT,
   SearchDocument,
   IOperationHistory,
-  REJECTED_STATUS
+  REJECTED_STATUS,
+  getLastStatusChangedAt
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { findPatientPrimaryIdentifier } from '@search/features/search/utils'
@@ -146,11 +147,10 @@ function createBrideIndex(
 
   body.brideFirstNames = brideName?.given?.at(0)
   body.brideMiddleName = brideName?.given?.at(1)
-  body.brideFamilyName = brideName && brideName.family && brideName.family[0]
+  body.brideFamilyName = brideName?.family
   body.brideFirstNamesLocal = brideNameLocal?.given?.at(0)
   body.brideMiddleNameLocal = brideNameLocal?.given?.at(1)
-  body.brideFamilyNameLocal =
-    brideNameLocal && brideNameLocal.family && brideNameLocal.family[0]
+  body.brideFamilyNameLocal = brideNameLocal?.family
   if (marriageExtension) {
     body.marriageDate = marriageExtension.valueDateTime
   }
@@ -176,11 +176,10 @@ function createGroomIndex(
 
   body.groomFirstNames = groomName?.given?.at(0)
   body.groomMiddleName = groomName?.given?.at(1)
-  body.groomFamilyName = groomName && groomName.family && groomName.family[0]
+  body.groomFamilyName = groomName?.family
   body.groomFirstNamesLocal = groomNameLocal?.given?.at(0)
   body.groomMiddleNameLocal = groomNameLocal?.given?.at(1)
-  body.groomFamilyNameLocal =
-    groomNameLocal && groomNameLocal.family && groomNameLocal.family[0]
+  body.groomFamilyNameLocal = groomNameLocal?.family
 
   if (marriageExtension) {
     body.marriageDate = marriageExtension.valueDateTime
@@ -219,12 +218,10 @@ function createWitnessOneIndex(
 
   body.witnessOneFirstNames = witnessName?.given?.at(0)
   body.witnessOneMiddleName = witnessName?.given?.at(1)
-  body.witnessOneFamilyName =
-    witnessName && witnessName.family && witnessName.family[0]
+  body.witnessOneFamilyName = witnessName?.family
   body.witnessOneFirstNamesLocal = witnessNameLocal?.given?.at(0)
   body.witnessOneMiddleNameLocal = witnessNameLocal?.given?.at(1)
-  body.witnessOneFamilyNameLocal =
-    witnessNameLocal && witnessNameLocal.family && witnessNameLocal.family[0]
+  body.witnessOneFamilyNameLocal = witnessNameLocal?.family
 }
 
 function createWitnessTwoIndex(
@@ -255,12 +252,10 @@ function createWitnessTwoIndex(
   const witnessNameLocal = findNameLocale(witness.name)
   body.witnessTwoFirstNames = witnessName?.given?.at(0)
   body.witnessTwoMiddleName = witnessName?.given?.at(1)
-  body.witnessTwoFamilyName =
-    witnessName && witnessName.family && witnessName.family[0]
+  body.witnessTwoFamilyName = witnessName?.family
   body.witnessTwoFirstNamesLocal = witnessNameLocal?.given?.at(0)
   body.witnessTwoMiddleNameLocal = witnessNameLocal?.given?.at(1)
-  body.witnessTwoFamilyNameLocal =
-    witnessNameLocal && witnessNameLocal.family && witnessNameLocal.family[0]
+  body.witnessTwoFamilyNameLocal = witnessNameLocal?.family
 }
 
 function createDeclarationIndex(
@@ -361,4 +356,6 @@ function createDeclarationIndex(
 
   body.createdBy = firstRegLastUser || regLastUser
   body.updatedBy = regLastUser
+
+  body.lastStatusChangedAt = getLastStatusChangedAt(bundle, task)
 }

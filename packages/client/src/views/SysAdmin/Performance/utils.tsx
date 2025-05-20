@@ -10,30 +10,30 @@
  */
 import React from 'react'
 
-import styled from 'styled-components'
+import { constantsMessages } from '@client/i18n/messages'
+import { ILocation } from '@client/offline/reducer'
+import { getPercentage } from '@client/utils/data-formatting'
+import { EventType } from '@client/utils/gateway'
 import type {
-  GQLLocation,
   GQLIdentifier,
+  GQLLocation,
   GQLPaymentMetric
 } from '@client/utils/gateway-deprecated-do-not-use'
-import { Event } from '@client/utils/gateway'
-import { ILocation } from '@client/offline/reducer'
-import startOfMonth from 'date-fns/startOfMonth'
-import endOfMonth from 'date-fns/endOfMonth'
-import { getPercentage } from '@client/utils/data-formatting'
-import { FormattedNumber, IntlShape } from 'react-intl'
-import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
-import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
-import { constantsMessages } from '@client/i18n/messages'
 import {
+  CORRECTION_TOTALS,
   PERFORMANCE_METRICS,
-  PERFORMANCE_STATS,
-  CORRECTION_TOTALS
+  PERFORMANCE_STATS
 } from '@client/views/SysAdmin/Performance/metricsQuery'
 import {
   GET_TOTAL_CERTIFICATIONS,
   GET_TOTAL_PAYMENTS
 } from '@client/views/SysAdmin/Performance/queries'
+import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
+import endOfMonth from 'date-fns/endOfMonth'
+import startOfMonth from 'date-fns/startOfMonth'
+import { FormattedNumber, IntlShape } from 'react-intl'
+import styled from 'styled-components'
 
 export const Header = styled.h1`
   color: ${({ theme }) => theme.colors.copy};
@@ -184,20 +184,6 @@ export function getJurisidictionType(location: GQLLocation): string | null {
   return jurisdictionType
 }
 
-export function isUnderJurisdictionOfUser(
-  locations: { [key: string]: ILocation },
-  locationId: string,
-  jurisdictionLocation: string | undefined | null
-) {
-  if (!jurisdictionLocation) return false
-
-  while (locationId !== jurisdictionLocation && locationId !== '0') {
-    locationId = locations[locationId].partOf.split('/')[1]
-  }
-
-  return locationId !== '0'
-}
-
 export function getPrimaryLocationIdOfOffice(
   locations: { [key: string]: ILocation },
   office: ILocation
@@ -308,7 +294,7 @@ export const mockRegistrationCountRequest = {
         'REGISTERED'
       ],
       populationYear: new Date(1487076708000).getFullYear(),
-      event: Event.Birth,
+      event: EventType.Birth,
       officeSelected: false
     }
   },

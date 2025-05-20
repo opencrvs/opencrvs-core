@@ -18,8 +18,7 @@ import {
   LinkButton
 } from '@opencrvs/components/lib/buttons'
 import { gql } from '@apollo/client'
-import Cropper from 'react-easy-crop'
-import { Point, Area, Size } from 'react-easy-crop/types'
+import Cropper, { Point, Area, Size } from 'react-easy-crop'
 import { Mutation } from '@apollo/client/react/components'
 import styled, { withTheme } from 'styled-components'
 import { getUserDetails } from '@client/profile/profileSelectors'

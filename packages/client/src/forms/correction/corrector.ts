@@ -16,12 +16,12 @@ import {
   IRadioOption,
   RADIO_GROUP_WITH_NESTED_FIELDS
 } from '@client/forms'
-import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
-import { formMessages, constantsMessages } from '@client/i18n/messages'
-import { messages } from '@client/i18n/messages/views/correction'
-import { Event } from '@client/utils/gateway'
-import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { getFilteredRadioOptions } from '@client/forms/certificate/fieldDefinitions/collectorSection'
+import { fieldValueSectionExchangeTransformer } from '@client/forms/register/mappings/mutation'
+import { constantsMessages, formMessages } from '@client/i18n/messages'
+import { messages } from '@client/i18n/messages/views/correction'
+import { EventType } from '@client/utils/gateway'
+import { RadioSize } from '@opencrvs/components/lib/Radio'
 
 export enum CorrectorRelationship {
   //death
@@ -37,10 +37,7 @@ export enum CorrectorRelationship {
   ANOTHER_AGENT = 'ANOTHER_AGENT',
   REGISTRAR = 'REGISTRAR',
   COURT = 'COURT',
-  OTHER = 'OTHER',
-  LOCAL_REGISTRAR = 'LOCAL_REGISTRAR',
-  NATIONAL_REGISTRAR = 'NATIONAL_REGISTRAR',
-  REGISTRATION_AGENT = 'REGISTRATION_AGENT'
+  OTHER = 'OTHER'
 }
 
 export const CorrectorRelationLabelArray = [
@@ -177,7 +174,7 @@ export const getCorrectorSection = (
               name: 'otherRelationship',
               type: 'TEXT',
               label:
-                declaration.event === Event.Birth
+                declaration.event === EventType.Birth
                   ? formMessages.informantsRelationWithChild
                   : formMessages.informantsRelationWithDeceased,
               placeholder: {

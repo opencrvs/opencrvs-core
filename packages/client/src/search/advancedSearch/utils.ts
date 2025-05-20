@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IAdvancedSearchParamState } from '@client/search/advancedSearch/reducer'
-import { advancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
-import { advancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
+import { createAdvancedSearchBirthSections } from '@client/forms/advancedSearch/fieldDefinitions/Birth'
+import { createAdvancedSearchDeathSections } from '@client/forms/advancedSearch/fieldDefinitions/Death'
 import { IDateRangePickerValue } from '@client/forms'
 import { IAdvancedSearchResultMessages } from '@client/i18n/messages/views/advancedSearchResult'
 import { constantsMessages, formMessages } from '@client/i18n/messages'
@@ -27,9 +27,13 @@ import { IntlShape } from 'react-intl'
 import { RegStatus } from '@client/utils/gateway'
 import { isEqual } from 'lodash'
 import { messages as advancedSearchForm } from '@client/i18n/messages/views/advancedSearchForm'
-import { ISearchLocation } from '@opencrvs/components'
+import { COLUMNS, ISearchLocation } from '@opencrvs/components'
 import formatDate from '@client/utils/date-formatting'
-import { isInvalidDate } from '@client/forms/advancedSearch/fieldDefinitions/utils'
+import {
+  isInvalidDate,
+  TIME_PERIOD
+} from '@client/forms/advancedSearch/fieldDefinitions/utils'
+import { UUID } from '@opencrvs/commons/client'
 
 export type advancedSearchPillKey = Exclude<
   keyof IAdvancedSearchResultMessages,
@@ -39,21 +43,6 @@ export type advancedSearchPillKey = Exclude<
 type pillKeyValueMap = {
   [key in advancedSearchPillKey]: string | undefined
 }
-
-const {
-  birthSearchRegistrationSection,
-  birthSearchChildSection,
-  birthSearchMotherSection,
-  birthSearchFatherSection,
-  birthSearchEventSection,
-  birthSearchInformantSection
-} = advancedSearchBirthSections
-const {
-  deathSearchRegistrationSection,
-  deathSearchDeceasedSection,
-  deathSearchEventSection,
-  deathSearchInformantSection
-} = advancedSearchDeathSections
 
 const baseKeysSameAsStore = [
   'event',
@@ -98,6 +87,7 @@ export interface IAdvancedSearchFormState {
   dateOfEvent?: IDateRangePickerValue
   dateOfEventStart?: string
   dateOfEventEnd?: string
+  registrationByPeriod?: string
   registrationNumber?: string
   trackingId?: string
   dateOfRegistration?: IDateRangePickerValue
@@ -165,7 +155,7 @@ export const transformAdvancedSearchLocalStateToStoreData = (
       localState.registrationStatuses === RegStatus.Registered
         ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
         : localState.registrationStatuses === 'IN_REVIEW'
-        ? [RegStatus.WaitingValidation, RegStatus.Validated, RegStatus.Declared]
+        ? [RegStatus.WaitingValidation, RegStatus.Declared]
         : localState.registrationStatuses === 'ALL'
         ? Object.values(RegStatus)
         : [localState.registrationStatuses]
@@ -186,6 +176,13 @@ export const transformAdvancedSearchLocalStateToStoreData = (
     ) {
       declarationJurisdictionId = localState.placeOfRegistration
     }
+  }
+
+  if (
+    localState.registrationByPeriod &&
+    localState.registrationByPeriod in TIME_PERIOD
+  ) {
+    transformedStoreState.timePeriodFrom = localState.registrationByPeriod
   }
 
   if (localState.eventLocationType === 'HEALTH_FACILITY') {
@@ -289,6 +286,11 @@ export const transformStoreDataToAdvancedSearchLocalState = (
     },
     {}
   )
+
+  if (reduxState.timePeriodFrom) {
+    localState.registrationByPeriod = reduxState.timePeriodFrom
+  }
+
   localState.event = eventType
   if (
     reduxState.registrationStatuses &&
@@ -299,11 +301,7 @@ export const transformStoreDataToAdvancedSearchLocalState = (
         ? reduxState.registrationStatuses[0]
         : isEqual(
             [...reduxState.registrationStatuses].sort(),
-            [
-              RegStatus.WaitingValidation,
-              RegStatus.Validated,
-              RegStatus.Declared
-            ].sort()
+            [RegStatus.WaitingValidation, RegStatus.Declared].sort()
           )
         ? 'IN_REVIEW'
         : isEqual(
@@ -393,8 +391,35 @@ export const transformStoreDataToAdvancedSearchLocalState = (
 }
 
 export const getAccordionActiveStateMap = (
-  storeState: IAdvancedSearchParamState
+  storeState: IAdvancedSearchParamState,
+  hasBirthSearchJurisdictionScope?: boolean,
+  hasDeathSearchJurisdictionScope?: boolean,
+  officeId?: UUID
 ): Record<string, boolean> => {
+  const advancedSearchBirthSections = createAdvancedSearchBirthSections(
+    hasBirthSearchJurisdictionScope,
+    officeId
+  )
+  const advancedSearchDeathSections = createAdvancedSearchDeathSections(
+    hasDeathSearchJurisdictionScope,
+    officeId
+  )
+  const {
+    birthSearchRegistrationSection,
+    birthSearchChildSection,
+    birthSearchMotherSection,
+    birthSearchFatherSection,
+    birthSearchEventSection,
+    birthSearchInformantSection
+  } = advancedSearchBirthSections
+
+  const {
+    deathSearchRegistrationSection,
+    deathSearchDeceasedSection,
+    deathSearchEventSection,
+    deathSearchInformantSection
+  } = advancedSearchDeathSections
+
   return {
     [birthSearchRegistrationSection.id]: Boolean(
       storeState.declarationLocationId ||
@@ -461,6 +486,43 @@ export const getAccordionActiveStateMap = (
         (storeState.informantDoBStart && storeState.informantDoBEnd)
     )
   }
+}
+
+const getFromDateFomTimePeriod = (timePeriod: TIME_PERIOD) => {
+  return formatDate(timePeriodToFromDate(timePeriod), 'yyyy-MM-dd')
+}
+
+const MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000
+
+const timePeriodToFromDate = (timePeriod: TIME_PERIOD) => {
+  switch (timePeriod) {
+    case TIME_PERIOD.LAST_7_DAYS:
+      return new Date(Date.now() - 7 * MILLISECONDS_IN_A_DAY)
+
+    case TIME_PERIOD.LAST_30_DAYS:
+      return new Date(Date.now() - 30 * MILLISECONDS_IN_A_DAY)
+
+    case TIME_PERIOD.LAST_90_DAYS:
+      return new Date(Date.now() - 90 * MILLISECONDS_IN_A_DAY)
+
+    case TIME_PERIOD.LAST_YEAR:
+      const oneYearAgo = new Date(Date.now())
+      oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1)
+      return oneYearAgo
+  }
+}
+
+export const replacePeriodWithDate = (
+  advancedSearchParamState: IAdvancedSearchParamState
+) => {
+  if (
+    advancedSearchParamState.timePeriodFrom &&
+    advancedSearchParamState.timePeriodFrom in TIME_PERIOD
+  )
+    advancedSearchParamState.timePeriodFrom = getFromDateFomTimePeriod(
+      advancedSearchParamState.timePeriodFrom as TIME_PERIOD
+    )
+  return advancedSearchParamState
 }
 
 const determineDateFromDateRangePickerVal = (
@@ -556,20 +618,17 @@ const getLabelForRegistrationStatus = (
 ) => {
   const statusLabelMapping: Record<string, string[]> = {
     ALL: Object.values(RegStatus),
-    IN_REVIEW: [
-      RegStatus.WaitingValidation,
-      RegStatus.Validated,
-      RegStatus.Declared
-    ],
+    IN_REVIEW: [RegStatus.WaitingValidation, RegStatus.Declared],
     ARCHIVED: [RegStatus.Archived],
     CERTIFIED: [RegStatus.Certified],
     DECLARATION_UPDATED: [RegStatus.DeclarationUpdated],
     DECLARED: [RegStatus.Declared],
     IN_PROGRESS: [RegStatus.InProgress],
-    REGISTERED: [RegStatus.Registered],
+    REGISTERED: [RegStatus.Registered, RegStatus.Issued, RegStatus.Certified],
     REJECTED: [RegStatus.Rejected],
     VALIDATED: [RegStatus.Validated],
-    WAITING_VALIDATION: [RegStatus.WaitingValidation]
+    WAITING_VALIDATION: [RegStatus.WaitingValidation],
+    CORRECTION_REQUESTED: [RegStatus.CorrectionRequested]
   }
   const statusType = Object.keys(statusLabelMapping).find((key) => {
     if (isEqual([...statusList].sort(), [...statusLabelMapping[key]].sort())) {
@@ -605,6 +664,16 @@ const getLabelForRegistrationStatus = (
     {
       value: RegStatus.Archived,
       label: intl.formatMessage(advancedSearchForm.recordStatusAchived)
+    },
+    {
+      value: RegStatus.CorrectionRequested,
+      label: intl.formatMessage(
+        advancedSearchForm.recordStatusCorrectionRequested
+      )
+    },
+    {
+      value: RegStatus.Validated,
+      label: intl.formatMessage(advancedSearchForm.recordStatusValidated)
     }
   ]
 
@@ -667,6 +736,12 @@ export const getFormattedAdvanceSearchParamPills = (
   intl: IntlShape,
   offlineData: IOfflineData
 ): pillKeyValueMap => {
+  const pillLabelFromTimePeriod = {
+    [TIME_PERIOD.LAST_90_DAYS]: advancedSearchForm.timePeriodLast90Days,
+    [TIME_PERIOD.LAST_30_DAYS]: advancedSearchForm.timePeriodLast30Days,
+    [TIME_PERIOD.LAST_7_DAYS]: advancedSearchForm.timePeriodLast7Days,
+    [TIME_PERIOD.LAST_YEAR]: advancedSearchForm.timePeriodLastYear
+  }
   const intlFormattedMapOfParams: pillKeyValueMap = {
     event:
       advancedSearchParamsState.event === 'birth'
@@ -682,6 +757,13 @@ export const getFormattedAdvanceSearchParamPills = (
           )
         : '',
 
+    timePeriodFrom:
+      advancedSearchParamsState.timePeriodFrom &&
+      intl.formatMessage(
+        pillLabelFromTimePeriod[
+          advancedSearchParamsState.timePeriodFrom as TIME_PERIOD
+        ]
+      ),
     trackingId: advancedSearchParamsState.trackingId,
     regNumber: advancedSearchParamsState.registrationNumber,
     childFirstName: advancedSearchParamsState.childFirstNames,
@@ -812,4 +894,16 @@ export const getFormattedAdvanceSearchParamPills = (
         }
       }
     }, {} as pillKeyValueMap)
+}
+
+const eventDateMapping: Record<string, string> = {
+  birth: 'childDoB',
+  death: 'deathDate',
+  marriage: 'marriageDate'
+}
+
+export const getSortColumn = (sortCol: COLUMNS, event: string) => {
+  return sortCol === 'dateOfEvent'
+    ? eventDateMapping[event] || sortCol
+    : sortCol
 }

@@ -5,6 +5,7 @@ title: ''
 labels: 'Tech'
 assignees: ''
 project: '🧿 CORE'
+status: 'Backlog'
 ---
 
 ### Description

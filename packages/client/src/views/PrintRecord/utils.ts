@@ -11,8 +11,8 @@
 
 import { ILanguageState } from '@client/i18n/reducer'
 import { ILocation, IOfflineData } from '@client/offline/reducer'
-import { Event } from '@client/utils/gateway'
-import { createIntl, MessageDescriptor, IntlShape, IntlCache } from 'react-intl'
+import { EventType } from '@client/utils/gateway'
+import { createIntl, IntlCache, IntlShape, MessageDescriptor } from 'react-intl'
 
 export function formatMessage(
   intls: IntlShape[],
@@ -55,10 +55,10 @@ export function getLocationHierarchy(
   }
 }
 
-export function getEventwiseSubjectColor(event: Event) {
-  if (event === Event.Death) {
+export function getEventwiseSubjectColor(event: EventType) {
+  if (event === EventType.Death) {
     return 'subheaderCopyDeath'
-  } else if (event === Event.Marriage) {
+  } else if (event === EventType.Marriage) {
     return 'subheaderCopyMarriage'
   } else {
     return 'subheaderCopyBirth'

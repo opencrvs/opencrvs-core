@@ -12,27 +12,14 @@ import { model, Schema, Document } from 'mongoose'
 interface IBirth {
   REGISTRATION_TARGET: number
   LATE_REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    LATE: number
-    DELAYED: number
-  }
   PRINT_IN_ADVANCE: boolean
 }
 interface IDeath {
   REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    DELAYED: number
-  }
   PRINT_IN_ADVANCE: boolean
 }
 interface IMarriage {
   REGISTRATION_TARGET: number
-  FEE: {
-    ON_TIME: number
-    DELAYED: number
-  }
   PRINT_IN_ADVANCE: boolean
 }
 interface ICurrency {
@@ -66,29 +53,16 @@ export interface IApplicationConfigurationModel extends Document {
 const birthSchema = new Schema<IBirth>({
   REGISTRATION_TARGET: { type: Number, default: 45 },
   LATE_REGISTRATION_TARGET: { type: Number, default: 365 },
-  FEE: {
-    ON_TIME: Number,
-    LATE: Number,
-    DELAYED: Number
-  },
   PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const deathSchema = new Schema<IDeath>({
   REGISTRATION_TARGET: { type: Number, default: 45 },
-  FEE: {
-    ON_TIME: Number,
-    DELAYED: Number
-  },
   PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
 const marriageSchema = new Schema<IMarriage>({
   REGISTRATION_TARGET: { type: Number, default: 45 },
-  FEE: {
-    ON_TIME: { type: Number, default: 10 },
-    DELAYED: { type: Number, default: 45 }
-  },
   PRINT_IN_ADVANCE: { type: Boolean, default: true }
 })
 
@@ -111,13 +85,6 @@ const currencySchema = new Schema<ICurrency>({
 export interface Integration {
   name: string
   status: string
-}
-
-export const statuses = {
-  PENDING: 'pending',
-  ACTIVE: 'active',
-  DISABLED: 'disabled',
-  DEACTIVATED: 'deactivated'
 }
 
 const configSchema = new Schema({

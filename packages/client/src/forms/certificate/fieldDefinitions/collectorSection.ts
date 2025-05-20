@@ -13,8 +13,11 @@ import {
   CHECKBOX_GROUP,
   FIELD_WITH_DYNAMIC_DEFINITIONS,
   identityTypeMapper,
+  IFormData,
   IFormField,
+  IFormFieldValue,
   IFormSection,
+  IFormSectionData,
   IFormSectionGroup,
   IRadioGroupFormField,
   IRadioOption,
@@ -33,9 +36,11 @@ import { validIDNumber } from '@client/utils/validate'
 import { RadioSize } from '@opencrvs/components/lib/Radio'
 import { BIRTH_REGISTRATION_NUMBER, NATIONAL_ID } from '@client/utils/constants'
 import { identityHelperTextMapper, identityNameMapper } from './messages'
-import { Event } from '@client/utils/gateway'
+import { EventType } from '@client/utils/gateway'
 import { IDeclaration } from '@client/declarations'
 import { issueMessages } from '@client/i18n/messages/issueCertificate'
+import { ICertificateData } from '@client/utils/referenceApi'
+import { IOfflineData } from '@client/offline/reducer'
 
 interface INameField {
   firstNamesField: string
@@ -808,11 +813,11 @@ export const collectMarriageCertificateFormSection: IFormSection = {
   ]
 }
 
-const otherCertCollectorFormGroup = (event: Event): IFormSectionGroup => {
+const otherCertCollectorFormGroup = (event: EventType): IFormSectionGroup => {
   const labelMap = {
-    [Event.Birth]: formMessages.informantsRelationWithChild,
-    [Event.Death]: formMessages.informantsRelationWithDeceased,
-    [Event.Marriage]: formMessages.relationshipToSpouses
+    [EventType.Birth]: formMessages.informantsRelationWithChild,
+    [EventType.Death]: formMessages.informantsRelationWithDeceased,
+    [EventType.Marriage]: formMessages.relationshipToSpouses
   }
 
   const fields: IFormField[] = [
@@ -964,7 +969,8 @@ const affidavitCertCollectorGroup: IFormSectionGroup = {
       conditionals: [
         {
           action: 'hide',
-          expression: 'values.noAffidavitAgreement?.length !== 0'
+          expression:
+            'values.noAffidavitAgreement && values.noAffidavitAgreement.length !== 0'
         }
       ]
     },
@@ -974,7 +980,24 @@ const affidavitCertCollectorGroup: IFormSectionGroup = {
       label: certificateMessages.noLabel,
       required: false,
       initialValue: [],
-      validator: [],
+      validator: [
+        (
+          value: IFormFieldValue,
+          drafts?: IFormData,
+          offlineCountryConfig?: IOfflineData,
+          form?: IFormSectionData
+        ) =>
+          form &&
+          !(
+            (form['noAffidavitAgreement'] as Array<string>)?.length ||
+            form['affidavitFile']
+          )
+            ? {
+                message:
+                  certificateMessages.certificateOtherCollectorAffidavitError
+              }
+            : undefined
+      ],
       options: [
         {
           value: 'AFFIDAVIT',
@@ -984,7 +1007,7 @@ const affidavitCertCollectorGroup: IFormSectionGroup = {
       conditionals: [
         {
           action: 'hide',
-          expression: 'values.affidavitFile !== ""'
+          expression: 'values.affidavitFile && values.affidavitFile !== ""'
         }
       ]
     }
@@ -1012,7 +1035,8 @@ const marriageIssueCollectorFormOptions = [
 ]
 
 function getCertCollectorGroupForEvent(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  certificates: ICertificateData[]
 ): IFormSectionGroup {
   const informant = (declaration.data.informant.otherInformantType ||
     declaration.data.informant.informantType) as string
@@ -1039,12 +1063,30 @@ function getCertCollectorGroupForEvent(
     birthCertCollectorOptions,
     marriageCertCollectorOptions
   )
-
+  const certificateTemplateOptions =
+    certificates
+      .filter((x) => x.event === declaration.event)
+      .map((x) => ({ label: x.label, value: x.id })) || []
   return {
     id: 'certCollector',
     title: certificateMessages.whoToCollect,
-    error: certificateMessages.certificateCollectorError,
     fields: [
+      {
+        name: 'certificateTemplateId',
+        type: 'SELECT_WITH_OPTIONS',
+        label: certificateMessages.certificateTemplateSelectLabel,
+        required: true,
+        validator: [
+          (value: IFormFieldValue) => {
+            return !value
+              ? {
+                  message: certificateMessages.certificateCollectorTemplateError
+                }
+              : undefined
+          }
+        ],
+        options: certificateTemplateOptions
+      },
       {
         name: 'type',
         type: RADIO_GROUP,
@@ -1053,7 +1095,15 @@ function getCertCollectorGroupForEvent(
         hideHeader: true,
         required: true,
         initialValue: '',
-        validator: [],
+        validator: [
+          (value: IFormFieldValue) => {
+            return !value
+              ? {
+                  message: certificateMessages.certificateCollectorError
+                }
+              : undefined
+          }
+        ],
         options: finalOptions
       }
     ]
@@ -1061,7 +1111,8 @@ function getCertCollectorGroupForEvent(
 }
 
 export function getCertificateCollectorFormSection(
-  declaration: IDeclaration
+  declaration: IDeclaration,
+  certificates: ICertificateData[]
 ): IFormSection {
   return {
     id: CertificateSection.Collector,
@@ -1069,7 +1120,7 @@ export function getCertificateCollectorFormSection(
     name: certificateMessages.printCertificate,
     title: certificateMessages.certificateCollectionTitle,
     groups: [
-      getCertCollectorGroupForEvent(declaration),
+      getCertCollectorGroupForEvent(declaration, certificates),
       otherCertCollectorFormGroup(declaration.event),
       affidavitCertCollectorGroup
     ]
@@ -1125,7 +1176,7 @@ export function getFilteredRadioOptions(
   birthForm: IRadioOption[],
   marriageForm?: IRadioOption[]
 ): IRadioOption[] {
-  if (declaration.event === Event.Birth) {
+  if (declaration.event === EventType.Birth) {
     options.splice(1, 0, ...birthForm)
 
     const rolesToCheck = ['MOTHER', 'FATHER']
@@ -1134,7 +1185,7 @@ export function getFilteredRadioOptions(
         options = options.filter((opt) => opt.value !== role)
       }
     }
-  } else if (declaration.event === Event.Marriage && marriageForm) {
+  } else if (declaration.event === EventType.Marriage && marriageForm) {
     options.splice(1, 0, ...marriageForm)
   }
 
