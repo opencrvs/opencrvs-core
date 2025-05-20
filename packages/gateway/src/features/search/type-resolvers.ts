@@ -13,12 +13,11 @@ import {
   IEventDurationResponse,
   getEventDurationsFromMetrics
 } from '@gateway/features/metrics/service'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+import { getFullName } from '@gateway/features/user/utils'
 import {
   GQLOperationHistorySearchSet,
   GQLResolver
 } from '@gateway/graphql/schema'
-import { getFullName } from '@gateway/features/user/utils'
 import { EVENT } from '@opencrvs/commons'
 
 interface ISearchEventDataTemplate {
@@ -482,7 +481,7 @@ export const searchTypeResolvers: GQLResolver = {
         if (!presignDocumentUrls) {
           return user.avatar.data
         }
-        const avatarURL = await getPresignedUrlFromUri(
+        const avatarURL = await dataSources.minioAPI.getPresignedUrlFromUri(
           user.avatar.data,
           authHeader
         )

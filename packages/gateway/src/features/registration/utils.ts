@@ -9,28 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { IAuthHeader } from '@opencrvs/commons'
-import { fetchDocuments } from '@gateway/features/documents/service'
 import { getTokenPayload, getUser } from '@gateway/features/user/utils'
 import {
   GQLBirthRegistrationInput,
   GQLDeathRegistrationInput,
   GQLMarriageRegistrationInput
 } from '@gateway/graphql/schema'
+import { IAuthHeader } from '@opencrvs/commons'
 
-export async function getPresignedUrlFromUri(
-  fileUri: string,
-  authHeader: IAuthHeader
-) {
-  const response = (await fetchDocuments(
-    '/presigned-url',
-    authHeader,
-    'POST',
-    JSON.stringify({ fileUri })
-  )) as { presignedURL: string }
-
-  return response.presignedURL
-}
 
 export async function setCollectorForPrintInAdvance(
   details:

@@ -1,0 +1,612 @@
+{
+  "resourceType": "Bundle",
+  "type": "document",
+  "entry": [
+    {
+      "fullUrl": "/fhir/Composition/1b496c84-7b8a-4539-95ce-0fb66950b8b1/_history/6248702e-2008-41d9-968e-32eca8bbc9db",
+      "resource": {
+        "identifier": { "system": "urn:ietf:rfc:3986", "value": "BX7QODM" },
+        "resourceType": "Composition",
+        "status": "preliminary",
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-types",
+              "code": "birth-declaration"
+            }
+          ],
+          "text": "Birth Declaration"
+        },
+        "class": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/doc-classes",
+              "code": "crvs-document"
+            }
+          ],
+          "text": "CRVS Document"
+        },
+        "title": "Birth Declaration",
+        "section": [
+          {
+            "title": "Informant's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "informant-details"
+                }
+              ],
+              "text": "Informant's details"
+            },
+            "entry": [
+              {
+                "reference": "RelatedPerson/c541ccad-b69f-4b94-b3de-074e3b18e232"
+              }
+            ]
+          },
+          {
+            "title": "Mother's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "mother-details"
+                }
+              ],
+              "text": "Mother's details"
+            },
+            "entry": [
+              { "reference": "Patient/68ed4d18-38a8-4d6d-91bf-f1afb0a6a810" }
+            ]
+          },
+          {
+            "title": "Child details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "child-details"
+                }
+              ],
+              "text": "Child details"
+            },
+            "entry": [
+              { "reference": "Patient/2df4e875-697a-48c4-8b7f-13477aca50f2" }
+            ]
+          },
+          {
+            "title": "Father's details",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/doc-sections",
+                  "code": "father-details"
+                }
+              ],
+              "text": "Father's details"
+            },
+            "entry": [
+              { "reference": "Patient/1a23fa96-8348-4838-b41c-791f3184b1e1" }
+            ]
+          },
+          {
+            "title": "Birth encounter",
+            "code": {
+              "coding": [
+                {
+                  "system": "http://opencrvs.org/specs/sections",
+                  "code": "birth-encounter"
+                }
+              ],
+              "text": "Birth encounter"
+            },
+            "entry": [
+              { "reference": "Encounter/9cef0776-6b41-454c-8eb4-7266b86d2d6d" }
+            ]
+          }
+        ],
+        "subject": {},
+        "date": "",
+        "author": [],
+        "relatesTo": [
+          {
+            "code": "duplicate",
+            "targetReference": {
+              "reference": "Composition/bb5fc6f5-61c8-46c9-80f2-d661ae387e92"
+            }
+          },
+          {
+            "code": "duplicate",
+            "targetReference": {
+              "reference": "Composition/d14a15a4-1dea-473e-b322-be531737a909"
+            }
+          }
+        ],
+        "meta": {
+          "lastUpdated": "2025-04-09T13:36:55.819+00:00",
+          "versionId": "6248702e-2008-41d9-968e-32eca8bbc9db"
+        },
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-04-09T13:36:55.819Z" }
+        },
+        "_request": { "method": "POST" },
+        "id": "1b496c84-7b8a-4539-95ce-0fb66950b8b1"
+      }
+    },
+    {
+      "fullUrl": "/fhir/Encounter/9cef0776-6b41-454c-8eb4-7266b86d2d6d/_history/4a99dbd7-1355-48d8-9871-b352f399bb60",
+      "resource": {
+        "resourceType": "Encounter",
+        "status": "finished",
+        "location": [
+          {
+            "location": {
+              "reference": "Location/569db7be-bc2c-4fd9-92cb-6f5575b9a06c"
+            }
+          }
+        ],
+        "meta": {
+          "lastUpdated": "2025-04-09T13:36:55.850+00:00",
+          "versionId": "4a99dbd7-1355-48d8-9871-b352f399bb60"
+        },
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-04-09T13:36:55.850Z" }
+        },
+        "_request": { "method": "POST" },
+        "id": "9cef0776-6b41-454c-8eb4-7266b86d2d6d"
+      }
+    },
+    {
+      "fullUrl": "/fhir/RelatedPerson/c541ccad-b69f-4b94-b3de-074e3b18e232/_history/46f7af54-44f5-4a50-8400-a535c065580c",
+      "resource": {
+        "resourceType": "RelatedPerson",
+        "relationship": {
+          "coding": [
+            {
+              "system": "http://hl7.org/fhir/ValueSet/relatedperson-relationshiptype",
+              "code": "MOTHER"
+            }
+          ]
+        },
+        "patient": {
+          "reference": "Patient/68ed4d18-38a8-4d6d-91bf-f1afb0a6a810"
+        },
+        "meta": {
+          "lastUpdated": "2025-04-09T13:36:55.834+00:00",
+          "versionId": "46f7af54-44f5-4a50-8400-a535c065580c"
+        },
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-04-09T13:36:55.834Z" }
+        },
+        "_request": { "method": "POST" },
+        "id": "c541ccad-b69f-4b94-b3de-074e3b18e232"
+      }
+    },
+    {
+      "fullUrl": "/fhir/Patient/1a23fa96-8348-4838-b41c-791f3184b1e1/_history/8be6dd29-e5c8-4666-be6c-4fa0c81d4d10",
+      "resource": {
+        "resourceType": "Patient",
+        "extension": [],
+        "active": true,
+        "name": [
+          { "use": "en", "given": ["F Firstname", ""], "family": "F Lastname" }
+        ],
+        "birthDate": "1998-10-10",
+        "_transforms": {
+          "matching": {
+            "name": {
+              "given": [
+                ["FFRS", "FFRS"],
+                ["", ""]
+              ],
+              "family": [["FLST", "FLST"]]
+            }
+          },
+          "meta": { "lastUpdated": "2025-04-09T13:36:55.846Z" }
+        },
+        "meta": {
+          "lastUpdated": "2025-04-09T13:36:55.846+00:00",
+          "versionId": "8be6dd29-e5c8-4666-be6c-4fa0c81d4d10"
+        },
+        "_request": { "method": "POST" },
+        "id": "1a23fa96-8348-4838-b41c-791f3184b1e1"
+      }
+    },
+    {
+      "fullUrl": "/fhir/Patient/2df4e875-697a-48c4-8b7f-13477aca50f2/_history/e03d58fd-4799-4c83-9707-e26902cfe7a3",
+      "resource": {
+        "resourceType": "Patient",
+        "extension": [],
+        "active": true,
+        "name": [
+          { "use": "en", "given": ["First name", ""], "family": "last name" }
+        ],
+        "gender": "male",
+        "birthDate": "2024-10-10",
+        "_transforms": {
+          "matching": {
+            "name": {
+              "given": [
+                ["FRST", "FRST"],
+                ["", ""]
+              ],
+              "family": [["LSTN", "LSTN"]]
+            }
+          },
+          "meta": { "lastUpdated": "2025-04-09T13:36:55.843Z" }
+        },
+        "meta": {
+          "lastUpdated": "2025-04-09T13:36:55.843+00:00",
+          "versionId": "e03d58fd-4799-4c83-9707-e26902cfe7a3"
+        },
+        "_request": { "method": "POST" },
+        "id": "2df4e875-697a-48c4-8b7f-13477aca50f2"
+      }
+    },
+    {
+      "fullUrl": "/fhir/Patient/68ed4d18-38a8-4d6d-91bf-f1afb0a6a810/_history/efbafde7-515a-4bc6-8e78-352297ff45b0",
+      "resource": {
+        "resourceType": "Patient",
+        "extension": [],
+        "active": true,
+        "name": [
+          { "use": "en", "given": ["M Firstname", ""], "family": "M Lastname" }
+        ],
+        "birthDate": "1998-10-10",
+        "_transforms": {
+          "matching": {
+            "name": {
+              "given": [
+                ["MFRS", "MFRS"],
+                ["", ""]
+              ],
+              "family": [["MLST", "MLST"]]
+            }
+          },
+          "meta": { "lastUpdated": "2025-04-09T13:36:55.837Z" }
+        },
+        "meta": {
+          "lastUpdated": "2025-04-09T13:36:55.837+00:00",
+          "versionId": "efbafde7-515a-4bc6-8e78-352297ff45b0"
+        },
+        "_request": { "method": "POST" },
+        "id": "68ed4d18-38a8-4d6d-91bf-f1afb0a6a810"
+      }
+    },
+    {
+      "fullUrl": "/fhir/Task/df671572-5964-4b5a-82c5-f93800efedcb/_history/15a860ec-7412-4431-89be-2ae8aa168a2c",
+      "resource": {
+        "resourceType": "Task",
+        "status": "ready",
+        "intent": "proposal",
+        "code": {
+          "coding": [
+            { "system": "http://opencrvs.org/specs/types", "code": "BIRTH" }
+          ]
+        },
+        "focus": {
+          "reference": "Composition/1b496c84-7b8a-4539-95ce-0fb66950b8b1"
+        },
+        "id": "df671572-5964-4b5a-82c5-f93800efedcb",
+        "requester": {
+          "agent": {
+            "reference": "Practitioner/de6ccbc7-4b38-4896-a93d-21198e7983c3"
+          }
+        },
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/birth-tracking-id",
+            "value": "BX7QODM"
+          }
+        ],
+        "extension": [
+          {
+            "url": "http://opencrvs.org/specs/extension/contact-person-email",
+            "valueString": "mother@email.com"
+          },
+          { "url": "http://opencrvs.org/specs/extension/regAssigned" },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastUser",
+            "valueReference": {
+              "reference": "Practitioner/de6ccbc7-4b38-4896-a93d-21198e7983c3"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/extension/regLastOffice",
+            "valueReference": {
+              "reference": "Location/5ae4e8fe-e15d-4345-bbea-dbd81fddbb9b"
+            }
+          }
+        ],
+        "lastModified": "2025-04-22T16:51:12.122Z",
+        "businessStatus": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/reg-status",
+              "code": "DECLARED"
+            }
+          ]
+        },
+        "meta": {
+          "lastUpdated": "2025-04-22T16:51:12.219+00:00",
+          "versionId": "15a860ec-7412-4431-89be-2ae8aa168a2c"
+        },
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-04-22T16:51:12.219Z" }
+        },
+        "_request": { "method": "PUT" }
+      }
+    },
+    {
+      "fullUrl": "/fhir/Practitioner/de6ccbc7-4b38-4896-a93d-21198e7983c3/_history/ef3f9227-fd6e-4090-bd48-9360c4f33067",
+      "resource": {
+        "resourceType": "Practitioner",
+        "identifier": [],
+        "telecom": [
+          { "system": "phone", "value": "0922222222" },
+          { "system": "email", "value": "kalushabwalya17+@gmail.com" }
+        ],
+        "name": [{ "use": "en", "family": "Katongo", "given": ["Felix"] }],
+        "meta": {
+          "lastUpdated": "2025-04-25T09:36:52.483+00:00",
+          "versionId": "ef3f9227-fd6e-4090-bd48-9360c4f33067"
+        },
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-04-25T09:36:52.483Z" }
+        },
+        "_request": { "method": "PUT" },
+        "id": "de6ccbc7-4b38-4896-a93d-21198e7983c3"
+      }
+    },
+    {
+      "fullUrl": "/fhir/Location/5ae4e8fe-e15d-4345-bbea-dbd81fddbb9b/_history/b439490b-395a-4751-9366-67ef9fdb4273",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/internal-id",
+            "value": "CRVS_OFFICE_JWMRGwDBXK"
+          }
+        ],
+        "name": "Ibombo District Office",
+        "alias": ["Ibombo District Office"],
+        "status": "active",
+        "mode": "instance",
+        "partOf": {
+          "reference": "Location/90ed97a7-a1d7-40db-841e-fcc474385022"
+        },
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/location-type",
+              "code": "CRVS_OFFICE"
+            }
+          ]
+        },
+        "physicalType": { "coding": [{ "code": "bu", "display": "Building" }] },
+        "meta": {
+          "lastUpdated": "2025-05-07T06:40:37.330+00:00",
+          "versionId": "b439490b-395a-4751-9366-67ef9fdb4273"
+        },
+        "id": "5ae4e8fe-e15d-4345-bbea-dbd81fddbb9b",
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-05-07T06:40:37.330Z" }
+        },
+        "_request": { "method": "PUT" }
+      }
+    },
+    {
+      "fullUrl": "/fhir/Location/569db7be-bc2c-4fd9-92cb-6f5575b9a06c/_history/afaa3037-d5c2-466c-a3ea-7fc1cb28cd07",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/internal-id",
+            "value": "HEALTH_FACILITY_FhCAve1Ndla"
+          }
+        ],
+        "name": "Chipeso Rural Health Centre",
+        "alias": ["Chipeso Rural Health Centre"],
+        "status": "active",
+        "mode": "instance",
+        "partOf": {
+          "reference": "Location/90ed97a7-a1d7-40db-841e-fcc474385022"
+        },
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/location-type",
+              "code": "HEALTH_FACILITY"
+            }
+          ]
+        },
+        "physicalType": { "coding": [{ "code": "bu", "display": "Building" }] },
+        "meta": {
+          "lastUpdated": "2023-09-19T12:20:24.404+00:00",
+          "versionId": "afaa3037-d5c2-466c-a3ea-7fc1cb28cd07"
+        },
+        "_transforms": {
+          "meta": { "lastUpdated": "2023-09-19T12:20:24.404Z" }
+        },
+        "_request": { "method": "POST" },
+        "id": "569db7be-bc2c-4fd9-92cb-6f5575b9a06c"
+      }
+    },
+    {
+      "fullUrl": "/fhir/PractitionerRole/0bf3180f-cc5a-4b2d-8978-2913a62a2c3e/_history/7ca1454a-57a2-49f0-a85c-3f98a9de7f7b",
+      "resource": {
+        "resourceType": "PractitionerRole",
+        "practitioner": {
+          "reference": "Practitioner/de6ccbc7-4b38-4896-a93d-21198e7983c3"
+        },
+        "code": [
+          {
+            "coding": [
+              {
+                "system": "http://opencrvs.org/specs/roles",
+                "code": "REGISTRATION_AGENT"
+              }
+            ]
+          },
+          {
+            "coding": [
+              {
+                "system": "http://opencrvs.org/specs/types",
+                "code": "[{\"label\":\"Registration Agent\",\"lang\":\"en\"},{\"label\":\"Agent d'enregistrement\",\"lang\":\"fr\"}]"
+              }
+            ]
+          }
+        ],
+        "location": [
+          { "reference": "Location/5ae4e8fe-e15d-4345-bbea-dbd81fddbb9b" }
+        ],
+        "meta": {
+          "lastUpdated": "2025-04-30T14:03:59.531+00:00",
+          "versionId": "7ca1454a-57a2-49f0-a85c-3f98a9de7f7b"
+        },
+        "id": "0bf3180f-cc5a-4b2d-8978-2913a62a2c3e",
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-04-30T14:03:59.531Z" }
+        },
+        "_request": { "method": "PUT" }
+      }
+    },
+    {
+      "fullUrl": "/fhir/Location/1570352d-af36-41e7-8001-bd5f8196f466/_history/201a61d2-6481-4abe-a8bc-74eb68815db2",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/statistical-code",
+            "value": "ADMIN_STRUCTURE_AWn3s2RqgAN"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+            "value": "STATE"
+          }
+        ],
+        "name": "Central",
+        "alias": ["Central"],
+        "description": "AWn3s2RqgAN",
+        "status": "active",
+        "mode": "instance",
+        "partOf": { "reference": "Location/0" },
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/location-type",
+              "code": "ADMIN_STRUCTURE"
+            }
+          ]
+        },
+        "physicalType": {
+          "coding": [{ "code": "jdn", "display": "Jurisdiction" }]
+        },
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+            "valueAttachment": {
+              "contentType": "application/geo+json",
+              "data": "<base64>"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-male-populations",
+            "valueString": "[{\"2007\":20000},{\"2008\":20000},{\"2009\":20000},{\"2010\":20000},{\"2011\":20000},{\"2012\":20000},{\"2013\":20000},{\"2014\":20000},{\"2015\":20000},{\"2016\":20000},{\"2017\":20000},{\"2018\":20000},{\"2019\":20000},{\"2020\":20000},{\"2021\":20000},{\"2022\":30000},{\"2023\":40000}]"
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-female-populations",
+            "valueString": "[{\"2007\":20000},{\"2008\":20000},{\"2009\":20000},{\"2010\":20000},{\"2011\":20000},{\"2012\":20000},{\"2013\":20000},{\"2014\":20000},{\"2015\":20000},{\"2016\":20000},{\"2017\":20000},{\"2018\":20000},{\"2019\":20000},{\"2020\":20000},{\"2021\":20000},{\"2022\":30000},{\"2023\":40000}]"
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-total-populations",
+            "valueString": "[{\"2007\":40000},{\"2008\":40000},{\"2009\":40000},{\"2010\":40000},{\"2011\":40000},{\"2012\":40000},{\"2013\":40000},{\"2014\":40000},{\"2015\":40000},{\"2016\":40000},{\"2017\":40000},{\"2018\":40000},{\"2019\":40000},{\"2020\":40000},{\"2021\":40000},{\"2022\":60000},{\"2023\":80000}]"
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-crude-birth-rates",
+            "valueString": "[{\"2007\":10},{\"2008\":10},{\"2009\":10},{\"2010\":10},{\"2011\":10},{\"2012\":10},{\"2013\":10},{\"2014\":10},{\"2015\":10},{\"2016\":10},{\"2017\":10},{\"2018\":10},{\"2019\":10},{\"2020\":10},{\"2021\":10},{\"2022\":15},{\"2023\":20}]"
+          }
+        ],
+        "meta": {
+          "lastUpdated": "2025-05-07T06:40:37.346+00:00",
+          "versionId": "201a61d2-6481-4abe-a8bc-74eb68815db2"
+        },
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-05-07T06:40:37.346Z" }
+        },
+        "_request": { "method": "PUT" },
+        "id": "1570352d-af36-41e7-8001-bd5f8196f466"
+      }
+    },
+    {
+      "fullUrl": "/fhir/Location/90ed97a7-a1d7-40db-841e-fcc474385022/_history/fc75c5ba-9ae5-48fe-9e9c-75dd1aa7b823",
+      "resource": {
+        "resourceType": "Location",
+        "identifier": [
+          {
+            "system": "http://opencrvs.org/specs/id/statistical-code",
+            "value": "ADMIN_STRUCTURE_oEBf29y8JP8"
+          },
+          {
+            "system": "http://opencrvs.org/specs/id/jurisdiction-type",
+            "value": "DISTRICT"
+          }
+        ],
+        "name": "Ibombo",
+        "alias": ["Ibombo"],
+        "description": "oEBf29y8JP8",
+        "status": "active",
+        "mode": "instance",
+        "partOf": {
+          "reference": "Location/1570352d-af36-41e7-8001-bd5f8196f466"
+        },
+        "type": {
+          "coding": [
+            {
+              "system": "http://opencrvs.org/specs/location-type",
+              "code": "ADMIN_STRUCTURE"
+            }
+          ]
+        },
+        "physicalType": {
+          "coding": [{ "code": "jdn", "display": "Jurisdiction" }]
+        },
+        "extension": [
+          {
+            "url": "http://hl7.org/fhir/StructureDefinition/location-boundary-geojson",
+            "valueAttachment": {
+              "contentType": "application/geo+json",
+              "data": "<base64>"
+            }
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-male-populations",
+            "valueString": "[{\"2007\":5000},{\"2008\":5000},{\"2009\":5000},{\"2010\":5000},{\"2011\":5000},{\"2012\":5000},{\"2013\":5000},{\"2014\":5000},{\"2015\":5000},{\"2016\":5000},{\"2017\":5000},{\"2018\":5000},{\"2019\":5000},{\"2020\":5000},{\"2021\":5000},{\"2022\":7500},{\"2023\":10000}]"
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-female-populations",
+            "valueString": "[{\"2007\":5000},{\"2008\":5000},{\"2009\":5000},{\"2010\":5000},{\"2011\":5000},{\"2012\":5000},{\"2013\":5000},{\"2014\":5000},{\"2015\":5000},{\"2016\":5000},{\"2017\":5000},{\"2018\":5000},{\"2019\":5000},{\"2020\":5000},{\"2021\":5000},{\"2022\":7500},{\"2023\":10000}]"
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-total-populations",
+            "valueString": "[{\"2007\":10000},{\"2008\":10000},{\"2009\":10000},{\"2010\":10000},{\"2011\":10000},{\"2012\":10000},{\"2013\":10000},{\"2014\":10000},{\"2015\":10000},{\"2016\":10000},{\"2017\":10000},{\"2018\":10000},{\"2019\":10000},{\"2020\":10000},{\"2021\":10000},{\"2022\":15000},{\"2023\":20000}]"
+          },
+          {
+            "url": "http://opencrvs.org/specs/id/statistics-crude-birth-rates",
+            "valueString": "[{\"2007\":10},{\"2008\":10},{\"2009\":10},{\"2010\":10},{\"2011\":10},{\"2012\":10},{\"2013\":10},{\"2014\":10},{\"2015\":10},{\"2016\":10},{\"2017\":10},{\"2018\":10},{\"2019\":10},{\"2020\":10},{\"2021\":10},{\"2022\":15},{\"2023\":20}]"
+          }
+        ],
+        "meta": {
+          "lastUpdated": "2025-05-07T06:40:37.349+00:00",
+          "versionId": "fc75c5ba-9ae5-48fe-9e9c-75dd1aa7b823"
+        },
+        "id": "90ed97a7-a1d7-40db-841e-fcc474385022",
+        "_transforms": {
+          "meta": { "lastUpdated": "2025-05-07T06:40:37.349Z" }
+        },
+        "_request": { "method": "PUT" }
+      }
+    }
+  ]
+}

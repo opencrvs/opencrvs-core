@@ -8,15 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { COUNTRY_CONFIG_URL, USER_MANAGEMENT_URL } from '@gateway/constants'
-import {
-  Roles,
-  logger,
-  isBase64FileString,
-  joinURL,
-  fetchJSON,
-  UUID
-} from '@opencrvs/commons'
+import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import {
   IUserModelData,
   IUserPayload,
@@ -24,11 +16,11 @@ import {
 } from '@gateway/features/user/type-resolvers'
 import {
   getFullName,
-  inScope,
-  isTokenOwner,
+  getUserFromHeader,
   getUserId,
+  inScope,
   isOfficeUnderJurisdiction,
-  getUserFromHeader
+  isTokenOwner
 } from '@gateway/features/user/utils'
 import {
   GQLHumanNameInput,
@@ -37,19 +29,26 @@ import {
   GQLUserInput
 } from '@gateway/graphql/schema'
 import { checkVerificationCode } from '@gateway/routes/verifyCode/handler'
+import {
+  isBase64FileString,
+  joinURL,
+  logger,
+  Roles,
+  UUID
+} from '@opencrvs/commons'
 
-import fetch from '@gateway/fetch'
-import { validateAttachments } from '@gateway/utils/validators'
-import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
+import { postMetrics } from '@gateway/features/metrics/service'
+import fetch from '@gateway/fetch'
 import { rateLimitedResolver } from '@gateway/rate-limit'
+import { UserInputError } from '@gateway/utils/graphql-errors'
+import { validateAttachments } from '@gateway/utils/validators'
 import {
   findScope,
   getScopes,
   hasScope,
   SCOPES
 } from '@opencrvs/commons/authentication'
-import { UserInputError } from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -307,7 +306,7 @@ export const resolvers: GQLResolver = {
   },
 
   Mutation: {
-    async createOrUpdateUser(_, { user }, { headers: authHeader }) {
+    async createOrUpdateUser(_, { user }, { dataSources, headers: authHeader }) {
       if (
         !inScope(authHeader, [
           SCOPES.USER_DATA_SEEDING,
@@ -361,10 +360,8 @@ export const resolvers: GQLResolver = {
         throw new UserInputError(error.message)
       }
 
-      const roles = await fetchJSON<Roles>(
-        joinURL(COUNTRY_CONFIG_URL, '/roles')
-      )
-      const userPayload: IUserPayload = createOrUpdateUserPayload(user, roles)
+      const roles = await dataSources.countryConfigAPI.getRoles()
+      const userPayload: IUserPayload = createOrUpdateUserPayload(user, roles as any)
       const action = userPayload.id ? 'updateUser' : 'createUser'
 
       const res = await fetch(joinURL(USER_MANAGEMENT_URL, action), {

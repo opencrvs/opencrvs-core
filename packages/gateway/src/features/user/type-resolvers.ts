@@ -9,19 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { fetchFHIR } from '@gateway/features/fhir/service'
+import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
 import {
   IAuthHeader,
-  Roles,
   UUID,
-  fetchJSON,
-  joinURL,
   logger
 } from '@opencrvs/commons'
-import { COUNTRY_CONFIG_URL } from '@gateway/constants'
-import { fetchFHIR } from '@gateway/features/fhir/service'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
-import { GQLResolver, GQLSignatureInput } from '@gateway/graphql/schema'
 
+import { SCOPES, Scope } from '@opencrvs/commons/authentication'
 import {
   Bundle,
   Extension,
@@ -32,7 +28,6 @@ import {
   resourceIdentifierToUUID
 } from '@opencrvs/commons/types'
 import { getTokenPayload, scopesInclude } from './utils'
-import { Scope, SCOPES } from '@opencrvs/commons/authentication'
 interface IAuditHistory {
   auditedBy: string
   auditedOn: number
@@ -157,12 +152,11 @@ export const userTypeResolvers: GQLResolver = {
     id(userModel: IUserModelData) {
       return userModel._id
     },
-    role: async (userModel: IUserModelData) => {
-      const roles = await fetchJSON<Roles>(
-        joinURL(COUNTRY_CONFIG_URL, '/roles')
-      )
+    role: async (userModel: IUserModelData, _, context) => {
+      const roles = await context.dataSources.countryConfigAPI.getRoles()
 
       logger.info('Fetching roles from country config')
+
       return roles.find((role) => role.id === userModel.role)
     },
     userMgntUserID(userModel: IUserModelData) {
@@ -226,7 +220,7 @@ export const userTypeResolvers: GQLResolver = {
         SCOPES.RECORD_SUBMIT_INCOMPLETE
       )
         ? signatureExtension &&
-          (await getPresignedUrlFromUri(
+          (await dataSources.minioAPI.getPresignedUrlFromUri(
             signatureExtension.valueAttachment.url,
             authHeader
           ))
@@ -251,7 +245,7 @@ export const userTypeResolvers: GQLResolver = {
 
       const presignedUrl =
         signatureExtension &&
-        (await getPresignedUrlFromUri(
+        (await dataSources.minioAPI.getPresignedUrlFromUri(
           signatureExtension.valueAttachment.url,
           authHeader
         ))

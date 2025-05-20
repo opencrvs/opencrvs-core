@@ -233,17 +233,18 @@ export function authSchemaTransformer(schema: GraphQLSchema) {
   })
 }
 
-export const getApolloConfig = (): ApolloServerOptions<Context> => {
+export const getApolloConfig = (withAuth = true): ApolloServerOptions<Context> => {
   const typeDefs = readFileSync(graphQLSchemaPath, 'utf8')
-  const schema = authSchemaTransformer(
+
+  const schema =
     makeExecutableSchema({
       typeDefs,
       resolvers
     })
-  )
+
 
   return {
-    schema,
+    schema: withAuth ? authSchemaTransformer(schema) : schema,
     introspection: true
   }
 }

@@ -48,6 +48,8 @@ export function generateQueryForType(
         fieldStr += `${fieldName} { ${buildFields(fieldType)} } `
       } else if (isScalarType(fieldType)) {
         fieldStr += `${fieldName} `
+      } else {
+        // throw new Error(`Unknown type! ${fieldType}`);
       }
     }
     return fieldStr.trim()

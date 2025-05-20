@@ -266,11 +266,14 @@ export function parseScope(scope: string) {
   if (maybeConfigurableScope.success) {
     const rawScope = maybeConfigurableScope.data
     const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
-    const options = rawOptions.split(',').reduce((acc, option) => {
-      const [key, value] = option.split('=')
-      acc[key] = value.split('|')
-      return acc
-    }, {} as Record<string, string[]>)
+    const options = rawOptions.split(',').reduce(
+      (acc, option) => {
+        const [key, value] = option.split('=')
+        acc[key] = value.split('|')
+        return acc
+      },
+      {} as Record<string, string[]>
+    )
     const parsedScope = {
       type,
       options

@@ -12,7 +12,8 @@
 import { AugmentedRequest } from '@apollo/datasource-rest'
 import { DOCUMENTS_URL } from '@gateway/constants'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
-
+import { IAuthHeader } from '@opencrvs/commons'
+import { fetchDocuments } from '@gateway/features/documents/service'
 export default class MinioAPI extends OpenCRVSRESTDataSource {
   override baseURL = `${DOCUMENTS_URL}`
 
@@ -26,5 +27,15 @@ export default class MinioAPI extends OpenCRVSRESTDataSource {
 
   getStaticData(fileUri: string) {
     return this.get(`/presigned-url${fileUri}`)
+  }
+  async getPresignedUrlFromUri(fileUri: string, authHeader: IAuthHeader) {
+    const response = (await fetchDocuments(
+      '/presigned-url',
+      authHeader,
+      'POST',
+      JSON.stringify({ fileUri })
+    )) as { presignedURL: string }
+
+    return response.presignedURL
   }
 }

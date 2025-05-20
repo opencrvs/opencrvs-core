@@ -50,7 +50,7 @@
     "graphql": "^16.9.0",
     "graphql-import": "^0.7.0",
     "graphql-tag": "^2.12.6",
-    "graphql-tools": "^4.0.7",
+    "graphql-tools": "^9.0.18",
     "hapi-auth-jwt2": "10.6.0",
     "hapi-boom-decorators": "^3.0.0",
     "hapi-pino": "^9.0.0",

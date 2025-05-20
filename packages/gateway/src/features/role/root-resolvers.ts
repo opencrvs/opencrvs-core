@@ -8,23 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { GQLResolver } from '@gateway/graphql/schema'
-import { fetchJSON, joinURL, Roles } from '@opencrvs/commons'
 
 export const resolvers: GQLResolver = {
   Query: {
-    async getUserRoles(_, __, { headers: authHeader }) {
-      const roles = await fetchJSON<Roles[]>(
-        joinURL(COUNTRY_CONFIG_URL, `/roles`),
-        {
-          headers: {
-            'Content-Type': 'application/json',
-            ...authHeader
-          }
-        }
-      )
-
+    async getUserRoles(_, __, { dataSources, headers: authHeader }) {
+      const roles = await dataSources.countryConfigAPI.getRoles()
       return roles
     }
   }

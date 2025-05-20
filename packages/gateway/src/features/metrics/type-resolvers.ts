@@ -12,7 +12,6 @@ import { GQLResolver, GQLVSExport } from '@gateway/graphql/schema'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import fetch from '@gateway/fetch'
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import { fetchLocation } from '@gateway/location'
 import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
 
@@ -47,12 +46,12 @@ export const typeResolvers: GQLResolver = {
     async url(
       { url: fileUri }: GQLVSExport,
       _,
-      { headers: authHeader, presignDocumentUrls }
+      { headers: authHeader, presignDocumentUrls, dataSources }
     ) {
       if (!presignDocumentUrls) {
         return fileUri
       }
-      return getPresignedUrlFromUri(fileUri, authHeader)
+      return dataSources.minioAPI.getPresignedUrlFromUri(fileUri, authHeader)
     }
   },
   EventMetricsByRegistrar: {

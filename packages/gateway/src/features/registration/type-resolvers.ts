@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
+
 import { getSignatureExtension } from '@gateway/features/user/type-resolvers'
 
 import {
@@ -95,7 +95,6 @@ import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
 
 import { Context } from '@gateway/graphql/context'
 import validateUUID from 'uuid-validate'
-import { fetchTaskByCompositionIdFromHearth } from '@gateway/features/fhir/service'
 import { TaskInput } from 'fhir/r3'
 
 function findRelatedPerson(
@@ -936,7 +935,7 @@ export const typeResolvers: GQLResolver = {
     informantsSignature: async (
       task,
       _,
-      { headers: authHeader, presignDocumentUrls }
+      { headers: authHeader, presignDocumentUrls, dataSources }
     ) => {
       const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/informants-signature`,
@@ -948,7 +947,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       if (signatureExtension && signatureExtension.valueString) {
-        return await getPresignedUrlFromUri(
+        return await dataSources.minioAPI.getPresignedUrlFromUri(
           signatureExtension.valueString,
           authHeader
         )
@@ -958,7 +957,7 @@ export const typeResolvers: GQLResolver = {
     groomSignature: async (
       task,
       _,
-      { headers: authHeader, presignDocumentUrls }
+      { headers: authHeader, presignDocumentUrls, dataSources }
     ) => {
       const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/groom-signature`,
@@ -970,7 +969,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       if (signatureExtension && signatureExtension.valueString) {
-        return await getPresignedUrlFromUri(
+        return await dataSources.minioAPI.getPresignedUrlFromUri(
           signatureExtension.valueString,
           authHeader
         )
@@ -980,7 +979,7 @@ export const typeResolvers: GQLResolver = {
     brideSignature: async (
       task,
       _,
-      { headers: authHeader, presignDocumentUrls }
+      { headers: authHeader, presignDocumentUrls, dataSources }
     ) => {
       const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/bride-signature`,
@@ -992,7 +991,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       if (signatureExtension && signatureExtension.valueString) {
-        return await getPresignedUrlFromUri(
+        return await dataSources.minioAPI.getPresignedUrlFromUri(
           signatureExtension.valueString,
           authHeader
         )
@@ -1002,7 +1001,7 @@ export const typeResolvers: GQLResolver = {
     witnessOneSignature: async (
       task,
       _,
-      { headers: authHeader, presignDocumentUrls }
+      { headers: authHeader, presignDocumentUrls, dataSources }
     ) => {
       const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/witness-one-signature`,
@@ -1014,7 +1013,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       if (signatureExtension && signatureExtension.valueString) {
-        return await getPresignedUrlFromUri(
+        return await dataSources.minioAPI.getPresignedUrlFromUri(
           signatureExtension.valueString,
           authHeader
         )
@@ -1024,7 +1023,7 @@ export const typeResolvers: GQLResolver = {
     witnessTwoSignature: async (
       task,
       _,
-      { headers: authHeader, presignDocumentUrls }
+      { headers: authHeader, presignDocumentUrls, dataSources }
     ) => {
       const signatureExtension = findExtension(
         `${OPENCRVS_SPECIFICATION_URL}extension/witness-two-signature`,
@@ -1036,7 +1035,7 @@ export const typeResolvers: GQLResolver = {
       }
 
       if (signatureExtension && signatureExtension.valueString) {
-        return await getPresignedUrlFromUri(
+        return await dataSources.minioAPI.getPresignedUrlFromUri(
           signatureExtension.valueString,
           authHeader
         )
@@ -1140,11 +1139,14 @@ export const typeResolvers: GQLResolver = {
         duplicateCompositionIds &&
         (await Promise.all(
           duplicateCompositionIds.map(async (compositionId: string) => {
+            // const taskData =
+            //   await fetchTaskByCompositionIdFromHearth(compositionId)
             const taskData =
-              await fetchTaskByCompositionIdFromHearth(compositionId)
+              getTaskFromSavedBundle(context.dataSources.recordsAPI.getRecord())
+
             return {
               compositionId: compositionId,
-              trackingId: taskData.entry?.[0].resource?.identifier?.find(
+              trackingId: taskData.identifier?.find(
                 (identifier) =>
                   identifier.system &&
                   [
@@ -1202,7 +1204,7 @@ export const typeResolvers: GQLResolver = {
     },
     reason: (task: Task) => (task.reason && task.reason.text) || null,
     timestamp: (task) => task.lastModified,
-    comments: (task) => task.note,
+    // comments: (task) => task.note,
     location: async (task, _, context) => {
       const record = context.dataSources.recordsAPI.fetchRecord()
       const taskLocation = findExtension(
@@ -1253,14 +1255,14 @@ export const typeResolvers: GQLResolver = {
     async data(
       docRef: DocumentReference,
       _,
-      { headers: authHeader, presignDocumentUrls }
+      { headers: authHeader, presignDocumentUrls, dataSources }
     ) {
       const fileUri = docRef.content[0].attachment.data
       if (fileUri) {
         if (!presignDocumentUrls) {
           return fileUri
         }
-        return getPresignedUrlFromUri(fileUri, authHeader)
+        return dataSources.minioAPI.getPresignedUrlFromUri(fileUri, authHeader)
       }
       return null
     },
@@ -1548,7 +1550,7 @@ export const typeResolvers: GQLResolver = {
         attachmentURL:
           documentReference.length > 0
             ? context.presignDocumentUrls
-              ? await getPresignedUrlFromUri(
+              ? await context.dataSources.minioAPI.getPresignedUrlFromUri(
                   documentReference[0].content[0].attachment.data!,
                   context.headers
                 )
@@ -1666,6 +1668,7 @@ export const typeResolvers: GQLResolver = {
       )
 
       const allRoles = await dataSources.countryConfigAPI.getRoles()
+
       const role = allRoles.find((role) => role.id === roleId)?.id
 
       return { ...userResponse, role }
@@ -1714,7 +1717,7 @@ export const typeResolvers: GQLResolver = {
         taskLocation.valueReference.reference?.split('/')[1] as string
       )
     },
-    comments: (task) => task.note || [],
+    // comments: (task) => task.note || [],
     input: (task) => task.input || [],
     output: (task) => task.output || [],
     certificates: resolveCertificates,
@@ -1753,7 +1756,7 @@ export const typeResolvers: GQLResolver = {
       const signatureExtension = getSignatureExtension(practitioner.extension)
       const presignedUrl =
         signatureExtension &&
-        getPresignedUrlFromUri(
+        context.dataSources.minioAPI.getPresignedUrlFromUri(
           signatureExtension.valueAttachment.url,
           authHeader
         )
