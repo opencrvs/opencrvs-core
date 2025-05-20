@@ -144,13 +144,12 @@ function userSectionFormType(): ISerializedFormSection {
             }
           },
           {
-            name: 'email',
+            name: 'fullHonorificName',
             type: TEXT,
-            label: userFormMessages.email,
-            required:
-              window.config.USER_NOTIFICATION_DELIVERY_METHOD === 'email',
+            label: userFormMessages.fullHonorificName,
+            required: false,
             initialValue: '',
-            validator: [{ operation: 'emailAddressFormat' }]
+            validator: []
           },
           {
             name: 'seperator',

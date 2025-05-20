@@ -38,6 +38,7 @@ interface IUserModelData {
   email: string
   emailForNotification?: string
   mobile?: string
+  fullHonorificName?: string
   status: string
   role: IUserRole
   creationDate?: string
