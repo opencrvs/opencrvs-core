@@ -13,6 +13,7 @@ import {
   IPrintableDeclaration,
   SUBMISSION_STATUS
 } from '@client/declarations'
+import { EMPTY_STRING } from '@client/utils/constants'
 import { EventType, History, RegStatus } from '@client/utils/gateway'
 import type {
   GQLBirthEventSearchSet,
@@ -22,7 +23,6 @@ import type {
 } from '@client/utils/gateway-deprecated-do-not-use'
 import { getEvent } from '@client/views/PrintCertificate/utils'
 import { includes } from 'lodash'
-import { EMPTY_STRING } from '@client/utils/constants'
 import { getLocalisedName } from './data-formatting'
 import { IntlShape } from 'react-intl'
 

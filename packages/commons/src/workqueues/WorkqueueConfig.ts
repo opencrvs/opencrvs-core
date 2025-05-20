@@ -13,6 +13,7 @@ import { TranslationConfig } from '../events/TranslationConfig'
 import { z } from 'zod'
 import { DefaultColumnKeys, WorkQueueColumnConfig } from './defaultColumns'
 
+/** @knipignore */
 const rootWorkqueueConfig = z.object({
   id: z.string(),
   title: TranslationConfig,
