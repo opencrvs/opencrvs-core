@@ -19,11 +19,14 @@
 ### New features
 
 - **TimeField component with AM/PM support**: The `TimeField` component now supports both 12-hour (AM/PM) and 24-hour formats through a new prop, `use12HourFormat: boolean`. The logic has been refactored into two separate components, `TimeInput24` and `TimeInput12`. The `TimeField` component automatically selects the appropriate component based on the prop. [#8336](https://github.com/opencrvs/opencrvs-core/issues/8336)
+- **Configurable Scopes**: Introduce a new syntax for scopes which provides more customizability to the SI's via scopes. Two new scopes `user.create[role=a|b|c]` & `user.update[role=d|e|f]` are getting included in this release which can be used to restrict what the role of a newly created or updated user can be set to by the user of a particular role. Gradually most of the existing scopes will be migrated to use this new syntax.
 
 ### Bug fixes
 
 - Filter out inactive locations in the Organisations menu [#8782](https://github.com/opencrvs/opencrvs-core/issues/8782)
 - Improve quick search results when searching by name [#9272](https://github.com/opencrvs/opencrvs-core/issues/9272)
+- Fix practitioner role history entries from being created with every view and download [#9462](https://github.com/opencrvs/opencrvs-core/issues/9462)
+- Fix a child's NID form field cannot be added eithe rmanually or via ESignet. A father section cannot be placed before a mother section if you wish to use a radio button to control mapping addresses from one individual to aother to make data entry easier [#9582](https://github.com/opencrvs/opencrvs-core/issues/9582)
 
 ## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
 
@@ -85,6 +88,14 @@
 - Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 - Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
+
+## [1.6.5](https://github.com/opencrvs/opencrvs-core/compare/v1.6.4...v1.6.5)
+
+- Fix migration issue discovered when restoring an OpenCRVS instance with a large number of records. `$push used too much memory and cannot spill to disk. Memory limit: 104857600 bytes` [#9116](https://github.com/opencrvs/opencrvs-core/issues/9116)
+
+### Breaking changes
+
+- Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
 ## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.3...v1.6.4)
 
