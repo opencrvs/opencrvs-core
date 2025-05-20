@@ -71,9 +71,9 @@ function withPostfix(str: string, postfix: string) {
 }
 
 export function getFullUrl(filename: string) {
-  const minioURL = window.config.MINIO_URL
-  if (minioURL && typeof minioURL === 'string') {
-    return new URL(filename, withPostfix(minioURL, '/')).toString()
+  const minioUrl = window.config.MINIO_URL
+  if (minioUrl && typeof minioUrl === 'string') {
+    return new URL(filename, withPostfix(minioUrl, '/')).toString()
   }
 
   throw new Error('MINIO_URL is not defined')
@@ -110,6 +110,7 @@ async function cacheFile(filename: string, file: File) {
   }
 
   const cache = await caches.open(cacheKey)
+
   return cache.put(
     getFullUrl(filename),
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
