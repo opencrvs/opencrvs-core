@@ -217,6 +217,21 @@ components:
                         default: *a1
                       fieldId:
                         type: string
+                      label:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          defaultMessage:
+                            type: string
+                          description:
+                            type: string
+                        required:
+                          - id
+                          - defaultMessage
+                          - description
+                        description: By default, the configured field's label is used. This can be
+                          overridden by providing a custom label.
                     required:
                       - fieldId
                     description: Field directly referencing event data with field id
