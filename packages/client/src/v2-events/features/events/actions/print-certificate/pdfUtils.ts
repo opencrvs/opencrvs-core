@@ -255,7 +255,7 @@ function formatAllNonStringValues(
 const cache = createIntlCache()
 
 /*
-  Turns certain field values into objects which we can access in the template.
+ * Turns certain field values into objects which we can access in the template.
  * For example, we want to access facility location fields with specific object keys instead of plain strings.
  */
 function objectifyFormData(formFields: FieldConfig[], values: EventState) {
