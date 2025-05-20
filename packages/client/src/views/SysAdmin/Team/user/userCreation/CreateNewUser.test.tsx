@@ -230,13 +230,20 @@ describe('edit user tests', () => {
   ]
 
   beforeEach(async () => {
-    setScopes([SCOPES.USER_CREATE], store)
+    setScopes(
+      [
+        SCOPES.USER_CREATE,
+        'user.create[role=FIELD_AGENT|REGISTRATION_AGENT]',
+        'user.edit[role=LOCAL_REGISTRAR]'
+      ],
+      store
+    )
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
 
-  it('check user role update', async () => {
+  it('should only generate allowed roles in the options', async () => {
     const section = store
       .getState()
       .userForm.userForm?.sections.find((section) => section.id === 'user')
@@ -246,7 +253,11 @@ describe('edit user tests', () => {
     const field = group.fields.find(
       (field) => field.name === 'role'
     ) as ISelectFormFieldWithOptions
-    expect(field.options).not.toEqual([])
+    expect(field.options.map((o) => o.value)).toEqual([
+      'FIELD_AGENT',
+      'REGISTRATION_AGENT',
+      'LOCAL_REGISTRAR'
+    ])
   })
 
   describe('when user is in update form page', () => {

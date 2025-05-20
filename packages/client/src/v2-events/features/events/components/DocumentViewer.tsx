@@ -9,142 +9,105 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
 import { defineMessages, useIntl, IntlShape } from 'react-intl'
 import styled from 'styled-components'
-import {
-  DocumentViewer as DocumentViewerComponent,
-  Link
-} from '@opencrvs/components'
+import React from 'react'
+import { isNil } from 'lodash'
+import { Link } from '@opencrvs/components'
 import {
   EventState,
   FormConfig,
-  FieldConfig,
   isFileFieldType,
-  isFileFieldWithOptionType
+  isFileFieldWithOptionType,
+  FieldType
 } from '@opencrvs/commons/client'
 import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
-
-interface DocumentViewerOptions {
-  selectOptions: { value: string; label: string }[]
-  documentOptions: { value: string; label: string }[]
-}
-
-function getOptions(
-  fieldConfig: FieldConfig,
-  form: EventState,
-  intl: IntlShape
-): DocumentViewerOptions {
-  const value = form[fieldConfig.id]
-  if (!value) {
-    return { selectOptions: [], documentOptions: [] }
-  }
-
-  const fieldObj = { config: fieldConfig, value }
-
-  if (isFileFieldType(fieldObj)) {
-    const label = fieldObj.config.configuration.fileName
-      ? `${intl.formatMessage(fieldObj.config.label)} (${intl.formatMessage(fieldObj.config.configuration.fileName)})`
-      : intl.formatMessage(fieldObj.config.label)
-
-    return {
-      selectOptions: [
-        {
-          value: fieldObj.config.id,
-          label
-        }
-      ],
-      documentOptions: [
-        {
-          value: getFullUrl(fieldObj.value.filename),
-          label: fieldObj.config.id
-        }
-      ]
-    }
-  }
-
-  if (isFileFieldWithOptionType(fieldObj)) {
-    const labelPrefix = intl.formatMessage(fieldObj.config.label)
-
-    return fieldObj.config.options.reduce<DocumentViewerOptions>(
-      (acc, { value: val, label }) => {
-        const specificValue = fieldObj.value.find(
-          ({ option }) => val === option
-        )
-        if (specificValue) {
-          return {
-            documentOptions: [
-              ...acc.documentOptions,
-              { value: getFullUrl(specificValue.filename), label: val }
-            ],
-            selectOptions: [
-              ...acc.selectOptions,
-              {
-                value: val,
-                label: `${labelPrefix} (${intl.formatMessage(label)})`
-              }
-            ]
-          }
-        }
-        return acc
-      },
-      { selectOptions: [], documentOptions: [] }
-    )
-  }
-
-  return { selectOptions: [], documentOptions: [] }
-}
-
-function extractViewerOptionsFromFieldConfig(
-  fieldConfigs: FieldConfig[],
-  form: EventState,
-  intl: IntlShape
-): DocumentViewerOptions {
-  return fieldConfigs.reduce<DocumentViewerOptions>(
-    (acc, fieldConfig) => {
-      const { selectOptions, documentOptions } = getOptions(
-        fieldConfig,
-        form,
-        intl
-      )
-      return {
-        documentOptions: [...acc.documentOptions, ...documentOptions],
-        selectOptions: [...acc.selectOptions, ...selectOptions]
-      }
-    },
-    { selectOptions: [], documentOptions: [] }
-  )
-}
+import {
+  DocumentViewer as DocumentViewerComponent,
+  DocumentViewerOptionValue
+} from '@client/v2-events/components/forms/inputs/DocumentViewer'
+import { Option } from '@client/v2-events/utils'
 
 /**
- * Extracts file-related options from the form configuration and generates
- * a structured list of selectable and viewable document options.
- *
- * @returns {DocumentViewerOptions} Options for the document viewer.
- *
- * Options are used to:
- * - Populate a dropdown for selecting available documents.
- * - Display the selected document by retrieving its corresponding URL.
+ * Based on form and configuration, searches through fields to find files in the current form.
+ * @returns Flat list of viewable files
  */
 function getFileOptions(
   form: EventState,
   formConfig: FormConfig,
   intl: IntlShape
-) {
-  const fileOptions = formConfig.pages.reduce<DocumentViewerOptions>(
-    (acc, page) => {
-      const { selectOptions, documentOptions } =
-        extractViewerOptionsFromFieldConfig(page.fields, form, intl)
+): Option<DocumentViewerOptionValue>[] {
+  const fileFields = formConfig.pages
+    .flatMap(({ fields }) => fields)
+    .filter(
+      (field) =>
+        field.type === FieldType.FILE ||
+        field.type === FieldType.FILE_WITH_OPTIONS
+    )
 
-      return {
-        documentOptions: [...acc.documentOptions, ...documentOptions],
-        selectOptions: [...acc.selectOptions, ...selectOptions]
-      }
-    },
-    { selectOptions: [], documentOptions: [] }
-  )
+  const selectableOptions = fileFields.reduce<
+    Option<DocumentViewerOptionValue>[]
+  >((options, fieldConfig) => {
+    const formValue = form[fieldConfig.id]
 
-  return fileOptions
+    if (!formValue) {
+      return options
+    }
+
+    const field = { config: fieldConfig, value: formValue }
+    const fieldLabel = intl.formatMessage(field.config.label)
+
+    if (isFileFieldType(field)) {
+      const filename = field.config.configuration.fileName
+        ? intl.formatMessage(field.config.configuration.fileName)
+        : undefined
+
+      const label = filename ? `${fieldLabel} (${filename})` : fieldLabel
+
+      return [
+        ...options,
+        {
+          value: {
+            filename: field.value.filename,
+            url: getFullUrl(field.value.filename),
+            id: field.config.id
+          },
+          label
+        }
+      ]
+    }
+
+    if (isFileFieldWithOptionType(field)) {
+      const fieldOptions = field.value
+        .map((formVal) => {
+          const fieldOption = field.config.options.find(
+            ({ value }) => value === formVal.option
+          )
+
+          if (!fieldOption) {
+            return null
+          }
+
+          const optionLabel = intl.formatMessage(fieldOption.label)
+
+          return {
+            value: {
+              filename: formVal.filename,
+              url: getFullUrl(formVal.filename),
+              id: `${field.config.id}-${formVal.option}`
+            },
+            label: `${fieldLabel} (${optionLabel})`
+          }
+        })
+        .filter((val) => !isNil(val))
+
+      return [...options, ...fieldOptions]
+    }
+
+    return options
+  }, [])
+
+  return selectableOptions
 }
 
 const ResponsiveDocumentViewer = styled.div<{ showInMobile: boolean }>`
@@ -192,12 +155,13 @@ export function DocumentViewer({
   disabled?: boolean
 }) {
   const intl = useIntl()
+
   const fileOptions = getFileOptions(form, formConfig, intl)
 
   return (
     <ResponsiveDocumentViewer showInMobile={!!showInMobile}>
       <DocumentViewerComponent id="document_section" options={fileOptions}>
-        {fileOptions.documentOptions.length === 0 && (
+        {fileOptions.length === 0 && (
           <ZeroDocument id={`zero_document`}>
             {intl.formatMessage(reviewMessages.zeroDocumentsTextForAnySection)}
             {!disabled && (
