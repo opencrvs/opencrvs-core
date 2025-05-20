@@ -129,6 +129,7 @@ type Condition =
   | { type: 'anyOf'; terms: string[] }
 
 export const ADVANCED_SEARCH_KEY = 'and'
+export const QUICK_SEARCH_KEY = 'or'
 
 function buildCondition(
   value: string,

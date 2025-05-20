@@ -25,9 +25,9 @@ import {
 import { useGetEvents } from './procedures/list'
 
 function toQueryType(
-  eventType: string,
   searchParams: QueryInputType,
-  type: 'and' | 'or'
+  type: 'and' | 'or',
+  eventType?: string
 ): QueryType {
   const topLevelFields: Record<string, unknown> = {}
   const dataFields: Record<string, unknown> = {}
@@ -74,11 +74,11 @@ export function useEvents() {
     getOutbox: useOutbox,
     searchEvent: {
       useQuery: (
-        eventType: string,
         searchParams: QueryInputType,
-        queryType: 'and' | 'or'
+        queryType: 'and' | 'or',
+        eventType?: string
       ) => {
-        const input = toQueryType(eventType, searchParams, queryType)
+        const input = toQueryType(searchParams, queryType, eventType)
 
         return useQuery({
           ...trpc.event.search.queryOptions(input),
@@ -86,11 +86,11 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (
-        eventType: string,
         searchParams: QueryInputType,
-        queryType: 'and' | 'or'
+        queryType: 'and' | 'or',
+        eventType?: string
       ) => {
-        const input = toQueryType(eventType, searchParams, queryType)
+        const input = toQueryType(searchParams, queryType, eventType)
 
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(input),

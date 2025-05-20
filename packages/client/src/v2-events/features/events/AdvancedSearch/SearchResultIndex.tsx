@@ -30,9 +30,9 @@ export const SearchResultIndex = () => {
   const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
 
   const queryData = searchEvent.useSuspenseQuery(
-    eventType,
     formattedSearchParams,
-    ADVANCED_SEARCH_KEY
+    ADVANCED_SEARCH_KEY,
+    eventType
   )
 
   return (
