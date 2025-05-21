@@ -10,35 +10,25 @@
  */
 
 import React, { useEffect } from 'react'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { findScope } from '@opencrvs/commons/client'
 import { Loader } from '@opencrvs/components'
-import { getScope } from '@client/profile/profileSelectors'
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueueConfigurations } from '../features/events/useWorkqueueConfiguration'
 
 export const RedirectToWorkqueue = () => {
   const workqueues = useWorkqueueConfigurations()
-  const scopes = useSelector(getScope)
   const navigate = useNavigate()
 
   useEffect(() => {
-    const availableWorkqueues =
-      findScope(scopes ?? [], 'workqueue')?.options.id ?? []
-
-    const firstWorkqueue = workqueues.find(({ slug }) =>
-      availableWorkqueues.includes(slug)
-    )
-
-    if (firstWorkqueue) {
+    if (workqueues.length) {
       navigate(
-        ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: firstWorkqueue.slug })
+        ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueues[0].slug })
       )
     } else {
       throw new Error('No workqueue is configured for this user')
     }
-  }, [workqueues, scopes, navigate])
+  }, [workqueues, navigate])
 
   return <Loader id="redirectToWorkqueue" />
 }

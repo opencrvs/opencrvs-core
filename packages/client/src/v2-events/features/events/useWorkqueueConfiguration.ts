@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSelector } from 'react-redux'
+import { findScope } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { getScope } from '@client/profile/profileSelectors'
 
 /**
  * @returns a list of workqueue configurations
@@ -17,5 +20,10 @@ import { useTRPC } from '@client/v2-events/trpc'
 export function useWorkqueueConfigurations() {
   const trpc = useTRPC()
   const config = useSuspenseQuery(trpc.event.workqueue.get.queryOptions()).data
-  return config
+
+  const scopes = useSelector(getScope)
+  const availableWorkqueues =
+    findScope(scopes ?? [], 'workqueue')?.options.id ?? []
+
+  return config.filter(({ slug }) => availableWorkqueues.includes(slug))
 }

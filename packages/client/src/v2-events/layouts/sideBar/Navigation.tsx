@@ -10,19 +10,16 @@
  */
 
 import * as React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useIntl } from 'react-intl'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { findScope } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
-import { getScope } from '@client/profile/profileSelectors'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
@@ -50,12 +47,9 @@ export const Navigation = ({
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const workqueues = useWorkqueueConfigurations()
-  const scopes = useSelector(getScope)
   const navigate = useNavigate()
 
   const runningVer = String(localStorage.getItem('running-version'))
-  const availableWorkqueues =
-    findScope(scopes ?? [], 'workqueue')?.options.id ?? []
 
   return (
     <LeftNavigation
@@ -67,24 +61,20 @@ export const Navigation = ({
       role={userInfo && userInfo.role}
     >
       <NavigationGroup>
-        {workqueues
-          .filter(({ slug }) => availableWorkqueues.includes(slug))
-          .map(({ name, slug, icon }) => (
-            <NavigationItem
-              key={slug}
-              count={7}
-              icon={() => <Icon name={icon} size="small" />}
-              id={`navigation_workqueue_${slug}`}
-              isSelected={slug === workqueueSlug}
-              label={intl.formatMessage(name)}
-              onClick={() => {
-                navigate(
-                  ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: slug })
-                )
-                menuCollapse && menuCollapse()
-              }}
-            />
-          ))}
+        {workqueues.map(({ name, slug, icon }) => (
+          <NavigationItem
+            key={slug}
+            count={7}
+            icon={() => <Icon name={icon} size="small" />}
+            id={`navigation_workqueue_${slug}`}
+            isSelected={slug === workqueueSlug}
+            label={intl.formatMessage(name)}
+            onClick={() => {
+              navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: slug }))
+              menuCollapse && menuCollapse()
+            }}
+          />
+        ))}
       </NavigationGroup>
       <NavigationGroup>
         <NavigationItem

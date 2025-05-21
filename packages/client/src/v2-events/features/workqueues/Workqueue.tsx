@@ -42,14 +42,16 @@ export function WorkqueueContainer() {
   const userId = useSelector(getUserDetails)?.id
   const [[user]] = getUsers.useSuspenseQuery(userId ? [userId] : [])
 
-  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
-
   const intl = useIntl()
 
   const availableWorkqueues =
     findScope(scopes ?? [], 'workqueue')?.options.id ?? []
 
   const userHasAccessToWorkqueue = availableWorkqueues.includes(workqueueSlug)
+
+  const workqueueConfig =
+    userHasAccessToWorkqueue &&
+    workqueues.find(({ slug }) => slug === workqueueSlug)
 
   const deSerializedQuery =
     (workqueueConfig &&
