@@ -153,7 +153,7 @@ export async function eventNotificationHandler(
 
     updatedBundle.entry = updatedBundle.entry.map(
       (e): SavedBundleEntry<Resource> => {
-        if (isComposition(e.resource) && response.duplicateIds.length > 0) {
+        if (isComposition(e.resource)) {
           logger.info(
             `Workflow/records/evenNotificationHandler: ${response.duplicateIds.length} duplicate composition(s) found`
           )
