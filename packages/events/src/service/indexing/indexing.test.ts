@@ -107,7 +107,15 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     const result = buildElasticQueryFromSearchPayload(exactStatusPayload)
     expect(result).toEqual({
       bool: {
-        must: [{ term: { status: 'REGISTERED' } }]
+        must: [
+          {
+            term: {
+              type: 'tennis-club-membership'
+            }
+          },
+          { term: { status: 'REGISTERED' } }
+        ],
+        should: undefined
       }
     })
   })
@@ -161,8 +169,19 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         should: [
-          { term: { status: 'ISSUED' } },
-          { term: { status: 'REJECTED' } }
+          {
+            bool: {
+              must: [{ term: { type: 'foo' } }, { term: { status: 'ISSUED' } }]
+            }
+          },
+          {
+            bool: {
+              must: [
+                { term: { type: 'bar' } },
+                { term: { status: 'REJECTED' } }
+              ]
+            }
+          }
         ]
       }
     })
@@ -171,7 +190,8 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   test('returns match_all for invalid input', () => {
     const result = buildElasticQueryFromSearchPayload({
       // @ts-expect-error testing invalid input
-      type: 'invalid'
+      type: 'invalid',
+      clauses: []
     })
     expect(result).toEqual({
       bool: { must_not: { match_all: {} } }

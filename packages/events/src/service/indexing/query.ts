@@ -169,9 +169,9 @@ function buildClause(clause: QueryExpression) {
 export function buildElasticQueryFromSearchPayload(
   input: QueryType
 ): estypes.QueryDslQueryContainer {
+  const must = input.clauses.flatMap((clause) => buildClause(clause))
   switch (input.type) {
     case 'and': {
-      const must = input.clauses.flatMap((clause) => buildClause(clause))
       return {
         bool: {
           must,
@@ -182,12 +182,16 @@ export function buildElasticQueryFromSearchPayload(
       }
     }
     case 'or': {
-      const should = input.clauses.flatMap((clause) => buildClause(clause))
+      const should = input.clauses.flatMap((clause) => ({
+        bool: {
+          must: buildClause(clause)
+        }
+      }))
       return {
         bool: {
           should
         }
-      }
+      } as estypes.QueryDslQueryContainer
     }
     // default fallback (shouldn't happen if input is validated correctly)
     default:
