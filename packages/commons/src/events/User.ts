@@ -9,13 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export type User = {
-  id: string
-  name: { use: string; given: string[]; family: string }[]
-  role: string
-  /**
-   * The filename of the user's signature stored in MinIO, ex: 'a552f64a-31c4-4e78-b44f-292c3179e2ef.png'.
-   * This is used to retrieve the signature file from storage.
-   */
-  signatureFilename?: string
-}
+import { z } from 'zod'
+
+export const User = z.object({
+  id: z.string(),
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  ),
+  role: z.string(),
+  signatureFilename: z.string().optional()
+})
+
+export type User = z.infer<typeof User>

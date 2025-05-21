@@ -9,10 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { userSerializer } from './serializers/user/serializer'
-
-export const serialize = {
-  user: userSerializer
-}
-
 export { deserializeQuery } from './serializers/user/deserializer'

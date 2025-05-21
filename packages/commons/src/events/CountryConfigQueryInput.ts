@@ -32,6 +32,10 @@ const Range = z.object({
 const Not = z.object({ type: z.literal('not'), term: z.string() })
 
 const Within = z.object({ type: z.literal('within'), location: z.string() })
+const SerializableWithin = z.object({
+  type: z.literal('within'),
+  location: z.union([z.string(), SerializedUserField])
+})
 
 const DateCondition = z.union([Exact, Range])
 
@@ -52,8 +56,12 @@ export const SerializedQueryExpression = z
     status: z.optional(z.union([AnyOf, Exact])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
-    createAtLocation: z.optional(z.union([Within, Exact])),
-    updatedAtLocation: z.optional(z.union([Within, Exact])),
+    createdAtLocation: z.optional(
+      z.union([SerializableWithin, SerializableExact])
+    ),
+    updatedAtLocation: z.optional(
+      z.union([SerializableWithin, SerializableExact])
+    ),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
     updatedBy: z.optional(SerializableExact),

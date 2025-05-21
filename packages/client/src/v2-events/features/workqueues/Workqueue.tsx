@@ -39,8 +39,8 @@ export function WorkqueueContainer() {
   const { searchEvent } = useEvents()
   const { getUsers } = useUsers()
   const scopes = useSelector(getScope)
-  const userId = useSelector(getUserDetails)?.id
-  const [[user]] = getUsers.useSuspenseQuery(userId ? [userId] : [])
+  const legacyUser = useSelector(getUserDetails)
+  const [[user]] = getUsers.useSuspenseQuery(legacyUser ? [legacyUser.id] : [])
 
   const intl = useIntl()
 
@@ -56,8 +56,12 @@ export function WorkqueueContainer() {
   const deSerializedQuery =
     (workqueueConfig &&
       userHasAccessToWorkqueue &&
+      legacyUser &&
       user &&
-      deserializeQuery(workqueueConfig.query, user)) ||
+      deserializeQuery(workqueueConfig.query, {
+        ...user,
+        primaryOfficeId: legacyUser.primaryOffice.id
+      })) ||
     {}
 
   const events = searchEvent.useSuspenseQuery(deSerializedQuery)

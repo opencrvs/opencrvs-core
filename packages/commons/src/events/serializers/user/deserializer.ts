@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod'
 import { QueryExpression, QueryType, User } from '../../../events'
 import {
   CountryConfigQueryType,
@@ -16,9 +17,14 @@ import {
 } from '../../../events/CountryConfigQueryInput'
 import { SerializedUserField } from './serializer'
 
+export const UserWithPrimaryOffice = User.extend({
+  primaryOfficeId: z.string()
+})
+export type UserWithPrimaryOffice = z.infer<typeof UserWithPrimaryOffice>
+
 function userDeSerializer(
   serializedUserField: SerializedUserField | string,
-  user: User
+  user: UserWithPrimaryOffice
 ): string {
   if (typeof serializedUserField === 'string') {
     return serializedUserField
@@ -26,12 +32,15 @@ function userDeSerializer(
   if (serializedUserField.$userField === 'id') {
     return user[serializedUserField.$userField]
   }
+  if (serializedUserField.$userField === 'primaryOfficeId') {
+    return user[serializedUserField.$userField]
+  }
   return 'ToDo'
 }
 
 function deserializeQueryExpression(
   expression: SerializedQueryExpression,
-  user: User
+  user: UserWithPrimaryOffice
 ): QueryExpression {
   return {
     ...expression,
@@ -46,13 +55,41 @@ function deserializeQueryExpression(
     updatedBy: expression.updatedBy && {
       ...expression.updatedBy,
       term: userDeSerializer(expression.updatedBy.term, user)
-    }
+    },
+    createdAtLocation:
+      expression.createdAtLocation &&
+      (expression.createdAtLocation.type === 'within'
+        ? {
+            ...expression.createdAtLocation,
+            location: userDeSerializer(
+              expression.createdAtLocation.location,
+              user
+            )
+          }
+        : {
+            ...expression.createdAtLocation,
+            term: userDeSerializer(expression.createdAtLocation.term, user)
+          }),
+    updatedAtLocation:
+      expression.updatedAtLocation &&
+      (expression.updatedAtLocation.type === 'within'
+        ? {
+            ...expression.updatedAtLocation,
+            location: userDeSerializer(
+              expression.updatedAtLocation.location,
+              user
+            )
+          }
+        : {
+            ...expression.updatedAtLocation,
+            term: userDeSerializer(expression.updatedAtLocation.term, user)
+          })
   }
 }
 
 export function deserializeQuery(
   query: CountryConfigQueryType,
-  user: User
+  user: UserWithPrimaryOffice
 ): QueryType {
   if (query.type === 'or') {
     return {

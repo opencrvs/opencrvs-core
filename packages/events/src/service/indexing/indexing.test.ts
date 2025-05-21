@@ -80,7 +80,7 @@ const fullAndPayload: QueryType = {
   trackingId: { type: 'exact', term: 'ABC123' },
   createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
   updatedAt: { type: 'exact', term: '2024-06-01' },
-  createAtLocation: { type: 'exact', term: 'some-location-id' },
+  createdAtLocation: { type: 'exact', term: 'some-location-id' },
   updatedAtLocation: {
     type: 'within',
     location: 'some-location-id'

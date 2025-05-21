@@ -136,14 +136,14 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  if (clause.createAtLocation) {
-    if (clause.createAtLocation.type === 'exact') {
-      must.push({ term: { createdAtLocation: clause.createAtLocation.term } })
+  if (clause.createdAtLocation) {
+    if (clause.createdAtLocation.type === 'exact') {
+      must.push({ term: { createdAtLocation: clause.createdAtLocation.term } })
     } else {
       must.push({
         geo_distance: {
           distance: '10km',
-          location: clause.createAtLocation.location
+          location: clause.createdAtLocation.location
         }
       })
     }
