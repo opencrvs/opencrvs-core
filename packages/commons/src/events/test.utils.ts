@@ -50,7 +50,7 @@ import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { EventStatus } from './EventMetadata'
+import { EventStatus, eventStatuses } from './EventMetadata'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -537,7 +537,7 @@ export function getRandomDatetime(
   return randomDate.toISOString()
 }
 
-function getSeededApplicant(
+function generateRandomApplicant(
   rng: () => number
 ): Record<string, string | boolean> {
   const firstNames = [
@@ -600,7 +600,7 @@ function createPseudoRandomNumberGenerator(seed: number) {
   }
 }
 
-function generateSeededUuid(rng: () => number): string {
+function generateUuid(rng: () => number): string {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.floor(rng() * 16)
     const v = c === 'x' ? r : (r & 0x3) | 0x8
@@ -608,18 +608,8 @@ function generateSeededUuid(rng: () => number): string {
   })
 }
 
-function getSeededEventStatus(rng: () => number): EventStatus {
-  const statuses: EventStatus[] = [
-    EventStatus.CREATED,
-    EventStatus.REGISTERED,
-    EventStatus.DECLARED
-  ]
-
-  return pickRandom(rng, statuses)
-}
-
-function getSeededTrackingId(rng: () => number): string {
-  const uuid = generateSeededUuid(rng).replace(/-/g, '')
+function generateTrackingId(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
   const trackingId = uuid.slice(0, 6).toUpperCase()
   return trackingId
 }
@@ -637,22 +627,22 @@ export const eventQueryDataGenerator = (
   )
 
   return {
-    id: overrides.id ?? generateSeededUuid(rng),
+    id: overrides.id ?? generateUuid(rng),
     type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
-    status: overrides.status ?? getSeededEventStatus(rng),
+    status: overrides.status ?? pickRandom(rng, eventStatuses),
     createdAt: overrides.createdAt ?? createdAt,
-    createdBy: overrides.createdBy ?? generateSeededUuid(rng),
-    createdAtLocation: overrides.createdAtLocation ?? generateSeededUuid(rng),
-    updatedAtLocation: overrides.updatedAtLocation ?? generateSeededUuid(rng),
+    createdBy: overrides.createdBy ?? generateUuid(rng),
+    createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),
+    updatedAtLocation: overrides.updatedAtLocation ?? generateUuid(rng),
     updatedAt:
       overrides.updatedAt ?? addDays(new Date(createdAt), 1).toISOString(),
     assignedTo: overrides.assignedTo ?? null,
-    updatedBy: overrides.updatedBy ?? generateSeededUuid(rng),
+    updatedBy: overrides.updatedBy ?? generateUuid(rng),
     updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
     flags: [],
     legalStatuses: overrides.legalStatuses ?? {},
-    declaration: overrides.declaration ?? getSeededApplicant(rng),
-    trackingId: overrides.trackingId ?? getSeededTrackingId(rng)
+    declaration: overrides.declaration ?? generateRandomApplicant(rng),
+    trackingId: overrides.trackingId ?? generateTrackingId(rng)
   }
 }
 
