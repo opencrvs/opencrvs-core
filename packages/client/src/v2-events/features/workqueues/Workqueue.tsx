@@ -25,6 +25,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 import {
   SearchResultComponent,
@@ -35,9 +36,9 @@ export function WorkqueueContainer() {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
   const workqueues = useWorkqueueConfigurations()
-  const { searchEvent, getEvents } = useEvents()
+  const { searchEvent } = useEvents()
   const scopes = useSelector(getScope)
-  const user = useSelector(getUserDetails)
+  const legacyUser = useSelector(getUserDetails)
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
@@ -46,6 +47,17 @@ export function WorkqueueContainer() {
   if (!workqueueConfig) {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
+  if (!legacyUser) {
+    throw new Error('Old user data not found')
+  }
+
+  const { getUsers } = useUsers()
+  const [[user]] = getUsers.useSuspenseQuery([legacyUser.id])
+
+  if (!user) {
+    throw new Error('User data not found for' + legacyUser.id)
+  }
+
   const availableWorkqueues =
     findScope(scopes ?? [], 'workqueue')?.options.id ?? []
 
