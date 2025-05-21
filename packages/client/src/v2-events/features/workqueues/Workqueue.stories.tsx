@@ -50,7 +50,9 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const queryData = Array.from({ length: 12 }, () => eventQueryDataGenerator())
+const queryData = Array.from({ length: 12 }, (_, i) =>
+  eventQueryDataGenerator(undefined, i * 100)
+)
 
 export const Workqueue: Story = {
   parameters: {

@@ -36,5 +36,3 @@ export async function getCache(cacheName: string) {
 
   return caches.open(cacheKey)
 }
-
-export const EVENT_ATTACHMENTS = 'event-attachments'

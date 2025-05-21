@@ -78,6 +78,7 @@ export function getFullUrl(filename: string) {
   throw new Error('MINIO_URL is not defined')
 }
 
+/** Where attachments are saved in external bucket. */
 export const EVENT_ATTACHMENTS_DIRECTORY = 'event-attachments'
 
 async function getPresignedUrl(fileUri: string, directory?: string) {
