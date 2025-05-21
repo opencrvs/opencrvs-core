@@ -9,15 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { defineMessages, useIntl } from 'react-intl'
+import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { stringify } from 'query-string'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
+import { FieldValue, Inferred } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
-import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import {
+  getFormDataStringifier,
+  RecursiveStringRecord
+} from '@client/v2-events/hooks/useFormDataStringifier'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useEventConfigurations } from '../useEventConfiguration'
 import { getDefaultSearchFields } from './utils'
@@ -45,6 +49,17 @@ const SearchParamContainer = styled.div`
   }
 `
 
+function filterSearchParamsByFields(
+  searchParams: Record<string, FieldValue>,
+  fieldConfigs: { id: string }[]
+): Record<string, FieldValue> {
+  return Object.fromEntries(
+    Object.entries(searchParams).filter(([key, value]) => {
+      return fieldConfigs.some((field) => field.id === key)
+    })
+  )
+}
+
 function convertPathToLabel(path?: string): string {
   if (!path) {
     return ''
@@ -58,18 +73,37 @@ function convertPathToLabel(path?: string): string {
   return [capitalizedFirst, ...parts.slice(1)].join(' ')
 }
 
+function buildSearchParamLabels(
+  fieldConfigs: Inferred[],
+  searchParams: RecursiveStringRecord,
+  hasPrefix: boolean,
+  intl: IntlShape
+) {
+  return Object.keys(searchParams)
+    .map((key) => {
+      const field = fieldConfigs.find((f) => f.id === key)
+      if (!field) {
+        return null
+      }
+      const prefix = key.split('.').slice(0, -1) + ' '
+      return `${hasPrefix ? convertPathToLabel(prefix) : ''}${intl.formatMessage(field.label)}: ${searchParams[key]}`
+    })
+    .filter(Boolean)
+}
+
 export function SearchModifierComponent({
   eventType,
   searchParams
 }: {
   eventType: string
-  searchParams: Record<string, string>
+  searchParams: Record<string, FieldValue>
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
 
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+  const stringifyForm = getFormDataStringifier(intl, locations)
 
   const eventConfigurations = useEventConfigurations()
   const eventConfig = eventConfigurations.find(
@@ -78,38 +112,17 @@ export function SearchModifierComponent({
   if (!eventConfig) {
     return null
   }
-  const stringifyForm = getFormDataStringifier(intl, locations)
 
-  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
-  const declarationSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key, value]) => {
-      return declarationFieldConfigs.some((field) => field.id === key)
-    })
-  )
+  /* --- Build event-label, ex: Event: V2 birth */
+  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventType)}`
 
-  const searchParamsResolved = stringifyForm(
-    declarationFieldConfigs,
-    declarationSearchParams
-  )
-
-  const declarationSearchParamLabels = Object.keys(searchParamsResolved)
-    .map((key) => {
-      const field = declarationFieldConfigs.find((f) => f.id === key)
-      if (!field) {
-        return null
-      }
-      const prefix = key.split('.').slice(0, -1) + ' '
-      return `${convertPathToLabel(prefix)}${intl.formatMessage(field.label)}: ${searchParamsResolved[key]}`
-    })
-    .filter(Boolean)
-
+  /* --- Build event-metadata-specific advanced search parameter labels --- */
   const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
     ([key, x]) => getDefaultSearchFields(x)
   )
-  const eventSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key, value]) => {
-      return eventFieldConfigs.some((field) => field.id === key)
-    })
+  const eventSearchParams = filterSearchParamsByFields(
+    searchParams,
+    eventFieldConfigs
   )
 
   const eventSearchParamsResolved = stringifyForm(
@@ -117,17 +130,29 @@ export function SearchModifierComponent({
     eventSearchParams
   )
 
-  const eventSearchParamLabels = Object.keys(eventSearchParamsResolved)
-    .map((key) => {
-      const field = eventFieldConfigs.find((f) => f.id === key)
-      if (!field) {
-        return null
-      }
-      return `${intl.formatMessage(field.label)}: ${eventSearchParamsResolved[key]}`
-    })
-    .filter(Boolean)
+  const eventSearchParamLabels = buildSearchParamLabels(
+    eventFieldConfigs,
+    eventSearchParamsResolved,
+    false,
+    intl
+  )
 
-  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventType)}`
+  /* --- Build event-declaration-specific advanced search parameter labels --- */
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
+  const declarationSearchParams = filterSearchParamsByFields(
+    searchParams,
+    declarationFieldConfigs
+  )
+  const searchParamsResolved = stringifyForm(
+    declarationFieldConfigs,
+    declarationSearchParams
+  )
+  const declarationSearchParamLabels = buildSearchParamLabels(
+    declarationFieldConfigs,
+    searchParamsResolved,
+    true,
+    intl
+  )
 
   const allSearchParamLabels = [
     eventParamLabel,

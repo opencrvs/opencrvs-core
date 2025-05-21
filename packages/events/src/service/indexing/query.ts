@@ -110,7 +110,7 @@ function buildClause(clause: QueryExpression) {
     if (clause.registeredAtLocation.type === 'exact') {
       must.push({
         term: {
-          'legalStatuses.REGISTERED.createdAtLocation.keyword':
+          'legalStatuses.REGISTERED.createdAtLocation':
             clause.registeredAtLocation.term
         }
       })

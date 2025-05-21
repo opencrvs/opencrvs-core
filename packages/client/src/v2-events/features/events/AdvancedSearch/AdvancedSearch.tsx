@@ -17,6 +17,7 @@ import {
   FormTabs,
   IFormTabProps
 } from '@opencrvs/components'
+import { SearchQueryParamSchema } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
 
@@ -39,9 +40,13 @@ const messages = defineMessages(messagesToDefine)
 export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
-  const { eventType = '', ...searchParams } = parse(
-    window.location.search
-  ) as Record<string, string>
+  const searchParams = SearchQueryParamSchema.safeParse(
+    parse(window.location.search)
+  )
+
+  if (searchParams.error) {
+    throw new Error('Invalid search params')
+  }
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
@@ -53,7 +58,7 @@ export function AdvancedSearch() {
   })) satisfies IFormTabProps['sections']
 
   const selectedTabId =
-    formTabSections.find((tab) => tab.id === eventType)?.id ??
+    formTabSections.find((tab) => tab.id === searchParams.data.eventType)?.id ??
     formTabSections[0]?.id
 
   const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
@@ -84,7 +89,10 @@ export function AdvancedSearch() {
         titleColor={'copy'}
       >
         {currentTabSections.length > 0 && (
-          <TabSearch currentEvent={currentEvent} fieldValues={searchParams} />
+          <TabSearch
+            currentEvent={currentEvent}
+            fieldValues={searchParams.data}
+          />
         )}
       </Content>
     </>

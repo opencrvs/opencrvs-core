@@ -218,17 +218,16 @@ function buildDataConditionFromSearchKeys(
     fieldType: 'field' | 'event'
     fieldConfig?: FieldConfig
   }[],
-  rawInput: Record<string, string> // values from UI or query string
+  rawInput: Record<string, FieldValue> // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
     (
       result: Record<string, Condition>,
       { fieldId, config, fieldType, fieldConfig }
     ) => {
-      const fieldIdEdited = fieldType === 'event' ? `event.${fieldId}` : fieldId
-      const value = formatValue(rawInput, fieldIdEdited, fieldConfig)
-      if (fieldIdEdited === 'event.status' && value === 'ALL') {
-        const transformedKey = fieldIdEdited.replace(/\./g, '____')
+      const value = formatValue(rawInput, fieldId, fieldConfig)
+      if (fieldId === 'event.status' && value === 'ALL') {
+        const transformedKey = fieldId.replace(/\./g, '____')
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
         // Handle the case where we want to search by range but the value is not a comma-separated string
@@ -239,7 +238,7 @@ function buildDataConditionFromSearchKeys(
             ? 'exact'
             : config?.type
         const condition = buildCondition(value, searchType)
-        const transformedKey = fieldIdEdited.replace(/\./g, '____')
+        const transformedKey = fieldId.replace(/\./g, '____')
         result[transformedKey] = condition
       }
       return result
@@ -249,7 +248,7 @@ function buildDataConditionFromSearchKeys(
 }
 
 export function buildDataCondition(
-  flat: Record<string, string>,
+  flat: Record<string, FieldValue>,
   eventConfig: EventConfig
 ): QueryInputType {
   const advancedSearch = eventConfig.advancedSearch
@@ -258,6 +257,16 @@ export function buildDataCondition(
     getDefaultSearchFields(section)
   )
 
+  const defaultSearchKeys = defaultMetadataSearchFields.map((field) => ({
+    fieldId: field.id,
+    config: advancedSearch
+      .flatMap((x) => x.fields)
+      .filter((x) => x.fieldType === 'event')
+      .find((x) => field.id.includes(x.fieldId))?.config,
+    fieldType: 'event' as const,
+    fieldConfig: field
+  }))
+
   // Flatten all fields into a single list of search keys
   const allFields = advancedSearch.flatMap((section) => section.fields)
 
@@ -265,14 +274,12 @@ export function buildDataCondition(
     fieldId: field.fieldId,
     config: field.config, // assuming field structure has a `config` prop
     fieldType: field.fieldType,
-    fieldConfig:
-      eventConfig.declaration.pages
-        .flatMap((page) => page.fields)
-        .find((f) => f.id === field.fieldId) ||
-      defaultMetadataSearchFields.find((f) => f.id === field.fieldId)
+    fieldConfig: eventConfig.declaration.pages
+      .flatMap((page) => page.fields)
+      .find((f) => f.id === field.fieldId)
   }))
-  const filteredSearchKeys = searchKeys.filter((searchKey) =>
-    Object.keys(flat).some((key) => key.includes(searchKey.fieldId))
+  const filteredSearchKeys = [...defaultSearchKeys, ...searchKeys].filter(
+    (searchKey) => Object.keys(flat).some((key) => key === searchKey.fieldId)
   )
 
   return buildDataConditionFromSearchKeys(filteredSearchKeys, flat)

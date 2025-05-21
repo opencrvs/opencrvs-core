@@ -12,7 +12,7 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { workqueues } from '@opencrvs/commons/client'
+import { SearchQueryParamSchema, workqueues } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -24,9 +24,18 @@ export const SearchResultIndex = () => {
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = parse(window.location.search) as Record<string, string>
+  const searchParams = SearchQueryParamSchema.safeParse(
+    parse(window.location.search)
+  )
 
-  const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
+  if (searchParams.error) {
+    throw new Error('Invalid search params')
+  }
+
+  const formattedSearchParams = buildDataCondition(
+    searchParams.data,
+    eventConfig
+  )
 
   const queryData = searchEvent.useSuspenseQuery(
     eventType,
@@ -47,7 +56,7 @@ export const SearchResultIndex = () => {
     <SearchResult
       eventConfig={eventConfig}
       queryData={queryData}
-      searchParams={searchParams}
+      searchParams={searchParams.data}
       workqueueConfig={workqueueConfig}
     />
   )

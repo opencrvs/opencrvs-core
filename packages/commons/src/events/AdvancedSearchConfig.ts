@@ -12,6 +12,7 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { SelectOption } from './FieldConfig'
 import { FieldConditional } from './Conditional'
+import { FieldValue } from './FieldValue'
 
 const MatchType = z.enum(['fuzzy', 'exact', 'range'])
 
@@ -20,9 +21,38 @@ const BaseField = z.object({
     type: MatchType.describe('Determines the type of field')
   }),
   options: z.array(SelectOption).optional(),
-  // If we ever need to override default field conditionals in advanced search
-  conditionals: z.array(FieldConditional).default([]).optional()
+  conditionals: z
+    .array(FieldConditional)
+    .default([])
+    .optional()
+    .describe(
+      `
+       In advanced search, we sometimes need to override the default field visibility conditionals.
+       
+       For example, Informant fields in the declaration form may have conditional logic 
+       that hides them based on other field values. Since the advanced search form reuses 
+       the declaration form config, those same conditionals would apply by default.
+       
+       However, in advanced search we often want to make all Informant fields searchable,
+       regardless of their original visibility logic. To do this, we explicitly set their 
+       'conditionals' to an empty array ('[]') in the search config. This ensures they 
+       are always rendered in the advanced search form.
+      `
+    )
 })
+
+export const SearchQueryParamSchema = z
+  .object({
+    eventType: z
+      .string()
+      .optional()
+      .describe(
+        'Defines type of event so that when redirecting to Advanced Search page, appropriate tab can be selected'
+      )
+  })
+  .catchall(FieldValue)
+
+// export type SearchQueryParam = z.infer<typeof SearchQueryParamSchema>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),

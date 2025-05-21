@@ -12,7 +12,7 @@
 /**
  * Returns configuration options for the field.
  */
-export function createSearchConfigs<T extends {}>(baseField: T) {
+export function createSearchConfig<T extends {}>(baseField: T) {
   return {
     /**
      * Creates a range configuration for the specified field.

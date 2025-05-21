@@ -351,15 +351,12 @@ export async function addAction(
     status: status
   }
 
-  await db.collection<EventDocument>('events').updateOne(
-    { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
-    {
-      $push: { actions: action },
-      $set: {
-        updatedAt: now
-      }
-    }
-  )
+  await db
+    .collection<EventDocument>('events')
+    .updateOne(
+      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
+      { $push: { actions: action }, $set: { updatedAt: now } }
+    )
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
     await db.collection<EventDocument>('events').updateOne(

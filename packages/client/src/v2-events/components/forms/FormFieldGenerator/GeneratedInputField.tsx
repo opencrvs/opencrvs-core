@@ -118,7 +118,7 @@ export const GeneratedInputField = React.memo(
       disabled: readonlyMode,
       helperText: fieldDefinition.helperText
         ? intl.formatMessage(fieldDefinition.helperText)
-        : '',
+        : undefined,
       error,
       touched
     }

@@ -10,12 +10,12 @@
  */
 
 import { FieldConditional } from 'src/events'
-import { createSearchConfigs } from '../searchConfigs'
+import { createSearchConfig } from '../searchConfigs'
 
 /**
  * Returns configuration options for the field.
  */
-export function createFieldConfigs(
+export function createFieldConfig(
   fieldId: string,
   options: { conditionals?: FieldConditional[] }
 ) {
@@ -25,5 +25,5 @@ export function createFieldConfigs(
     ...options
   }
 
-  return createSearchConfigs(baseField)
+  return createSearchConfig(baseField)
 }

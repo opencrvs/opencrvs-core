@@ -68,6 +68,24 @@ const exactStatusPayload: QueryType = {
   status: { type: 'exact', term: 'REGISTERED' }
 }
 
+const exactRegisteredAtPayload: QueryType = {
+  type: 'and',
+  eventType: 'tennis-club-membership',
+  registeredAt: { type: 'exact', term: '2024-01-01' }
+}
+
+const rangeRegisteredAtPayload: QueryType = {
+  type: 'and',
+  eventType: 'tennis-club-membership',
+  registeredAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' }
+}
+
+const exactRegisteredAtLocationPayload: QueryType = {
+  type: 'and',
+  eventType: 'tennis-club-membership',
+  registeredAtLocation: { type: 'exact', term: 'some-location-id' }
+}
+
 const anyOfStatusPayload: QueryType = {
   type: 'and',
   status: { type: 'anyOf', terms: ['REGISTERED', 'VALIDATED'] }
@@ -113,6 +131,55 @@ describe('test buildElasticQueryFromSearchPayload', () => {
       bool: {
         must: [
           { term: { status: 'REGISTERED' } },
+          { match: { eventType: 'tennis-club-membership' } }
+        ]
+      }
+    })
+  })
+
+  test('builds query with exact registeredAt', () => {
+    const result = buildElasticQueryFromSearchPayload(exactRegisteredAtPayload)
+    expect(result).toEqual({
+      bool: {
+        must: [
+          { term: { 'legalStatuses.REGISTERED.createdAt': '2024-01-01' } },
+          { match: { eventType: 'tennis-club-membership' } }
+        ]
+      }
+    })
+  })
+
+  test('builds query with range registeredAt', () => {
+    const result = buildElasticQueryFromSearchPayload(rangeRegisteredAtPayload)
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            range: {
+              'legalStatuses.REGISTERED.createdAt': {
+                gte: '2024-01-01',
+                lte: '2024-12-31'
+              }
+            }
+          },
+          { match: { eventType: 'tennis-club-membership' } }
+        ]
+      }
+    })
+  })
+
+  test('builds query with exact registeredAtLocation', () => {
+    const result = buildElasticQueryFromSearchPayload(
+      exactRegisteredAtLocationPayload
+    )
+    expect(result).toEqual({
+      bool: {
+        must: [
+          {
+            term: {
+              'legalStatuses.REGISTERED.createdAtLocation': 'some-location-id'
+            }
+          },
           { match: { eventType: 'tennis-club-membership' } }
         ]
       }

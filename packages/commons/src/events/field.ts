@@ -10,7 +10,7 @@
  */
 
 import { createFieldConditionals } from '../conditionals/conditionals'
-import { createFieldConfigs } from '../field-config/field-configuration'
+import { createFieldConfig } from '../field-config/field-configuration'
 import { FieldConditional } from './Conditional'
 
 /**
@@ -30,6 +30,6 @@ export function field(
      */
     _fieldId: fieldId,
     ...createFieldConditionals(fieldId),
-    ...createFieldConfigs(fieldId, options)
+    ...createFieldConfig(fieldId, options)
   }
 }
