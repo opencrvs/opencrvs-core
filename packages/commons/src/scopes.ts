@@ -222,6 +222,13 @@ const rawConfigurableScopeRegex =
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
+const NotifyEventScope = z.object({
+  type: z.literal('record.notify'),
+  options: z.object({
+    event: z.array(z.string())
+  })
+})
+
 const CreateUserScope = z.object({
   type: z.literal('user.create'),
   options: z.object({
@@ -238,7 +245,8 @@ const EditUserScope = z.object({
 
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
-  EditUserScope
+  EditUserScope,
+  NotifyEventScope
 ])
 
 type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
@@ -257,38 +265,38 @@ export function findScope(
 
 export function parseScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
+
   if (maybeLiteralScope.success) {
     return {
       type: maybeLiteralScope.data
     }
   }
+
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
-  if (maybeConfigurableScope.success) {
-    const rawScope = maybeConfigurableScope.data
-    const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
-    const options = rawOptions.split(',').reduce((acc, option) => {
+
+  if (!maybeConfigurableScope.success) {
+    return
+  }
+
+  const rawScope = maybeConfigurableScope.data
+  const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
+  const options = rawOptions.split(',').reduce(
+    (acc, option) => {
       const [key, value] = option.split('=')
       acc[key] = value.split('|')
       return acc
-    }, {} as Record<string, string[]>)
-    const parsedScope = {
-      type,
-      options
-    }
-    const result = ConfigurableScopes.safeParse(parsedScope)
-    if (result.success) {
-      return result.data
-    }
-  }
-  return undefined
-}
+    },
+    {} as Record<string, string[]>
+  )
 
-/*
- * @deprecated
- * scopes are configurable so all possible
- * values can't be retrieved anymore
- */
-export const scopes: Scope[] = Object.values(SCOPES)
+  const parsedScope = {
+    type,
+    options
+  }
+
+  const result = ConfigurableScopes.safeParse(parsedScope)
+  return result.success ? result.data : undefined
+}
 
 export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
