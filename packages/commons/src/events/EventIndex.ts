@@ -70,7 +70,6 @@ export type QueryInputType = BaseInput | QueryMap
 
 const QueryExpression = z
   .object({
-    type: z.literal('and'),
     eventType: z.string(),
     status: z.optional(z.union([AnyOf, Exact])),
     createdAt: z.optional(DateCondition),
@@ -90,7 +89,12 @@ const Or = z.object({
   clauses: z.array(QueryExpression)
 })
 
-export type QueryExpression = z.infer<typeof QueryExpression>
+const And = z.object({
+  type: z.literal('and'),
+  clauses: z.array(QueryExpression)
+})
 
-export const QueryType = z.discriminatedUnion('type', [QueryExpression, Or])
+export const QueryType = z.discriminatedUnion('type', [Or, And])
+
 export type QueryType = z.infer<typeof QueryType>
+export type QueryExpression = z.infer<typeof QueryExpression>

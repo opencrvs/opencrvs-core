@@ -41,19 +41,10 @@ function toQueryType(
     }
   })
 
-  const queryExpression: QueryType = {
-    type: 'and',
-    eventType,
-    ...topLevelFields,
-    data: dataFields
+  return {
+    type: type === 'and' ? 'and' : 'or',
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
   }
-
-  return type === 'and'
-    ? queryExpression
-    : {
-        type: 'or',
-        clauses: [queryExpression]
-      }
 }
 
 export function useEvents() {

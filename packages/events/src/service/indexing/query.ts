@@ -146,10 +146,6 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  if (clause.eventType) {
-    must.push({ match: { eventType: clause.eventType } })
-  }
-
   if (clause.data) {
     const dataQuery = generateQuery(clause.data)
     const innerMust = dataQuery.bool?.must
@@ -161,22 +157,28 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  return { bool: { must } } as estypes.QueryDslQueryContainer
+  return must
 }
 
 export function buildElasticQueryFromSearchPayload(input: QueryType) {
   if (input.type === 'and') {
-    return buildClause(input)
-  }
-
-  if (input.type === 'or') {
-    const should = input.clauses.map((clause) => buildClause(clause))
+    const must = Object.values(input.clauses).flatMap((clause) =>
+      buildClause(clause)
+    )
     return {
       bool: {
-        should,
-        minimum_should_match: 1
+        must
       }
-    }
+    } as estypes.QueryDslQueryContainer
+  } else if (input.type === 'or') {
+    const should = Object.values(input.clauses).flatMap((clause) =>
+      buildClause(clause)
+    )
+    return {
+      bool: {
+        should
+      }
+    } as estypes.QueryDslQueryContainer
   }
 
   // default fallback (shouldn't happen if input is validated correctly)
