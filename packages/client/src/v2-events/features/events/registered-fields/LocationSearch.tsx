@@ -75,20 +75,20 @@ function stringify(
   locations: Location[],
   value: Stringifiable | undefined | null
 ) {
-  const country = intl.formatMessage({
-    id: `countries.${window.config.COUNTRY}`,
-    defaultMessage: 'Farajaland',
-    description: 'Country name'
-  })
-
   if (!value) {
     return {
       location: '',
       district: '',
       province: '',
-      country
+      country: ''
     }
   }
+
+  const country = intl.formatMessage({
+    id: `countries.${window.config.COUNTRY}`,
+    defaultMessage: 'Farajaland',
+    description: 'Country name'
+  })
 
   const locationId = value.toString()
   const location = locations.find((loc) => loc.id === locationId)
