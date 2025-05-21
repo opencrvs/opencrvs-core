@@ -377,28 +377,26 @@ export async function getIndex(eventParams: QueryType) {
     throw new Error('Missing eventType in clauses')
   }
 
-  if (eventType) {
-    if (Object.values(eventParams).length === 0) {
-      throw new Error('No search params provided')
-    }
-
-    const query = buildElasticQueryFromSearchPayload(eventParams)
-    const response = await esClient.search<EncodedEventIndex>({
-      index: getEventIndexName(eventType),
-      size: DEFAULT_SIZE,
-      request_cache: false,
-      query
-    })
-
-    const events = z.array(EventIndex).parse(
-      response.hits.hits
-        .map((hit) => hit._source)
-        .filter((event): event is EncodedEventIndex => event !== undefined)
-        .map((event) => decodeEventIndex(event))
-    )
-
-    return events
+  if (Object.values(eventParams).length === 0) {
+    throw new Error('No search params provided')
   }
+
+  const query = buildElasticQueryFromSearchPayload(eventParams)
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventIndexName(eventType),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query
+  })
+
+  const events = z.array(EventIndex).parse(
+    response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
+  )
+
+  return events
 
   return []
 }
