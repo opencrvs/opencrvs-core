@@ -38,6 +38,14 @@ function deserializeQueryExpression(
     assignedTo: expression.assignedTo && {
       ...expression.assignedTo,
       term: userDeSerializer(expression.assignedTo.term, user)
+    },
+    createdBy: expression.createdBy && {
+      ...expression.createdBy,
+      term: userDeSerializer(expression.createdBy.term, user)
+    },
+    updatedBy: expression.updatedBy && {
+      ...expression.updatedBy,
+      term: userDeSerializer(expression.updatedBy.term, user)
     }
   }
 }

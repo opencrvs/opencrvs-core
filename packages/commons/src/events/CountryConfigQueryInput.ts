@@ -55,8 +55,8 @@ export const SerializedQueryExpression = z
     createAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(SerializableExact),
-    createdBy: z.optional(Exact),
-    updatedBy: z.optional(Exact),
+    createdBy: z.optional(SerializableExact),
+    updatedBy: z.optional(SerializableExact),
     trackingId: z.optional(Exact),
     flags: z.optional(z.array(z.union([AnyOf, Not]))),
     data: QueryInput

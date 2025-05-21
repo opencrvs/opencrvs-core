@@ -94,6 +94,18 @@ function buildClause(clause: QueryExpression) {
     })
   }
 
+  if (clause.createdBy) {
+    must.push({
+      term: { createdBy: clause.createdBy.term }
+    })
+  }
+
+  if (clause.updatedBy) {
+    must.push({
+      term: { updatedBy: clause.updatedBy.term }
+    })
+  }
+
   if (clause.createdAt) {
     if (clause.createdAt.type === 'exact') {
       must.push({ term: { createdAt: clause.createdAt.term } })
