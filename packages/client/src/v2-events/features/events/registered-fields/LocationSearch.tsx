@@ -113,11 +113,9 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
     value
   )
 
-  const locationsArray = [location, district, province, country].filter(
-    (loc) => loc !== ''
-  )
-
-  return locationsArray.join(', ')
+  return [location, district, province, country]
+    .filter((loc) => loc !== '')
+    .join(', ')
 }
 
 export const LocationSearch = {
