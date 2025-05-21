@@ -37,37 +37,40 @@ export function WorkqueueContainer() {
   const eventConfigs = useEventConfigurations()
   const workqueues = useWorkqueueConfigurations()
   const { searchEvent } = useEvents()
+  const { getUsers } = useUsers()
   const scopes = useSelector(getScope)
-  const legacyUser = useSelector(getUserDetails)
+  const userId = useSelector(getUserDetails)?.id
+  const [[user]] = getUsers.useSuspenseQuery(userId ? [userId] : [])
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
   const intl = useIntl()
 
-  if (!workqueueConfig) {
-    throw new Error('Workqueue configuration not found for' + workqueueSlug)
-  }
-  if (!legacyUser) {
-    throw new Error('Old user data not found')
-  }
-
-  const { getUsers } = useUsers()
-  const [[user]] = getUsers.useSuspenseQuery([legacyUser.id])
-
-  if (!user) {
-    throw new Error('User data not found for' + legacyUser.id)
-  }
-
   const availableWorkqueues =
     findScope(scopes ?? [], 'workqueue')?.options.id ?? []
 
-  if (!availableWorkqueues.includes(workqueueSlug)) {
-    throw new Error(`Workqueue ${workqueueSlug} is not available for this user`)
-  }
+  const userHasAccessToWorkqueue = availableWorkqueues.includes(workqueueSlug)
 
-  const deSerializedQuery = deserializeQuery(workqueueConfig.query, user)
+  const deSerializedQuery =
+    (workqueueConfig &&
+      userHasAccessToWorkqueue &&
+      user &&
+      deserializeQuery(workqueueConfig.query, user)) ||
+    {}
 
   const events = searchEvent.useSuspenseQuery(deSerializedQuery)
+
+  if (!workqueueConfig) {
+    throw new Error('Workqueue configuration not found for' + workqueueSlug)
+  }
+
+  if (!user) {
+    throw new Error('User data not found for')
+  }
+
+  if (!userHasAccessToWorkqueue) {
+    throw new Error(`Workqueue ${workqueueSlug} is not available for this user`)
+  }
 
   return (
     <WQContentWrapper
