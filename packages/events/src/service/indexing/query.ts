@@ -161,28 +161,28 @@ function buildClause(clause: QueryExpression) {
 }
 
 export function buildElasticQueryFromSearchPayload(input: QueryType) {
-  if (input.type === 'and') {
-    const must = Object.values(input.clauses).flatMap((clause) =>
-      buildClause(clause)
-    )
-    return {
-      bool: {
-        must
+  switch (input.type) {
+    case 'and': {
+      const must = input.clauses.flatMap((clause) => buildClause(clause))
+      return {
+        bool: {
+          must
+        }
       }
-    } as estypes.QueryDslQueryContainer
-  } else if (input.type === 'or') {
-    const should = Object.values(input.clauses).flatMap((clause) =>
-      buildClause(clause)
-    )
-    return {
-      bool: {
-        should
-      }
-    } as estypes.QueryDslQueryContainer
-  }
+    }
 
-  // default fallback (shouldn't happen if input is validated correctly)
-  return {
-    bool: { must_not: { match_all: {} } }
-  } as estypes.QueryDslQueryContainer
+    case 'or': {
+      const should = input.clauses.flatMap((clause) => buildClause(clause))
+      return {
+        bool: {
+          should
+        }
+      }
+    }
+    // default fallback (shouldn't happen if input is validated correctly)
+    default:
+      return {
+        bool: { must_not: { match_all: {} } }
+      }
+  }
 }

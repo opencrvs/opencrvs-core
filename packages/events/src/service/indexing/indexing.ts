@@ -368,9 +368,13 @@ export async function getIndex(eventParams: QueryType) {
     return []
   }
 
-  const { eventType } = eventParams.clauses.find(
+  const eventType = eventParams.clauses.find(
     (clause) => 'eventType' in clause
-  ) as { eventType: string }
+  )?.eventType
+
+  if (!eventType) {
+    throw new Error('Missing eventType in clauses')
+  }
 
   if (eventType) {
     if (Object.values(eventParams).length === 0) {
