@@ -361,8 +361,9 @@ export async function getIndexedEvents(userId: string) {
 export async function getIndex(eventParams: QueryType) {
   const esClient = getOrCreateClient()
 
-  if ('type' in eventParams && eventParams.type === 'or') {
+  if (eventParams.type === 'or') {
     const { clauses } = eventParams
+    // @todo: implement or query for quick search
     // eslint-disable-next-line no-console
     console.log({ clauses })
     return []

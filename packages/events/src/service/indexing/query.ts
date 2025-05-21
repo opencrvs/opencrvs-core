@@ -170,7 +170,6 @@ export function buildElasticQueryFromSearchPayload(input: QueryType) {
         }
       }
     }
-
     case 'or': {
       const should = input.clauses.flatMap((clause) => buildClause(clause))
       return {
