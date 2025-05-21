@@ -3738,6 +3738,44 @@ components:
                                   - conditional
                           default:
                             &a7 []
+                          description: "
+
+                            \       In advanced
+                            search, we sometimes need to override the default
+                            field visibility conditionals.
+
+                            \      \ 
+
+                            \       For example,
+                            Informant fields in the declaration form may have
+                            conditional logic\ 
+
+                            \       that hides them
+                            based on other field values. Since the advanced
+                            search form reuses\ 
+
+                            \       the declaration
+                            form config, those same conditionals would apply by
+                            default.
+
+                            \      \ 
+
+                            \       However, in
+                            advanced search we often want to make all Informant
+                            fields searchable,
+
+                            \       regardless of
+                            their original visibility logic. To do this, we
+                            explicitly set their\ 
+
+                            \       'conditionals'
+                            to an empty array ('[]') in the search config. This
+                            ensures they\ 
+
+                            \       are always
+                            rendered in the advanced search form.
+
+                            \      "
                         fieldId:
                           type: string
                         fieldType:
@@ -3813,6 +3851,44 @@ components:
                                   - type
                                   - conditional
                           default: *a7
+                          description: "
+
+                            \       In advanced
+                            search, we sometimes need to override the default
+                            field visibility conditionals.
+
+                            \      \ 
+
+                            \       For example,
+                            Informant fields in the declaration form may have
+                            conditional logic\ 
+
+                            \       that hides them
+                            based on other field values. Since the advanced
+                            search form reuses\ 
+
+                            \       the declaration
+                            form config, those same conditionals would apply by
+                            default.
+
+                            \      \ 
+
+                            \       However, in
+                            advanced search we often want to make all Informant
+                            fields searchable,
+
+                            \       regardless of
+                            their original visibility logic. To do this, we
+                            explicitly set their\ 
+
+                            \       'conditionals'
+                            to an empty array ('[]') in the search config. This
+                            ensures they\ 
+
+                            \       are always
+                            rendered in the advanced search form.
+
+                            \      "
                         fieldId:
                           type: string
                           enum:
