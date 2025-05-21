@@ -13,6 +13,7 @@ import * as React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
+import { useSelector } from 'react-redux'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { LogoutNavigation } from '@opencrvs/components/lib/icons/LogoutNavigation'
 import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavigation'
@@ -28,6 +29,7 @@ import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
 import { removeUserDetails } from '@client/utils/userUtils'
 import { constantsMessages } from '@client/v2-events/messages'
+import { getOfflineData } from '@client/offline/selectors'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -48,12 +50,13 @@ export const Navigation = ({
   const intl = useIntl()
   const workqueues = useWorkqueueConfigurations()
   const navigate = useNavigate()
+  const offlineCountryConfig = useSelector(getOfflineData)
 
   const runningVer = String(localStorage.getItem('running-version'))
 
   return (
     <LeftNavigation
-      applicationName={intl.formatMessage(constantsMessages.applicationName)} // @todo Should come from country config
+      applicationName={offlineCountryConfig.config.APPLICATION_NAME}
       applicationVersion={runningVer}
       avatar={() => userInfo && userInfo.avatar}
       name={userInfo && userInfo.name}
