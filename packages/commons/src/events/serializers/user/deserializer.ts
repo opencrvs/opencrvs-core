@@ -13,7 +13,7 @@ import { QueryExpression, QueryType, User } from '../../../events'
 import {
   CountryConfigQueryType,
   SerializedQueryExpression
-} from 'src/events/CountryConfigQueryInput'
+} from '../../../events/CountryConfigQueryInput'
 import { SerializedUserField } from './serializer'
 
 function userDeSerializer(
