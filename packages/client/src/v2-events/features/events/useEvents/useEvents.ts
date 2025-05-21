@@ -23,6 +23,7 @@ import {
   useEventCustomAction
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
+import { useGetEventCounts } from './procedures/count'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -36,6 +37,7 @@ export function useEvents() {
     getEvents,
     /** Returns an event with aggregated history. If you need the history of the event, use getEvent. */
     getEventState: useGetEventState(),
+    useGetEventCounts,
     deleteEvent: {
       useMutation: useDeleteEvent
     },

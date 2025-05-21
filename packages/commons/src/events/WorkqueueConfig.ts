@@ -19,6 +19,7 @@ import {
 } from './WorkqueueColumnConfig'
 import { CountryConfigQueryType } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
+import { QueryType } from './EventIndex'
 
 export const defaultThirdColumn = defineWorkqueueColumns([
   {
@@ -58,3 +59,11 @@ export type WorkqueueConfigInput = z.input<typeof WorkqueueConfig>
 export function defineWorkqueue(workqueues: WorkqueueConfigInput[]) {
   return workqueues.map((workqueue) => WorkqueueConfig.parse(workqueue))
 }
+
+export const WorkqueueCountInput = z.array(
+  z.object({ slug: z.string(), query: QueryType })
+)
+export type WorkqueueCountInput = z.infer<typeof WorkqueueCountInput>
+
+export const WorkqueueCountOutput = z.record(z.string(), z.number())
+export type WorkqueueCountOutput = z.infer<typeof WorkqueueCountOutput>

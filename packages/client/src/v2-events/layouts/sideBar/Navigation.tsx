@@ -20,6 +20,7 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
+import { deserializeQuery } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
@@ -28,8 +29,10 @@ import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
 import { removeUserDetails } from '@client/utils/userUtils'
-import { constantsMessages } from '@client/v2-events/messages'
 import { getOfflineData } from '@client/offline/selectors'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useUsers } from '../../hooks/useUsers'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -51,6 +54,23 @@ export const Navigation = ({
   const workqueues = useWorkqueueConfigurations()
   const navigate = useNavigate()
   const offlineCountryConfig = useSelector(getOfflineData)
+  const { getUsers } = useUsers()
+  const legacyUser = useSelector(getUserDetails)
+  const [[user]] = getUsers.useSuspenseQuery(legacyUser ? [legacyUser.id] : [])
+  const { useGetEventCounts } = useEvents()
+
+  const queries = workqueues.map(({ slug, query }) => ({
+    slug: slug,
+    query:
+      user && legacyUser
+        ? deserializeQuery(query, {
+            ...user,
+            primaryOfficeId: legacyUser.primaryOffice.id
+          })
+        : {}
+  }))
+
+  const counts = useGetEventCounts().useSuspenseQuery(queries)
 
   const runningVer = String(localStorage.getItem('running-version'))
 
@@ -67,7 +87,7 @@ export const Navigation = ({
         {workqueues.map(({ name, slug, icon }) => (
           <NavigationItem
             key={slug}
-            count={7}
+            count={counts[slug] || 0}
             icon={() => <Icon name={icon} size="small" />}
             id={`navigation_workqueue_${slug}`}
             isSelected={slug === workqueueSlug}

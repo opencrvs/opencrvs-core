@@ -30,7 +30,9 @@ import {
   CONFIG_SEARCH_ALLOWED_SCOPES,
   QueryType,
   DeleteActionInput,
-  WorkqueueConfig
+  WorkqueueConfig,
+  WorkqueueCountInput,
+  WorkqueueCountOutput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -48,7 +50,11 @@ import {
   deleteEvent,
   getEventById
 } from '@events/service/events/events'
-import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import {
+  getEventCount,
+  getIndex,
+  getIndexedEvents
+} from '@events/service/indexing/indexing'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { getDefaultActionProcedures } from './actions'
@@ -102,6 +108,12 @@ export const eventRouter = router({
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
         return getworkqueueConfigurations(options.ctx.token)
+      }),
+    count: publicProcedure
+      .input(WorkqueueCountInput)
+      .output(WorkqueueCountOutput)
+      .query(async (options) => {
+        return getEventCount(options.input)
       })
   }),
   create: publicProcedure

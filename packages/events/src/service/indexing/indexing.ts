@@ -24,7 +24,8 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType
+  QueryType,
+  WorkqueueCountInput
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -421,4 +422,18 @@ export async function getIndex(eventParams: QueryType) {
   }
 
   return []
+}
+
+export async function getEventCount(queries: WorkqueueCountInput) {
+  return (
+    await Promise.all(
+      queries.map(async ({ slug, query }) => {
+        const count = (await getIndex(query)).length
+        return { slug, count }
+      })
+    )
+  ).reduce((acc: Record<string, number>, { slug, count }) => {
+    acc[slug] = count
+    return acc
+  }, {})
 }
