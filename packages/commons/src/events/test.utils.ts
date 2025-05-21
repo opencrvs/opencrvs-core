@@ -585,7 +585,6 @@ function generateRandomApplicant(
  * @returns A function that generates pseudo-random numbers between 0 and 1
  */
 function createPseudoRandomNumberGenerator(seed: number) {
-  console.log('seed', seed)
   // Parameters are not arbirary. Reference: https://en.wikipedia.org/wiki/Linear_congruential_generator
   const MODULUS = 2 ** 32
   const MULTIPLIER = 1664525
