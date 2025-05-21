@@ -99,7 +99,7 @@ export const Navigation = ({
             removeToken()
             await removeUserDetails()
             window.location.assign(
-              `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}`
+              `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}/v2`
             )
           }}
         />
