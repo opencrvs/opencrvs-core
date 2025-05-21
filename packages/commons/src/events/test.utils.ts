@@ -50,7 +50,7 @@ import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { EventStatus, eventStatuses } from './EventMetadata'
+import { eventStatuses } from './EventMetadata'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
