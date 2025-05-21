@@ -31384,6 +31384,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         type:
           type: string
         dateOfEvent:
@@ -36507,6 +36508,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -36811,6 +36813,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -36828,6 +36831,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -37131,6 +37135,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -37150,6 +37155,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -37453,6 +37459,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -37469,6 +37476,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -37772,6 +37780,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -37786,6 +37795,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -38089,6 +38099,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -38103,6 +38114,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -38406,6 +38418,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -38420,6 +38433,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -38723,6 +38737,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -38737,6 +38752,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -39040,6 +39056,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -39054,6 +39071,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -39357,6 +39375,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -39374,6 +39393,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -39677,6 +39697,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -39694,6 +39715,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -39997,6 +40019,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -40011,6 +40034,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -40314,6 +40338,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -40328,6 +40353,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -40631,6 +40657,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         requestId:
@@ -40648,6 +40675,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -40951,6 +40979,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         requestId:
@@ -40968,6 +40997,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -41271,6 +41301,7 @@ components:
                   - district2
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
