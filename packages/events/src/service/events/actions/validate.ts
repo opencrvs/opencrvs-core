@@ -29,12 +29,12 @@ export async function validate(
     createdByRole,
     token,
     transactionId,
-    updatedAtLocation
+    createdAtLocation
   }: {
     eventId: string
     createdBy: string
     createdByRole: string
-    updatedAtLocation: string
+    createdAtLocation: string
     transactionId: string
     token: string
   }
@@ -59,7 +59,7 @@ export async function validate(
         createdBy,
         createdByRole,
         id: getUUID(),
-        updatedAtLocation,
+        createdAtLocation,
         status: ActionStatus.Accepted
       }
     ]
@@ -96,7 +96,7 @@ export async function validate(
       createdByRole,
       transactionId,
       token,
-      updatedAtLocation,
+      createdAtLocation,
       status: ActionStatus.Accepted
     }
   )

@@ -59,6 +59,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   )
 
   const annotation = useActionAnnotation((state) => state.annotation)
+  const clearAnnotation = useActionAnnotation((state) => state.clear)
 
   useEffect(() => {
     if (!annotation) {
@@ -120,6 +121,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
        * staged drafts the user has for this event id and type
        */
       setLocalDraft(null)
+      clearAnnotation()
     }
 
     /*

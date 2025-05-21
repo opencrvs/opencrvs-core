@@ -10,7 +10,6 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import { expect, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React from 'react'
 import superjson from 'superjson'
@@ -144,7 +143,8 @@ export const WithRejectedAction: Story = {
                   transactionId: getUUID(),
                   createdAt: new Date().toISOString(),
                   createdBy: '123',
-                  createdAtLocation: '123'
+                  createdAtLocation: '123',
+                  createdByRole: 'LOCAL_REGISTRAR'
                 }
               ])
             }

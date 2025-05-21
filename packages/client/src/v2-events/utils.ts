@@ -25,7 +25,8 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   getDeclarationFields,
-  SystemVariables
+  SystemVariables,
+  EventState
 } from '@opencrvs/commons/client'
 import { getLocations } from '@client/offline/selectors'
 import { countries } from '@client/utils/countries'
@@ -77,12 +78,9 @@ export const getAllUniqueFields = (eventConfig: EventConfig) => {
   return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
-export function flattenEventIndex(
-  event: EventIndex
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Omit<EventIndex, 'declaration'> & { [key: string]: any } {
+export function flattenEventIndex(event: NonNullable<EventIndex>) {
   const { declaration, ...rest } = event
-  return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
+  return { ...rest, ...declaration }
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -254,4 +252,9 @@ export function filterEmptyValues(
         !(typeof v === 'number' && isNaN(v))
     )
   )
+}
+
+export interface Option<T = string> {
+  value: T
+  label: string
 }

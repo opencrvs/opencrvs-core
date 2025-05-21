@@ -22,7 +22,7 @@
     "build:clean": "rm -rf build",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "test-storybook": "test-storybook",
+    "test-storybook": "test-storybook --maxWorkers=2",
     "test-storybook:watch": "test-storybook --watch",
     "chromatic": "chromatic --exit-zero-on-changes --only-changed"
   },
@@ -95,6 +95,7 @@
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-easy-crop": "^4.0.1",
+    "react-hot-toast": "^2.5.2",
     "react-idle-timer": "^4.2.11",
     "react-intl": "5.25.1",
     "react-page-visibility": "^3.2.1",

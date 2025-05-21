@@ -138,6 +138,11 @@ const messagesToDefine: IErrorMessages = {
     defaultMessage: 'Failed to load users',
     description: 'Error message when user list loads fails',
     id: 'error.userListError'
+  },
+  searchParamCountError: {
+    defaultMessage: 'You must select a minimum of 2 search criteria',
+    description: 'Error message when the search parameters are less than two',
+    id: 'error.searchParamCountError'
   }
 }
 
