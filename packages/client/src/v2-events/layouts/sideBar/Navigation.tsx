@@ -98,7 +98,9 @@ export const Navigation = ({
             await storage.removeItem(SCREEN_LOCK)
             removeToken()
             await removeUserDetails()
-            window.location.assign(window.config.LOGIN_URL) // how to preserve language
+            window.location.assign(
+              `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}`
+            )
           }}
         />
       </NavigationGroup>
