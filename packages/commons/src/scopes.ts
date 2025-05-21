@@ -218,7 +218,7 @@ const LiteralScopes = z.union([
 ])
 
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z]+)\[((?:\w+=[\w-]+(?:\|[\w-]+)*)(:?,[\w-]+=[\w-]+(?:\|[\w-]+)*)*)\]$/
+  /^([a-zA-Z\.]+)\[((?:\w+=[\w-]+(?:\|[\w-]+)*)(:?,[\w-]+=[\w-]+(?:\|[\w-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
