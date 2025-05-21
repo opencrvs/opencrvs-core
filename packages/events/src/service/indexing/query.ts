@@ -160,13 +160,18 @@ function buildClause(clause: QueryExpression) {
   return must
 }
 
-export function buildElasticQueryFromSearchPayload(input: QueryType) {
+export function buildElasticQueryFromSearchPayload(
+  input: QueryType
+): estypes.QueryDslQueryContainer {
   switch (input.type) {
     case 'and': {
       const must = input.clauses.flatMap((clause) => buildClause(clause))
       return {
         bool: {
-          must
+          must,
+          // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
+          // when no `should` clauses are provided.
+          should: undefined
         }
       }
     }
@@ -181,7 +186,7 @@ export function buildElasticQueryFromSearchPayload(input: QueryType) {
     // default fallback (shouldn't happen if input is validated correctly)
     default:
       return {
-        bool: { must_not: { match_all: {} } }
+        bool: { must_not: { match_all: {} }, should: undefined }
       }
   }
 }
