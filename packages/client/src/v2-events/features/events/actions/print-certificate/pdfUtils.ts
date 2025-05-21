@@ -273,11 +273,7 @@ export function compileSvg({
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
     const stringifyDeclaration = getFormDataStringifier(intl, locations)
     const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
-
     const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
-
-    console.log('resolvedDeclaration')
-    console.log(resolvedDeclaration)
 
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
