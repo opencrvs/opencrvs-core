@@ -37,7 +37,7 @@ import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
 import { isConditionMet, isFieldVisible } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
-import { getUUID } from '../uuid'
+import { getUUID, UUID } from '../uuid'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
@@ -185,8 +185,8 @@ export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
 }
 
 export function createEmptyDraft(
-  eventId: string,
-  draftId: string,
+  eventId: UUID,
+  draftId: UUID,
   actionType: ActionType
 ): Draft {
   return {

@@ -22,7 +22,7 @@ const prettierConfig = {
 
 /** @type {import('prettier-plugin-embed').PrettierPluginEmbedOptions} */
 const prettierPluginEmbedConfig = {
-  embeddedSqlTags: ['sql.typeAlias']
+  embeddedSqlTags: ['sql.typeAlias', 'sql.type']
 }
 
 /** @type {import('prettier-plugin-sql').SqlBaseOptions} */

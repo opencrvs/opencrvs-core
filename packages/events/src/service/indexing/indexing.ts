@@ -27,12 +27,12 @@ import {
   QueryType
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
-import * as eventsDb from '@events/storage/mongodb/events'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { getClient, sql } from '@events/storage/postgres/events'
 import {
   decodeEventIndex,
   DEFAULT_SIZE,
@@ -248,7 +248,7 @@ type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 
 export async function indexAllEvents(eventConfiguration: EventConfig) {
-  const mongoClient = await eventsDb.getClient()
+  const db = await getClient()
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(eventConfiguration.id)
   const hasEventsIndex = await esClient.indices.exists({
@@ -259,8 +259,6 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   }
 
-  const stream = mongoClient.collection(indexName).find().stream()
-
   const transformedStreamData = new Transform({
     readableObjectMode: true,
     writableObjectMode: true,
@@ -269,18 +267,70 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     }
   })
 
-  await esClient.helpers.bulk({
-    retries: 3,
-    wait: 3000,
-    datasource: stream.pipe(transformedStreamData),
-    onDocument: (doc: EventIndex) => ({
-      index: {
-        _index: indexName,
-        _id: doc.id
-      }
-    }),
-    refresh: 'wait_for'
-  })
+  await db.stream(
+    sql.type(EventDocument)`
+      SELECT
+        e.id,
+        e.event_type AS type,
+        e.date_of_event_field_id AS "dateOfEventFieldId",
+        e.created_at AS "createdAt",
+        e.updated_at AS "updatedAt",
+        e.tracking_id AS "trackingId",
+        COALESCE(
+          json_agg(
+            jsonb_build_object(
+              'id',
+              a.id,
+              'transactionId',
+              a.transaction_id,
+              'createdAt',
+              a.created_at,
+              'createdBy',
+              a.created_by,
+              'createdByRole',
+              a.created_by_role,
+              'declaration',
+              a.declaration,
+              'annotation',
+              a.annotation,
+              'createdAtLocation',
+              a.created_at_location,
+              'status',
+              a.status,
+              'type',
+              a.action_type,
+              'originalActionId',
+              a.original_action_id
+            )
+          ) FILTER (
+            WHERE
+              a.id IS NOT NULL
+          ),
+          '[]'::json
+        ) AS actions
+      FROM
+        events e
+        LEFT JOIN event_actions a ON a.event_id = e.id
+      GROUP BY
+        e.id
+    `,
+    // @TODO: Look into thi
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    async (stream) => {
+      await esClient.helpers.bulk({
+        retries: 3,
+        wait: 3000,
+        datasource: stream.pipe(transformedStreamData),
+        onDocument: (doc: EventIndex) => ({
+          index: {
+            _index: indexName,
+            _id: doc.id
+          }
+        }),
+        refresh: 'wait_for'
+      })
+    }
+  )
 }
 
 export async function indexEvent(event: EventDocument) {

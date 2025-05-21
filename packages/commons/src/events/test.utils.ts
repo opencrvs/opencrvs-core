@@ -11,7 +11,7 @@
  */
 import { merge, omitBy, isString } from 'lodash'
 import { tennisClubMembershipEvent } from '../fixtures'
-import { getUUID } from '../uuid'
+import { getUUID, UUID } from '../uuid'
 import {
   ActionBase,
   ActionDocument,
@@ -130,7 +130,7 @@ export const eventPayloadGenerator = {
     id
   }),
   draft: (
-    { eventId, actionType }: { eventId: string; actionType: ActionType },
+    { eventId, actionType }: { eventId: UUID; actionType: ActionType },
     input: Partial<Draft> = {}
   ): Draft =>
     merge(
@@ -498,7 +498,7 @@ export function generateEventDocument({
 }
 
 export function generateEventDraftDocument(
-  eventId: string,
+  eventId: UUID,
   actionType: ActionType = ActionType.DECLARE,
   declaration: Record<string, FieldValue> = {}
 ): Draft {

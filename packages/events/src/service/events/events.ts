@@ -31,44 +31,109 @@ import {
   EventStatus,
   isWriteAction
 } from '@opencrvs/commons/events'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
-import * as events from '@events/storage/mongodb/events'
+import { getClient, sql } from '@events/storage/postgres/events'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
-async function getEventByTransactionId(transactionId: string) {
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
+export async function findEventByTransactionId(
+  transactionId: string
+): Promise<EventDocument | undefined> {
+  const db = await getClient()
 
-  const document = await collection.findOne({ transactionId })
+  return db.transaction(async (trx) => {
+    const event = await trx.maybeOne(sql.type(
+      EventDocument.omit({ actions: true })
+    )`
+      SELECT
+        id,
+        event_type AS type,
+        date_of_event_field_id AS "dateOfEventFieldId",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt",
+        tracking_id AS "trackingId"
+      FROM
+        events
+      WHERE
+        transaction_id = ${transactionId}
+    `)
 
-  return document
+    if (!event) {
+      return undefined
+    }
+
+    const actions = await trx.any(sql.type(ActionDocument)`
+      SELECT
+        id,
+        transaction_id AS "transactionId",
+        created_at AS "createdAt",
+        created_by AS "createdBy",
+        created_by_role AS "createdByRole",
+        declaration,
+        annotation,
+        created_at_location AS "createdAtLocation",
+        status,
+        action_type AS "type",
+        original_action_id  AS "originalActionId"
+      FROM
+        event_actions
+      WHERE
+        event_id = ${event.id}::uuid
+  `)
+
+    return {
+      ...event,
+      actions: [...actions]
+    }
+  })
 }
-class EventNotFoundError extends TRPCError {
-  constructor(id: string) {
-    super({
-      code: 'NOT_FOUND',
-      message: `Event not found with ID: ${id}`
-    })
-  }
-}
 
-export async function getEventById(id: string): Promise<EventDocument> {
-  const db = await events.getClient()
+export async function getEventById(id: UUID): Promise<EventDocument> {
+  const db = await getClient()
 
-  const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne<Omit<EventDocument, '_id'>>(
-    { id: id },
-    { projection: { _id: 0 } }
-  )
+  const result = await db.transaction(async (trx) => {
+    const event = await trx.one(sql.type(EventDocument.omit({ actions: true }))`
+      SELECT
+        id,
+        event_type AS type,
+        date_of_event_field_id AS "dateOfEventFieldId",
+        created_at AS "createdAt",
+        updated_at AS "updatedAt",
+        tracking_id AS "trackingId"
+      FROM
+        events
+      WHERE
+        id = ${id}
+    `)
 
-  if (!event) {
-    throw new EventNotFoundError(id)
-  }
+    const actions = await trx.any(sql.type(ActionDocument)`
+      SELECT
+        id,
+        transaction_id AS "transactionId",
+        created_at AS "createdAt",
+        created_by AS "createdBy",
+        created_by_role AS "createdByRole",
+        declaration,
+        annotation,
+        created_at_location AS "createdAtLocation",
+        status,
+        action_type AS "type",
+        original_action_id  AS "originalActionId"
+      FROM
+        event_actions
+      WHERE
+        event_id = ${event.id}::uuid
+  `)
 
-  return event
+    return {
+      ...event,
+      actions: [...actions]
+    }
+  })
+
+  return result
 }
 
 function getValidFileValue(
@@ -107,19 +172,9 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
-export async function deleteEvent(
-  eventId: string,
-  { token }: { token: string }
-) {
-  const db = await events.getClient()
-
-  const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ id: eventId })
-
-  if (!event) {
-    throw new EventNotFoundError(eventId)
-  }
-
+export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
+  const db = await getClient()
+  const event = await getEventById(eventId)
   const eventState = getCurrentEventState(event)
 
   // Once an event is declared or notified, it can not be deleted anymore
@@ -134,7 +189,11 @@ export async function deleteEvent(
   await deleteEventAttachments(token, event)
   await deleteEventIndex(event)
   await deleteDraftsByEventId(id)
-  await collection.deleteOne({ id })
+  await db.query(sql.typeAlias('void')`
+    DELETE FROM events
+    WHERE
+      id = ${eventId}
+  `)
 
   return { id }
 }
@@ -153,8 +212,6 @@ function generateTrackingId(): string {
   return result
 }
 
-type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
-
 export async function createEvent({
   eventInput,
   createdAtLocation,
@@ -168,57 +225,96 @@ export async function createEvent({
   createdAtLocation: string
   transactionId: string
 }): Promise<EventDocument> {
-  const existingEvent = await getEventByTransactionId(transactionId)
+  const existingEvent = await findEventByTransactionId(transactionId)
 
   if (existingEvent) {
     return existingEvent
   }
 
-  const db = await events.getClient()
-  const collection = db.collection<EventDocumentWithTransActionId>('events')
-
-  const now = new Date().toISOString()
+  const db = await getClient()
   const id = getUUID()
   const trackingId = generateTrackingId()
 
-  await collection.insertOne({
-    ...eventInput,
-    id,
-    transactionId,
-    createdAt: now,
-    updatedAt: now,
-    trackingId,
-    actions: [
-      {
-        type: ActionType.CREATE,
-        createdAt: now,
-        createdBy,
-        createdByRole,
-        createdAtLocation,
-        id: getUUID(),
-        declaration: {},
-        status: ActionStatus.Accepted,
-        transactionId: getUUID()
-      }
-    ]
+  await db.transaction(async (trx) => {
+    const eventResult = await trx.one(sql.type(z.object({ id: UUID }))`
+      INSERT INTO events (
+        event_type,
+        transaction_id,
+        tracking_id,
+        date_of_event_field_id
+      )
+      VALUES (
+        ${eventInput.type},
+        gen_random_uuid(),
+        ${trackingId},
+        ${eventInput.dateOfEvent?.fieldId ?? null}
+      )
+      RETURNING id
+    `)
+
+    const eventId = eventResult.id
+
+    // Insert initial CREATE action
+    await trx.query(sql.typeAlias('void')`
+      INSERT INTO
+        event_actions (
+          event_id,
+          transaction_id,
+          action_type,
+          declaration,
+          annotation,
+          status,
+          original_action_id,
+          created_by,
+          created_by_role,
+          created_at_location
+        )
+      VALUES
+        (
+          ${eventId}::uuid,
+          gen_random_uuid (),
+          ${ActionType.CREATE},
+          '{}'::jsonb,
+          '{}'::jsonb,
+          ${ActionStatus.Accepted}::action_status,
+          NULL,
+          ${createdBy},
+          ${createdByRole},
+          ${createdAtLocation}
+        )
+    `)
   })
 
-  const action: ActionDocument = {
-    type: ActionType.ASSIGN,
-    assignedTo: createdBy,
-    declaration: {},
-    createdBy,
-    createdByRole,
-    createdAt: now,
-    createdAtLocation,
-    id,
-    status: ActionStatus.Accepted,
-    transactionId: getUUID()
-  }
-
-  await db
-    .collection<EventDocument>('events')
-    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
+  await db.query(sql.typeAlias('void')`
+    INSERT INTO
+      event_actions (
+        event_id,
+        transaction_id,
+        action_type,
+        assigned_to,
+        declaration,
+        annotation,
+        status,
+        original_action_id,
+        created_by,
+        created_by_role,
+        created_at_location
+      )
+    VALUES
+      (
+        ${id},
+        gen_random_uuid (),
+        ${ActionType.ASSIGN},
+        ${createdBy},
+        '{}'::jsonb,
+        '{}'::jsonb,
+        ${ActionStatus.Accepted}::action_status,
+        NULL,
+        ${createdBy},
+        ${createdByRole},
+        ${createdAtLocation}
+      )
+  `)
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -278,21 +374,19 @@ export async function addAction(
     createdAtLocation,
     status
   }: {
-    eventId: string
+    eventId: UUID
     createdBy: string
     createdByRole: string
     /**
      * The location where the action was created. This is used for auditing purposes.
      */
-    createdAtLocation: string
+    createdAtLocation: UUID
     token: string
     transactionId: string
     status: ActionStatus
-  },
-  actionId = getUUID()
+  }
 ): Promise<EventDocument> {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
+  const db = await getClient()
   const event = await getEventById(eventId)
   const configuration = await getEventConfigurationById({
     token,
@@ -313,73 +407,96 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    await db.collection<EventDocument>('events').updateOne(
-      {
-        id: eventId,
-        'actions.transactionId': {
-          $ne: input.transactionId
-        }
-      },
-      {
-        $push: {
-          actions: {
-            ...input,
-            transactionId: getUUID(),
-            type: ActionType.MARKED_AS_DUPLICATE,
-            createdBy,
-            createdByRole,
-            createdAt: now,
-            createdAtLocation,
-            id: getUUID(),
-            status
-          }
-        },
-        $set: {
-          updatedAt: now
-        }
-      }
-    )
+    await db.query(sql.typeAlias('void')`
+      INSERT INTO
+        event_actions (
+          transaction_id,
+          event_id,
+          action_type,
+          declaration,
+          annotation,
+          status,
+          original_action_id,
+          created_by,
+          created_by_role,
+          created_at_location
+        )
+      VALUES
+        (
+          gen_random_uuid (),
+          ${eventId},
+          ${ActionType.MARKED_AS_DUPLICATE},
+          ${sql.jsonb(input.declaration)},
+          ${sql.jsonb(input.annotation)},
+          ${status}::action_status,
+          ${input.originalActionId ?? null}::uuid,
+          ${createdBy},
+          ${createdByRole},
+          ${createdAtLocation}::uuid
+        )
+      ON CONFLICT (transaction_id) DO NOTHING
+    `)
   }
 
-  const action: ActionDocument = {
-    ...input,
-    createdBy,
-    createdByRole,
-    createdAt: now,
-    createdAtLocation,
-    id: actionId,
-    status: status
-  }
-
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
+  await db.query(sql.typeAlias('void')`
+    INSERT INTO
+      event_actions (
+        transaction_id,
+        event_id,
+        action_type,
+        declaration,
+        annotation,
+        status,
+        original_action_id,
+        created_by,
+        created_by_role,
+        created_at_location
+      )
+    VALUES
+      (
+        gen_random_uuid (),
+        ${eventId},
+        ${status},
+        ${sql.jsonb(input.declaration)},
+        ${sql.jsonb(input.annotation)},
+        ${status}::action_status,
+        ${input.originalActionId ?? null}::uuid,
+        ${createdBy},
+        ${createdByRole},
+        ${createdAtLocation}::uuid
+      )
+    ON CONFLICT (transaction_id) DO NOTHING
+  `)
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
-    await db.collection<EventDocument>('events').updateOne(
-      { id: eventId },
-      {
-        $push: {
-          actions: {
-            ...input,
-            transactionId: getUUID(),
-            type: ActionType.UNASSIGN,
-            declaration: {},
-            assignedTo: null,
-            createdBy,
-            createdByRole,
-            createdAt: now,
-            createdAtLocation,
-            id: actionId,
-            status
-          }
-        },
-        $set: { updatedAt: now }
-      }
-    )
+    await db.query(sql.typeAlias('void')`
+      INSERT INTO
+        event_actions (
+          transaction_id,
+          event_id,
+          action_type,
+          declaration,
+          annotation,
+          status,
+          original_action_id,
+          created_by,
+          created_by_role,
+          created_at_location
+        )
+      VALUES
+        (
+          gen_random_uuid (),
+          ${eventId},
+          ${ActionType.UNASSIGN},
+          '{}'::jsonb,
+          '{}'::jsonb,
+          ${status}::action_status,
+          NULL,
+          ${createdBy},
+          ${createdByRole},
+          ${createdAtLocation}::uuid
+        )
+    `)
   }
 
   const drafts = await getDraftsForAction(eventId, createdBy, input.type)
@@ -393,10 +510,10 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  if (action.type !== ActionType.READ) {
+  if (input.type !== ActionType.READ) {
     await indexEvent(updatedEvent)
 
-    if (action.type !== ActionType.ASSIGN) {
+    if (input.type !== ActionType.ASSIGN) {
       await deleteDraftsByEventId(eventId)
     }
   }
@@ -407,26 +524,37 @@ export async function addAction(
 type AsyncRejectActionInput = Omit<
   z.infer<typeof AsyncRejectActionDocument>,
   'createdAt' | 'id' | 'status'
-> & { transactionId: string; eventId: string }
+> & { transactionId: string; eventId: UUID }
 
 export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
+  const db = await getClient()
   const { transactionId, eventId } = input
 
-  const action = {
-    ...input,
-    createdAt: now,
-    id: getUUID(),
-    status: ActionStatus.Rejected
-  } satisfies AsyncRejectActionDocument
-
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
+  await db.query(sql.typeAlias('void')`
+    INSERT INTO
+      event_actions (
+        event_id,
+        transaction_id,
+        action_type,
+        status,
+        original_action_id,
+        created_by,
+        created_by_role,
+        created_at_location
+      )
+    VALUES
+      (
+        ${eventId},
+        ${transactionId},
+        ${input.type},
+        ${ActionStatus.Rejected}::action_status,
+        ${input.originalActionId ?? null}::uuid,
+        ${input.createdBy},
+        ${input.createdByRole},
+        ${input.createdAtLocation}
+      )
+    ON CONFLICT (transaction_id) DO NOTHING
+  `)
 
   const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent)

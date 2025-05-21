@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput } from '@opencrvs/commons/events'
+import { Draft, DraftInput } from '@opencrvs/commons/events'
 import { UUID } from '@opencrvs/commons'
 import { getClient, sql } from '@events/storage/postgres/events'
 
@@ -32,14 +32,14 @@ export async function createDraft(
 ) {
   const db = await getClient()
 
-  const draft = await db.one(sql.typeAlias('draft')`
+  const draft = await db.one(sql.type(Draft)`
     INSERT INTO
       event_action_drafts (
         event_id,
         transaction_id,
         action_type,
         declaration,
-        annotations,
+        annotation,
         created_by,
         created_by_role,
         created_at_location
@@ -58,14 +58,14 @@ export async function createDraft(
     ON CONFLICT (transaction_id) DO UPDATE
     SET
       declaration = EXCLUDED.declaration,
-      annotations = EXCLUDED.annotations,
+      annotation = EXCLUDED.annotation,
       created_at = now()
     RETURNING
       id,
       event_id AS "eventId",
       transaction_id AS "transactionId",
       declaration,
-      annotations
+      annotation
   `)
 
   return draft
@@ -73,13 +73,13 @@ export async function createDraft(
 
 export async function getDraftsByUserId(createdBy: string) {
   const db = await getClient()
-  const drafts = await db.any(sql.typeAlias('draft')`
+  const drafts = await db.any(sql.type(Draft)`
     SELECT
       id,
       event_id AS "eventId",
       transaction_id AS "transactionId",
       declaration,
-      annotations
+      annotation
     FROM
       event_action_drafts
     WHERE
@@ -95,13 +95,13 @@ export async function getDraftsForAction(
   actionType: string
 ) {
   const db = await getClient()
-  const drafts = await db.any(sql.typeAlias('draft')`
+  const drafts = await db.any(sql.type(Draft)`
     SELECT
       id,
       event_id AS "eventId",
       transaction_id AS "transactionId",
       declaration,
-      annotations
+      annotation
     FROM
       event_action_drafts
     WHERE
@@ -115,7 +115,7 @@ export async function getDraftsForAction(
 
 export async function deleteDraftsByEventId(eventId: UUID) {
   const db = await getClient()
-  await db.any(sql.typeAlias('void')`
+  return db.query(sql.typeAlias('void')`
     DELETE FROM event_action_drafts
     WHERE
       event_id = ${eventId}

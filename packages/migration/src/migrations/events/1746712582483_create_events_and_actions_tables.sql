@@ -2,10 +2,10 @@
 
 CREATE TABLE events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  event_type text NOT NULL,
   transaction_id text NOT NULL UNIQUE,
-  type text NOT NULL,
-  data jsonb NOT NULL,
-  tracking_id text NOT NULL,
+  tracking_id text NOT NULL UNIQUE,
+  date_of_event_field_id text,
   created_at timestamp with time zone DEFAULT now() NOT NULL,
   updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
@@ -24,9 +24,11 @@ CREATE TABLE event_actions (
   transaction_id text UNIQUE NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
   action_type text NOT NULL,
+  assigned_to text,
   declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
-  annotations jsonb DEFAULT '{}'::jsonb NOT NULL,
+  annotation jsonb DEFAULT '{}'::jsonb NOT NULL,
   status action_status NOT NULL,
+  original_action_id uuid REFERENCES event_actions(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_at_location text NOT NULL,
@@ -36,13 +38,16 @@ CREATE TABLE event_actions (
 COMMENT ON TABLE event_actions IS
   'Stores actions performed on life events, including client-supplied transaction_id for idempotency. Each action is linked to a specific event.';
 
+COMMENT ON COLUMN event_actions.original_action_id IS
+  'References the original action if this is an asynchronous confirmation of it.';
+
 CREATE TABLE event_action_drafts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   transaction_id text UNIQUE NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
   action_type text NOT NULL,
   declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
-  annotations jsonb DEFAULT '{}'::jsonb NOT NULL,
+  annotation jsonb DEFAULT '{}'::jsonb NOT NULL,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_at_location text NOT NULL,

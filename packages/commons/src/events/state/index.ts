@@ -229,7 +229,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     ).data ?? null
 
   return deepDropNulls({
-    id: event.id,
+    id: event.id as string, // @TODO: Is this needed?
     type: event.type,
     status: getStatusFromActions(event.actions),
     legalStatuses: getLegalStatuses(event.actions),

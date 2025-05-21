@@ -16,7 +16,7 @@ import {
   findLastAssignmentAction,
   UnassignActionInput
 } from '@opencrvs/commons/events'
-import { inScope, SCOPES } from '@opencrvs/commons'
+import { inScope, SCOPES, UUID } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 import { setBearerForToken } from '@events/router/middleware'
 
@@ -30,10 +30,10 @@ export async function unassignRecord(
     createdAtLocation,
     transactionId
   }: {
-    eventId: string
+    eventId: UUID
     createdBy: string
     createdByRole: string
-    createdAtLocation: string
+    createdAtLocation: UUID
     token: string
     transactionId: string
   }
