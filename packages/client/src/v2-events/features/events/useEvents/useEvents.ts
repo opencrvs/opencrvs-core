@@ -42,7 +42,7 @@ function toQueryType(
   })
 
   return {
-    type: type === 'and' ? 'and' : 'or',
+    type,
     clauses: [{ ...topLevelFields, eventType, data: dataFields }]
   }
 }

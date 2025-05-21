@@ -373,17 +373,13 @@ export async function getIndex(eventParams: QueryType) {
     (clause) => 'eventType' in clause
   )?.eventType
 
-  if (!eventType) {
-    throw new Error('Missing eventType in clauses')
-  }
-
   if (Object.values(eventParams).length === 0) {
     throw new Error('No search params provided')
   }
 
   const query = buildElasticQueryFromSearchPayload(eventParams)
   const response = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(eventType),
+    index: eventType ? getEventIndexName(eventType) : getEventAliasName(),
     size: DEFAULT_SIZE,
     request_cache: false,
     query
