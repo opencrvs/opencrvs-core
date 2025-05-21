@@ -74,6 +74,12 @@ function generateQuery(
 function buildClause(clause: QueryExpression) {
   const must: estypes.QueryDslQueryContainer[] = []
 
+  if (clause.eventType) {
+    must.push({
+      term: { type: clause.eventType }
+    })
+  }
+
   if (clause.status) {
     if (clause.status.type === 'anyOf') {
       must.push({ terms: { status: clause.status.terms } })
