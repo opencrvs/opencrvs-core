@@ -96,7 +96,7 @@ export const getFormDataStringifier = (
     }
 
     if (isFacilityFieldType(field)) {
-      return LocationSearch.Output({ value: field.value })
+      return LocationSearch.stringify(intl, locations, field.value)
     }
 
     return simpleFieldStringifier(fieldConfig, value)

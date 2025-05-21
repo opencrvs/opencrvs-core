@@ -33,18 +33,14 @@ import {
   getMixedPath,
   EventMetadata,
   EventStatus,
-  DEFAULT_DATE_OF_EVENT_PROPERTY,
-  FieldConfig,
-  isFacilityFieldType
+  DEFAULT_DATE_OF_EVENT_PROPERTY
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
-import {
-  getUsersFullName,
-  useResolveLocationToObject
-} from '@client/v2-events/utils'
+import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 
 interface FontFamilyTypes {
   normal: string
@@ -56,38 +52,6 @@ interface FontFamilyTypes {
 type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
-
-function findLocationById(
-  intl: IntlShape,
-  locationId: string | null | undefined,
-  locations: Location[]
-) {
-  const country = intl.formatMessage({
-    id: `countries.${window.config.COUNTRY}`,
-    defaultMessage: 'Farajaland',
-    description: 'Country name'
-  })
-
-  if (!locationId) {
-    return {
-      location: '',
-      district: '',
-      province: '',
-      country
-    }
-  }
-
-  const location = locations.find((loc) => loc.id === locationId)
-  const district = locations.find((loc) => loc.id === location?.partOf)
-  const province = locations.find((loc) => loc.id === district?.partOf)
-
-  return {
-    location: location?.name || '',
-    district: district?.name || '',
-    province: province?.name || '',
-    country: country
-  }
-}
 
 function findUserById(userId: string, users: User[]) {
   const user = users.find((u) => u.id === userId)
@@ -125,10 +89,10 @@ export const stringifyEventMetadata = ({
       : DateField.stringify(intl, metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]),
     createdAt: DateField.stringify(intl, metadata.createdAt),
     createdBy: findUserById(metadata.createdBy, users),
-    createdAtLocation: findLocationById(
+    createdAtLocation: LocationSearch.stringify(
       intl,
-      metadata.createdAtLocation,
-      locations
+      locations,
+      metadata.createdAtLocation
     ),
     updatedAt: DateField.stringify(intl, metadata.updatedAt),
     updatedBy: metadata.updatedBy
@@ -139,10 +103,10 @@ export const stringifyEventMetadata = ({
     trackingId: metadata.trackingId,
     status: EventStatus.REGISTERED,
     updatedByUserRole: metadata.updatedByUserRole,
-    updatedAtLocation: findLocationById(
+    updatedAtLocation: LocationSearch.stringify(
       intl,
-      metadata.updatedAtLocation,
-      locations
+      locations,
+      metadata.updatedAtLocation
     ),
     flags: [],
     legalStatuses: {
@@ -156,10 +120,10 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.DECLARED.createdBy,
               users
             ),
-            createdAtLocation: findLocationById(
+            createdAtLocation: LocationSearch.stringify(
               intl,
-              metadata.legalStatuses.DECLARED.createdAtLocation,
-              locations
+              locations,
+              metadata.legalStatuses.DECLARED.createdAtLocation
             ),
             acceptedAt: DateField.stringify(
               intl,
@@ -178,10 +142,10 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.REGISTERED.createdBy,
               users
             ),
-            createdAtLocation: findLocationById(
+            createdAtLocation: LocationSearch.stringify(
               intl,
-              metadata.legalStatuses.REGISTERED.createdAtLocation,
-              locations
+              locations,
+              metadata.legalStatuses.REGISTERED.createdAtLocation
             ),
             acceptedAt: DateField.stringify(
               intl,
@@ -253,28 +217,6 @@ function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
-/*
- * Turns certain field values into objects which we can access in the template.
- * For example, we want to access facility location fields with specific object keys instead of plain strings.
- */
-function objectifyFormData(formFields: FieldConfig[], values: EventState) {
-  return Object.keys(values).reduce((acc: Record<string, unknown>, key) => {
-    const fieldConfig = formFields.find((field) => field.id === key)
-    if (!fieldConfig) {
-      throw new Error(`Field ${key} not found in form config`)
-    }
-
-    const value = values[key]
-    const field = { config: fieldConfig, value }
-
-    if (isFacilityFieldType(field)) {
-      acc[key] = useResolveLocationToObject(value?.toString())
-    }
-
-    return acc
-  }, {})
-}
-
 export function compileSvg({
   templateString,
   $metadata,
@@ -332,14 +274,10 @@ export function compileSvg({
     const stringifyDeclaration = getFormDataStringifier(intl, locations)
     const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
 
-    // Sometimes we want to access certain fields as specific object keys instead of plain strings.
-    // For example, we want to access birthLocation as an object with keys FACILITY, DISTRICT, STATE, COUNTRY.
-    const asObjects = objectifyFormData(fieldConfigs, $declaration)
+    const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
-    const resolvedDeclaration = {
-      ...stringifyDeclaration(fieldConfigs, $declaration),
-      asObjects
-    }
+    console.log('resolvedDeclaration')
+    console.log(resolvedDeclaration)
 
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
