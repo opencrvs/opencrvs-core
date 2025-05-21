@@ -251,14 +251,14 @@ const ConfigurableScopes = z.discriminatedUnion('type', [
 
 type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
-export function findScope<t extends ConfigurableScopes['type']>(
+export function findScope<T extends ConfigurableScopes['type']>(
   scopes: string[],
-  scopeType: t
+  scopeType: T
 ) {
   return scopes
     .map((rawScope) => parseScope(rawScope))
     .find(
-      (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: t }> =>
+      (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
         parsedScope?.type === scopeType
     )
 }

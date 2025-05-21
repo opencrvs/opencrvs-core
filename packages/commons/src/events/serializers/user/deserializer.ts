@@ -22,7 +22,7 @@ export const UserWithPrimaryOffice = User.extend({
 })
 export type UserWithPrimaryOffice = z.infer<typeof UserWithPrimaryOffice>
 
-function userDeSerializer(
+function userDeserializer(
   serializedUserField: SerializedUserField | string,
   user: UserWithPrimaryOffice
 ): string {
@@ -46,43 +46,43 @@ function deserializeQueryExpression(
     ...expression,
     assignedTo: expression.assignedTo && {
       ...expression.assignedTo,
-      term: userDeSerializer(expression.assignedTo.term, user)
+      term: userDeserializer(expression.assignedTo.term, user)
     },
     createdBy: expression.createdBy && {
       ...expression.createdBy,
-      term: userDeSerializer(expression.createdBy.term, user)
+      term: userDeserializer(expression.createdBy.term, user)
     },
     updatedBy: expression.updatedBy && {
       ...expression.updatedBy,
-      term: userDeSerializer(expression.updatedBy.term, user)
+      term: userDeserializer(expression.updatedBy.term, user)
     },
     createdAtLocation:
       expression.createdAtLocation &&
       (expression.createdAtLocation.type === 'within'
         ? {
             ...expression.createdAtLocation,
-            location: userDeSerializer(
+            location: userDeserializer(
               expression.createdAtLocation.location,
               user
             )
           }
         : {
             ...expression.createdAtLocation,
-            term: userDeSerializer(expression.createdAtLocation.term, user)
+            term: userDeserializer(expression.createdAtLocation.term, user)
           }),
     updatedAtLocation:
       expression.updatedAtLocation &&
       (expression.updatedAtLocation.type === 'within'
         ? {
             ...expression.updatedAtLocation,
-            location: userDeSerializer(
+            location: userDeserializer(
               expression.updatedAtLocation.location,
               user
             )
           }
         : {
             ...expression.updatedAtLocation,
-            term: userDeSerializer(expression.updatedAtLocation.term, user)
+            term: userDeserializer(expression.updatedAtLocation.term, user)
           })
   }
 }
