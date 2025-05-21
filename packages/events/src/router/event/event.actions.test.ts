@@ -10,8 +10,11 @@
  */
 
 import {
+  ActionStatus,
   ActionType,
   AddressType,
+  EventIndex,
+  EventStatus,
   getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
@@ -127,12 +130,12 @@ test('Action data accepts partial changes', async () => {
     }
   )
 
-  const createAction = originalEvent.actions.filter(
+  const [createAction] = originalEvent.actions.filter(
     (action) => action.type === ActionType.CREATE
   )
 
   const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
+    assignedTo: createAction.createdBy
   })
 
   await client.event.actions.assignment.assign(assignmentInput)
@@ -176,8 +179,16 @@ test('Action data accepts partial changes', async () => {
   expect(events).toEqual([
     expect.objectContaining({
       ...stateAfterVillageRemoval,
-      updatedAt: expect.any(String)
-    })
+      legalStatuses: {
+        [EventStatus.DECLARED]: {
+          acceptedAt: stateAfterVillageRemoval.updatedAt as string,
+          createdAt: stateAfterVillageRemoval.updatedAt as string,
+          createdByRole: user.role,
+          createdBy: user.id,
+          createdAtLocation: user.primaryOfficeId
+        }
+      }
+    } satisfies EventIndex)
   ])
 })
 
@@ -198,7 +209,8 @@ test('READ action does not delete draft', async () => {
       }
     },
     transactionId: 'transactionId',
-    eventId: originalEvent.id
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)
@@ -231,7 +243,8 @@ test('Action other than READ deletes draft', async () => {
       }
     },
     transactionId: 'transactionId',
-    eventId: originalEvent.id
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)

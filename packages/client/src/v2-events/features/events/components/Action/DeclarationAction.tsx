@@ -18,7 +18,8 @@ import {
   getActionAnnotation,
   DeclarationUpdateActionType,
   ActionType,
-  Action
+  Action,
+  deepMerge
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -99,6 +100,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
    */
   const formValues = useEventFormData((state) => state.formValues)
   const annotation = useActionAnnotation((state) => state.annotation)
+  const clearForm = useEventFormData((state) => state.clear)
+  const clearAnnotation = useActionAnnotation((state) => state.clear)
 
   useEffect(() => {
     if (!formValues || !annotation) {
@@ -120,14 +123,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   /*
    * Initialize the form state
    */
-
-  const setInitialFormValues = useEventFormData(
-    (state) => state.setInitialFormValues
-  )
-
-  const setInitialAnnotation = useActionAnnotation(
-    (state) => state.setInitialAnnotation
-  )
+  const setFormValues = useEventFormData((state) => state.setFormValues)
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const eventDrafts = drafts
     .filter((d) => d.eventId === event.id)
@@ -191,8 +188,22 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   }, [event, actionType])
 
   useEffect(() => {
-    setInitialFormValues(eventStateWithDrafts.declaration)
-    setInitialAnnotation({ ...previousActionAnnotation, ...actionAnnotation })
+    // Use the form values from the zustand state, so that filled form state is not lost
+    // If user e.g. enters the 'screen lock' flow while filling form.
+    // Then use form values from drafts.
+    const initialFormValues = deepMerge(
+      formValues || {},
+      eventStateWithDrafts.declaration
+    )
+
+    setFormValues(initialFormValues)
+
+    const initialAnnotation = deepMerge(
+      deepMerge(annotation || {}, previousActionAnnotation),
+      actionAnnotation
+    )
+
+    setAnnotation(initialAnnotation)
 
     return () => {
       /*
@@ -200,6 +211,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
        * staged drafts the user has for this event id and type
        */
       setLocalDraft(null)
+      clearForm()
+      clearAnnotation()
     }
 
     /*

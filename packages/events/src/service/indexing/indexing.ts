@@ -13,10 +13,13 @@ import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
 import { z } from 'zod'
 import {
+  ActionCreationMetadata,
+  RegistrationCreationMetadata,
   AddressFieldValue,
   EventConfig,
   EventDocument,
   EventIndex,
+  EventStatus,
   FieldConfig,
   FieldType,
   getCurrentEventState,
@@ -68,6 +71,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
+    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.SIGNATURE:
@@ -177,7 +181,39 @@ export async function createIndex(
             properties: formFieldsToDataMapping(formFields)
           },
           trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' }
+          legalStatuses: {
+            type: 'object',
+            properties: {
+              [EventStatus.DECLARED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
+              [EventStatus.REGISTERED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' },
+                  registrationNumber: { type: 'keyword' }
+                } satisfies Record<
+                  keyof RegistrationCreationMetadata,
+                  estypes.MappingProperty
+                >
+              }
+            }
+          },
+          flags: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
@@ -272,7 +308,7 @@ export async function deleteEventIndex(event: EventDocument) {
   return response
 }
 
-export async function getIndexedEvents() {
+export async function getIndexedEvents(userId: string) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -286,8 +322,32 @@ export async function getIndexedEvents() {
     return []
   }
 
+  const query = {
+    // We basically want to fetch all events,
+    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
+    bool: {
+      should: [
+        {
+          bool: {
+            must_not: [{ term: { status: EventStatus.CREATED } }]
+          }
+        },
+        {
+          bool: {
+            must: [
+              { term: { status: EventStatus.CREATED } },
+              { term: { createdBy: userId } }
+            ]
+          }
+        }
+      ],
+      minimum_should_match: 1
+    }
+  } as estypes.QueryDslQueryContainer
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
+    query,
     size: 10000,
     request_cache: false
   })

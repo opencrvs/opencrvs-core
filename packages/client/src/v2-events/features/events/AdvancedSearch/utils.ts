@@ -16,9 +16,9 @@ import {
   FieldValue,
   QueryInputType,
   SearchField,
-  EventFieldId,
-  MatchType
+  EventFieldId
 } from '@opencrvs/commons/client'
+import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
   Errors,
@@ -115,6 +115,13 @@ const RegStatus = {
   Created: 'CREATED'
 } as const
 
+const MatchType = {
+  fuzzy: 'fuzzy',
+  exact: 'exact',
+  anyOf: 'anyOf',
+  range: 'range'
+} as const
+
 type Condition =
   | { type: 'fuzzy'; term: string }
   | { type: 'exact'; term: string }
@@ -123,15 +130,18 @@ type Condition =
 
 export const ADVANCED_SEARCH_KEY = 'and'
 
-function buildCondition(type: MatchType, value: string): Condition {
+function buildCondition(
+  value: string,
+  type: keyof typeof MatchType = 'exact'
+): Condition {
   switch (type) {
-    case 'FUZZY':
+    case MatchType.fuzzy:
       return { type: 'fuzzy', term: value }
-    case 'EXACT':
+    case MatchType.exact:
       return { type: 'exact', term: value }
-    case 'ANY_OF':
+    case MatchType.anyOf:
       return { type: 'anyOf', terms: value.split(',') }
-    case 'RANGE':
+    case MatchType.range:
       const [gte, lte] = value.split(',')
       return { type: 'range', gte, lte }
     default:
@@ -143,26 +153,55 @@ function buildConditionForStatus(): Condition {
   return { type: 'anyOf', terms: Object.values(RegStatus) }
 }
 
+function formatValue(
+  rawInput: Record<string, FieldValue>,
+  fieldId: string,
+  fieldConfig?: FieldConfig
+): string {
+  const value = rawInput[fieldId]
+
+  if (
+    fieldConfig &&
+    fieldConfig.type === FieldType.DATE_RANGE &&
+    Array.isArray(value) &&
+    value.length === 2
+  ) {
+    return `${value[0]},${value[1]}`
+  }
+  return String(value)
+}
+
 function buildDataConditionFromSearchKeys(
   searchKeys: {
     fieldId: string
     config?: {
-      type: MatchType
+      type: keyof typeof MatchType
     }
     fieldType: 'field' | 'event'
+    fieldConfig?: FieldConfig
   }[],
   rawInput: Record<string, string> // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
-    (result: Record<string, Condition>, { fieldId, config, fieldType }) => {
+    (
+      result: Record<string, Condition>,
+      { fieldId, config, fieldType, fieldConfig }
+    ) => {
       const fieldIdEdited = fieldType === 'event' ? `event.${fieldId}` : fieldId
-      const value = rawInput[fieldIdEdited]
+      const value = formatValue(rawInput, fieldIdEdited, fieldConfig)
 
       if (fieldIdEdited === 'event.status' && value === 'ALL') {
         const transformedKey = fieldIdEdited.replace(/\./g, '____')
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
-        const condition = buildCondition(config?.type ?? 'EXACT', value)
+        // Handle the case where we want to search by range but the value is not a comma-separated string
+        // e.g. "2023-01-01,2023-12-31" should be treated as a range
+        // but "2023-01-01" should be treated as an exact match
+        const searchType =
+          config?.type === 'range' && value.split(',').length === 1
+            ? 'exact'
+            : config?.type
+        const condition = buildCondition(value, searchType)
         const transformedKey = fieldIdEdited.replace(/\./g, '____')
         result[transformedKey] = condition
       }
@@ -183,7 +222,10 @@ export function buildDataCondition(
     section.fields.map((field) => ({
       fieldId: field.fieldId,
       config: field.config, // assuming field structure has a `config` prop
-      fieldType: field.fieldType
+      fieldType: field.fieldType,
+      fieldConfig: eventConfig.declaration.pages
+        .flatMap((page) => page.fields)
+        .find((f) => f.id === field.fieldId)
     }))
   )
 

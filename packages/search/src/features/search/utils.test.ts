@@ -46,4 +46,95 @@ describe('elasticsearch db helper', () => {
       }
     })
   })
+  it('should create a query that searches by name', async () => {
+    const newQuery = await advancedQueryBuilder(
+      {
+        trackingId: '',
+        nationalId: '',
+        registrationNumber: '',
+        contactNumber: '',
+        contactEmail: '',
+        name: 'John Doe'
+      },
+      '',
+      false
+    )
+    expect(newQuery).toEqual({
+      bool: {
+        filter: [],
+        must: [
+          {
+            bool: {
+              should: [
+                {
+                  bool: {
+                    filter: { term: { event: 'birth' } },
+                    must: {
+                      multi_match: {
+                        query: 'John Doe',
+                        fields: [
+                          'name^3',
+                          'childFirstNames^2',
+                          'childFamilyName',
+                          'informantFirstNames',
+                          'informantFamilyName',
+                          'motherFirstNames',
+                          'motherFamilyName',
+                          'fatherFirstNames',
+                          'fatherFamilyName'
+                        ],
+                        fuzziness: 'AUTO'
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    filter: { term: { event: 'death' } },
+                    must: {
+                      multi_match: {
+                        query: 'John Doe',
+                        fields: [
+                          'name^3',
+                          'deceasedFirstNames^2',
+                          'deceasedFamilyName',
+                          'informantFirstNames',
+                          'informantFamilyName',
+                          'spouseFirstNames',
+                          'spouseFamilyName'
+                        ],
+                        fuzziness: 'AUTO'
+                      }
+                    }
+                  }
+                },
+                {
+                  bool: {
+                    filter: { term: { event: 'marriage' } },
+                    must: {
+                      multi_match: {
+                        query: 'John Doe',
+                        fields: [
+                          'brideFirstNames^6',
+                          'brideFamilyName^6',
+                          'groomFirstNames^6',
+                          'groomFamilyName^6',
+                          'witnessOneFirstNames',
+                          'witnessOneFamilyName',
+                          'witnessTwoFirstNames',
+                          'witnessTwoFamilyName'
+                        ],
+                        fuzziness: 'AUTO'
+                      }
+                    }
+                  }
+                }
+              ],
+              minimum_should_match: 1
+            }
+          }
+        ]
+      }
+    })
+  })
 })

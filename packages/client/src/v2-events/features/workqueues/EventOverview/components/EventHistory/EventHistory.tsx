@@ -87,9 +87,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     )
     .map((item) => {
       const user = getUser(item.createdBy)
-      const location = getLocation(
-        item.updatedAtLocation ?? item.createdAtLocation ?? ''
-      )
+      const location = getLocation(item.createdAtLocation)
 
       return {
         date: format(

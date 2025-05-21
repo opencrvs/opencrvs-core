@@ -16,7 +16,13 @@ import { stringify } from 'query-string'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
-import { EventConfig, FieldValue } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  FieldType,
+  FieldValue,
+  Inferred,
+  SearchField
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
@@ -52,6 +58,41 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
+function enhanceFieldWithSearchFieldConfig(
+  field: Inferred,
+  searchField: SearchField
+): Inferred {
+  if (field.type === FieldType.DATE && searchField.config.type === 'range') {
+    return {
+      ...field,
+      validation: [],
+      type: FieldType.DATE_RANGE,
+      defaultValue: undefined
+    }
+  }
+  return field
+}
+
+function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
+  return {
+    ...event,
+    declaration: {
+      ...event.declaration,
+      pages: event.declaration.pages.map((page) => ({
+        ...page,
+        fields: page.fields.map((field) => {
+          const searchField = event.advancedSearch
+            .flatMap((x) => x.fields)
+            .find((f) => f.fieldId === field.id)
+          return searchField
+            ? enhanceFieldWithSearchFieldConfig(field, searchField)
+            : field
+        })
+      }))
+    }
+  }
+}
+
 function getSectionFields(
   event: EventConfig,
   handleFieldChange: (fieldId: string, value: FieldValue) => void,
@@ -65,8 +106,8 @@ function getSectionFields(
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
-    const advancedSearchFields = allUniqueFields.filter((field) =>
-      advancedSearchFieldId.includes(field.id)
+    const advancedSearchFields: Inferred[] = allUniqueFields.filter(
+      (field: Inferred) => advancedSearchFieldId.includes(field.id)
     )
 
     const combinedFields = [...metadataFields, ...advancedSearchFields]
@@ -125,6 +166,8 @@ export function TabSearch({
     }
   }, [currentEvent])
 
+  const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(currentEvent)
+
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({
       ...prev,
@@ -133,20 +176,21 @@ export function TabSearch({
   }
 
   const advancedSearchFieldErrors = flattenFieldErrors(
-    getAdvancedSearchFieldErrors(currentEvent, formValues)
+    getAdvancedSearchFieldErrors(enhancedEvent, formValues)
   )
 
   const SectionFields = getSectionFields(
-    currentEvent,
+    enhancedEvent,
     handleFieldChange,
     intl,
     fieldValues
   )
 
   const handleSearch = () => {
-    const searchParams = stringify(filterEmptyValues(formValues))
+    const nonEmptyValues = filterEmptyValues(formValues)
+    const searchParams = stringify(nonEmptyValues, { arrayFormat: 'comma' })
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
-      eventType: currentEvent.id
+      eventType: enhancedEvent.id
     })
 
     navigate(`${navigateTo}?${searchParams.toString()}`)

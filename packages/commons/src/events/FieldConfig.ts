@@ -18,7 +18,8 @@ import {
   DateValue,
   NumberFieldValue,
   NonEmptyTextValue,
-  TextValue
+  TextValue,
+  DateRangeFieldValue
 } from './FieldValue'
 import { AddressFieldValue } from './CompositeFieldValue'
 
@@ -171,6 +172,22 @@ const DateField = BaseField.extend({
 }).describe('A single date input (dd-mm-YYYY)')
 
 export type DateField = z.infer<typeof DateField>
+
+const DateRangeField = BaseField.extend({
+  type: z.literal(FieldType.DATE_RANGE),
+  defaultValue: DateRangeFieldValue.optional(),
+  configuration: z
+    .object({
+      notice: TranslationConfig.describe(
+        'Text to display above the date input'
+      ).optional()
+    })
+    .optional()
+}).describe(
+  'A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY })'
+)
+
+export type DateRangeField = z.infer<typeof DateRangeField>
 
 const HtmlFontVariant = z.enum([
   'reg12',
@@ -403,6 +420,7 @@ export type AllFields =
   | typeof NumberField
   | typeof TextAreaField
   | typeof DateField
+  | typeof DateRangeField
   | typeof Paragraph
   | typeof RadioGroup
   | typeof BulletList
@@ -428,6 +446,7 @@ export type Inferred =
   | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
+  | z.infer<typeof DateRangeField>
   | z.infer<typeof Paragraph>
   | z.infer<typeof RadioGroup>
   | z.infer<typeof BulletList>
@@ -456,6 +475,7 @@ export type InferredInput =
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
+  | z.input<typeof DateRangeField>
   | z.input<typeof Paragraph>
   | z.input<typeof RadioGroup>
   | z.input<typeof BulletList>
@@ -480,6 +500,7 @@ export const FieldConfig = z.discriminatedUnion('type', [
   NumberField,
   TextAreaField,
   DateField,
+  DateRangeField,
   Paragraph,
   RadioGroup,
   BulletList,

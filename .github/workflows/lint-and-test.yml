@@ -320,7 +320,10 @@ jobs:
           git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
           git config --local --bool core.bare false
           git reset --hard
+          git clean -fd
           git fetch --prune
+          git checkout ${{ github.head_ref || github.ref_name }}
+          git reset --hard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
