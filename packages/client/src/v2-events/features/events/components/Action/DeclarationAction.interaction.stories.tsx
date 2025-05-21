@@ -21,6 +21,7 @@ import {
   generateEventDraftDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
+import { TestImage } from '@client/v2-events/features/events/fixtures'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import {
   ensureCacheExists,
@@ -101,14 +102,9 @@ const handlers = {
         presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
       })
     }),
-    http.get('http://localhost:3535/ocrvs/:id', (request) => {
+    http.get('http://localhost:3535/ocrvs/:id', () => {
       spies.fetchFile++
-
-      const file = `
-      <svg width="150" height="100" xmlns="http://www.w3.org/2000/svg">
-      </svg>`
-
-      return new HttpResponse(file, {
+      return new HttpResponse(TestImage.Fish, {
         headers: {
           'Content-Type': 'image/svg+xml',
           'Cache-Control': 'no-cache'
