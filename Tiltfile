@@ -57,7 +57,7 @@ update_settings(max_parallel_updates=1)
 # Build baseimage
 docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
               dockerfile="packages/Dockerfile.base", 
-              only=["packages/commons","package.json","yarn.lock"], 
+              only=["packages/commons","package.json","pnpm-lock.yaml"], 
               network="host")
 
 # Build services

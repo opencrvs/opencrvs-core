@@ -5,7 +5,7 @@
   "license": "MPL-2.0",
   "private": true,
   "dependencies": {
-    "@opencrvs/components": "^1.7.0",
+    "@opencrvs/components": "workspace:^1.7.0",
     "@sentry/react": "^7.12.1",
     "@sentry/tracing": "^7.12.1",
     "@types/history": "^4.6.2",
@@ -53,12 +53,12 @@
     "gen:sw": "workbox generateSW --config workbox-config.js",
     "docker:build": "docker build ../../ -f ../../Dockerfile-login -t ocrvs-login",
     "docker:run": "docker run -it --rm -p 5000:80 --name ocrvs-login ocrvs-login",
-    "test": "yarn test:compilation && vitest run --coverage --silent --dangerouslyIgnoreUnhandledErrors",
+    "test": "pnpm test:compilation && vitest run --coverage --silent --dangerouslyIgnoreUnhandledErrors",
     "test:watch": "vitest",
-    "open:cov": "yarn test && opener coverage/index.html",
+    "open:cov": "pnpm test && opener coverage/index.html",
     "lint:css": "stylelint 'src/**/*.{ts,tsx}'",
     "lint:ts": "eslint -c eslint.config.js --fix",
-    "start:prod": "yarn serve -s -l 3020 build",
+    "start:prod": "pnpm serve -s -l 3020 build",
     "test:compilation": "tsc --noEmit",
     "build:clean": "rm -rf build",
     "extract:translations": "bash extract-translations.sh"
@@ -68,7 +68,7 @@
       "prettier --write",
       "eslint --fix",
       "stylelint",
-      "yarn extract:translations"
+      "pnpm extract:translations"
     ],
     "src/**/*.json": "prettier --write"
   },

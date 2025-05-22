@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first  nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "yarn test:compilation && vitest run",
+    "test": "pnpm test:compilation && vitest run",
     "test:watch": "vitest",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "precommit": "lint-staged",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
-    "@opencrvs/commons": "^1.7.0",
+    "@opencrvs/commons": "workspace:^1.7.0",
     "@trpc/server": "^11.0.0-rc.804",
     "app-module-path": "^2.2.0",
     "date-fns": "^4.1.0",
@@ -26,7 +26,7 @@
     "mongodb": "6.9.0",
     "msw": "^2.7.3",
     "superjson": "1.9.0-0",
-    "trpc-to-openapi": "^2.1.5",
+    "trpc-to-openapi": "2.1.5",
     "tsconfig-paths": "^3.13.0",
     "zod": "^3.23.8",
     "zod-openapi": "^4.2.4"

@@ -7,9 +7,9 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "yarn test:compilation && jest  --coverage --silent --noStackTrace",
+    "test": "pnpm test:compilation && jest  --coverage --silent --noStackTrace",
     "test:watch": "jest --watch",
-    "open:cov": "yarn test && opener coverage/index.html",
+    "open:cov": "pnpm test && opener coverage/index.html",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "test:compilation": "tsc --noEmit",
     "build": "tsc",
@@ -18,7 +18,7 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "^1.7.0",
+    "@opencrvs/commons": "workspace:^1.7.0",
     "app-module-path": "^2.2.0",
     "bcryptjs": "^2.4.3",
     "crypto": "^1.0.1",

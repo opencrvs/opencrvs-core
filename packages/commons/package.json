@@ -17,15 +17,15 @@
     "./events": "./build/dist/common/events/index.js"
   },
   "scripts": {
-    "start": "yarn build:watch",
-    "test": "yarn test:compilation && jest",
+    "start": "pnpm build:watch",
+    "test": "pnpm test:compilation && jest",
     "test:watch": "jest --watch",
     "test:compilation": "tsc --noEmit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
-    "postinstall": "yarn build",
+    "postinstall": "pnpm build",
     "build:default": "tsc --project tsconfig.build.json",
     "build:esm": "tsc --project tsconfig.esm.build.json",
-    "build": "yarn build:default && yarn build:esm",
+    "build": "pnpm build:default && pnpm build:esm",
     "build:watch": "concurrently \"tsc --watch --project tsconfig.build.json\" \"tsc --watch --project tsconfig.esm.build.json\"",
     "build:clean": "rm -rf build"
   },
@@ -51,6 +51,7 @@
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
+    "yaml": "^2.7.1",
     "zod": "^3.23.8",
     "zod-openapi": "^4.2.4"
   },

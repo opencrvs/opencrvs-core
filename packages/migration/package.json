@@ -6,7 +6,7 @@
   "type": "module",
   "license": "MPL-2.0",
   "scripts": {
-    "start": "yarn build && ./run-migrations.sh",
+    "start": "pnpm build && ./run-migrations.sh",
     "revert": "./revert-migrations.sh",
     "start:prod": "NODE_ENV=production ./run-migrations.sh",
     "create:hearth": "./create-migrations.sh hearth",
