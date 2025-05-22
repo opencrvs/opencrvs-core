@@ -39,7 +39,7 @@ import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import { publicProcedure, router } from '@events/router/trpc'
 import {
   getEventConfigurations,
-  getworkqueueConfigurations
+  getWorkqueueConfigurations
 } from '@events/service/config/config'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
@@ -107,7 +107,7 @@ export const eventRouter = router({
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
-        return getworkqueueConfigurations(options.ctx.token)
+        return getWorkqueueConfigurations(options.ctx.token)
       }),
     count: publicProcedure
       .input(WorkqueueCountInput)

@@ -56,7 +56,7 @@ export async function getEventConfigurationById({
   )
 }
 
-export async function getworkqueueConfigurations(token: string) {
+export async function getWorkqueueConfigurations(token: string) {
   const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
