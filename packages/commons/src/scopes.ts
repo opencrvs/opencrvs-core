@@ -251,18 +251,33 @@ type ResolvedScope<T extends ConfigurableScope> = {
   options: { [K in keyof ScopeOptionSchema<T>]: ScopeOptionValue<T, K> }
 }
 
+function isConfigurableScope(scope: string): scope is ConfigurableScope {
+  return Object.keys(CONFIGURABLE_SCOPES).includes(scope)
+}
+
 function parseRawScope(scope: string) {
   const [, type, rawOptions] = scope.match(RAW_CONFIGURABLE_SCOPE_REGEX) ?? []
+  const scopeName = isConfigurableScope(type) ? type : undefined
+
+  if (!scopeName) {
+    throw new Error(`Invalid scope: ${scope}`)
+  }
 
   const options = rawOptions
     .split(',')
-    .reduce((acc: Record<string, string[]>, option) => {
+    .reduce<Record<string, string[]>>((acc, option) => {
       const [key, value] = option.split('=')
       acc[key] = value.split('|')
       return acc
     }, {})
 
-  return { type, options }
+  return {
+    scopeName,
+    options
+  } as {
+    scopeName: ConfigurableScope
+    options: { [K in keyof ScopeOptionSchema<typeof scopeName>]: string[] }
+  }
 }
 
 export function findScope<T extends ConfigurableScope>(
@@ -295,11 +310,11 @@ export function parseScope(scope: string) {
 
   const rawScope = maybeConfigurableScope.data
   const parsedScope = parseRawScope(rawScope)
-  const { type } = parsedScope
+  const { scopeName } = parsedScope
 
-  const scopeDef = CONFIGURABLE_SCOPES[type as ConfigurableScope]
+  const scopeDef = CONFIGURABLE_SCOPES[scopeName]
   const scopeSchema = z.object({
-    type: z.literal(type),
+    type: z.literal(scopeName),
     options: z.object(scopeDef.options)
   })
 
