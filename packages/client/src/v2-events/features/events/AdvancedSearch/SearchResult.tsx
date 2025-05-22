@@ -11,7 +11,9 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { orderBy } from 'lodash'
+import styled from 'styled-components'
 import {
   EventIndex,
   EventConfig,
@@ -23,9 +25,12 @@ import {
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
   ColumnContentAlignment,
+  SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { Link as TextButton } from '@opencrvs/components'
+import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
+import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -35,10 +40,14 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import { SearchModifierComponent } from './SearchModifier'
 
-const SORT_ORDER = {
-  ASCENDING: 'asc',
-  DESCENDING: 'desc'
-} as const
+const FabContainer = styled.div`
+  position: fixed;
+  right: 40px;
+  bottom: 55px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
 
 const COLUMNS = {
   ICON_WITH_NAME: 'iconWithName',
@@ -163,6 +172,8 @@ interface Props {
   eventConfigs: EventConfig[]
   searchParams: Record<string, string>
   queryData: EventIndex[]
+  limit: number
+  offset: number
 }
 
 const ExtendedEventStatuses = {
@@ -173,17 +184,28 @@ const ExtendedEventStatuses = {
 export const SearchResultComponent = ({
   columns,
   queryData,
-  eventConfigs
+  eventConfigs,
+  limit,
+  offset,
+  title,
+  tabBarContent,
+  showPlusButton
 }: {
+  showPlusButton?: boolean
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
   queryData: EventIndex[]
+  limit: number
+  offset: number
+  title: string
+  tabBarContent?: React.ReactNode
 }) => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -321,12 +343,45 @@ export const SearchResultComponent = ({
         .slice(0, 2)
     }
   }
+
+  const allResults = transformData(queryData)
+
+  const totalPages = allResults.length
+    ? Math.ceil(allResults.length / limit)
+    : 0
+
+  const isShowPagination = totalPages > 1
+
   return (
-    <Workqueue
-      columns={[...getDefaultColumns(), ...getColumns()]}
-      content={transformData(queryData)}
-      hideLastBorder={true}
-    />
+    <WQContentWrapper
+      error={false}
+      isMobileSize={windowWidth < theme.grid.breakpoints.lg}
+      isShowPagination={isShowPagination}
+      noContent={allResults.length === 0}
+      noResultText={intl.formatMessage(messages.noResult)}
+      paginationId={currentPageNumber}
+      tabBarContent={tabBarContent}
+      title={title}
+      totalPages={totalPages}
+      onPageChange={(page) => setCurrentPageNumber(page)}
+    >
+      <Workqueue
+        columns={[...getDefaultColumns(), ...getColumns()]}
+        content={orderBy(allResults, sortedCol, sortOrder)}
+        hideLastBorder={!isShowPagination}
+        sortOrder={sortOrder}
+      />
+      {showPlusButton && (
+        <FabContainer>
+          <Link to={ROUTES.V2.EVENTS.CREATE.path}>
+            <FloatingActionButton
+              icon={() => <PlusTransparentWhite />}
+              id="new_event_declaration"
+            />
+          </Link>
+        </FabContainer>
+      )}
+    </WQContentWrapper>
   )
 }
 
@@ -334,17 +389,20 @@ export const SearchResult = ({
   columns,
   eventConfigs,
   searchParams,
-  queryData
+  queryData,
+  limit,
+  offset
 }: Props) => {
   const intl = useIntl()
   const total = queryData.length
-  const noResultText = intl.formatMessage(messages.noResult)
 
   return (
-    <WQContentWrapper
-      isMobileSize={false}
-      noContent={total < 1}
-      noResultText={noResultText}
+    <SearchResultComponent
+      columns={columns}
+      eventConfigs={eventConfigs}
+      limit={limit}
+      offset={offset}
+      queryData={queryData}
       tabBarContent={
         <SearchModifierComponent
           eventType={eventConfigs[0].id}
@@ -354,12 +412,6 @@ export const SearchResult = ({
       title={`${intl.formatMessage(messages.searchResult)} ${
         ' (' + total + ')'
       }`}
-    >
-      <SearchResultComponent
-        columns={columns}
-        eventConfigs={eventConfigs}
-        queryData={queryData}
-      />
-    </WQContentWrapper>
+    />
   )
 }

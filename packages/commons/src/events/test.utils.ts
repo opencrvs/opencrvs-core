@@ -50,6 +50,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
 import { EventStatus } from './EventMetadata'
+import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -610,3 +611,24 @@ export const generateTranslationConfig = (
   description: 'Description for ${message}',
   id: message
 })
+
+export const generateWorkqueues = (
+  slug: string = 'in-progress'
+): WorkqueueConfig[] =>
+  defineWorkqueues([
+    {
+      slug,
+      name: {
+        id: 'workqueues.inProgress.title',
+        defaultMessage:
+          slug.charAt(0).toUpperCase() + slug.slice(1).split('-').join(' '),
+        description: 'Title of in progress workqueue'
+      },
+      query: {
+        type: 'and',
+        clauses: [{ eventType: tennisClubMembershipEvent.id }]
+      },
+      actions: [],
+      icon: 'Draft'
+    }
+  ])

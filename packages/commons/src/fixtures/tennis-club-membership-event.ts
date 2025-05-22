@@ -19,7 +19,7 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
-import { defineWorkqueue } from '../events'
+import { defineWorkqueues } from '../events'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -1317,7 +1317,7 @@ export const tennisClubMembershipEvent = defineConfig({
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
 
-export const WorkqueueFixture = defineWorkqueue([
+export const WorkqueueFixture = defineWorkqueues([
   {
     slug: 'in-progress',
     name: {

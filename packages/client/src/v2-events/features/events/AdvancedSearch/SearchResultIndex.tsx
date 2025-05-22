@@ -38,6 +38,8 @@ export const SearchResultIndex = () => {
     <SearchResult
       columns={defaultThirdColumn}
       eventConfigs={[eventConfig]}
+      limit={10}
+      offset={0}
       queryData={queryData}
       searchParams={searchParams}
     />

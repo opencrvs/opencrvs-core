@@ -14,14 +14,14 @@ import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
 import { event } from './event'
 import {
-  defineWorkqueueColumns,
+  defineWorkqueuesColumns,
   WorkqueueColumn
 } from './WorkqueueColumnConfig'
 import { CountryConfigQueryType } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
 
-export const defaultThirdColumn = defineWorkqueueColumns([
+export const defaultThirdColumn = defineWorkqueuesColumns([
   {
     label: {
       id: 'workqueues.dateOfEvent',
@@ -56,8 +56,12 @@ export const WorkqueueConfig = z
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
 export type WorkqueueConfigInput = z.input<typeof WorkqueueConfig>
 
-export function defineWorkqueue(workqueues: WorkqueueConfigInput[]) {
-  return workqueues.map((workqueue) => WorkqueueConfig.parse(workqueue))
+export function defineWorkqueue(workqueue: WorkqueueConfigInput) {
+  return WorkqueueConfig.parse(workqueue)
+}
+
+export function defineWorkqueues(workqueues: WorkqueueConfigInput[]) {
+  return workqueues.map((workqueue) => defineWorkqueue(workqueue))
 }
 
 export const WorkqueueCountInput = z.array(

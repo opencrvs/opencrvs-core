@@ -23,7 +23,7 @@ export const WorkqueueColumn = z.object({
 export type WorkqueueColumn = z.infer<typeof WorkqueueColumn>
 export type WorkqueueColumnInput = z.infer<typeof WorkqueueColumn>
 
-export function defineWorkqueueColumns(
+export function defineWorkqueuesColumns(
   workqueueColumns: WorkqueueColumnInput[]
 ) {
   return workqueueColumns.map((workqueueColumn) =>

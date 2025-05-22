@@ -11,7 +11,10 @@
 
 import React from 'react'
 
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
@@ -24,17 +27,14 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 import { ROUTES } from '@client/v2-events/routes'
-import { WQContentWrapper } from '@client/views/OfficeHome/WQContentWrapper'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
-import {
-  SearchResultComponent,
-  searchResultMessages
-} from '../events/AdvancedSearch/SearchResult'
+import { SearchResultComponent } from '../events/AdvancedSearch/SearchResult'
 
 export function WorkqueueContainer() {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+  const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
   const workqueues = useWorkqueueConfigurations()
   const { searchEvent } = useEvents()
@@ -82,17 +82,13 @@ export function WorkqueueContainer() {
   }
 
   return (
-    <WQContentWrapper
-      isMobileSize={false}
-      noContent={events.length === 0}
-      noResultText={intl.formatMessage(searchResultMessages.noResult)}
+    <SearchResultComponent
+      columns={defaultThirdColumn}
+      eventConfigs={eventConfigs}
+      queryData={events}
       title={intl.formatMessage(workqueueConfig.name)}
-    >
-      <SearchResultComponent
-        columns={defaultThirdColumn}
-        eventConfigs={eventConfigs}
-        queryData={events}
-      />
-    </WQContentWrapper>
+      {...searchParams}
+      showPlusButton
+    />
   )
 }
