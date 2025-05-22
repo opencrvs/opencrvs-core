@@ -226,6 +226,9 @@ export const CONFIGURABLE_SCOPES = {
   },
   'user.edit': {
     options: { role: z.array(z.string()) }
+  },
+  workqueue: {
+    options: { id: z.array(z.string()) }
   }
 } as const satisfies Record<string, { options: Record<string, z.ZodTypeAny> }>
 
