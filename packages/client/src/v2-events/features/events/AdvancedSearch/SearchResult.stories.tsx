@@ -11,6 +11,7 @@
 import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
+  defaultThirdColumn,
   eventQueryDataGenerator,
   EventStatus,
   tennisClubMembershipEvent,
@@ -61,7 +62,7 @@ export const DefaultSearchResult: Story = {
       })
     ],
     searchParams: mockSearchParams,
-    columns: WorkqueueFixture[0].columns
+    columns: defaultThirdColumn
   }
 }
 
@@ -74,7 +75,7 @@ export const SearchResultWithMultipleItems: Story = {
     eventConfigs: [tennisClubMembershipEvent],
     queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
     searchParams: { status: EventStatus.REGISTERED },
-    columns: WorkqueueFixture[0].columns
+    columns: defaultThirdColumn
   }
 }
 export const NoSearchResult: Story = {
@@ -83,6 +84,6 @@ export const NoSearchResult: Story = {
     eventConfigs: [tennisClubMembershipEvent],
     queryData: [],
     searchParams: mockSearchParams,
-    columns: WorkqueueFixture[0].columns
+    columns: defaultThirdColumn
   }
 }
