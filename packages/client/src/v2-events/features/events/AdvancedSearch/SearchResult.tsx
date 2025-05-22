@@ -187,7 +187,7 @@ export const SearchResultComponent = ({
   eventConfigs,
   limit,
   offset,
-  title,
+  title: contentTitle,
   tabBarContent,
   showPlusButton
 }: {
@@ -361,7 +361,7 @@ export const SearchResultComponent = ({
       noResultText={intl.formatMessage(messages.noResult)}
       paginationId={currentPageNumber}
       tabBarContent={tabBarContent}
-      title={title}
+      title={contentTitle}
       totalPages={totalPages}
       onPageChange={(page) => setCurrentPageNumber(page)}
     >
