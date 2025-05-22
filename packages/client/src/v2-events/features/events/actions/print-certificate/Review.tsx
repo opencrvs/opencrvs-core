@@ -24,8 +24,7 @@ import {
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SCOPES,
-  getCurrentEventState
+  SCOPES
 } from '@opencrvs/commons/client'
 import {
   Box,
