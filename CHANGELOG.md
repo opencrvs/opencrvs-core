@@ -1,5 +1,7 @@
 # Changelog
 
+## 0.7.0 Release Candidate
+
 ## 1.9.0 Release candidate
 
 ### New features
