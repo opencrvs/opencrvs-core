@@ -171,7 +171,10 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         should: [
           {
             bool: {
-              must: [{ term: { type: 'foo' } }, { term: { status: 'ISSUED' } }]
+              must: [
+                { term: { type: 'foo' } },
+                { term: { status: 'REGISTERED' } }
+              ]
             }
           },
           {

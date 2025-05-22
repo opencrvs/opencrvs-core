@@ -24,7 +24,6 @@ import type {
 import pdfMake from 'pdfmake/build/pdfmake'
 import { Location } from '@events/service/locations/locations'
 import { isEqual } from 'lodash'
-
 import {
   EventState,
   User,
@@ -41,6 +40,7 @@ import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 
 interface FontFamilyTypes {
   normal: string
@@ -52,38 +52,6 @@ interface FontFamilyTypes {
 type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
-
-function findLocationById(
-  intl: IntlShape,
-  locationId: string | null | undefined,
-  locations: Location[]
-) {
-  const country = intl.formatMessage({
-    id: `countries.${window.config.COUNTRY}`,
-    defaultMessage: 'Farajaland',
-    description: 'Country name'
-  })
-
-  if (!locationId) {
-    return {
-      location: '',
-      district: '',
-      province: '',
-      country
-    }
-  }
-
-  const location = locations.find((loc) => loc.id === locationId)
-  const district = locations.find((loc) => loc.id === location?.partOf)
-  const province = locations.find((loc) => loc.id === district?.partOf)
-
-  return {
-    location: location?.name || '',
-    district: district?.name || '',
-    province: province?.name || '',
-    country: country
-  }
-}
 
 function findUserById(userId: string, users: User[]) {
   const user = users.find((u) => u.id === userId)
@@ -121,10 +89,10 @@ export const stringifyEventMetadata = ({
       : DateField.stringify(intl, metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]),
     createdAt: DateField.stringify(intl, metadata.createdAt),
     createdBy: findUserById(metadata.createdBy, users),
-    createdAtLocation: findLocationById(
+    createdAtLocation: LocationSearch.stringify(
       intl,
-      metadata.createdAtLocation,
-      locations
+      locations,
+      metadata.createdAtLocation
     ),
     updatedAt: DateField.stringify(intl, metadata.updatedAt),
     updatedBy: metadata.updatedBy
@@ -135,10 +103,10 @@ export const stringifyEventMetadata = ({
     trackingId: metadata.trackingId,
     status: EventStatus.REGISTERED,
     updatedByUserRole: metadata.updatedByUserRole,
-    updatedAtLocation: findLocationById(
+    updatedAtLocation: LocationSearch.stringify(
       intl,
-      metadata.updatedAtLocation,
-      locations
+      locations,
+      metadata.updatedAtLocation
     ),
     flags: [],
     legalStatuses: {
@@ -152,10 +120,10 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.DECLARED.createdBy,
               users
             ),
-            createdAtLocation: findLocationById(
+            createdAtLocation: LocationSearch.stringify(
               intl,
-              metadata.legalStatuses.DECLARED.createdAtLocation,
-              locations
+              locations,
+              metadata.legalStatuses.DECLARED.createdAtLocation
             ),
             acceptedAt: DateField.stringify(
               intl,
@@ -174,10 +142,10 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.REGISTERED.createdBy,
               users
             ),
-            createdAtLocation: findLocationById(
+            createdAtLocation: LocationSearch.stringify(
               intl,
-              metadata.legalStatuses.REGISTERED.createdAtLocation,
-              locations
+              locations,
+              metadata.legalStatuses.REGISTERED.createdAtLocation
             ),
             acceptedAt: DateField.stringify(
               intl,
@@ -304,11 +272,8 @@ export function compileSvg({
    */
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
     const stringifyDeclaration = getFormDataStringifier(intl, locations)
-
-    const resolvedDeclaration = stringifyDeclaration(
-      config.declaration.pages.flatMap((x) => x.fields),
-      $declaration
-    )
+    const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+    const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
 
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
