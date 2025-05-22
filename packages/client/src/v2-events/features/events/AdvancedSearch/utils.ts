@@ -250,17 +250,8 @@ export function toQueryType(
     }
   })
 
-  const queryExpression: QueryType = {
-    type: 'and',
-    eventType,
-    ...topLevelFields,
-    data: dataFields
+  return {
+    type,
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
   }
-
-  return type === 'and'
-    ? queryExpression
-    : {
-        type: 'or',
-        clauses: [queryExpression]
-      }
 }

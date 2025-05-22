@@ -11,17 +11,28 @@
 
 import { z, ZodType } from 'zod'
 import { SerializedUserField } from './serializers/user/serializer'
-
-const SerializableExact = z.object({
-  type: z.literal('exact'),
-  term: z.union([z.string(), SerializedUserField])
-})
+import { EventStatusEnum } from './EventMetadata'
 
 const Fuzzy = z.object({ type: z.literal('fuzzy'), term: z.string() })
 const Exact = z.object({ type: z.literal('exact'), term: z.string() })
 const AnyOf = z.object({
   type: z.literal('anyOf'),
   terms: z.array(z.string())
+})
+
+const AnyOfStatus = z.object({
+  type: z.literal('anyOf'),
+  terms: z.array(EventStatusEnum)
+})
+
+const SerializableExact = z.object({
+  type: z.literal('exact'),
+  term: z.union([z.string(), SerializedUserField])
+})
+
+const SerializableExactStatus = z.object({
+  type: z.literal('exact'),
+  term: z.union([EventStatusEnum, SerializedUserField])
 })
 
 const Range = z.object({
@@ -53,7 +64,7 @@ export const SerializedQueryExpression = z
     type: z.literal('and'),
     title: z.string(),
     eventType: z.string(),
-    status: z.optional(z.union([AnyOf, Exact])),
+    status: z.optional(z.union([AnyOfStatus, SerializableExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     createdAtLocation: z.optional(
@@ -76,12 +87,14 @@ const Or = z.object({
   clauses: z.array(SerializedQueryExpression)
 })
 
+const And = z.object({
+  type: z.literal('and'),
+  clauses: z.array(SerializedQueryExpression)
+})
+
 export type SerializedQueryExpression = z.infer<
   typeof SerializedQueryExpression
 >
 
-export const CountryConfigQueryType = z.discriminatedUnion('type', [
-  SerializedQueryExpression,
-  Or
-])
+export const CountryConfigQueryType = z.discriminatedUnion('type', [And, Or])
 export type CountryConfigQueryType = z.infer<typeof CountryConfigQueryType>

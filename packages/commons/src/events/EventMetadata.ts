@@ -29,6 +29,19 @@ export const EventStatus = {
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
+const eventStatusValues = [
+  EventStatus.CREATED,
+  EventStatus.NOTIFIED,
+  EventStatus.DECLARED,
+  EventStatus.VALIDATED,
+  EventStatus.REGISTERED,
+  EventStatus.CERTIFIED,
+  EventStatus.REJECTED,
+  EventStatus.ARCHIVED
+] as const
+
+export const EventStatusEnum = z.enum(eventStatusValues)
+
 export const CustomFlags = {
   CERTIFICATE_PRINTED: 'certificate-printed'
 } as const
