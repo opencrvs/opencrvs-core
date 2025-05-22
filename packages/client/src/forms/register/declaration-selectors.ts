@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { IRegisterFormState } from '@client/forms/register/reducer'
-import { IStoreState } from '@opencrvs/client/src/store'
+import { IStoreState } from '@client/store'
 import { Section, IFormSection } from '@client/forms'
 import { EventType } from '@client/utils/gateway'
 

@@ -14,7 +14,7 @@ import { RegStatus, EventType } from '@client/utils/gateway'
 import {
   Description,
   SubHeader
-} from '@opencrvs/client/src/views/SysAdmin/Performance/utils'
+} from '@client/views/SysAdmin/Performance/utils'
 import { ProgressBar } from '@opencrvs/components/lib/ProgressBar'
 import type { GQLRegistrationCountResult } from '@client/utils/gateway-deprecated-do-not-use'
 import * as React from 'react'

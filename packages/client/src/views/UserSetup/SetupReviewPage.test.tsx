@@ -10,7 +10,7 @@
  */
 import { createStore } from '@client/store'
 import { createTestComponent, userDetails } from '@client/tests/util'
-import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 import * as React from 'react'
 import { UserSetupReview } from './SetupReviewPage'
 import { activateUserMutation } from './queries'

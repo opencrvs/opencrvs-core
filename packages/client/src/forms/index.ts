@@ -10,7 +10,7 @@
  */
 import { ApolloQueryResult } from '@apollo/client'
 import { ValidationInitializer } from '@client/utils/validate'
-import { IDynamicValues } from '@opencrvs/client/src/navigation'
+import { IDynamicValues } from '@client/navigation'
 import { ICheckboxOption as CheckboxComponentOption } from '@opencrvs/components/lib/Checkbox'
 import {
   IRadioOption as RadioComponentOption,
@@ -22,7 +22,7 @@ import { MessageDescriptor } from 'react-intl'
 
 import { ICertificate as IDeclarationCertificate } from '@client/declarations'
 import { IOfflineData } from '@client/offline/reducer'
-import * as validators from '@opencrvs/client/src/utils/validate'
+import * as validators from '@client/utils/validate'
 import { IFont } from '@opencrvs/components/lib/fonts'
 import { ISearchLocation } from '@opencrvs/components/lib/LocationSearch'
 import * as mutations from './register/mappings/mutation'

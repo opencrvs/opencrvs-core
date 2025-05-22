@@ -18,7 +18,7 @@ import {
 } from '@client/tests/util'
 import { createStore } from '@client/store'
 import { SettingsPage } from '@client/views/Settings/SettingsPage'
-import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 import { DataSection } from '@opencrvs/components/lib/ViewData'
 import { ReactWrapper } from 'enzyme'
 import { SEARCH_EVENTS } from '@client/search/queries'

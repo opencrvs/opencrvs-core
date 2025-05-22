@@ -14,7 +14,7 @@ import { createStore } from '@client/store'
 import { createTestComponent, userDetails } from '@client/tests/util'
 import { ProfileMenu } from '@client/components/ProfileMenu'
 
-import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 
 describe('when user opens profile menu without user details', () => {
   let component: ReactWrapper<{}, {}>
