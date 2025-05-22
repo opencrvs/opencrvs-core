@@ -20,7 +20,7 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { deserializeQuery } from '@opencrvs/commons/client'
+import { deserializeQuery, QueryType } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
@@ -62,12 +62,13 @@ export const Navigation = ({
   const queries = workqueues.map(({ slug, query }) => ({
     slug: slug,
     query:
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       user && legacyUser
         ? deserializeQuery(query, {
             ...user,
             primaryOfficeId: legacyUser.primaryOffice.id
           })
-        : {}
+        : ({ type: 'and', clauses: [] } satisfies QueryType)
   }))
 
   const counts = useGetEventCounts().useSuspenseQuery(queries)
