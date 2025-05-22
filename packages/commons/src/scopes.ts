@@ -222,13 +222,6 @@ const rawConfigurableScopeRegex =
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
-const NotifyEventScope = z.object({
-  type: z.literal('record.notify'),
-  options: z.object({
-    event: z.array(z.string())
-  })
-})
-
 const CreateUserScope = z.object({
   type: z.literal('user.create'),
   options: z.object({
@@ -245,11 +238,52 @@ const EditUserScope = z.object({
 
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
-  EditUserScope,
-  NotifyEventScope
+  EditUserScope
 ])
 
 type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
+
+// TODO: config multiple options?
+export const CONFIGURABLE_SCOPES = {
+  'record.notify': { options: 'event' },
+  'user.create': { options: 'role' },
+  'user.edit': { options: 'role' }
+} as const
+
+// For now the options only support a list of strings separated by pipes '|', which we resolve to an array of strings.
+// If we need to support more complex options, we can extend this type.
+type ConfigurableSearchOptionValue = string[]
+
+type ResolvedScope<T extends keyof typeof CONFIGURABLE_SCOPES> = {
+  options: {
+    [K in (typeof CONFIGURABLE_SCOPES)[T]['options']]: ConfigurableSearchOptionValue
+  }
+}
+
+export function findConfigurableScope<
+  T extends keyof typeof CONFIGURABLE_SCOPES
+>(userScopes: string[], configurableScope: T): ResolvedScope<T> | undefined {
+  const foundScope = userScopes.find(
+    (s) => s.split('[')[0] === configurableScope
+  )
+
+  if (!foundScope) {
+    return undefined
+  }
+
+  const [, _, rawOptions] = foundScope.match(rawConfigurableScopeRegex) ?? []
+
+  const options = rawOptions
+    .split(',')
+    .reduce((acc: Record<string, string[]>, option) => {
+      const [key, value] = option.split('=')
+      acc[key] = value.split('|')
+      return acc
+    }, {})
+
+  // TODO CIHAN: move cast to reduce?
+  return { options } as ResolvedScope<T>
+}
 
 export function findScope(
   scopes: string[],
