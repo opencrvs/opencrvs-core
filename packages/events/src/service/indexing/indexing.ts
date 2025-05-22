@@ -371,41 +371,34 @@ export async function getIndexedEvents(userId: string) {
 export async function getIndex(eventParams: QueryType) {
   const esClient = getOrCreateClient()
 
-  if ('type' in eventParams && eventParams.type === 'or') {
+  if (eventParams.type === 'or') {
     const { clauses } = eventParams
+    // @todo: implement or query for quick search
     // eslint-disable-next-line no-console
     console.log({ clauses })
     return []
   }
 
-  if ('eventType' in eventParams) {
-    const { eventType, ...queryParams } = eventParams
-    if (Object.values(eventParams).length === 0) {
-      throw new Error('No search params provided')
-    }
-
-    const query = buildElasticQueryFromSearchPayload(queryParams)
-
-    if (!eventType) {
-      throw new Error('No eventType provided')
-    }
-
-    const response = await esClient.search<EncodedEventIndex>({
-      index: getEventIndexName(eventType),
-      size: DEFAULT_SIZE,
-      request_cache: false,
-      query
-    })
-
-    const events = z.array(EventIndex).parse(
-      response.hits.hits
-        .map((hit) => hit._source)
-        .filter((event): event is EncodedEventIndex => event !== undefined)
-        .map((event) => decodeEventIndex(event))
-    )
-
-    return events
+  if (Object.values(eventParams).length === 0) {
+    throw new Error('No search params provided')
   }
+
+  const query = buildElasticQueryFromSearchPayload(eventParams)
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventAliasName(),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query
+  })
+
+  const events = z.array(EventIndex).parse(
+    response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
+  )
+
+  return events
 
   return []
 }
