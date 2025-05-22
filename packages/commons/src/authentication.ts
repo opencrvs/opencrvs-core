@@ -202,7 +202,7 @@ export interface ITokenPayload {
   exp: string
   algorithm: string
   scope: Scope[]
-  user_type: TokenUserType
+  userType: TokenUserType
 }
 
 export function getScopes(authHeader: IAuthHeader): RawScopes[] {
@@ -241,7 +241,7 @@ export const getUserId = (token: TokenWithBearer): string => {
 
 export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
-  return tokenPayload.user_type
+  return tokenPayload.userType
 }
 
 export const TokenWithBearer = z

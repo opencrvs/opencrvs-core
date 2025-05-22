@@ -126,7 +126,7 @@ export async function createToken(
   temporary?: boolean,
   userType: TokenUserType = TokenUserType.USER
 ): Promise<string> {
-  return sign({ scope, user_type: userType }, cert, {
+  return sign({ scope, userType }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: temporary
