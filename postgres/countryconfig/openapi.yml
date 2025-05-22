@@ -31425,6 +31425,7 @@ components:
                     const: Rejected
                   originalActionId:
                     type: string
+                    format: uuid
                   type:
                     type: string
                     enum:
@@ -31811,6 +31812,7 @@ components:
             - Rejected
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: CREATE
@@ -32143,6 +32145,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: VALIDATE
@@ -32475,6 +32478,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: REJECT
@@ -32807,6 +32811,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: MARKED_AS_DUPLICATE
@@ -33139,6 +33144,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: ARCHIVE
@@ -33471,6 +33477,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: NOTIFY
@@ -33803,6 +33810,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: REGISTER
@@ -34137,6 +34145,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: DECLARE
@@ -34469,6 +34478,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: ASSIGN
@@ -34804,6 +34814,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -35136,6 +35147,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: APPROVE_CORRECTION
@@ -35471,6 +35483,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: REJECT_CORRECTION
@@ -35806,6 +35819,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: UNASSIGN
@@ -36141,6 +36155,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -36473,6 +36488,7 @@ components:
           enum: *a20
         originalActionId:
           type: string
+          format: uuid
         type:
           type: string
           const: READ
