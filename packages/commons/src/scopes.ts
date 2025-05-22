@@ -217,37 +217,16 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_DATA_SEEDING)
 ])
 
-const rawConfigurableScopeRegex =
-  /^([a-zA-Z]+\.[a-zA-Z]+)\[((?:\w+=\w+(?:\|\w+)*)(:?,\w+=\w+(?:\|\w+)*)*)\]$/
-
-const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
-
-const CreateUserScope = z.object({
-  type: z.literal('user.create'),
-  options: z.object({
-    role: z.array(z.string())
-  })
-})
-
-const EditUserScope = z.object({
-  type: z.literal('user.edit'),
-  options: z.object({
-    role: z.array(z.string())
-  })
-})
-
-const ConfigurableScopes = z.discriminatedUnion('type', [
-  CreateUserScope,
-  EditUserScope
-])
-
-type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
-
 export const CONFIGURABLE_SCOPES = {
   'record.notify': { options: ['event'] },
   'user.create': { options: ['role'] },
   'user.edit': { options: ['role'] }
 } as const
+
+const RAW_CONFIGURABLE_SCOPE_REGEX =
+  /^([a-zA-Z]+\.[a-zA-Z]+)\[((?:\w+=\w+(?:\|\w+)*)(:?,\w+=\w+(?:\|\w+)*)*)\]$/
+
+const rawConfigurableScope = z.string().regex(RAW_CONFIGURABLE_SCOPE_REGEX)
 
 // For now the options only support a list of strings separated by pipes '|', which we resolve to an array of strings.
 // If we need to support more complex options, we can extend this type.
@@ -257,6 +236,20 @@ type ResolvedScope<T extends keyof typeof CONFIGURABLE_SCOPES> = {
   options: {
     [K in (typeof CONFIGURABLE_SCOPES)[T]['options'][number]]: ConfigurableSearchOptionValue
   }
+}
+
+function parseRawScope(scope: string) {
+  const [, type, rawOptions] = scope.match(RAW_CONFIGURABLE_SCOPE_REGEX) ?? []
+
+  const options = rawOptions
+    .split(',')
+    .reduce((acc: Record<string, string[]>, option) => {
+      const [key, value] = option.split('=')
+      acc[key] = value.split('|')
+      return acc
+    }, {})
+
+  return { type, options }
 }
 
 export function findScope<T extends keyof typeof CONFIGURABLE_SCOPES>(
@@ -271,17 +264,7 @@ export function findScope<T extends keyof typeof CONFIGURABLE_SCOPES>(
     return undefined
   }
 
-  const [, , rawOptions] = foundScope.match(rawConfigurableScopeRegex) ?? []
-
-  const options = rawOptions
-    .split(',')
-    .reduce((acc: Record<string, string[]>, option) => {
-      const [key, value] = option.split('=')
-      acc[key] = value.split('|')
-      return acc
-    }, {})
-
-  // TODO CIHAN: move cast to reduce?
+  const { options } = parseRawScope(foundScope)
   return { options } as ResolvedScope<T>
 }
 
@@ -289,9 +272,7 @@ export function parseScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
 
   if (maybeLiteralScope.success) {
-    return {
-      type: maybeLiteralScope.data
-    }
+    return { type: maybeLiteralScope.data }
   }
 
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
@@ -301,29 +282,30 @@ export function parseScope(scope: string) {
   }
 
   const rawScope = maybeConfigurableScope.data
-  const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
-  const options = rawOptions.split(',').reduce(
-    (acc, option) => {
-      const [key, value] = option.split('=')
-      acc[key] = value.split('|')
-      return acc
-    },
-    {} as Record<string, string[]>
+
+  const parsedScope = parseRawScope(rawScope)
+  const { type } = parsedScope
+
+  const expectedOptions =
+    CONFIGURABLE_SCOPES[type as keyof typeof CONFIGURABLE_SCOPES].options
+
+  const objSchema = expectedOptions.reduce(
+    (acc, option) => ({
+      ...acc,
+      [option]: z.array(z.string())
+    }),
+    {}
   )
 
-  const parsedScope = {
-    type,
-    options
-  }
+  const scopeSchema = z.object({
+    type: z.literal(type),
+    options: z.object(objSchema)
+  })
 
-  const result = ConfigurableScopes.safeParse(parsedScope)
+  const result = scopeSchema.safeParse(parsedScope)
   return result.success ? result.data : undefined
 }
 
 export const scopes: Scope[] = Object.values(SCOPES)
-
-export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
-
-// for backwards compatibility
-export type Scope = RawScopes
+export type Scope = RawScopes // for backwards compatibility
