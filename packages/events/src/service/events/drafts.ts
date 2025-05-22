@@ -11,7 +11,7 @@
 
 import { Draft, DraftInput } from '@opencrvs/commons/events'
 import { UUID } from '@opencrvs/commons'
-import { getClient, sql } from '@events/storage/postgres/events'
+import { getClient, sql } from '@events/storage/postgres/events/db'
 
 export async function createDraft(
   input: DraftInput,

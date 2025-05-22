@@ -10,7 +10,7 @@
  */
 
 import z from 'zod'
-import { CommonQueryMethods } from 'slonik'
+import { CommonQueryMethods, SerializableValue } from 'slonik'
 import {
   ActionDocument,
   ActionStatus,
@@ -20,7 +20,7 @@ import {
 } from '@opencrvs/commons'
 import { getClient, sql } from './db'
 
-export async function getEventByIdInTransaction(
+async function getEventByIdInTransaction(
   eventId: UUID,
   trx: CommonQueryMethods
 ): Promise<EventDocument> {
@@ -76,63 +76,11 @@ export async function getEventById(id: UUID): Promise<EventDocument> {
 export async function deleteEventById(eventId: UUID): Promise<void> {
   const db = await getClient()
 
-  await db.query(sql.typeAlias('void')`
+  await db.query(sql.type(z.void())`
     DELETE FROM events
     WHERE
       id = ${eventId}
   `)
-}
-
-export async function findEventByTransactionId(
-  transactionId: string
-): Promise<EventDocument | undefined> {
-  const db = await getClient()
-
-  return db.transaction(async (trx) => {
-    const event = await trx.maybeOne(sql.type(
-      EventDocument.omit({ actions: true })
-    )`
-      SELECT
-        id,
-        event_type AS type,
-        date_of_event_field_id AS "dateOfEventFieldId",
-        created_at AS "createdAt",
-        updated_at AS "updatedAt",
-        tracking_id AS "trackingId"
-      FROM
-        events
-      WHERE
-        transaction_id = ${transactionId}
-    `)
-
-    if (!event) {
-      return undefined
-    }
-
-    const actions = await trx.any(sql.type(ActionDocument)`
-      SELECT
-        id,
-        transaction_id AS "transactionId",
-        created_at AS "createdAt",
-        created_by AS "createdBy",
-        created_by_role AS "createdByRole",
-        declaration,
-        annotation,
-        created_at_location AS "createdAtLocation",
-        status,
-        action_type AS "type",
-        original_action_id AS "originalActionId"
-      FROM
-        event_actions
-      WHERE
-        event_id = ${event.id}
-    `)
-
-    return {
-      ...event,
-      actions: [...actions]
-    }
-  })
 }
 
 export const createEvent = async (
@@ -167,6 +115,77 @@ export const createEvent = async (
     RETURNING
       id
   `)
+}
+
+async function createActionInTransaction(
+  {
+    eventId,
+    transactionId,
+    type,
+    status,
+    createdBy,
+    createdByRole,
+    createdAtLocation,
+    declaration,
+    annotation,
+    originalActionId
+  }: {
+    eventId: UUID
+    transactionId: string
+    type: ActionType
+    status: ActionStatus
+    createdBy: string
+    createdByRole: string
+    createdAtLocation: string
+    declaration?: Record<string, SerializableValue>
+    annotation?: Record<string, SerializableValue>
+    originalActionId?: UUID
+  },
+  trx: CommonQueryMethods
+) {
+  // @TODO: Some typing error here
+  const originalActionIdx = originalActionId as string | undefined
+
+  const { id } = await trx.one(sql.type(z.object({ id: UUID }))`
+    INSERT INTO
+      event_actions (
+        event_id,
+        transaction_id,
+        action_type,
+        status,
+        declaration,
+        annotation,
+        created_by,
+        created_by_role,
+        created_at_location,
+        original_action_id
+      )
+    VALUES
+      (
+        ${eventId},
+        ${transactionId},
+        ${type}::action_type,
+        ${status}::action_status,
+        ${sql.jsonb(declaration)},
+        ${sql.jsonb(annotation)},
+        ${createdBy},
+        ${createdByRole},
+        ${createdAtLocation},
+        ${originalActionIdx ?? null}::uuid
+      )
+    ON CONFLICT (transaction_id) DO NOTHING
+    RETURNING
+      id
+  `)
+
+  return id
+}
+
+export const createAction = async (
+  params: Parameters<typeof createActionInTransaction>[0]
+) => {
+  const db = await getClient()
+  return db.transaction(async (trx) => createActionInTransaction(params, trx))
 }
 
 export const getOrCreateEvent = async ({
@@ -209,67 +228,31 @@ export const getOrCreateEvent = async ({
         id
     `)
 
-    await trx.query(sql.type(z.void())`
-      INSERT INTO
-        event_actions (
-          event_id,
-          transaction_id,
-          action_type,
-          declaration,
-          annotation,
-          status,
-          original_action_id,
-          created_by,
-          created_by_role,
-          created_at_location
-        )
-      VALUES
-        (
-          ${eventId},
-          ${transactionId},
-          ${ActionType.CREATE},
-          '{}'::jsonb,
-          '{}'::jsonb,
-          ${ActionStatus.Accepted}::action_status,
-          NULL,
-          ${createdBy},
-          ${createdByRole},
-          ${createdAtLocation}
-        )
-      ON CONFLICT (transaction_id) DO NOTHING
-    `)
+    await createActionInTransaction(
+      {
+        eventId,
+        transactionId,
+        type: ActionType.CREATE,
+        status: ActionStatus.Accepted,
+        createdBy,
+        createdByRole,
+        createdAtLocation
+      },
+      trx
+    )
 
-    await trx.query(sql.type(z.void())`
-      INSERT INTO
-        event_actions (
-          event_id,
-          transaction_id,
-          action_type,
-          assigned_to,
-          declaration,
-          annotation,
-          status,
-          original_action_id,
-          created_by,
-          created_by_role,
-          created_at_location
-        )
-      VALUES
-        (
-          ${eventId},
-          ${transactionId},
-          ${ActionType.ASSIGN},
-          ${createdBy},
-          '{}'::jsonb,
-          '{}'::jsonb,
-          ${ActionStatus.Accepted}::action_status,
-          NULL,
-          ${createdBy},
-          ${createdByRole},
-          ${createdAtLocation}
-        )
-      ON CONFLICT (transaction_id) DO NOTHING
-    `)
+    await createActionInTransaction(
+      {
+        eventId,
+        transactionId,
+        type: ActionType.ASSIGN,
+        status: ActionStatus.Accepted,
+        createdBy,
+        createdByRole,
+        createdAtLocation
+      },
+      trx
+    )
 
     return getEventByIdInTransaction(eventId, trx)
   })

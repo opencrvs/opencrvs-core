@@ -12,7 +12,6 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import {
-  ActionDocument,
   ActionInputWithType,
   ActionStatus,
   ActionUpdate,
@@ -201,7 +200,6 @@ export async function addAction(
     status: ActionStatus
   }
 ): Promise<EventDocument> {
-  const db = await getClient()
   const event = await eventsDb.getEventById(eventId)
   const configuration = await getEventConfigurationById({
     token,
@@ -222,96 +220,44 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    await db.query(sql.typeAlias('void')`
-      INSERT INTO
-        event_actions (
-          transaction_id,
-          event_id,
-          action_type,
-          declaration,
-          annotation,
-          status,
-          original_action_id,
-          created_by,
-          created_by_role,
-          created_at_location
-        )
-      VALUES
-        (
-          gen_random_uuid (),
-          ${eventId},
-          ${ActionType.MARKED_AS_DUPLICATE},
-          ${sql.jsonb(input.declaration)},
-          ${sql.jsonb(input.annotation)},
-          ${status}::action_status,
-          ${input.originalActionId ?? null}::uuid,
-          ${createdBy},
-          ${createdByRole},
-          ${createdAtLocation}::uuid
-        )
-      ON CONFLICT (transaction_id) DO NOTHING
-    `)
+    await eventsDb.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      type: ActionType.MARKED_AS_DUPLICATE,
+      declaration: input.declaration,
+      annotation: input.annotation,
+      status,
+      createdBy,
+      createdByRole,
+      createdAtLocation,
+      originalActionId: input.originalActionId
+    })
   }
 
-  await db.query(sql.typeAlias('void')`
-    INSERT INTO
-      event_actions (
-        transaction_id,
-        event_id,
-        action_type,
-        declaration,
-        annotation,
-        status,
-        original_action_id,
-        created_by,
-        created_by_role,
-        created_at_location
-      )
-    VALUES
-      (
-        gen_random_uuid (),
-        ${eventId},
-        ${status},
-        ${sql.jsonb(input.declaration)},
-        ${sql.jsonb(input.annotation)},
-        ${status}::action_status,
-        ${input.originalActionId ?? null}::uuid,
-        ${createdBy},
-        ${createdByRole},
-        ${createdAtLocation}::uuid
-      )
-    ON CONFLICT (transaction_id) DO NOTHING
-  `)
+  await eventsDb.createAction({
+    eventId,
+    transactionId: input.transactionId,
+    type: input.type,
+    declaration: input.declaration,
+    annotation: input.annotation,
+    status,
+    createdBy,
+    createdByRole,
+    createdAtLocation,
+    originalActionId: input.originalActionId
+  })
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
-    await db.query(sql.typeAlias('void')`
-      INSERT INTO
-        event_actions (
-          transaction_id,
-          event_id,
-          action_type,
-          declaration,
-          annotation,
-          status,
-          original_action_id,
-          created_by,
-          created_by_role,
-          created_at_location
-        )
-      VALUES
-        (
-          gen_random_uuid (),
-          ${eventId},
-          ${ActionType.UNASSIGN},
-          '{}'::jsonb,
-          '{}'::jsonb,
-          ${status}::action_status,
-          NULL,
-          ${createdBy},
-          ${createdByRole},
-          ${createdAtLocation}::uuid
-        )
-    `)
+    await eventsDb.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      type: ActionType.UNASSIGN,
+      status,
+      createdBy,
+      createdByRole,
+      createdAtLocation,
+      originalActionId: input.originalActionId
+    })
   }
 
   const drafts = await getDraftsForAction(eventId, createdBy, input.type)
@@ -341,35 +287,25 @@ type AsyncRejectActionInput = Omit<
   'createdAt' | 'id' | 'status'
 > & { transactionId: string; eventId: UUID }
 
-export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
-  const db = await getClient()
-  const { transactionId, eventId } = input
-
-  await db.query(sql.typeAlias('void')`
-    INSERT INTO
-      event_actions (
-        event_id,
-        transaction_id,
-        action_type,
-        status,
-        original_action_id,
-        created_by,
-        created_by_role,
-        created_at_location
-      )
-    VALUES
-      (
-        ${eventId},
-        ${transactionId},
-        ${input.type},
-        ${ActionStatus.Rejected}::action_status,
-        ${input.originalActionId ?? null}::uuid,
-        ${input.createdBy},
-        ${input.createdByRole},
-        ${input.createdAtLocation}
-      )
-    ON CONFLICT (transaction_id) DO NOTHING
-  `)
+export async function addAsyncRejectAction({
+  transactionId,
+  eventId,
+  type,
+  originalActionId,
+  createdBy,
+  createdByRole,
+  createdAtLocation
+}: AsyncRejectActionInput) {
+  await eventsDb.createAction({
+    eventId,
+    transactionId,
+    type,
+    status: ActionStatus.Rejected,
+    originalActionId,
+    createdBy,
+    createdByRole,
+    createdAtLocation
+  })
 
   const updatedEvent = await eventsDb.getEventById(eventId)
   await indexEvent(updatedEvent)
@@ -377,3 +313,5 @@ export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
 
   return updatedEvent
 }
+
+export const getEventById = eventsDb.getEventById

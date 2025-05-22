@@ -19,11 +19,31 @@ CREATE TYPE action_status AS ENUM (
   'Rejected'
 );
 
+CREATE TYPE action_type AS ENUM (
+  'DELETE',
+  'CREATE',
+  'NOTIFY',
+  'DECLARE',
+  'VALIDATE',
+  'REGISTER',
+  'DETECT_DUPLICATE',
+  'REJECT',
+  'MARKED_AS_DUPLICATE',
+  'ARCHIVE',
+  'PRINT_CERTIFICATE',
+  'REQUEST_CORRECTION',
+  'REJECT_CORRECTION',
+  'APPROVE_CORRECTION',
+  'READ',
+  'ASSIGN',
+  'UNASSIGN'
+);
+
 CREATE TABLE event_actions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   transaction_id text UNIQUE NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
-  action_type text NOT NULL,
+  action_type action_type NOT NULL,
   assigned_to text,
   declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
   annotation jsonb DEFAULT '{}'::jsonb NOT NULL,
@@ -61,5 +81,6 @@ COMMENT ON TABLE event_action_drafts IS
 
 DROP TABLE IF EXISTS event_action_drafts;
 DROP TABLE IF EXISTS event_actions;
+DROP TYPE IF EXISTS action_type;
 DROP TYPE IF EXISTS action_status;
 DROP TABLE IF EXISTS events;
