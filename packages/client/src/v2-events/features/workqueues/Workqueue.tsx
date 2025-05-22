@@ -17,7 +17,8 @@ import { useSelector } from 'react-redux'
 import {
   defaultThirdColumn,
   findScope,
-  deserializeQuery
+  deserializeQuery,
+  QueryType
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -63,7 +64,7 @@ export function WorkqueueContainer() {
         ...user,
         primaryOfficeId: legacyUser.primaryOffice.id
       })) ||
-    {}
+    ({ type: 'and', clauses: [] } satisfies QueryType)
 
   const events = searchEvent.useSuspenseQuery(deSerializedQuery)
 
