@@ -10,7 +10,7 @@
  */
 
 import { z, ZodType } from 'zod'
-import { EventMetadata } from './EventMetadata'
+import { EventMetadata, EventStatusEnum } from './EventMetadata'
 import { EventState } from './ActionDocument'
 
 export const EventIndex = EventMetadata.extend({
@@ -31,6 +31,16 @@ const Exact = z.object({ type: z.literal('exact'), term: z.string() })
 const AnyOf = z.object({
   type: z.literal('anyOf'),
   terms: z.array(z.string())
+})
+
+const ExactStatus = z.object({
+  type: z.literal('exact'),
+  term: EventStatusEnum
+})
+
+const AnyOfStatus = z.object({
+  type: z.literal('anyOf'),
+  terms: z.array(EventStatusEnum)
 })
 
 const Range = z.object({
@@ -71,7 +81,7 @@ export type QueryInputType = BaseInput | QueryMap
 const QueryExpression = z
   .object({
     eventType: z.string(),
-    status: z.optional(z.union([AnyOf, Exact])),
+    status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     createAtLocation: z.optional(z.union([Within, Exact])),

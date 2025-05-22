@@ -157,7 +157,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
       clauses: [
         {
           eventType: 'foo',
-          status: { type: 'exact', term: 'ISSUED' }
+          status: { type: 'exact', term: 'REGISTERED' }
         },
         {
           eventType: 'bar',
