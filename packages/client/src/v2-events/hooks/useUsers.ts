@@ -29,7 +29,7 @@ setQueryDefaults(trpcOptionsProxy.user.get, {
     const user = await queryOptions.queryFn(...params)
 
     if (user.signatureFilename) {
-      await precacheFile(user.signatureFilename, '/')
+      await precacheFile(user.signatureFilename)
       return {
         ...user,
         signatureFilename: getFullUrl(user.signatureFilename)
@@ -57,7 +57,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
     await Promise.allSettled(
       users.map(async (user) => {
         if (user.signatureFilename) {
-          return precacheFile(user.signatureFilename, '/')
+          return precacheFile(user.signatureFilename)
         }
         return user
       })
