@@ -37,7 +37,10 @@ import { publicProcedure, router } from '@events/router/trpc'
 import { getEventConfigurations } from '@events/service/config/config'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
-import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
+import {
+  createDraft,
+  getDraftsByUserId
+} from '@events/storage/postgres/events/drafts'
 import {
   addAction,
   createEvent,

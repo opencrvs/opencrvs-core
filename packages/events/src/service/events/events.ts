@@ -34,8 +34,8 @@ import { UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
-import * as eventsDb from '@events/storage/postgres/events'
-import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
+import * as eventsDb from '@events/storage/postgres/events/events'
+import * as draftsDb from '@events/storage/postgres/events/drafts'
 
 function getValidFileValue(
   fieldKey: string,
@@ -88,7 +88,7 @@ export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
   const { id } = event
   await deleteEventAttachments(token, event)
   await deleteEventIndex(event)
-  await deleteDraftsByEventId(id)
+  await draftsDb.deleteDraftsByEventId(id)
   await eventsDb.deleteEventById(id)
 
   return { id }
@@ -260,7 +260,11 @@ export async function addAction(
     })
   }
 
-  const drafts = await getDraftsForAction(eventId, createdBy, input.type)
+  const drafts = await draftsDb.getDraftsForAction(
+    eventId,
+    createdBy,
+    input.type
+  )
 
   await cleanUnreferencedAttachmentsFromPreviousDrafts(
     token,
@@ -275,7 +279,7 @@ export async function addAction(
     await indexEvent(updatedEvent)
 
     if (input.type !== ActionType.ASSIGN) {
-      await deleteDraftsByEventId(eventId)
+      await draftsDb.deleteDraftsByEventId(eventId)
     }
   }
 
@@ -309,7 +313,7 @@ export async function addAsyncRejectAction({
 
   const updatedEvent = await eventsDb.getEventById(eventId)
   await indexEvent(updatedEvent)
-  await deleteDraftsByEventId(eventId)
+  await draftsDb.deleteDraftsByEventId(eventId)
 
   return updatedEvent
 }
