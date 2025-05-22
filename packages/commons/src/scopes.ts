@@ -245,7 +245,7 @@ type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
 export const CONFIGURABLE_SCOPES = {
   'record.notify': { options: ['event'] },
-  'user.create': { options: ['role', 'kakke'] },
+  'user.create': { options: ['role'] },
   'user.edit': { options: ['role'] }
 } as const
 
@@ -259,9 +259,10 @@ type ResolvedScope<T extends keyof typeof CONFIGURABLE_SCOPES> = {
   }
 }
 
-export function findConfigurableScope<
-  T extends keyof typeof CONFIGURABLE_SCOPES
->(userScopes: string[], configurableScope: T): ResolvedScope<T> | undefined {
+export function findScope<T extends keyof typeof CONFIGURABLE_SCOPES>(
+  userScopes: string[],
+  configurableScope: T
+): ResolvedScope<T> | undefined {
   const foundScope = userScopes.find(
     (s) => s.split('[')[0] === configurableScope
   )
@@ -282,18 +283,6 @@ export function findConfigurableScope<
 
   // TODO CIHAN: move cast to reduce?
   return { options } as ResolvedScope<T>
-}
-
-export function findScope(
-  scopes: string[],
-  scopeType: ConfigurableScopes['type']
-) {
-  return scopes
-    .map((rawScope) => parseScope(rawScope))
-    .find(
-      (parsedScope): parsedScope is ConfigurableScopes =>
-        parsedScope?.type === scopeType
-    )
 }
 
 export function parseScope(scope: string) {

@@ -44,7 +44,7 @@ import { postMetrics } from '@gateway/features/metrics/service'
 import { uploadBase64ToMinio } from '@gateway/features/documents/service'
 import { rateLimitedResolver } from '@gateway/rate-limit'
 import {
-  findConfigurableScope,
+  findScope,
   getScopes,
   hasScope,
   SCOPES
@@ -342,10 +342,10 @@ export const resolvers: GQLResolver = {
         const scopes = getScopes(authHeader)
 
         const creatableRoleIds =
-          findConfigurableScope(scopes, 'user.create')?.options?.role ?? []
+          findScope(scopes, 'user.create')?.options?.role ?? []
 
         const editableRoleIds =
-          findConfigurableScope(scopes, 'user.edit')?.options?.role ?? []
+          findScope(scopes, 'user.edit')?.options?.role ?? []
 
         if (![...creatableRoleIds, ...editableRoleIds].includes(user.role)) {
           throw new Error(
