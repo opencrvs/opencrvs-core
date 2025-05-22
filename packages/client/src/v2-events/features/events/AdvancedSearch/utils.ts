@@ -128,8 +128,8 @@ type Condition =
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
 
-export const ADVANCED_SEARCH_KEY = 'and'
-export const QUICK_SEARCH_KEY = 'or'
+export const ADVANCED_SEARCH_KEY = 'and' as const
+export const QUICK_SEARCH_KEY = 'or' as const
 
 function buildCondition(
   value: string,

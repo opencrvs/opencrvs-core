@@ -24,29 +24,6 @@ import {
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
 
-function toQueryType(
-  searchParams: QueryInputType,
-  type: 'and' | 'or',
-  eventType?: string
-): QueryType {
-  const topLevelFields: Record<string, unknown> = {}
-  const dataFields: Record<string, unknown> = {}
-
-  Object.entries(searchParams).forEach(([key, value]) => {
-    if (key.startsWith('event')) {
-      const strippedKey = key.replace(/^event____/, '')
-      topLevelFields[strippedKey] = value
-    } else {
-      dataFields[key] = value
-    }
-  })
-
-  return {
-    type,
-    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
-  }
-}
-
 export function useEvents() {
   const trpc = useTRPC()
   const getEvent = useGetEvent()
@@ -64,28 +41,16 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     searchEvent: {
-      useQuery: (
-        searchParams: QueryInputType,
-        queryType: 'and' | 'or',
-        eventType?: string
-      ) => {
-        const input = toQueryType(searchParams, queryType, eventType)
-
+      useQuery: (query: QueryType) => {
         return useQuery({
-          ...trpc.event.search.queryOptions(input),
-          queryKey: trpc.event.search.queryKey(input)
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query)
         })
       },
-      useSuspenseQuery: (
-        searchParams: QueryInputType,
-        queryType: 'and' | 'or',
-        eventType?: string
-      ) => {
-        const input = toQueryType(searchParams, queryType, eventType)
-
+      useSuspenseQuery: (query: QueryType) => {
         return useSuspenseQuery({
-          ...trpc.event.search.queryOptions(input),
-          queryKey: trpc.event.search.queryKey(input)
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query)
         }).data
       }
     },

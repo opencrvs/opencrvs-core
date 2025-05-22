@@ -14,7 +14,8 @@ import {
   EventConfig,
   FieldType,
   Inferred,
-  QueryInputType
+  QueryExpression,
+  QueryType
 } from '@opencrvs/commons/client'
 import { SearchResult } from '@client/v2-events/features/events/AdvancedSearch/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -33,35 +34,46 @@ const searchFields = Object.keys(
   searchFieldTypeMapping
 ) as (keyof typeof searchFieldTypeMapping)[]
 
-function buildQueryFromQuickSearchFields(searchableFields: Inferred[]) {
-  const queryObj = searchableFields.reduce((acc, field) => {
-    const fieldType = field.type as keyof typeof searchFieldTypeMapping
-  }, {})
+function buildQueryFromQuickSearchFields(
+  searchableFields: Inferred[],
+  terms: string[]
+): QueryType {
+  const clauses: QueryExpression[] = []
 
-  return queryObj
+  for (const field of searchableFields) {
+    const matchType =
+      searchFieldTypeMapping[field.type as keyof typeof searchFieldTypeMapping]
+
+    for (const term of terms) {
+      const queryClause: QueryExpression = field.id.includes('.')
+        ? { data: { [field.id]: { type: matchType, term } } }
+        : { [field.id]: { type: matchType, term } }
+
+      clauses.push(queryClause)
+    }
+  }
+
+  return {
+    type: QUICK_SEARCH_KEY,
+    clauses
+  }
 }
 
 function buildQuickSearchQuery(
   searchParams: Record<string, string>,
   events: EventConfig[]
-): QueryInputType {
+): QueryType {
   const fieldsOfEvents = events.reduce<Inferred[]>((acc, event) => {
     const fields = getAllUniqueFields(event)
     return [...acc, ...fields]
   }, [])
 
-  const fieldsToSearch = fieldsOfEvents
-    .filter((field) => {
-      // @ts-ignore
-      if (searchFields.includes(field.type)) {
-        return field
-      } else {
-        return undefined
-      }
-    })
-    .filter((field) => Boolean(field))
+  const fieldsToSearch = fieldsOfEvents.filter((field) =>
+    searchFields.includes(field.type as keyof typeof searchFieldTypeMapping)
+  )
+  const terms = Object.values(searchParams).filter(Boolean)
 
-  const query = buildQueryFromQuickSearchFields(fieldsToSearch)
+  return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
 }
 
 export const QuickSearchIndex = () => {
@@ -73,7 +85,7 @@ export const QuickSearchIndex = () => {
   }) as Record<string, string>
 
   const query = buildQuickSearchQuery(searchParams, eventConfigurations)
-  const queryData = searchEvent.useSuspenseQuery(query, QUICK_SEARCH_KEY)
+  const queryData = searchEvent.useSuspenseQuery(query)
 
   return <SearchResult queryData={queryData} />
 }
