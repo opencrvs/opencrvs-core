@@ -119,21 +119,23 @@ export const DeclarationDraftCache: Story = {
   args: {
     actionType: ActionType.DECLARE
   },
-  beforeEach: async () => {
-    spies.draftList = 0
-    spies.eventGet = 0
-    spies.presignFile = 0
-    spies.uploadFile = 0
-    spies.fetchFile = 0
+  loaders: [
+    async () => {
+      spies.draftList = 0
+      spies.eventGet = 0
+      spies.presignFile = 0
+      spies.uploadFile = 0
+      spies.fetchFile = 0
 
-    const cacheKeys = await caches.keys()
-    const cacheKey = cacheKeys.find((key) => key === CACHE_NAME)
-    if (cacheKey) {
-      await caches.delete(cacheKey)
+      const cacheKeys = await caches.keys()
+      const cacheKey = cacheKeys.find((key) => key === CACHE_NAME)
+      if (cacheKey) {
+        await caches.delete(cacheKey)
+      }
+
+      await ensureCacheExists(CACHE_NAME)
     }
-
-    await ensureCacheExists(CACHE_NAME)
-  },
+  ],
   parameters: {
     reactRouter: {
       router: router,
