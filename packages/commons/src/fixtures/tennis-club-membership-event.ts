@@ -1325,7 +1325,10 @@ export const WorkqueueFixture = defineWorkqueue([
       defaultMessage: 'In progress',
       description: 'Title of in progress workqueue'
     },
-    query: { eventType: tennisClubMembershipEvent.id },
+    query: {
+      type: 'and',
+      clauses: [{ eventType: tennisClubMembershipEvent.id }]
+    },
     actions: [],
     icon: 'Draft'
   }

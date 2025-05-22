@@ -91,14 +91,10 @@ export function deserializeQuery(
   query: CountryConfigQueryType,
   user: UserWithPrimaryOffice
 ): QueryType {
-  if (query.type === 'or') {
-    return {
-      type: 'or',
-      clauses: query.clauses.map((clause) =>
-        deserializeQueryExpression(clause, user)
-      )
-    }
-  } else {
-    return deserializeQueryExpression(query, user)
+  return {
+    ...query,
+    clauses: query.clauses.map((clause) =>
+      deserializeQueryExpression(clause, user)
+    )
   }
 }

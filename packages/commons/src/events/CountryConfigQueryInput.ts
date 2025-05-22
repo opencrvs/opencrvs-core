@@ -30,9 +30,9 @@ const SerializableExact = z.object({
   term: z.union([z.string(), SerializedUserField])
 })
 
-const SerializableExactStatus = z.object({
+const ExactStatus = z.object({
   type: z.literal('exact'),
-  term: z.union([EventStatusEnum, SerializedUserField])
+  term: EventStatusEnum
 })
 
 const Range = z.object({
@@ -61,10 +61,9 @@ const QueryInput: ZodType = z.lazy(() =>
 
 export const SerializedQueryExpression = z
   .object({
-    type: z.literal('and'),
     title: z.string(),
     eventType: z.string(),
-    status: z.optional(z.union([AnyOfStatus, SerializableExactStatus])),
+    status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     createdAtLocation: z.optional(
