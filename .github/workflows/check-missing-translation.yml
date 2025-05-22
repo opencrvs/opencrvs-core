@@ -64,19 +64,20 @@ jobs:
           fi
           echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
 
-      - name: Setup Node.js
+      - name: Checkout core repository
+        uses: actions/checkout@v4
+        with:
+          repository: opencrvs/opencrvs-core
+          ref: ${{ github.head_ref }}
+
+      - name: Setup Node.js from core nvmrc
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version-file: .nvmrc
 
-      - name: Clone the Core repository and Check for missing translation
+      - name: Install dependencies and check for missing translations
         run: |
-          cd $HOME/core
-          acting_branch=${{steps.set_branch.outputs.working_branch}}
           export COUNTRY_CONFIG_PATH=${{steps.set_branch.outputs.countryconfig_path}}
-          git clone https://github.com/opencrvs/opencrvs-core.git
-          cd ./opencrvs-core
-          git checkout $acting_branch
           yarn install
           cd ./packages/client
           CI=true yarn extract:translations 2>&1 | tee output.txt
@@ -87,6 +88,6 @@ jobs:
              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
              cat missing_translations.txt >> $GITHUB_STEP_SUMMARY
              echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
-             echo "Create a pull request to the \`opencrvs/countryconfig\` repository with a branch name $acting_branch and add the translations to \`src/translations/client.csv\`. After pushing the changes, you can run this pipeline again." >> $GITHUB_STEP_SUMMARY
+             echo "Create a pull request to the \`opencrvs/countryconfig\` repository with a branch name ${{ github.head_ref }} and add the translations to \`src/translations/client.csv\`. After pushing the changes, you can run this pipeline again." >> $GITHUB_STEP_SUMMARY
              exit 1
           fi

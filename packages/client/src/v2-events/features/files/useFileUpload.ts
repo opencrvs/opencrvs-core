@@ -78,11 +78,8 @@ export function getFullUrl(filename: string) {
   throw new Error('MINIO_URL is not defined')
 }
 
-/** Where attachments are saved in external bucket. */
-export const EVENT_ATTACHMENTS_DIRECTORY = 'event-attachments'
-
-async function getPresignedUrl(fileUri: string, directory?: string) {
-  const url = joinValues(['/api/presigned-url', directory, fileUri], '/')
+async function getPresignedUrl(fileUri: string) {
+  const url = joinValues(['/api/presigned-url', fileUri], '/')
 
   const response = await fetch(url, {
     method: 'GET',
@@ -133,8 +130,8 @@ export async function removeCached(filename: string) {
   return cache.delete(getFullUrl(filename))
 }
 
-export async function precacheFile(filename: string, directory?: string) {
-  const presignedUrl = (await getPresignedUrl(filename, directory)).presignedURL
+export async function precacheFile(filename: string) {
+  const presignedUrl = (await getPresignedUrl(filename)).presignedURL
   const response = await fetch(presignedUrl)
   const blob = await response.blob()
   const file = new File([blob], filename, { type: blob.type })
