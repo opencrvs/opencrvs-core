@@ -12,7 +12,12 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
-import { Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
+import {
+  Scope,
+  SCOPES,
+  TokenUserType,
+  TokenWithBearer
+} from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
@@ -60,6 +65,7 @@ export function createTestClient(
   const token = createTestToken(user.id, scopes)
 
   const caller = createCaller({
+    userType: TokenUserType.USER,
     user: {
       id: user.id,
       primaryOfficeId: user.primaryOfficeId,

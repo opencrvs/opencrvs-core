@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID, SCOPES, TokenUserType } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -141,9 +141,21 @@ export const eventRouter = router({
     }),
   draft: router({
     list: publicProcedure.output(z.array(Draft)).query(async (options) => {
+      if (options.ctx.userType === TokenUserType.SYSTEM) {
+        throw new TRPCError({
+          code: 'NOT_IMPLEMENTED',
+          message: 'Drafts are not supported for system users'
+        })
+      }
       return getDraftsByUserId(options.ctx.user.id)
     }),
     create: publicProcedure.input(DraftInput).mutation(async (options) => {
+      if (options.ctx.userType === TokenUserType.SYSTEM) {
+        throw new TRPCError({
+          code: 'NOT_IMPLEMENTED',
+          message: 'Drafts are not supported for system users'
+        })
+      }
       const eventId = options.input.eventId
       await getEventById(eventId)
 

@@ -17,12 +17,10 @@ import {
   DeleteActionInput,
   getAssignedUserFromActions,
   inScope,
-  Scope
+  Scope,
+  TokenUserType
 } from '@opencrvs/commons'
-import {
-  UserRequestContext,
-  MiddlewareOptions
-} from '@events/router/middleware/utils'
+import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
 
 /**
@@ -54,8 +52,14 @@ export function requiresAnyOfScopes(scopes: Scope[]) {
 /**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
 export const requireAssignment = experimental_standaloneMiddleware<{
   input: ActionInputWithType | DeleteActionInput
-  ctx: UserRequestContext
+  ctx: Context
 }>().create(async ({ next, ctx, input }) => {
+  if (ctx.userType === TokenUserType.SYSTEM) {
+    throw new TRPCError({
+      code: 'NOT_IMPLEMENTED',
+      message: 'Drafts are not supported for system users'
+    })
+  }
   const event = await getEventById(input.eventId)
   if (
     'transactionId' in input &&

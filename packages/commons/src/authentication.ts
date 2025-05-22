@@ -192,11 +192,17 @@ export type UserScope =
 export type SystemScope =
   (typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES)[keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES][number]
 
+export enum TokenUserType {
+  USER = 'user',
+  SYSTEM = 'system'
+}
+
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
   scope: Scope[]
+  user_type: TokenUserType
 }
 
 export function getScopes(authHeader: IAuthHeader): RawScopes[] {
@@ -231,6 +237,11 @@ export const getTokenPayload = (token: string): ITokenPayload => {
 export const getUserId = (token: TokenWithBearer): string => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
   return tokenPayload.sub
+}
+
+export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+  return tokenPayload.user_type
 }
 
 export const TokenWithBearer = z

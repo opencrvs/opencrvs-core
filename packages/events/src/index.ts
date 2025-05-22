@@ -13,8 +13,12 @@ import '@opencrvs/commons/monitoring'
 
 import { createHTTPServer } from '@trpc/server/adapters/standalone'
 import { TRPCError } from '@trpc/server'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
-import { getSystem, getUser, logger } from '@opencrvs/commons'
+import {
+  getUserId,
+  getUserTypeFromToken,
+  TokenWithBearer
+} from '@opencrvs/commons/authentication'
+import { TokenUserType, getSystem, getUser, logger } from '@opencrvs/commons'
 import { appRouter } from './router/router'
 import { env } from './environment'
 import { getEventConfigurations } from './service/config/config'
@@ -42,41 +46,41 @@ const server = createHTTPServer({
 
     const token = parseResult.data
 
-    const userId = getUserId(token)
-
-    if (!userId) {
+    const sub = getUserId(token)
+    if (!sub) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
       })
     }
-    try {
-      const { primaryOfficeId, role } = await getUser(
-        env.USER_MANAGEMENT_URL,
-        userId,
-        token
-      )
+
+    const userType = getUserTypeFromToken(token)
+
+    if (userType === TokenUserType.SYSTEM) {
+      await getSystem(env.USER_MANAGEMENT_URL, sub, token)
 
       return {
-        user: {
-          id: userId,
-          primaryOfficeId,
-          role
+        userType: TokenUserType.SYSTEM,
+        system: {
+          id: sub
         },
         token: token
       }
-    } catch (error) {
-      if (!(await getSystem(env.USER_MANAGEMENT_URL, userId, token))) {
-        throw error
-      }
+    }
 
-      return {
-        user: {
-          id: userId,
-          role: 'SYSTEM',
-          primaryOfficeId: ''
-        },
-        token: token
-      }
+    const { primaryOfficeId, role } = await getUser(
+      env.USER_MANAGEMENT_URL,
+      sub,
+      token
+    )
+
+    return {
+      userType: TokenUserType.USER,
+      user: {
+        id: sub,
+        primaryOfficeId,
+        role
+      },
+      token: token
     }
   }
 })
