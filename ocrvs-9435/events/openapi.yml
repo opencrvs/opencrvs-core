@@ -4758,8 +4758,8 @@ components:
                           enum:
                             - trackingId
                             - status
-                            - registeredAt
-                            - registeredAtLocation
+                            - legalStatus.REGISTERED.createdAt
+                            - legalStatus.REGISTERED.createdAtLocation
                             - updatedAt
                         fieldType:
                           type: string
