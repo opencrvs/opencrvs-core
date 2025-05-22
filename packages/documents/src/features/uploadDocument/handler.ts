@@ -63,16 +63,11 @@ export async function fileUploadHandler(
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
 
-  await minioClient.putObject(
-    MINIO_BUCKET,
-    'event-attachments/' + filename,
-    file,
-    {
-      'created-by': userId
-    }
-  )
+  await minioClient.putObject(MINIO_BUCKET, filename, file, {
+    'created-by': userId
+  })
 
-  return 'event-attachments/' + filename
+  return filename
 }
 
 export async function fileExistsHandler(
@@ -80,10 +75,7 @@ export async function fileExistsHandler(
   h: Hapi.ResponseToolkit
 ) {
   const { filename } = request.params
-  const exists = await minioClient.statObject(
-    MINIO_BUCKET,
-    'event-attachments/' + filename
-  )
+  const exists = await minioClient.statObject(MINIO_BUCKET, filename)
   if (!exists) {
     return notFound('File not found')
   }
