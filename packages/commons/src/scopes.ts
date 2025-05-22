@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import { z, ZodType } from 'zod'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
@@ -217,25 +217,36 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_DATA_SEEDING)
 ])
 
+// TODO CIHAN: muokkaa tää niiku RECORD_NOTIFY: { scope: 'record.notify, options: ['event'] },
 export const CONFIGURABLE_SCOPES = {
-  'record.notify': { options: ['event'] },
-  'user.create': { options: ['role'] },
-  'user.edit': { options: ['role'] }
-} as const
+  'record.notify': {
+    options: { event: z.array(z.string()) }
+  },
+  'user.create': {
+    options: { role: z.array(z.string()) }
+  },
+  'user.edit': {
+    options: { role: z.array(z.string()) }
+  }
+} as const satisfies Record<string, { options: Record<string, z.ZodTypeAny> }>
+
+export type ConfigurableScope = keyof typeof CONFIGURABLE_SCOPES
 
 const RAW_CONFIGURABLE_SCOPE_REGEX =
   /^([a-zA-Z]+\.[a-zA-Z]+)\[((?:\w+=\w+(?:\|\w+)*)(:?,\w+=\w+(?:\|\w+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(RAW_CONFIGURABLE_SCOPE_REGEX)
 
-// For now the options only support a list of strings separated by pipes '|', which we resolve to an array of strings.
-// If we need to support more complex options, we can extend this type.
-type ConfigurableSearchOptionValue = string[]
+type ScopeOptionSchema<T extends ConfigurableScope> =
+  (typeof CONFIGURABLE_SCOPES)[T]['options']
 
-type ResolvedScope<T extends keyof typeof CONFIGURABLE_SCOPES> = {
-  options: {
-    [K in (typeof CONFIGURABLE_SCOPES)[T]['options'][number]]: ConfigurableSearchOptionValue
-  }
+type Foo<
+  T extends ConfigurableScope,
+  K extends keyof ScopeOptionSchema<T>
+> = z.infer<Extract<ScopeOptionSchema<T>[K], ZodType>>
+
+type ResolvedScope<T extends ConfigurableScope> = {
+  options: { [K in keyof ScopeOptionSchema<T>]: Foo<T, K> }
 }
 
 function parseRawScope(scope: string) {
@@ -252,7 +263,7 @@ function parseRawScope(scope: string) {
   return { type, options }
 }
 
-export function findScope<T extends keyof typeof CONFIGURABLE_SCOPES>(
+export function findScope<T extends ConfigurableScope>(
   userScopes: string[],
   configurableScope: T
 ): ResolvedScope<T> | undefined {
@@ -276,30 +287,18 @@ export function parseScope(scope: string) {
   }
 
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
-
   if (!maybeConfigurableScope.success) {
     return
   }
 
   const rawScope = maybeConfigurableScope.data
-
   const parsedScope = parseRawScope(rawScope)
   const { type } = parsedScope
 
-  const expectedOptions =
-    CONFIGURABLE_SCOPES[type as keyof typeof CONFIGURABLE_SCOPES].options
-
-  const objSchema = expectedOptions.reduce(
-    (acc, option) => ({
-      ...acc,
-      [option]: z.array(z.string())
-    }),
-    {}
-  )
-
+  const scopeDef = CONFIGURABLE_SCOPES[type as ConfigurableScope]
   const scopeSchema = z.object({
     type: z.literal(type),
-    options: z.object(objSchema)
+    options: z.object(scopeDef.options)
   })
 
   const result = scopeSchema.safeParse(parsedScope)
@@ -309,3 +308,6 @@ export function parseScope(scope: string) {
 export const scopes: Scope[] = Object.values(SCOPES)
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 export type Scope = RawScopes // for backwards compatibility
+
+// TODO CIHAN: rename
+export type NewScope = z.infer<typeof LiteralScopes> | ConfigurableScope
