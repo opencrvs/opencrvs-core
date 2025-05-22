@@ -32,7 +32,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getClient, sql } from '@events/storage/postgres/events'
+import { getClient, sql } from '@events/storage/postgres/events/db'
 import {
   decodeEventIndex,
   DEFAULT_SIZE,
