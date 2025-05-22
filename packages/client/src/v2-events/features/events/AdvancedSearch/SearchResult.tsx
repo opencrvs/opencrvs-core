@@ -12,7 +12,6 @@ import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
-import { mapKeys } from 'lodash'
 import {
   EventIndex,
   EventConfig,
@@ -228,7 +227,7 @@ export const SearchResultComponent = ({
             useFallbackTitle,
             title,
             label: eventConfig.label,
-            ...mapKeys(declaration, (_, key) => `${key}`)
+            ...declaration
           }
         })
         .map((doc) => {
