@@ -96,7 +96,7 @@ const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/event-attachments/:filename', (req) => {
+    http.get('/api/presigned-url/:filename', (req) => {
       spies.presignFile++
       return HttpResponse.json({
         presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`

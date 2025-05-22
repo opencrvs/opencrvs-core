@@ -378,7 +378,7 @@ export const ReviewShowsFilesFromDraft: Story = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/event-attachments/:filename', (req) => {
+          http.get('/api/presigned-url/:filename', (req) => {
             return HttpResponse.json({
               presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
             })
