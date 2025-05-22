@@ -39,10 +39,14 @@ test('Throws error without proper scope', async () => {
   await expect(
     client.event.search({
       type: 'and',
-      eventType: 'TENNIS_CLUB_MEMBERSHIP',
-      data: {
-        'applicant.firstname': 'Unique'
-      }
+      clauses: [
+        {
+          eventType: 'TENNIS_CLUB_MEMBERSHIP',
+          data: {
+            'applicant.firstname': 'Unique'
+          }
+        }
+      ]
     })
   ).rejects.toThrowError('FORBIDDEN')
 })
@@ -80,10 +84,14 @@ test('Returns empty list when no events match search criteria', async () => {
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
-    data: {
-      applicant____firstname: { type: 'exact', term: 'Johnson' }
-    }
+    clauses: [
+      {
+        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        data: {
+          applicant____firstname: { type: 'exact', term: 'Johnson' }
+        }
+      }
+    ]
   })
 
   expect(fetchedEvents).toEqual([])
@@ -164,11 +172,15 @@ test('Returns events that match the text field criteria of applicant', async () 
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
-    data: {
-      applicant____firstname: { type: 'exact', term: 'John' },
-      applicant____dob: { type: 'exact', term: '2000-01-01' }
-    }
+    clauses: [
+      {
+        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        data: {
+          applicant____firstname: { type: 'exact', term: 'John' },
+          applicant____dob: { type: 'exact', term: '2000-01-01' }
+        }
+      }
+    ]
   })
 
   expect(fetchedEvents).toHaveLength(2)
@@ -228,10 +240,14 @@ test('Returns events that match date of birth of applicant', async () => {
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
-    data: {
-      applicant____dob: { type: 'exact', term: '2000-01-01' }
-    }
+    clauses: [
+      {
+        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        data: {
+          applicant____dob: { type: 'exact', term: '2000-01-01' }
+        }
+      }
+    ]
   })
   expect(fetchedEvents[0].declaration['applicant.firstname']).toBe('Johnson') // fetches first document as result
   expect(fetchedEvents).toHaveLength(1)
@@ -291,10 +307,14 @@ test('Does not return events when searching with a similar but different date of
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
-    data: {
-      applicant____dob: { type: 'exact', term: '1999-11-11' } // search with same day and month
-    }
+    clauses: [
+      {
+        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        data: {
+          applicant____dob: { type: 'exact', term: '1999-11-11' } // search with same day and month
+        }
+      }
+    ]
   })
   expect(fetchedEvents).toHaveLength(0)
 })
@@ -329,13 +349,17 @@ test('Returns single document after creation', async () => {
 
   const response = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
-    data: {
-      applicant____firstname: {
-        type: 'exact',
-        term: 'Unique'
+    clauses: [
+      {
+        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        data: {
+          applicant____firstname: {
+            type: 'exact',
+            term: 'Unique'
+          }
+        }
       }
-    }
+    ]
   })
 
   expect(response).toHaveLength(1)
@@ -410,17 +434,21 @@ test('Returns multiple documents after creation', async () => {
 
   const response = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
-    data: {
-      applicant____firstname: {
-        type: 'exact',
-        term: 'Unique'
-      },
-      applicant____surname: {
-        type: 'exact',
-        term: 'Lastname'
+    clauses: [
+      {
+        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        data: {
+          applicant____firstname: {
+            type: 'exact',
+            term: 'Unique'
+          },
+          applicant____surname: {
+            type: 'exact',
+            term: 'Lastname'
+          }
+        }
       }
-    }
+    ]
   })
 
   // event1 and event2 should be returned
@@ -496,17 +524,21 @@ test('Returns no documents when search params are not matched', async () => {
 
   const response = await client.event.search({
     type: 'and',
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
-    data: {
-      applicant____firstname: {
-        type: 'exact',
-        term: 'Nothing'
-      },
-      applicant____surname: {
-        type: 'exact',
-        term: 'Matching'
+    clauses: [
+      {
+        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        data: {
+          applicant____firstname: {
+            type: 'exact',
+            term: 'Nothing'
+          },
+          applicant____surname: {
+            type: 'exact',
+            term: 'Matching'
+          }
+        }
       }
-    }
+    ]
   })
 
   expect(response).toHaveLength(0)
@@ -543,10 +575,14 @@ test('Throws error when search params are not matching proper schema', async () 
   await expect(
     client.event.search({
       type: 'and',
-      eventType: 'TENNIS_CLUB_MEMBERSHIP',
-      data: {
-        applicant____firstname: 'Johnny' // invalid schema
-      }
+      clauses: [
+        {
+          eventType: 'TENNIS_CLUB_MEMBERSHIP',
+          data: {
+            applicant____firstname: 'Johnny' // invalid schema
+          }
+        }
+      ]
     })
   ).rejects.toThrowError()
 })
