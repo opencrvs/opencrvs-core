@@ -33,6 +33,16 @@ type User = {
   status: string
   creationDate: number
 }
+type System = {
+  name: string
+  createdBy: string
+  username: string
+  client_id: string
+  status: string
+  scope: string[]
+  sha_secret: string
+  type: string
+}
 
 export async function getUser(
   userManagementHost: string,
@@ -59,4 +69,31 @@ export async function getUser(
   }
 
   return res.json() as Promise<User>
+}
+
+export async function getSystem(
+  userManagementHost: string,
+  systemId: string,
+  token: string
+) {
+  const hostWithTrailingSlash = userManagementHost.endsWith('/')
+    ? userManagementHost
+    : userManagementHost + '/'
+
+  const res = await fetch(new URL('getSystem', hostWithTrailingSlash).href, {
+    method: 'POST',
+    body: JSON.stringify({ systemId }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve system details. Error: ${res.status} status received`
+    )
+  }
+
+  return res.json() as Promise<System>
 }
