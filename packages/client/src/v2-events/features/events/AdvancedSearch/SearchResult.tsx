@@ -146,7 +146,7 @@ function changeSortedColumn(
   }
 }
 
-export const searchResultMessages = {
+const searchResultMessages = {
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
