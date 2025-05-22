@@ -55,9 +55,10 @@ export function WorkqueueContainer() {
 
   const deSerializedQuery =
     (workqueueConfig &&
-      userHasAccessToWorkqueue &&
       legacyUser &&
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       user &&
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
       deserializeQuery(workqueueConfig.query, {
         ...user,
         primaryOfficeId: legacyUser.primaryOffice.id
@@ -66,16 +67,17 @@ export function WorkqueueContainer() {
 
   const events = searchEvent.useSuspenseQuery(deSerializedQuery)
 
-  if (!workqueueConfig) {
-    throw new Error('Workqueue configuration not found for' + workqueueSlug)
-  }
-
+  // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
   if (!user) {
     throw new Error('User data not found for')
   }
 
   if (!userHasAccessToWorkqueue) {
     throw new Error(`Workqueue ${workqueueSlug} is not available for this user`)
+  }
+
+  if (!workqueueConfig) {
+    throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
 
   return (
