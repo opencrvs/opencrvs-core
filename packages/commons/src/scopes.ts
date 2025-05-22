@@ -243,11 +243,10 @@ const ConfigurableScopes = z.discriminatedUnion('type', [
 
 type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
-// TODO: config multiple options?
 export const CONFIGURABLE_SCOPES = {
-  'record.notify': { options: 'event' },
-  'user.create': { options: 'role' },
-  'user.edit': { options: 'role' }
+  'record.notify': { options: ['event'] },
+  'user.create': { options: ['role', 'kakke'] },
+  'user.edit': { options: ['role'] }
 } as const
 
 // For now the options only support a list of strings separated by pipes '|', which we resolve to an array of strings.
@@ -256,7 +255,7 @@ type ConfigurableSearchOptionValue = string[]
 
 type ResolvedScope<T extends keyof typeof CONFIGURABLE_SCOPES> = {
   options: {
-    [K in (typeof CONFIGURABLE_SCOPES)[T]['options']]: ConfigurableSearchOptionValue
+    [K in (typeof CONFIGURABLE_SCOPES)[T]['options'][number]]: ConfigurableSearchOptionValue
   }
 }
 
@@ -271,7 +270,7 @@ export function findConfigurableScope<
     return undefined
   }
 
-  const [, _, rawOptions] = foundScope.match(rawConfigurableScopeRegex) ?? []
+  const [, , rawOptions] = foundScope.match(rawConfigurableScopeRegex) ?? []
 
   const options = rawOptions
     .split(',')
