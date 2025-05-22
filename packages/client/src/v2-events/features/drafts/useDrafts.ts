@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { ActionStatus, Draft } from '@opencrvs/commons/client'
@@ -21,10 +21,37 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
-  setMutationDefaults
+  setMutationDefaults,
+  setQueryDefaults
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
+import { getFileNames } from '../files/cache'
+import { precacheFile } from '../files/useFileUpload'
+
+/*
+ * Overrides the default behaviour of "api.event.draft.list"
+ * Cache files referenced in the draft.
+ *
+ * This ensures the full record can be browsed even when the user goes offline
+ */
+setQueryDefaults(trpcOptionsProxy.event.draft.list, {
+  queryFn: async (...params) => {
+    const queryOptions = trpcOptionsProxy.event.draft.list.queryOptions()
+
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+
+    const response = await queryOptions.queryFn(...params)
+    const drafts = response.map((draft) => Draft.parse(draft))
+
+    const filenames = drafts.flatMap((draft) => getFileNames([draft.action]))
+    await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
+
+    return drafts
+  }
+})
 
 interface DraftStore {
   draft: Draft | null
@@ -130,7 +157,8 @@ export function useDrafts() {
       })
     },
     getRemoteDrafts: function useDraftList(): Draft[] {
-      const options = trpc.event.draft.list.queryOptions()
+      // Skip the queryFn defined by tRPC and use the one defined above
+      const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
 
       const drafts = useSuspenseQuery({
         ...options,

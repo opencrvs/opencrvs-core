@@ -13,6 +13,8 @@ import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
+import { CACHE_NAME } from '@client/v2-events/cache'
+import { joinValues } from '@client/v2-events/utils'
 
 async function uploadFile({
   file,
@@ -59,9 +61,6 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-/* Must match the one defined src-sw.ts */
-const CACHE_NAME = 'workbox-runtime'
-
 function withPostfix(str: string, postfix: string) {
   if (str.endsWith(postfix)) {
     return str
@@ -71,16 +70,17 @@ function withPostfix(str: string, postfix: string) {
 }
 
 export function getFullUrl(filename: string) {
-  const minioURL = window.config.MINIO_URL
-  if (minioURL && typeof minioURL === 'string') {
-    return new URL(filename, withPostfix(minioURL, '/')).toString()
+  const minioUrl = window.config.MINIO_URL
+  if (minioUrl && typeof minioUrl === 'string') {
+    return new URL(filename, withPostfix(minioUrl, '/')).toString()
   }
 
   throw new Error('MINIO_URL is not defined')
 }
 
 async function getPresignedUrl(fileUri: string) {
-  const url = `/api/presigned-url/` + fileUri
+  const url = joinValues(['/api/presigned-url', fileUri], '/')
+
   const response = await fetch(url, {
     method: 'GET',
     headers: {
@@ -107,6 +107,7 @@ async function cacheFile(filename: string, file: File) {
   }
 
   const cache = await caches.open(cacheKey)
+
   return cache.put(
     getFullUrl(filename),
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
