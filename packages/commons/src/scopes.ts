@@ -256,8 +256,10 @@ function isConfigurableScope(scope: string): scope is ConfigurableScope {
 }
 
 function parseRawScope(scope: string) {
-  const [, type, rawOptions] = scope.match(RAW_CONFIGURABLE_SCOPE_REGEX) ?? []
-  const scopeName = isConfigurableScope(type) ? type : undefined
+  const [, rawScopeName, rawOptions] =
+    scope.match(RAW_CONFIGURABLE_SCOPE_REGEX) ?? []
+
+  const scopeName = isConfigurableScope(rawScopeName) ? rawScopeName : undefined
 
   if (!scopeName) {
     throw new Error(`Invalid scope: ${scope}`)
@@ -271,7 +273,7 @@ function parseRawScope(scope: string) {
       return acc
     }, {})
 
-  return { scopeName, options }
+  return { scope: scopeName, options }
 }
 
 export function findScope<T extends ConfigurableScope>(
@@ -294,7 +296,7 @@ export function parseScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
 
   if (maybeLiteralScope.success) {
-    return { type: maybeLiteralScope.data }
+    return { scope: maybeLiteralScope.data }
   }
 
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
@@ -304,11 +306,11 @@ export function parseScope(scope: string) {
 
   const rawScope = maybeConfigurableScope.data
   const parsedScope = parseRawScope(rawScope)
-  const { scopeName } = parsedScope
+  const { scope: scopeName } = parsedScope
 
   const scopeDef = CONFIGURABLE_SCOPES[scopeName]
   const scopeSchema = z.object({
-    type: z.literal(scopeName),
+    scope: z.literal(scopeName),
     options: z.object(scopeDef.options)
   })
 
