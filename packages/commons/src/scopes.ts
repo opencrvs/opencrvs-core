@@ -306,11 +306,10 @@ export function parseScope(scope: string) {
 
   const rawScope = maybeConfigurableScope.data
   const parsedScope = parseRawScope(rawScope)
-  const { scope: scopeName } = parsedScope
 
-  const scopeDef = CONFIGURABLE_SCOPES[scopeName]
+  const scopeDef = CONFIGURABLE_SCOPES[parsedScope.scope]
   const scopeSchema = z.object({
-    scope: z.literal(scopeName),
+    scope: z.literal(parsedScope.scope),
     options: z.object(scopeDef.options)
   })
 
