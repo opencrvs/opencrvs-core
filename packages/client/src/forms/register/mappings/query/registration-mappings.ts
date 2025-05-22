@@ -160,6 +160,12 @@ const getUserRole = (history: History): MessageDescriptor => {
   )
 }
 
+const getUserFullHonorificName = (history: History): string => {
+  return (
+    history?.user?.fullHonorificName || ''
+  )
+}
+
 const getUserSignature = (history: History): string => {
   return history?.signature?.data as string
 }
@@ -209,7 +215,8 @@ export const userTransformer =
         date: history.date,
         ...locationHierarchy,
         signature: getUserSignature(history),
-        comments: history.comments?.[0]?.comment
+        comments: history.comments?.[0]?.comment,
+        fullHonorificName: getUserFullHonorificName(history)
       } as IFormSectionData
     }
   }

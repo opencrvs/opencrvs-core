@@ -68,6 +68,7 @@ export default async function updateUser(
   existingUser.name = user.name
   existingUser.email = user.email
   existingUser.mobile = user.mobile
+  existingUser.fullHonorificName = user.fullHonorificName
   existingUser.emailForNotification = user.emailForNotification
   existingUser.signature = user.signature
   existingUser.localRegistrar = user.localRegistrar

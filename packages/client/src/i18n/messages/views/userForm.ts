@@ -69,6 +69,11 @@ export const messages = {
     description: 'Input label for email address',
     id: 'form.field.label.email'
   },
+  fullHonorificName: {
+    defaultMessage: 'Full Honorific Name',
+    description: 'Input label for full honorific name',
+    id: 'form.field.label.fullHonorificName'
+  },
   accountDetails: {
     defaultMessage: 'Account details',
     description: 'Account details section',

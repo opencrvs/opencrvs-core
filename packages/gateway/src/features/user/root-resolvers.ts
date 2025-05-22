@@ -716,7 +716,8 @@ function createOrUpdateUserPayload(
     ...(user.mobile && { mobile: user.mobile as string }),
     device: user.device as string,
     signature: user.signature,
-    ...(user.username && { username: user.username })
+    ...(user.username && { username: user.username }),
+    fullHonorificName: user.fullHonorificName
   }
   if (user.id) {
     userPayload.id = user.id
