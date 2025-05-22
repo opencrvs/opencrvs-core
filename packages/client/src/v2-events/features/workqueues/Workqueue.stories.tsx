@@ -94,10 +94,10 @@ export const AllEventsWorkqueueWithPagination: Story = {
           tRPCMsw.event.list.query(() => {
             return queryData
           }),
-          tRPCMsw.event.workqueue.list.query(() => {
+          tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('recent')
           }),
-          tRPCMsw.event.workqueue.count.query((input) => {
+          tRPCMsw.workqueue.count.query((input) => {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: queryData.length }
             }, {})
@@ -133,10 +133,10 @@ export const ReadyToPrintWorkqueue: Story = {
               (record) => record.status === EventStatus.REGISTERED
             )
           }),
-          tRPCMsw.event.workqueue.list.query(() => {
+          tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('ready-to-print')
           }),
-          tRPCMsw.event.workqueue.count.query((input) => {
+          tRPCMsw.workqueue.count.query((input) => {
             return input.reduce((acc, { slug }) => {
               return {
                 ...acc,
@@ -174,10 +174,10 @@ export const NoResults: Story = {
           tRPCMsw.event.list.query(() => {
             return []
           }),
-          tRPCMsw.event.workqueue.list.query(() => {
+          tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('recent')
           }),
-          tRPCMsw.event.workqueue.count.query((input) => {
+          tRPCMsw.workqueue.count.query((input) => {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: 0 }
             }, {})

@@ -29,18 +29,12 @@ import {
   CONFIG_GET_ALLOWED_SCOPES,
   CONFIG_SEARCH_ALLOWED_SCOPES,
   QueryType,
-  DeleteActionInput,
-  WorkqueueConfig,
-  WorkqueueCountInput,
-  WorkqueueCountOutput
+  DeleteActionInput
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import { publicProcedure, router } from '@events/router/trpc'
-import {
-  getEventConfigurations,
-  getWorkqueueConfigurations
-} from '@events/service/config/config'
+import { getEventConfigurations } from '@events/service/config/config'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
@@ -50,11 +44,7 @@ import {
   deleteEvent,
   getEventById
 } from '@events/service/events/events'
-import {
-  getEventCount,
-  getIndex,
-  getIndexedEvents
-} from '@events/service/indexing/indexing'
+import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { getDefaultActionProcedures } from './actions'
@@ -92,28 +82,6 @@ export const eventRouter = router({
       .output(z.array(EventConfig))
       .query(async (options) => {
         return getEventConfigurations(options.ctx.token)
-      })
-  }),
-  workqueue: router({
-    list: publicProcedure
-      .meta({
-        openapi: {
-          summary: 'List workqueue configurations',
-          method: 'GET',
-          path: '/events/workqueue/config',
-          tags: ['Workqueues']
-        }
-      })
-      .input(z.void())
-      .output(z.array(WorkqueueConfig))
-      .query(async (options) => {
-        return getWorkqueueConfigurations(options.ctx.token)
-      }),
-    count: publicProcedure
-      .input(WorkqueueCountInput)
-      .output(WorkqueueCountOutput)
-      .query(async (options) => {
-        return getEventCount(options.input)
       })
   }),
   create: publicProcedure

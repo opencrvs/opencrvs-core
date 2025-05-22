@@ -19,7 +19,9 @@ import { getScope } from '@client/profile/profileSelectors'
  */
 export function useWorkqueueConfigurations() {
   const trpc = useTRPC()
-  const config = useSuspenseQuery(trpc.event.workqueue.list.queryOptions()).data
+  const config = useSuspenseQuery(
+    trpc.workqueue.config.list.queryOptions()
+  ).data
 
   const scopes = useSelector(getScope)
   const availableWorkqueues =

@@ -107,10 +107,10 @@ export const SaveAndExit: Story = {
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
           }),
-          tRPCMsw.event.workqueue.list.query(() => {
+          tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues()
           }),
-          tRPCMsw.event.workqueue.count.query((input) => {
+          tRPCMsw.workqueue.count.query((input) => {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: 7 }
             }, {})
