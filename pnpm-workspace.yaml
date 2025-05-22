@@ -1,0 +1,4 @@
+packages:
+  - 'packages/*'
+patchedDependencies:
+  pdfmake: patches/pdfmake+0.2.7.patch
