@@ -217,7 +217,6 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_DATA_SEEDING)
 ])
 
-// TODO CIHAN: muokkaa tää niiku RECORD_NOTIFY: { scope: 'record.notify, options: ['event'] },
 export const CONFIGURABLE_SCOPES = {
   'record.notify': {
     options: { event: z.array(z.string()) }
@@ -240,13 +239,13 @@ const rawConfigurableScope = z.string().regex(RAW_CONFIGURABLE_SCOPE_REGEX)
 type ScopeOptionSchema<T extends ConfigurableScope> =
   (typeof CONFIGURABLE_SCOPES)[T]['options']
 
-type Foo<
+type ScopeOptionValue<
   T extends ConfigurableScope,
   K extends keyof ScopeOptionSchema<T>
 > = z.infer<Extract<ScopeOptionSchema<T>[K], ZodType>>
 
 type ResolvedScope<T extends ConfigurableScope> = {
-  options: { [K in keyof ScopeOptionSchema<T>]: Foo<T, K> }
+  options: { [K in keyof ScopeOptionSchema<T>]: ScopeOptionValue<T, K> }
 }
 
 function parseRawScope(scope: string) {
