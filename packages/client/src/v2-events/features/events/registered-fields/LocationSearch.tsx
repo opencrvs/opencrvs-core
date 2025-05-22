@@ -10,14 +10,15 @@
  */
 import React from 'react'
 import { useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
+import { Location } from '@events/service/locations/locations'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
 import { FieldProps } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
-import { useResolveLocationFullName } from '@client/v2-events/utils'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 interface SearchLocation {
   id: string
@@ -69,11 +70,56 @@ function LocationSearchInput({
   )
 }
 
+function stringify(
+  intl: IntlShape,
+  locations: Location[],
+  value: Stringifiable | undefined | null
+) {
+  if (!value) {
+    return {
+      location: '',
+      district: '',
+      province: '',
+      country: ''
+    }
+  }
+
+  const country = intl.formatMessage({
+    id: `countries.${window.config.COUNTRY}`,
+    defaultMessage: 'Farajaland',
+    description: 'Country name'
+  })
+
+  const locationId = value.toString()
+  const location = locations.find((loc) => loc.id === locationId)
+  const district = locations.find((loc) => loc.id === location?.partOf)
+  const province = locations.find((loc) => loc.id === district?.partOf)
+
+  return {
+    location: location?.name || '',
+    district: district?.name || '',
+    province: province?.name || '',
+    country: country
+  }
+}
+
 function LocationSearchOutput({ value }: { value: Stringifiable }) {
-  return useResolveLocationFullName(value.toString())
+  const intl = useIntl()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const { location, district, province, country } = stringify(
+    intl,
+    locations,
+    value
+  )
+
+  return [location, district, province, country]
+    .filter((loc) => loc !== '')
+    .join(', ')
 }
 
 export const LocationSearch = {
   Input: LocationSearchInput,
-  Output: LocationSearchOutput
+  Output: LocationSearchOutput,
+  stringify
 }
