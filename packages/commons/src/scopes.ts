@@ -265,19 +265,13 @@ function parseRawScope(scope: string) {
 
   const options = rawOptions
     .split(',')
-    .reduce<Record<string, string[]>>((acc, option) => {
+    .reduce((acc: Record<string, string[]>, option) => {
       const [key, value] = option.split('=')
       acc[key] = value.split('|')
       return acc
     }, {})
 
-  return {
-    scopeName,
-    options
-  } as {
-    scopeName: ConfigurableScope
-    options: { [K in keyof ScopeOptionSchema<typeof scopeName>]: string[] }
-  }
+  return { scopeName, options }
 }
 
 export function findScope<T extends ConfigurableScope>(
