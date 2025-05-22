@@ -298,6 +298,8 @@ export function parseScope(scope: string) {
   return result.success ? result.data : undefined
 }
 
+export const scopes: Scope[] = Object.values(SCOPES)
+
 export type ParsedScopes = NonNullable<ReturnType<typeof parseScope>>
 export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
