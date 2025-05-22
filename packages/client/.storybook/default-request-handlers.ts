@@ -1140,7 +1140,7 @@ export const handlers = {
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
     }),
-    tRPCMsw.event.workqueue.get.query(() => {
+    tRPCMsw.event.workqueue.list.query(() => {
       return WorkqueueFixture
     })
   ],

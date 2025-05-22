@@ -94,7 +94,7 @@ export const AllEventsWorkqueueWithPagination: Story = {
           tRPCMsw.event.list.query(() => {
             return queryData
           }),
-          tRPCMsw.event.workqueue.get.query(() => {
+          tRPCMsw.event.workqueue.list.query(() => {
             return generateWorkqueues('recent')
           }),
           tRPCMsw.event.workqueue.count.query((input) => {
@@ -133,7 +133,7 @@ export const ReadyToPrintWorkqueue: Story = {
               (record) => record.status === EventStatus.REGISTERED
             )
           }),
-          tRPCMsw.event.workqueue.get.query(() => {
+          tRPCMsw.event.workqueue.list.query(() => {
             return generateWorkqueues('ready-to-print')
           }),
           tRPCMsw.event.workqueue.count.query((input) => {
@@ -174,7 +174,7 @@ export const NoResults: Story = {
           tRPCMsw.event.list.query(() => {
             return []
           }),
-          tRPCMsw.event.workqueue.get.query(() => {
+          tRPCMsw.event.workqueue.list.query(() => {
             return generateWorkqueues('recent')
           }),
           tRPCMsw.event.workqueue.count.query((input) => {

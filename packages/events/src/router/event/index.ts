@@ -95,7 +95,7 @@ export const eventRouter = router({
       })
   }),
   workqueue: router({
-    get: publicProcedure
+    list: publicProcedure
       .meta({
         openapi: {
           summary: 'List workqueue configurations',
