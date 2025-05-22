@@ -421,10 +421,6 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
-      - name: Use Node 18.X
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
@@ -437,11 +433,19 @@ jobs:
           ref: ${{ github.head_ref }}
           path: pr
 
-      - uses: actions/setup-node@v4
+      - name: Use Node.js from .nvmrc from base branch
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: base/.nvmrc
 
       - name: Install base dependencies
         run: yarn install --ignore-scripts
         working-directory: base
+
+      - name: Use Node.js from .nvmrc from PR branch
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: pr/.nvmrc
 
       - name: Install PR dependencies
         run: yarn install --ignore-scripts
