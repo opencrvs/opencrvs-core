@@ -11,7 +11,6 @@
 
 import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -389,12 +388,10 @@ export async function getIndex(eventParams: QueryType) {
       query
     })
 
-    const events = z.array(EventIndex).parse(
-      response.hits.hits
-        .map((hit) => hit._source)
-        .filter((event): event is EncodedEventIndex => event !== undefined)
-        .map((event) => decodeEventIndex(event))
-    )
+    const events = response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
 
     return events
   } else {
@@ -411,17 +408,13 @@ export async function getIndex(eventParams: QueryType) {
       query
     })
 
-    const events = z.array(EventIndex).parse(
-      response.hits.hits
-        .map((hit) => hit._source)
-        .filter((event): event is EncodedEventIndex => event !== undefined)
-        .map((event) => decodeEventIndex(event))
-    )
+    const events = response.hits.hits
+      .map((hit) => hit._source)
+      .filter((event): event is EncodedEventIndex => event !== undefined)
+      .map((event) => decodeEventIndex(event))
 
     return events
   }
-
-  return []
 }
 
 export async function getEventCount(queries: WorkqueueCountInput) {
