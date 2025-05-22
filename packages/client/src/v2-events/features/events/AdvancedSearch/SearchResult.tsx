@@ -148,6 +148,11 @@ export const searchResultMessages = {
     description:
       'The label for search result header in advancedSearchResult page',
     id: 'v2.advancedSearchResult.table.searchResult'
+  },
+  eventStatus: {
+    id: `v2.events.status`,
+    defaultMessage:
+      '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
   }
 }
 
@@ -159,6 +164,11 @@ interface Props {
   searchParams: Record<string, string>
   queryData: EventIndex[]
 }
+
+const ExtendedEventStatuses = {
+  OUTBOX: 'OUTBOX',
+  DRAFT: 'DRAFT'
+} as const
 
 export const SearchResultComponent = ({
   columns,
@@ -238,31 +248,23 @@ export const SearchResultComponent = ({
 
           const getEventStatus = () => {
             if (isInOutbox) {
-              return 'OUTBOX'
+              return ExtendedEventStatuses.OUTBOX
             }
             if (isInDrafts) {
-              return 'DRAFT'
+              return ExtendedEventStatuses.DRAFT
             }
             return doc.status
           }
 
-          const status = doc.status
-
+          const status = getEventStatus()
           return {
             ...doc,
             type: intl.formatMessage(doc.label),
             createdAt: formattedDuration(new Date(doc.createdAt)),
             updatedAt: formattedDuration(new Date(doc.updatedAt)),
-            status: intl.formatMessage(
-              {
-                id: `v2.events.status`,
-                defaultMessage:
-                  '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
-              },
-              {
-                status: getEventStatus()
-              }
-            ),
+            status: intl.formatMessage(messages.eventStatus, {
+              status
+            }),
             title: isInOutbox ? (
               <IconWithName name={doc.title} status={status} />
             ) : (
