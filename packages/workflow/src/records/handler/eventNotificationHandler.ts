@@ -41,7 +41,14 @@ import {
   updateCompositionWithDuplicateIds,
   updateTaskWithDuplicateIds
 } from '@workflow/utils/duplicate-checker'
-import { logger } from '@opencrvs/commons'
+import { logger, UUID } from '@opencrvs/commons'
+
+interface DuplicateCheckResponse {
+  duplicateIds: Array<{
+    id: UUID
+    trackingId: string
+  }>
+}
 
 export async function eventNotificationHandler(
   request: Hapi.Request,
@@ -145,7 +152,8 @@ export async function eventNotificationHandler(
     throw internal('Failed to check for duplicates from search microservice')
   }
 
-  const response: any = await duplicateCheckResponse.json()
+  const response =
+    (await duplicateCheckResponse.json()) as DuplicateCheckResponse
 
   if (response.duplicateIds && response.duplicateIds.length > 0) {
     let task = getTaskFromSavedBundle(updatedBundle)
