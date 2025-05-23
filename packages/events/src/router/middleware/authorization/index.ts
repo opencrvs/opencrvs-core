@@ -39,8 +39,15 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
-function getAuthorizedCtx(foundScopes: ConfigurableScopes[]) {
-  const authorizedEvents = foundScopes
+/**
+ * Extracts authorized events from the found configurable scopes.
+ * Currently supports event types, but more options can be added in the future.
+ *
+ * @param scopes - Array of configurable scopes with options
+ * @returns Object containing authorized events
+ */
+function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
+  const authorizedEvents = scopes
     .flatMap(({ options }) => {
       if ('event' in options) {
         return options.event
@@ -77,7 +84,7 @@ function inConfigurableScopes(
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  return getAuthorizedCtx(foundScopes)
+  return getAuthorizedEntitiesFromScopes(foundScopes)
 }
 
 type CtxWithAuthorizedEntities = Context & {
