@@ -588,7 +588,7 @@ test('Throws error when search params are not matching proper schema', async () 
   ).rejects.toThrowError()
 })
 
-test.only('Returns events assigned to a specific user', async () => {
+test('Returns events assigned to a specific user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     'search.birth',
