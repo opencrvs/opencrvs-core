@@ -20,7 +20,8 @@ import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
 import { event } from '../events/event'
-import { format, subDays } from 'date-fns'
+import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
+import { EventStatus } from '../events/EventMetadata'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -953,63 +954,31 @@ const statusOptions = [
     }
   },
   {
-    value: 'IN_PROGRESS',
+    value: EventStatus.CREATED,
     label: {
-      defaultMessage: 'In progress',
+      defaultMessage: 'Draft',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusInprogress'
+      id: 'v2.advancedSearch.form.recordStatusCreated'
     }
   },
   {
-    value: 'IN_REVIEW',
+    value: EventStatus.NOTIFIED,
     label: {
-      defaultMessage: 'In review',
+      defaultMessage: 'Notified',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusInReview'
+      id: 'v2.advancedSearch.form.recordStatusNotified'
     }
   },
   {
-    value: 'REJECTED',
+    value: EventStatus.DECLARED,
     label: {
-      defaultMessage: 'Requires updates',
+      defaultMessage: 'Declared',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRequireUpdate'
+      id: 'v2.advancedSearch.form.recordStatusDeclared'
     }
   },
   {
-    value: 'REGISTERED',
-    label: {
-      defaultMessage: 'Registered',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRegistered'
-    }
-  },
-  {
-    value: 'CERTIFIED',
-    label: {
-      defaultMessage: 'Certified',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCertified'
-    }
-  },
-  {
-    value: 'ARCHIVED',
-    label: {
-      defaultMessage: 'Archived',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusAchived'
-    }
-  },
-  {
-    value: 'CORRECTION_REQUESTED',
-    label: {
-      defaultMessage: 'Correction requested',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCorrectionRequested'
-    }
-  },
-  {
-    value: 'VALIDATED',
+    value: EventStatus.VALIDATED,
     label: {
       defaultMessage: 'Validated',
       description: 'Option for form field: status of record',
@@ -1017,14 +986,39 @@ const statusOptions = [
     }
   },
   {
-    value: 'CREATED',
+    value: EventStatus.REGISTERED,
     label: {
-      defaultMessage: 'Draft',
+      defaultMessage: 'Registered',
       description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCreated'
+      id: 'v2.advancedSearch.form.recordStatusRegistered'
+    }
+  },
+  {
+    value: EventStatus.CERTIFIED,
+    label: {
+      defaultMessage: 'Certified',
+      description: 'Option for form field: status of record',
+      id: 'v2.advancedSearch.form.recordStatusCertified'
+    }
+  },
+  {
+    value: EventStatus.REJECTED,
+    label: {
+      defaultMessage: 'Rejected',
+      description: 'Option for form field: status of record',
+      id: 'v2.advancedSearch.form.recordStatusRejected'
+    }
+  },
+  {
+    value: EventStatus.ARCHIVED,
+    label: {
+      defaultMessage: 'Archived',
+      description: 'Option for form field: status of record',
+      id: 'v2.advancedSearch.form.recordStatusArchived'
     }
   }
 ]
+
 const timePeriodOptions = [
   {
     label: {
@@ -1040,7 +1034,7 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 30 days',
       id: 'form.section.label.timePeriodLast30Days'
     },
-    value: `${format(subDays(new Date(), 30), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subMonths(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
   },
   {
     label: {
@@ -1048,7 +1042,7 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 90 days',
       id: 'form.section.label.timePeriodLast90Days'
     },
-    value: `${format(subDays(new Date(), 90), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subQuarters(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
   },
   {
     label: {
@@ -1056,7 +1050,7 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last year',
       id: 'form.section.label.timePeriodLastYear'
     },
-    value: `${format(subDays(new Date(), 365), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subYears(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
   }
 ]
 
