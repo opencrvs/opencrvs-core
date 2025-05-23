@@ -34,8 +34,8 @@ import { UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
-import * as eventsDb from '@events/storage/postgres/events/events'
-import * as draftsDb from '@events/storage/postgres/events/drafts'
+import * as eventsRepo from '@events/storage/postgres/events/events'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 
 function getValidFileValue(
   fieldKey: string,
@@ -74,7 +74,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 }
 
 export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
-  const event = await eventsDb.getEventById(eventId)
+  const event = await eventsRepo.getEventById(eventId)
   const eventState = getCurrentEventState(event)
 
   // Once an event is declared or notified, it can not be deleted anymore
@@ -88,8 +88,8 @@ export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
   const { id } = event
   await deleteEventAttachments(token, event)
   await deleteEventIndex(event)
-  await draftsDb.deleteDraftsByEventId(id)
-  await eventsDb.deleteEventById(id)
+  await draftsRepo.deleteDraftsByEventId(id)
+  await eventsRepo.deleteEventById(id)
 
   return { id }
 }
@@ -121,7 +121,7 @@ export async function createEvent({
   createdAtLocation: string
   transactionId: string
 }): Promise<EventDocument> {
-  const event = await eventsDb.getOrCreateEvent({
+  const event = await eventsRepo.getOrCreateEvent({
     type: eventInput.type,
     fieldId: eventInput.dateOfEvent?.fieldId,
     transactionId: transactionId,
@@ -200,7 +200,7 @@ export async function addAction(
     status: ActionStatus
   }
 ): Promise<EventDocument> {
-  const event = await eventsDb.getEventById(eventId)
+  const event = await eventsRepo.getEventById(eventId)
   const configuration = await getEventConfigurationById({
     token,
     eventType: event.type
@@ -220,7 +220,7 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    await eventsDb.createAction({
+    await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
       type: ActionType.MARKED_AS_DUPLICATE,
@@ -234,7 +234,7 @@ export async function addAction(
     })
   }
 
-  await eventsDb.createAction({
+  await eventsRepo.createAction({
     eventId,
     transactionId: input.transactionId,
     type: input.type,
@@ -248,7 +248,7 @@ export async function addAction(
   })
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
-    await eventsDb.createAction({
+    await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
       type: ActionType.UNASSIGN,
@@ -260,7 +260,7 @@ export async function addAction(
     })
   }
 
-  const drafts = await draftsDb.getDraftsForAction(
+  const drafts = await draftsRepo.getDraftsForAction(
     eventId,
     createdBy,
     input.type
@@ -273,13 +273,13 @@ export async function addAction(
     drafts
   )
 
-  const updatedEvent = await eventsDb.getEventById(eventId)
+  const updatedEvent = await eventsRepo.getEventById(eventId)
 
   if (input.type !== ActionType.READ) {
     await indexEvent(updatedEvent)
 
     if (input.type !== ActionType.ASSIGN) {
-      await draftsDb.deleteDraftsByEventId(eventId)
+      await draftsRepo.deleteDraftsByEventId(eventId)
     }
   }
 
@@ -300,7 +300,7 @@ export async function addAsyncRejectAction({
   createdByRole,
   createdAtLocation
 }: AsyncRejectActionInput) {
-  await eventsDb.createAction({
+  await eventsRepo.createAction({
     eventId,
     transactionId,
     type,
@@ -311,11 +311,11 @@ export async function addAsyncRejectAction({
     createdAtLocation
   })
 
-  const updatedEvent = await eventsDb.getEventById(eventId)
+  const updatedEvent = await eventsRepo.getEventById(eventId)
   await indexEvent(updatedEvent)
-  await draftsDb.deleteDraftsByEventId(eventId)
+  await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
 }
 
-export const getEventById = eventsDb.getEventById
+export const getEventById = eventsRepo.getEventById
