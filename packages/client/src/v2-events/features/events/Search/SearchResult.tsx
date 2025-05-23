@@ -17,7 +17,8 @@ import {
   defaultColumns,
   EventIndex,
   EventConfig,
-  workqueues
+  workqueues,
+  WorkQueueTypes
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -157,14 +158,12 @@ const messagesToDefine = {
 const messages = defineMessages(messagesToDefine)
 
 interface Props {
-  workqueueConfig: (typeof workqueues)['all']
-  eventConfig: EventConfig
-  searchParams: Record<string, string>
+  eventConfig?: EventConfig
+  searchParams?: Record<string, string>
   queryData: EventIndex[]
 }
 
 export const SearchResult = ({
-  workqueueConfig,
   eventConfig,
   searchParams,
   queryData
@@ -198,6 +197,9 @@ export const SearchResult = ({
     setSortOrder(newSortOrder)
   }
 
+  const workqueueId = 'all' satisfies WorkQueueTypes
+  const workqueueConfig = workqueues[workqueueId as WorkQueueTypes]
+
   const transformData = (eventData: EventIndex[]) => {
     return eventData
       .map((event) => {
@@ -223,11 +225,12 @@ export const SearchResult = ({
         const titleColumnId = workqueueConfig.columns[0].id
         const status = doc.status
 
-        const title = flattenedIntl.formatMessage(eventConfig.title, doc)
+        const title =
+          eventConfig && flattenedIntl.formatMessage(eventConfig.title, doc)
 
         return {
           ...doc,
-          event: intl.formatMessage(eventConfig.label),
+          event: eventConfig && intl.formatMessage(eventConfig.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
           modifiedAt: formattedDuration(new Date(doc.updatedAt)),
           status: intl.formatMessage(
@@ -302,10 +305,13 @@ export const SearchResult = ({
       noContent={total < 1}
       noResultText={noResultText}
       tabBarContent={
-        <SearchModifierComponent
-          eventType={eventConfig.id}
-          searchParams={searchParams}
-        />
+        eventConfig &&
+        searchParams && (
+          <SearchModifierComponent
+            eventType={eventConfig.id}
+            searchParams={searchParams}
+          />
+        )
       }
       title={`${intl.formatMessage(messages.searchResult)} ${
         ' (' + total + ')'

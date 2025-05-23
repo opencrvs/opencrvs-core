@@ -12,12 +12,35 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { workqueues } from '@opencrvs/commons/client'
+import { QueryInputType, QueryType } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchResult } from './SearchResult'
 import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
+
+function toQueryType(
+  searchParams: QueryInputType,
+  type: 'and' | 'or',
+  eventType?: string
+): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (key.startsWith('event')) {
+      const strippedKey = key.replace(/^event____/, '')
+      topLevelFields[strippedKey] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+  }
+}
 
 export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
@@ -31,26 +54,14 @@ export const SearchResultIndex = () => {
   const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
 
   const queryData = searchEvent.useSuspenseQuery(
-    eventType,
-    formattedSearchParams,
-    ADVANCED_SEARCH_KEY
+    toQueryType(formattedSearchParams, ADVANCED_SEARCH_KEY, eventType)
   )
-  const workqueueId = 'all'
-  const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
-      : null
-
-  if (!workqueueConfig) {
-    return null
-  }
 
   return (
     <SearchResult
       eventConfig={eventConfig}
       queryData={queryData}
       searchParams={searchParams}
-      workqueueConfig={workqueueConfig}
     />
   )
 }

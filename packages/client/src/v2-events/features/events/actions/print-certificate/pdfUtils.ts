@@ -201,7 +201,6 @@ function formatAllNonStringValues(
           isMessageDescriptor(item) ? intl.formatMessage(item) : item
         )
         .join(', ')
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
       formattedData[key] = formatAllNonStringValues(
         value satisfies EventState,
