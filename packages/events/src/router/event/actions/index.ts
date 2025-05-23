@@ -56,44 +56,37 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: false,
-    inputSchema: NotifyActionInput,
-    useEventTypeAuthorization: true
+    inputSchema: NotifyActionInput
   },
   [ActionType.DECLARE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: DeclareActionInput,
-    useEventTypeAuthorization: false
+    inputSchema: DeclareActionInput
   },
   [ActionType.VALIDATE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: ValidateActionInput,
-    useEventTypeAuthorization: false
+    inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     validatePayload: true,
-    inputSchema: RegisterActionInput,
-    useEventTypeAuthorization: false
+    inputSchema: RegisterActionInput
   },
   [ActionType.REJECT]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: RejectDeclarationActionInput,
-    useEventTypeAuthorization: false
+    inputSchema: RejectDeclarationActionInput
   },
   [ActionType.ARCHIVE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: ArchiveActionInput,
-    useEventTypeAuthorization: false
+    inputSchema: ArchiveActionInput
   },
   [ActionType.PRINT_CERTIFICATE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: PrintCertificateActionInput,
-    useEventTypeAuthorization: false
+    inputSchema: PrintCertificateActionInput
   }
 }
 
@@ -128,12 +121,7 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const {
-    notifyApiPayloadSchema,
-    validatePayload,
-    inputSchema,
-    useEventTypeAuthorization
-  } = actionConfig
+  const { notifyApiPayloadSchema, validatePayload, inputSchema } = actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
 
@@ -150,15 +138,11 @@ export function getDefaultActionProcedures(
     ? middleware.validateAction(actionType)
     : async ({ next }: MiddlewareOptions) => next()
 
-  const eventTypeAuthorizationMiddleware = useEventTypeAuthorization
-    ? middleware.eventTypeAuthorization
-    : async ({ next }: MiddlewareOptions) => next()
-
   return {
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema)
-      .use(eventTypeAuthorizationMiddleware)
+      .use(middleware.eventTypeAuthorization)
       .use(async ({ input, next, ctx }) => {
         const { eventId } = input
         const event = await getEventById(eventId)
