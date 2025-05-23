@@ -32,10 +32,19 @@ test(`allows access with required scope`, async () => {
   ).resolves.not.toThrow()
 })
 
+test('dont allow access with API scope with incorrect event type', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, ['notify.event[event=some-event-type]'])
+
+  await expect(
+    client.event.create(generator.event.create())
+  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
 test('allows access with API scope with correct event type', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'notify.event[event=birth-registration]'
+    'notify.event[event=TENNIS_CLUB_MEMBERSHIP]'
   ])
 
   await expect(

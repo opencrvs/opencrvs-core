@@ -1,22 +1,10 @@
 import { ActionType, ConfigurableScope } from '@opencrvs/commons'
 
-// TODO CIHAN: this should be in events backend probably?
-type ScopeOptionMatcher = { input?: string } | { event?: string }
-
-// TODO CIHAN: write comment here
-export type ConfigurableScopeWithMatcher = {
-  scope: ConfigurableScope
-  optionMatchers: { [key: string]: ScopeOptionMatcher }
-}
-
+// TODO CIHAN: move?
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.READ]: [],
-  [ActionType.CREATE]: [
-    { scope: 'notify-event', optionMatchers: { event: { event: 'foobar' } } }
-  ],
-  [ActionType.NOTIFY]: [
-    { scope: 'notify-event', optionMatchers: { event: { event: 'foobar' } } }
-  ],
+  [ActionType.CREATE]: ['notify.event'],
+  [ActionType.NOTIFY]: ['notify.event'],
   [ActionType.DECLARE]: [],
   [ActionType.DELETE]: [],
   [ActionType.VALIDATE]: [],
@@ -31,4 +19,4 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.ASSIGN]: [],
   [ActionType.UNASSIGN]: [],
   [ActionType.DETECT_DUPLICATE]: []
-} satisfies Record<ActionType, ConfigurableScopeWithMatcher[]>
+} satisfies Record<ActionType, ConfigurableScope[]>

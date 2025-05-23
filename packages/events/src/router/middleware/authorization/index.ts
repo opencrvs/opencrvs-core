@@ -17,13 +17,16 @@ import {
   DeleteActionInput,
   getAssignedUserFromActions,
   getScopes,
-  IAuthHeader,
   inScope,
-  Scope
+  Scope,
+  findScope,
+  ConfigurableScope,
+  ConfigurableScopes,
+  IAuthHeader
 } from '@opencrvs/commons'
 import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
-import { ConfigurableScopeWithMatcher } from './api-scopes'
+
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
  * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
@@ -34,20 +37,38 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
-function inConfigurableScope(
+function getAuthorizedCtx(foundScopes: ConfigurableScopes[]) {
+  const authorizedEvents = foundScopes
+    .flatMap(({ options }) => {
+      if ('event' in options) {
+        return options.event
+      }
+
+      return undefined
+    })
+    .filter((event) => event !== undefined)
+
+  // TODO CIHAN: add all events if not authorized events are present?
+  return {
+    ...(authorizedEvents.length > 0 && { events: authorizedEvents })
+  }
+}
+
+// TODO CIHAN: comment
+function inConfigurableScopes(
   authHeader: IAuthHeader,
-  opts: MiddlewareOptions,
-  configurableScopes: ConfigurableScopeWithMatcher[]
+  configurableScopes: ConfigurableScope[]
 ) {
   const userScopes = getScopes(authHeader)
+  const foundScopes = configurableScopes
+    .map((scope) => findScope(userScopes, scope))
+    .filter((scope) => scope !== undefined)
 
-  const result = configurableScopes.some((scope) => {
-    console.log('scope', scope)
-    return false
-  })
+  if (!foundScopes.length) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
 
-  console.log('userScopes', userScopes)
-  return result
+  return getAuthorizedCtx(foundScopes)
 }
 
 /**
@@ -58,24 +79,29 @@ function inConfigurableScope(
  */
 export function requiresAnyOfScopes(
   scopes: Scope[],
-  configurableScopes?: ConfigurableScopeWithMatcher[]
+  configurableScopes?: ConfigurableScope[]
 ) {
   return async (opts: MiddlewareOptions) => {
     const token = setBearerForToken(opts.ctx.token)
-    const authorizationHeader = { Authorization: token }
+    const authHeader = { Authorization: token }
 
-    if (inScope(authorizationHeader, scopes)) {
+    if (inScope(authHeader, scopes)) {
       return opts.next()
     }
 
-    if (
-      configurableScopes &&
-      inConfigurableScope(authorizationHeader, opts, configurableScopes)
-    ) {
-      console.log('\nCIHAN TEST', opts.path)
-      console.log('requiredConfigurableScopes', configurableScopes)
-      console.log('\nopts', opts)
-      return opts.next()
+    if (configurableScopes) {
+      const authorizedEntities = inConfigurableScopes(
+        authHeader,
+        configurableScopes
+      )
+
+      return opts.next({
+        ...opts,
+        ctx: {
+          ...opts.ctx,
+          authorizedEntities
+        }
+      })
     }
 
     throw new TRPCError({ code: 'FORBIDDEN' })

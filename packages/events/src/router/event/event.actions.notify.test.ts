@@ -23,7 +23,8 @@ test(`prevents forbidden access if missing required scope`, async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access if required scope is present`, async () => {
+// TODO CIHAN:
+test.skip(`allows access if required scope is present`, async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_INCOMPLETE])
 

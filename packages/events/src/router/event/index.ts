@@ -92,6 +92,26 @@ export const eventRouter = router({
         ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
       )
     )
+    // TODO CIHAN: refactor?
+    .use(async ({ next, ctx, getRawInput }) => {
+      const authorizedEntities = ctx.authorizedEntities
+      if (!authorizedEntities || !authorizedEntities.events) {
+        return next()
+      }
+
+      const authorizedEvents = authorizedEntities.events
+      const input = await getRawInput()
+      const eventType =
+        typeof input === 'object' && input && 'type' in input
+          ? input.type
+          : null
+
+      if (!eventType || !authorizedEvents.includes(eventType)) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+
+      return next()
+    })
     .input(EventInput)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
