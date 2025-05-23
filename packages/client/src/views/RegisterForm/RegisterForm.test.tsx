@@ -627,7 +627,8 @@ describe('When user is in Preview section death event', () => {
         mockDeathDeclarationData as IFormData,
         deathDraft.id,
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.type
     ).toBe('OTHER')
   })
@@ -639,7 +640,8 @@ describe('When user is in Preview section death event', () => {
         mockDeathDeclarationData as IFormData,
         deathDraft.id,
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.address.country
     ).toEqual('FAR')
   })
@@ -670,7 +672,8 @@ describe('When user is in Preview section death event', () => {
         hospitalLocatioMockDeathDeclarationData as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.address
     ).toBe(undefined)
   })
@@ -690,7 +693,8 @@ describe('When user is in Preview section death event', () => {
         hospitalLocatioMockDeathDeclarationData as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
   })
@@ -704,7 +708,8 @@ describe('When user is in Preview section death event', () => {
         mockDeathDeclaration as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.type
     ).toBe('PRIMARY_ADDRESS')
   })
@@ -837,7 +842,8 @@ describe('When user is in Preview section marriage event', () => {
         mockMarriageDeclarationData as unknown as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.address.country
     ).toEqual('FAR')
   })
@@ -849,7 +855,8 @@ describe('When user is in Preview section marriage event', () => {
         mockMarriageDeclarationData as unknown as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).witnessOne._fhirID
     ).toEqual('36972633-1c80-4fb4-a636-17f7dc9c2e14')
   })

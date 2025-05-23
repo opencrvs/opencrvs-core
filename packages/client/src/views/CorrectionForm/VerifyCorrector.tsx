@@ -140,7 +140,8 @@ const VerifyCorrectorComponent = ({
       declaration.data,
       declaration.id,
       user,
-      config
+      config,
+      declaration.originalData
     )
 
     const informantType =

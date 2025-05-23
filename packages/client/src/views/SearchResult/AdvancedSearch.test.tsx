@@ -41,15 +41,81 @@ describe('should render both birth and death tabs', () => {
 })
 
 describe('when advancedSearchPage renders with no active params in store', () => {
-  it('renders searchbutton as disabled', async () => {
+  it('renders searchbutton as enabled', async () => {
     expect(
       testComponent.find('#search').hostNodes().props().disabled
-    ).toBeTruthy()
+    ).toBeFalsy()
   })
   it('renders all accordions as closed', async () => {
     expect(
       testComponent.find('#BirthRegistrationDetails-content').hostNodes().length
     ).toBe(0)
+  })
+})
+
+describe('when search button is clicked with insufficient parameters', () => {
+  let testComponent: ReactWrapper
+
+  beforeEach(async () => {
+    const { store } = createStore()
+    setScopes([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_DEATH], store)
+    store.dispatch(
+      setAdvancedSearchParam({
+        event: 'birth'
+      })
+    )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    store.dispatch(setUserDetails(mockUserResponse as any))
+    ;({ component: testComponent } = await createTestComponent(
+      <AdvancedSearchConfig></AdvancedSearchConfig>,
+      {
+        store
+      }
+    ))
+    testComponent.update()
+  })
+
+  it('renders error message when searchbutton is clicked under birth tab', async () => {
+    testComponent.find('#search').hostNodes().simulate('click')
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    testComponent.update()
+
+    const errorText = testComponent.find('#error-text').hostNodes()
+    expect(errorText.exists()).toBe(true)
+  })
+})
+
+describe('when search button is clicked with insufficient parameters', () => {
+  let testComponent: ReactWrapper
+
+  beforeEach(async () => {
+    const { store } = createStore()
+    setScopes([SCOPES.SEARCH_BIRTH, SCOPES.SEARCH_DEATH], store)
+    store.dispatch(
+      setAdvancedSearchParam({
+        event: 'death'
+      })
+    )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    store.dispatch(setUserDetails(mockUserResponse as any))
+    ;({ component: testComponent } = await createTestComponent(
+      <AdvancedSearchConfig></AdvancedSearchConfig>,
+      {
+        store
+      }
+    ))
+    testComponent.update()
+  })
+
+  it('renders error message when searchbutton is clicked under death tab', async () => {
+    testComponent.find('#search').hostNodes().simulate('click')
+
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    testComponent.update()
+
+    const errorText = testComponent.find('#error-text').hostNodes()
+    expect(errorText.exists()).toBe(true)
   })
 })
 
