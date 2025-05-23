@@ -162,7 +162,6 @@ describe('when user is in the register form for death event', () => {
       // TODO: need to check if causeOfDeathNotice is needed or not
       // clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
-      // const mock: any = vi.fn()
       const { component: testComponent } = await createTestComponent(
         <RegisterForm
           registerForm={clonedForm}
@@ -628,7 +627,8 @@ describe('When user is in Preview section death event', () => {
         mockDeathDeclarationData as IFormData,
         deathDraft.id,
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.type
     ).toBe('OTHER')
   })
@@ -640,7 +640,8 @@ describe('When user is in Preview section death event', () => {
         mockDeathDeclarationData as IFormData,
         deathDraft.id,
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.address.country
     ).toEqual('FAR')
   })
@@ -671,7 +672,8 @@ describe('When user is in Preview section death event', () => {
         hospitalLocatioMockDeathDeclarationData as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.address
     ).toBe(undefined)
   })
@@ -691,7 +693,8 @@ describe('When user is in Preview section death event', () => {
         hospitalLocatioMockDeathDeclarationData as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation._fhirID
     ).toBe('5e3736a0-090e-43b4-9012-f1cef399e123')
   })
@@ -705,7 +708,8 @@ describe('When user is in Preview section death event', () => {
         mockDeathDeclaration as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.type
     ).toBe('PRIMARY_ADDRESS')
   })
@@ -838,7 +842,8 @@ describe('When user is in Preview section marriage event', () => {
         mockMarriageDeclarationData as unknown as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).eventLocation.address.country
     ).toEqual('FAR')
   })
@@ -850,7 +855,8 @@ describe('When user is in Preview section marriage event', () => {
         mockMarriageDeclarationData as unknown as IFormData,
         '123',
         userDetails,
-        mockOfflineData
+        mockOfflineData,
+        undefined
       ).witnessOne._fhirID
     ).toEqual('36972633-1c80-4fb4-a636-17f7dc9c2e14')
   })

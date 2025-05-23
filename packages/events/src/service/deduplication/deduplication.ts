@@ -9,32 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  getOrCreateClient,
-  getEventIndexName
-} from '@events/storage/elasticsearch'
 import * as elasticsearch from '@elastic/elasticsearch'
 
+import { subDays, addDays } from 'date-fns'
 import {
   EventIndex,
   DeduplicationConfig,
   Clause,
   ClauseOutput
 } from '@opencrvs/commons/events'
-import { subDays, addDays } from 'date-fns'
-
-function dataReference(fieldName: string) {
-  return `data.${fieldName}`
-}
+import {
+  getOrCreateClient,
+  getEventIndexName
+} from '@events/storage/elasticsearch'
+import {
+  declarationReference,
+  decodeEventIndex,
+  EncodedEventIndex,
+  encodeEventIndex,
+  encodeFieldId
+} from '@events/service/indexing/utils'
 
 function generateElasticsearchQuery(
-  eventIndex: EventIndex,
+  eventIndex: EncodedEventIndex,
   configuration: ClauseOutput
 ): elasticsearch.estypes.QueryDslQueryContainer | null {
   const matcherFieldWithoutData =
     configuration.type !== 'and' &&
     configuration.type !== 'or' &&
-    !eventIndex.data[configuration.fieldId]
+    !eventIndex.declaration[encodeFieldId(configuration.fieldId)]
 
   if (matcherFieldWithoutData) {
     return null
@@ -66,47 +69,57 @@ function generateElasticsearchQuery(
             )
         }
       }
-    case 'fuzzy':
+    case 'fuzzy': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         match: {
-          ['data.' + configuration.fieldId]: {
-            query: eventIndex.data[configuration.fieldId],
+          [declarationReference(encodedFieldId)]: {
+            query: eventIndex.declaration[encodedFieldId],
             fuzziness: configuration.options.fuzziness,
             boost: configuration.options.boost
           }
         }
       }
-    case 'strict':
+    }
+    case 'strict': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
       return {
         match_phrase: {
-          [dataReference(configuration.fieldId)]:
-            eventIndex.data[configuration.fieldId] || ''
+          [declarationReference(encodedFieldId)]:
+            eventIndex.declaration[encodedFieldId] || ''
         }
       }
-    case 'dateRange':
+    }
+    case 'dateRange': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
+      const origin = encodeFieldId(configuration.options.origin)
       return {
         range: {
-          [dataReference(configuration.fieldId)]: {
+          [declarationReference(encodedFieldId)]: {
             // @TODO: Improve types for origin field to be sure it returns a string when accessing data
             gte: subDays(
-              new Date(eventIndex.data[configuration.options.origin] as string),
+              new Date(eventIndex.declaration[origin] as string),
               configuration.options.days
             ).toISOString(),
             lte: addDays(
-              new Date(eventIndex.data[configuration.options.origin] as string),
+              new Date(eventIndex.declaration[origin] as string),
               configuration.options.days
             ).toISOString()
           }
         }
       }
-    case 'dateDistance':
+    }
+    case 'dateDistance': {
+      const encodedFieldId = encodeFieldId(configuration.fieldId)
+      const origin = encodeFieldId(configuration.options.origin)
       return {
         distance_feature: {
-          field: dataReference(configuration.fieldId),
+          field: declarationReference(encodedFieldId),
           pivot: `${configuration.options.days}d`,
-          origin: eventIndex.data[configuration.options.origin]
+          origin: eventIndex.declaration[origin]
         }
       }
+    }
   }
 }
 
@@ -117,14 +130,17 @@ export async function searchForDuplicates(
   const esClient = getOrCreateClient()
   const query = Clause.parse(configuration.query)
 
-  const esQuery = generateElasticsearchQuery(eventIndex, query)
+  const esQuery = generateElasticsearchQuery(
+    encodeEventIndex(eventIndex),
+    query
+  )
 
   if (!esQuery) {
     return []
   }
 
-  const result = await esClient.search<EventIndex>({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+  const result = await esClient.search<EncodedEventIndex>({
+    index: getEventIndexName(eventIndex.type),
     query: {
       bool: {
         should: [esQuery],
@@ -137,6 +153,6 @@ export async function searchForDuplicates(
     .filter((hit) => hit._source)
     .map((hit) => ({
       score: hit._score || 0,
-      event: hit._source
+      event: hit._source && decodeEventIndex(hit._source)
     }))
 }

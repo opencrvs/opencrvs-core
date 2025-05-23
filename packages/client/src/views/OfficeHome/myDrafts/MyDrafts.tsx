@@ -91,7 +91,6 @@ export const MyDrafts: React.FC<{
   }
 
   const transformDraftContent = () => {
-    const { locale } = intl
     if (drafts.length <= 0) {
       return []
     }
@@ -144,8 +143,8 @@ export const MyDrafts: React.FC<{
         draft.event === EventType.Birth
           ? draft.data.child?.childBirthDate || ''
           : draft.event === EventType.Death
-          ? draft.data.deathEvent?.deathDate || ''
-          : draft.data.marriageEvent?.marriageDate || ''
+            ? draft.data.deathEvent?.deathDate || ''
+            : draft.data.marriageEvent?.marriageDate || ''
 
       const dateOfEvent = isValidPlainDate(eventTime)
         ? plainDateToLocalDate(eventTime)

@@ -44,11 +44,7 @@ const sumUpAllValues = (data: IDataPoint[]) =>
 export const VerticalBar = withTheme(
   (props: IVerticalBarProps & { theme: ITheme }) => {
     const { data, theme, xAxisLabel, yAxisLabel } = props
-    const colours = [
-      theme.colors.primary,
-      theme.colors.secondary,
-      theme.colors.tertiary
-    ]
+    const colours = [theme.colors.primary, theme.colors.grey400]
 
     return (
       <Container>
@@ -95,7 +91,7 @@ export const VerticalBar = withTheme(
               dataKey="label"
             >
               <Label
-                fill={theme.colors.secondary}
+                fill={theme.colors.primary}
                 fontFamily={theme.fontFamily}
                 offset={20}
                 value={xAxisLabel}
@@ -104,7 +100,7 @@ export const VerticalBar = withTheme(
             </XAxis>
             <YAxis width={30} tickLine={false} axisLine={false} tick={false}>
               <Label
-                fill={theme.colors.secondary}
+                fill={theme.colors.primary}
                 fontFamily={theme.fontFamily}
                 transform="rotate(-90)"
                 dy={-40}
@@ -117,7 +113,7 @@ export const VerticalBar = withTheme(
               vertical={false}
               horizontal={false}
               fillOpacity="0.05"
-              fill={theme.colors.secondary}
+              fill={theme.colors.primary}
             />
 
             <Bar dataKey="value">

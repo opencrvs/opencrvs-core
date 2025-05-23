@@ -8,12 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useRef } from 'react'
 import styled from 'styled-components'
 import { Text } from '../Text'
 import { Button } from '../Button'
 import { Icon } from '../Icon'
-import { Stack } from '../Stack'
 
 export interface IDialogProps {
   id?: string
@@ -65,30 +64,30 @@ const DialogContainer = styled.div<{ variant?: 'small' | 'large' }>`
   flex-direction: column;
   max-height: 80vh;
 `
-const DialogHeader = styled.div<{ hasOverflow?: boolean }>`
+const DialogHeader = styled.div`
   display: flex;
-  padding: 16px 16px 14px 24px;
+  padding: 10px 32px;
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey200};
   justify-content: space-between;
-  align-items: flex-start;
-  gap: 24px;
-  ${({ hasOverflow }) => hasOverflow && `border-bottom: 1px solid #ccc`}
 `
 const DialogTitle = styled.div`
-  padding-top: 2px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 `
 
 const DialogContent = styled.div`
-  padding: 8px 24px 24px 24px;
+  padding: 24px 32px;
   flex-grow: 1;
   overflow-y: auto;
 `
 
 const DialogFooter = styled.div`
-  padding: 16px 24px;
+  padding: 24px 32px;
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  border-top: 1px solid ${({ theme }) => theme.colors.grey300};
+  border-top: 1px solid ${({ theme }) => theme.colors.grey200};
 `
 
 export function Dialog({
@@ -101,14 +100,11 @@ export function Dialog({
   variant = 'small',
   titleIcon
 }: IDialogProps) {
-  const contentRef = useRef<HTMLDivElement>(null)
   const dialogRef = useRef<HTMLDivElement>(null)
   const handleClose = () => {
     onClose && onClose()
   }
 
-  const [hasOverflow, setHasOverflow] = useState(false)
-  const [hasScrolled, setHasScrolled] = useState(false)
   const hasActions = actions && actions.length > 0
 
   const handleClickOutside = (
@@ -122,49 +118,23 @@ export function Dialog({
     }
   }
 
-  useEffect(() => {
-    const contentReference = contentRef.current
-
-    const hasOverflow =
-      contentReference &&
-      contentReference?.scrollHeight > contentReference?.clientHeight
-
-    setHasOverflow(hasOverflow ?? false)
-
-    const handleScroll = () => {
-      if (contentReference) {
-        setHasScrolled(contentReference.scrollTop > 0)
-      }
-    }
-
-    contentReference?.addEventListener('scroll', handleScroll)
-
-    return () => {
-      contentReference?.removeEventListener('scroll', handleScroll)
-    }
-  }, [contentRef, isOpen])
-
-  const headerHasBorder = hasOverflow && hasScrolled
-
   return (
     <>
       {isOpen && (
         <DialogWrapper onClick={handleClickOutside}>
           <DialogContainer id={id} variant={variant} ref={dialogRef}>
-            <DialogHeader hasOverflow={headerHasBorder}>
+            <DialogHeader>
               <DialogTitle>
-                <Stack alignItems="center">
-                  {titleIcon}
-                  <Text variant="h2" element="h2" color="grey600">
-                    {title}
-                  </Text>
-                </Stack>
+                {titleIcon}
+                <Text variant="h2" element="h2" color="grey600">
+                  {title}
+                </Text>
               </DialogTitle>
-              <Button type="icon" size="small" onClick={handleClose}>
-                <Icon name="X" size="medium" weight="bold" />
+              <Button type="icon" size="medium" onClick={handleClose}>
+                <Icon name="X" size="large" weight="bold" />
               </Button>
             </DialogHeader>
-            <DialogContent ref={contentRef}>{children}</DialogContent>
+            <DialogContent>{children}</DialogContent>
             {hasActions && <DialogFooter>{actions}</DialogFooter>}
           </DialogContainer>
         </DialogWrapper>

@@ -42,8 +42,6 @@ import endOfMonth from 'date-fns/endOfMonth'
 
 const { useState, useEffect, useMemo } = React
 
-const LIMIT_YEAR_PAST_RECORDS = 1900
-
 function getMonthsShort(locale = 'en') {
   const months = []
   for (let i = 0; i < 12; i++) {
@@ -297,7 +295,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
 
   ${({ theme, selected }) =>
     selected
-      ? `background: ${theme.colors.secondary};
+      ? `background: ${theme.colors.primary};
   color: ${theme.colors.white};`
       : `background: none;
   color: ${theme.colors.copy};`}
@@ -306,7 +304,7 @@ const PresetRangeButton = styled.button<{ selected?: boolean }>`
     padding: 12px 24px;
 
     &:active {
-      background: ${({ theme }) => theme.colors.secondary};
+      background: ${({ theme }) => theme.colors.primaryDark};
       color: ${({ theme }) => theme.colors.white};
     }
   }
@@ -318,7 +316,7 @@ const MonthButton = styled.button<{ selected?: boolean }>`
   border: 0;
   ${({ theme, selected }) =>
     selected
-      ? `background: ${theme.colors.secondary};
+      ? `background: ${theme.colors.primary};
   color: ${theme.colors.white};`
       : `background: none;
   color: ${theme.colors.copy};`}
@@ -342,7 +340,7 @@ const MonthButton = styled.button<{ selected?: boolean }>`
     -moz-background-clip: content-box;
 
     &:active {
-      background: ${({ theme }) => theme.colors.secondary};
+      background: ${({ theme }) => theme.colors.primaryDark};
       background-clip: content-box;
       -moz-background-clip: content-box;
       color: ${({ theme }) => theme.colors.white};
@@ -487,7 +485,6 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
     selectedDate,
     onNavigateDate
   }: MonthSelectorProps) {
-    const limitDate = new Date(LIMIT_YEAR_PAST_RECORDS)
     const year = date.getFullYear().toString()
 
     return (
@@ -502,7 +499,6 @@ function DateRangePickerComponent(props: IDateRangePickerProps) {
             <CircleButton
               id={`${id}-prev`}
               onClick={() => onNavigateDate(subYears(date, 1))}
-              disabled={isSameYear(date, limitDate)}
             >
               <ChevronLeft />
             </CircleButton>

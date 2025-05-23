@@ -51,7 +51,8 @@ import {
   TaskHistory,
   RejectedRecord,
   SupportedPatientIdentifierCode,
-  PractitionerRole
+  PractitionerRole,
+  Saved
 } from '@opencrvs/commons/types'
 import { getUUID, logger, UUID } from '@opencrvs/commons'
 import {
@@ -59,7 +60,6 @@ import {
   SECTION_CODE
 } from '@workflow/features/events/utils'
 import {
-  invokeRegistrationValidation,
   setupLastRegOffice,
   setupLastRegUser,
   updatePatientIdentifierWithRN,
@@ -111,7 +111,8 @@ import {
   createRetrieveTask
 } from '@workflow/records/fhir'
 import { REG_NUMBER_GENERATION_FAILED } from '@workflow/features/registration/fhir/constants'
-import { tokenExchangeHandler } from './token-exchange-handler'
+import { getRecordSpecificToken } from './token-exchange'
+import { invokeRegistrationValidation } from '@workflow/utils/country-config-api'
 
 export async function toCorrected(
   record: RegisteredRecord | CertifiedRecord | IssuedRecord,
@@ -339,8 +340,7 @@ export async function toViewed<T extends ValidRecord>(
           (e) => e.resource.resourceType === 'Task'
         )[0].fullUrl,
         resource: viewedTask
-      },
-      practitionerRoleEntry
+      }
     ]
   }
 
@@ -353,7 +353,7 @@ export function toIdentifierUpserted<T extends ValidRecord>(
     type: SupportedPatientIdentifierCode
     value: string
   }[]
-): T {
+): [T, Bundle<Saved<Patient>>] {
   const task = getTaskFromSavedBundle(record)
   const event = getTaskEventType(task)
   const composition = getComposition(record)
@@ -369,16 +369,27 @@ export function toIdentifierUpserted<T extends ValidRecord>(
         .map((patient) => patient.id)
         .includes(e.resource.id)
   )
-  return {
-    ...record,
-    entry: [
-      ...filteredEntry,
-      ...patientWithUpsertedIdentifier.map((resource) => ({
-        ...record.entry.find((e) => e.resource.id === resource.id),
-        resource
-      }))
-    ]
-  }
+  return [
+    {
+      ...record,
+      entry: [
+        ...filteredEntry,
+        ...patientWithUpsertedIdentifier.map((resource) => ({
+          ...record.entry.find((e) => e.resource.id === resource.id),
+          resource
+        }))
+      ]
+    },
+    {
+      ...record,
+      entry: [
+        ...patientWithUpsertedIdentifier.map((resource) => ({
+          ...record.entry.find((e) => e.resource.id === resource.id),
+          resource
+        }))
+      ]
+    }
+  ]
 }
 
 export async function toDownloaded(
@@ -428,13 +439,10 @@ export async function toDownloaded(
     practitionerDetailsBundle
   ) as ValidRecord
 
-  const downloadedBundleWithResources: Bundle<SavedTask | PractitionerRole> = {
+  const downloadedBundleWithResources: Bundle<SavedTask> = {
     resourceType: 'Bundle',
     type: 'document',
-    entry: [
-      { resource: downloadedTask },
-      { resource: practitionerRoleEntry.resource }
-    ]
+    entry: [{ resource: downloadedTask }]
   }
 
   return { downloadedRecord, downloadedBundleWithResources }
@@ -558,7 +566,7 @@ export async function initiateRegistration(
 ): Promise<WaitingForValidationRecord | RejectedRecord> {
   try {
     const composition = getComposition(record)
-    const recordSpecificToken = await tokenExchangeHandler(
+    const recordSpecificToken = await getRecordSpecificToken(
       token,
       headers,
       composition.id

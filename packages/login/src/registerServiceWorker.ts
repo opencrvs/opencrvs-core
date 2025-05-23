@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-// eslint-disable no-console
+/*  eslint-disable no-console */
 
 // In production, we register a service worker to serve assets from local cache.
 

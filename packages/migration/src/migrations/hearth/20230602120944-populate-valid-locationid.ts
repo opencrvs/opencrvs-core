@@ -66,7 +66,7 @@ export const up = async (db: Db, client: MongoClient) => {
       { size: 10 }
     )
     const elasticDocBatch = elasticDocBatchResult?.body.hits.hits || []
-    // eslint-disable-next-line no-console
+
     console.log(
       `Migration - ElasticSearch :: Processing ${processedDocCount + 1} - ${
         processedDocCount + limit
@@ -78,7 +78,6 @@ export const up = async (db: Db, client: MongoClient) => {
       try {
         await updateEventLocationIdOrJurisdictionIds(db, elasticDoc)
       } catch (error: any) {
-        // eslint-disable-next-line no-console
         console.error(
           `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds for ${elasticDoc._id} failed: ${error.stack}`
         )
@@ -89,7 +88,7 @@ export const up = async (db: Db, client: MongoClient) => {
   }
 
   await session.endSession()
-  // eslint-disable-next-line no-console
+
   console.log(
     `Migration - ElasticSearch :: Process for populating missing eventLocationId/eventJurisdictionIds completed successfully.`
   )
@@ -170,7 +169,6 @@ async function updateEventLocationIdOrJurisdictionIds(db: Db, elasticDoc: any) {
         }
       }
     } else {
-      // eslint-disable-next-line no-console
       console.error(
         `No location found for locationId:${locationId} against encounter of compositionId:${composition.id}`
       )

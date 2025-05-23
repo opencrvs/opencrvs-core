@@ -75,6 +75,7 @@ function prepareChartData(
   return (
     data &&
     data.reduce(
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       (chartData: any[], dataDetails: GQLMonthWiseEstimationMetric) => {
         if (dataDetails !== null) {
           chartData.push({

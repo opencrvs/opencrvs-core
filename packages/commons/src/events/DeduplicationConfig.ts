@@ -92,11 +92,13 @@ export type OrOutput = {
 
 const And = z.object({
   type: z.literal('and'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   clauses: z.lazy(() => Clause.array())
 })
 
 const Or = z.object({
   type: z.literal('or'),
+  // eslint-disable-next-line @typescript-eslint/no-use-before-define
   clauses: z.lazy(() => Clause.array())
 })
 

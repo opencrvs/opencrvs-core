@@ -39,7 +39,7 @@ test('Returns user in correct format', async () => {
     {
       id: user.id,
       name: user.name,
-      systemRole: user.systemRole
+      role: user.role
     }
   ])
 })

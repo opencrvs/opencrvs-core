@@ -31,3 +31,6 @@ src/i18n/locales/en.csv
 graphql.schema.json
 .lh
 .idea
+
+*storybook.log
+storybook-static

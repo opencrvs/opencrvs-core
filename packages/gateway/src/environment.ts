@@ -35,6 +35,7 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   DISABLE_RATE_LIMIT: bool({
+    devDefault: true,
     default: false,
     desc: 'Disables the Redis-based rate limiting globally'
   }),

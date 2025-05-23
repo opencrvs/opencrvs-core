@@ -8,16 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export const persistenceMapper = async (data: any) => {
   const parsed = JSON.parse(data)
-
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const mapped: any = {}
   const persistEntities: Set<string> = new Set()
   const rootQuery = parsed['ROOT_QUERY']
 
   // recursively identify all the nested entities
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   function persistEntity(entity: any) {
     if (Array.isArray(entity)) {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       entity.forEach((item: any) => persistEntity(item))
     } else if (entity && typeof entity === 'object') {
       if ('__ref' in entity) {
@@ -34,6 +38,7 @@ export const persistenceMapper = async (data: any) => {
   }
 
   mapped['ROOT_QUERY'] = Object.keys(rootQuery).reduce(
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     (obj: any, key: string) => {
       if (key === '__typename') return obj
 

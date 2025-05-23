@@ -2,7 +2,6 @@
   "data": [
     {
       "lang": "en",
-      "displayName": "English",
       "messages": {
         "form.section.child.name": "Child",
         "form.section.child.title": "Child's details",
@@ -135,6 +134,7 @@
         "constants.fieldAgent": "Field Agent",
         "constants.gender": "Gender",
         "constants.healthDivision": "Health Division",
+        "constants.humanName": "{lastName} {middleName} {firstName}",
         "constants.id": "ID",
         "constants.informant": "Informant",
         "constants.issuedBy": "Issued by",
@@ -1152,7 +1152,6 @@
     },
     {
       "lang": "bn",
-      "displayName": "বাংলা",
       "messages": {
         "form.section.child.name": "শিশু",
         "form.section.child.title": "শিশুর বিবরণ",
@@ -1285,6 +1284,7 @@
         "constants.fieldAgent": "মাঠকর্মী",
         "constants.gender": "লিঙ্গ",
         "constants.healthDivision": "স্বাস্থ্য বিভাগ",
+        "constants.humanName": "{lastName} {middleName} {firstName}",
         "constants.id": "আইডি",
         "constants.informant": "তথ্যদাতা",
         "constants.issuedBy": "প্রদান",

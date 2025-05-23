@@ -35,6 +35,10 @@ import {
 import { capitalize } from 'lodash'
 import { resolveLocationChildren } from './location'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { composeDocument as composeBirthDocument } from '@search/features/registration/birth/service'
+import { composeDocument as composeDeathDocument } from '@search/features/registration/death/service'
+import { SavedBundle } from '@opencrvs/commons/types'
+import { getEventType } from '@search/utils/event'
 
 type IAssignmentPayload = {
   compositionId: string
@@ -266,5 +270,41 @@ export async function searchForDeathDeDuplication(
   } catch (err) {
     logger.error(`Search for death duplications : error : ${err}`)
     return internal(err)
+  }
+}
+
+export async function checkDuplicatesHandler(
+  request: Hapi.Request,
+  h: Hapi.ResponseToolkit
+) {
+  const bundle = request.payload as SavedBundle
+
+  const client = getOrCreateClient()
+
+  try {
+    const event = getEventType(bundle)
+
+    let document
+    if (event === 'BIRTH') {
+      document = composeBirthDocument(bundle)
+    } else if (event === 'DEATH') {
+      document = composeDeathDocument(bundle)
+    }
+
+    if (!document) {
+      throw new Error('Failed to convert the bundle to document')
+    }
+
+    const duplicates =
+      document.event === EVENT.BIRTH
+        ? await searchForBirthDuplicates(document, client)
+        : await searchForDeathDuplicates(document, client)
+
+    const duplicateIds = findDuplicateIds(duplicates)
+
+    return h.response({ duplicateIds }).code(200)
+  } catch (error) {
+    logger.error(`Search/checkDuplicatesHandler: error: ${error}`)
+    return internal(error)
   }
 }

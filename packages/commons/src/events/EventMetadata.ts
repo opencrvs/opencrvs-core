@@ -21,7 +21,9 @@ export const EventStatus = {
   DECLARED: 'DECLARED',
   VALIDATED: 'VALIDATED',
   REGISTERED: 'REGISTERED',
-  CERTIFIED: 'CERTIFIED'
+  CERTIFIED: 'CERTIFIED',
+  REJECTED: 'REJECTED',
+  ARCHIVED: 'ARCHIVED'
 } as const
 export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
@@ -41,8 +43,10 @@ export const EventMetadata = z.object({
   createdBy: z.string(),
   createdAtLocation: z.string(),
   modifiedAt: z.string().datetime(),
-  assignedTo: z.string().nullable(),
-  updatedBy: z.string()
+  assignedTo: z.string().nullish(),
+  updatedBy: z.string(),
+  trackingId: z.string(),
+  registrationNumber: z.string().nullish()
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>
@@ -102,5 +106,15 @@ export const eventMetadataLabelMap: Record<
     id: 'event.updatedBy.label',
     defaultMessage: 'Updated By',
     description: 'Updated By'
+  },
+  'event.trackingId': {
+    id: 'event.trackingId.label',
+    defaultMessage: 'Tracking ID',
+    description: 'Tracking ID'
+  },
+  'event.registrationNumber': {
+    id: 'event.registrationNumber.label',
+    defaultMessage: 'Registration Number',
+    description: 'Registration Number'
   }
 }
