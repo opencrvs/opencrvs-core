@@ -295,7 +295,8 @@ export const draftToGqlTransformer = (
          * Ideally all the changed fields should be included in the
          * transformedData but due to how we use the "hide" conditional
          * action to only visually hide the fields but the data is still
-         * present in the formData, we need to exclude those
+         * present in the formData, we need to exclude those.
+         * This is for TEXT fields only
          */
         if (
           (!conditionalActions.includes('hide') &&
@@ -304,7 +305,8 @@ export const draftToGqlTransformer = (
               fieldDef,
               currentFormData[section.id],
               previousFormData[section.id]
-            )) ||
+            ) &&
+            fieldDef.type === 'TEXT') ||
           (currentFormData[section.id][fieldDef.name] !== null &&
             currentFormData[section.id][fieldDef.name] !== undefined &&
             currentFormData[section.id][fieldDef.name] !== '' &&
