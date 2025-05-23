@@ -1430,8 +1430,8 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'v2.advancedSearch.form.registrationDetails'
       },
       fields: [
-        event('registeredAtLocation').exact(),
-        event('registeredAt').range(),
+        event('legalStatus.REGISTERED.createdAtLocation').exact(),
+        event('legalStatus.REGISTERED.createdAt').range(),
         event('status', statusOptions).exact(),
         event('updatedAt', timePeriodOptions).range()
       ]

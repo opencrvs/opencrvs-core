@@ -19,7 +19,7 @@ export function createSearchConfig<T extends {}>(baseField: T) {
      *
      * @returns An object containing the field ID and a configuration object with a type of 'range'.
      *
-     * @example event('registeredAt').range()
+     * @example event('legalStatus.REGISTERED.createdAt').range()
      * // {
      * //   ...
      * //   config: { type: 'range' }

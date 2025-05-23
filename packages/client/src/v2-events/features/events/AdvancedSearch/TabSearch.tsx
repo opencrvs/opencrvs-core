@@ -145,10 +145,8 @@ function buildSearchSections({
   return enhancedEvent.advancedSearch.map((section) => {
     const metadataFields = getDefaultSearchFields(section)
 
-    const fieldIdsInSection = new Set(section.fields.map((f) => f.fieldId))
-
     const matchingFields = allUniqueFields.filter((f) =>
-      fieldIdsInSection.has(f.id)
+      section.fields.some((searchField) => searchField.fieldId === f.id)
     )
 
     const combinedFields = [...metadataFields, ...matchingFields]

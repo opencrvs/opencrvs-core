@@ -16,7 +16,9 @@ import {
   FieldValue,
   QueryInputType,
   SearchField,
-  EventFieldId
+  EventFieldId,
+  SearchQueryParams,
+  Inferred
 } from '@opencrvs/commons/client'
 import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
@@ -61,8 +63,8 @@ const defaultSearchFieldGenerator: Record<
   EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
-  [EventFieldId.enum.registeredAtLocation]: (_) => ({
-    id: 'event.registeredAtLocation',
+  [EventFieldId.enum['legalStatus.REGISTERED.createdAtLocation']]: (_) => ({
+    id: 'event.legalStatus.REGISTERED.createdAtLocation',
     type: FieldType.OFFICE,
     label: {
       defaultMessage: 'Place of registration',
@@ -75,8 +77,8 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.registeredAtLocation.helperText'
     }
   }),
-  [EventFieldId.enum.registeredAt]: (_) => ({
-    id: 'event.registeredAt',
+  [EventFieldId.enum['legalStatus.REGISTERED.createdAt']]: (_) => ({
+    id: 'event.legalStatus.REGISTERED.createdAt',
     type: FieldType.DATE_RANGE,
     label: {
       defaultMessage: 'Date of registration',
@@ -283,4 +285,37 @@ export function buildDataCondition(
   )
 
   return buildDataConditionFromSearchKeys(filteredSearchKeys, flat)
+}
+
+export function getSearchParamsFieldConfigs(
+  eventConfig: EventConfig,
+  searchParams: SearchQueryParams
+): Inferred[] {
+  const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
+    ([, value]) => getDefaultSearchFields(value)
+  )
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
+  const searchFieldConfigs = [
+    ...eventFieldConfigs,
+    ...declarationFieldConfigs
+  ].filter((field) => {
+    return Object.keys(searchParams).some((key) => key === field.id)
+  })
+  return searchFieldConfigs
+}
+
+export function filterValuesBasedOnFieldConfigs(
+  eventConfig: EventConfig,
+  searchParams: SearchQueryParams
+) {
+  const searchFieldConfigs = getSearchParamsFieldConfigs(
+    eventConfig,
+    searchParams
+  )
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([key]) =>
+      searchFieldConfigs.some((config) => config.id === key)
+    )
+  )
+  return filteredSearchParams
 }

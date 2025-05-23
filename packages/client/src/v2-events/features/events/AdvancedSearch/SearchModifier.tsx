@@ -13,18 +13,23 @@ import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
 import { stringify } from 'query-string'
+import { capitalize } from 'lodash'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
-import { FieldValue, Inferred } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  EventFieldId,
+  FieldValue,
+  Inferred
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
-import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
+import { filterEmptyValues } from '@client/v2-events/utils'
 import {
   getFormDataStringifier,
   RecursiveStringRecord
 } from '@client/v2-events/hooks/useFormDataStringifier'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
-import { useEventConfigurations } from '../useEventConfiguration'
-import { getDefaultSearchFields } from './utils'
+import { getSearchParamsFieldConfigs } from './utils'
 
 const messagesToDefine = {
   edit: {
@@ -49,53 +54,58 @@ const SearchParamContainer = styled.div`
   }
 `
 
-function filterSearchParamsByFields(
-  searchParams: Record<string, FieldValue>,
-  fieldConfigs: { id: string }[]
-): Record<string, FieldValue> {
-  return Object.fromEntries(
-    Object.entries(searchParams).filter(([key, value]) => {
-      return fieldConfigs.some((field) => field.id === key)
-    })
-  )
-}
-
 function convertPathToLabel(path?: string): string {
   if (!path) {
     return ''
   }
-  if (!path.includes('.')) {
-    return path.charAt(0).toUpperCase() + path.slice(1)
-  }
-
-  const parts = path.split('.')
-  const capitalizedFirst = parts[0].charAt(0).toUpperCase() + parts[0].slice(1)
-  return [capitalizedFirst, ...parts.slice(1)].join(' ')
+  const [first, ...rest] = path.split('.')
+  const capitalizedFirst = capitalize(first)
+  return [capitalizedFirst, ...rest].join(' ')
 }
 
 function buildSearchParamLabels(
   fieldConfigs: Inferred[],
   searchParams: RecursiveStringRecord,
-  hasPrefix: boolean,
   intl: IntlShape
-) {
-  return Object.keys(searchParams)
-    .map((key) => {
+): string[] {
+  return Object.entries(searchParams)
+    .map(([key, value]) => {
       const field = fieldConfigs.find((f) => f.id === key)
       if (!field) {
         return null
       }
-      const prefix = key.split('.').slice(0, -1) + ' '
-      return `${hasPrefix ? convertPathToLabel(prefix) : ''}${intl.formatMessage(field.label)}: ${searchParams[key]}`
+      // Determine if its not a EventMetadata field, then show prefix (ex: 'child.firstName)
+      const showPrefix = !EventFieldId.options.some((x) => key.includes(x))
+      /*
+        Example:
+        key = "child.firstname", 'mother.firstname", "informant.firstname"
+
+        Breakdown:
+        - key.includes('.') => true               // (it's a key with '.', as per convention)
+        - key.split('.')[0] => "child"            // extract the parent path
+        - convertPathToLabel("child") => "Child"  // capitalize the parent key
+        - prefix = "Child "                       // space added after prefix
+
+        - intl.formatMessage(field.label) => "First name(s)" // localized label, retrieved from respective FieldConfig
+
+        Final output:
+        "Child First name(s): [value]"
+      */
+
+      const prefix = showPrefix
+        ? convertPathToLabel(key.split('.')[0]) + ' '
+        : ''
+      const label = intl.formatMessage(field.label)
+      return `${prefix}${label}: ${value}`
     })
-    .filter(Boolean)
+    .filter((entry): entry is string => Boolean(entry))
 }
 
 export function SearchModifierComponent({
-  eventType,
+  eventConfig,
   searchParams
 }: {
-  eventType: string
+  eventConfig: EventConfig
   searchParams: Record<string, FieldValue>
 }) {
   const navigate = useNavigate()
@@ -105,65 +115,33 @@ export function SearchModifierComponent({
   const [locations] = getLocations.useSuspenseQuery()
   const stringifyForm = getFormDataStringifier(intl, locations)
 
-  const eventConfigurations = useEventConfigurations()
-  const eventConfig = eventConfigurations.find(
-    (config) => config.id === eventType
-  )
-  if (!eventConfig) {
-    return null
-  }
-
   /* --- Build event-label, ex: Event: V2 birth */
-  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventType)}`
+  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventConfig.id)}`
 
-  /* --- Build event-metadata-specific advanced search parameter labels --- */
-  const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
-    ([key, x]) => getDefaultSearchFields(x)
+  const searchFieldConfigs = getSearchParamsFieldConfigs(
+    eventConfig,
+    searchParams
   )
-  const eventSearchParams = filterSearchParamsByFields(
-    searchParams,
-    eventFieldConfigs
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([key]) =>
+      searchFieldConfigs.some((config) => config.id === key)
+    )
+  )
+  const stringifiedSearchParams = stringifyForm(
+    searchFieldConfigs,
+    filteredSearchParams
   )
 
-  const eventSearchParamsResolved = stringifyForm(
-    eventFieldConfigs,
-    eventSearchParams
-  )
-
-  const eventSearchParamLabels = buildSearchParamLabels(
-    eventFieldConfigs,
-    eventSearchParamsResolved,
-    false,
+  const searchParamsLabels = buildSearchParamLabels(
+    searchFieldConfigs,
+    stringifiedSearchParams,
     intl
   )
-
-  /* --- Build event-declaration-specific advanced search parameter labels --- */
-  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
-  const declarationSearchParams = filterSearchParamsByFields(
-    searchParams,
-    declarationFieldConfigs
-  )
-  const searchParamsResolved = stringifyForm(
-    declarationFieldConfigs,
-    declarationSearchParams
-  )
-  const declarationSearchParamLabels = buildSearchParamLabels(
-    declarationFieldConfigs,
-    searchParamsResolved,
-    true,
-    intl
-  )
-
-  const allSearchParamLabels = [
-    eventParamLabel,
-    ...eventSearchParamLabels,
-    ...declarationSearchParamLabels
-  ]
 
   return (
     <>
       <SearchParamContainer>
-        {allSearchParamLabels.map((label) => (
+        {[eventParamLabel, ...searchParamsLabels].map((label) => (
           <Pill key={label} label={label} size="small" type="default"></Pill>
         ))}
         <StyledLink
@@ -171,7 +149,7 @@ export function SearchModifierComponent({
           onClick={() => {
             const nonEmptyValues = filterEmptyValues({
               ...searchParams,
-              eventType
+              eventType: eventConfig.id
             })
             const serializedParams = stringify(nonEmptyValues)
             const navigateTo = ROUTES.V2.ADVANCED_SEARCH.buildPath({})

@@ -304,7 +304,7 @@ export const SearchResult = ({
       noResultText={noResultText}
       tabBarContent={
         <SearchModifierComponent
-          eventType={eventConfig.id}
+          eventConfig={eventConfig}
           searchParams={searchParams}
         />
       }

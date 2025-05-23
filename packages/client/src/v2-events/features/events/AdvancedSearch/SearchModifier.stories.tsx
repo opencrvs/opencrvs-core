@@ -10,6 +10,7 @@
  */
 import * as React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchModifierComponent } from './SearchModifier'
 
@@ -40,7 +41,7 @@ const mockSearchParams = {
 export const DefaultSearchResult: Story = {
   name: 'SearchModifier',
   args: {
-    eventType: 'TENNIS_CLUB_MEMBERSHIP',
+    eventConfig: tennisClubMembershipEvent,
     searchParams: mockSearchParams
   }
 }

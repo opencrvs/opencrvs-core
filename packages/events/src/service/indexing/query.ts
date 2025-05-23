@@ -88,30 +88,31 @@ function buildClause(clause: QueryExpression) {
     })
   }
 
-  if (clause.registeredAt) {
-    if (clause.registeredAt.type === 'exact') {
+  if (clause['legalStatus.REGISTERED.createdAt']) {
+    if (clause['legalStatus.REGISTERED.createdAt'].type === 'exact') {
       must.push({
         term: {
-          'legalStatuses.REGISTERED.createdAt': clause.registeredAt.term
+          'legalStatuses.REGISTERED.createdAt':
+            clause['legalStatus.REGISTERED.createdAt'].term
         }
       })
     } else {
       must.push({
         range: {
           'legalStatuses.REGISTERED.createdAt': {
-            gte: clause.registeredAt.gte,
-            lte: clause.registeredAt.lte
+            gte: clause['legalStatus.REGISTERED.createdAt'].gte,
+            lte: clause['legalStatus.REGISTERED.createdAt'].lte
           }
         }
       })
     }
   }
-  if (clause.registeredAtLocation) {
-    if (clause.registeredAtLocation.type === 'exact') {
+  if (clause['legalStatus.REGISTERED.createdAtLocation']) {
+    if (clause['legalStatus.REGISTERED.createdAtLocation'].type === 'exact') {
       must.push({
         term: {
           'legalStatuses.REGISTERED.createdAtLocation':
-            clause.registeredAtLocation.term
+            clause['legalStatus.REGISTERED.createdAtLocation'].term
         }
       })
     }

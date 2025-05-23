@@ -41,7 +41,7 @@ const BaseField = z.object({
     )
 })
 
-export const SearchQueryParamSchema = z
+export const SearchQueryParams = z
   .object({
     eventType: z
       .string()
@@ -51,8 +51,7 @@ export const SearchQueryParamSchema = z
       )
   })
   .catchall(FieldValue)
-
-// export type SearchQueryParam = z.infer<typeof SearchQueryParamSchema>
+export type SearchQueryParams = z.infer<typeof SearchQueryParams>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),
@@ -62,10 +61,11 @@ export const FieldConfigSchema = BaseField.extend({
 export const EventFieldId = z.enum([
   'trackingId',
   'status',
-  'registeredAt',
-  'registeredAtLocation',
+  'legalStatus.REGISTERED.createdAt',
+  'legalStatus.REGISTERED.createdAtLocation',
   'updatedAt'
 ])
+
 export type EventFieldId = z.infer<typeof EventFieldId>
 
 export const EventFieldConfigSchema = BaseField.extend({

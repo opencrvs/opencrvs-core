@@ -71,19 +71,26 @@ const exactStatusPayload: QueryType = {
 const exactRegisteredAtPayload: QueryType = {
   type: 'and',
   eventType: 'tennis-club-membership',
-  registeredAt: { type: 'exact', term: '2024-01-01' }
+  'legalStatus.REGISTERED.createdAt': { type: 'exact', term: '2024-01-01' }
 }
 
 const rangeRegisteredAtPayload: QueryType = {
   type: 'and',
   eventType: 'tennis-club-membership',
-  registeredAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' }
+  'legalStatus.REGISTERED.createdAt': {
+    type: 'range',
+    gte: '2024-01-01',
+    lte: '2024-12-31'
+  }
 }
 
 const exactRegisteredAtLocationPayload: QueryType = {
   type: 'and',
   eventType: 'tennis-club-membership',
-  registeredAtLocation: { type: 'exact', term: 'some-location-id' }
+  'legalStatus.REGISTERED.createdAtLocation': {
+    type: 'exact',
+    term: 'some-location-id'
+  }
 }
 
 const anyOfStatusPayload: QueryType = {
@@ -137,7 +144,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with exact registeredAt', () => {
+  test('builds query with exact legalStatus.REGISTERED.createdAt', () => {
     const result = buildElasticQueryFromSearchPayload(exactRegisteredAtPayload)
     expect(result).toEqual({
       bool: {
@@ -149,7 +156,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with range registeredAt', () => {
+  test('builds query with range legalStatus.REGISTERED.createdAt', () => {
     const result = buildElasticQueryFromSearchPayload(rangeRegisteredAtPayload)
     expect(result).toEqual({
       bool: {
@@ -168,7 +175,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with exact registeredAtLocation', () => {
+  test('builds query with exact legalStatus.REGISTERED.createdAtLocation', () => {
     const result = buildElasticQueryFromSearchPayload(
       exactRegisteredAtLocationPayload
     )
