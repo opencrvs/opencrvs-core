@@ -29,7 +29,8 @@ import {
   CONFIG_GET_ALLOWED_SCOPES,
   CONFIG_SEARCH_ALLOWED_SCOPES,
   QueryType,
-  DeleteActionInput
+  DeleteActionInput,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -47,7 +48,6 @@ import {
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
-import { ACTION_ALLOWED_CONFIGURABLE_SCOPES } from '@events/router/middleware/authorization/api-scopes'
 import { getDefaultActionProcedures } from './actions'
 
 function validateEventType({
@@ -96,7 +96,6 @@ export const eventRouter = router({
     .use(async ({ next, ctx, input }) => {
       const { authorizedEntities } = ctx
 
-      // TODO CIHAN: is this ok? perhaps we should return all events?
       if (!authorizedEntities || !authorizedEntities.events) {
         return next()
       }

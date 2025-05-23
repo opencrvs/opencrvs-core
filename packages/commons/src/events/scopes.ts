@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import { Scope, SCOPES } from '../scopes'
+import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
 import { ActionType } from './ActionType'
 
 type RequiresNoScope = null
@@ -80,6 +80,26 @@ export const ACTION_ALLOWED_SCOPES = {
   [ActionType.UNASSIGN]: null,
   [ActionType.DETECT_DUPLICATE]: []
 } satisfies Record<ActionType, RequiredScopes>
+
+export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
+  [ActionType.READ]: [],
+  [ActionType.CREATE]: ['notify.event'],
+  [ActionType.NOTIFY]: ['notify.event'],
+  [ActionType.DECLARE]: [],
+  [ActionType.DELETE]: [],
+  [ActionType.VALIDATE]: [],
+  [ActionType.REGISTER]: [],
+  [ActionType.PRINT_CERTIFICATE]: [],
+  [ActionType.REQUEST_CORRECTION]: [],
+  [ActionType.REJECT_CORRECTION]: [],
+  [ActionType.APPROVE_CORRECTION]: [],
+  [ActionType.MARKED_AS_DUPLICATE]: [],
+  [ActionType.ARCHIVE]: [],
+  [ActionType.REJECT]: [],
+  [ActionType.ASSIGN]: [],
+  [ActionType.UNASSIGN]: [],
+  [ActionType.DETECT_DUPLICATE]: []
+} satisfies Record<ActionType, ConfigurableScopeType[]>
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0

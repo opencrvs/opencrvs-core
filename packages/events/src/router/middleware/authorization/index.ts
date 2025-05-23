@@ -50,13 +50,20 @@ function getAuthorizedCtx(foundScopes: ConfigurableScopes[]) {
     })
     .filter((event) => event !== undefined)
 
-  // TODO CIHAN: add all events if not authorized events are present?
   return {
     ...(authorizedEvents.length > 0 && { events: authorizedEvents })
   }
 }
 
-// TODO CIHAN: comment
+/**
+ * Checks if the auth header contains any of the configurable scopes and returns authorized entities.
+ *
+ * @param authHeader - Authorization header containing the token
+ * @param configurableScopes - Array of configurable scope types to check against
+ * @returns Object containing authorized entities (e.g. events) based on found scopes
+ * @throws {TRPCError} If no matching configurable scopes are found
+ */
+
 function inConfigurableScopes(
   authHeader: IAuthHeader,
   configurableScopes: ConfigurableScopeType[]
@@ -124,7 +131,7 @@ export function requiresAnyOfScopes(
 }
 
 /**
- * Middleware function that checks if the event type is authorized for the user.
+ * Middleware function that checks if the event type is authorized for the user, using the event id.
  *
  * The function checks the authorized entities, specifically events, in the context.
  * If no authorized entities or events are present in the context, it allows access.
@@ -147,7 +154,6 @@ export const eventTypeAuthorization: MiddlewareFunction<
   const eventType = event.type
   const { authorizedEntities } = ctx
 
-  // TODO CIHAN: is this ok? perhaps we should return all events?
   if (!authorizedEntities || !authorizedEntities.events) {
     return next()
   }

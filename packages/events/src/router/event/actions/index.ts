@@ -24,7 +24,8 @@ import {
   PrintCertificateActionInput,
   DeclareActionInput,
   ValidateActionInput,
-  ACTION_ALLOWED_SCOPES
+  ACTION_ALLOWED_SCOPES,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import {
@@ -38,7 +39,6 @@ import {
   addAction,
   addAsyncRejectAction
 } from '@events/service/events/events'
-import { ACTION_ALLOWED_CONFIGURABLE_SCOPES } from '@events/router/middleware/authorization/api-scopes'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -150,7 +150,6 @@ export function getDefaultActionProcedures(
 
         const { authorizedEntities } = ctx
 
-        // TODO CIHAN: is this ok? perhaps we should return all events?
         if (!authorizedEntities || !authorizedEntities.events) {
           return next()
         }
