@@ -613,7 +613,7 @@ export const generateTranslationConfig = (
 })
 
 export const generateWorkqueues = (
-  slug: string = 'in-progress'
+  slug: string = 'all-events'
 ): WorkqueueConfig[] =>
   defineWorkqueues([
     {

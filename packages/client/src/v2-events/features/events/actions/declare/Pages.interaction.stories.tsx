@@ -70,7 +70,7 @@ function createDraftHandlers() {
           createdByRole: 'test-role',
           createdAtLocation: 'test-location',
           createdAt: new Date().toISOString(),
-          status: ActionStatus.Requested
+          status: ActionStatus.Accepted
         }
       }
       spy(req)
@@ -184,6 +184,17 @@ export const DraftShownInForm: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
+            return [getCurrentEventState(undeclaredDraftEvent)]
+          }),
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          }),
+          tRPCMsw.event.search.query((input) => {
             return [getCurrentEventState(undeclaredDraftEvent)]
           })
         ],
