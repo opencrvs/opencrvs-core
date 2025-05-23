@@ -1,4 +1,4 @@
-import { ActionType, ConfigurableScope } from '@opencrvs/commons'
+import { ActionType, ConfigurableScopeType } from '@opencrvs/commons'
 
 // TODO CIHAN: move?
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
@@ -19,4 +19,4 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.ASSIGN]: [],
   [ActionType.UNASSIGN]: [],
   [ActionType.DETECT_DUPLICATE]: []
-} satisfies Record<ActionType, ConfigurableScope[]>
+} satisfies Record<ActionType, ConfigurableScopeType[]>

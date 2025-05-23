@@ -257,10 +257,10 @@ const ConfigurableScopes = z.discriminatedUnion('type', [
   NotifyEventScope
 ])
 
-export type ConfigurableScope = ConfigurableScopes['type']
+export type ConfigurableScopeType = ConfigurableScopes['type']
 export type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
-export function findScope<T extends ConfigurableScope>(
+export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
 ) {

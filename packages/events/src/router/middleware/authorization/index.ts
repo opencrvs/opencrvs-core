@@ -20,7 +20,7 @@ import {
   inScope,
   Scope,
   findScope,
-  ConfigurableScope,
+  ConfigurableScopeType,
   ConfigurableScopes,
   IAuthHeader
 } from '@opencrvs/commons'
@@ -57,7 +57,7 @@ function getAuthorizedCtx(foundScopes: ConfigurableScopes[]) {
 // TODO CIHAN: comment
 function inConfigurableScopes(
   authHeader: IAuthHeader,
-  configurableScopes: ConfigurableScope[]
+  configurableScopes: ConfigurableScopeType[]
 ) {
   const userScopes = getScopes(authHeader)
   const foundScopes = configurableScopes
@@ -79,7 +79,7 @@ function inConfigurableScopes(
  */
 export function requiresAnyOfScopes(
   scopes: Scope[],
-  configurableScopes?: ConfigurableScope[]
+  configurableScopes?: ConfigurableScopeType[]
 ) {
   return async (opts: MiddlewareOptions) => {
     const token = setBearerForToken(opts.ctx.token)
