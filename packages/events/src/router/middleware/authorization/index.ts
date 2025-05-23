@@ -11,6 +11,7 @@
 
 import { experimental_standaloneMiddleware, TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
+import { OpenApiMeta } from 'trpc-to-openapi'
 import {
   ActionDocument,
   ActionInputWithType,
@@ -82,8 +83,13 @@ export function requiresAnyOfScopes(
   scopes: Scope[],
   configurableScopes?: ConfigurableScopeType[]
 ) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const fn: MiddlewareFunction<any, any, any, any, any> = async (opts) => {
+  const fn: MiddlewareFunction<
+    Context,
+    OpenApiMeta,
+    Context,
+    Context & { authorizedEntities?: { events?: string[] } },
+    unknown
+  > = async (opts) => {
     const token = setBearerForToken(opts.ctx.token)
     const authHeader = { Authorization: token }
 

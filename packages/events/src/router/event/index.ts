@@ -92,27 +92,21 @@ export const eventRouter = router({
         ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
       )
     )
-    // TODO CIHAN: refactor?
-    .use(async ({ next, ctx, getRawInput }) => {
-      const authorizedEntities = ctx.authorizedEntities
+    .input(EventInput)
+    .use(async ({ next, ctx, input }) => {
+      const { authorizedEntities } = ctx
+
+      // TODO CIHAN: is this ok? perhaps we should return all events?
       if (!authorizedEntities || !authorizedEntities.events) {
         return next()
       }
 
-      const authorizedEvents = authorizedEntities.events
-      const input = await getRawInput()
-      const eventType =
-        typeof input === 'object' && input && 'type' in input
-          ? input.type
-          : null
-
-      if (!eventType || !authorizedEvents.includes(eventType)) {
+      if (!authorizedEntities.events.includes(input.type)) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
 
       return next()
     })
-    .input(EventInput)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)

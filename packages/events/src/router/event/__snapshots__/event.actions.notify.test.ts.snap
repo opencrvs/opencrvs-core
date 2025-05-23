@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`allows sending partial payload as NOTIFY action 1`] = `
+exports[`event.actions.notify > allows sending partial payload as NOTIFY action 1`] = `
 {
   "applicant.address": {
     "addressType": "DOMESTIC",

@@ -13,73 +13,87 @@ import { TRPCError } from '@trpc/server'
 import { ActionType, getAcceptedActions, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-test(`prevents forbidden access if missing required scope`, async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [])
+describe('event.actions.notify', () => {
+  describe('authorization', () => {
+    test(`prevents forbidden access if missing required scope`, async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [])
 
-  await expect(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.event.actions.notify.request({} as any)
-  ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
-})
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client.event.actions.notify.request({} as any)
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
 
-// TODO CIHAN:
-test.skip(`allows access if required scope is present`, async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_INCOMPLETE])
+    test(`allows access if required scope is present`, async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [SCOPES.RECORD_SUBMIT_INCOMPLETE])
 
-  await expect(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.event.actions.notify.request({} as any)
-  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
-})
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client.event.actions.notify.request({} as any)
+      ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
 
-test('allows access with API scope with correct event type', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [
-    'notify.event[event=birth-registration]'
-  ])
+    test.skip('disallows access with API scope with incorrect event type', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, ['notify.event[event=some-event]'])
 
-  await expect(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    client.event.actions.notify.request({} as any)
-  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
-})
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client.event.actions.notify.request({} as any)
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
 
-test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_DECLARE
-  ])
+    test('allows access with API scope with correct event type', async () => {
+      const { user } = await setupTestCase()
+      const client = createTestClient(user, [
+        'notify.event[event=TENNIS_CLUB_MEMBERSHIP]'
+      ])
 
-  const event = await client.event.create(generator.event.create())
+      await expect(
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        client.event.actions.notify.request({} as any)
+      ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
+  })
 
-  const response = await client.event.actions.notify.request(
-    generator.event.actions.notify(event.id)
-  )
+  test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, [
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_DECLARE
+    ])
 
-  const activeActions = getAcceptedActions(response)
+    const event = await client.event.create(generator.event.create())
 
-  expect(
-    activeActions.find((action) => action.type === ActionType.NOTIFY)
-      ?.declaration
-  ).toMatchSnapshot()
-})
+    const response = await client.event.actions.notify.request(
+      generator.event.actions.notify(event.id)
+    )
 
-test(`${ActionType.NOTIFY} is idempotent`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user, [
-    SCOPES.RECORD_SUBMIT_INCOMPLETE,
-    SCOPES.RECORD_DECLARE
-  ])
+    const activeActions = getAcceptedActions(response)
 
-  const event = await client.event.create(generator.event.create())
+    expect(
+      activeActions.find((action) => action.type === ActionType.NOTIFY)
+        ?.declaration
+    ).toMatchSnapshot()
+  })
 
-  const notifyPayload = generator.event.actions.notify(event.id)
+  test(`${ActionType.NOTIFY} is idempotent`, async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, [
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_DECLARE
+    ])
 
-  const firstResponse = await client.event.actions.notify.request(notifyPayload)
-  const secondResponse =
-    await client.event.actions.notify.request(notifyPayload)
-  expect(firstResponse).toEqual(secondResponse)
+    const event = await client.event.create(generator.event.create())
+
+    const notifyPayload = generator.event.actions.notify(event.id)
+
+    const firstResponse =
+      await client.event.actions.notify.request(notifyPayload)
+    const secondResponse =
+      await client.event.actions.notify.request(notifyPayload)
+    expect(firstResponse).toEqual(secondResponse)
+  })
 })
