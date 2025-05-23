@@ -153,7 +153,7 @@ export const eventTypeAuthorization: MiddlewareFunction<
   CtxWithAuthorizedEntities,
   { eventId: string } | { type: string }
 > = async ({ input, next, ctx }) => {
-  let eventType: string | undefined = 'type' in input ? input.type : undefined
+  let eventType = 'type' in input ? input.type : undefined
 
   if ('eventId' in input) {
     const event = await getEventById(input.eventId)
