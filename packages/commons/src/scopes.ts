@@ -218,7 +218,7 @@ const LiteralScopes = z.union([
 ])
 
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z]+\.[a-zA-Z]+)\[((?:\w+=\w+(?:\|\w+)*)(:?,\w+=\w+(?:\|\w+)*)*)\]$/
+  /^([a-zA-Z\.]+)\[((?:\w+=[\w-]+(?:\|[\w-]+)*)(:?,[\w-]+=[\w-]+(?:\|[\w-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -236,21 +236,29 @@ const EditUserScope = z.object({
   })
 })
 
+const WorkqueueScope = z.object({
+  type: z.literal('workqueue'),
+  options: z.object({
+    id: z.array(z.string())
+  })
+})
+
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
-  EditUserScope
+  EditUserScope,
+  WorkqueueScope
 ])
 
 type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
-export function findScope(
+export function findScope<T extends ConfigurableScopes['type']>(
   scopes: string[],
-  scopeType: ConfigurableScopes['type']
+  scopeType: T
 ) {
   return scopes
     .map((rawScope) => parseScope(rawScope))
     .find(
-      (parsedScope): parsedScope is ConfigurableScopes =>
+      (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
         parsedScope?.type === scopeType
     )
 }
@@ -266,11 +274,14 @@ export function parseScope(scope: string) {
   if (maybeConfigurableScope.success) {
     const rawScope = maybeConfigurableScope.data
     const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
-    const options = rawOptions.split(',').reduce((acc, option) => {
-      const [key, value] = option.split('=')
-      acc[key] = value.split('|')
-      return acc
-    }, {} as Record<string, string[]>)
+    const options = rawOptions.split(',').reduce(
+      (acc, option) => {
+        const [key, value] = option.split('=')
+        acc[key] = value.split('|')
+        return acc
+      },
+      {} as Record<string, string[]>
+    )
     const parsedScope = {
       type,
       options
