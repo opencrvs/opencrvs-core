@@ -56,37 +56,44 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: false,
-    inputSchema: NotifyActionInput
+    inputSchema: NotifyActionInput,
+    useEventTypeAuthorization: true
   },
   [ActionType.DECLARE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: DeclareActionInput
+    inputSchema: DeclareActionInput,
+    useEventTypeAuthorization: false
   },
   [ActionType.VALIDATE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: ValidateActionInput
+    inputSchema: ValidateActionInput,
+    useEventTypeAuthorization: false
   },
   [ActionType.REGISTER]: {
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     validatePayload: true,
-    inputSchema: RegisterActionInput
+    inputSchema: RegisterActionInput,
+    useEventTypeAuthorization: false
   },
   [ActionType.REJECT]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: RejectDeclarationActionInput
+    inputSchema: RejectDeclarationActionInput,
+    useEventTypeAuthorization: false
   },
   [ActionType.ARCHIVE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: ArchiveActionInput
+    inputSchema: ArchiveActionInput,
+    useEventTypeAuthorization: false
   },
   [ActionType.PRINT_CERTIFICATE]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: true,
-    inputSchema: PrintCertificateActionInput
+    inputSchema: PrintCertificateActionInput,
+    useEventTypeAuthorization: false
   }
 }
 
@@ -121,7 +128,12 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { notifyApiPayloadSchema, validatePayload, inputSchema } = actionConfig
+  const {
+    notifyApiPayloadSchema,
+    validatePayload,
+    inputSchema,
+    useEventTypeAuthorization
+  } = actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
 
@@ -138,10 +150,33 @@ export function getDefaultActionProcedures(
     ? middleware.validateAction(actionType)
     : async ({ next }: MiddlewareOptions) => next()
 
+  const eventTypeAuthorizationMiddleware = useEventTypeAuthorization
+    ? middleware.eventTypeAuthorization
+    : async ({ next }: MiddlewareOptions) => next()
+
   return {
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema)
+      .use(eventTypeAuthorizationMiddleware)
+      .use(async ({ input, next, ctx }) => {
+        const { eventId } = input
+        const event = await getEventById(eventId)
+        const eventType = event.type
+
+        const { authorizedEntities } = ctx
+
+        // TODO CIHAN: is this ok? perhaps we should return all events?
+        if (!authorizedEntities || !authorizedEntities.events) {
+          return next()
+        }
+
+        if (!authorizedEntities.events.includes(eventType)) {
+          throw new TRPCError({ code: 'FORBIDDEN' })
+        }
+
+        return next()
+      })
       .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {

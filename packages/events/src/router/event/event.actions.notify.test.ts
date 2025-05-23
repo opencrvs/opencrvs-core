@@ -35,13 +35,22 @@ describe('event.actions.notify', () => {
       ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 
-    test.skip('disallows access with API scope with incorrect event type', async () => {
-      const { user } = await setupTestCase()
+    test('disallows access with API scope with incorrect event type', async () => {
+      const { user, generator } = await setupTestCase()
+      const eventCreateClient = createTestClient(user, [
+        'notify.event[event=TENNIS_CLUB_MEMBERSHIP]'
+      ])
+
+      const event = await eventCreateClient.event.create(
+        generator.event.create()
+      )
+
       const client = createTestClient(user, ['notify.event[event=some-event]'])
 
       await expect(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        client.event.actions.notify.request({} as any)
+        client.event.actions.notify.request(
+          generator.event.actions.notify(event.id)
+        )
       ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
     })
 

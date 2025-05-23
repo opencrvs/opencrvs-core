@@ -73,10 +73,15 @@ function inConfigurableScopes(
   return getAuthorizedCtx(foundScopes)
 }
 
+type CtxWithAuthorizedEntities = Context & {
+  authorizedEntities?: { events?: string[] }
+}
+
 /**
- * Middleware which checks that one of the required scopes are present in the token.
+ * Middleware which checks that one of the required scopes (either basic scopes or configurable scopes) are present in the token.
  *
  * @param scopes scopes that are required to access the resource
+ * @param configurableScopes scopes that are configurable
  * @returns TRPC compatible middleware function
  */
 export function requiresAnyOfScopes(
@@ -87,7 +92,7 @@ export function requiresAnyOfScopes(
     Context,
     OpenApiMeta,
     Context,
-    Context & { authorizedEntities?: { events?: string[] } },
+    CtxWithAuthorizedEntities,
     unknown
   > = async (opts) => {
     const token = setBearerForToken(opts.ctx.token)
@@ -116,6 +121,42 @@ export function requiresAnyOfScopes(
   }
 
   return fn
+}
+
+/**
+ * Middleware function that checks if the event type is authorized for the user.
+ *
+ * The function checks the authorized entities, specifically events, in the context.
+ * If no authorized entities or events are present in the context, it allows access.
+ * Otherwise, it verifies that the event type is included in the list of authorized events.
+ *
+ * @param input - Object containing eventId
+ * @param next - Next middleware function to be called
+ * @param ctx - Context object containing authorizedEntities
+ * @returns Next middleware result or throws FORBIDDEN error if unauthorized
+ */
+export const eventTypeAuthorization: MiddlewareFunction<
+  CtxWithAuthorizedEntities,
+  OpenApiMeta,
+  CtxWithAuthorizedEntities,
+  CtxWithAuthorizedEntities,
+  { eventId: string }
+> = async ({ input, next, ctx }) => {
+  const { eventId } = input
+  const event = await getEventById(eventId)
+  const eventType = event.type
+  const { authorizedEntities } = ctx
+
+  // TODO CIHAN: is this ok? perhaps we should return all events?
+  if (!authorizedEntities || !authorizedEntities.events) {
+    return next()
+  }
+
+  if (!authorizedEntities.events.includes(eventType)) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return next()
 }
 
 /**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
