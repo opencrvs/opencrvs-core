@@ -29,7 +29,8 @@ import {
   CONFIG_GET_ALLOWED_SCOPES,
   CONFIG_SEARCH_ALLOWED_SCOPES,
   QueryType,
-  DeleteActionInput
+  DeleteActionInput,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -85,8 +86,14 @@ export const eventRouter = router({
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.CREATE]))
+    .use(
+      requiresAnyOfScopes(
+        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
+        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
+      )
+    )
     .input(EventInput)
+    .use(middleware.eventTypeAuthorization)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)

@@ -54,7 +54,7 @@ export function createTestToken(
 
 export function createTestClient(
   user: CreatedUser,
-  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
+  scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken(user.id, scopes)

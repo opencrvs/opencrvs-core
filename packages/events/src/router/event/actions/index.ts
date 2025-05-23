@@ -24,7 +24,8 @@ import {
   PrintCertificateActionInput,
   DeclareActionInput,
   ValidateActionInput,
-  ACTION_ALLOWED_SCOPES
+  ACTION_ALLOWED_SCOPES,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import {
@@ -129,7 +130,8 @@ export function getDefaultActionProcedures(
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[actionType]
+    ACTION_ALLOWED_SCOPES[actionType],
+    ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
   )
 
   const validatePayloadMiddleware = validatePayload
@@ -140,6 +142,7 @@ export function getDefaultActionProcedures(
     request: publicProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema)
+      .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
