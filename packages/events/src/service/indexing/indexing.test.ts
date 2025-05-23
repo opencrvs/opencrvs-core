@@ -64,8 +64,12 @@ test('records are automatically indexed when they are created', async () => {
 
 const exactStatusPayload: QueryType = {
   type: 'and',
-  eventType: 'tennis-club-membership',
-  status: { type: 'exact', term: 'REGISTERED' }
+  clauses: [
+    {
+      eventType: 'tennis-club-membership',
+      status: { type: 'exact', term: 'REGISTERED' }
+    }
+  ]
 }
 
 const exactRegisteredAtPayload: QueryType = {
@@ -95,38 +99,30 @@ const exactRegisteredAtLocationPayload: QueryType = {
 
 const anyOfStatusPayload: QueryType = {
   type: 'and',
-  status: { type: 'anyOf', terms: ['REGISTERED', 'VALIDATED'] }
+  clauses: [
+    {
+      status: { type: 'anyOf', terms: ['REGISTERED', 'VALIDATED'] }
+    }
+  ]
 }
 
 const fullAndPayload: QueryType = {
   type: 'and',
-  eventType: 'tennis-club-membership',
-  status: { type: 'exact', term: 'ARCHIVED' },
-  trackingId: { type: 'exact', term: 'ABC123' },
-  createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
-  updatedAt: { type: 'exact', term: '2024-06-01' },
-  createAtLocation: { type: 'exact', term: 'some-location-id' },
-  updatedAtLocation: {
-    type: 'within',
-    location: 'some-location-id'
-  },
-  data: {
-    name: { type: 'exact', term: 'John Doe' }
-  }
-}
-
-const orPayload: QueryType = {
-  type: 'or',
   clauses: [
     {
-      eventType: 'foo',
-      status: { type: 'exact', term: 'ISSUED' },
-      type: 'and'
-    },
-    {
-      eventType: 'bar',
-      status: { type: 'exact', term: 'REJECTED' },
-      type: 'and'
+      eventType: 'tennis-club-membership',
+      status: { type: 'exact', term: 'ARCHIVED' },
+      trackingId: { type: 'exact', term: 'ABC123' },
+      createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
+      updatedAt: { type: 'exact', term: '2024-06-01' },
+      createAtLocation: { type: 'exact', term: 'some-location-id' },
+      updatedAtLocation: {
+        type: 'within',
+        location: 'some-location-id'
+      },
+      data: {
+        name: { type: 'exact', term: 'John Doe' }
+      }
     }
   ]
 }
@@ -137,9 +133,14 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { status: 'REGISTERED' } },
-          { match: { eventType: 'tennis-club-membership' } }
-        ]
+          {
+            term: {
+              type: 'tennis-club-membership'
+            }
+          },
+          { term: { status: 'REGISTERED' } }
+        ],
+        should: undefined
       }
     })
   })
@@ -218,7 +219,6 @@ describe('test buildElasticQueryFromSearchPayload', () => {
               location: 'some-location-id'
             }
           },
-          { match: { eventType: 'tennis-club-membership' } },
           { match: { 'declaration.name': 'John Doe' } }
         ])
       }
@@ -226,6 +226,19 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   })
 
   test('builds OR query with multiple clauses', () => {
+    const orPayload: QueryType = {
+      type: 'or',
+      clauses: [
+        {
+          eventType: 'foo',
+          status: { type: 'exact', term: 'REGISTERED' }
+        },
+        {
+          eventType: 'bar',
+          status: { type: 'exact', term: 'REJECTED' }
+        }
+      ]
+    }
     const result = buildElasticQueryFromSearchPayload(orPayload)
     expect(result).toEqual({
       bool: {
@@ -233,27 +246,30 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           {
             bool: {
               must: [
-                { term: { status: 'ISSUED' } },
-                { match: { eventType: 'foo' } }
+                { term: { type: 'foo' } },
+                { term: { status: 'REGISTERED' } }
               ]
             }
           },
           {
             bool: {
               must: [
-                { term: { status: 'REJECTED' } },
-                { match: { eventType: 'bar' } }
+                { term: { type: 'bar' } },
+                { term: { status: 'REJECTED' } }
               ]
             }
           }
-        ],
-        minimum_should_match: 1
+        ]
       }
     })
   })
 
   test('returns match_all for invalid input', () => {
-    const result = buildElasticQueryFromSearchPayload({})
+    const result = buildElasticQueryFromSearchPayload({
+      // @ts-expect-error testing invalid input
+      type: 'invalid',
+      clauses: []
+    })
     expect(result).toEqual({
       bool: { must_not: { match_all: {} } }
     })

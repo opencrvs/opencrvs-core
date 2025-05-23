@@ -28,7 +28,8 @@ import {
   AdministrativeArea,
   RadioGroup,
   SelectCountry as Country,
-  Select
+  Select,
+  LocationSearch
 } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
 
@@ -100,6 +101,10 @@ export const getFormDataStringifier = (
     const field = { config: fieldConfig, value }
     if (isAddressFieldType(field)) {
       return Address.stringify(intl, locations, field.value)
+    }
+
+    if (isFacilityFieldType(field)) {
+      return LocationSearch.stringify(intl, locations, field.value)
     }
 
     return simpleFieldStringifier(fieldConfig, value)

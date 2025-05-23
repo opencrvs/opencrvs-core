@@ -197,7 +197,7 @@ function formatValue(
   rawInput: Record<string, FieldValue>,
   fieldId: string,
   fieldConfig?: FieldConfig
-): string {
+): string | undefined {
   const value = rawInput[fieldId]
 
   if (
@@ -208,7 +208,7 @@ function formatValue(
   ) {
     return `${value[0]},${value[1]}`
   }
-  return String(value)
+  return value ? String(value) : undefined
 }
 
 function buildDataConditionFromSearchKeys(
