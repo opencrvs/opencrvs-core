@@ -274,5 +274,6 @@ export const eventRouter = router({
   search: publicProcedure
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
+    .output(z.array(EventIndex))
     .query(async ({ input }) => getIndex(input))
 })

@@ -129,11 +129,11 @@ function aggregateActionDeclarations(
     ActionType.PRINT_CERTIFICATE
   ]
 
-  return actions.reduce((status, action) => {
+  return actions.reduce((declaration, action) => {
     if (
       excludedActions.some((excludedAction) => excludedAction === action.type)
     ) {
-      return status
+      return declaration
     }
 
     /*
@@ -145,12 +145,12 @@ function aggregateActionDeclarations(
     if (action.type === ActionType.APPROVE_CORRECTION) {
       const requestAction = actions.find(({ id }) => id === action.requestId)
       if (!requestAction) {
-        return status
+        return declaration
       }
-      return deepMerge(status, requestAction.declaration)
+      return deepMerge(declaration, requestAction.declaration)
     }
 
-    return deepMerge(status, action.declaration)
+    return deepMerge(declaration, action.declaration)
   }, {})
 }
 
@@ -221,16 +221,21 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  const dateOfEvent =
-    ZodDate.safeParse(
-      event.dateOfEvent?.fieldId
-        ? declaration[event.dateOfEvent.fieldId]
-        : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
-    ).data ?? null
+  let dateOfEvent
+
+  if (event.dateOfEvent) {
+    const parsedDate = ZodDate.safeParse(declaration[event.dateOfEvent.fieldId])
+    if (parsedDate.success) {
+      dateOfEvent = parsedDate.data
+    }
+  } else {
+    dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+  }
 
   return deepDropNulls({
     id: event.id,
     type: event.type,
+    title: 'ToDo',
     status: getStatusFromActions(event.actions),
     legalStatuses: getLegalStatuses(event.actions),
     createdAt: creationAction.createdAt,

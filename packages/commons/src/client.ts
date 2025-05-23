@@ -13,7 +13,6 @@ export * from './search'
 export * from './events'
 export * from './scopes'
 export * from './documents'
-export * from './workqueues'
 export * from './uuid'
 export * from './utils'
 

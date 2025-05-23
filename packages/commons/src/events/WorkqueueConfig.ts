@@ -12,9 +12,25 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { Conditional } from './Conditional'
-import { QueryType } from './EventIndex'
-import { EventMetadataParameter } from './EventMetadata'
 import { event } from './event'
+import {
+  defineWorkqueuesColumns,
+  WorkqueueColumn
+} from './WorkqueueColumnConfig'
+import { CountryConfigQueryType } from './CountryConfigQueryInput'
+import { AvailableIcons } from '../icons'
+import { QueryType } from './EventIndex'
+
+export const defaultThirdColumn = defineWorkqueuesColumns([
+  {
+    label: {
+      id: 'workqueues.dateOfEvent',
+      defaultMessage: 'Date of Event',
+      description: 'Label for workqueue column: dateOfEvent'
+    },
+    value: event.field('dateOfEvent')
+  }
+])
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
@@ -25,33 +41,33 @@ export const WorkqueueConfig = z
     name: TranslationConfig.describe(
       'Title of the workflow (both in navigation and on the page)'
     ),
-    query: QueryType,
+    query: CountryConfigQueryType,
     actions: z.array(
       z.object({
         type: z.string(),
         conditionals: z.array(Conditional).optional()
       })
     ),
-    columns: z
-      .array(
-        z.object({ label: TranslationConfig, value: EventMetadataParameter })
-      )
-      .default([
-        {
-          label: {
-            id: 'workqueues.dateOfEvent',
-            defaultMessage: 'Date of Event',
-            description: 'Label for workqueue column: dateOfEvent'
-          },
-          value: event.field('dateOfEvent')
-        }
-      ])
+    columns: z.array(WorkqueueColumn).default(defaultThirdColumn),
+    icon: AvailableIcons
   })
   .describe('Configuration for workqueue.')
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
 export type WorkqueueConfigInput = z.input<typeof WorkqueueConfig>
 
-export function defineWorkqueue(workqueues: WorkqueueConfigInput[]) {
-  return workqueues.map((workqueue) => WorkqueueConfig.parse(workqueue))
+export function defineWorkqueue(workqueue: WorkqueueConfigInput) {
+  return WorkqueueConfig.parse(workqueue)
 }
+
+export function defineWorkqueues(workqueues: WorkqueueConfigInput[]) {
+  return workqueues.map((workqueue) => defineWorkqueue(workqueue))
+}
+
+export const WorkqueueCountInput = z.array(
+  z.object({ slug: z.string(), query: QueryType })
+)
+export type WorkqueueCountInput = z.infer<typeof WorkqueueCountInput>
+
+export const WorkqueueCountOutput = z.record(z.string(), z.number())
+export type WorkqueueCountOutput = z.infer<typeof WorkqueueCountOutput>

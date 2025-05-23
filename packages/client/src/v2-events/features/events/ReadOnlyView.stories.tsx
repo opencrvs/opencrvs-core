@@ -130,7 +130,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
           tRPCMsw.user.list.query(() => {
             return [
               {
-                id: '6780dbf7a263c6515c7b97d2',
+                id: '6821c175dce4d7886d4e8210',
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
                 signatureFilename: undefined

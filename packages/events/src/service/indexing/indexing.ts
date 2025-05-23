@@ -11,7 +11,6 @@
 
 import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -24,7 +23,8 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType
+  QueryType,
+  WorkqueueCountInput
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -166,6 +166,7 @@ export async function createIndex(
       mappings: {
         properties: {
           id: { type: 'keyword' },
+          title: { type: 'keyword' },
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
@@ -381,14 +382,24 @@ export async function getIndex(eventParams: QueryType) {
     query
   })
 
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
-  )
+  const events = response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map((event) => decodeEventIndex(event))
 
   return events
+}
 
-  return []
+export async function getEventCount(queries: WorkqueueCountInput) {
+  return (
+    await Promise.all(
+      queries.map(async ({ slug, query }) => {
+        const count = (await getIndex(query)).length
+        return { slug, count }
+      })
+    )
+  ).reduce((acc: Record<string, number>, { slug, count }) => {
+    acc[slug] = count
+    return acc
+  }, {})
 }

@@ -10,21 +10,8 @@
  */
 
 import { z, ZodType } from 'zod'
-import { EventMetadata, EventStatusEnum } from './EventMetadata'
-import { EventState } from './ActionDocument'
-
-export const EventIndex = EventMetadata.extend({
-  declaration: EventState
-})
-
-export const EventSearchIndex = z.record(z.string(), z.any()).and(
-  z.object({
-    type: z.string() // Ensures "type" (event-id) exists and is a string
-  })
-)
-
-export type EventSearchIndex = z.infer<typeof EventSearchIndex>
-export type EventIndex = z.infer<typeof EventIndex>
+import { SerializedUserField } from './serializers/user/serializer'
+import { EventStatusEnum } from './EventMetadata'
 
 const Fuzzy = z.object({ type: z.literal('fuzzy'), term: z.string() })
 const Exact = z.object({ type: z.literal('exact'), term: z.string() })
@@ -33,14 +20,19 @@ const AnyOf = z.object({
   terms: z.array(z.string())
 })
 
-const ExactStatus = z.object({
-  type: z.literal('exact'),
-  term: EventStatusEnum
-})
-
 const AnyOfStatus = z.object({
   type: z.literal('anyOf'),
   terms: z.array(EventStatusEnum)
+})
+
+const SerializableExact = z.object({
+  type: z.literal('exact'),
+  term: z.union([z.string(), SerializedUserField])
+})
+
+const ExactStatus = z.object({
+  type: z.literal('exact'),
+  term: EventStatusEnum
 })
 
 const Range = z.object({
@@ -51,45 +43,38 @@ const Range = z.object({
 const Not = z.object({ type: z.literal('not'), term: z.string() })
 
 const Within = z.object({ type: z.literal('within'), location: z.string() })
+const SerializableWithin = z.object({
+  type: z.literal('within'),
+  location: z.union([z.string(), SerializedUserField])
+})
 
 const DateCondition = z.union([Exact, Range])
 
 // Use `ZodType` here to avoid locking the output type prematurely —
 // this keeps recursive inference intact and allows `z.infer<typeof QueryInput>` to work correctly.
-export const QueryInput: ZodType = z.lazy(() =>
+const QueryInput: ZodType = z.lazy(() =>
   z.union([
     z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf, Not]),
     z.record(z.string(), QueryInput)
   ])
 )
-export type BaseInput =
-  | z.infer<typeof Fuzzy>
-  | z.infer<typeof Exact>
-  | z.infer<typeof Range>
-  | z.infer<typeof Within>
-  | z.infer<typeof AnyOf>
-  | z.infer<typeof Not>
 
-type QueryMap = {
-  [key: string]: BaseInput | QueryMap
-}
-
-// This is a recursive type that can be used to represent nested query structures
-// where each key can be a string and the value can be either a base input or another query map.
-export type QueryInputType = BaseInput | QueryMap
-
-export const QueryExpression = z
+export const SerializedQueryExpression = z
   .object({
     title: z.string(),
     eventType: z.string(),
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
-    createdAtLocation: z.optional(z.union([Within, Exact])),
-    updatedAtLocation: z.optional(z.union([Within, Exact])),
-    assignedTo: z.optional(Exact),
-    createdBy: z.optional(Exact),
-    updatedBy: z.optional(Exact),
+    createdAtLocation: z.optional(
+      z.union([SerializableWithin, SerializableExact])
+    ),
+    updatedAtLocation: z.optional(
+      z.union([SerializableWithin, SerializableExact])
+    ),
+    assignedTo: z.optional(SerializableExact),
+    createdBy: z.optional(SerializableExact),
+    updatedBy: z.optional(SerializableExact),
     trackingId: z.optional(Exact),
     flags: z.optional(z.array(z.union([AnyOf, Not]))),
     data: QueryInput
@@ -98,15 +83,17 @@ export const QueryExpression = z
 
 const Or = z.object({
   type: z.literal('or'),
-  clauses: z.array(QueryExpression)
+  clauses: z.array(SerializedQueryExpression)
 })
 
 const And = z.object({
   type: z.literal('and'),
-  clauses: z.array(QueryExpression)
+  clauses: z.array(SerializedQueryExpression)
 })
 
-export const QueryType = z.discriminatedUnion('type', [Or, And])
+export type SerializedQueryExpression = z.infer<
+  typeof SerializedQueryExpression
+>
 
-export type QueryType = z.infer<typeof QueryType>
-export type QueryExpression = z.infer<typeof QueryExpression>
+export const CountryConfigQueryType = z.discriminatedUnion('type', [And, Or])
+export type CountryConfigQueryType = z.infer<typeof CountryConfigQueryType>

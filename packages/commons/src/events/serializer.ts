@@ -8,16 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/service'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
-export * from './icons'
+
+export { deserializeQuery } from './serializers/user/deserializer'

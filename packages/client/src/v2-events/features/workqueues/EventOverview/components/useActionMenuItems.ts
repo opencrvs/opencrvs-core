@@ -164,11 +164,11 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
    */
   const { refetch: refetchEvent } = events.getEvent.useQuery(event.id, false)
 
+  const { mutate: deleteEvent } = events.deleteEvent.useMutation()
+
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
   }
-
-  const { mutate: deleteEvent } = events.deleteEvent.useMutation()
 
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 

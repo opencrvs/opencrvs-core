@@ -112,7 +112,7 @@ export function IconWithName({
   )
 }
 
-export function IconWithNameEvent({
+function IconWithNameEvent({
   status,
   name,
   event,

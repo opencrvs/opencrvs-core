@@ -50,6 +50,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
 import { EventStatus } from './EventMetadata'
+import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -586,6 +587,7 @@ export const eventQueryDataGenerator = (
   overrides: Partial<EventIndex> = {}
 ): EventIndex => ({
   id: overrides.id ?? getUUID(),
+  title: overrides.title ?? 'Danny Doe',
   type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
   status: overrides.status ?? getEventStatus(),
   createdAt: overrides.createdAt ?? new Date().toISOString(),
@@ -609,3 +611,24 @@ export const generateTranslationConfig = (
   description: 'Description for ${message}',
   id: message
 })
+
+export const generateWorkqueues = (
+  slug: string = 'all-events'
+): WorkqueueConfig[] =>
+  defineWorkqueues([
+    {
+      slug,
+      name: {
+        id: 'workqueues.inProgress.title',
+        defaultMessage:
+          slug.charAt(0).toUpperCase() + slug.slice(1).split('-').join(' '),
+        description: 'Title of in progress workqueue'
+      },
+      query: {
+        type: 'and',
+        clauses: [{ eventType: tennisClubMembershipEvent.id }]
+      },
+      actions: [],
+      icon: 'Draft'
+    }
+  ])
