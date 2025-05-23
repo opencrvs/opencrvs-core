@@ -243,15 +243,25 @@ const WorkqueueScope = z.object({
   })
 })
 
+const NotifyEventScope = z.object({
+  type: z.literal('notify-event'),
+  options: z.object({
+    event: z.array(z.string())
+  })
+})
+
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
   EditUserScope,
-  WorkqueueScope
+  WorkqueueScope,
+  NotifyEventScope
 ])
+
+export type ConfigurableScope = ConfigurableScopes['type']
 
 type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
-export function findScope<T extends ConfigurableScopes['type']>(
+export function findScope<T extends ConfigurableScope>(
   scopes: string[],
   scopeType: T
 ) {

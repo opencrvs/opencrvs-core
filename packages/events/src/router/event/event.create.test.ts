@@ -32,6 +32,17 @@ test(`allows access with required scope`, async () => {
   ).resolves.not.toThrow()
 })
 
+test('allows access with API scope with correct event type', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'notify.event[event=birth-registration]'
+  ])
+
+  await expect(
+    client.event.create(generator.event.create())
+  ).resolves.not.toThrow()
+})
+
 test('event can be created and fetched', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)

@@ -33,6 +33,18 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
+test('allows access with API scope with correct event type', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [
+    'notify.event[event=birth-registration]'
+  ])
+
+  await expect(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    client.event.actions.notify.request({} as any)
+  ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
 test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [

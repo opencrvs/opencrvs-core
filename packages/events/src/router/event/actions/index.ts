@@ -38,6 +38,7 @@ import {
   addAction,
   addAsyncRejectAction
 } from '@events/service/events/events'
+import { ACTION_ALLOWED_CONFIGURABLE_SCOPES } from '@events/router/middleware/authorization/api-scopes'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -129,7 +130,8 @@ export function getDefaultActionProcedures(
   }
 
   const requireScopesMiddleware = requiresAnyOfScopes(
-    ACTION_ALLOWED_SCOPES[actionType]
+    ACTION_ALLOWED_SCOPES[actionType],
+    ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
   )
 
   const validatePayloadMiddleware = validatePayload

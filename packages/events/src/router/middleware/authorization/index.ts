@@ -16,12 +16,14 @@ import {
   ActionType,
   DeleteActionInput,
   getAssignedUserFromActions,
+  getScopes,
+  IAuthHeader,
   inScope,
   Scope
 } from '@opencrvs/commons'
 import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
-
+import { ConfigurableScopeWithMatcher } from './api-scopes'
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
  * To allow for usage with both direct HTTP calls and TRPC, ensure it's present to be able to use shared scope auth functions.
@@ -32,15 +34,47 @@ export function setBearerForToken(token: string) {
   return token.startsWith(bearer) ? token : `${bearer} ${token}`
 }
 
+function inConfigurableScope(
+  authHeader: IAuthHeader,
+  opts: MiddlewareOptions,
+  configurableScopes: ConfigurableScopeWithMatcher[]
+) {
+  const userScopes = getScopes(authHeader)
+
+  const result = configurableScopes.some((scope) => {
+    console.log('scope', scope)
+    return false
+  })
+
+  console.log('userScopes', userScopes)
+  return result
+}
+
 /**
  * Middleware which checks that one of the required scopes are present in the token.
  *
  * @param scopes scopes that are required to access the resource
  * @returns TRPC compatible middleware function
  */
-export function requiresAnyOfScopes(scopes: Scope[]) {
+export function requiresAnyOfScopes(
+  scopes: Scope[],
+  configurableScopes?: ConfigurableScopeWithMatcher[]
+) {
   return async (opts: MiddlewareOptions) => {
-    if (inScope({ Authorization: setBearerForToken(opts.ctx.token) }, scopes)) {
+    const token = setBearerForToken(opts.ctx.token)
+    const authorizationHeader = { Authorization: token }
+
+    if (inScope(authorizationHeader, scopes)) {
+      return opts.next()
+    }
+
+    if (
+      configurableScopes &&
+      inConfigurableScope(authorizationHeader, opts, configurableScopes)
+    ) {
+      console.log('\nCIHAN TEST', opts.path)
+      console.log('requiredConfigurableScopes', configurableScopes)
+      console.log('\nopts', opts)
       return opts.next()
     }
 

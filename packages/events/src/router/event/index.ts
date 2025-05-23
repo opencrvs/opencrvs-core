@@ -47,6 +47,7 @@ import {
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
+import { ACTION_ALLOWED_CONFIGURABLE_SCOPES } from '@events/router/middleware/authorization/api-scopes'
 import { getDefaultActionProcedures } from './actions'
 
 function validateEventType({
@@ -85,7 +86,12 @@ export const eventRouter = router({
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.CREATE]))
+    .use(
+      requiresAnyOfScopes(
+        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
+        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
+      )
+    )
     .input(EventInput)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)

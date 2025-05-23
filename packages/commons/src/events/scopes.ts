@@ -12,12 +12,9 @@ import { intersection } from 'lodash'
 import { Scope, SCOPES } from '../scopes'
 import { ActionType } from './ActionType'
 
-export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
-  return intersection(a, b).length > 0
-}
-
 type RequiresNoScope = null
 type NotAvailableAsAction = [] // pseudo actions
+
 type RequiresAnyOfScopes = [Scope, ...Scope[]]
 type RequiredScopes =
   | RequiresAnyOfScopes
@@ -83,6 +80,10 @@ export const ACTION_ALLOWED_SCOPES = {
   [ActionType.UNASSIGN]: null,
   [ActionType.DETECT_DUPLICATE]: []
 } satisfies Record<ActionType, RequiredScopes>
+
+export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
+  return intersection(a, b).length > 0
+}
 
 export function filterUnallowedActions(
   actions: ActionType[],
