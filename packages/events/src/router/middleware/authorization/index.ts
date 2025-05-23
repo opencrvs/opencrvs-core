@@ -10,6 +10,7 @@
  */
 
 import { experimental_standaloneMiddleware, TRPCError } from '@trpc/server'
+import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import {
   ActionDocument,
   ActionInputWithType,
@@ -24,7 +25,7 @@ import {
   ConfigurableScopes,
   IAuthHeader
 } from '@opencrvs/commons'
-import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
+import { Context } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
 
 /**
@@ -81,7 +82,7 @@ export function requiresAnyOfScopes(
   scopes: Scope[],
   configurableScopes?: ConfigurableScopeType[]
 ) {
-  return async (opts: MiddlewareOptions) => {
+  const fn: MiddlewareFunction<any, any, any, any, any> = async (opts) => {
     const token = setBearerForToken(opts.ctx.token)
     const authHeader = { Authorization: token }
 
@@ -106,6 +107,8 @@ export function requiresAnyOfScopes(
 
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
+
+  return fn
 }
 
 /**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
