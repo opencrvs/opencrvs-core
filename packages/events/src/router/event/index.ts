@@ -93,19 +93,7 @@ export const eventRouter = router({
       )
     )
     .input(EventInput)
-    .use(async ({ next, ctx, input }) => {
-      const { authorizedEntities } = ctx
-
-      if (!authorizedEntities || !authorizedEntities.events) {
-        return next()
-      }
-
-      if (!authorizedEntities.events.includes(input.type)) {
-        throw new TRPCError({ code: 'FORBIDDEN' })
-      }
-
-      return next()
-    })
+    .use(middleware.eventTypeAuthorization)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)

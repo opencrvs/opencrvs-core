@@ -131,34 +131,42 @@ export function requiresAnyOfScopes(
 }
 
 /**
- * Middleware function that checks if the event type is authorized for the user, using the event id.
+ * Middleware function that checks if the event type is authorized for the user.
  *
- * The function checks the authorized entities, specifically events, in the context.
- * If no authorized entities or events are present in the context, it allows access.
- * Otherwise, it verifies that the event type is included in the list of authorized events.
+ * The function accepts either an eventId or event type directly in the input.
+ * If an eventId is provided, it fetches the event to determine its type.
  *
- * @param input - Object containing eventId
+ * Authorization is checked against authorized entities in the context:
+ * - If no authorized entities or events are present, access is allowed
+ * - Otherwise, verifies the event type is included in authorized events
+ *
+ * @param input - Object containing either eventId or type
  * @param next - Next middleware function to be called
  * @param ctx - Context object containing authorizedEntities
- * @returns Next middleware result or throws FORBIDDEN error if unauthorized
+ * @returns Next middleware result
+ * @throws {TRPCError} With code 'FORBIDDEN' if event type is not authorized
  */
 export const eventTypeAuthorization: MiddlewareFunction<
   CtxWithAuthorizedEntities,
   OpenApiMeta,
   CtxWithAuthorizedEntities,
   CtxWithAuthorizedEntities,
-  { eventId: string }
+  { eventId: string } | { type: string }
 > = async ({ input, next, ctx }) => {
-  const { eventId } = input
-  const event = await getEventById(eventId)
-  const eventType = event.type
+  let eventType: string | undefined = 'type' in input ? input.type : undefined
+
+  if ('eventId' in input) {
+    const event = await getEventById(input.eventId)
+    eventType = event.type
+  }
+
   const { authorizedEntities } = ctx
 
   if (!authorizedEntities || !authorizedEntities.events) {
     return next()
   }
 
-  if (!authorizedEntities.events.includes(eventType)) {
+  if (!eventType || !authorizedEntities.events.includes(eventType)) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
