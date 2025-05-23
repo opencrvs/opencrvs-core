@@ -23,7 +23,7 @@ import * as Validate from '@client/v2-events/features/events/actions/validate'
 import {
   AdvancedSearch,
   SearchResult
-} from '@client/v2-events/features/events/AdvancedSearch'
+} from '@client/v2-events/features/events/Search'
 import { EventSelectionIndex } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
@@ -34,7 +34,7 @@ import { DeclarationAction } from '@client/v2-events/features/events/components/
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
-import { QuickSearchIndex } from '../features/events/components/QuickSearchIndex'
+import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 

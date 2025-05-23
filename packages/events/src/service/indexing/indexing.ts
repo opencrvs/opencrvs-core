@@ -369,20 +369,14 @@ export async function getIndexedEvents(userId: string) {
 }
 
 export async function getIndex(eventParams: QueryType) {
-  const esClient = getOrCreateClient()
-
-  if (eventParams.type === 'or') {
-    const { clauses } = eventParams
-    // @todo: implement or query for quick search
-    // eslint-disable-next-line no-console
-    console.log({ clauses })
-    return []
-  }
-
-  if (Object.values(eventParams).length === 0) {
+  if (
+    Object.values(eventParams).length === 0 ||
+    eventParams.clauses.length === 0
+  ) {
     throw new Error('No search params provided')
   }
 
+  const esClient = getOrCreateClient()
   const query = buildElasticQueryFromSearchPayload(eventParams)
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -399,6 +393,4 @@ export async function getIndex(eventParams: QueryType) {
   )
 
   return events
-
-  return []
 }

@@ -37,9 +37,10 @@ function generateQuery(
 
     if (value.type === 'fuzzy') {
       return {
-        fuzzy: {
+        match: {
           [field]: {
-            value: value.term
+            query: value.term,
+            fuzziness: 'AUTO'
           }
         }
       }
@@ -82,15 +83,24 @@ function buildClause(clause: QueryExpression) {
 
   if (clause.status) {
     if (clause.status.type === 'anyOf') {
-      must.push({ terms: { 'status.keyword': clause.status.terms } })
+      must.push({ terms: { status: clause.status.terms } })
     } else {
-      must.push({ term: { 'status.keyword': clause.status.term } })
+      must.push({ term: { status: clause.status.term } })
     }
   }
 
   if (clause.trackingId) {
     must.push({
-      term: { 'trackingId.keyword': clause.trackingId.term }
+      term: { trackingId: clause.trackingId.term }
+    })
+  }
+
+  if (clause.registrationNumber) {
+    must.push({
+      term: {
+        'legalStatuses.REGISTERED.registrationNumber':
+          clause.registrationNumber.term
+      }
     })
   }
 
@@ -184,14 +194,15 @@ export function buildElasticQueryFromSearchPayload(
     case 'or': {
       const should = input.clauses.flatMap((clause) => ({
         bool: {
-          must: buildClause(clause)
+          must: buildClause(clause),
+          should: undefined
         }
       }))
       return {
         bool: {
           should
         }
-      } as estypes.QueryDslQueryContainer
+      }
     }
     // default fallback (shouldn't happen if input is validated correctly)
     default:
