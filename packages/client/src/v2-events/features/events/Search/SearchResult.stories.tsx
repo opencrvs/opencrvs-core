@@ -13,8 +13,7 @@ import * as React from 'react'
 import {
   eventQueryDataGenerator,
   EventStatus,
-  tennisClubMembershipEvent,
-  workqueues
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchResult } from './SearchResult'
@@ -60,8 +59,7 @@ export const DefaultSearchResult: Story = {
         status: EventStatus.REGISTERED
       })
     ],
-    searchParams: mockSearchParams,
-    workqueueConfig: workqueues['all']
+    searchParams: mockSearchParams
   }
 }
 
@@ -73,8 +71,7 @@ export const SearchResultWithMultipleItems: Story = {
   args: {
     eventConfig: tennisClubMembershipEvent,
     queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
-    searchParams: { status: EventStatus.REGISTERED },
-    workqueueConfig: workqueues['all']
+    searchParams: { status: EventStatus.REGISTERED }
   }
 }
 export const NoSearchResult: Story = {
@@ -82,7 +79,6 @@ export const NoSearchResult: Story = {
   args: {
     eventConfig: tennisClubMembershipEvent,
     queryData: [],
-    searchParams: mockSearchParams,
-    workqueueConfig: workqueues['all']
+    searchParams: mockSearchParams
   }
 }
