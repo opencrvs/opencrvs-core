@@ -17,7 +17,10 @@ import { createSearchConfig } from '../searchConfigs'
  */
 export function createFieldConfig(
   fieldId: string,
-  options: { conditionals?: FieldConditional[] }
+  options: {
+    conditionals?: FieldConditional[]
+    hideSearchLabelPrefix?: boolean
+  }
 ) {
   const baseField = {
     fieldId,

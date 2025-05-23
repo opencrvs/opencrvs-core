@@ -22,6 +22,7 @@ export function field(
   fieldId: string,
   options: {
     conditionals?: FieldConditional[]
+    hideSearchLabelPrefix?: boolean
   } = {}
 ) {
   return {

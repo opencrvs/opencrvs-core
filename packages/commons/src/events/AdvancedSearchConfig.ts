@@ -21,6 +21,25 @@ const BaseField = z.object({
     type: MatchType.describe('Determines the type of field')
   }),
   options: z.array(SelectOption).optional(),
+  hideSearchLabelPrefix: z
+    .boolean()
+    .optional()
+    .describe(
+      `
+     This property determines whether to add a prefix (such as "Child" or "Applicant") before the field label when 
+    rendering search parameter labels — for example, in the search results page to indicate which fields were used 
+    in the search.
+
+    The prefix is inferred from the field's 'id'. For example, a field config like 
+    { id: "child.firstname", label: { defaultMessage: "First Name(s)" } } would 
+    render as "Child First Name(s)" by default. 
+    
+    However, in cases like { id: "applicant.firstname", label: { defaultMessage: "Applicant's First Name" } }, 
+    this would result in "Applicant Applicant's First Name", which is redundant and awkward.
+
+    Setting 'hideSearchLabelPrefix' to true prevents this prefix from being added, avoiding awkward label duplication.
+    `
+    ),
   conditionals: z
     .array(FieldConditional)
     .default([])

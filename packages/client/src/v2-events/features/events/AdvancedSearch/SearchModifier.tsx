@@ -15,12 +15,7 @@ import styled from 'styled-components'
 import { stringify } from 'query-string'
 import { capitalize } from 'lodash'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
-import {
-  EventConfig,
-  EventFieldId,
-  FieldValue,
-  Inferred
-} from '@opencrvs/commons/client'
+import { EventConfig, FieldValue, Inferred } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
 import { filterEmptyValues } from '@client/v2-events/utils'
@@ -64,6 +59,7 @@ function convertPathToLabel(path?: string): string {
 }
 
 function buildSearchParamLabels(
+  eventConfig: EventConfig,
   fieldConfigs: Inferred[],
   searchParams: RecursiveStringRecord,
   intl: IntlShape
@@ -75,7 +71,11 @@ function buildSearchParamLabels(
         return null
       }
       // Determine if its not a EventMetadata field, then show prefix (ex: 'child.firstName)
-      const showPrefix = !EventFieldId.options.some((x) => key.includes(x))
+      const hidePrefix = eventConfig.advancedSearch
+        .flatMap((section) => section.fields)
+        .find(
+          (f) => f.fieldId === key && f.hideSearchLabelPrefix
+        )?.hideSearchLabelPrefix
       /*
         Example:
         key = "child.firstname", 'mother.firstname", "informant.firstname"
@@ -92,9 +92,9 @@ function buildSearchParamLabels(
         "Child First name(s): [value]"
       */
 
-      const prefix = showPrefix
-        ? convertPathToLabel(key.split('.')[0]) + ' '
-        : ''
+      const prefix = hidePrefix
+        ? ''
+        : convertPathToLabel(key.split('.')[0]) + ' '
       const label = intl.formatMessage(field.label)
       return `${prefix}${label}: ${value}`
     })
@@ -133,6 +133,7 @@ export function SearchModifierComponent({
   )
 
   const searchParamsLabels = buildSearchParamLabels(
+    eventConfig,
     searchFieldConfigs,
     stringifiedSearchParams,
     intl
