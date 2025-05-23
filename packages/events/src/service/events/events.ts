@@ -12,7 +12,6 @@
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import {
-  ActionDocument,
   ActionInputWithType,
   ActionStatus,
   ActionUpdate,
@@ -31,45 +30,12 @@ import {
   EventStatus,
   isWriteAction
 } from '@opencrvs/commons/events'
-import { getUUID } from '@opencrvs/commons'
+import { UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
-import * as events from '@events/storage/mongodb/events'
-import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
-
-async function getEventByTransactionId(transactionId: string) {
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
-
-  const document = await collection.findOne({ transactionId })
-
-  return document
-}
-class EventNotFoundError extends TRPCError {
-  constructor(id: string) {
-    super({
-      code: 'NOT_FOUND',
-      message: `Event not found with ID: ${id}`
-    })
-  }
-}
-
-export async function getEventById(id: string): Promise<EventDocument> {
-  const db = await events.getClient()
-
-  const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne<Omit<EventDocument, '_id'>>(
-    { id: id },
-    { projection: { _id: 0 } }
-  )
-
-  if (!event) {
-    throw new EventNotFoundError(id)
-  }
-
-  return event
-}
+import * as eventsRepo from '@events/storage/postgres/events/events'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 
 function getValidFileValue(
   fieldKey: string,
@@ -107,19 +73,8 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
-export async function deleteEvent(
-  eventId: string,
-  { token }: { token: string }
-) {
-  const db = await events.getClient()
-
-  const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ id: eventId })
-
-  if (!event) {
-    throw new EventNotFoundError(eventId)
-  }
-
+export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
+  const event = await eventsRepo.getEventById(eventId)
   const eventState = getCurrentEventState(event)
 
   // Once an event is declared or notified, it can not be deleted anymore
@@ -133,8 +88,8 @@ export async function deleteEvent(
   const { id } = event
   await deleteEventAttachments(token, event)
   await deleteEventIndex(event)
-  await deleteDraftsByEventId(id)
-  await collection.deleteOne({ id })
+  await draftsRepo.deleteDraftsByEventId(id)
+  await eventsRepo.deleteEventById(id)
 
   return { id }
 }
@@ -153,8 +108,6 @@ function generateTrackingId(): string {
   return result
 }
 
-type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
-
 export async function createEvent({
   eventInput,
   createdAtLocation,
@@ -165,62 +118,19 @@ export async function createEvent({
   eventInput: z.infer<typeof EventInput>
   createdBy: string
   createdByRole: string
-  createdAtLocation: string
+  createdAtLocation: UUID
   transactionId: string
 }): Promise<EventDocument> {
-  const existingEvent = await getEventByTransactionId(transactionId)
-
-  if (existingEvent) {
-    return existingEvent
-  }
-
-  const db = await events.getClient()
-  const collection = db.collection<EventDocumentWithTransActionId>('events')
-
-  const now = new Date().toISOString()
-  const id = getUUID()
-  const trackingId = generateTrackingId()
-
-  await collection.insertOne({
-    ...eventInput,
-    id,
-    transactionId,
-    createdAt: now,
-    updatedAt: now,
-    trackingId,
-    actions: [
-      {
-        type: ActionType.CREATE,
-        createdAt: now,
-        createdBy,
-        createdByRole,
-        createdAtLocation,
-        id: getUUID(),
-        declaration: {},
-        status: ActionStatus.Accepted,
-        transactionId: getUUID()
-      }
-    ]
-  })
-
-  const action: ActionDocument = {
-    type: ActionType.ASSIGN,
-    assignedTo: createdBy,
-    declaration: {},
+  const event = await eventsRepo.getOrCreateEvent({
+    type: eventInput.type,
+    fieldId: eventInput.dateOfEvent?.fieldId,
+    transactionId: transactionId,
+    trackingId: generateTrackingId(),
     createdBy,
     createdByRole,
-    createdAt: now,
-    createdAtLocation,
-    id,
-    status: ActionStatus.Accepted,
-    transactionId: getUUID()
-  }
+    createdAtLocation
+  })
 
-  await db
-    .collection<EventDocument>('events')
-    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
-
-  const event = await getEventById(id)
   await indexEvent(event)
 
   return event
@@ -278,22 +188,19 @@ export async function addAction(
     createdAtLocation,
     status
   }: {
-    eventId: string
+    eventId: UUID
     createdBy: string
     createdByRole: string
     /**
      * The location where the action was created. This is used for auditing purposes.
      */
-    createdAtLocation: string
+    createdAtLocation: UUID
     token: string
     transactionId: string
     status: ActionStatus
-  },
-  actionId = getUUID()
+  }
 ): Promise<EventDocument> {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
-  const event = await getEventById(eventId)
+  const event = await eventsRepo.getEventById(eventId)
   const configuration = await getEventConfigurationById({
     token,
     eventType: event.type
@@ -313,76 +220,51 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    await db.collection<EventDocument>('events').updateOne(
-      {
-        id: eventId,
-        'actions.transactionId': {
-          $ne: input.transactionId
-        }
-      },
-      {
-        $push: {
-          actions: {
-            ...input,
-            transactionId: getUUID(),
-            type: ActionType.MARKED_AS_DUPLICATE,
-            createdBy,
-            createdByRole,
-            createdAt: now,
-            createdAtLocation,
-            id: getUUID(),
-            status
-          }
-        },
-        $set: {
-          updatedAt: now
-        }
-      }
-    )
+    await eventsRepo.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      type: ActionType.MARKED_AS_DUPLICATE,
+      declaration: input.declaration,
+      annotation: input.annotation,
+      status,
+      createdBy,
+      createdByRole,
+      createdAtLocation,
+      originalActionId: input.originalActionId
+    })
   }
 
-  const action: ActionDocument = {
-    ...input,
+  await eventsRepo.createAction({
+    eventId,
+    transactionId: input.transactionId,
+    type: input.type,
+    declaration: input.declaration,
+    annotation: input.annotation,
+    status,
     createdBy,
     createdByRole,
-    createdAt: now,
     createdAtLocation,
-    id: actionId,
-    status: status
-  }
-
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
+    originalActionId: input.originalActionId
+  })
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
-    await db.collection<EventDocument>('events').updateOne(
-      { id: eventId },
-      {
-        $push: {
-          actions: {
-            ...input,
-            transactionId: getUUID(),
-            type: ActionType.UNASSIGN,
-            declaration: {},
-            assignedTo: null,
-            createdBy,
-            createdByRole,
-            createdAt: now,
-            createdAtLocation,
-            id: actionId,
-            status
-          }
-        },
-        $set: { updatedAt: now }
-      }
-    )
+    await eventsRepo.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      type: ActionType.UNASSIGN,
+      status,
+      createdBy,
+      createdByRole,
+      createdAtLocation,
+      originalActionId: input.originalActionId
+    })
   }
 
-  const drafts = await getDraftsForAction(eventId, createdBy, input.type)
+  const drafts = await draftsRepo.getDraftsForAction(
+    eventId,
+    createdBy,
+    input.type
+  )
 
   await cleanUnreferencedAttachmentsFromPreviousDrafts(
     token,
@@ -391,13 +273,13 @@ export async function addAction(
     drafts
   )
 
-  const updatedEvent = await getEventById(eventId)
+  const updatedEvent = await eventsRepo.getEventById(eventId)
 
-  if (action.type !== ActionType.READ) {
+  if (input.type !== ActionType.READ) {
     await indexEvent(updatedEvent)
 
-    if (action.type !== ActionType.ASSIGN) {
-      await deleteDraftsByEventId(eventId)
+    if (input.type !== ActionType.ASSIGN) {
+      await draftsRepo.deleteDraftsByEventId(eventId)
     }
   }
 
@@ -407,30 +289,33 @@ export async function addAction(
 type AsyncRejectActionInput = Omit<
   z.infer<typeof AsyncRejectActionDocument>,
   'createdAt' | 'id' | 'status'
-> & { transactionId: string; eventId: string }
+> & { transactionId: string; eventId: UUID }
 
-export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
-  const { transactionId, eventId } = input
+export async function addAsyncRejectAction({
+  transactionId,
+  eventId,
+  type,
+  originalActionId,
+  createdBy,
+  createdByRole,
+  createdAtLocation
+}: AsyncRejectActionInput) {
+  await eventsRepo.createAction({
+    eventId,
+    transactionId,
+    type,
+    status: ActionStatus.Rejected,
+    originalActionId,
+    createdBy,
+    createdByRole,
+    createdAtLocation
+  })
 
-  const action = {
-    ...input,
-    createdAt: now,
-    id: getUUID(),
-    status: ActionStatus.Rejected
-  } satisfies AsyncRejectActionDocument
-
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
-
-  const updatedEvent = await getEventById(eventId)
+  const updatedEvent = await eventsRepo.getEventById(eventId)
   await indexEvent(updatedEvent)
-  await deleteDraftsByEventId(eventId)
+  await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
 }
+
+export const getEventById = eventsRepo.getEventById

@@ -12,11 +12,12 @@
 import { z } from 'zod'
 import { Action } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID } from '../uuid'
 extendZodWithOpenApi(z)
 
 export const EventDocument = z
   .object({
-    id: z.string(),
+    id: UUID,
     type: z.string(),
     dateOfEvent: z.object({ fieldId: z.string() }).optional(),
     createdAt: z.string().datetime(),

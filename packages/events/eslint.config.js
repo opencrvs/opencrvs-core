@@ -13,6 +13,7 @@ const { FlatCompat } = require('@eslint/eslintrc')
 const { defineConfig } = require('eslint/config')
 const path = require('path')
 const eventsConfig = require('../../eslint.events.config.js')
+const safeql = require('@ts-safeql/eslint-plugin/config')
 
 const compat = new FlatCompat({
   baseDirectory: path.dirname(__filename)
@@ -70,8 +71,36 @@ module.exports = defineConfig([
         {
           name: '@opencrvs/commons/client',
           message: 'Please use @opencrvs/commons or @opencrvs/commons/events'
+        },
+        {
+          name: 'slonik',
+          importNames: ['sql'],
+          message: 'Please import `sql` from `storage/postgres/events/db.ts`'
         }
       ]
     }
-  }
+  },
+  safeql.configs.connections({
+    // read more about configuration in the next section
+    databaseUrl: 'postgres://events_app:app_password@localhost:5432/events',
+    targets: [
+      {
+        // This will lint syntax that matches "sql.typeAlias()`...`", "sql.type()`...`" or "sql.unsafe`...`"
+        tag: 'sql.+(type\\(*\\)|typeAlias\\(*\\)|unsafe)',
+        // this will tell SafeQL to not suggest type annotations
+        // since we will be using our Zod schemas in slonik
+        skipTypeAnnotations: true
+      }
+    ],
+    overrides: {
+      types: {
+        jsonb: 'JsonBinarySqlToken',
+        uuid: 'UUID',
+        uuid: 'string & BRAND<"UUID">',
+        action_type: 'ActionType',
+        action_status: 'ActionStatus',
+        'text[]': 'ArraySqlToken'
+      }
+    }
+  })
 ])

@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID } from '../uuid'
 extendZodWithOpenApi(z)
 
 /**
@@ -43,14 +44,14 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string(),
+  createdAtLocation: UUID,
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
     ActionStatus.Rejected
   ]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
-  originalActionId: z.string().optional()
+  originalActionId: UUID.optional()
 })
 
 export type ActionBase = z.infer<typeof ActionBase>

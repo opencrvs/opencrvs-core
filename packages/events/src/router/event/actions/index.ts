@@ -11,7 +11,7 @@
 import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -122,7 +122,7 @@ export function getDefaultActionProcedures(
 
   const { notifyApiPayloadSchema, validatePayload, inputSchema } = actionConfig
 
-  let acceptInputFields = z.object({ actionId: z.string() })
+  let acceptInputFields = z.object({ actionId: UUID })
 
   if (notifyApiPayloadSchema) {
     acceptInputFields = acceptInputFields.merge(notifyApiPayloadSchema)
@@ -203,8 +203,7 @@ export function getDefaultActionProcedures(
             token,
             transactionId,
             status
-          },
-          actionId
+          }
         )
       }),
 
@@ -260,8 +259,8 @@ export function getDefaultActionProcedures(
       .use(requireScopesMiddleware)
       .input(
         z.object({
-          actionId: z.string(),
-          eventId: z.string(),
+          actionId: UUID,
+          eventId: UUID,
           transactionId: z.string()
         })
       )

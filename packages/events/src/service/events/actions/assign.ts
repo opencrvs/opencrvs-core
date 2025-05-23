@@ -16,6 +16,7 @@ import {
   AssignActionInput,
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
+import { UUID } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 
 export async function assignRecord({
@@ -27,7 +28,7 @@ export async function assignRecord({
 }: {
   createdBy: string
   createdByRole: string
-  createdAtLocation: string
+  createdAtLocation: UUID
   token: string
   input: AssignActionInput
 }) {
