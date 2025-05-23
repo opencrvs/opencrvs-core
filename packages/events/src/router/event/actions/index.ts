@@ -143,23 +143,6 @@ export function getDefaultActionProcedures(
       .use(requireScopesMiddleware)
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
-      .use(async ({ input, next, ctx }) => {
-        const { eventId } = input
-        const event = await getEventById(eventId)
-        const eventType = event.type
-
-        const { authorizedEntities } = ctx
-
-        if (!authorizedEntities || !authorizedEntities.events) {
-          return next()
-        }
-
-        if (!authorizedEntities.events.includes(eventType)) {
-          throw new TRPCError({ code: 'FORBIDDEN' })
-        }
-
-        return next()
-      })
       .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
