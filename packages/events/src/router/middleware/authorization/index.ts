@@ -15,9 +15,12 @@ import {
   ActionInputWithType,
   ActionType,
   DeleteActionInput,
+  findScope,
   getAssignedUserFromActions,
+  getScopes,
   inScope,
-  Scope
+  Scope,
+  WorkqueueCountInput
 } from '@opencrvs/commons'
 import { Context, MiddlewareOptions } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
@@ -76,6 +79,20 @@ export const requireAssignment = experimental_standaloneMiddleware<{
       code: 'CONFLICT',
       message: JSON.stringify('You are not assigned to this event')
     })
+  }
+  return next()
+})
+
+export const requireScopeForWorkqueues = experimental_standaloneMiddleware<{
+  input: WorkqueueCountInput
+  ctx: Context
+}>().create(async ({ next, ctx, input }) => {
+  const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
+
+  const availableWorkqueues = findScope(scopes, 'workqueue')?.options.id ?? []
+
+  if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
   return next()
 })

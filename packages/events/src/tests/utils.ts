@@ -32,7 +32,8 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_DECLARATION_ARCHIVE,
   SCOPES.RECORD_SUBMIT_FOR_UPDATES,
   SCOPES.RECORD_UNASSIGN_OTHERS,
-  SCOPES.SEARCH_BIRTH
+  SCOPES.SEARCH_BIRTH,
+  'workqueue[id=assigned-to-you|recent|requires-updates|sent-for-review]'
 ]
 
 export function createTestToken(

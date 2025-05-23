@@ -18,6 +18,7 @@ import {
 import { router, publicProcedure } from '@events/router/trpc'
 import { getWorkqueueConfigurations } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
+import { requireScopeForWorkqueues } from '@events/router/middleware'
 
 export const workqueueRouter = router({
   config: router({
@@ -38,6 +39,7 @@ export const workqueueRouter = router({
   }),
   count: publicProcedure
     .input(WorkqueueCountInput)
+    .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
     .query(async (options) => {
       return getEventCount(options.input)
