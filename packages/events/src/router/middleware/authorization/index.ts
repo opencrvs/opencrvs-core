@@ -82,6 +82,7 @@ export function requiresAnyOfScopes(
   scopes: Scope[],
   configurableScopes?: ConfigurableScopeType[]
 ) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const fn: MiddlewareFunction<any, any, any, any, any> = async (opts) => {
     const token = setBearerForToken(opts.ctx.token)
     const authHeader = { Authorization: token }
