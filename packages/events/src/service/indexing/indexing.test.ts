@@ -74,27 +74,39 @@ const exactStatusPayload: QueryType = {
 
 const exactRegisteredAtPayload: QueryType = {
   type: 'and',
-  eventType: 'tennis-club-membership',
-  'legalStatus.REGISTERED.createdAt': { type: 'exact', term: '2024-01-01' }
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAt': { type: 'exact', term: '2024-01-01' },
+      eventType: 'tennis-club-membership'
+    }
+  ]
 }
 
 const rangeRegisteredAtPayload: QueryType = {
   type: 'and',
-  eventType: 'tennis-club-membership',
-  'legalStatus.REGISTERED.createdAt': {
-    type: 'range',
-    gte: '2024-01-01',
-    lte: '2024-12-31'
-  }
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAt': {
+        type: 'range',
+        gte: '2024-01-01',
+        lte: '2024-12-31'
+      },
+      eventType: 'tennis-club-membership'
+    }
+  ]
 }
 
 const exactRegisteredAtLocationPayload: QueryType = {
   type: 'and',
-  eventType: 'tennis-club-membership',
-  'legalStatus.REGISTERED.createdAtLocation': {
-    type: 'exact',
-    term: 'some-location-id'
-  }
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAtLocation': {
+        type: 'exact',
+        term: 'some-location-id'
+      },
+      eventType: 'tennis-club-membership'
+    }
+  ]
 }
 
 const anyOfStatusPayload: QueryType = {
@@ -150,8 +162,8 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { 'legalStatuses.REGISTERED.createdAt': '2024-01-01' } },
-          { match: { eventType: 'tennis-club-membership' } }
+          { term: { type: 'tennis-club-membership' } },
+          { term: { 'legalStatuses.REGISTERED.createdAt': '2024-01-01' } }
         ]
       }
     })
@@ -162,6 +174,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
+          { term: { type: 'tennis-club-membership' } },
           {
             range: {
               'legalStatuses.REGISTERED.createdAt': {
@@ -169,8 +182,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
                 lte: '2024-12-31'
               }
             }
-          },
-          { match: { eventType: 'tennis-club-membership' } }
+          }
         ]
       }
     })
@@ -183,12 +195,12 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
+          { term: { type: 'tennis-club-membership' } },
           {
             term: {
               'legalStatuses.REGISTERED.createdAtLocation': 'some-location-id'
             }
-          },
-          { match: { eventType: 'tennis-club-membership' } }
+          }
         ]
       }
     })
