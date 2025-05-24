@@ -8,13 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { userEvent, within, expect, waitFor } from '@storybook/test'
-
-import React from 'react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
@@ -113,11 +111,7 @@ export const AdvancedSearchStory: Story = {
         const placeOfRegistration = await canvas.findByTestId(
           'event____legalStatus____REGISTERED____createdAtLocation'
         )
-        await new Promise((resolve) => {
-          setTimeout(() => {
-            resolve({})
-          }, 1 * 1000)
-        })
+
         await userEvent.type(placeOfRegistration, 'Ibombo', {
           delay: 100
         })
