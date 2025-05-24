@@ -141,18 +141,14 @@ export const getDefaultSearchFields = (
 }
 
 const RegStatus = {
-  Archived: 'ARCHIVED',
-  Certified: 'CERTIFIED',
-  CorrectionRequested: 'CORRECTION_REQUESTED',
-  DeclarationUpdated: 'DECLARATION_UPDATED',
+  Created: 'CREATED',
+  Notified: 'NOTIFIED',
   Declared: 'DECLARED',
-  InProgress: 'IN_PROGRESS',
-  Issued: 'ISSUED',
-  Registered: 'REGISTERED',
-  Rejected: 'REJECTED',
   Validated: 'VALIDATED',
-  WaitingValidation: 'WAITING_VALIDATION',
-  Created: 'CREATED'
+  Registered: 'REGISTERED',
+  Certified: 'CERTIFIED',
+  Rejected: 'REJECTED',
+  Archived: 'ARCHIVED'
 } as const
 
 const MatchType = {
