@@ -16,7 +16,9 @@ import {
   FieldValue,
   QueryInputType,
   SearchField,
-  EventFieldId
+  EventFieldId,
+  SearchQueryParams,
+  Inferred
 } from '@opencrvs/commons/client'
 import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
@@ -61,9 +63,47 @@ const defaultSearchFieldGenerator: Record<
   EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
+  [EventFieldId.enum['legalStatus.REGISTERED.createdAtLocation']]: (_) => ({
+    id: 'event.legalStatus.REGISTERED.createdAtLocation',
+    type: FieldType.OFFICE,
+    label: {
+      defaultMessage: 'Place of registration',
+      description: 'Label for place of registration field',
+      id: 'v2.advancedSearch.registeredAtLocation'
+    },
+    helperText: {
+      defaultMessage: 'Search for a province, district or registration office',
+      description: 'Helper text for place of registration field',
+      id: 'v2.advancedSearch.registeredAtLocation.helperText'
+    }
+  }),
+  [EventFieldId.enum['legalStatus.REGISTERED.createdAt']]: (_) => ({
+    id: 'event.legalStatus.REGISTERED.createdAt',
+    type: FieldType.DATE_RANGE,
+    label: {
+      defaultMessage: 'Date of registration',
+      description: 'Label for date of registration field',
+      id: 'v2.advancedSearch.registeredAt'
+    }
+  }),
+  [EventFieldId.enum.updatedAt]: (config) => ({
+    id: 'event.updatedAt',
+    type: FieldType.SELECT,
+    label: {
+      defaultMessage: 'Time period',
+      description: 'Label for date of update field',
+      id: 'v2.advancedSearch.updatedAt'
+    },
+    helperText: {
+      defaultMessage: 'Period of time since the record status changed',
+      description: 'Helper text for date of update field',
+      id: 'v2.advancedSearch.updatedAt.helperText'
+    },
+    options: config.options ?? []
+  }),
   [EventFieldId.enum.trackingId]: (_) => ({
     id: 'event.trackingId',
-    type: 'TEXT',
+    type: FieldType.TEXT,
     label: {
       defaultMessage: 'Tracking ID',
       description: 'Label for tracking ID field',
@@ -72,7 +112,7 @@ const defaultSearchFieldGenerator: Record<
   }),
   [EventFieldId.enum.status]: (config) => ({
     id: 'event.status',
-    type: 'SELECT',
+    type: FieldType.SELECT,
     label: {
       defaultMessage: 'Status of record',
       description: 'Label for status field',
@@ -101,18 +141,14 @@ export const getDefaultSearchFields = (
 }
 
 const RegStatus = {
-  Archived: 'ARCHIVED',
-  Certified: 'CERTIFIED',
-  CorrectionRequested: 'CORRECTION_REQUESTED',
-  DeclarationUpdated: 'DECLARATION_UPDATED',
+  Created: 'CREATED',
+  Notified: 'NOTIFIED',
   Declared: 'DECLARED',
-  InProgress: 'IN_PROGRESS',
-  Issued: 'ISSUED',
-  Registered: 'REGISTERED',
-  Rejected: 'REJECTED',
   Validated: 'VALIDATED',
-  WaitingValidation: 'WAITING_VALIDATION',
-  Created: 'CREATED'
+  Registered: 'REGISTERED',
+  Certified: 'CERTIFIED',
+  Rejected: 'REJECTED',
+  Archived: 'ARCHIVED'
 } as const
 
 const MatchType = {
@@ -180,18 +216,16 @@ function buildDataConditionFromSearchKeys(
     fieldType: 'field' | 'event'
     fieldConfig?: FieldConfig
   }[],
-  rawInput: Record<string, string> // values from UI or query string
+  rawInput: Record<string, FieldValue> // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
     (
       result: Record<string, Condition>,
       { fieldId, config, fieldType, fieldConfig }
     ) => {
-      const fieldIdEdited = fieldType === 'event' ? `event.${fieldId}` : fieldId
-      const value = formatValue(rawInput, fieldIdEdited, fieldConfig)
-
-      if (fieldIdEdited === 'event.status' && value === 'ALL') {
-        const transformedKey = fieldIdEdited.replace(/\./g, '____')
+      const value = formatValue(rawInput, fieldId, fieldConfig)
+      if (fieldId === 'event.status' && value === 'ALL') {
+        const transformedKey = fieldId.replace(/\./g, '____')
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
         // Handle the case where we want to search by range but the value is not a comma-separated string
@@ -202,7 +236,7 @@ function buildDataConditionFromSearchKeys(
             ? 'exact'
             : config?.type
         const condition = buildCondition(value, searchType)
-        const transformedKey = fieldIdEdited.replace(/\./g, '____')
+        const transformedKey = fieldId.replace(/\./g, '____')
         result[transformedKey] = condition
       }
       return result
@@ -212,22 +246,72 @@ function buildDataConditionFromSearchKeys(
 }
 
 export function buildDataCondition(
-  flat: Record<string, string>,
+  flat: Record<string, FieldValue>,
   eventConfig: EventConfig
 ): QueryInputType {
   const advancedSearch = eventConfig.advancedSearch
 
-  // Flatten all fields into a single list of search keys
-  const searchKeys = advancedSearch.flatMap((section) =>
-    section.fields.map((field) => ({
-      fieldId: field.fieldId,
-      config: field.config, // assuming field structure has a `config` prop
-      fieldType: field.fieldType,
-      fieldConfig: eventConfig.declaration.pages
-        .flatMap((page) => page.fields)
-        .find((f) => f.id === field.fieldId)
-    }))
+  const defaultMetadataSearchFields = advancedSearch.flatMap((section) =>
+    getDefaultSearchFields(section)
   )
 
-  return buildDataConditionFromSearchKeys(searchKeys, flat)
+  const defaultSearchKeys = defaultMetadataSearchFields.map((field) => ({
+    fieldId: field.id,
+    config: advancedSearch
+      .flatMap((x) => x.fields)
+      .filter((x) => x.fieldType === 'event')
+      .find((x) => field.id.includes(x.fieldId))?.config,
+    fieldType: 'event' as const,
+    fieldConfig: field
+  }))
+
+  // Flatten all fields into a single list of search keys
+  const allFields = advancedSearch.flatMap((section) => section.fields)
+
+  const searchKeys = allFields.map((field) => ({
+    fieldId: field.fieldId,
+    config: field.config, // assuming field structure has a `config` prop
+    fieldType: field.fieldType,
+    fieldConfig: eventConfig.declaration.pages
+      .flatMap((page) => page.fields)
+      .find((f) => f.id === field.fieldId)
+  }))
+  const filteredSearchKeys = [...defaultSearchKeys, ...searchKeys].filter(
+    (searchKey) => Object.keys(flat).some((key) => key === searchKey.fieldId)
+  )
+
+  return buildDataConditionFromSearchKeys(filteredSearchKeys, flat)
+}
+
+export function getSearchParamsFieldConfigs(
+  eventConfig: EventConfig,
+  searchParams: SearchQueryParams
+): Inferred[] {
+  const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
+    ([, value]) => getDefaultSearchFields(value)
+  )
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
+  const searchFieldConfigs = [
+    ...eventFieldConfigs,
+    ...declarationFieldConfigs
+  ].filter((field) => {
+    return Object.keys(searchParams).some((key) => key === field.id)
+  })
+  return searchFieldConfigs
+}
+
+export function filterValuesBasedOnFieldConfigs(
+  eventConfig: EventConfig,
+  searchParams: SearchQueryParams
+) {
+  const searchFieldConfigs = getSearchParamsFieldConfigs(
+    eventConfig,
+    searchParams
+  )
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([key]) =>
+      searchFieldConfigs.some((config) => config.id === key)
+    )
+  )
+  return filteredSearchParams
 }

@@ -213,6 +213,13 @@ export const createDeclarationTrpcMsw = (
         procedure: trpcMsw.event.draft.list.query,
         handler: () => [draft]
       }
+    ]),
+    search: wrapHandlersWithSpies([
+      {
+        name: 'event.search',
+        procedure: trpcMsw.event.search.query,
+        handler: () => [tennisClubMembershipEventIndex]
+      }
     ])
   } as const
 }

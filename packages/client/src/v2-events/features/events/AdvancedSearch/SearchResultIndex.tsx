@@ -12,29 +12,46 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { workqueues } from '@opencrvs/commons/client'
+import { SearchQueryParams, workqueues } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchResult } from './SearchResult'
-import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
+import {
+  ADVANCED_SEARCH_KEY,
+  buildDataCondition,
+  filterValuesBasedOnFieldConfigs
+} from './utils'
 
 export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = parse(window.location.search, {
-    arrayFormat: 'comma'
-  }) as Record<string, string>
+  const searchParams = SearchQueryParams.safeParse(
+    parse(window.location.search)
+  )
 
-  const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
+  if (searchParams.error) {
+    throw new Error('Invalid search params')
+  }
+
+  const filteredSearchParams = filterValuesBasedOnFieldConfigs(
+    eventConfig,
+    searchParams.data
+  )
+
+  const formattedSearchParams = buildDataCondition(
+    filteredSearchParams,
+    eventConfig
+  )
 
   const queryData = searchEvent.useSuspenseQuery(
     eventType,
     formattedSearchParams,
     ADVANCED_SEARCH_KEY
   )
+
   const workqueueId = 'all'
   const workqueueConfig =
     workqueueId in workqueues
@@ -49,7 +66,7 @@ export const SearchResultIndex = () => {
     <SearchResult
       eventConfig={eventConfig}
       queryData={queryData}
-      searchParams={searchParams}
+      searchParams={searchParams.data}
       workqueueConfig={workqueueConfig}
     />
   )

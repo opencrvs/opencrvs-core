@@ -10,15 +10,17 @@
  */
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { useLocation } from 'react-router-dom'
+import { parse } from 'query-string'
 import {
   Content,
   ContentSize,
   FormTabs,
   IFormTabProps
 } from '@opencrvs/components'
+import { SearchQueryParams } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
+import { filterValuesBasedOnFieldConfigs } from './utils'
 
 const messagesToDefine = {
   advancedSearch: {
@@ -39,9 +41,14 @@ const messages = defineMessages(messagesToDefine)
 export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
-  const location = useLocation()
-  const { searchParams = {}, eventType = '' } = location.state || {}
 
+  const searchParams = SearchQueryParams.safeParse(
+    parse(window.location.search)
+  )
+
+  if (searchParams.error) {
+    throw new Error('Invalid search params')
+  }
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
   )
@@ -52,21 +59,26 @@ export function AdvancedSearch() {
   })) satisfies IFormTabProps['sections']
 
   const selectedTabId =
-    formTabSections.find((tab) => tab.id === eventType)?.id ??
+    formTabSections.find((tab) => tab.id === searchParams.data.eventType)?.id ??
     formTabSections[0]?.id
 
   const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
-
-  const handleTabClick = (tabId: string) => {
-    setActiveTabId(tabId)
-  }
 
   const currentEvent = allEvents.find((e) => e.id === activeTabId)
   if (!currentEvent) {
     return null
   }
+
   const currentTabSections = currentEvent.advancedSearch
 
+  const filteredSearchParams = filterValuesBasedOnFieldConfigs(
+    currentEvent,
+    searchParams.data
+  )
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTabId(tabId)
+  }
   return (
     <>
       <Content
@@ -83,7 +95,10 @@ export function AdvancedSearch() {
         titleColor={'copy'}
       >
         {currentTabSections.length > 0 && (
-          <TabSearch currentEvent={currentEvent} fieldValues={searchParams} />
+          <TabSearch
+            currentEvent={currentEvent}
+            fieldValues={filteredSearchParams}
+          />
         )}
       </Content>
     </>

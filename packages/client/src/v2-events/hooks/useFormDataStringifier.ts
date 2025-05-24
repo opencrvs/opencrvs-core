@@ -18,14 +18,17 @@ import {
   isCountryFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,
+  isOfficeFieldType,
   isLocationFieldType,
-  isRadioGroupFieldType
+  isRadioGroupFieldType,
+  isSelectFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
   AdministrativeArea,
   RadioGroup,
   SelectCountry as Country,
+  Select,
   LocationSearch
 } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
@@ -45,7 +48,8 @@ export function stringifySimpleField(intl: IntlShape, locations: Location[]) {
     if (
       isLocationFieldType(field) ||
       isAdministrativeAreaFieldType(field) ||
-      isFacilityFieldType(field)
+      isFacilityFieldType(field) ||
+      isOfficeFieldType(field)
     ) {
       // Since all of the above field types are actually locations
       return AdministrativeArea.stringify(locations, field.value)
@@ -57,6 +61,10 @@ export function stringifySimpleField(intl: IntlShape, locations: Location[]) {
 
     if (isCountryFieldType(field)) {
       return Country.stringify(intl, field.value)
+    }
+
+    if (isSelectFieldType(field)) {
+      return Select.stringify(intl, field.value, field.config)
     }
 
     return !value ? '' : value.toString()

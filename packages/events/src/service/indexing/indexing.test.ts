@@ -72,6 +72,43 @@ const exactStatusPayload: QueryType = {
   ]
 }
 
+const exactRegisteredAtPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAt': { type: 'exact', term: '2024-01-01' },
+      eventType: 'tennis-club-membership'
+    }
+  ]
+}
+
+const rangeRegisteredAtPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAt': {
+        type: 'range',
+        gte: '2024-01-01',
+        lte: '2024-12-31'
+      },
+      eventType: 'tennis-club-membership'
+    }
+  ]
+}
+
+const exactRegisteredAtLocationPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAtLocation': {
+        type: 'exact',
+        term: 'some-location-id'
+      },
+      eventType: 'tennis-club-membership'
+    }
+  ]
+}
+
 const anyOfStatusPayload: QueryType = {
   type: 'and',
   clauses: [
@@ -116,6 +153,55 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           { term: { status: 'REGISTERED' } }
         ],
         should: undefined
+      }
+    })
+  })
+
+  test('builds query with exact legalStatus.REGISTERED.createdAt', () => {
+    const result = buildElasticQueryFromSearchPayload(exactRegisteredAtPayload)
+    expect(result).toEqual({
+      bool: {
+        must: [
+          { term: { type: 'tennis-club-membership' } },
+          { term: { 'legalStatuses.REGISTERED.createdAt': '2024-01-01' } }
+        ]
+      }
+    })
+  })
+
+  test('builds query with range legalStatus.REGISTERED.createdAt', () => {
+    const result = buildElasticQueryFromSearchPayload(rangeRegisteredAtPayload)
+    expect(result).toEqual({
+      bool: {
+        must: [
+          { term: { type: 'tennis-club-membership' } },
+          {
+            range: {
+              'legalStatuses.REGISTERED.createdAt': {
+                gte: '2024-01-01',
+                lte: '2024-12-31'
+              }
+            }
+          }
+        ]
+      }
+    })
+  })
+
+  test('builds query with exact legalStatus.REGISTERED.createdAtLocation', () => {
+    const result = buildElasticQueryFromSearchPayload(
+      exactRegisteredAtLocationPayload
+    )
+    expect(result).toEqual({
+      bool: {
+        must: [
+          { term: { type: 'tennis-club-membership' } },
+          {
+            term: {
+              'legalStatuses.REGISTERED.createdAtLocation': 'some-location-id'
+            }
+          }
+        ]
       }
     })
   })

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { createSearchConfig } from '../searchConfigs'
 import { EventFieldId } from '../events/AdvancedSearchConfig'
 import { SelectOption } from '../events/FieldConfig'
 
@@ -22,10 +23,11 @@ export function createEventFieldConfig(
   fieldId: EventFieldId,
   options?: SelectOption[]
 ) {
-  return {
+  const baseField = {
     fieldId,
     options,
-    config: { type: 'exact' as const },
     fieldType: 'event' as const
   }
+
+  return createSearchConfig(baseField)
 }
