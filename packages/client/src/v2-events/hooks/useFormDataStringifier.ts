@@ -33,7 +33,7 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
 
-export interface RecursiveStringRecord {
+interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
 
