@@ -21,25 +21,26 @@ const BaseField = z.object({
     type: MatchType.describe('Determines the type of field')
   }),
   options: z.array(SelectOption).optional(),
-  hideSearchLabelPrefix: z
-    .boolean()
-    .optional()
-    .describe(
-      `
-     This property determines whether to add a prefix (such as "Child" or "Applicant") before the field label when 
-    rendering search parameter labels — for example, in the search results page to indicate which fields were used 
-    in the search.
-
-    The prefix is inferred from the field's 'id'. For example, a field config like 
-    { id: "child.firstname", label: { defaultMessage: "First Name(s)" } } would 
-    render as "Child First Name(s)" by default. 
-    
-    However, in cases like { id: "applicant.firstname", label: { defaultMessage: "Applicant's First Name" } }, 
-    this would result in "Applicant Applicant's First Name", which is redundant and awkward.
-
-    Setting 'hideSearchLabelPrefix' to true prevents this prefix from being added, avoiding awkward label duplication.
+  searchCriteriaLabelPrefix: TranslationConfig.optional().describe(
     `
-    ),
+    This property determines whether to add a prefix (such as "Child" or "Applicant") before the field label 
+    when rendering search parameter labels — for example, in the search results page to indicate which fields were used in the search.
+
+    For example, a field config like { id: "child.firstname", label: { defaultMessage: "First Name(s)" } } would render as "First Name(s)" by default.
+
+    A field config like { id: "mother.firstname", label: { defaultMessage: "First Name(s)" } } would also render as "First Name(s)" by default.
+
+    So, if both child.firstname and mother.firstname are used in a search, the resulting search criteria labels would be "First Name(s)", "First Name(s)", 
+    which is ambiguous.
+
+    Now, if we treat the field ID prefix as a label (e.g., "applicant.firstname" → "Applicant"), and the field label is already 
+    descriptive — like { id: "applicant.firstname", label: { defaultMessage: "Applicant's First Name" } } — then the resulting 
+    label would be "Applicant Applicant's First Name", which is redundant and awkward.
+
+    By setting searchCriteriaLabelPrefix to a translation config object, we can explicitly define the desired prefix 
+    in the country-config > event.advancedSearch configuration. For example: field("child.dob", { searchCriteriaLabelPrefix: TranslationConfig }).
+    `
+  ),
   conditionals: z
     .array(FieldConditional)
     .default([])

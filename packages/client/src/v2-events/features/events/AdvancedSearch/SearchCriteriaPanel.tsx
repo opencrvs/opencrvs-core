@@ -65,35 +65,20 @@ function buildSearchParamLabels(
     if (!field) {
       return null
     }
-    // Determine if its not a EventMetadata field, then show prefix (ex: 'child.firstName)
-    const hidePrefix = eventConfig.advancedSearch
+    const searchCriteriaLabelPrefix = eventConfig.advancedSearch
       .flatMap((section) => section.fields)
       .find(
-        (f) => f.fieldId === key && f.hideSearchLabelPrefix
-      )?.hideSearchLabelPrefix
-    /*
-        Example:
-        key = "child.firstname", 'mother.firstname", "informant.firstname"
+        (f) => f.fieldId === key && f.searchCriteriaLabelPrefix
+      )?.searchCriteriaLabelPrefix
+    const prefix = searchCriteriaLabelPrefix
+      ? intl.formatMessage(searchCriteriaLabelPrefix)
+      : undefined
 
-        Breakdown:
-        - key.includes('.') => true               // (it's a key with '.', as per convention)
-        - key.split('.')[0] => "child"            // extract the parent path
-        - convertPathToLabel("child") => "Child"  // capitalize the parent key
-        - prefix = "Child "                       // space added after prefix
-
-        - intl.formatMessage(field.label) => "First name(s)" // localized label, retrieved from respective FieldConfig
-
-        Final output:
-        "Child First name(s): value"
-      */
-
-    const prefix = hidePrefix ? '' : convertPathToLabel(key.split('.')[0]) + ' '
     const label = intl.formatMessage(field.label)
     const valueOutput = <ValueOutput config={field} value={value} />
     const output = (
       <>
-        {prefix}
-        {label}
+        {prefix} {label}
         {':'} {valueOutput}
       </>
     )

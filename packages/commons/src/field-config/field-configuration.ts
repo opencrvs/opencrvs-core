@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConditional } from 'src/events'
+import { FieldConditional, TranslationConfig } from 'src/events'
 import { createSearchConfig } from '../searchConfigs'
 
 /**
@@ -19,7 +19,7 @@ export function createFieldConfig(
   fieldId: string,
   options: {
     conditionals?: FieldConditional[]
-    hideSearchLabelPrefix?: boolean
+    searchCriteriaLabelPrefix?: TranslationConfig
   }
 ) {
   const baseField = {

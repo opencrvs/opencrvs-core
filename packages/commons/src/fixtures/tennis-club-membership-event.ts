@@ -1437,16 +1437,10 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'v2.event.tennis-club-membership.search.applicants'
       },
       fields: [
-        field('applicant.firstname', {
-          hideSearchLabelPrefix: true
-        }).fuzzy(),
-        field('applicant.surname', {
-          hideSearchLabelPrefix: true
-        }).fuzzy(),
-        field('applicant.dob', { hideSearchLabelPrefix: true }).range(),
-        field('applicant.email', {
-          hideSearchLabelPrefix: true
-        }).exact()
+        field('applicant.firstname').fuzzy(),
+        field('applicant.surname').fuzzy(),
+        field('applicant.dob').range(),
+        field('applicant.email').exact()
       ]
     },
     {
@@ -1456,12 +1450,8 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'v2.event.tennis-club-membership.search.recommender'
       },
       fields: [
-        field('recommender.firstname', {
-          hideSearchLabelPrefix: true
-        }).fuzzy(),
-        field('recommender.surname', {
-          hideSearchLabelPrefix: true
-        }).fuzzy()
+        field('recommender.firstname').fuzzy(),
+        field('recommender.surname').fuzzy()
       ]
     }
   ],

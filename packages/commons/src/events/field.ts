@@ -12,6 +12,7 @@
 import { createFieldConditionals } from '../conditionals/conditionals'
 import { createFieldConfig } from '../field-config/field-configuration'
 import { FieldConditional } from './Conditional'
+import { TranslationConfig } from './TranslationConfig'
 
 /**
  * Entry point for defining conditional logic or configuration for a form field.
@@ -22,7 +23,7 @@ export function field(
   fieldId: string,
   options: {
     conditionals?: FieldConditional[]
-    hideSearchLabelPrefix?: boolean
+    searchCriteriaLabelPrefix?: TranslationConfig
   } = {}
 ) {
   return {
