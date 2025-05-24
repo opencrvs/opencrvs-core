@@ -12,11 +12,11 @@ import * as React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { SearchModifierComponent } from './SearchModifier'
+import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 
-const meta: Meta<typeof SearchModifierComponent> = {
-  title: 'Components/SearchModifierComponent',
-  component: SearchModifierComponent,
+const meta: Meta<typeof SearchCriteriaPanel> = {
+  title: 'Components/SearchCriteriaPanel',
+  component: SearchCriteriaPanel,
   parameters: {
     layout: 'centered'
   },
@@ -31,7 +31,7 @@ const meta: Meta<typeof SearchModifierComponent> = {
 
 export default meta
 
-type Story = StoryObj<typeof SearchModifierComponent>
+type Story = StoryObj<typeof SearchCriteriaPanel>
 
 const mockSearchParams = {
   'applicant.firstname': 'Danny',
@@ -39,7 +39,7 @@ const mockSearchParams = {
 }
 
 export const DefaultSearchResult: Story = {
-  name: 'SearchModifier',
+  name: 'SearchCriteriaPanel',
   args: {
     eventConfig: tennisClubMembershipEvent,
     searchParams: mockSearchParams

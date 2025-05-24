@@ -103,7 +103,7 @@ function buildSearchParamLabels(
   })
 }
 
-export function SearchModifierComponent({
+export function SearchCriteriaPanel({
   eventConfig,
   searchParams
 }: {
