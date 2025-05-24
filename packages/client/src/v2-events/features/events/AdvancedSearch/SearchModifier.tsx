@@ -19,11 +19,7 @@ import { EventConfig, FieldValue, Inferred } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
 import { filterEmptyValues } from '@client/v2-events/utils'
-import {
-  getFormDataStringifier,
-  RecursiveStringRecord
-} from '@client/v2-events/hooks/useFormDataStringifier'
-import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { ValueOutput } from '@client/v2-events/features/events/components/Output'
 import { getSearchParamsFieldConfigs } from './utils'
 
 const messagesToDefine = {
@@ -61,22 +57,21 @@ function convertPathToLabel(path?: string): string {
 function buildSearchParamLabels(
   eventConfig: EventConfig,
   fieldConfigs: Inferred[],
-  searchParams: RecursiveStringRecord,
+  searchParams: Record<string, FieldValue>,
   intl: IntlShape
-): string[] {
-  return Object.entries(searchParams)
-    .map(([key, value]) => {
-      const field = fieldConfigs.find((f) => f.id === key)
-      if (!field) {
-        return null
-      }
-      // Determine if its not a EventMetadata field, then show prefix (ex: 'child.firstName)
-      const hidePrefix = eventConfig.advancedSearch
-        .flatMap((section) => section.fields)
-        .find(
-          (f) => f.fieldId === key && f.hideSearchLabelPrefix
-        )?.hideSearchLabelPrefix
-      /*
+): React.ReactNode[] {
+  return Object.entries(searchParams).map(([key, value]) => {
+    const field = fieldConfigs.find((f) => f.id === key)
+    if (!field) {
+      return null
+    }
+    // Determine if its not a EventMetadata field, then show prefix (ex: 'child.firstName)
+    const hidePrefix = eventConfig.advancedSearch
+      .flatMap((section) => section.fields)
+      .find(
+        (f) => f.fieldId === key && f.hideSearchLabelPrefix
+      )?.hideSearchLabelPrefix
+    /*
         Example:
         key = "child.firstname", 'mother.firstname", "informant.firstname"
 
@@ -89,16 +84,23 @@ function buildSearchParamLabels(
         - intl.formatMessage(field.label) => "First name(s)" // localized label, retrieved from respective FieldConfig
 
         Final output:
-        "Child First name(s): [value]"
+        "Child First name(s): value"
       */
 
-      const prefix = hidePrefix
-        ? ''
-        : convertPathToLabel(key.split('.')[0]) + ' '
-      const label = intl.formatMessage(field.label)
-      return `${prefix}${label}: ${value}`
-    })
-    .filter((entry): entry is string => Boolean(entry))
+    const prefix = hidePrefix ? '' : convertPathToLabel(key.split('.')[0]) + ' '
+    const label = intl.formatMessage(field.label)
+    const valueOutput = <ValueOutput config={field} value={value} />
+    const output = (
+      <>
+        {prefix}
+        {label}
+        {':'} {valueOutput}
+      </>
+    )
+    return (
+      <Pill key={field.id} label={output} size="small" type="default"></Pill>
+    )
+  })
 }
 
 export function SearchModifierComponent({
@@ -111,13 +113,7 @@ export function SearchModifierComponent({
   const navigate = useNavigate()
   const intl = useIntl()
 
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
-  const stringifyForm = getFormDataStringifier(intl, locations)
-
   /* --- Build event-label, ex: Event: V2 birth */
-  const eventParamLabel = `${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventConfig.id)}`
-
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
     searchParams
@@ -127,23 +123,25 @@ export function SearchModifierComponent({
       searchFieldConfigs.some((config) => config.id === key)
     )
   )
-  const stringifiedSearchParams = stringifyForm(
-    searchFieldConfigs,
-    filteredSearchParams
-  )
 
   const searchParamsLabels = buildSearchParamLabels(
     eventConfig,
     searchFieldConfigs,
-    stringifiedSearchParams,
+    filteredSearchParams,
     intl
   )
 
   return (
     <>
       <SearchParamContainer>
-        {[eventParamLabel, ...searchParamsLabels].map((label) => (
-          <Pill key={label} label={label} size="small" type="default"></Pill>
+        <Pill
+          key={constantsMessages.event.id}
+          label={`${intl.formatMessage(constantsMessages.event)}: ${convertPathToLabel(eventConfig.id)}`}
+          size="small"
+          type="default"
+        ></Pill>
+        {searchParamsLabels.map((label) => (
+          <>{label}</>
         ))}
         <StyledLink
           font="bold14"
