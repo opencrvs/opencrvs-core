@@ -89,7 +89,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   const [event] = getEvent.useSuspenseQuery(params.eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
-    params.eventId
+    event.type
   )
 
   const drafts = getRemoteDrafts()
