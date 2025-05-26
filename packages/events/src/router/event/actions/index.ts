@@ -76,8 +76,7 @@ const ACTION_PROCEDURE_CONFIG = {
         tags: ['events'],
         protect: true
       }
-    },
-    outputSchema: EventDocument
+    }
   },
   [ActionType.DECLARE]: {
     notifyApiPayloadSchema: undefined,
@@ -160,8 +159,6 @@ export function getDefaultActionProcedures(
     : async ({ next }: MiddlewareOptions) => next()
 
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
-  const outputSchema =
-    'outputSchema' in actionConfig ? actionConfig.outputSchema : z.any()
 
   return {
     request: publicProcedure
@@ -171,7 +168,7 @@ export function getDefaultActionProcedures(
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
-      .output(outputSchema)
+      .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, transactionId } = input
