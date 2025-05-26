@@ -83,7 +83,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
 // Check if the request is a tRPC request
 function isTrpcRequest(req: IncomingMessage) {
   if (!req.url) {
-    return false
+    throw new Error('No URL provided')
   }
 
   const url = new URL(req.url, `http://${req.headers.host}`)
