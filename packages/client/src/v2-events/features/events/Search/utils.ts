@@ -127,8 +127,31 @@ type Condition =
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
 
-export const ADVANCED_SEARCH_KEY = 'and' as const
-export const QUICK_SEARCH_KEY = 'or' as const
+const ADVANCED_SEARCH_KEY = 'and' as const
+const QUICK_SEARCH_KEY = 'or' as const
+
+export function toAdvancedSearchQueryType(
+  searchParams: QueryInputType,
+  eventType?: string,
+  type = ADVANCED_SEARCH_KEY
+): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (key.startsWith('event')) {
+      const strippedKey = key.replace(/^event____/, '')
+      topLevelFields[strippedKey] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+  }
+}
 
 function buildCondition(
   value: string,

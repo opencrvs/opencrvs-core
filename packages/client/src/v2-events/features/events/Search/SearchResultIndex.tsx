@@ -12,35 +12,11 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { QueryInputType, QueryType } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchResult } from './SearchResult'
-import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
-
-function toQueryType(
-  searchParams: QueryInputType,
-  type: 'and' | 'or',
-  eventType?: string
-): QueryType {
-  const topLevelFields: Record<string, unknown> = {}
-  const dataFields: Record<string, unknown> = {}
-
-  Object.entries(searchParams).forEach(([key, value]) => {
-    if (key.startsWith('event')) {
-      const strippedKey = key.replace(/^event____/, '')
-      topLevelFields[strippedKey] = value
-    } else {
-      dataFields[key] = value
-    }
-  })
-
-  return {
-    type,
-    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
-  }
-}
+import { buildDataCondition, toAdvancedSearchQueryType } from './utils'
 
 export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
@@ -52,9 +28,8 @@ export const SearchResultIndex = () => {
   }) as Record<string, string>
 
   const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
-
   const queryData = searchEvent.useSuspenseQuery(
-    toQueryType(formattedSearchParams, ADVANCED_SEARCH_KEY, eventType)
+    toAdvancedSearchQueryType(formattedSearchParams, eventType)
   )
 
   return (
