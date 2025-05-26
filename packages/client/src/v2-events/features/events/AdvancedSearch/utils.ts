@@ -26,6 +26,7 @@ import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -243,7 +244,7 @@ function buildDataConditionFromSearchKeys(
       // Format the raw field value based on its type (e.g., date range value is a string tuple, format it as comma-separated string)
       const value = formatValue(rawInput, fieldId, fieldConfig)
       if (fieldId === 'event.status' && value === 'ALL') {
-        const transformedKey = fieldId.replace(/\./g, '____')
+        const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
         // Handle the case where we want to search by range but the value is not a comma-separated string
@@ -254,7 +255,7 @@ function buildDataConditionFromSearchKeys(
             ? 'exact'
             : config?.type
         const condition = buildCondition(value, searchType)
-        const transformedKey = fieldId.replace(/\./g, '____')
+        const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = condition
       }
       return result
