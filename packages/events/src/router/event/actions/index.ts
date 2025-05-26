@@ -11,6 +11,7 @@
 import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
+import { OpenApiMeta } from 'trpc-to-openapi'
 import { getUUID } from '@opencrvs/commons'
 import {
   ActionType,
@@ -44,6 +45,14 @@ import {
   requestActionConfirmation
 } from './actionConfirmationRequest'
 
+interface ActionProcedureConfig {
+  notifyApiPayloadSchema: z.ZodType | undefined
+  validatePayload: boolean
+  inputSchema: z.ZodType
+  meta?: OpenApiMeta
+  outputSchema?: z.ZodType
+}
+
 /**
  * Configuration for different action types which use the default confirmation flow.
  *
@@ -51,12 +60,24 @@ import {
  * @property {z.ZodType} inputSchema - The Zod schema for validating the action input
  * @property {z.ZodType|undefined} notifyApiPayloadSchema - Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
  * @property {boolean} validatePayload - Whether the payload should be strictly validated against the inputSchema schema
+ * @property {OpenApiMeta|undefined} meta - Meta information, incl. OpenAPI definition
+ * @property {z.ZodType} outputSchema - The Zod schema for validating the output
  */
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     notifyApiPayloadSchema: undefined,
     validatePayload: false,
-    inputSchema: NotifyActionInput
+    inputSchema: NotifyActionInput,
+    meta: {
+      openapi: {
+        summary: 'Notify an event',
+        method: 'POST',
+        path: '/events/notify',
+        tags: ['events'],
+        protect: true
+      }
+    },
+    outputSchema: z.any()
   },
   [ActionType.DECLARE]: {
     notifyApiPayloadSchema: undefined,
@@ -88,7 +109,7 @@ const ACTION_PROCEDURE_CONFIG = {
     validatePayload: true,
     inputSchema: PrintCertificateActionInput
   }
-}
+} satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
 type ActionProcedure = {
   request: MutationProcedure<{
@@ -138,13 +159,19 @@ export function getDefaultActionProcedures(
     ? middleware.validateAction(actionType)
     : async ({ next }: MiddlewareOptions) => next()
 
+  const meta = 'meta' in actionConfig ? actionConfig.meta : {}
+  const outputSchema =
+    'outputSchema' in actionConfig ? actionConfig.outputSchema : z.any()
+
   return {
     request: publicProcedure
+      .meta(meta)
       .use(requireScopesMiddleware)
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(validatePayloadMiddleware)
+      .output(outputSchema)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, transactionId } = input
