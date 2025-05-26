@@ -1907,6 +1907,37 @@ components:
                             type:
                               type: string
                               const: NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -5491,6 +5522,37 @@ components:
                       type:
                         type: string
                         const: NAME
+                      configuration:
+                        type: object
+                        properties:
+                          maxLength:
+                            type: number
+                          prefix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                          postfix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
                     required:
                       - id
                       - label
@@ -8868,6 +8930,37 @@ components:
                       type:
                         type: string
                         const: NAME
+                      configuration:
+                        type: object
+                        properties:
+                          maxLength:
+                            type: number
+                          prefix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                          postfix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
                     required:
                       - id
                       - label
@@ -12389,6 +12482,37 @@ components:
                       type:
                         type: string
                         const: NAME
+                      configuration:
+                        type: object
+                        properties:
+                          maxLength:
+                            type: number
+                          prefix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                          postfix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                              defaultMessage:
+                                type: string
+                              description:
+                                type: string
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
                     required:
                       - id
                       - label
@@ -15835,6 +15959,37 @@ components:
                                 type:
                                   type: string
                                   const: NAME
+                                configuration:
+                                  type: object
+                                  properties:
+                                    maxLength:
+                                      type: number
+                                    prefix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                        defaultMessage:
+                                          type: string
+                                        description:
+                                          type: string
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                                    postfix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                        defaultMessage:
+                                          type: string
+                                        description:
+                                          type: string
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
                               required:
                                 - id
                                 - label
@@ -19169,6 +19324,37 @@ components:
                                 type:
                                   type: string
                                   const: NAME
+                                configuration:
+                                  type: object
+                                  properties:
+                                    maxLength:
+                                      type: number
+                                    prefix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                        defaultMessage:
+                                          type: string
+                                        description:
+                                          type: string
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                                    postfix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                        defaultMessage:
+                                          type: string
+                                        description:
+                                          type: string
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
                               required:
                                 - id
                                 - label
@@ -22634,6 +22820,37 @@ components:
                             type:
                               type: string
                               const: NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -25968,6 +26185,37 @@ components:
                             type:
                               type: string
                               const: NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -29381,6 +29629,37 @@ components:
                             type:
                               type: string
                               const: NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -32715,6 +32994,37 @@ components:
                             type:
                               type: string
                               const: NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                    defaultMessage:
+                                      type: string
+                                    description:
+                                      type: string
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label

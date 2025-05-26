@@ -2311,6 +2311,46 @@ components:
                               type: string
                               enum:
                                 - NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                  description: Maximum length of the text
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -6746,6 +6786,46 @@ components:
                         type: string
                         enum:
                           - NAME
+                      configuration:
+                        type: object
+                        properties:
+                          maxLength:
+                            type: number
+                            description: Maximum length of the text
+                          prefix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                          postfix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
                     required:
                       - id
                       - label
@@ -10955,6 +11035,46 @@ components:
                         type: string
                         enum:
                           - NAME
+                      configuration:
+                        type: object
+                        properties:
+                          maxLength:
+                            type: number
+                            description: Maximum length of the text
+                          prefix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                          postfix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
                     required:
                       - id
                       - label
@@ -15341,6 +15461,46 @@ components:
                         type: string
                         enum:
                           - NAME
+                      configuration:
+                        type: object
+                        properties:
+                          maxLength:
+                            type: number
+                            description: Maximum length of the text
+                          prefix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
+                          postfix:
+                            type: object
+                            properties:
+                              id:
+                                type: string
+                                description: The identifier of the translation referred in translation CSV files
+                              defaultMessage:
+                                type: string
+                                description: Default translation message
+                              description:
+                                type: string
+                                description: Describe the translation for a translator to be able to identify
+                                  it.
+                            required:
+                              - id
+                              - defaultMessage
+                              - description
                     required:
                       - id
                       - label
@@ -19648,6 +19808,46 @@ components:
                                   type: string
                                   enum:
                                     - NAME
+                                configuration:
+                                  type: object
+                                  properties:
+                                    maxLength:
+                                      type: number
+                                      description: Maximum length of the text
+                                    prefix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          description: The identifier of the translation referred in translation CSV files
+                                        defaultMessage:
+                                          type: string
+                                          description: Default translation message
+                                        description:
+                                          type: string
+                                          description: Describe the translation for a translator to be able to identify
+                                            it.
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                                    postfix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          description: The identifier of the translation referred in translation CSV files
+                                        defaultMessage:
+                                          type: string
+                                          description: Default translation message
+                                        description:
+                                          type: string
+                                          description: Describe the translation for a translator to be able to identify
+                                            it.
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
                               required:
                                 - id
                                 - label
@@ -23834,6 +24034,46 @@ components:
                                   type: string
                                   enum:
                                     - NAME
+                                configuration:
+                                  type: object
+                                  properties:
+                                    maxLength:
+                                      type: number
+                                      description: Maximum length of the text
+                                    prefix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          description: The identifier of the translation referred in translation CSV files
+                                        defaultMessage:
+                                          type: string
+                                          description: Default translation message
+                                        description:
+                                          type: string
+                                          description: Describe the translation for a translator to be able to identify
+                                            it.
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
+                                    postfix:
+                                      type: object
+                                      properties:
+                                        id:
+                                          type: string
+                                          description: The identifier of the translation referred in translation CSV files
+                                        defaultMessage:
+                                          type: string
+                                          description: Default translation message
+                                        description:
+                                          type: string
+                                          description: Describe the translation for a translator to be able to identify
+                                            it.
+                                      required:
+                                        - id
+                                        - defaultMessage
+                                        - description
                               required:
                                 - id
                                 - label
@@ -28167,6 +28407,46 @@ components:
                               type: string
                               enum:
                                 - NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                  description: Maximum length of the text
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -32327,6 +32607,46 @@ components:
                               type: string
                               enum:
                                 - NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                  description: Maximum length of the text
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -36583,6 +36903,46 @@ components:
                               type: string
                               enum:
                                 - NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                  description: Maximum length of the text
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
@@ -40743,6 +41103,46 @@ components:
                               type: string
                               enum:
                                 - NAME
+                            configuration:
+                              type: object
+                              properties:
+                                maxLength:
+                                  type: number
+                                  description: Maximum length of the text
+                                prefix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
+                                postfix:
+                                  type: object
+                                  properties:
+                                    id:
+                                      type: string
+                                      description: The identifier of the translation referred in translation CSV files
+                                    defaultMessage:
+                                      type: string
+                                      description: Default translation message
+                                    description:
+                                      type: string
+                                      description: Describe the translation for a translator to be able to identify
+                                        it.
+                                  required:
+                                    - id
+                                    - defaultMessage
+                                    - description
                           required:
                             - id
                             - label
