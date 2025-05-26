@@ -74,7 +74,7 @@ export const requireAssignment = experimental_standaloneMiddleware<{
   if (ctx.user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
-      message: JSON.stringify('You are not assigned to this event')
+      message: 'You are not assigned to this event'
     })
   }
   return next()

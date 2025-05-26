@@ -128,7 +128,8 @@ async function createActionInTransaction(
     createdAtLocation,
     declaration,
     annotation,
-    originalActionId
+    originalActionId,
+    assignedTo
   }: {
     eventId: UUID
     transactionId: string
@@ -140,6 +141,7 @@ async function createActionInTransaction(
     declaration?: Record<string, SerializableValue>
     annotation?: Record<string, SerializableValue>
     originalActionId?: UUID
+    assignedTo?: string
   },
   trx: CommonQueryMethods
 ) {
@@ -152,6 +154,7 @@ async function createActionInTransaction(
         event_id,
         transaction_id,
         action_type,
+        assigned_to,
         status,
         declaration,
         annotation,
@@ -165,6 +168,7 @@ async function createActionInTransaction(
         ${eventId},
         ${transactionId},
         ${type}::action_type,
+        ${assignedTo ?? null},
         ${status}::action_status,
         ${sql.jsonb(declaration ?? {})},
         ${sql.jsonb(annotation ?? {})},
@@ -253,7 +257,8 @@ export const getOrCreateEvent = async ({
         status: ActionStatus.Accepted,
         createdBy,
         createdByRole,
-        createdAtLocation
+        createdAtLocation,
+        assignedTo: createdBy
       },
       trx
     )
