@@ -87,7 +87,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
 }
 
 // Check if the URL is a defined tRPC path
-function hasTrpcPath(url: URL) {
+function isTrpcUrl(url: URL) {
   const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
   const pathParts = pathName.split('.')
 
@@ -107,7 +107,7 @@ function hasTrpcPath(url: URL) {
     return false
   })
 
-  return appRouterHasPath
+  return url.search.startsWith('?input') && appRouterHasPath
 }
 
 const restServer = createOpenApiHttpHandler(trpcConfig)
@@ -122,9 +122,8 @@ const server = createServer((req, res) => {
   }
 
   const url = new URL(req.url, `http://${req.headers.host}`)
-  const isTrpcUrl = url.search.startsWith('?input') && hasTrpcPath(url)
 
-  if (isTrpcUrl) {
+  if (isTrpcUrl(url)) {
     trpcServer(req, res)
   } else {
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
