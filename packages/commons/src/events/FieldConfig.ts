@@ -58,6 +58,7 @@ const BaseField = z.object({
     .default([])
     .optional(),
   label: TranslationConfig,
+  helperText: TranslationConfig.optional(),
   hideLabel: z.boolean().default(false).optional()
 })
 
