@@ -80,7 +80,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   }
 }
 
-// Check if the URL is a defined tRPC path
+// Check if the request is a tRPC request
 function isTrpcRequest(req: IncomingMessage) {
   if (!req.url) {
     return false
