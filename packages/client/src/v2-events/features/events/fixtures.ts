@@ -20,7 +20,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
   title: 'John Doe',
-  type: 'TENNIS_CLUB_MEMBERSHIP',
+  type: 'tennis-club-membership',
   trackingId: 'TEST12',
   status: 'CREATED',
   createdAt: '2023-03-01T00:00:00.000Z',
@@ -41,7 +41,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
 }
 
 export const tennisClubMembershipEventDocument: EventDocument = {
-  type: 'TENNIS_CLUB_MEMBERSHIP',
+  type: 'tennis-club-membership',
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
   trackingId: 'TEST12',
   createdAt: '2025-01-23T05:30:02.615Z',

@@ -943,7 +943,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
 })
 
 export const tennisClubMembershipEvent = defineConfig({
-  id: 'TENNIS_CLUB_MEMBERSHIP',
+  id: 'tennis-club-membership',
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',

@@ -27,7 +27,7 @@ exports[`stringifyEventMetadata > Resolves event metadata 1`] = `
   "modifiedAt": "2 February 2000",
   "status": "REGISTERED",
   "trackingId": "B77FF6",
-  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "type": "tennis-club-membership",
   "updatedAt": "2 February 2000",
   "updatedAtLocation": {
     "country": "Farajaland",

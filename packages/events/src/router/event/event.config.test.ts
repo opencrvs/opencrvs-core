@@ -16,8 +16,8 @@ test('event config can be fetched', async () => {
   const client = createTestClient(user)
   const config = await client.event.config.get()
 
-  expect(config[0].id).toEqual('TENNIS_CLUB_MEMBERSHIP')
-  expect(config[1].id).toEqual('TENNIS_CLUB_MEMBERSHIP_PREMIUM')
+  expect(config[0].id).toEqual('tennis-club-membership')
+  expect(config[1].id).toEqual('tennis-club-membership_PREMIUM')
 
   expect(config.length).toEqual(2)
 })
