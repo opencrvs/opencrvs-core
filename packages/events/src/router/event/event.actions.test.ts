@@ -181,8 +181,8 @@ test('Action data accepts partial changes', async () => {
   })
 
   const events = await client.event.list()
-  expect(events).toEqual([
-    expect.objectContaining({
+  expect(events).toMatchObject([
+    {
       ...stateAfterVillageRemoval,
       legalStatuses: {
         [EventStatus.DECLARED]: {
@@ -193,7 +193,7 @@ test('Action data accepts partial changes', async () => {
           createdAtLocation: user.primaryOfficeId
         }
       }
-    } satisfies EventIndex)
+    } satisfies EventIndex
   ])
 })
 

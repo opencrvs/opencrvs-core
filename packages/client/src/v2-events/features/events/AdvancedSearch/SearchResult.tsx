@@ -20,7 +20,8 @@ import {
   defaultWorkqueueColumns,
   WorkqueueColumn,
   deepDropNulls,
-  applyDraftsToEventIndex
+  applyDraftsToEventIndex,
+  EventState
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -38,7 +39,7 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventTitle } from '../useEvents/useEventTitle'
-import { SearchModifierComponent } from './SearchModifier'
+import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 
 const FabContainer = styled.div`
   position: fixed;
@@ -170,7 +171,7 @@ const messages = defineMessages(searchResultMessages)
 interface Props {
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
-  searchParams: Record<string, string>
+  searchParams: EventState
   queryData: EventIndex[]
   limit: number
   offset: number
@@ -404,8 +405,8 @@ export const SearchResult = ({
       offset={offset}
       queryData={queryData}
       tabBarContent={
-        <SearchModifierComponent
-          eventType={eventConfigs[0].id}
+        <SearchCriteriaPanel
+          eventConfig={eventConfigs[0]}
           searchParams={searchParams}
         />
       }

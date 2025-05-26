@@ -13,11 +13,13 @@ import {
   AdvancedSearchConfig,
   EventConfig,
   FieldConfig,
-  FieldValue,
   QueryInputType,
   SearchField,
   EventFieldId,
-  QueryType
+  QueryType,
+  SearchQueryParams,
+  Inferred,
+  EventState
 } from '@opencrvs/commons/client'
 import { FieldType } from '@opencrvs/commons/client'
 import { getAllUniqueFields } from '@client/v2-events/utils'
@@ -25,10 +27,11 @@ import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
-  formValues: Record<string, FieldValue>
+  formValues: EventState
 ) => {
   const allUniqueFields = getAllUniqueFields(currentEvent)
   return currentEvent.advancedSearch.reduce(
@@ -62,9 +65,47 @@ const defaultSearchFieldGenerator: Record<
   EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
+  [EventFieldId.enum['legalStatus.REGISTERED.createdAtLocation']]: (_) => ({
+    id: 'event.legalStatus.REGISTERED.createdAtLocation',
+    type: FieldType.OFFICE,
+    label: {
+      defaultMessage: 'Place of registration',
+      description: 'Label for place of registration field',
+      id: 'v2.advancedSearch.registeredAtLocation'
+    },
+    helperText: {
+      defaultMessage: 'Search for a province, district or registration office',
+      description: 'Helper text for place of registration field',
+      id: 'v2.advancedSearch.registeredAtLocation.helperText'
+    }
+  }),
+  [EventFieldId.enum['legalStatus.REGISTERED.createdAt']]: (_) => ({
+    id: 'event.legalStatus.REGISTERED.createdAt',
+    type: FieldType.DATE_RANGE,
+    label: {
+      defaultMessage: 'Date of registration',
+      description: 'Label for date of registration field',
+      id: 'v2.advancedSearch.registeredAt'
+    }
+  }),
+  [EventFieldId.enum.updatedAt]: (config) => ({
+    id: 'event.updatedAt',
+    type: FieldType.SELECT,
+    label: {
+      defaultMessage: 'Time period',
+      description: 'Label for date of update field',
+      id: 'v2.advancedSearch.updatedAt'
+    },
+    helperText: {
+      defaultMessage: 'Period of time since the record status changed',
+      description: 'Helper text for date of update field',
+      id: 'v2.advancedSearch.updatedAt.helperText'
+    },
+    options: config.options ?? []
+  }),
   [EventFieldId.enum.trackingId]: (_) => ({
     id: 'event.trackingId',
-    type: 'TEXT',
+    type: FieldType.TEXT,
     label: {
       defaultMessage: 'Tracking ID',
       description: 'Label for tracking ID field',
@@ -73,7 +114,7 @@ const defaultSearchFieldGenerator: Record<
   }),
   [EventFieldId.enum.status]: (config) => ({
     id: 'event.status',
-    type: 'SELECT',
+    type: FieldType.SELECT,
     label: {
       defaultMessage: 'Status of record',
       description: 'Label for status field',
@@ -102,18 +143,14 @@ export const getDefaultSearchFields = (
 }
 
 const RegStatus = {
-  Archived: 'ARCHIVED',
-  Certified: 'CERTIFIED',
-  CorrectionRequested: 'CORRECTION_REQUESTED',
-  DeclarationUpdated: 'DECLARATION_UPDATED',
+  Created: 'CREATED',
+  Notified: 'NOTIFIED',
   Declared: 'DECLARED',
-  InProgress: 'IN_PROGRESS',
-  Issued: 'ISSUED',
-  Registered: 'REGISTERED',
-  Rejected: 'REJECTED',
   Validated: 'VALIDATED',
-  WaitingValidation: 'WAITING_VALIDATION',
-  Created: 'CREATED'
+  Registered: 'REGISTERED',
+  Certified: 'CERTIFIED',
+  Rejected: 'REJECTED',
+  Archived: 'ARCHIVED'
 } as const
 
 const MatchType = {
@@ -155,7 +192,7 @@ function buildConditionForStatus(): Condition {
 }
 
 function formatValue(
-  rawInput: Record<string, FieldValue>,
+  rawInput: EventState,
   fieldId: string,
   fieldConfig?: FieldConfig
 ): string | undefined {
@@ -172,6 +209,26 @@ function formatValue(
   return value ? String(value) : undefined
 }
 
+/**
+ * Builds a condition object for querying data based on a set of search keys and raw input values.
+ *
+ * This function:
+ * - Formats raw values depending on the field configuration (e.g., formats date ranges).
+ * - Transforms `event.status` with value "ALL" into a special status condition.
+ * - Converts other values into query conditions based on their configured match type (e.g., exact, range).
+ * - Normalizes field keys by replacing dots (`.`) with double underscores (`____`) to align with query system format.
+ *
+ * @param {Array<{
+ *   fieldId: string,
+ *   config?: { type: keyof typeof MatchType },
+ *   fieldType: 'field' | 'event',
+ *   fieldConfig?: FieldConfig
+ * }>} searchKeys - The list of fields with their metadata used to build query conditions.
+ *
+ * @param {EventState} rawInput - The user input or query parameters in flat key-value form.
+ *
+ * @returns {Record<string, Condition>} A mapping of transformed field keys to their respective query conditions.
+ */
 function buildDataConditionFromSearchKeys(
   searchKeys: {
     fieldId: string
@@ -181,18 +238,14 @@ function buildDataConditionFromSearchKeys(
     fieldType: 'field' | 'event'
     fieldConfig?: FieldConfig
   }[],
-  rawInput: Record<string, string> // values from UI or query string
+  rawInput: EventState // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
-    (
-      result: Record<string, Condition>,
-      { fieldId, config, fieldType, fieldConfig }
-    ) => {
-      const fieldIdEdited = fieldType === 'event' ? `event.${fieldId}` : fieldId
-      const value = formatValue(rawInput, fieldIdEdited, fieldConfig)
-
-      if (fieldIdEdited === 'event.status' && value === 'ALL') {
-        const transformedKey = fieldIdEdited.replace(/\./g, '____')
+    (result: Record<string, Condition>, { fieldId, config, fieldConfig }) => {
+      // Format the raw field value based on its type (e.g., date range value is a string tuple, format it as comma-separated string)
+      const value = formatValue(rawInput, fieldId, fieldConfig)
+      if (fieldId === 'event.status' && value === 'ALL') {
+        const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
         // Handle the case where we want to search by range but the value is not a comma-separated string
@@ -203,7 +256,7 @@ function buildDataConditionFromSearchKeys(
             ? 'exact'
             : config?.type
         const condition = buildCondition(value, searchType)
-        const transformedKey = fieldIdEdited.replace(/\./g, '____')
+        const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = condition
       }
       return result
@@ -212,25 +265,99 @@ function buildDataConditionFromSearchKeys(
   )
 }
 
+/**
+ * Builds a data condition object based on the provided event state and configuration.
+ *
+ * This function:
+ * - Extracts default metadata fields and advanced search fields from the event configuration.
+ * - Constructs a list of search keys by resolving the matching field configurations.
+ * - Filters out any search keys that don't have corresponding values in the raw input (`flat`).
+ * - Uses the filtered search keys and raw input to construct a query-compatible condition.
+ *
+ * @param {EventState} flat - A flat key-value object representing the current form/input state.
+ * @param {EventConfig} eventConfig - The event configuration object that includes
+ *                                    advanced search sections and declaration field mappings.
+ * @returns {QueryInputType} A query object representing the current search condition,
+ *                           ready to be used for filtering or querying data.
+ */
 export function buildDataCondition(
-  flat: Record<string, string>,
+  flat: EventState,
   eventConfig: EventConfig
 ): QueryInputType {
   const advancedSearch = eventConfig.advancedSearch
 
-  // Flatten all fields into a single list of search keys
-  const searchKeys = advancedSearch.flatMap((section) =>
-    section.fields.map((field) => ({
-      fieldId: field.fieldId,
-      config: field.config, // assuming field structure has a `config` prop
-      fieldType: field.fieldType,
-      fieldConfig: eventConfig.declaration.pages
-        .flatMap((page) => page.fields)
-        .find((f) => f.id === field.fieldId)
-    }))
+  // Extract default metadata-based search fields from each advanced search section.
+  const defaultMetadataSearchFields = advancedSearch.flatMap((section) =>
+    getDefaultSearchFields(section)
   )
 
-  return buildDataConditionFromSearchKeys(searchKeys, flat)
+  // Build default search key metadata for event-level fields
+  const defaultSearchKeys = defaultMetadataSearchFields.map((field) => ({
+    fieldId: field.id,
+    // Find matching event field config based on fieldId pattern
+    config: advancedSearch
+      .flatMap((x) => x.fields)
+      .filter((x) => x.fieldType === 'event')
+      .find((x) => field.id.includes(x.fieldId))?.config,
+    fieldType: 'event' as const,
+    fieldConfig: field
+  }))
+
+  // Flatten all advanced search fields across all sections
+  const allFields = advancedSearch.flatMap((section) => section.fields)
+
+  // Build a list of search keys from all advanced search fields,
+  // linking each to the corresponding declaration field config
+  const searchKeys = allFields.map((field) => ({
+    fieldId: field.fieldId,
+    config: field.config, // assumes each advanced search field has a config
+    fieldType: field.fieldType,
+    fieldConfig: eventConfig.declaration.pages
+      .flatMap((page) => page.fields)
+      .find((f) => f.id === field.fieldId)
+  }))
+
+  // Combine default and advanced search keys, and filter to only include keys
+  // that are present in the actual flat input data (i.e., user provided values)
+  const filteredSearchKeys = [...defaultSearchKeys, ...searchKeys].filter(
+    (searchKey) => Object.keys(flat).some((key) => key === searchKey.fieldId)
+  )
+
+  // Generate the final query condition object from the filtered keys and raw input
+  return buildDataConditionFromSearchKeys(filteredSearchKeys, flat)
+}
+
+export function getSearchParamsFieldConfigs(
+  eventConfig: EventConfig,
+  searchParams: SearchQueryParams
+): Inferred[] {
+  const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
+    ([, value]) => getDefaultSearchFields(value)
+  )
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
+  const searchFieldConfigs = [
+    ...eventFieldConfigs,
+    ...declarationFieldConfigs
+  ].filter((field) => {
+    return Object.keys(searchParams).some((key) => key === field.id)
+  })
+  return searchFieldConfigs
+}
+
+export function parseFieldSearchParams(
+  eventConfig: EventConfig,
+  searchParams: SearchQueryParams
+) {
+  const searchFieldConfigs = getSearchParamsFieldConfigs(
+    eventConfig,
+    searchParams
+  )
+  const filteredSearchParams = Object.fromEntries(
+    Object.entries(searchParams).filter(([key]) =>
+      searchFieldConfigs.some((config) => config.id === key)
+    )
+  )
+  return filteredSearchParams
 }
 
 export function toQueryType(

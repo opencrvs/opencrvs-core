@@ -85,6 +85,10 @@ export const QueryExpression = z
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
+    'legalStatus.REGISTERED.createdAt': z.optional(DateCondition),
+    'legalStatus.REGISTERED.createdAtLocation': z.optional(
+      z.union([Within, Exact])
+    ),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),

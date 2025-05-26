@@ -362,7 +362,6 @@ describe('getCurrentEventState()', () => {
     }
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
-
     expect(state).toStrictEqual({
       title: 'ToDo',
       createdAt: createAction.createdAt,
