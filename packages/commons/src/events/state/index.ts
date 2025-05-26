@@ -23,8 +23,9 @@ import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import { deepMerge, findActiveDrafts } from '../utils'
 import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
+import { EventConfig } from '../EventConfig'
 
-function getStatusFromActions(actions: Array<Action>) {
+export function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
   const hasRejectedAction = actions.some(
     (a) => a.status === ActionStatus.Rejected
@@ -204,7 +205,10 @@ export const DEFAULT_DATE_OF_EVENT_PROPERTY =
  * @returns the current state of the event based on the actions taken.
  * @see EventIndex for the description of the returned object.
  */
-export function getCurrentEventState(event: EventDocument): EventIndex {
+export function getCurrentEventState(
+  event: EventDocument,
+  config?: EventConfig
+): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
   )
@@ -221,12 +225,18 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  const dateOfEvent =
-    ZodDate.safeParse(
-      event.dateOfEvent?.fieldId
-        ? declaration[event.dateOfEvent.fieldId]
-        : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
-    ).data ?? null
+  let dateOfEvent
+
+  if (config && config.dateOfEvent) {
+    const parsedDate = ZodDate.safeParse(
+      declaration[config.dateOfEvent.fieldId]
+    )
+    if (parsedDate.success) {
+      dateOfEvent = parsedDate.data
+    }
+  } else {
+    dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+  }
 
   return deepDropNulls({
     id: event.id,
@@ -252,10 +262,15 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 /**
  * @returns the future state of the event with drafts applied
  */
-export function getCurrentEventStateWithDrafts(
-  event: EventDocument,
+export function getCurrentEventStateWithDrafts({
+  event,
+  drafts,
+  configuration
+}: {
+  event: EventDocument
   drafts: Draft[]
-): EventIndex {
+  configuration: EventConfig
+}): EventIndex {
   const actions = event.actions
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
@@ -285,7 +300,7 @@ export function getCurrentEventStateWithDrafts(
     actions: actionWithDrafts
   }
 
-  return getCurrentEventState(withDrafts)
+  return getCurrentEventState(withDrafts, configuration)
 }
 
 export function applyDraftsToEventIndex(

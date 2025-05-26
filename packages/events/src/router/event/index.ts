@@ -51,23 +51,6 @@ import { assignRecord } from '@events/service/events/actions/assign'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { getDefaultActionProcedures } from './actions'
 
-function validateEventType({
-  eventTypes,
-  eventInputType
-}: {
-  eventTypes: string[]
-  eventInputType: string
-}) {
-  if (!eventTypes.includes(eventInputType)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: `Invalid event type ${eventInputType}. Valid event types are: ${eventTypes.join(
-        ', '
-      )}`
-    })
-  }
-}
-
 export const eventRouter = router({
   config: router({
     get: publicProcedure
@@ -107,20 +90,27 @@ export const eventRouter = router({
     .use(middleware.eventTypeAuthorization)
     .output(EventDocument)
     .mutation(async (options) => {
-      const config = await getEventConfigurations(options.ctx.token)
-      const eventIds = config.map((c) => c.id)
+      const configs = await getEventConfigurations(options.ctx.token)
+      const eventIds = configs.map((c) => c.id)
 
-      validateEventType({
-        eventTypes: eventIds,
-        eventInputType: options.input.type
-      })
+      const config = configs.find(({ id }) => id === options.input.type)
+
+      if (!config) {
+        throw new TRPCError({
+          code: 'BAD_REQUEST',
+          message: `Invalid event type ${options.input.type}. Valid event types are: ${eventIds.join(
+            ', '
+          )}`
+        })
+      }
 
       return createEvent({
         eventInput: options.input,
         createdBy: options.ctx.user.id,
         createdByRole: options.ctx.user.role,
         createdAtLocation: options.ctx.user.primaryOfficeId,
-        transactionId: options.input.transactionId
+        transactionId: options.input.transactionId,
+        config
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */

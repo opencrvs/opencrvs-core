@@ -18,7 +18,6 @@ export const EventDocument = z
   .object({
     id: z.string(),
     type: z.string(),
-    dateOfEvent: z.object({ fieldId: z.string() }).optional(),
     createdAt: z.string().datetime(),
     updatedAt: z.string().datetime(),
     actions: z.array(Action),

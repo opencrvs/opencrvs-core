@@ -109,7 +109,13 @@ export function EventOverviewLayout({
           mobileRight={<ActionMenu eventId={eventId} />}
           mobileTitle={flattenedIntl.formatMessage(
             eventConfiguration.title,
-            flattenEventIndex(getCurrentEventStateWithDrafts(event, drafts))
+            flattenEventIndex(
+              getCurrentEventStateWithDrafts({
+                event,
+                drafts,
+                configuration: eventConfiguration
+              })
+            )
           )}
         />
       }
