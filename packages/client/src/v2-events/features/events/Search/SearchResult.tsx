@@ -32,6 +32,7 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useEventConfiguration } from '../useEventConfiguration'
 import { SearchModifierComponent } from './SearchModifier'
 
 const SORT_ORDER = {
@@ -207,6 +208,8 @@ export const SearchResult = ({
         return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
       })
       .map((doc) => {
+        const eventConfigOfDocument =
+          eventConfig ?? useEventConfiguration(doc.type).eventConfiguration
         const isInOutbox = outbox.some(
           (outboxEvent) => outboxEvent.id === doc.id
         )
@@ -225,12 +228,14 @@ export const SearchResult = ({
         const titleColumnId = workqueueConfig.columns[0].id
         const status = doc.status
 
-        const title =
-          eventConfig && flattenedIntl.formatMessage(eventConfig.title, doc)
+        const title = flattenedIntl.formatMessage(
+          eventConfigOfDocument.title,
+          doc
+        )
 
         return {
           ...doc,
-          event: eventConfig && intl.formatMessage(eventConfig.label),
+          event: intl.formatMessage(eventConfigOfDocument.label),
           createdAt: formattedDuration(new Date(doc.createdAt)),
           modifiedAt: formattedDuration(new Date(doc.updatedAt)),
           status: intl.formatMessage(
