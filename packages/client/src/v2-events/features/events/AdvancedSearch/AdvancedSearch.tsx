@@ -42,13 +42,8 @@ export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
 
-  const searchParams = SearchQueryParams.safeParse(
-    parse(window.location.search)
-  )
+  const searchParams = SearchQueryParams.parse(parse(window.location.search))
 
-  if (searchParams.error) {
-    throw new Error('Invalid search params')
-  }
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
   )
@@ -59,7 +54,7 @@ export function AdvancedSearch() {
   })) satisfies IFormTabProps['sections']
 
   const selectedTabId =
-    formTabSections.find((tab) => tab.id === searchParams.data.eventType)?.id ??
+    formTabSections.find((tab) => tab.id === searchParams.eventType)?.id ??
     formTabSections[0]?.id
 
   const [activeTabId, setActiveTabId] = useState<string>(selectedTabId)
@@ -73,7 +68,7 @@ export function AdvancedSearch() {
 
   const filteredSearchParams = parseFieldSearchParams(
     currentEvent,
-    searchParams.data
+    searchParams
   )
 
   const handleTabClick = (tabId: string) => {

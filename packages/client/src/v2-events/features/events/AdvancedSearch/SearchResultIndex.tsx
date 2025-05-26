@@ -28,18 +28,9 @@ export const SearchResultIndex = () => {
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = SearchQueryParams.safeParse(
-    parse(window.location.search)
-  )
+  const searchParams = SearchQueryParams.parse(parse(window.location.search))
 
-  if (searchParams.error) {
-    throw new Error('Invalid search params')
-  }
-
-  const filteredSearchParams = parseFieldSearchParams(
-    eventConfig,
-    searchParams.data
-  )
+  const filteredSearchParams = parseFieldSearchParams(eventConfig, searchParams)
 
   const formattedSearchParams = buildDataCondition(
     filteredSearchParams,
@@ -66,7 +57,7 @@ export const SearchResultIndex = () => {
     <SearchResult
       eventConfig={eventConfig}
       queryData={queryData}
-      searchParams={searchParams.data}
+      searchParams={searchParams}
       workqueueConfig={workqueueConfig}
     />
   )
