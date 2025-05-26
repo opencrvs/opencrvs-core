@@ -54,38 +54,40 @@ function convertPathToLabel(path?: string): string {
   return [capitalizedFirst, ...rest].join(' ')
 }
 
-function buildSearchParamLabels(
-  eventConfig: EventConfig,
-  fieldConfigs: Inferred[],
-  searchParams: Record<string, FieldValue>,
-  intl: IntlShape
-): React.ReactNode[] {
-  return Object.entries(searchParams).map(([key, value]) => {
-    const field = fieldConfigs.find((f) => f.id === key)
-    if (!field) {
-      return null
-    }
-    const searchCriteriaLabelPrefix = eventConfig.advancedSearch
-      .flatMap((section) => section.fields)
-      .find(
-        (f) => f.fieldId === key && f.searchCriteriaLabelPrefix
-      )?.searchCriteriaLabelPrefix
-    const prefix = searchCriteriaLabelPrefix
-      ? intl.formatMessage(searchCriteriaLabelPrefix)
-      : undefined
+function SearchParamLabel({
+  eventConfig,
+  fieldConfigs,
+  fieldName,
+  value
+}: {
+  eventConfig: EventConfig
+  fieldConfigs: Inferred[]
+  fieldName: string
+  value: FieldValue
+}) {
+  const intl = useIntl()
+  const field = fieldConfigs.find((f) => f.id === fieldName)
+  if (!field) {
+    return null
+  }
+  const searchCriteriaLabelPrefix = eventConfig.advancedSearch
+    .flatMap((section) => section.fields)
+    .find(
+      (f) => f.fieldId === fieldName && f.searchCriteriaLabelPrefix
+    )?.searchCriteriaLabelPrefix
+  const prefix = searchCriteriaLabelPrefix
+    ? intl.formatMessage(searchCriteriaLabelPrefix)
+    : undefined
 
-    const label = intl.formatMessage(field.label)
-    const valueOutput = <ValueOutput config={field} value={value} />
-    const output = (
-      <>
-        {prefix} {label}
-        {':'} {valueOutput}
-      </>
-    )
-    return (
-      <Pill key={field.id} label={output} size="small" type="default"></Pill>
-    )
-  })
+  const label = intl.formatMessage(field.label)
+  const valueOutput = <ValueOutput config={field} value={value} />
+  const output = (
+    <>
+      {prefix} {label}
+      {':'} {valueOutput}
+    </>
+  )
+  return <Pill key={field.id} label={output} size="small" type="default"></Pill>
 }
 
 export function SearchCriteriaPanel({
@@ -98,7 +100,6 @@ export function SearchCriteriaPanel({
   const navigate = useNavigate()
   const intl = useIntl()
 
-  /* --- Build event-label, ex: Event: V2 birth */
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
     searchParams
@@ -107,13 +108,6 @@ export function SearchCriteriaPanel({
     Object.entries(searchParams).filter(([key]) =>
       searchFieldConfigs.some((config) => config.id === key)
     )
-  )
-
-  const searchParamsLabels = buildSearchParamLabels(
-    eventConfig,
-    searchFieldConfigs,
-    filteredSearchParams,
-    intl
   )
 
   return (
@@ -125,8 +119,14 @@ export function SearchCriteriaPanel({
           size="small"
           type="default"
         ></Pill>
-        {searchParamsLabels.map((label) => (
-          <>{label}</>
+        {Object.entries(filteredSearchParams).map(([key, value]) => (
+          <SearchParamLabel
+            key={key}
+            eventConfig={eventConfig}
+            fieldConfigs={searchFieldConfigs}
+            fieldName={key}
+            value={value}
+          />
         ))}
         <StyledLink
           font="bold14"

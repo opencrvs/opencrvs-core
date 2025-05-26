@@ -102,7 +102,7 @@ function SearchSectionForm({
 }: {
   section: {
     title: TranslationConfig
-    sectionShouldBeExpanded: boolean
+    isExpanded: boolean
     fields: FieldConfig[]
   }
   handleFieldChange: (fieldId: string, value: FieldValue) => void
@@ -113,7 +113,7 @@ function SearchSectionForm({
   return (
     <Accordion
       key={section.title.id}
-      expand={section.sectionShouldBeExpanded}
+      expand={section.isExpanded}
       label={intl.formatMessage(section.title)}
       labelForHideAction={intl.formatMessage(messages.hide)}
       labelForShowAction={intl.formatMessage(messages.show)}
@@ -160,13 +160,13 @@ function buildSearchSections({
       }
     })
 
-    const sectionShouldBeExpanded =
+    const isExpanded =
       modifiedFields.find((f) => fieldValues?.hasOwnProperty(f.id)) !==
       undefined
 
     return {
       title: section.title,
-      sectionShouldBeExpanded,
+      isExpanded,
       fields: modifiedFields
     }
   })

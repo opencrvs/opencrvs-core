@@ -85,7 +85,7 @@ export const AdvancedSearchStory: Story = {
     )
 
     await step(
-      'Search button should be disabled when less than 2 field is not filled or there are search field errors',
+      'Search button should be disabled when less than 2 fields are not filled or there are search field errors',
       async () => {
         const searchButton = (
           await canvas.findAllByRole('button', {
