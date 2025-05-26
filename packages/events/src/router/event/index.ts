@@ -75,8 +75,8 @@ export const eventRouter = router({
         openapi: {
           summary: 'List event configurations',
           method: 'GET',
-          path: '/events/config',
-          tags: ['Events'],
+          path: '/config',
+          tags: ['events'],
           protect: true
         }
       })
@@ -92,8 +92,8 @@ export const eventRouter = router({
       openapi: {
         summary: 'Create event',
         method: 'POST',
-        path: '/events/create',
-        tags: ['Events'],
+        path: '/events',
+        tags: ['events'],
         protect: true
       }
     })
@@ -175,7 +175,6 @@ export const eventRouter = router({
     })
   }),
   actions: router({
-    // TODO CIHAN: add meta for notify
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
     validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),

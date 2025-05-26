@@ -72,11 +72,12 @@ const ACTION_PROCEDURE_CONFIG = {
       openapi: {
         summary: 'Notify an event',
         method: 'POST',
-        path: '/events/notify',
+        path: '/events/notifications',
         tags: ['events'],
         protect: true
       }
     },
+    // TODO CIHAN: type here
     outputSchema: z.any()
   },
   [ActionType.DECLARE]: {
