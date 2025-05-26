@@ -38,8 +38,8 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useEventTitle } from '../useEvents/useEventTitle'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
+import { useEventTitle } from '../useEvents/useEventTitle'
 
 const FabContainer = styled.div`
   position: fixed;
