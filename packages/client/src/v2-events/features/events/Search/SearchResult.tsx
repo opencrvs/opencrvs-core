@@ -32,7 +32,10 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useEventConfiguration } from '../useEventConfiguration'
+import {
+  useEventConfiguration,
+  useEventConfigurations
+} from '../useEventConfiguration'
 import { SearchModifierComponent } from './SearchModifier'
 
 const SORT_ORDER = {
@@ -175,6 +178,7 @@ export const SearchResult = ({
   const theme = useTheme()
   const total = queryData.length
   const noResultText = intl.formatMessage(messages.noResult)
+  const eventConfigurations = useEventConfigurations()
 
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -200,6 +204,10 @@ export const SearchResult = ({
 
   const workqueueId = 'all' satisfies WorkQueueTypes
   const workqueueConfig = workqueues[workqueueId as WorkQueueTypes]
+  const getEventConfig = (id: string) =>
+    eventConfigurations.find(
+      (eventConfiguration) => eventConfiguration.id === id
+    )
 
   const transformData = (eventData: EventIndex[]) => {
     return eventData
@@ -208,8 +216,9 @@ export const SearchResult = ({
         return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
       })
       .map((doc) => {
-        const eventConfigOfDocument =
-          eventConfig ?? useEventConfiguration(doc.type).eventConfiguration
+        // Event document should always have a type that matches an event configuration
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        const eventConfigOfDocument = eventConfig ?? getEventConfig(doc.type)!
         const isInOutbox = outbox.some(
           (outboxEvent) => outboxEvent.id === doc.id
         )
