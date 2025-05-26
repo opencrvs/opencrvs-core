@@ -74,7 +74,8 @@ paths:
           description: Successful response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: "#/components/schemas/EventDocument"
         "400":
           description: Invalid input data
           content:
@@ -2918,6 +2919,5097 @@ components:
         code: INTERNAL_SERVER_ERROR
         message: Internal server error
         issues: []
+    EventDocument:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+        dateOfEvent:
+          type: object
+          properties:
+            fieldId:
+              type: string
+          required:
+            - fieldId
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        actions:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/ActionDocument"
+              - type: object
+                properties:
+                  id:
+                    type: string
+                  transactionId:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+                  createdBy:
+                    type: string
+                  createdByRole:
+                    type: string
+                  createdAtLocation:
+                    type: string
+                  status:
+                    type: string
+                    enum:
+                      - Rejected
+                  originalActionId:
+                    type: string
+                  type:
+                    type: string
+                    enum:
+                      - NOTIFY
+                      - DECLARE
+                      - VALIDATE
+                      - REGISTER
+                      - REJECT
+                      - ARCHIVE
+                      - PRINT_CERTIFICATE
+                required:
+                  - id
+                  - transactionId
+                  - createdAt
+                  - createdBy
+                  - createdByRole
+                  - createdAtLocation
+                  - status
+                  - type
+        trackingId:
+          type: string
+      required:
+        - id
+        - type
+        - createdAt
+        - updatedAt
+        - actions
+        - trackingId
+    ActionDocument:
+      oneOf:
+        - $ref: "#/components/schemas/CreatedAction"
+        - $ref: "#/components/schemas/ValidateAction"
+        - $ref: "#/components/schemas/RejectAction"
+        - $ref: "#/components/schemas/MarkAsDuplicateAction"
+        - $ref: "#/components/schemas/ArchiveAction"
+        - $ref: "#/components/schemas/NotifiedAction"
+        - $ref: "#/components/schemas/RegisterAction"
+        - $ref: "#/components/schemas/DeclareAction"
+        - $ref: "#/components/schemas/AssignedAction"
+        - $ref: "#/components/schemas/RequestedCorrectionAction"
+        - $ref: "#/components/schemas/ApprovedCorrectionAction"
+        - $ref: "#/components/schemas/RejectedCorrectionAction"
+        - $ref: "#/components/schemas/UnassignedAction"
+        - $ref: "#/components/schemas/PrintCertificateAction"
+        - $ref: "#/components/schemas/ReadAction"
+      discriminator:
+        propertyName: type
+        mapping:
+          CREATE: "#/components/schemas/CreatedAction"
+          VALIDATE: "#/components/schemas/ValidateAction"
+          REJECT: "#/components/schemas/RejectAction"
+          MARKED_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
+          ARCHIVE: "#/components/schemas/ArchiveAction"
+          NOTIFY: "#/components/schemas/NotifiedAction"
+          REGISTER: "#/components/schemas/RegisterAction"
+          DECLARE: "#/components/schemas/DeclareAction"
+          ASSIGN: "#/components/schemas/AssignedAction"
+          REQUEST_CORRECTION: "#/components/schemas/RequestedCorrectionAction"
+          APPROVE_CORRECTION: "#/components/schemas/ApprovedCorrectionAction"
+          REJECT_CORRECTION: "#/components/schemas/RejectedCorrectionAction"
+          UNASSIGN: "#/components/schemas/UnassignedAction"
+          PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateAction"
+          READ: "#/components/schemas/ReadAction"
+    CreatedAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: &a8
+            - Requested
+            - Accepted
+            - Rejected
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - CREATE
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    ValidateAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - VALIDATE
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    RejectAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - REJECT
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    MarkAsDuplicateAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - MARKED_AS_DUPLICATE
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    ArchiveAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - ARCHIVE
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    NotifiedAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - NOTIFY
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    RegisterAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - REGISTER
+        registrationNumber:
+          type: string
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    DeclareAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - DECLARE
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    AssignedAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - ASSIGN
+        assignedTo:
+          type: string
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+        - assignedTo
+    RequestedCorrectionAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - REQUEST_CORRECTION
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    ApprovedCorrectionAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - APPROVE_CORRECTION
+        requestId:
+          type: string
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+        - requestId
+    RejectedCorrectionAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - REJECT_CORRECTION
+        requestId:
+          type: string
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+        - requestId
+    UnassignedAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - UNASSIGN
+        assignedTo:
+          type: "null"
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+        - assignedTo
+    PrintCertificateAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - PRINT_CERTIFICATE
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
+    ReadAction:
+      type: object
+      properties:
+        id:
+          type: string
+        transactionId:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        annotation:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+        createdAtLocation:
+          type: string
+        status:
+          type: string
+          enum: *a8
+        originalActionId:
+          type: string
+        type:
+          type: string
+          enum:
+            - READ
+      required:
+        - id
+        - transactionId
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - createdAtLocation
+        - status
+        - type
     error.BAD_REQUEST:
       type: object
       properties:
