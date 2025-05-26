@@ -107,7 +107,7 @@ function isTrpcUrl(url: URL) {
     return false
   })
 
-  return url.search.startsWith('?input') && appRouterHasPath
+  return url.search.startsWith('?input') || appRouterHasPath
 }
 
 const restServer = createOpenApiHttpHandler(trpcConfig)
