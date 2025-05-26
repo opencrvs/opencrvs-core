@@ -207,7 +207,7 @@ export const DEFAULT_DATE_OF_EVENT_PROPERTY =
  */
 export function getCurrentEventState(
   event: EventDocument,
-  config: EventConfig
+  config?: EventConfig
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -227,7 +227,7 @@ export function getCurrentEventState(
 
   let dateOfEvent
 
-  if (config.dateOfEvent) {
+  if (config && config.dateOfEvent) {
     const parsedDate = ZodDate.safeParse(
       declaration[config.dateOfEvent.fieldId]
     )
@@ -237,7 +237,6 @@ export function getCurrentEventState(
   } else {
     dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
   }
-
   return deepDropNulls({
     id: event.id,
     type: event.type,

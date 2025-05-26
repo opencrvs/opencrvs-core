@@ -100,7 +100,12 @@ export const SaveAndExit: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
-            return [getCurrentEventState(undeclaredDraftEvent)]
+            return [
+              getCurrentEventState(
+                undeclaredDraftEvent,
+                tennisClubMembershipEvent
+              )
+            ]
           })
         ],
         event: [
@@ -116,7 +121,12 @@ export const SaveAndExit: Story = {
             }, {})
           }),
           tRPCMsw.event.search.query((input) => {
-            return [getCurrentEventState(undeclaredDraftEvent)]
+            return [
+              getCurrentEventState(
+                undeclaredDraftEvent,
+                tennisClubMembershipEvent
+              )
+            ]
           })
         ]
       }
@@ -184,7 +194,12 @@ export const DraftShownInForm: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
-            return [getCurrentEventState(undeclaredDraftEvent)]
+            return [
+              getCurrentEventState(
+                undeclaredDraftEvent,
+                tennisClubMembershipEvent
+              )
+            ]
           }),
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues()
@@ -195,7 +210,12 @@ export const DraftShownInForm: Story = {
             }, {})
           }),
           tRPCMsw.event.search.query((input) => {
-            return [getCurrentEventState(undeclaredDraftEvent)]
+            return [
+              getCurrentEventState(
+                undeclaredDraftEvent,
+                tennisClubMembershipEvent
+              )
+            ]
           })
         ],
         event: [

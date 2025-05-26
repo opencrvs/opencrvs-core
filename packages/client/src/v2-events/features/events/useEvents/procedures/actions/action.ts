@@ -300,7 +300,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     )
 
     const originalDeclaration = params.fullEvent
-      ? getCurrentEventState(params.fullEvent).declaration
+      ? getCurrentEventState(params.fullEvent, eventConfiguration).declaration
       : {}
 
     const annotation = actionConfiguration
