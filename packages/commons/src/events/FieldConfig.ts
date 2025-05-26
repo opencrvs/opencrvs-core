@@ -525,7 +525,7 @@ export const FieldConfig = z
   .openapi({
     description: 'Form field configuration',
     ref: 'FieldConfig'
-  }) as unknown as z.ZodType<Inferred, any, InferredInput>
+  })
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
