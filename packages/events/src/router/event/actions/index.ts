@@ -46,23 +46,16 @@ import {
 } from './actionConfirmationRequest'
 
 interface ActionProcedureConfig {
-  notifyApiPayloadSchema: z.ZodType | undefined
-  validatePayload: boolean
+  // The Zod schema for validating the action input
   inputSchema: z.ZodType
+  // Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
+  notifyApiPayloadSchema: z.ZodType | undefined
+  // Whether the payload should be strictly validated against the inputSchema schema
+  validatePayload: boolean
+  // Meta information, incl. OpenAPI definition
   meta?: OpenApiMeta
-  outputSchema?: z.ZodType
 }
 
-/**
- * Configuration for different action types which use the default confirmation flow.
- *
- * @typedef {Object} ACTION_PROCEDURE_CONFIG
- * @property {z.ZodType} inputSchema - The Zod schema for validating the action input
- * @property {z.ZodType|undefined} notifyApiPayloadSchema - Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
- * @property {boolean} validatePayload - Whether the payload should be strictly validated against the inputSchema schema
- * @property {OpenApiMeta|undefined} meta - Meta information, incl. OpenAPI definition
- * @property {z.ZodType} outputSchema - The Zod schema for validating the output
- */
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     notifyApiPayloadSchema: undefined,
