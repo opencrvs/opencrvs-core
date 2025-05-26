@@ -13,11 +13,12 @@ import { useSelector } from 'react-redux'
 import { getLocations } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
-export function useUserAddress() {
+export function useUser() {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
 
   const primaryOfficeId = userDetails?.primaryOffice.id
+  const signature = userDetails?.signature?.data ?? undefined
 
   if (primaryOfficeId) {
     const primaryOfficeLocation = locations[primaryOfficeId]
@@ -29,12 +30,14 @@ export function useUserAddress() {
 
     return {
       district: districtId ?? '',
-      province: provinceId ?? ''
+      province: provinceId ?? '',
+      signature
     }
   }
 
   return {
     district: '',
-    province: ''
+    province: '',
+    signature
   }
 }

@@ -72,7 +72,8 @@ const UnassignedAction = ActionBase.merge(
 export const RegisterAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    registrationNumber: z.string().optional()
+    registrationNumber: z.string().optional(),
+    signature: z.string().optional()
   })
 )
 

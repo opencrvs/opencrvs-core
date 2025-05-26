@@ -23,6 +23,7 @@ export type SystemVariables = {
   $user: {
     province: string
     district: string
+    signature?: string
   }
 }
 
