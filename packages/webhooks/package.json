@@ -18,7 +18,7 @@
   "dependencies": {
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "workspace:^1.7.0",
+    "@opencrvs/commons": "^1.7.0",
     "app-module-path": "^2.2.0",
     "bullmq": "^1.9.0",
     "envalid": "^8.0.0",

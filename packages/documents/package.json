@@ -19,7 +19,7 @@
     "zod": "^3.23.8",
     "@hapi/boom": "^9.1.1",
     "@hapi/hapi": "^20.0.1",
-    "@opencrvs/commons": "workspace:^1.7.0",
+    "@opencrvs/commons": "^1.7.0",
     "app-module-path": "^2.2.0",
     "date-fns": "^2.28.0",
     "envalid": "^8.0.0",
