@@ -30,7 +30,8 @@ import {
   CONFIG_SEARCH_ALLOWED_SCOPES,
   QueryType,
   DeleteActionInput,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  EventDocument
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -104,8 +105,7 @@ export const eventRouter = router({
     )
     .input(EventInput)
     .use(middleware.eventTypeAuthorization)
-    // TODO CIHAN: type
-    .output(z.any())
+    .output(EventDocument)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)

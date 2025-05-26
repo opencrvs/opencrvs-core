@@ -85,6 +85,31 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     }
   }
 }
+
+// Check if the URL is a defined tRPC path
+function hasTrpcPath(url: URL) {
+  const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
+  const pathParts = pathName.split('.')
+
+  if (pathParts.length === 0) {
+    return false
+  }
+
+  let appRouterPath = appRouter
+
+  const appRouterHasPath = pathParts.every((part) => {
+    if (part in appRouterPath) {
+      // @ts-expect-error appRouterPath is not typed
+      appRouterPath = appRouterPath[part]
+      return true
+    }
+
+    return false
+  })
+
+  return appRouterHasPath
+}
+
 const restServer = createOpenApiHttpHandler(trpcConfig)
 const trpcServer = createHTTPHandler(trpcConfig)
 
@@ -95,13 +120,9 @@ const server = createServer((req, res) => {
     res.end('No URL provided')
     return
   }
+
   const url = new URL(req.url, `http://${req.headers.host}`)
-
-  const isTrpcUrl =
-    url.search.startsWith('?input') || url.pathname.startsWith('/event.')
-
-  // TODO CIHAN: parempi ratkasu tähän?
-  console.log({ isTrpcUrl, url, method: req.method })
+  const isTrpcUrl = url.search.startsWith('?input') && hasTrpcPath(url)
 
   if (isTrpcUrl) {
     trpcServer(req, res)
