@@ -77,8 +77,7 @@ const ACTION_PROCEDURE_CONFIG = {
         protect: true
       }
     },
-    // TODO CIHAN: type here
-    outputSchema: z.any()
+    outputSchema: EventDocument
   },
   [ActionType.DECLARE]: {
     notifyApiPayloadSchema: undefined,
