@@ -58,11 +58,15 @@ function EventOverview({
   onAction: () => void
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
-  const eventIndex = getCurrentEventState(event)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { trackingId, status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
-  const eventWithDrafts = getCurrentEventStateWithDrafts(event, drafts)
+  const eventWithDrafts = getCurrentEventStateWithDrafts({
+    event,
+    drafts,
+    configuration: eventConfiguration
+  })
   const { getUser } = useEventOverviewContext()
   const intl = useIntl()
 

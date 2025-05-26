@@ -91,8 +91,7 @@ function EventSelector() {
 
     createEvent.mutate({
       type: eventType,
-      transactionId,
-      dateOfEvent: eventConfig.dateOfEvent
+      transactionId
     })
 
     clearForm()

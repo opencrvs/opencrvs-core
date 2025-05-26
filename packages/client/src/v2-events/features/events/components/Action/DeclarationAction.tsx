@@ -30,6 +30,7 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
+import { useEventConfiguration } from '../../useEventConfiguration'
 
 type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
 
@@ -86,6 +87,10 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
   const [event] = getEvent.useSuspenseQuery(params.eventId)
+
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    params.eventId
+  )
 
   const drafts = getRemoteDrafts()
   const activeDraft = findActiveDrafts(event, drafts)[0]
@@ -148,8 +153,13 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     })
 
   const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, eventDrafts),
-    [eventDrafts, event]
+    () =>
+      getCurrentEventStateWithDrafts({
+        event,
+        drafts: eventDrafts,
+        configuration
+      }),
+    [eventDrafts, event, configuration]
   )
 
   const actionAnnotation = useMemo(() => {

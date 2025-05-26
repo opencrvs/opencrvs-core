@@ -42,8 +42,11 @@ import {
 } from './utils'
 import { buildElasticQueryFromSearchPayload } from './query'
 
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
+function eventToEventIndex(
+  event: EventDocument,
+  config: EventConfig
+): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event, config))
 }
 
 /*
@@ -284,7 +287,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   })
 }
 
-export async function indexEvent(event: EventDocument) {
+export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
@@ -292,7 +295,7 @@ export async function indexEvent(event: EventDocument) {
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event),
+    document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
 }
