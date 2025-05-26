@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createServer } from 'http'
+import { createServer, IncomingMessage } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
@@ -81,9 +81,13 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
 }
 
 // Check if the URL is a defined tRPC path
-function isTrpcUrl(url: URL) {
-  const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
+function isTrpcRequest(req: IncomingMessage) {
+  if (!req.url) {
+    return false
+  }
 
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
   const trpcProcedurePaths = Object.keys(appRouter._def.procedures)
 
   return (
@@ -102,10 +106,8 @@ const server = createServer((req, res) => {
     return
   }
 
-  const url = new URL(req.url, `http://${req.headers.host}`)
-
   // If it's a tRPC request, handle it with the tRPC server
-  if (isTrpcUrl(url)) {
+  if (isTrpcRequest(req)) {
     trpcServer(req, res)
   } else {
     // If it's a REST request, handle it with the REST server
