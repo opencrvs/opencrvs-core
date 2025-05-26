@@ -433,7 +433,8 @@ paths:
           description: Successful response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: "#/components/schemas/EventDocument"
         "400":
           description: Invalid input data
           content:
