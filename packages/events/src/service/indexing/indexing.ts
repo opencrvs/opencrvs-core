@@ -134,7 +134,8 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         type: 'object',
         properties: {
           firstname: { type: 'keyword' },
-          surname: { type: 'keyword' }
+          surname: { type: 'keyword' },
+          fullname: { type: 'keyword' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:

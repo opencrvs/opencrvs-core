@@ -9,12 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import {
-  FieldProps,
-  FieldType,
-  NameFieldUpdateValue,
-  NameFieldValue
-} from '@opencrvs/commons/client'
+import { NameFieldUpdateValue, NameFieldValue } from '@opencrvs/commons/client'
 import { joinValues } from '@client/v2-events/utils'
 import { Text } from '@client/v2-events/features/events/registered-fields'
 
@@ -33,13 +28,27 @@ function NameInput(props: Props) {
       <Text.Input
         type={'text'}
         value={firstname}
-        onChange={(val) => val && onChange({ firstname: val, surname })}
+        onChange={(val) =>
+          val &&
+          onChange({
+            firstname: val,
+            surname,
+            fullname: [firstname, val].filter(Boolean).join(' ')
+          })
+        }
       />
 
       <Text.Input
         type={'text'}
         value={surname}
-        onChange={(val) => val && onChange({ firstname, surname: val })}
+        onChange={(val) =>
+          val &&
+          onChange({
+            firstname,
+            surname: val,
+            fullname: [firstname, val].filter(Boolean).join(' ')
+          })
+        }
       />
     </>
   )

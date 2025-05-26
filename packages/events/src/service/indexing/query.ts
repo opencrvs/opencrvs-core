@@ -36,6 +36,21 @@ function generateQuery(
     }
 
     if (value.type === 'fuzzy') {
+      /**
+       * Keys ending in 'name' are matched against `fullname`, a concatenation
+       * of first and last names, to enable fuzzy search despite typos or variations.
+       */
+      if (key.endsWith('.name')) {
+        return {
+          match: {
+            [`${field}.fullname`]: {
+              query: value.term,
+              fuzziness: 'AUTO'
+            }
+          }
+        }
+      }
+
       return {
         match: {
           [field]: {

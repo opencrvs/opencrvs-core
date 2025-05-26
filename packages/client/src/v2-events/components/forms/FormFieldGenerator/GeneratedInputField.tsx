@@ -43,7 +43,6 @@ import {
   EventConfig,
   getDeclarationFields,
   isNameFieldType,
-  NameFieldUpdateValue,
   isPhoneFieldType,
   isIdFieldType
 } from '@opencrvs/commons/client'
