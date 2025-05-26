@@ -16,6 +16,7 @@ import { Text } from '@client/v2-events/features/events/registered-fields'
 interface Props {
   onChange: (newValue: NameFieldValue) => void
   value?: NameFieldUpdateValue
+  maxLength?: number
 }
 
 function NameInput(props: Props) {
@@ -26,6 +27,7 @@ function NameInput(props: Props) {
   return (
     <>
       <Text.Input
+        maxLength={props.maxLength}
         type={'text'}
         value={firstname}
         onChange={(val) =>
@@ -39,6 +41,7 @@ function NameInput(props: Props) {
       />
 
       <Text.Input
+        maxLength={props.maxLength}
         type={'text'}
         value={surname}
         onChange={(val) =>

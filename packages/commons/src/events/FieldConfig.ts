@@ -301,7 +301,14 @@ const Select = BaseField.extend({
 }).describe('Select input')
 
 const NameField = BaseField.extend({
-  type: z.literal(FieldType.NAME)
+  type: z.literal(FieldType.NAME),
+  configuration: z
+    .object({
+      maxLength: z.number().optional().describe('Maximum length of the text'),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
+    })
+    .optional()
 }).describe('Name input field')
 
 const PhoneField = BaseField.extend({
