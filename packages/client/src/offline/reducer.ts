@@ -97,6 +97,7 @@ export interface IForms {
   death: ISerializedForm
   marriage: ISerializedForm
 }
+
 export interface IOfflineData {
   locations: ILocationDataResponse
   forms: IForms

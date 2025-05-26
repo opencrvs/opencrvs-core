@@ -9,14 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Action, ActionType } from '@opencrvs/commons'
+import * as yaml from 'yaml'
+import { createDocument } from 'zod-openapi'
+import { countryConfigApi } from '.'
 
-export function findLastAssignmentAction(actions: Action[]) {
-  return actions
-    .filter(
-      ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
-    )
-    .reduce<
-      Action | undefined
-    >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
-}
+const document = createDocument({
+  openapi: '3.1.0',
+  info: {
+    title: 'Countryconfig implementation requirements',
+    version: '1.8.0',
+    description: 'Country specific configuration server for OpenCRVS'
+  },
+  paths: countryConfigApi
+})
+
+// eslint-disable-next-line no-console
+console.log(yaml.stringify(document))

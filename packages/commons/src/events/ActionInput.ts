@@ -12,13 +12,16 @@
 import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { ActionUpdate } from './ActionDocument'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
   eventId: z.string(),
   transactionId: z.string(),
   declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
-  originalActionId: z.string().optional()
+  originalActionId: z.string().optional(),
+  keepAssignment: z.boolean().optional()
 })
 
 const CreateActionInput = BaseActionInput.merge(
@@ -160,6 +163,9 @@ export const ReadActionInput = BaseActionInput.merge(
 
 export type ReadActionInput = z.infer<typeof ReadActionInput>
 
+export const DeleteActionInput = z.object({ eventId: z.string() })
+export type DeleteActionInput = z.infer<typeof DeleteActionInput>
+
 /**
  * ActionInput types are used to validate the input data for the action.
  * In our use case, we use it directly with TRPC to validate the input data for the action.
@@ -168,23 +174,35 @@ export type ReadActionInput = z.infer<typeof ReadActionInput>
  *
  * e.g. mutation.declare({createdAt: new Date()}) vs mutation.declare({createdAt: new Date(), type: 'DECLARE'})
  */
-export const ActionInput = z.discriminatedUnion('type', [
-  CreateActionInput,
-  ValidateActionInput,
-  RegisterActionInput,
-  NotifyActionInput,
-  DeclareActionInput,
-  RejectDeclarationActionInput,
-  MarkedAsDuplicateActionInput,
-  ArchiveActionInput,
-  AssignActionInput,
-  UnassignActionInput,
-  PrintCertificateActionInput,
-  RequestCorrectionActionInput,
-  RejectCorrectionActionInput,
-  ApproveCorrectionActionInput,
-  ReadActionInput
-])
+export const ActionInput = z
+  .discriminatedUnion('type', [
+    CreateActionInput.openapi({ ref: 'CreateActionInput' }),
+    ValidateActionInput.openapi({ ref: 'ValidateActionInput' }),
+    RegisterActionInput.openapi({ ref: 'RegisterActionInput' }),
+    NotifyActionInput.openapi({ ref: 'NotifyActionInput' }),
+    DeclareActionInput.openapi({ ref: 'DeclareActionInput' }),
+    RejectDeclarationActionInput.openapi({
+      ref: 'RejectDeclarationActionInput'
+    }),
+    MarkedAsDuplicateActionInput.openapi({
+      ref: 'MarkedAsDuplicateActionInput'
+    }),
+    ArchiveActionInput.openapi({ ref: 'ArchiveActionInput' }),
+    AssignActionInput.openapi({ ref: 'AssignActionInput' }),
+    UnassignActionInput.openapi({ ref: 'UnassignActionInput' }),
+    PrintCertificateActionInput.openapi({ ref: 'PrintCertificateActionInput' }),
+    RequestCorrectionActionInput.openapi({
+      ref: 'RequestCorrectionActionInput'
+    }),
+    RejectCorrectionActionInput.openapi({ ref: 'RejectCorrectionActionInput' }),
+    ApproveCorrectionActionInput.openapi({
+      ref: 'ApproveCorrectionActionInput'
+    }),
+    ReadActionInput.openapi({ ref: 'ReadActionInput' })
+  ])
+  .openapi({
+    ref: 'ActionInput'
+  })
 
 export type ActionInput = z.input<typeof ActionInput>
 export type ActionInputWithType = z.infer<typeof ActionInput>

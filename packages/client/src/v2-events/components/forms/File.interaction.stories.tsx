@@ -42,7 +42,6 @@ export const FileInputWithOptionTest: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         fields={[
@@ -102,12 +101,9 @@ export const FileInputWithOptionTest: StoryObj<typeof FormFieldGenerator> = {
             ]
           }
         ]}
-        form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
@@ -184,7 +180,6 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         fields={[
@@ -193,7 +188,12 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
             type: FieldType.FILE,
             configuration: {
               maxFileSize: 1 * 1024 * 1024,
-              acceptedFileTypes: ['image/jpeg']
+              acceptedFileTypes: ['image/jpeg'],
+              fileName: {
+                defaultMessage: 'Uploaded photo',
+                description: 'The title for the file input',
+                id: 'storybook.file.label'
+              }
             },
             label: {
               id: 'storybook.file.label',
@@ -202,12 +202,9 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
             }
           }
         ]}
-        form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
@@ -259,7 +256,7 @@ export const FileInputButton: StoryObj<typeof StyledFormFieldGenerator> = {
 
       await userEvent.upload(input, validFile)
 
-      await canvas.findByRole('button', { name: filename })
+      await canvas.findByRole('button', { name: 'Uploaded photo' })
     })
   }
 }

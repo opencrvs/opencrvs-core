@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { GenericContainer, type StartedTestContainer } from 'testcontainers'
-import * as redisClient from './redis'
-import { promisify } from 'util'
+import { start, stop } from './redis'
 
 const REDIS_HTTP_PORT = 6379
 
@@ -22,7 +21,7 @@ export const startContainer = async () => {
     .withStartupTimeout(120_000)
     .start()
 
-  await redisClient.start(
+  await start(
     testContainer.getHost(),
     testContainer.getMappedPort(REDIS_HTTP_PORT)
   )
@@ -34,14 +33,9 @@ export const stopContainer = async (
   container: StartedTestContainer
 ): Promise<void> => {
   try {
-    await redisClient.stop()
+    await stop()
   } catch (error) {
   } finally {
     await container.stop()
   }
-}
-
-export const flushAll = () => {
-  const client = redisClient.getClient()
-  return promisify(client.flushall).bind(client)()
 }

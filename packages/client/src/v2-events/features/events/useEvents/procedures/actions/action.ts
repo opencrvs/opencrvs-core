@@ -14,13 +14,21 @@ import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
+import { toast } from 'react-hot-toast'
 import { TRPCClientError } from '@trpc/client'
-import { ActionType, omitHiddenPaginatedFields } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  getCurrentEventState,
+  omitHiddenAnnotationFields,
+  omitHiddenPaginatedFields
+} from '@opencrvs/commons/client'
 import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   cleanUpOnUnassign,
   findLocalEventData,
+  onAssign,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
@@ -34,14 +42,26 @@ import {
   queryClient,
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
+import { ToastKey } from '@client/v2-events/routes/Toaster'
+
+function retryUnlessConflict(_: unknown, error: TRPCClientError<AppRouter>) {
+  return error.data?.httpStatus !== 409
+}
+
+function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
+  if (error.data?.httpStatus === 409) {
+    toast.error(ToastKey.NOT_ASSIGNED_ERROR)
+  }
+}
 
 setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.declare.request
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(ActionType.DECLARE),
   meta: {
     actionType: ActionType.DECLARE
@@ -52,9 +72,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.register.request
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REGISTER
   }
@@ -64,9 +85,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.notify.request
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.NOTIFY
   }
@@ -76,9 +98,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.validate.request
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.VALIDATE
   }
@@ -88,9 +111,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.reject.request
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REJECT
   }
@@ -100,9 +124,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.archive.request
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.ARCHIVE
   }
@@ -113,6 +138,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
     trpcOptionsProxy.event.actions.printCertificate.request
   ),
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.PRINT_CERTIFICATE
   }
@@ -122,9 +148,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.request
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REQUEST_CORRECTION
   }
@@ -134,9 +161,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.approve
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.APPROVE_CORRECTION
   }
@@ -146,9 +174,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.correction.reject
   ),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REJECT_CORRECTION
   }
@@ -158,10 +187,10 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.assignment.assign
   ),
-  retry: (_, error: TRPCClientError<AppRouter>) =>
-    error.data?.httpStatus !== 409,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
-  onSuccess: updateLocalEvent,
+  onSuccess: onAssign,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.ASSIGN
   }
@@ -175,6 +204,7 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
     error.data?.httpStatus !== 403,
   retryDelay: 10000,
   onSuccess: cleanUpOnUnassign,
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.UNASSIGN
   }
@@ -188,23 +218,26 @@ export const customMutationKeys = {
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
-  retry: true,
+  retry: retryUnlessConflict,
   retryDelay: 10000,
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
-  mutationFn: customApi.registerOnValidate,
-  retry: true,
+  mutationFn: waitUntilEventIsCreated(customApi.registerOnValidate),
+  retry: retryUnlessConflict,
   retryDelay: 10000,
-  onSuccess: updateLocalEvent
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict
 })
 
 /**
@@ -246,44 +279,53 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     ...mutationOptions
   })
 
-  return {
-    mutate: (params: inferInput<P>) => {
-      const localEvent = findLocalEventData(params.eventId)
+  type ActionMutationInput = inferInput<P> & { fullEvent?: EventDocument }
 
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
+  function getMutationPayload(params: ActionMutationInput) {
+    const { eventId } = params
+    const localEvent = findLocalEventData(eventId)
+    const eventConfiguration = eventConfigurations.find(
+      (event) => event.id === localEvent?.type
+    )
 
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      return mutation.mutate({
-        ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
-          params.declaration
-        )
-      })
-    },
-    mutateAsync: async (params: inferInput<P>) => {
-      const localEvent = findLocalEventData(params.eventId)
-      const eventConfiguration = eventConfigurations.find(
-        (event) => event.id === localEvent?.type
-      )
-
-      if (!eventConfiguration) {
-        throw new Error('Event configuration not found')
-      }
-
-      return mutation.mutateAsync({
-        ...params,
-        declaration: omitHiddenPaginatedFields(
-          eventConfiguration.declaration,
-          params.declaration
-        )
-      })
+    if (!eventConfiguration) {
+      throw new Error('Event configuration not found')
     }
+
+    // Let's find the action configuration. For NOTIFY action, we can use the DECLARE action configuration.
+    const actionConfiguration = eventConfiguration.actions.find((action) =>
+      actionType === ActionType.NOTIFY
+        ? action.type === ActionType.DECLARE
+        : action.type === actionType
+    )
+
+    const originalDeclaration = params.fullEvent
+      ? getCurrentEventState(params.fullEvent).declaration
+      : {}
+
+    const annotation = actionConfiguration
+      ? omitHiddenAnnotationFields(
+          actionConfiguration,
+          params.annotation,
+          originalDeclaration
+        )
+      : {}
+
+    return {
+      ...params,
+      declaration: omitHiddenPaginatedFields(
+        eventConfiguration.declaration,
+        params.declaration
+      ),
+      annotation
+    }
+  }
+
+  return {
+    mutate: (params: ActionMutationInput) =>
+      mutation.mutate(getMutationPayload(params)),
+    mutateAsync: async (params: ActionMutationInput) =>
+      mutation.mutateAsync(getMutationPayload(params))
   }
 }
 

@@ -31,7 +31,8 @@ export const TEST_USER_DEFAULT_SCOPES = [
   SCOPES.RECORD_SUBMIT_FOR_APPROVAL,
   SCOPES.RECORD_DECLARATION_ARCHIVE,
   SCOPES.RECORD_SUBMIT_FOR_UPDATES,
-  SCOPES.RECORD_UNASSIGN_OTHERS
+  SCOPES.RECORD_UNASSIGN_OTHERS,
+  SCOPES.SEARCH_BIRTH
 ]
 
 export function createTestToken(
@@ -59,7 +60,11 @@ export function createTestClient(
   const token = createTestToken(user.id, scopes)
 
   const caller = createCaller({
-    user: { id: user.id, primaryOfficeId: user.primaryOfficeId },
+    user: {
+      id: user.id,
+      primaryOfficeId: user.primaryOfficeId,
+      role: user.role
+    },
     token
   })
   return caller

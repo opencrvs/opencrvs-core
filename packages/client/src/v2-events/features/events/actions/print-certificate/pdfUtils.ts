@@ -21,20 +21,26 @@ import type {
   TDocumentDefinitions,
   TFontFamilyTypes
 } from 'pdfmake/interfaces'
-import { Location } from '@events/service/locations/locations'
 import pdfMake from 'pdfmake/build/pdfmake'
-import format from 'date-fns/format'
-import isValid from 'date-fns/isValid'
+import { Location } from '@events/service/locations/locations'
+import { isEqual } from 'lodash'
 import {
-  EventIndex,
   EventState,
   User,
-  LanguageConfig
+  LanguageConfig,
+  FieldValue,
+  EventConfig,
+  getMixedPath,
+  EventMetadata,
+  EventStatus,
+  DEFAULT_DATE_OF_EVENT_PROPERTY
 } from '@opencrvs/commons/client'
-
+import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
 import { isMobileDevice } from '@client/utils/commonUtils'
 import { getUsersFullName } from '@client/v2-events/utils'
+import { getFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
+import { LocationSearch } from '@client/v2-events/features/events/registered-fields'
 
 interface FontFamilyTypes {
   normal: string
@@ -46,6 +52,113 @@ interface FontFamilyTypes {
 type CertificateConfiguration = Partial<{
   fonts: Record<string, FontFamilyTypes>
 }>
+
+function findUserById(userId: string, users: User[]) {
+  const user = users.find((u) => u.id === userId)
+
+  if (!user) {
+    return {
+      name: '',
+      signature: ''
+    }
+  }
+
+  return {
+    name: getUsersFullName(user.name, 'en'),
+    signature: user.signatureFilename ?? ''
+  }
+}
+
+export const stringifyEventMetadata = ({
+  metadata,
+  intl,
+  locations,
+  users
+}: {
+  metadata: NonNullable<EventMetadata & { modifiedAt: string }>
+  intl: IntlShape
+  locations: Location[]
+  users: User[]
+}) => {
+  return {
+    modifiedAt: DateField.stringify(intl, metadata.modifiedAt),
+    assignedTo: findUserById(metadata.assignedTo ?? '', users),
+    // @TODO: DATE_OF_EVENT config needs to be defined some other way and bake it in.
+    dateOfEvent: metadata.dateOfEvent
+      ? DateField.stringify(intl, metadata.dateOfEvent)
+      : DateField.stringify(intl, metadata[DEFAULT_DATE_OF_EVENT_PROPERTY]),
+    createdAt: DateField.stringify(intl, metadata.createdAt),
+    createdBy: findUserById(metadata.createdBy, users),
+    createdAtLocation: LocationSearch.stringify(
+      intl,
+      locations,
+      metadata.createdAtLocation
+    ),
+    updatedAt: DateField.stringify(intl, metadata.updatedAt),
+    updatedBy: metadata.updatedBy
+      ? findUserById(metadata.updatedBy, users)
+      : '',
+    id: metadata.id,
+    type: metadata.type,
+    trackingId: metadata.trackingId,
+    status: EventStatus.REGISTERED,
+    updatedByUserRole: metadata.updatedByUserRole,
+    updatedAtLocation: LocationSearch.stringify(
+      intl,
+      locations,
+      metadata.updatedAtLocation
+    ),
+    flags: [],
+    legalStatuses: {
+      [EventStatus.DECLARED]: metadata.legalStatuses.DECLARED
+        ? {
+            createdAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.DECLARED.createdAt
+            ),
+            createdBy: findUserById(
+              metadata.legalStatuses.DECLARED.createdBy,
+              users
+            ),
+            createdAtLocation: LocationSearch.stringify(
+              intl,
+              locations,
+              metadata.legalStatuses.DECLARED.createdAtLocation
+            ),
+            acceptedAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.DECLARED.acceptedAt
+            ),
+            createdByRole: metadata.legalStatuses.DECLARED.createdByRole
+          }
+        : null,
+      [EventStatus.REGISTERED]: metadata.legalStatuses.REGISTERED
+        ? {
+            createdAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.REGISTERED.createdAt
+            ),
+            createdBy: findUserById(
+              metadata.legalStatuses.REGISTERED.createdBy,
+              users
+            ),
+            createdAtLocation: LocationSearch.stringify(
+              intl,
+              locations,
+              metadata.legalStatuses.REGISTERED.createdAtLocation
+            ),
+            acceptedAt: DateField.stringify(
+              intl,
+              metadata.legalStatuses.REGISTERED.acceptedAt
+            ),
+            createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
+            registrationNumber:
+              metadata.legalStatuses.REGISTERED.registrationNumber
+          }
+        : null
+    }
+  }
+}
 
 const certificateBaseTemplate = {
   definition: {
@@ -72,8 +185,8 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 function formatAllNonStringValues(
   templateData: EventState,
   intl: IntlShape
-): Record<string, string> {
-  const formattedData: Record<string, string> = {}
+): Record<string, FieldValue> {
+  const formattedData: Record<string, FieldValue> = {}
 
   for (const key of Object.keys(templateData)) {
     const value = templateData[key]
@@ -90,9 +203,10 @@ function formatAllNonStringValues(
         .join(', ')
       // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
-      formattedData[key] = JSON.stringify(
-        formatAllNonStringValues(value as EventState, intl)
-      )
+      formattedData[key] = formatAllNonStringValues(
+        value satisfies EventState,
+        intl
+      ) as FieldValue
     } else {
       formattedData[key] = String(value)
     }
@@ -105,20 +219,22 @@ const cache = createIntlCache()
 
 export function compileSvg({
   templateString,
-  $state,
+  $metadata,
   $declaration,
   locations,
   users,
-  language
+  language,
+  config
 }: {
   templateString: string
-  $state: EventIndex
+  $metadata: EventMetadata & { modifiedAt: string }
   $declaration: EventState
   locations: Location[]
   users: User[]
   language: LanguageConfig
+  config: EventConfig
 }): string {
-  const intl: IntlShape = createIntl(
+  const intl = createIntl(
     {
       locale: language.lang,
       messages: language.messages
@@ -140,30 +256,163 @@ export function compileSvg({
     Handlebars.registerHelper(helperName, helper)
   }
 
+  /**
+   * Handlebars helper: $lookup
+   *
+   * Resolves a value from the given property path within the combined $state and $declaration objects. useful for extracting specific properties from complex structures like `child.address.other`
+   * and optionally returns a nested field from the resolved value. e.g. when defaultValue is set to $user.province, it resolves to the matching id.
+   *
+   * @param obj - Object to look up. This is for providing the same interface as the handlebars 'lookup'. It is not used as is.
+   *  @param propertyPath - $declaration or $state property to look up without the top-level property name.
+   *  @returns - a nested field from the resolved value.
+   *
+   * @example {'foo.bar.baz': 'quix' } // $lookup 'foo.bar.baz' => 'quix'
+   * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => 'quix'
+   * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
+   */
+  function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
+    const stringifyDeclaration = getFormDataStringifier(intl, locations)
+    const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+    const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
+
+    const resolvedMetadata = stringifyEventMetadata({
+      metadata: $metadata,
+      intl,
+      locations,
+      users
+    })
+
+    if (isEqual($metadata, obj)) {
+      return getMixedPath(resolvedMetadata, propertyPath)
+    }
+    return getMixedPath(resolvedDeclaration, propertyPath)
+  }
+
+  Handlebars.registerHelper('$lookup', $lookup)
+
+  /**
+   * Handlebars helper: $intl
+   *
+   * Usage example in SVG template:
+   *   <tspan>{{ $intl 'constants' (lookup $declaration "child.gender") }}</tspan>
+   *
+   * This helper dynamically constructs a translation key by joining multiple string parts
+   * (e.g., 'constants.male') and uses `intl.formatMessage` to fetch the localized translation.
+   *
+   * In the example above, `"child.gender"` resolves to a value like `"male"` which forms
+   * part of the translation key: `constants.male`.
+   *
+   * - If any of the parts is undefined (e.g., gender not provided), it returns an empty string to prevent rendering issues.
+   * - If the translation for the constructed ID is missing, it falls back to showing: 'Missing translation for [id]'.
+   *
+   * This is especially useful in templates where dynamic values (like gender, marital status, etc.)
+   * need to be translated using i18n keys constructed from user-provided data.
+   */
   Handlebars.registerHelper(
-    'formatDate',
-    function (dateString: string, formatString: string) {
-      const date = new Date(dateString)
-      return isValid(date) ? format(date, formatString) : ''
+    '$intl',
+
+    function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this: any,
+      ...args: [...(string | undefined)[], Handlebars.HelperOptions]
+    ) {
+      // If even one of the parts is undefined, then return empty string
+      const idParts = args.slice(0, -1)
+      if (idParts.some((part) => part === undefined)) {
+        return ''
+      }
+
+      const id = idParts.join('.')
+
+      return intl.formatMessage({
+        id,
+        defaultMessage: 'Missing translation for ' + id
+      })
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  /**
+   * Handlebars helper: $OR
+   * Returns the first truthy value between v1 and v2.
+   */
+  Handlebars.registerHelper(
+    '$or',
+    function (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      v1: any,
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      v2: any
+    ) {
+      return !!v1 ? v1 : v2
     }
   )
 
-  Handlebars.registerHelper('findUserById', function (u: User[], id: string) {
-    const user = u.find((usr) => usr.id === id)
-
-    return user ? getUsersFullName(user.name, 'en') : ''
-  })
+  /**
+   * Handlebars helper: ifCond
+   *
+   * Usage example in template:
+   *   {{#ifCond value1 '===' value2}} ... {{/ifCond}}
+   *
+   * This helper compares two values (`v1` and `v2`) using the specified operator and
+   * conditionally renders a block based on the result of the comparison.
+   *
+   * Supported operators:
+   *   - '===' : strict equality
+   *   - '!==' : strict inequality
+   *   - '<', '<=', '>', '>=' : numeric/string comparisons
+   *   - '&&' : both values must be truthy
+   *   - '||' : at least one value must be truthy
+   *
+   * If the condition is met, it renders the main block (`options.fn(this)`),
+   * otherwise it renders the `else` block (`options.inverse(this)`).
+   *
+   * This helper is useful for adding conditional logic directly within Handlebars templates.
+   */
+  Handlebars.registerHelper(
+    'ifCond',
+    function (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      this: any,
+      v1: string,
+      operator: string,
+      v2: string,
+      options: Handlebars.HelperOptions
+    ) {
+      switch (operator) {
+        case '===':
+          return v1 === v2 ? options.fn(this) : options.inverse(this)
+        case '!==':
+          return v1 !== v2 ? options.fn(this) : options.inverse(this)
+        case '<':
+          return v1 < v2 ? options.fn(this) : options.inverse(this)
+        case '<=':
+          return v1 <= v2 ? options.fn(this) : options.inverse(this)
+        case '>':
+          return v1 > v2 ? options.fn(this) : options.inverse(this)
+        case '>=':
+          return v1 >= v2 ? options.fn(this) : options.inverse(this)
+        case '&&':
+          return v1 && v2 ? options.fn(this) : options.inverse(this)
+        case '||':
+          return v1 || v2 ? options.fn(this) : options.inverse(this)
+        default:
+          return options.inverse(this)
+      }
+    }
+  )
 
   const template = Handlebars.compile(templateString)
   $declaration = formatAllNonStringValues($declaration, intl)
-  const output = template({
+  const data = {
     $declaration,
-    $state,
+    $metadata,
     $references: {
       locations,
       users
     }
-  })
+  }
+  const output = template(data)
   return output
 }
 
@@ -191,6 +440,7 @@ src: url("${url}") format("truetype");
   const serializer = new XMLSerializer()
   return serializer.serializeToString(svg)
 }
+
 export function svgToPdfTemplate(
   svg: string,
   certificateFonts: CertificateConfiguration

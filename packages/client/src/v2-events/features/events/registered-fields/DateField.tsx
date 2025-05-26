@@ -9,15 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable */
+import format from 'date-fns/format'
+import * as React from 'react'
+import { defineMessages, IntlShape, useIntl } from 'react-intl'
+import { DatetimeValue, DateValue } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
 } from '@opencrvs/components/lib/DateField'
-import format from 'date-fns/format'
-import * as React from 'react'
-import { DateValue } from '@opencrvs/commons/client'
-import { defineMessages, useIntl } from 'react-intl'
 
 const messages = defineMessages({
   dateFormat: {
@@ -47,9 +46,8 @@ function DateInput({
   return (
     <DateFieldComponent
       {...props}
-      value={value}
-      onChange={cleanOnChange}
       data-testid={`${props.id}`}
+      value={value}
       onBlur={(e) => {
         const segmentType = String(e.target.id.split('-').pop())
         const val = e.target.value
@@ -64,8 +62,9 @@ function DateInput({
           cleanOnChange(`${dateSegmentVals[0]}-0${val}-${dateSegmentVals[2]}`)
         }
 
-        return props.onBlur && props?.onBlur(e)
+        return props.onBlur && props.onBlur(e)
       }}
+      onChange={cleanOnChange}
     />
   )
 }
@@ -84,7 +83,22 @@ function DateOutput({ value }: { value?: string }) {
   return value ?? ''
 }
 
+function stringify(intl: IntlShape, value?: string) {
+  // We should allow parsing valid datetimes into the configured date format.
+  const parsed = DateValue.or(DatetimeValue).safeParse(value)
+
+  if (parsed.success) {
+    return format(
+      new Date(parsed.data),
+      intl.formatMessage(messages.dateFormat)
+    )
+  }
+
+  return value ?? ''
+}
+
 export const DateField = {
   Input: DateInput,
-  Output: DateOutput
+  Output: DateOutput,
+  stringify: stringify
 }

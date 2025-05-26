@@ -35,15 +35,18 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       (parentKey ? parentKey + INTERNAL_SEPARATOR : '') +
       key.replace(/\./g, INTERNAL_SEPARATOR)
     if (Array.isArray(value)) {
-      value.forEach((val, id) =>
-        Object.assign(
-          result,
-          convertDotToTripleUnderscore(
-            val,
-            (newKey ? newKey + INTERNAL_SEPARATOR : '') + id
+      value.forEach((val, id) => {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (typeof val === 'object' && val !== null) {
+          Object.assign(
+            result,
+            convertDotToTripleUnderscore(
+              val,
+              (newKey ? newKey + INTERNAL_SEPARATOR : '') + id
+            )
           )
-        )
-      )
+        }
+      })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
       /*  eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */
     } else if (typeof value === 'object' && value !== null) {
@@ -159,7 +162,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
     }
     // When multiple variables are provided, we trim to ensure empty content in case both are missing.
     // We might need to adjust this and allow more freedom for configuration (e.g. provide values and join pattern)
-    return formatted.trim().replaceAll(EMPTY_TOKEN, '')
+    return formatted.replaceAll(EMPTY_TOKEN, '').trim()
   }
 
   return {

@@ -17,18 +17,24 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchResult } from './SearchResult'
+import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
 
 export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
-  const { eventConfiguration: currentEvent } = useEventConfiguration(eventType)
+  const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
   const searchParams = parse(window.location.search, {
     arrayFormat: 'comma'
   }) as Record<string, string>
 
-  const queryData = searchEvent.useSuspenseQuery(eventType, searchParams)
+  const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
 
+  const queryData = searchEvent.useSuspenseQuery(
+    eventType,
+    formattedSearchParams,
+    ADVANCED_SEARCH_KEY
+  )
   const workqueueId = 'all'
   const workqueueConfig =
     workqueueId in workqueues
@@ -41,7 +47,7 @@ export const SearchResultIndex = () => {
 
   return (
     <SearchResult
-      currentEvent={currentEvent}
+      eventConfig={eventConfig}
       queryData={queryData}
       searchParams={searchParams}
       workqueueConfig={workqueueConfig}

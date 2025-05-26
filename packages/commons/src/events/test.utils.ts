@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -15,7 +16,8 @@ import {
   ActionBase,
   ActionDocument,
   ActionUpdate,
-  ActionStatus
+  ActionStatus,
+  EventState
 } from './ActionDocument'
 import {
   ArchiveActionInput,
@@ -39,8 +41,7 @@ import {
   getActionAnnotationFields,
   getDeclaration,
   getDeclarationFields,
-  isPageVisible,
-  isVerificationPage,
+  getVisibleVerificationPageIds,
   omitHiddenFields,
   omitHiddenPaginatedFields
 } from './utils'
@@ -48,6 +49,7 @@ import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
+import { EventStatus } from './EventMetadata'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -62,7 +64,7 @@ function fieldConfigsToActionPayload(fields: FieldConfig[]) {
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType
-) {
+): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
     const fields = getDeclarationFields(configuration)
@@ -96,13 +98,10 @@ export function generateActionAnnotationInput(
 
   const annotation = fieldConfigsToActionPayload(annotationFields)
 
-  const visibleVerificationPageIds = findRecordActionPages(
-    configuration,
-    action
+  const visibleVerificationPageIds = getVisibleVerificationPageIds(
+    findRecordActionPages(configuration, action),
+    annotation
   )
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
-    .map((page) => page.id)
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
     (acc, pageId) => ({
@@ -141,6 +140,7 @@ export const eventPayloadGenerator = {
         createdAt: new Date().toISOString(),
         transactionId: getUUID(),
         action: {
+          transactionId: getUUID(),
           type: actionType,
           status: ActionStatus.Accepted,
           declaration: {
@@ -155,6 +155,7 @@ export const eventPayloadGenerator = {
           },
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
+          createdByRole: '@todo',
           createdAtLocation: '@todo'
         }
       } satisfies Draft,
@@ -420,12 +421,14 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
+    createdByRole: 'FIELD_AGENT',
     id: getUUID(),
-    createdAtLocation: 'TODO',
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
-    ...defaults,
-    status: ActionStatus.Accepted
+    status: ActionStatus.Accepted,
+    transactionId: getUUID(),
+    ...defaults
   } satisfies ActionBase
 
   switch (action) {
@@ -436,7 +439,7 @@ export function generateActionDocument({
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, assignedTo: null }
     case ActionType.ASSIGN:
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
@@ -489,7 +492,8 @@ export function generateEventDocument({
     id: getUUID(),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    updatedAt: new Date(Date.now() - 1000).toISOString()
+    updatedAt: new Date(Date.now() - 1000).toISOString(),
+    dateOfEvent: configuration.dateOfEvent
   }
 }
 
@@ -517,25 +521,85 @@ export function generateEventDraftDocument(
   }
 }
 
+function getEventStatus(): EventStatus {
+  const statuses: EventStatus[] = [
+    EventStatus.CREATED,
+    EventStatus.REGISTERED,
+    EventStatus.DECLARED
+  ]
+  const randomIndex = Math.floor(Math.random() * 3)
+  return statuses[randomIndex]
+}
+
+function getTrackingId(): string {
+  const uuid = getUUID().replace(/-/g, '')
+  const trackingId = uuid.slice(0, 6).toUpperCase()
+  return trackingId
+}
+
+function getRandomApplicant(): Record<string, string | boolean> {
+  const firstNames = [
+    'Danny',
+    'John',
+    'Jane',
+    'Emily',
+    'Michael',
+    'Sarah',
+    'Chris',
+    'Jessica'
+  ]
+  const surnames = [
+    'Doe',
+    'Smith',
+    'Johnson',
+    'Brown',
+    'Williams',
+    'Jones',
+    'Garcia',
+    'Miller'
+  ]
+
+  function getRandomDate(start: Date, end: Date): string {
+    const randomDate = new Date(
+      start.getTime() + Math.random() * (end.getTime() - start.getTime())
+    )
+    return randomDate.toISOString().split('T')[0]
+  }
+
+  const randomFirstName =
+    firstNames[Math.floor(Math.random() * firstNames.length)]
+  const randomSurname = surnames[Math.floor(Math.random() * surnames.length)]
+  const randomDob = getRandomDate(
+    new Date('1990-01-01'),
+    new Date('2010-12-31')
+  )
+
+  return {
+    'recommender.none': true,
+    'applicant.firstname': randomFirstName,
+    'applicant.surname': randomSurname,
+    'applicant.dob': randomDob
+  }
+}
+
 export const eventQueryDataGenerator = (
   overrides: Partial<EventIndex> = {}
 ): EventIndex => ({
   id: overrides.id ?? getUUID(),
-  type: overrides.type ?? 'tennis-club-membership',
-  status: overrides.status ?? 'REGISTERED',
+  type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+  status: overrides.status ?? getEventStatus(),
   createdAt: overrides.createdAt ?? new Date().toISOString(),
   createdBy: overrides.createdBy ?? getUUID(),
   createdAtLocation: overrides.createdAtLocation ?? getUUID(),
-  modifiedAt: overrides.modifiedAt ?? new Date().toISOString(),
+  updatedAtLocation: overrides.updatedAtLocation ?? getUUID(),
+  updatedAt: overrides.updatedAt ?? new Date().toISOString(),
   assignedTo: overrides.assignedTo ?? null,
   updatedBy: overrides.updatedBy ?? getUUID(),
-  declaration: overrides.declaration ?? {
-    'recommender.none': true,
-    'applicant.firstname': 'Danny',
-    'applicant.surname': 'Doe',
-    'applicant.dob': '1999-11-11'
-  },
-  trackingId: overrides.trackingId ?? 'M3F8YQ'
+  updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
+  flags: [],
+  legalStatuses: overrides.legalStatuses ?? {},
+  declaration: overrides.declaration ?? getRandomApplicant(),
+  trackingId: overrides.trackingId ?? getTrackingId()
 })
 
 export const generateTranslationConfig = (

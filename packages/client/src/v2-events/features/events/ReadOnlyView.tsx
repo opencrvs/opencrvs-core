@@ -44,7 +44,7 @@ function ReadonlyView() {
         form={eventStateWithDrafts.declaration}
         formConfig={configuration.declaration}
         title={formatMessage(
-          configuration.summary.title.label,
+          configuration.title,
           eventStateWithDrafts.declaration
         )}
         onEdit={noop}

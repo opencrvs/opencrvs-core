@@ -33,7 +33,7 @@ import {
   setScopes,
   TestComponentWithRouteMock
 } from '@client/tests/util'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -161,9 +161,7 @@ describe('create new user tests', () => {
     it('clicking submit button submits the form data', async () => {
       testComponent.find('#submit_user_form').hostNodes().simulate('click')
 
-      await flushPromises()
-
-      expect(store.getState().userForm.submitting).toBe(false)
+      await waitFor(() => store.getState().userForm.submitting === false)
     })
   })
 })
@@ -232,13 +230,20 @@ describe('edit user tests', () => {
   ]
 
   beforeEach(async () => {
-    setScopes([SCOPES.USER_CREATE], store)
+    setScopes(
+      [
+        SCOPES.USER_CREATE,
+        'user.create[role=FIELD_AGENT|REGISTRATION_AGENT]',
+        'user.edit[role=LOCAL_REGISTRAR]'
+      ],
+      store
+    )
     ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
     store.dispatch(offlineDataReady(mockOfflineDataDispatch))
     await flushPromises()
   })
 
-  it('check user role update', async () => {
+  it('should only generate allowed roles in the options', async () => {
     const section = store
       .getState()
       .userForm.userForm?.sections.find((section) => section.id === 'user')
@@ -248,7 +253,11 @@ describe('edit user tests', () => {
     const field = group.fields.find(
       (field) => field.name === 'role'
     ) as ISelectFormFieldWithOptions
-    expect(field.options).not.toEqual([])
+    expect(field.options.map((o) => o.value)).toEqual([
+      'FIELD_AGENT',
+      'REGISTRATION_AGENT',
+      'LOCAL_REGISTRAR'
+    ])
   })
 
   describe('when user is in update form page', () => {

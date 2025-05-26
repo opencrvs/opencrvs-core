@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { SCOPES, ActionType } from '@opencrvs/commons'
+import { SCOPES, ActionType, getUUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
@@ -43,16 +43,33 @@ test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} 
 
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await client.event.actions.declare.request(declareInput)
 
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
   const actions = (
     await client.event.actions.archive.request(
       generator.event.actions.archive(originalEvent.id, undefined, true)
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVE)
-  expect(actions.at(-2)).toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
+  expect(actions.slice(-3)).toEqual([
+    ActionType.MARKED_AS_DUPLICATE,
+    ActionType.ARCHIVE,
+    ActionType.UNASSIGN
+  ])
 })
 
 test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicate`, async () => {
@@ -61,9 +78,23 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
 
   const originalEvent = await client.event.create(generator.event.create())
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const declareInput = generator.event.actions.declare(originalEvent.id)
 
   await client.event.actions.declare.request(declareInput)
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
 
   const actions = (
     await client.event.actions.archive.request(
@@ -71,6 +102,40 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
     )
   ).actions.map(({ type }) => type)
 
-  expect(actions.at(-1)).toStrictEqual(ActionType.ARCHIVE)
-  expect(actions.at(-2)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
+  expect(actions.at(-2)).toStrictEqual(ActionType.ARCHIVE)
+  expect(actions.at(-3)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
+})
+
+test(`${ActionType.ARCHIVE} action is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  const declareInput = generator.event.actions.declare(originalEvent.id)
+
+  await client.event.actions.declare.request(declareInput)
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const archivePayload = generator.event.actions.archive(originalEvent.id)
+
+  const firstResponse =
+    await client.event.actions.archive.request(archivePayload)
+  const secondResponse =
+    await client.event.actions.archive.request(archivePayload)
+
+  expect(firstResponse).toEqual(secondResponse)
 })

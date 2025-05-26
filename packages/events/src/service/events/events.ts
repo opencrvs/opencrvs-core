@@ -28,7 +28,8 @@ import {
   AsyncRejectActionDocument,
   ActionType,
   getCurrentEventState,
-  EventStatus
+  EventStatus,
+  isWriteAction
 } from '@opencrvs/commons/events'
 import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -158,10 +159,12 @@ export async function createEvent({
   eventInput,
   createdAtLocation,
   createdBy,
+  createdByRole,
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
   createdBy: string
+  createdByRole: string
   createdAtLocation: string
   transactionId: string
 }): Promise<EventDocument> {
@@ -190,13 +193,32 @@ export async function createEvent({
         type: ActionType.CREATE,
         createdAt: now,
         createdBy,
+        createdByRole,
         createdAtLocation,
         id: getUUID(),
         declaration: {},
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        transactionId: getUUID()
       }
     ]
   })
+
+  const action: ActionDocument = {
+    type: ActionType.ASSIGN,
+    assignedTo: createdBy,
+    declaration: {},
+    createdBy,
+    createdByRole,
+    createdAt: now,
+    createdAtLocation,
+    id,
+    status: ActionStatus.Accepted,
+    transactionId: getUUID()
+  }
+
+  await db
+    .collection<EventDocument>('events')
+    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -251,13 +273,17 @@ export async function addAction(
   {
     eventId,
     createdBy,
+    createdByRole,
     token,
     createdAtLocation,
-    transactionId,
     status
   }: {
     eventId: string
     createdBy: string
+    createdByRole: string
+    /**
+     * The location where the action was created. This is used for auditing purposes.
+     */
     createdAtLocation: string
     token: string
     transactionId: string
@@ -287,18 +313,21 @@ export async function addAction(
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
-    input.transactionId = getUUID()
     await db.collection<EventDocument>('events').updateOne(
       {
         id: eventId,
-        'actions.transactionId': { $nin: [transactionId, input.transactionId] }
+        'actions.transactionId': {
+          $ne: input.transactionId
+        }
       },
       {
         $push: {
           actions: {
             ...input,
+            transactionId: getUUID(),
             type: ActionType.MARKED_AS_DUPLICATE,
             createdBy,
+            createdByRole,
             createdAt: now,
             createdAtLocation,
             id: getUUID(),
@@ -310,12 +339,12 @@ export async function addAction(
         }
       }
     )
-    input.transactionId = transactionId
   }
 
   const action: ActionDocument = {
     ...input,
     createdBy,
+    createdByRole,
     createdAt: now,
     createdAtLocation,
     id: actionId,
@@ -325,9 +354,33 @@ export async function addAction(
   await db
     .collection<EventDocument>('events')
     .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: transactionId } },
+      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
+
+  if (isWriteAction(input.type) && !input.keepAssignment) {
+    await db.collection<EventDocument>('events').updateOne(
+      { id: eventId },
+      {
+        $push: {
+          actions: {
+            ...input,
+            transactionId: getUUID(),
+            type: ActionType.UNASSIGN,
+            declaration: {},
+            assignedTo: null,
+            createdBy,
+            createdByRole,
+            createdAt: now,
+            createdAtLocation,
+            id: actionId,
+            status
+          }
+        },
+        $set: { updatedAt: now }
+      }
+    )
+  }
 
   const drafts = await getDraftsForAction(eventId, createdBy, input.type)
 
@@ -342,7 +395,10 @@ export async function addAction(
 
   if (action.type !== ActionType.READ) {
     await indexEvent(updatedEvent)
-    await deleteDraftsByEventId(eventId)
+
+    if (action.type !== ActionType.ASSIGN) {
+      await deleteDraftsByEventId(eventId)
+    }
   }
 
   return updatedEvent

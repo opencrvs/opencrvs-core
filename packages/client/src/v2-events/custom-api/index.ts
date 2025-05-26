@@ -38,7 +38,8 @@ export async function registerOnDeclare({
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    keepAssignment: true
   })
 
   // update is a patch, no need to send again.
@@ -47,7 +48,8 @@ export async function registerOnDeclare({
     annotation,
     eventId,
     transactionId: getUUID(),
-    duplicates: []
+    duplicates: [],
+    keepAssignment: true
   })
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(
@@ -78,7 +80,8 @@ export async function validateOnDeclare(variables: {
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID()
+    transactionId: getUUID(),
+    keepAssignment: true
   })
 
   const latestResponse = await trpcClient.event.actions.validate.request.mutate(
@@ -107,12 +110,14 @@ export async function registerOnValidate(variables: {
   annotation?: EventState
 }) {
   const { eventId, declaration, annotation } = variables
+
   await trpcClient.event.actions.validate.request.mutate({
     declaration,
     annotation,
     eventId,
     transactionId: getUUID(),
-    duplicates: []
+    duplicates: [],
+    keepAssignment: true
   })
 
   const latestResponse = await trpcClient.event.actions.register.request.mutate(

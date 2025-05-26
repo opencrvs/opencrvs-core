@@ -28,6 +28,7 @@ import { useEventConfigurations } from './useEventConfiguration'
 import { useEventFormData } from './useEventFormData'
 import { useEventFormNavigation } from './useEventFormNavigation'
 import { useEvents } from './useEvents/useEvents'
+import { useActionAnnotation } from './useActionAnnotation'
 
 const messages = defineMessages({
   registerNewEventTitle: {
@@ -74,6 +75,7 @@ function EventSelector() {
   const eventConfigurations = useEventConfigurations()
   const events = useEvents()
   const clearForm = useEventFormData((state) => state.clear)
+  const clearAnnotation = useActionAnnotation((state) => state.clear)
   const createEvent = events.createEvent()
 
   function handleContinue() {
@@ -81,13 +83,20 @@ function EventSelector() {
       return setNoEventSelectedError(true)
     }
     const transactionId = createTemporaryId()
+    const eventConfig = eventConfigurations.find(({ id }) => id === eventType)
+
+    if (!eventConfig) {
+      throw new Error(`Configuration for event '${eventType}' not found`)
+    }
 
     createEvent.mutate({
       type: eventType,
-      transactionId
+      transactionId,
+      dateOfEvent: eventConfig.dateOfEvent
     })
 
     clearForm()
+    clearAnnotation()
 
     navigate(
       ROUTES.V2.EVENTS.DECLARE.buildPath({

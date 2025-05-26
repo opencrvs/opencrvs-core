@@ -257,11 +257,27 @@ test('valid action is appended to event actions', async () => {
 
   expect(updatedEvent.actions).toEqual([
     expect.objectContaining({ type: ActionType.CREATE }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
       type: ActionType.DECLARE
     }),
+    expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({
       type: ActionType.READ
     })
   ])
+})
+
+test(`${ActionType.DECLARE} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  const data = generator.event.actions.declare(event.id)
+
+  const firstResponse = await client.event.actions.declare.request(data)
+  const secondResponse = await client.event.actions.declare.request(data)
+
+  expect(firstResponse).toEqual(secondResponse)
 })

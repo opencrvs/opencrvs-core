@@ -43,9 +43,10 @@ import {
   FieldValue,
   FieldUpdateValueSchema,
   NumberFieldValue,
-  RequiredTextValue,
+  NonEmptyTextValue,
   TextValue,
-  DataFieldValue
+  DataFieldValue,
+  DateRangeFieldValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -83,6 +84,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.EMAIL:
       schema = EmailValue
       break
+    case FieldType.DATE_RANGE:
+      schema = DateRangeFieldValue
+      break
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.DIVIDER:
@@ -97,8 +101,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.SIGNATURE:
-    case FieldType.HIDDEN:
-      schema = required ? RequiredTextValue : TextValue
+      schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
       schema = NumberFieldValue
@@ -175,6 +178,8 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.DATE_RANGE:
+      return ['2021-01-01', '2021-01-02']
     case FieldType.CHECKBOX:
       return true
     case FieldType.FILE:
@@ -213,6 +218,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.EMAIL:
     case FieldType.DATE:
     case FieldType.CHECKBOX:
+    case FieldType.DATE_RANGE:
     case FieldType.DATA:
       return null
     case FieldType.ADDRESS:
@@ -251,6 +257,13 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isDateRangeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: DateField } => {
+  return field.config.type === FieldType.DATE_RANGE
 }
 
 export const isPageHeaderFieldType = (field: {

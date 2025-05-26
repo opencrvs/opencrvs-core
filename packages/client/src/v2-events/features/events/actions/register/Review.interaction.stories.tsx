@@ -40,11 +40,21 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof Review> = {
   title: 'Register/Review/Interaction/Local Registrar',
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  }
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ]
 }
 
 export default meta
@@ -67,7 +77,8 @@ const mockUser = {
       family: 'Bwalya'
     }
   ],
-  role: 'SOCIAL_WORKER'
+  role: 'SOCIAL_WORKER',
+  signatureFilename: 'signature.png'
 }
 
 const validateEventDocument = generateEventDocument({
@@ -111,9 +122,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based on content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Register' })
-      )
+
+      await waitFor(async () => {
+        const registerButton = await canvas.findByRole('button', {
+          name: 'Register'
+        })
+
+        await expect(registerButton).toBeEnabled()
+        await userEvent.click(registerButton)
+      })
 
       const modal = within(await canvas.findByRole('dialog'))
 
@@ -177,62 +194,91 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
-    const modal = within(await canvas.findByRole('dialog'))
-
     await step('Archive is disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
-      })
+      const modal = within(canvas.getByRole('dialog'))
 
-      await expect(archiveButton).toBeDisabled()
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeDisabled()
+      })
     })
 
     await step('Add description', async () => {
-      const descriptionInput = await modal.findByRole('textbox')
+      const modal = within(canvas.getByRole('dialog'))
 
-      await fireEvent.change(descriptionInput, {
-        target: { value: 'Wrong data' }
-      })
+      await waitFor(async () =>
+        expect(modal.getByRole('textbox')).toBeInTheDocument()
+      )
+
+      const descriptionInput = modal.getByRole('textbox')
+      await userEvent.clear(descriptionInput)
+      await userEvent.type(descriptionInput, 'Wrong data')
     })
 
     await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
+      const modal = within(await canvas.findByRole('dialog'))
+      await waitFor(async () => {
+        const archiveButton = await modal.findByRole('button', {
+          name: 'Archive'
+        })
+        await expect(archiveButton).toBeEnabled()
       })
-
-      await expect(archiveButton).not.toBeDisabled()
     })
 
     await step('Mark as a duplicate', async () => {
-      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+      const modal = within(await canvas.findByRole('dialog'))
+
+      await waitFor(async () =>
+        expect(
+          modal.getByRole('checkbox', { name: 'Mark as a duplicate' })
+        ).toBeInTheDocument()
+      )
+
+      const checkbox = modal.getByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
-
-      await userEvent.click(markAsDuplicateCheckbox)
+      await userEvent.click(checkbox)
     })
 
-    await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
+    await step('Archive is not disabled (after duplicate)', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
+
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeEnabled()
       })
 
-      await expect(archiveButton).not.toBeDisabled()
-
+      const archiveButton = modal.getByRole('button', { name: 'Archive' })
       await userEvent.click(archiveButton)
-      await within(canvasElement).findByText('All events')
+
+      await waitFor(async () =>
+        expect(
+          within(canvasElement).getByText('All events')
+        ).toBeInTheDocument()
+      )
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
-          'event.create': false,
-          'event.actions.notify.request': false,
-          'event.actions.declare.request': false,
-          'event.actions.validate.request': false,
-          'event.actions.register.request': false,
           'event.actions.archive.request': true,
-          'event.actions.reject.request': false
+          'event.actions.declare.request': false,
+          'event.actions.notify.request': false,
+          'event.actions.register.request': false,
+          'event.actions.reject.request': false,
+          'event.actions.validate.request': false,
+          'event.config.get': true,
+          'event.create': false,
+          'event.get': true,
+          'event.list': true
         })
       })
     })
@@ -273,7 +319,14 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
     const modal = within(await canvas.findByRole('dialog'))

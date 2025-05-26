@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { estypes } from '@elastic/elasticsearch'
-import { EventSearchIndex, EventIndex } from '@opencrvs/commons/events'
+import { EventIndex } from '@opencrvs/commons/events'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -52,24 +51,4 @@ export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
 
 export function declarationReference(fieldName: string) {
   return `declaration.${fieldName}`
-}
-
-/**
- * Generates an Elasticsearch query to search within `document.declaration`
- * using the provided search payload.
- */
-export function generateQuery(event: Omit<EventSearchIndex, 'type'>) {
-  const must: estypes.QueryDslQueryContainer[] = Object.entries(event).map(
-    ([key, value]) => ({
-      match: {
-        [declarationReference(encodeFieldId(key))]: value
-      }
-    })
-  )
-
-  return {
-    bool: {
-      must
-    }
-  } as estypes.SearchRequest['query']
 }

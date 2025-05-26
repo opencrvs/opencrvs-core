@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { v4 as uuid } from 'uuid'
 import { useMutation } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
@@ -18,7 +19,9 @@ import {
   ActionType,
   CreatedAction,
   getCurrentEventState,
-  ActionStatus
+  ActionStatus,
+  getUUID,
+  EventInput
 } from '@opencrvs/commons/client'
 
 import {
@@ -73,9 +76,11 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
+          createdByRole: 'offline',
           createdAtLocation: 'TODO',
           declaration: {},
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         } satisfies CreatedAction
       ]
     }
@@ -95,9 +100,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
 
 export function useCreateEvent() {
   const trpc = useTRPC()
-  const options = trpc.event.create.mutationOptions<{
-    transactionId: string
-  }>()
+  const options = trpc.event.create.mutationOptions<EventInput>()
 
   const overrides = queryClient.getMutationDefaults(
     trpcOptionsProxy.event.create.mutationKey()

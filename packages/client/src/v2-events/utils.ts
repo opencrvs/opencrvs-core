@@ -8,10 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, mapKeys, uniqBy } from 'lodash'
+import { uniq, isString, get, uniqBy } from 'lodash'
 import { v4 as uuid } from 'uuid'
-import { useSelector } from 'react-redux'
-import { useIntl } from 'react-intl'
 import {
   ResolvedUser,
   ActionDocument,
@@ -27,8 +25,6 @@ import {
   getDeclarationFields,
   SystemVariables
 } from '@opencrvs/commons/client'
-import { getLocations } from '@client/offline/selectors'
-import { countries } from '@client/utils/countries'
 
 /**
  *
@@ -77,12 +73,9 @@ export const getAllUniqueFields = (eventConfig: EventConfig) => {
   return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
-export function flattenEventIndex(
-  event: EventIndex
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-): Omit<EventIndex, 'declaration'> & { [key: string]: any } {
+export function flattenEventIndex(event: NonNullable<EventIndex>) {
   const { declaration, ...rest } = event
-  return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
+  return { ...rest, ...declaration }
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -183,40 +176,42 @@ export function replacePlaceholders({
   )
 }
 
-/** Does not have parent */
-const ROOT_LOCATION_ID = '0'
+export const AssignmentStatus = {
+  ASSIGNED_TO_SELF: 'ASSIGNED_TO_SELF',
+  ASSIGNED_TO_OTHERS: 'ASSIGNED_TO_OTHERS',
+  UNASSIGNED: 'UNASSIGNED'
+} as const
 
-/** Given location id, returns full name of the location by resolving the hierarchy values all the way to country name. */
-export function useResolveLocationFullName(
-  locationId: string | undefined,
-  name: string = ''
-) {
-  const locations = useSelector(getLocations)
-  const intl = useIntl()
+type AssignmentStatus = (typeof AssignmentStatus)[keyof typeof AssignmentStatus]
 
-  if (!locationId) {
-    return name
+export function getAssignmentStatus(
+  eventState: EventIndex,
+  userId: string | undefined
+): AssignmentStatus {
+  if (!eventState.assignedTo) {
+    return AssignmentStatus.UNASSIGNED
   }
 
-  const location = locations[locationId]
+  return eventState.assignedTo == userId
+    ? AssignmentStatus.ASSIGNED_TO_SELF
+    : AssignmentStatus.ASSIGNED_TO_OTHERS
+}
 
-  if (!location) {
-    if (locationId === ROOT_LOCATION_ID) {
-      const country = countries.find(
-        (c) => c.value === window.config.COUNTRY
-      )?.label
-
-      const countryName = country ? intl.formatMessage(country) : ''
-
-      return joinValues([name, countryName], ', ')
-    }
-
-    return name
-  }
-
-  const partOf = location.partOf.split('/')[1]
-  return useResolveLocationFullName(
-    partOf,
-    joinValues([name, location.name], ', ')
+export function filterEmptyValues(
+  obj: Record<string, unknown>
+): Record<string, unknown> {
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([, v]) =>
+        v !== '' &&
+        v !== null &&
+        v !== undefined &&
+        !(typeof v === 'number' && isNaN(v))
+    )
   )
+}
+
+export interface Option<T = string> {
+  value: T
+  label: string
 }

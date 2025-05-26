@@ -46,14 +46,23 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof Review> = {
   title: 'Validate/Review/Interaction/Registration Agent',
-  beforeEach: () => {
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-  }
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ]
 }
 
 export default meta
@@ -76,7 +85,8 @@ const mockUser = {
       family: 'Bwalya'
     }
   ],
-  role: 'SOCIAL_WORKER'
+  role: 'SOCIAL_WORKER',
+  signatureFilename: 'signature.png'
 }
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
@@ -115,9 +125,15 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Send for approval' })
-      )
+
+      await waitFor(async () => {
+        const sendForApprovalButton = await canvas.findByRole('button', {
+          name: 'Send for approval'
+        })
+
+        await expect(sendForApprovalButton).toBeEnabled()
+        await userEvent.click(sendForApprovalButton)
+      })
 
       const modal = within(await canvas.findByRole('dialog'))
 
@@ -181,52 +197,77 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
-    const modal = within(await canvas.findByRole('dialog'))
-
     await step('Archive is disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
-      })
+      const modal = within(canvas.getByRole('dialog'))
 
-      await expect(archiveButton).toBeDisabled()
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeDisabled()
+      })
     })
 
     await step('Add description', async () => {
-      const descriptionInput = await modal.findByRole('textbox')
+      const modal = within(canvas.getByRole('dialog'))
 
-      await fireEvent.change(descriptionInput, {
-        target: { value: 'Wrong data' }
-      })
+      await waitFor(async () =>
+        expect(modal.getByRole('textbox')).toBeInTheDocument()
+      )
+
+      const descriptionInput = modal.getByRole('textbox')
+      await userEvent.clear(descriptionInput)
+      await userEvent.type(descriptionInput, 'Wrong data')
     })
 
     await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
-      })
+      const modal = within(canvas.getByRole('dialog'))
 
-      await expect(archiveButton).not.toBeDisabled()
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeEnabled()
+      })
     })
 
     await step('Mark as a duplicate', async () => {
-      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+      const modal = within(canvas.getByRole('dialog'))
+
+      await waitFor(async () =>
+        expect(
+          modal.getByRole('checkbox', { name: 'Mark as a duplicate' })
+        ).toBeInTheDocument()
+      )
+
+      const checkbox = modal.getByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
-
-      await userEvent.click(markAsDuplicateCheckbox)
+      await userEvent.click(checkbox)
     })
 
-    await step('Archive is not disabled', async () => {
-      const archiveButton = await modal.findByRole('button', {
-        name: 'Archive'
+    await step('Archive is not disabled (after duplicate)', async () => {
+      const modal = within(canvas.getByRole('dialog'))
+
+      await waitFor(async () => {
+        const archiveButton = modal.getByRole('button', { name: 'Archive' })
+        await expect(archiveButton).toBeEnabled()
       })
 
-      await expect(archiveButton).not.toBeDisabled()
-
+      const archiveButton = modal.getByRole('button', { name: 'Archive' })
       await userEvent.click(archiveButton)
-      await within(canvasElement).findByText('All events')
+
+      await waitFor(async () =>
+        expect(
+          within(canvasElement).getByText('All events')
+        ).toBeInTheDocument()
+      )
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -277,12 +318,18 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
       const rejectButton = await canvas.findByRole('button', {
         name: 'Reject'
       })
+
+      await expect(rejectButton).toBeVisible()
       await userEvent.click(rejectButton)
+
+      // Wait explicitly for dialog to appear
+      await waitFor(async () =>
+        expect(canvas.getByRole('dialog')).toBeInTheDocument()
+      )
     })
 
-    const modal = within(await canvas.findByRole('dialog'))
-
     await step('Send For Update is disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -291,6 +338,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
     })
 
     await step('Add description', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const descriptionInput = await modal.findByRole('textbox')
 
       await fireEvent.change(descriptionInput, {
@@ -299,6 +347,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
     })
 
     await step('Send For Update is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -307,14 +356,22 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
     })
 
     await step('Mark as a duplicate', async () => {
-      const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
+      const modal = within(canvas.getByRole('dialog'))
+
+      await waitFor(async () =>
+        expect(
+          modal.getByRole('checkbox', { name: 'Mark as a duplicate' })
+        ).toBeInTheDocument()
+      )
+
+      const checkbox = modal.getByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
-
-      await userEvent.click(markAsDuplicateCheckbox)
+      await userEvent.click(checkbox)
     })
 
     await step('Send For Update is disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })
@@ -323,6 +380,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
     })
 
     await step('Unmark as a duplicate', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const markAsDuplicateCheckbox = await modal.findByRole('checkbox', {
         name: 'Mark as a duplicate'
       })
@@ -331,6 +389,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
     })
 
     await step('Send For Update is not disabled', async () => {
+      const modal = within(await canvas.findByRole('dialog'))
       const sendForUpdateButton = await modal.findByRole('button', {
         name: 'Send For Update'
       })

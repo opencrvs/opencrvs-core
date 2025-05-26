@@ -16,11 +16,23 @@ import { stringify } from 'query-string'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
-import { EventConfig, FieldValue } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  FieldType,
+  FieldValue,
+  Inferred,
+  SearchField
+} from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { getAllUniqueFields } from '@client/v2-events/utils'
+import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { flattenFieldErrors, getAdvancedSearchFieldErrors } from './utils'
+import {
+  flattenFieldErrors,
+  getAdvancedSearchFieldErrors,
+  getDefaultSearchFields
+} from './utils'
+
+const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
   margin-top: 32px;
@@ -46,9 +58,43 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
+function enhanceFieldWithSearchFieldConfig(
+  field: Inferred,
+  searchField: SearchField
+): Inferred {
+  if (field.type === FieldType.DATE && searchField.config.type === 'range') {
+    return {
+      ...field,
+      validation: [],
+      type: FieldType.DATE_RANGE,
+      defaultValue: undefined
+    }
+  }
+  return field
+}
+
+function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
+  return {
+    ...event,
+    declaration: {
+      ...event.declaration,
+      pages: event.declaration.pages.map((page) => ({
+        ...page,
+        fields: page.fields.map((field) => {
+          const searchField = event.advancedSearch
+            .flatMap((x) => x.fields)
+            .find((f) => f.fieldId === field.id)
+          return searchField
+            ? enhanceFieldWithSearchFieldConfig(field, searchField)
+            : field
+        })
+      }))
+    }
+  }
+}
+
 function getSectionFields(
   event: EventConfig,
-  formValues: Record<string, FieldValue>,
   handleFieldChange: (fieldId: string, value: FieldValue) => void,
   intl: IntlShape,
   fieldValues?: Record<string, string>
@@ -56,16 +102,19 @@ function getSectionFields(
   const advancedSearchSections = event.advancedSearch
   const allUniqueFields = getAllUniqueFields(event)
   return advancedSearchSections.map((section) => {
+    const metadataFields = getDefaultSearchFields(section)
     const advancedSearchFieldId = section.fields.map(
       (f: { fieldId: string }) => f.fieldId
     )
-    const advancedSearchFields = allUniqueFields.filter((field) =>
-      advancedSearchFieldId.includes(field.id)
+    const advancedSearchFields: Inferred[] = allUniqueFields.filter(
+      (field: Inferred) => advancedSearchFieldId.includes(field.id)
     )
 
-    const modifiedFields = advancedSearchFields.map((f) => ({
+    const combinedFields = [...metadataFields, ...advancedSearchFields]
+    const modifiedFields = combinedFields.map((f) => ({
       ...f,
-      required: false as const // advanced search fields need not be required
+      required: false as const, // advanced search fields need not be required
+      defaultValue: undefined // advanced search fields need no default or initial value
     }))
 
     return (
@@ -79,10 +128,8 @@ function getSectionFields(
       >
         <FormFieldGenerator
           fields={modifiedFields}
-          form={formValues}
           id={section.title.id}
           initialValues={fieldValues}
-          setAllFieldsDirty={false}
           onChange={(updatedValues) => {
             Object.entries(updatedValues).forEach(([fieldId, value]) => {
               handleFieldChange(fieldId, value)
@@ -107,12 +154,19 @@ export function TabSearch({
     Record<string, FieldValue>
   >(fieldValues ?? {})
 
-  const hasEnoughParams = Object.entries(formValues).length > 0
   const navigate = useNavigate()
 
+  const prevEventId = React.useRef(currentEvent.id)
+
   React.useEffect(() => {
-    setFormValues({})
+    // only reset formValues if another event search tab is selected
+    if (prevEventId.current !== currentEvent.id) {
+      setFormValues({})
+      prevEventId.current = currentEvent.id
+    }
   }, [currentEvent])
+
+  const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(currentEvent)
 
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
     setFormValues((prev) => ({
@@ -122,25 +176,28 @@ export function TabSearch({
   }
 
   const advancedSearchFieldErrors = flattenFieldErrors(
-    getAdvancedSearchFieldErrors(currentEvent, formValues)
+    getAdvancedSearchFieldErrors(enhancedEvent, formValues)
+  )
+
+  const SectionFields = getSectionFields(
+    enhancedEvent,
+    handleFieldChange,
+    intl,
+    fieldValues
   )
 
   const handleSearch = () => {
-    const searchParams = stringify(formValues)
+    const nonEmptyValues = filterEmptyValues(formValues)
+    const searchParams = stringify(nonEmptyValues, { arrayFormat: 'comma' })
     const navigateTo = ROUTES.V2.SEARCH_RESULT.buildPath({
-      eventType: currentEvent.id
+      eventType: enhancedEvent.id
     })
 
     navigate(`${navigateTo}?${searchParams.toString()}`)
   }
 
-  const SectionFields = getSectionFields(
-    currentEvent,
-    formValues,
-    handleFieldChange,
-    intl,
-    fieldValues
-  )
+  const hasEnoughParams =
+    Object.entries(filterEmptyValues(formValues)).length >= MIN_PARAMS_TO_SEARCH
 
   const Search = (
     <SearchButton

@@ -16,12 +16,12 @@ export const FieldType = {
   TEXTAREA: 'TEXTAREA',
   EMAIL: 'EMAIL',
   DATE: 'DATE',
+  DATE_RANGE: 'DATE_RANGE',
   PARAGRAPH: 'PARAGRAPH',
   PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
   FILE: 'FILE',
   FILE_WITH_OPTIONS: 'FILE_WITH_OPTIONS',
-  HIDDEN: 'HIDDEN',
   BULLET_LIST: 'BULLET_LIST',
   CHECKBOX: 'CHECKBOX',
   SELECT: 'SELECT',
@@ -42,6 +42,7 @@ export type FieldType = (typeof fieldTypes)[number]
  * Composite field types are field types that consist of multiple field values.
  */
 export const compositeFieldTypes = [
+  FieldType.DATE_RANGE,
   FieldType.ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
   FieldType.FILE

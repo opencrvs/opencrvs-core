@@ -50,11 +50,9 @@ export const FormWizard = ({
   onNextPage,
   onPreviousPage,
   continueButtonText = 'Continue',
-  showReviewButton,
-  disableContinue = false
+  showReviewButton
 }: FormWizardProps & {
   continueButtonText?: string
-  disableContinue?: boolean
 }) => {
   const intl = useIntl()
 
@@ -74,7 +72,6 @@ export const FormWizard = ({
             {children}
 
             <Button
-              disabled={disableContinue}
               role="button"
               size="large"
               type="primary"

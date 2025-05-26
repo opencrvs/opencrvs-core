@@ -372,7 +372,7 @@ export const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/event-attachments/:filename', async (req) => {
+    http.get('/api/presigned-url/:filename', async (req) => {
       return HttpResponse.json({
         presignedURL: `http://localhost:3535/ocrvs/tree.svg`
       })
@@ -380,9 +380,7 @@ export const handlers = {
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
-      return HttpResponse.text(
-        `event-attachments/${formData.get('transactionId')}.jpg`
-      )
+      return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
     }),
     http.delete('/api/files/:filename', async (request) => {
       return HttpResponse.text('OK')
@@ -1126,7 +1124,8 @@ export const handlers = {
         {
           id: '6780dbf7a263c6515c7b97d2',
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-          role: 'LOCAL_REGISTRAR'
+          role: 'LOCAL_REGISTRAR',
+          signatureFilename: undefined
         }
       ]
     })

@@ -13,15 +13,18 @@ import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
 import { z } from 'zod'
 import {
+  ActionCreationMetadata,
+  RegistrationCreationMetadata,
   AddressFieldValue,
   EventConfig,
   EventDocument,
   EventIndex,
-  EventSearchIndex,
+  EventStatus,
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields
+  getDeclarationFields,
+  QueryType
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -35,9 +38,9 @@ import {
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId,
-  generateQuery
+  encodeFieldId
 } from './utils'
+import { buildElasticQueryFromSearchPayload } from './query'
 
 function eventToEventIndex(event: EventDocument): EventIndex {
   return encodeEventIndex(getCurrentEventState(event))
@@ -68,6 +71,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
+    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.SIGNATURE:
@@ -167,15 +171,49 @@ export async function createIndex(
           createdAt: { type: 'date' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
-          modifiedAt: { type: 'date' },
+          updatedAtLocation: { type: 'keyword' },
+          updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
+          updatedByUserRole: { type: 'keyword' },
           declaration: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
           },
           trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' }
+          legalStatuses: {
+            type: 'object',
+            properties: {
+              [EventStatus.DECLARED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
+              [EventStatus.REGISTERED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  acceptedAt: { type: 'date' },
+                  registrationNumber: { type: 'keyword' }
+                } satisfies Record<
+                  keyof RegistrationCreationMetadata,
+                  estypes.MappingProperty
+                >
+              }
+            }
+          },
+          flags: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
@@ -270,7 +308,7 @@ export async function deleteEventIndex(event: EventDocument) {
   return response
 }
 
-export async function getIndexedEvents() {
+export async function getIndexedEvents(userId: string) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -284,8 +322,32 @@ export async function getIndexedEvents() {
     return []
   }
 
+  const query = {
+    // We basically want to fetch all events,
+    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
+    bool: {
+      should: [
+        {
+          bool: {
+            must_not: [{ term: { status: EventStatus.CREATED } }]
+          }
+        },
+        {
+          bool: {
+            must: [
+              { term: { status: EventStatus.CREATED } },
+              { term: { createdBy: userId } }
+            ]
+          }
+        }
+      ],
+      minimum_should_match: 1
+    }
+  } as estypes.QueryDslQueryContainer
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
+    query,
     size: 10000,
     request_cache: false
   })
@@ -296,18 +358,24 @@ export async function getIndexedEvents() {
     .map(decodeEventIndex)
 }
 
-export async function getIndex(eventParams: EventSearchIndex) {
+export async function getIndex(eventParams: QueryType) {
   const esClient = getOrCreateClient()
-  const { type, ...queryParams } = eventParams
 
-  if (Object.values(queryParams).length === 0) {
+  if (eventParams.type === 'or') {
+    const { clauses } = eventParams
+    // @todo: implement or query for quick search
+    // eslint-disable-next-line no-console
+    console.log({ clauses })
+    return []
+  }
+
+  if (Object.values(eventParams).length === 0) {
     throw new Error('No search params provided')
   }
 
-  const query = generateQuery(queryParams)
-
+  const query = buildElasticQueryFromSearchPayload(eventParams)
   const response = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(type),
+    index: getEventAliasName(),
     size: DEFAULT_SIZE,
     request_cache: false,
     query
@@ -321,4 +389,6 @@ export async function getIndex(eventParams: EventSearchIndex) {
   )
 
   return events
+
+  return []
 }

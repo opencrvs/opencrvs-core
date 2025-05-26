@@ -11,6 +11,7 @@
 import { v4 as uuid } from 'uuid'
 import {
   ActionStatus,
+  ActionType,
   EventDocument,
   EventIndex
 } from '@opencrvs/commons/client'
@@ -21,11 +22,15 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   trackingId: 'TEST12',
   status: 'CREATED',
   createdAt: '2023-03-01T00:00:00.000Z',
+  legalStatuses: {},
   createdBy: uuid(),
   createdAtLocation: uuid(),
-  modifiedAt: '2023-03-01T00:00:00.000Z',
+  updatedAtLocation: uuid(),
+  updatedAt: '2023-03-01T00:00:00.000Z',
   assignedTo: null,
   updatedBy: 'system',
+  updatedByUserRole: 'system',
+  flags: [],
   declaration: {
     'applicant.firstname': 'John',
     'applicant.surname': 'Doe',
@@ -46,8 +51,10 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       status: ActionStatus.Accepted,
       createdAt: '2025-01-23T05:30:02.615Z',
       createdBy: '6780dbf7a263c6515c7b97d2',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      declaration: {}
+      createdByRole: 'some-user-role',
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      declaration: {},
+      transactionId: 'a0f1b2c3-d4e5-6f7g-8h9i-j0k1l2m3n4o5'
     },
     {
       id: '8db635cf-ee30-40ca-8117-a7188256a2b1',
@@ -68,8 +75,10 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       },
       type: 'DECLARE',
       createdBy: '6780dbf7a263c6515c7b97d2',
+      createdByRole: 'some-user-role',
       createdAt: '2025-01-23T05:30:08.847Z',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf'
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      transactionId: 'aasdk342-asdkj3423-kn234k23'
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
@@ -83,8 +92,10 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       },
       type: 'VALIDATE',
       createdBy: '6780dbf7a263c6515c7b97d2',
+      createdByRole: 'some-user-role',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf'
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      transactionId: 'aasdk342-asdkj3423-kn234k24'
     },
     {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
@@ -98,9 +109,23 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       },
       type: 'REGISTER',
       createdBy: '6780dbf7a263c6515c7b97d2',
+      createdByRole: 'some-user-role',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: '052891bf-916a-4332-a76a-dae0ebb0efbf',
-      registrationNumber: 'TEST12121212'
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      registrationNumber: 'TEST12121212',
+      transactionId: 'aasdk342-asdkj3423-kn234k25'
+    },
+    {
+      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
+      status: ActionStatus.Accepted,
+      declaration: {},
+      type: ActionType.ASSIGN,
+      createdBy: '6780dbf7a263c6515c7b97d2',
+      createdByRole: 'some-user-role',
+      createdAt: '2025-01-23T05:35:27.689Z',
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      assignedTo: '67ef7f83d6a9cb92e9edaaa9',
+      transactionId: 'aasdk342-asdkj3423-kn234k26'
     }
   ]
 }

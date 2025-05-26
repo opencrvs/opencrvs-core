@@ -14,15 +14,15 @@ import {
   Action,
   ActionDocument,
   ActionStatus,
-  EventState,
-  RegisterAction
+  ActionUpdate,
+  EventState
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { EventStatus } from '../EventMetadata'
+import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import * as _ from 'lodash'
 import { deepMerge, findActiveDrafts } from '../utils'
+import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
 
 function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -35,38 +35,76 @@ function getStatusFromActions(actions: Array<Action>) {
   }
 
   return actions.reduce<EventStatus>((status, action) => {
-    if (action.type === ActionType.CREATE) {
-      return EventStatus.CREATED
+    switch (action.type) {
+      case ActionType.CREATE:
+        return EventStatus.CREATED
+      case ActionType.DECLARE:
+        return EventStatus.DECLARED
+      case ActionType.VALIDATE:
+        return EventStatus.VALIDATED
+      case ActionType.REGISTER:
+        return EventStatus.REGISTERED
+      case ActionType.REJECT:
+        return EventStatus.REJECTED
+      case ActionType.ARCHIVE:
+        return EventStatus.ARCHIVED
+      case ActionType.NOTIFY:
+        return EventStatus.NOTIFIED
+      case ActionType.PRINT_CERTIFICATE:
+        return EventStatus.CERTIFIED
+      case ActionType.ASSIGN:
+      case ActionType.UNASSIGN:
+      case ActionType.REQUEST_CORRECTION:
+      case ActionType.APPROVE_CORRECTION:
+      case ActionType.MARKED_AS_DUPLICATE:
+      case ActionType.REJECT_CORRECTION:
+      case ActionType.READ:
+      default:
+        return status
     }
-
-    if (action.type === ActionType.DECLARE) {
-      return EventStatus.DECLARED
-    }
-
-    if (action.type === ActionType.VALIDATE) {
-      return EventStatus.VALIDATED
-    }
-
-    if (action.type === ActionType.REGISTER) {
-      return EventStatus.REGISTERED
-    }
-
-    if (action.type === ActionType.REJECT) {
-      return EventStatus.REJECTED
-    }
-
-    if (action.type === ActionType.ARCHIVE) {
-      return EventStatus.ARCHIVED
-    }
-
-    if (action.type === ActionType.NOTIFY) {
-      return EventStatus.NOTIFIED
-    }
-    return status
   }, EventStatus.CREATED)
 }
 
-function getAssignedUserFromActions(actions: Array<ActionDocument>) {
+function getFlagsFromActions(actions: Action[]): Flag[] {
+  const sortedactions = actions.sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
+  const actionStatus = sortedactions.reduce(
+    (actionStatuses, { type, status }) => ({
+      ...actionStatuses,
+      [type]: status
+    }),
+    {} as Record<ActionType, ActionStatus>
+  )
+
+  const flags = Object.entries(actionStatus)
+    .filter(([, status]) => status !== ActionStatus.Accepted)
+    .map(([type, status]) => {
+      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
+      return flag satisfies Flag
+    })
+
+  const isCertificatePrinted = sortedactions.reduce<boolean>(
+    (prev, { type }) => {
+      if (type === ActionType.PRINT_CERTIFICATE) {
+        return true
+      }
+      if (type === ActionType.APPROVE_CORRECTION) {
+        return false
+      }
+      return prev
+    },
+    false
+  )
+
+  if (isCertificatePrinted) {
+    flags.push(CustomFlags.CERTIFICATE_PRINTED)
+  }
+
+  return flags
+}
+
+export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   return actions.reduce<null | string>((user, action) => {
     if (action.type === ActionType.ASSIGN) {
       return action.assignedTo
@@ -79,7 +117,9 @@ function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
-function aggregateActionDeclarations(actions: Array<ActionDocument>) {
+function aggregateActionDeclarations(
+  actions: Array<ActionDocument>
+): ActionUpdate {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
@@ -114,11 +154,13 @@ function aggregateActionDeclarations(actions: Array<ActionDocument>) {
   }, {})
 }
 
-type NonNullableDeep<T> = T extends (infer U)[]
-  ? NonNullableDeep<U>[]
-  : T extends object
-    ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-    : NonNullable<T>
+type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
+  ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+  : T extends (infer U)[]
+    ? NonNullableDeep<U>[]
+    : T extends object
+      ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+      : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
@@ -154,6 +196,14 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
     (a): a is ActionDocument => a.status === ActionStatus.Accepted
   )
 }
+
+export const DEFAULT_DATE_OF_EVENT_PROPERTY =
+  'createdAt' satisfies keyof EventDocument
+
+/**
+ * @returns the current state of the event based on the actions taken.
+ * @see EventIndex for the description of the returned object.
+ */
 export function getCurrentEventState(event: EventDocument): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -163,29 +213,39 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const activeActions = getAcceptedActions(event)
-  const latestAction = activeActions[activeActions.length - 1]
+  const acceptedActions = getAcceptedActions(event)
 
-  const registrationAction = activeActions.find(
-    (a): a is RegisterAction =>
-      a.type === ActionType.REGISTER && a.status === ActionStatus.Accepted
+  const declarationUpdateMetadata = getDeclarationActionUpdateMetadata(
+    event.actions
   )
 
-  const registrationNumber = registrationAction?.registrationNumber ?? null
+  const declaration = aggregateActionDeclarations(acceptedActions)
+
+  const dateOfEvent =
+    ZodDate.safeParse(
+      event.dateOfEvent?.fieldId
+        ? declaration[event.dateOfEvent.fieldId]
+        : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
+    ).data ?? null
 
   return deepDropNulls({
     id: event.id,
     type: event.type,
     status: getStatusFromActions(event.actions),
-    createdAt: event.createdAt,
+    legalStatuses: getLegalStatuses(event.actions),
+    createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
-    modifiedAt: latestAction.createdAt,
-    assignedTo: getAssignedUserFromActions(activeActions),
-    updatedBy: latestAction.createdBy,
-    declaration: aggregateActionDeclarations(activeActions),
+    updatedAt: declarationUpdateMetadata.createdAt,
+    assignedTo: getAssignedUserFromActions(acceptedActions),
+    updatedBy: declarationUpdateMetadata.createdBy,
+    updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
+    declaration,
     trackingId: event.trackingId,
-    registrationNumber
+    // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
+    updatedByUserRole: declarationUpdateMetadata.createdByRole,
+    dateOfEvent,
+    flags: getFlagsFromActions(event.actions)
   })
 }
 
@@ -232,7 +292,7 @@ export function applyDraftsToEventIndex(
   eventIndex: EventIndex,
   drafts: Draft[]
 ) {
-  const indexedAt = eventIndex.modifiedAt
+  const indexedAt = eventIndex.updatedAt
 
   const activeDrafts = drafts
     .filter(({ createdAt }) => new Date(createdAt) > new Date(indexedAt))
@@ -271,11 +331,11 @@ export function getAnnotationFromDrafts(drafts: Draft[]) {
 export function getActionAnnotation({
   event,
   actionType,
-  drafts
+  drafts = []
 }: {
   event: EventDocument
   actionType: ActionType
-  drafts: Draft[]
+  drafts?: Draft[]
 }): EventState {
   const activeActions = getAcceptedActions(event)
   const action = activeActions.find(

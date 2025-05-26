@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, DraftInput, SCOPES } from '@opencrvs/commons'
+import { ActionStatus, ActionType, DraftInput, SCOPES } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
@@ -72,6 +72,16 @@ test('declared event can not be deleted', async () => {
     generator.event.actions.declare(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await expect(
     client.event.delete({ eventId: event.id })
   ).rejects.toThrowErrorMatchingSnapshot()
@@ -120,7 +130,8 @@ describe('check unreferenced draft attachments are deleted while final action su
           }
         },
         transactionId: `transactionId-${n}`,
-        eventId: event.id
+        eventId: event.id,
+        status: ActionStatus.Requested
       }
     }
     const getDeclaration = (n: number) => {
@@ -159,7 +170,9 @@ describe('check unreferenced draft attachments are deleted while final action su
     // since declare action has been submitted 5 times
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
       expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({ type: ActionType.UNASSIGN }),
       expect.objectContaining({ type: ActionType.READ })
     ])
   })

@@ -17,7 +17,8 @@ import {
   generateTranslationConfig,
   FieldType,
   defineActionForm,
-  getDeclaration
+  getDeclaration,
+  PageTypes
 } from '@opencrvs/commons/client'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -124,6 +125,114 @@ export const DocumentViewerWithFiles: StoryObj<typeof DocumentViewer> = {
                       label: generateTranslationConfig('OTHER')
                     }
                   ]
+                }
+              ],
+              id: '1',
+              title: generateTranslationConfig('field title')
+            }
+          ],
+          label: generateTranslationConfig('form label')
+        })}
+        onEdit={noop}
+      />
+    )
+  }
+}
+
+export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
+  name: 'Same options for different fields',
+  parameters: {
+    layout: 'center'
+  },
+  render: function Component() {
+    const options = [
+      {
+        value: 'NATIONAL_ID',
+        label: generateTranslationConfig('NATIONAL_ID')
+      },
+      {
+        value: 'PASSPORT',
+        label: generateTranslationConfig('PASSPORT')
+      },
+      {
+        value: 'BIRTH_REGISTRATION_NUMBER',
+        label: generateTranslationConfig('BIRTH_REGISTRATION_NUMBER')
+      },
+      {
+        value: 'OTHER',
+        label: generateTranslationConfig('OTHER')
+      }
+    ]
+
+    const duplicateDocuments = [
+      {
+        filename: 'fish.svg',
+        originalFilename: 'fish.svg',
+        type: 'image/svg+xml',
+        option: 'NATIONAL_ID'
+      },
+      {
+        filename: 'mountain.svg',
+        originalFilename: 'mountain.svg',
+        type: 'image/svg+xml',
+        option: 'PASSPORT'
+      },
+      {
+        filename: 'tree.svg',
+        originalFilename: 'tree.svg',
+        type: 'image/svg+xml',
+        option: 'BIRTH_REGISTRATION_NUMBER'
+      },
+      {
+        filename: 'fish.svg',
+        originalFilename: 'fish.svg',
+        type: 'image/svg+xml',
+        option: 'NONE'
+      }
+    ]
+
+    const formWithDuplicates = {
+      'documents.one': duplicateDocuments,
+      'documents.two': duplicateDocuments,
+      'documents.three': {
+        filename: 'tree.svg',
+        originalFilename: 'tree.svg',
+        type: 'image/svg+xml'
+      }
+    }
+
+    return (
+      <DocumentViewer
+        form={formWithDuplicates}
+        formConfig={defineActionForm({
+          pages: [
+            {
+              type: PageTypes.Enum.FORM,
+              fields: [
+                {
+                  id: 'documents.one',
+                  label: generateTranslationConfig('File with options 1'),
+                  type: FieldType.FILE_WITH_OPTIONS,
+                  options
+                },
+                {
+                  id: 'documents.two',
+                  label: generateTranslationConfig('File with options 2'),
+                  type: FieldType.FILE_WITH_OPTIONS,
+                  options
+                },
+                {
+                  id: 'documents.three',
+                  label: generateTranslationConfig('File 3'),
+                  type: FieldType.FILE,
+                  configuration: {
+                    fileName: generateTranslationConfig('custom file name')
+                  }
+                },
+                {
+                  id: 'documents.four',
+                  label: generateTranslationConfig('File 4'),
+                  type: FieldType.FILE
                 }
               ],
               id: '1',

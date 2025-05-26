@@ -19,7 +19,8 @@ import {
   ActionType,
   getActionAnnotation,
   getDeclaration,
-  getActionReview
+  getActionReview,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -38,6 +39,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { reviewMessages } from '../messages'
 
 function getTranslations(hasErrors: boolean) {
@@ -66,8 +68,7 @@ export function Review() {
 
   const previousAnnotation = getActionAnnotation({
     event,
-    actionType: ActionType.REGISTER,
-    drafts: []
+    actionType: ActionType.REGISTER
   })
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
@@ -79,7 +80,8 @@ export function Review() {
   const reviewConfig = getActionReview(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).declaration
+  const currentEventState = getCurrentEventState(event)
+  const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
   const incomplete = validationErrorsInActionFormExist({
@@ -113,7 +115,7 @@ export function Review() {
           {
             from: 'review'
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -200,11 +202,16 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
+          icon="Check"
           incomplete={incomplete}
           messages={messages}
           primaryButtonType="positive"
           onConfirm={handleRegistration}
-          onReject={handleRejection}
+          onReject={
+            currentEventState.status === EventStatus.REJECTED
+              ? undefined
+              : handleRejection
+          }
         />
         {modal}
       </ReviewComponent.Body>

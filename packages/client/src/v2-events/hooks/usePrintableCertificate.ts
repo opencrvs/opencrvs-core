@@ -12,14 +12,14 @@
 import { Location } from '@events/service/locations/locations'
 import {
   EventDocument,
-  EventState,
   getCurrentEventState,
   isMinioUrl,
   User,
   CertificateTemplateConfig,
-  LanguageConfig
+  LanguageConfig,
+  EventConfig,
+  FieldType
 } from '@opencrvs/commons/client'
-
 import {
   addFontsToSvg,
   compileSvg,
@@ -28,48 +28,51 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function replaceMinioUrlWithBase64(template: Record<string, any>) {
+async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  async function recursiveTransform(obj: any) {
-    if (typeof obj !== 'object' || obj === null) {
-      return obj
+  declaration: Record<string, any>,
+  config: EventConfig
+) {
+  const fileFieldIds = config.declaration.pages
+    .flatMap((page) => page.fields)
+    .filter((field) => field.type === FieldType.FILE)
+    .map((field) => field.id)
+
+  for (const fieldId of fileFieldIds) {
+    const fieldValue = declaration[fieldId]
+    if (
+      fieldValue &&
+      typeof fieldValue === 'object' &&
+      'filename' in fieldValue &&
+      isMinioUrl(fieldValue.filename)
+    ) {
+      declaration[fieldId].filename = await fetchImageAsBase64(
+        // this should be a presigned minio url
+        fieldValue.filename
+      )
     }
-
-    const transformedObject = Array.isArray(obj) ? [...obj] : { ...obj }
-
-    for (const key in obj) {
-      const value = obj[key]
-      if (typeof value === 'string' && isMinioUrl(value)) {
-        transformedObject[key] = await fetchImageAsBase64(value)
-      } else if (typeof value === 'object') {
-        transformedObject[key] = await recursiveTransform(value)
-      } else {
-        transformedObject[key] = value
-      }
-    }
-
-    return transformedObject
   }
-  return recursiveTransform(template)
+  return declaration
 }
 
 export const usePrintableCertificate = ({
   event,
+  config,
   locations,
   users,
   certificateConfig,
   language
 }: {
   event: EventDocument
+  config: EventConfig
   locations: Location[]
   users: User[]
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const currentState = getCurrentEventState(event)
-  const modifiedState = {
-    ...currentState,
+  const { declaration, ...metadata } = getCurrentEventState(event)
+  const modifiedMetadata = {
+    ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
     // the current certification date in the certificate preview on the review page.
     modifiedAt: new Date().toISOString()
@@ -84,37 +87,59 @@ export const usePrintableCertificate = ({
   const certificateFonts = certificateConfig.fonts ?? {}
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
-    $state: modifiedState,
-    $declaration: currentState.declaration,
+    $metadata: modifiedMetadata,
+    $declaration: declaration,
     locations,
     users,
-    language
+    language,
+    config
   })
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
   const handleCertify = async (updatedEvent: EventDocument) => {
-    const currentEventState = getCurrentEventState(updatedEvent)
-    const base64ReplacedTemplate = await replaceMinioUrlWithBase64(
-      currentEventState.declaration
+    const { declaration: updatedDeclaration, ...updatedMetadata } =
+      getCurrentEventState(updatedEvent)
+    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
+      updatedDeclaration,
+      config
+    )
+
+    const base64ReplacedUsersWithSignature = await Promise.all(
+      users.map(async (user) => {
+        if (user.signatureFilename && isMinioUrl(user.signatureFilename)) {
+          const base64Signature = await fetchImageAsBase64(
+            user.signatureFilename
+          )
+          return {
+            ...user,
+            signatureFilename: base64Signature
+          }
+        }
+        return user
+      })
     )
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
-      $state: currentEventState,
-      $declaration: {
-        ...base64ReplacedTemplate,
-        preview: false
+      $metadata: {
+        ...updatedMetadata,
+        // Temporarily add `modifiedAt` to the last action's data to display
+        // the current certification date in the certificate preview on the review page.
+        modifiedAt: new Date().toISOString()
       },
+      $declaration: declarationWithResolvedImages,
       locations,
-      users,
-      language
+      users: base64ReplacedUsersWithSignature,
+      language,
+      config
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
     const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
     printAndDownloadPdf(pdfTemplate, event.id)
   }
+
   return {
     svgCode,
     handleCertify

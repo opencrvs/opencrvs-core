@@ -9,17 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import { FieldProps, SelectOption } from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
 import { Select } from './Select'
 
 function SelectCountryInput({
-  setFieldValue,
   value,
+  onChange,
   ...props
 }: FieldProps<'COUNTRY'> & {
-  setFieldValue: (name: string, val: string | undefined) => void
+  onChange: (val: string | undefined) => void
   value?: string
 }) {
   return (
@@ -30,7 +30,7 @@ function SelectCountryInput({
       options={countries as SelectOption[]}
       type="SELECT"
       value={value}
-      onChange={(val: string) => setFieldValue(props.id, val)}
+      onChange={onChange}
     />
   )
 }
@@ -42,17 +42,13 @@ function SelectCountryOutput({ value }: { value: string | undefined }) {
   return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }
 
-function useStringifier() {
-  const intl = useIntl()
-
-  return (value: string) => {
-    const selectedCountry = countries.find((country) => country.value === value)
-    return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
-  }
+function stringify(intl: IntlShape, value: string) {
+  const selectedCountry = countries.find((country) => country.value === value)
+  return selectedCountry ? intl.formatMessage(selectedCountry.label) : ''
 }
 
 export const SelectCountry = {
   Input: SelectCountryInput,
   Output: SelectCountryOutput,
-  useStringifier: useStringifier
+  stringify
 }

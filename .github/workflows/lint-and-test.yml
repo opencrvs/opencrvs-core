@@ -164,6 +164,8 @@ jobs:
   prepare-client-tests:
     name: Prepare client tests
     runs-on: ubuntu-24.04
+    permissions:
+      contents: read
     outputs:
       chromatic_required: ${{ steps.detect-changes.outputs.chromatic_required }}
     steps:
@@ -244,6 +246,7 @@ jobs:
           include-hidden-files: true
           path: |
             .
+            !**/.git
             !**/node_modules
   lint-client:
     name: Lint client
@@ -312,13 +315,15 @@ jobs:
       - name: Install dependencies
         run: CI="" yarn install --frozen-lockfile
 
-      # Without this, the fetch command will fail with
-      # fatal: could not read Username for 'https://github.com': No such device or address
-      - name: Remove extraheader config
-        run: git config --unset http.https://github.com/.extraheader
-
       - name: Fetch full Git history
-        run: git fetch --prune --unshallow
+        run: |
+          git clone --bare https://github.com/opencrvs/opencrvs-core.git .git
+          git config --local --bool core.bare false
+          git reset --hard
+          git clean -fd
+          git fetch --prune
+          git checkout ${{ github.head_ref || github.ref_name }}
+          git reset --hard
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -416,10 +421,6 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.event_name == 'pull_request'
     steps:
-      - name: Use Node 18.X
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
       - name: Checkout base branch
         uses: actions/checkout@v4
         with:
@@ -432,11 +433,19 @@ jobs:
           ref: ${{ github.head_ref }}
           path: pr
 
-      - uses: actions/setup-node@v4
+      - name: Use Node.js from .nvmrc from base branch
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: base/.nvmrc
 
       - name: Install base dependencies
         run: yarn install --ignore-scripts
         working-directory: base
+
+      - name: Use Node.js from .nvmrc from PR branch
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: pr/.nvmrc
 
       - name: Install PR dependencies
         run: yarn install --ignore-scripts

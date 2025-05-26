@@ -22,7 +22,6 @@ import ReactTooltip from 'react-tooltip'
 import {
   ActionType,
   EventConfig,
-  EventDocument,
   getOrThrow,
   getAcceptedActions,
   SCOPES
@@ -173,9 +172,12 @@ export function Review() {
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const formConfig = getPrintForm(eventConfiguration)
 
   const { svgCode, handleCertify } = usePrintableCertificate({
     event: fullEvent,
+    config: eventConfiguration,
     locations,
     users,
     certificateConfig,
@@ -187,13 +189,6 @@ export function Review() {
    * print certificate form page, since the user should not be able to
    * review/print the certificate if there are validation errors.
    */
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = getPrintForm(eventConfiguration)
-
-  if (!svgCode) {
-    return <Spinner id="review-certificate-loading" />
-  }
-
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
     form: annotation
@@ -207,6 +202,10 @@ export function Review() {
         to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
       />
     )
+  }
+
+  if (!svgCode) {
+    return <Spinner id="review-certificate-loading" />
   }
 
   const handleCorrection = () =>
@@ -247,27 +246,17 @@ export function Review() {
 
     if (confirmed) {
       try {
-        const response: EventDocument =
-          await onlineActions.printCertificate.mutateAsync({
-            eventId: fullEvent.id,
-            declaration: {},
-            annotation: { ...annotation, templateId },
-            transactionId: uuid(),
-            type: ActionType.PRINT_CERTIFICATE
-          })
-        const printAction = response.actions
-          .reverse()
-          .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
+        await onlineActions.printCertificate.mutateAsync({
+          fullEvent,
+          eventId: fullEvent.id,
+          declaration: {},
+          annotation: { ...annotation, templateId },
+          transactionId: uuid(),
+          type: ActionType.PRINT_CERTIFICATE
+        })
 
-        if (printAction) {
-          await handleCertify({
-            ...fullEvent,
-            actions: [...fullEvent.actions, printAction]
-          })
-          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-        } else {
-          throw new Error('Print action not found in the response')
-        }
+        await handleCertify(fullEvent)
+        navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

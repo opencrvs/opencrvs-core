@@ -15,7 +15,10 @@ import { defineMessages, useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import styled, { useTheme } from 'styled-components'
 
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 
 import { Link, useNavigate } from 'react-router-dom'
 import {
@@ -25,7 +28,9 @@ import {
   EventIndex,
   getOrThrow,
   RootWorkqueueConfig,
-  workqueues
+  workqueues,
+  WorkQueueColumnConfig,
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/lib/hooks'
 import {
@@ -47,7 +52,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { WQContentWrapper } from './components/ContentWrapper'
 
 const messages = defineMessages({
@@ -116,7 +121,6 @@ function Workqueue({
   eventConfigs: EventConfig[]
 }) {
   const intl = useIntl()
-  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
   const theme = useTheme()
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -124,9 +128,15 @@ function Workqueue({
   const drafts = getRemoteDrafts()
   const navigate = useNavigate()
   const { width } = useWindowSize()
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const [sortedCol, setSortedCol] = useState('modifiedAt')
+  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
+  const { getEventTitle } = useEventTitle()
 
-  const validEvents = events.filter((event) =>
-    eventConfigs.some((e) => e.id === event.type)
+  const validEvents = orderBy(
+    events.filter((event) => eventConfigs.some((e) => e.id === event.type)),
+    ['updatedAt'],
+    ['desc']
   )
 
   if (validEvents.length !== events.length) {
@@ -135,15 +145,18 @@ function Workqueue({
   }
 
   const workqueue = validEvents
+    .slice((currentPageNumber - 1) * limit, currentPageNumber * limit)
     .filter((event) => eventConfigs.some((e) => e.id === event.type))
     /*
      * Apply pending drafts to the event index.
      * This is necessary to show the most up to date information in the workqueue.
      */
     .map((event) =>
-      applyDraftsToEventIndex(
-        event,
-        drafts.filter((d) => d.eventId === event.id)
+      deepDropNulls(
+        applyDraftsToEventIndex(
+          event,
+          drafts.filter((d) => d.eventId === event.id)
+        )
       )
     )
     .map((event) => {
@@ -157,7 +170,7 @@ function Workqueue({
         (outboxEvent) => outboxEvent.id === event.id
       )
       const isInDrafts = drafts
-        .filter((draft) => draft.createdAt > event.modifiedAt)
+        .filter((draft) => draft.createdAt > event.updatedAt)
         .some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
@@ -167,16 +180,12 @@ function Workqueue({
         if (isInDrafts) {
           return 'DRAFT'
         }
+
         return event.status
       }
 
+      const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
       const titleColumnId = workqueueConfig.columns[0].id
-
-      const title = flattenedIntl.formatMessage(
-        eventConfig.summary.title.label,
-        flattenEventIndex(event)
-      )
-
       const TitleColumn =
         width > theme.grid.breakpoints.lg ? (
           <IconWithName name={title} status={getEventStatus()} />
@@ -192,13 +201,13 @@ function Workqueue({
         ...flattenEventIndex(event),
         event: intl.formatMessage(eventConfig.label),
         createdAt: formattedDuration(new Date(event.createdAt)),
-        modifiedAt: formattedDuration(new Date(event.modifiedAt)),
+        modifiedAt: formattedDuration(new Date(event.updatedAt)),
 
         status: intl.formatMessage(
           {
-            id: `events.status`,
+            id: 'v2.events.status',
             defaultMessage:
-              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} REJECTED {Requires update} ARCHIVED {Archived} NOTIFIED {In progress} other {Unknown}}'
+              '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
           },
           {
             status: getEventStatus()
@@ -208,6 +217,7 @@ function Workqueue({
           TitleColumn
         ) : (
           <TextButton
+            color={useFallbackTitle ? 'red' : 'primary'}
             onClick={() => {
               return navigate(
                 ROUTES.V2.EVENTS.OVERVIEW.buildPath({
@@ -222,9 +232,6 @@ function Workqueue({
       }
     })
 
-  const [sortedCol, setSortedCol] = useState('createdAt')
-  const [sortOrder, setSortOrder] = useState(SORT_ORDER.DESCENDING)
-
   function onColumnClick(columnName: string) {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
@@ -237,7 +244,7 @@ function Workqueue({
 
   function getDefaultColumns(): Array<Column> {
     return workqueueConfig.defaultColumns.map(
-      (column): Column => ({
+      (column: string): Column => ({
         label:
           column in defaultColumns
             ? intl.formatMessage(
@@ -255,7 +262,7 @@ function Workqueue({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     const configuredColumns: Array<Column> = workqueueConfig.columns.map(
-      (column) => ({
+      (column: WorkQueueColumnConfig) => ({
         label: intl.formatMessage(column.label),
         width: 35,
         key: column.id,
@@ -263,6 +270,7 @@ function Workqueue({
         isSorted: sortedCol === column.id
       })
     )
+
     const allColumns = configuredColumns.concat(getDefaultColumns())
 
     if (width > theme.grid.breakpoints.lg) {
@@ -272,9 +280,11 @@ function Workqueue({
     }
   }
 
-  const totalPages = workqueue.length ? Math.round(workqueue.length / limit) : 0
+  const totalPages = validEvents.length
+    ? Math.ceil(validEvents.length / limit)
+    : 0
 
-  const isShowPagination = totalPages >= 1
+  const isShowPagination = totalPages > 1
   return (
     <WQContentWrapper
       error={false}
@@ -283,9 +293,10 @@ function Workqueue({
       loading={false} // @TODO: Handle these on top level
       noContent={workqueue.length === 0}
       noResultText={'No results'}
-      paginationId={Math.round(offset / limit)}
+      paginationId={currentPageNumber}
       title={intl.formatMessage(workqueueConfig.title)}
       totalPages={totalPages}
+      onPageChange={(page) => setCurrentPageNumber(page)}
     >
       <ReactTooltip id="validateTooltip">
         <ToolTipContainer>
@@ -312,24 +323,21 @@ function Workqueue({
 }
 
 export function WorkqueueContainer() {
-  // @TODO: We need to revisit on how the workqueue id is passed.
-  // We'll follow up during 'workqueue' feature.
-  const workqueueId = 'all'
-  const { getEvents } = useEvents()
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  const [events] = getEvents.useSuspenseQuery()
-
+  const { getEvents } = useEvents()
   const eventConfigs = useEventConfigurations()
 
   const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
+    workqueueSlug in workqueues
+      ? workqueues[workqueueSlug as keyof typeof workqueues]
       : null
 
   if (!workqueueConfig) {
     return null
   }
+
+  const [events] = getEvents.useSuspenseQuery()
 
   return (
     <Workqueue

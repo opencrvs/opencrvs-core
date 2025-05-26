@@ -63,7 +63,9 @@ const meta: Meta<typeof Review.Body> = {
   decorators: [
     (Story) => (
       <TRPCProvider>
-        <Story />
+        <React.Suspense>
+          <Story />
+        </React.Suspense>
       </TRPCProvider>
     )
   ]
@@ -182,6 +184,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
           onEdit={handleEdit}
         >
           <Review.Actions
+            icon="Check"
             incomplete={false}
             messages={reviewActionMessages}
             onConfirm={handleDeclaration}
@@ -239,6 +242,7 @@ export const ReviewWithValidationErrors: Story = {
         onEdit={noop}
       >
         <Review.Actions
+          icon="Check"
           incomplete={false}
           messages={reviewActionMessages}
           onConfirm={noop}
@@ -381,6 +385,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         onEdit={noop}
       >
         <Review.Actions
+          icon="Check"
           incomplete={false}
           messages={reviewActionMessages}
           onConfirm={noop}

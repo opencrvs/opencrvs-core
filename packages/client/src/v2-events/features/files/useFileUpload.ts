@@ -80,15 +80,13 @@ export function getFullUrl(filename: string) {
 }
 
 async function getPresignedUrl(fileUri: string) {
-  const response = await fetch(
-    '/api/presigned-url/event-attachments/' + fileUri,
-    {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${getToken()}`
-      }
+  const url = `/api/presigned-url/` + fileUri
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
     }
-  )
+  })
 
   const res = await response.json()
   return res

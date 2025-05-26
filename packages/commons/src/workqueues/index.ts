@@ -12,11 +12,13 @@
 import { allWorkqueue } from './all'
 import { inReviewWorkqueue } from './readyForReview'
 import { registeredWorkqueue } from './readyToPrint'
-export { RootWorkqueueConfig } from './WorkqueueConfig'
+/** @knipignore */
+export { RootWorkqueueConfig, WorkQueueColumnConfig } from './WorkqueueConfig'
+/** @knipignore */
 export { defaultColumns } from './defaultColumns'
 
 export const workqueues = {
   all: allWorkqueue,
   registered: registeredWorkqueue,
-  inReview: inReviewWorkqueue
+  'in-review': inReviewWorkqueue
 }

@@ -11,7 +11,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { getUUID } from '@opencrvs/commons/client'
+import { QueryInputType, QueryType, getUUID } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent, useGetEventState } from './procedures/get'
 import { useOutbox } from './outbox'
@@ -23,6 +23,29 @@ import {
   useEventCustomAction
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
+
+function toQueryType(
+  eventType: string,
+  searchParams: QueryInputType,
+  type: 'and' | 'or'
+): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (key.startsWith('event')) {
+      const strippedKey = key.replace(/^event____/, '')
+      topLevelFields[strippedKey] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+  }
+}
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -41,28 +64,30 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     searchEvent: {
-      useQuery: (type: string, searchParams: Record<string, string>) =>
-        useQuery({
-          ...trpc.event.search.queryOptions({
-            ...searchParams,
-            type
-          }),
-          queryKey: trpc.event.search.queryKey({
-            ...searchParams,
-            type
-          })
-        }),
-      useSuspenseQuery: (type: string, searchParams: Record<string, string>) =>
-        useSuspenseQuery({
-          ...trpc.event.search.queryOptions({
-            ...searchParams,
-            type
-          }),
-          queryKey: trpc.event.search.queryKey({
-            ...searchParams,
-            type
-          })
+      useQuery: (
+        eventType: string,
+        searchParams: QueryInputType,
+        queryType: 'and' | 'or'
+      ) => {
+        const input = toQueryType(eventType, searchParams, queryType)
+
+        return useQuery({
+          ...trpc.event.search.queryOptions(input),
+          queryKey: trpc.event.search.queryKey(input)
+        })
+      },
+      useSuspenseQuery: (
+        eventType: string,
+        searchParams: QueryInputType,
+        queryType: 'and' | 'or'
+      ) => {
+        const input = toQueryType(eventType, searchParams, queryType)
+
+        return useSuspenseQuery({
+          ...trpc.event.search.queryOptions(input),
+          queryKey: trpc.event.search.queryKey(input)
         }).data
+      }
     },
     actions: {
       validate: useEventAction(trpc.event.actions.validate.request),

@@ -9,23 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { flattenDeep, omitBy, mergeWith, isArray, isObject } from 'lodash'
-import { workqueues } from '../workqueues'
+import {
+  flattenDeep,
+  omitBy,
+  mergeWith,
+  isArray,
+  isObject,
+  get,
+  has,
+  isNil
+} from 'lodash'
 import {
   ActionType,
   DeclarationActionType,
-  DeclarationActions
+  DeclarationActions,
+  writeActions
 } from './ActionType'
 import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
-import { WorkqueueConfig } from './WorkqueueConfig'
-import { ActionUpdate, EventState } from './ActionDocument'
+import {
+  Action,
+  ActionStatus,
+  ActionUpdate,
+  EventState
+} from './ActionDocument'
 import { PageConfig, PageTypes, VerificationPageConfig } from './PageConfig'
-import { isFieldVisible, validate } from '../conditionals/validate'
+import { isConditionMet, isFieldVisible } from '../conditionals/validate'
 import { Draft } from './Draft'
 import { EventDocument } from './EventDocument'
 import { getUUID } from '../uuid'
-import { formatISO } from 'date-fns'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
@@ -69,18 +81,8 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   return []
 }
 
-export const getAllAnnotationFields = (config: EventConfig): FieldConfig[] => {
+function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
   return flattenDeep(config.actions.map(getActionAnnotationFields))
-}
-
-/**
- * @returns All the fields in the event configuration.
- */
-export const findAllFields = (config: EventConfig): FieldConfig[] => {
-  return flattenDeep([
-    ...getDeclarationFields(config),
-    ...getAllAnnotationFields(config)
-  ])
 }
 
 /**
@@ -124,39 +126,34 @@ export function getActionReviewFields(
   return getActionReview(configuration, actionType).fields
 }
 
-export function validateWorkqueueConfig(workqueueConfigs: WorkqueueConfig[]) {
-  workqueueConfigs.map((workqueue) => {
-    const rootWorkqueue = Object.values(workqueues).find(
-      (wq) => wq.id === workqueue.id
-    )
-    if (!rootWorkqueue) {
-      throw new Error(
-        `Invalid workqueue configuration: workqueue not found with id: ${workqueue.id}`
-      )
-    }
-  })
-}
-
 export function isPageVisible(page: PageConfig, formValues: ActionUpdate) {
   if (!page.conditional) {
     return true
   }
 
-  return validate(page.conditional, {
-    $form: formValues,
-    $now: formatISO(new Date(), { representation: 'date' })
-  })
+  return isConditionMet(page.conditional, formValues)
 }
 
-export function omitHiddenFields(fields: FieldConfig[], values: EventState) {
-  return omitBy(values, (_, fieldId) => {
-    const field = fields.find((f) => f.id === fieldId)
+export function omitHiddenFields<T extends EventState | ActionUpdate>(
+  fields: FieldConfig[],
+  values: T,
+  visibleVerificationPageIds: string[] = []
+) {
+  return omitBy<T>(values, (_, fieldId) => {
+    // We dont want to omit visible verification page values
+    if (visibleVerificationPageIds.includes(fieldId)) {
+      return false
+    }
 
-    if (!field) {
+    // There can be multiple field configurations with the same id, with e.g. different options and conditions
+    const fieldConfigs = fields.filter((f) => f.id === fieldId)
+
+    if (!fieldConfigs.length) {
       return true
     }
 
-    return !isFieldVisible(field, values)
+    // As long as one of the field configs is visible, the field should be included
+    return fieldConfigs.every((f) => !isFieldVisible(f, values))
   })
 }
 
@@ -191,7 +188,7 @@ export function createEmptyDraft(
   eventId: string,
   draftId: string,
   actionType: ActionType
-) {
+): Draft {
   return {
     id: draftId,
     eventId,
@@ -203,7 +200,10 @@ export function createEmptyDraft(
       annotation: {},
       createdAt: new Date().toISOString(),
       createdBy: '@todo',
-      createdAtLocation: '@todo'
+      createdAtLocation: '@todo',
+      status: ActionStatus.Accepted,
+      transactionId: '@todo',
+      createdByRole: '@todo'
     }
   }
 }
@@ -214,10 +214,63 @@ export function isVerificationPage(
   return page.type === PageTypes.enum.VERIFICATION
 }
 
-export function deepMerge<T extends Record<string, unknown>>(
-  currentDocument: T,
-  actionDocument: T
-): T {
+export function getVisibleVerificationPageIds(
+  pages: PageConfig[],
+  annotation: ActionUpdate
+): string[] {
+  return pages
+    .filter((page) => isVerificationPage(page))
+    .filter((page) => isPageVisible(page, annotation))
+    .map((page) => page.id)
+}
+
+export function getActionVerificationPageIds(
+  actionConfig: ActionConfig,
+  annotation: ActionUpdate
+): string[] {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
+    return [
+      ...getVisibleVerificationPageIds(actionConfig.onboardingForm, annotation),
+      ...getVisibleVerificationPageIds(
+        actionConfig.additionalDetailsForm,
+        annotation
+      )
+    ]
+  }
+
+  if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
+    return getVisibleVerificationPageIds(
+      actionConfig.printForm.pages,
+      annotation
+    )
+  }
+
+  return []
+}
+
+export function omitHiddenAnnotationFields(
+  actionConfig: ActionConfig,
+  declaration: EventState,
+  annotation: ActionUpdate
+) {
+  const annotationFields = getActionAnnotationFields(actionConfig)
+
+  const visibleVerificationPageIds = getActionVerificationPageIds(
+    actionConfig,
+    annotation
+  )
+
+  return omitHiddenFields(
+    annotationFields,
+    { ...declaration, ...annotation },
+    visibleVerificationPageIds
+  )
+}
+
+export function deepMerge<
+  T extends Record<string, unknown>,
+  K extends Record<string, unknown>
+>(currentDocument: T, actionDocument: K): T & K {
   return mergeWith(
     currentDocument,
     actionDocument,
@@ -237,9 +290,72 @@ export function deepMerge<T extends Record<string, unknown>>(
   )
 }
 
+export function findLastAssignmentAction(actions: Action[]) {
+  return actions
+    .filter(
+      ({ type }) => type === ActionType.ASSIGN || type === ActionType.UNASSIGN
+    )
+    .reduce<
+      Action | undefined
+    >((latestAction, action) => (!latestAction || action.createdAt > latestAction.createdAt ? action : latestAction), undefined)
+}
+
 /** Tell compiler that accessing record with arbitrary key might result to undefined
  * Use when you **cannot guarantee**  that key exists in the record
  */
 export type IndexMap<T> = {
   [id: string]: T | undefined
+}
+
+export function isWriteAction(actionType: ActionType): boolean {
+  return writeActions.safeParse(actionType).success
+}
+
+/**
+ * @returns All the fields in the event configuration.
+ */
+export const findAllFields = (config: EventConfig): FieldConfig[] => {
+  return flattenDeep([
+    ...getDeclarationFields(config),
+    ...getAllAnnotationFields(config)
+  ])
+}
+
+/**
+ * Returns the value of the object at the given path with the ability of resolving mixed paths. See examples.
+ *
+ * @param obj Entity we want to get the value from
+ * @param path property path e.g. `a.b.c`
+ * @param defaultValue
+ * @returns the value of the object at the given path.
+ */
+export function getMixedPath<T = unknown>(
+  obj: Record<string, unknown>,
+  path: string,
+  defaultValue?: T | undefined
+): T | undefined {
+  const parts = path.split('.')
+
+  // We don't know the type of the object at the path is.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const resolve = (current: unknown, segments: string[]): any => {
+    if (current == null || segments.length === 0) {
+      return current
+    }
+
+    // Try all compound segment combinations from longest to shortest
+    for (let i = segments.length; i > 0; i--) {
+      const compoundKey = segments.slice(0, i).join('.')
+
+      if (has(current, compoundKey)) {
+        const next = get(current, compoundKey)
+        return resolve(next, segments.slice(i))
+      }
+    }
+
+    return undefined
+  }
+
+  const result = resolve(obj, parts)
+  return isNil(result) ? defaultValue : result
 }
