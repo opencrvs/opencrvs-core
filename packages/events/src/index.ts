@@ -95,11 +95,11 @@ function isTrpcUrl(url: URL) {
     return false
   }
 
-  let appRouterPath = appRouter
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let appRouterPath = appRouter as any
 
   const appRouterHasPath = pathParts.every((part) => {
     if (part in appRouterPath) {
-      // @ts-expect-error appRouterPath is not typed
       appRouterPath = appRouterPath[part]
       return true
     }
