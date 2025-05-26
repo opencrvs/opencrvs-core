@@ -1,3 +1,13 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
 export const spacing = {
   '3xs': 'clamp(0.125rem, 0.125rem + 0vw, 0.125rem)',
   '2xs': 'clamp(0.25rem, 0.2283rem + 0.2174vw, 0.5rem)',
