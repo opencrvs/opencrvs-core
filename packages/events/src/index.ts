@@ -33,16 +33,10 @@ appModulePath.addPath(path.join(__dirname, '../'))
 // This function normalizes the headers to a consistent format.
 function normalizeHeaders(
   headers: Headers | Record<string, string | string[] | undefined>
-): Record<string, string> {
-  if (headers instanceof Headers) {
-    const result: Record<string, string> = {}
-    headers.forEach((value, key) => {
-      result[key] = value
-    })
-    return result
-  }
-
-  return headers as Record<string, string>
+): Record<string, string | string[] | undefined> {
+  return headers instanceof Headers
+    ? Object.fromEntries(headers.entries())
+    : headers
 }
 
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
@@ -89,25 +83,12 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
 // Check if the URL is a defined tRPC path
 function isTrpcUrl(url: URL) {
   const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
-  const pathParts = pathName.split('.')
 
-  if (pathParts.length === 0) {
-    return false
-  }
+  const trpcProcedurePaths = Object.keys(appRouter._def.procedures)
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let appRouterPath = appRouter as any
-
-  const appRouterHasPath = pathParts.every((part) => {
-    if (part in appRouterPath) {
-      appRouterPath = appRouterPath[part]
-      return true
-    }
-
-    return false
-  })
-
-  return url.search.startsWith('?input') || appRouterHasPath
+  return (
+    url.search.startsWith('?input') || trpcProcedurePaths.includes(pathName)
+  )
 }
 
 const restServer = createOpenApiHttpHandler(trpcConfig)
@@ -123,9 +104,11 @@ const server = createServer((req, res) => {
 
   const url = new URL(req.url, `http://${req.headers.host}`)
 
+  // If it's a tRPC request, handle it with the tRPC server
   if (isTrpcUrl(url)) {
     trpcServer(req, res)
   } else {
+    // If it's a REST request, handle it with the REST server
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     restServer(req, res)
   }

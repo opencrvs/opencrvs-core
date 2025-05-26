@@ -279,28 +279,32 @@ export function parseScope(scope: string) {
       type: maybeLiteralScope.data
     }
   }
+
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
-  if (maybeConfigurableScope.success) {
-    const rawScope = maybeConfigurableScope.data
-    const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
-    const options = rawOptions.split(',').reduce(
-      (acc, option) => {
-        const [key, value] = option.split('=')
-        acc[key] = value.split('|')
-        return acc
-      },
-      {} as Record<string, string[]>
-    )
-    const parsedScope = {
-      type,
-      options
-    }
-    const result = ConfigurableScopes.safeParse(parsedScope)
-    if (result.success) {
-      return result.data
-    }
+  if (!maybeConfigurableScope.success) {
+    return
   }
-  return undefined
+
+  const rawScope = maybeConfigurableScope.data
+  const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
+
+  // Different options are separated by commas, and each option value is separated by a pipe e.g.:
+  // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
+  const options = rawOptions
+    .split(',')
+    .reduce((acc: Record<string, string[]>, option) => {
+      const [key, value] = option.split('=')
+      acc[key] = value.split('|')
+      return acc
+    }, {})
+
+  const parsedScope = {
+    type,
+    options
+  }
+
+  const result = ConfigurableScopes.safeParse(parsedScope)
+  return result.success ? result.data : undefined
 }
 
 /*
