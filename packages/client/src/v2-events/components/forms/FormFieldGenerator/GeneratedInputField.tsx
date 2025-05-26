@@ -121,6 +121,9 @@ export const GeneratedInputField = React.memo(
       label,
       required: fieldDefinition.required,
       disabled: readonlyMode,
+      helperText: fieldDefinition.helperText
+        ? intl.formatMessage(fieldDefinition.helperText)
+        : undefined,
       error,
       touched
     }
@@ -459,34 +462,40 @@ export const GeneratedInputField = React.memo(
 
     if (isLocationFieldType(field)) {
       return (
-        <LocationSearch.Input
-          {...field.config}
-          searchableResource={['locations']}
-          value={field.value}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
-        />
+        <InputField {...inputFieldProps}>
+          <LocationSearch.Input
+            {...field.config}
+            searchableResource={['locations']}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 
     if (isOfficeFieldType(field)) {
       return (
-        <LocationSearch.Input
-          {...field.config}
-          searchableResource={['offices']}
-          value={field.value}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
-        />
+        <InputField {...inputFieldProps}>
+          <LocationSearch.Input
+            {...field.config}
+            searchableResource={['offices']}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 
     if (isFacilityFieldType(field)) {
       return (
-        <LocationSearch.Input
-          {...field.config}
-          searchableResource={['facilities']}
-          value={field.value}
-          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
-        />
+        <InputField {...inputFieldProps}>
+          <LocationSearch.Input
+            {...field.config}
+            searchableResource={['facilities']}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
     if (isDividerFieldType(field)) {

@@ -110,6 +110,36 @@ function buildClause(clause: QueryExpression) {
     })
   }
 
+  if (clause['legalStatus.REGISTERED.createdAt']) {
+    if (clause['legalStatus.REGISTERED.createdAt'].type === 'exact') {
+      must.push({
+        term: {
+          'legalStatuses.REGISTERED.createdAt':
+            clause['legalStatus.REGISTERED.createdAt'].term
+        }
+      })
+    } else {
+      must.push({
+        range: {
+          'legalStatuses.REGISTERED.createdAt': {
+            gte: clause['legalStatus.REGISTERED.createdAt'].gte,
+            lte: clause['legalStatus.REGISTERED.createdAt'].lte
+          }
+        }
+      })
+    }
+  }
+  if (clause['legalStatus.REGISTERED.createdAtLocation']) {
+    if (clause['legalStatus.REGISTERED.createdAtLocation'].type === 'exact') {
+      must.push({
+        term: {
+          'legalStatuses.REGISTERED.createdAtLocation':
+            clause['legalStatus.REGISTERED.createdAtLocation'].term
+        }
+      })
+    }
+  }
+
   if (clause.registrationNumber) {
     must.push({
       term: {

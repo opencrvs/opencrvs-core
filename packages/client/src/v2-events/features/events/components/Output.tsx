@@ -21,11 +21,13 @@ import {
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
+  isDateRangeFieldType,
   isDividerFieldType,
   isEmailFieldType,
   isFacilityFieldType,
   isFileFieldType,
   isNumberFieldType,
+  isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
@@ -51,6 +53,7 @@ import {
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -62,13 +65,17 @@ const Deleted = styled.del`
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
+export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   if (isEmailFieldType(field) || isTextFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 
   if (isDateFieldType(field)) {
     return DateField.Output({ value: field.value })
+  }
+
+  if (isDateRangeFieldType(field)) {
+    return DateRangeField.Output({ value: field.value })
   }
 
   if (isPageHeaderFieldType(field)) {
@@ -126,6 +133,10 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
 
   if (isAdministrativeAreaFieldType(field)) {
     return AdministrativeArea.Output({ value: field.value })
+  }
+
+  if (isOfficeFieldType(field)) {
+    return LocationSearch.Output({ value: field.value })
   }
 
   if (isDividerFieldType(field)) {
