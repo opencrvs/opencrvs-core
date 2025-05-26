@@ -269,7 +269,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     readableObjectMode: true,
     writableObjectMode: true,
     transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record))
+      callback(null, eventToEventIndex(record, eventConfiguration))
     }
   })
 
