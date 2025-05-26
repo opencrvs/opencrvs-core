@@ -75,7 +75,8 @@ export const eventRouter = router({
           summary: 'List event configurations',
           method: 'GET',
           path: '/events/config',
-          tags: ['Events']
+          tags: ['Events'],
+          protect: true
         }
       })
       .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
@@ -86,6 +87,15 @@ export const eventRouter = router({
       })
   }),
   create: publicProcedure
+    .meta({
+      openapi: {
+        summary: 'Create event',
+        method: 'POST',
+        path: '/events/create',
+        tags: ['Events'],
+        protect: true
+      }
+    })
     .use(
       requiresAnyOfScopes(
         ACTION_ALLOWED_SCOPES[ActionType.CREATE],
@@ -94,6 +104,8 @@ export const eventRouter = router({
     )
     .input(EventInput)
     .use(middleware.eventTypeAuthorization)
+    // TODO CIHAN: type
+    .output(z.any())
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)
@@ -163,6 +175,7 @@ export const eventRouter = router({
     })
   }),
   actions: router({
+    // TODO CIHAN: add meta for notify
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
     declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
     validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
