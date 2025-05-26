@@ -31420,6 +31420,7 @@ components:
                     type: string
                   createdAtLocation:
                     type: string
+                    format: uuid
                   status:
                     type: string
                     const: Rejected
@@ -31803,6 +31804,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum:
@@ -32140,6 +32142,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -32473,6 +32476,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -32806,6 +32810,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -33139,6 +33144,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -33472,6 +33478,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -33805,6 +33812,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -34140,6 +34148,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -34473,6 +34482,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -34809,6 +34819,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -35142,6 +35153,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -35478,6 +35490,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -35814,6 +35827,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -36150,6 +36164,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
@@ -36483,6 +36498,7 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          format: uuid
         status:
           type: string
           enum: *a20
