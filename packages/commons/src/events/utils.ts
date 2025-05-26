@@ -200,7 +200,7 @@ export function createEmptyDraft(
       annotation: {},
       createdAt: new Date().toISOString(),
       createdBy: '@todo',
-      createdAtLocation: '@todo',
+      createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
       status: ActionStatus.Accepted,
       transactionId: '@todo',
       createdByRole: '@todo'

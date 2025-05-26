@@ -18,7 +18,7 @@ import {
   EventDocument,
   UUID
 } from '@opencrvs/commons'
-import { getClient, sql } from './db'
+import { formatTimestamp, getClient, sql } from './db'
 
 async function getEventByIdInTransaction(
   eventId: UUID,
@@ -29,8 +29,8 @@ async function getEventByIdInTransaction(
       id,
       event_type AS type,
       date_of_event_field_id AS "dateOfEventFieldId",
-      created_at AS "createdAt",
-      updated_at AS "updatedAt",
+      ${formatTimestamp('created_at')} AS "createdAt",
+      ${formatTimestamp('updated_at')} AS "updatedAt",
       tracking_id AS "trackingId"
     FROM
       events
@@ -42,7 +42,7 @@ async function getEventByIdInTransaction(
     SELECT
       id,
       transaction_id AS "transactionId",
-      created_at AS "createdAt",
+      ${formatTimestamp('created_at')} AS "createdAt",
       created_by AS "createdBy",
       created_by_role AS "createdByRole",
       declaration,
@@ -136,7 +136,7 @@ async function createActionInTransaction(
     status: ActionStatus
     createdBy: string
     createdByRole: string
-    createdAtLocation: string
+    createdAtLocation: UUID
     declaration?: Record<string, SerializableValue>
     annotation?: Record<string, SerializableValue>
     originalActionId?: UUID
@@ -146,7 +146,7 @@ async function createActionInTransaction(
   // @TODO: Some typing error here
   const originalActionIdx = originalActionId as string | undefined
 
-  const { id } = await trx.one(sql.type(z.object({ id: UUID }))`
+  const id = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
     INSERT INTO
       event_actions (
         event_id,
@@ -166,14 +166,16 @@ async function createActionInTransaction(
         ${transactionId},
         ${type}::action_type,
         ${status}::action_status,
-        ${sql.jsonb(declaration)},
-        ${sql.jsonb(annotation)},
+        ${sql.jsonb(declaration ?? {})},
+        ${sql.jsonb(annotation ?? {})},
         ${createdBy},
         ${createdByRole},
         ${createdAtLocation},
         ${originalActionIdx ?? null}::uuid
       )
-    ON CONFLICT (transaction_id) DO NOTHING
+    ON CONFLICT (action_type, transaction_id) DO UPDATE -- no-op, DO NOTHING would not return the id
+    SET
+      action_type = event_actions.action_type
     RETURNING
       id
   `)
@@ -203,12 +205,12 @@ export const getOrCreateEvent = async ({
   fieldId?: string
   createdBy: string
   createdByRole: string
-  createdAtLocation: string
+  createdAtLocation: UUID
 }) => {
   const db = await getClient()
 
   return db.transaction(async (trx) => {
-    const { id: eventId } = await trx.one(sql.type(z.object({ id: UUID }))`
+    const eventId = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
       INSERT INTO
         events (
           event_type,
@@ -223,7 +225,9 @@ export const getOrCreateEvent = async ({
           ${trackingId},
           ${fieldId ?? null}
         )
-      ON CONFLICT (transaction_id) DO NOTHING
+      ON CONFLICT (transaction_id) DO UPDATE
+      SET
+        updated_at = NOW()
       RETURNING
         id
     `)

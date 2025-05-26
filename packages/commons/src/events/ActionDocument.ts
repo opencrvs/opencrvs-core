@@ -44,7 +44,7 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string(),
+  createdAtLocation: UUID,
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,

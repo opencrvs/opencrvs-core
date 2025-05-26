@@ -10,6 +10,7 @@
  */
 
 import fetch from 'node-fetch'
+import { UUID } from '../uuid'
 
 interface IUserName {
   use: string
@@ -28,7 +29,7 @@ type User = {
   email: string
   role: ObjectId
   practitionerId: string
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   scope: string[]
   status: string
   creationDate: number

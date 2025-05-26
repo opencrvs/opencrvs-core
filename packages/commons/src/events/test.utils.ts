@@ -156,7 +156,7 @@ export const eventPayloadGenerator = {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByRole: '@todo',
-          createdAtLocation: '@todo'
+          createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
         }
       } satisfies Draft,
       input
@@ -423,7 +423,7 @@ export function generateActionDocument({
     createdBy: getUUID(),
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     status: ActionStatus.Accepted,

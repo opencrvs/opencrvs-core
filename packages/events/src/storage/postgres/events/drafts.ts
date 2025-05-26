@@ -11,7 +11,11 @@
 
 import { Draft, DraftInput } from '@opencrvs/commons/events'
 import { UUID } from '@opencrvs/commons'
-import { getClient, sql } from '@events/storage/postgres/events/db'
+import {
+  formatTimestamp,
+  getClient,
+  sql
+} from '@events/storage/postgres/events/db'
 
 export async function createDraft(
   input: DraftInput,
@@ -25,7 +29,7 @@ export async function createDraft(
     eventId: UUID
     createdBy: string
     createdByRole: string
-    createdAtLocation: string
+    createdAtLocation: UUID
     token: string
     transactionId: string
   }
@@ -73,13 +77,33 @@ export async function createDraft(
 
 export async function getDraftsByUserId(createdBy: string) {
   const db = await getClient()
+  // @TODO: Change the Draft type to be flat ?
   const drafts = await db.any(sql.type(Draft)`
     SELECT
       id,
       event_id AS "eventId",
       transaction_id AS "transactionId",
-      declaration,
-      annotation
+      ${formatTimestamp('created_at')} AS "createdAt",
+      json_build_object(
+        'transactionId',
+        transaction_id,
+        'createdAt',
+        ${formatTimestamp('created_at')},
+        'createdBy',
+        created_by,
+        'createdByRole',
+        created_by_role,
+        'createdAtLocation',
+        created_at_location,
+        'declaration',
+        declaration,
+        'annotation',
+        annotation,
+        'type',
+        action_type,
+        'status',
+        'Accepted'::action_status::text
+      ) AS action
     FROM
       event_action_drafts
     WHERE
@@ -101,7 +125,8 @@ export async function getDraftsForAction(
       event_id AS "eventId",
       transaction_id AS "transactionId",
       declaration,
-      annotation
+      annotation,
+      ${formatTimestamp('created_at')} AS "createdAt"
     FROM
       event_action_drafts
     WHERE

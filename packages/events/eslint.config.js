@@ -98,7 +98,9 @@ module.exports = defineConfig([
         uuid: 'UUID',
         uuid: 'string & BRAND<"UUID">',
         action_type: 'ActionType',
-        action_status: 'ActionStatus'
+        action_status: 'ActionStatus',
+        'text[]': 'ArraySqlToken',
+        text: 'SqlFragmentToken'
       }
     }
   })

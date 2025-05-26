@@ -48,7 +48,7 @@ CREATE TYPE action_type AS ENUM (
 
 CREATE TABLE event_actions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  transaction_id text UNIQUE NOT NULL,
+  transaction_id text NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
   action_type action_type NOT NULL,
   assigned_to text,
@@ -59,11 +59,12 @@ CREATE TABLE event_actions (
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_at_location uuid NOT NULL REFERENCES locations(id),
-  created_at timestamp with time zone DEFAULT now() NOT NULL
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  UNIQUE (transaction_id, action_type)
 );
 
 COMMENT ON TABLE event_actions IS
-  'Stores actions performed on life events, including client-supplied transaction_id for idempotency. Each action is linked to a specific event.';
+  'Stores actions performed on life events, including client-supplied transaction_id for idempotency. The same transaction id can only create action of one type. Each action is linked to a specific event.';
 
 COMMENT ON COLUMN event_actions.original_action_id IS
   'References the original action if this is an asynchronous confirmation of it.';

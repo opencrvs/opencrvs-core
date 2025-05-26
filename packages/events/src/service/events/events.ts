@@ -118,7 +118,7 @@ export async function createEvent({
   eventInput: z.infer<typeof EventInput>
   createdBy: string
   createdByRole: string
-  createdAtLocation: string
+  createdAtLocation: UUID
   transactionId: string
 }): Promise<EventDocument> {
   const event = await eventsRepo.getOrCreateEvent({

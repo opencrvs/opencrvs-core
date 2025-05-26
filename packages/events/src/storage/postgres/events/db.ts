@@ -30,3 +30,7 @@ export const sql = createSqlTag({
     draft: Draft
   }
 })
+
+export const formatTimestamp = (columnName: string) => {
+  return sql.fragment`TO_CHAR(${sql.identifier([columnName])}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`
+}

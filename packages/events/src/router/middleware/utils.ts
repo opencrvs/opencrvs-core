@@ -10,12 +10,12 @@
  */
 
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
-import { ActionInputWithType, TokenWithBearer } from '@opencrvs/commons'
+import { ActionInputWithType, TokenWithBearer, UUID } from '@opencrvs/commons'
 
 export interface Context {
   user: {
     id: string
-    primaryOfficeId: string
+    primaryOfficeId: UUID
     role: string
   }
   token: TokenWithBearer
