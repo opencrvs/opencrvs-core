@@ -20,7 +20,7 @@ import {
 import { SearchQueryParams } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
-import { filterValuesBasedOnFieldConfigs } from './utils'
+import { parseFieldSearchParams } from './utils'
 
 const messagesToDefine = {
   advancedSearch: {
@@ -71,7 +71,7 @@ export function AdvancedSearch() {
 
   const currentTabSections = currentEvent.advancedSearch
 
-  const filteredSearchParams = filterValuesBasedOnFieldConfigs(
+  const filteredSearchParams = parseFieldSearchParams(
     currentEvent,
     searchParams.data
   )

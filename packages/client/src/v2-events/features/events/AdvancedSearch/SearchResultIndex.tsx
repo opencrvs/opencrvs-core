@@ -20,7 +20,7 @@ import { SearchResult } from './SearchResult'
 import {
   ADVANCED_SEARCH_KEY,
   buildDataCondition,
-  filterValuesBasedOnFieldConfigs
+  parseFieldSearchParams
 } from './utils'
 
 export const SearchResultIndex = () => {
@@ -36,7 +36,7 @@ export const SearchResultIndex = () => {
     throw new Error('Invalid search params')
   }
 
-  const filteredSearchParams = filterValuesBasedOnFieldConfigs(
+  const filteredSearchParams = parseFieldSearchParams(
     eventConfig,
     searchParams.data
   )

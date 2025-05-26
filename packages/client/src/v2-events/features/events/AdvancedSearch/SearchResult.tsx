@@ -18,7 +18,7 @@ import {
   EventIndex,
   EventConfig,
   workqueues,
-  FieldValue
+  EventState
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -160,7 +160,7 @@ const messages = defineMessages(messagesToDefine)
 interface Props {
   workqueueConfig: (typeof workqueues)['all']
   eventConfig: EventConfig
-  searchParams: Record<string, FieldValue>
+  searchParams: EventState
   queryData: EventIndex[]
 }
 

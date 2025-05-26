@@ -11,7 +11,7 @@
 import {
   FieldConfig,
   FieldType,
-  FieldValue,
+  EventState,
   SystemVariables,
   isFieldConfigDefaultValue
 } from '@opencrvs/commons/client'
@@ -71,7 +71,7 @@ export function formatDateFieldValue(value: string) {
  * @returns adds 0 before single digit days and months to make them 2 digit
  * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
  */
-export function makeDatesFormatted<T extends Record<string, FieldValue>>(
+export function makeDatesFormatted<T extends EventState>(
   fields: FieldConfig[],
   values: T
 ): T {

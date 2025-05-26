@@ -61,7 +61,6 @@ export const AdvancedSearchStory: Story = {
     const canvas = within(canvasElement)
     await step('Opens up advanced tennis club membership tab', async () => {
       await waitFor(async () => {
-        // await canvas.findByText('Advanced Search')
         await canvas.findByText('Tennis club membership application')
       })
     })
@@ -72,15 +71,6 @@ export const AdvancedSearchStory: Story = {
         await canvas.findByText('Registration details')
         await canvas.findByText("Applicant's details")
         await canvas.findByText("Recommender's details")
-
-        const registrationAccordion = await canvas.findByTestId(
-          'accordion-v2.advancedSearch.form.registrationDetails'
-        )
-        await userEvent.click(
-          await within(registrationAccordion).findByRole('button', {
-            name: 'Show'
-          })
-        )
       }
     )
 
@@ -107,6 +97,15 @@ export const AdvancedSearchStory: Story = {
           })
         ).find((x) => x.id === 'search')
         await expect(searchButton).toBeVisible()
+
+        const registrationAccordion = await canvas.findByTestId(
+          'accordion-v2.advancedSearch.form.registrationDetails'
+        )
+        await userEvent.click(
+          await within(registrationAccordion).findByRole('button', {
+            name: 'Show'
+          })
+        )
 
         const placeOfRegistration = await canvas.findByTestId(
           'event____legalStatus____REGISTERED____createdAtLocation'

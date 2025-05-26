@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { useIntl, defineMessages, IntlShape } from 'react-intl'
+import { useIntl, defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
 import { Accordion } from '@opencrvs/components'
@@ -23,7 +23,8 @@ import {
   FieldValue,
   Inferred,
   SearchField,
-  TranslationConfig
+  TranslationConfig,
+  EventState
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
@@ -106,7 +107,7 @@ function SearchSectionForm({
     fields: FieldConfig[]
   }
   handleFieldChange: (fieldId: string, value: FieldValue) => void
-  fieldValues?: Record<string, FieldValue>
+  fieldValues?: EventState
 }) {
   const intl = useIntl()
 
@@ -138,7 +139,7 @@ function buildSearchSections({
   fieldValues
 }: {
   enhancedEvent: EventConfig
-  fieldValues?: Record<string, FieldValue>
+  fieldValues?: EventState
 }) {
   const allUniqueFields = getAllUniqueFields(enhancedEvent)
 
@@ -177,14 +178,14 @@ export function TabSearch({
   fieldValues
 }: {
   currentEvent: EventConfig
-  fieldValues?: Record<string, FieldValue>
+  fieldValues?: EventState
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
 
-  const [formValues, setFormValues] = React.useState<
-    Record<string, FieldValue>
-  >(fieldValues ?? {})
+  const [formValues, setFormValues] = React.useState<EventState>(
+    fieldValues ?? {}
+  )
 
   const prevEventId = React.useRef(currentEvent.id)
 

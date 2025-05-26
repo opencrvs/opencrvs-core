@@ -15,7 +15,12 @@ import styled from 'styled-components'
 import { stringify } from 'query-string'
 import { capitalize } from 'lodash'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
-import { EventConfig, FieldValue, Inferred } from '@opencrvs/commons/client'
+import {
+  EventConfig,
+  EventState,
+  FieldValue,
+  Inferred
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
 import { filterEmptyValues } from '@client/v2-events/utils'
@@ -76,14 +81,15 @@ function SearchParamLabel({
       (f) => f.fieldId === fieldName && f.searchCriteriaLabelPrefix
     )?.searchCriteriaLabelPrefix
   const prefix = searchCriteriaLabelPrefix
-    ? intl.formatMessage(searchCriteriaLabelPrefix)
+    ? `${intl.formatMessage(searchCriteriaLabelPrefix)} `
     : undefined
 
   const label = intl.formatMessage(field.label)
   const valueOutput = <ValueOutput config={field} value={value} />
   const output = (
     <>
-      {prefix} {label}
+      {prefix}
+      {label}
       {':'} {valueOutput}
     </>
   )
@@ -95,7 +101,7 @@ export function SearchCriteriaPanel({
   searchParams
 }: {
   eventConfig: EventConfig
-  searchParams: Record<string, FieldValue>
+  searchParams: EventState
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
