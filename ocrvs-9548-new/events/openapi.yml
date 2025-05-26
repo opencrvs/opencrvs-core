@@ -100,6 +100,364 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/notify:
+    post:
+      operationId: event-actions-notify-request
+      summary: Notify an event
+      tags:
+        - events
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  type: string
+                transactionId:
+                  type: string
+                declaration:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            items:
+                              oneOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          filename:
+                            type: string
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - filename
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            filename:
+                              type: string
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - filename
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                  default: {}
+                annotation:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - anyOf:
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                          - type: array
+                            maxItems: 2
+                            minItems: 2
+                            items:
+                              oneOf:
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                                - type: string
+                                  format: date
+                                  description: Date in the format YYYY-MM-DD
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          filename:
+                            type: string
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - filename
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            filename:
+                              type: string
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - filename
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                originalActionId:
+                  type: string
+                keepAssignment:
+                  type: boolean
+                type:
+                  type: string
+                  enum:
+                    - NOTIFY
+                  default: NOTIFY
+              required:
+                - eventId
+                - transactionId
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema: {}
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
 components:
   securitySchemes:
     Authorization:
