@@ -30,6 +30,7 @@ import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
 import uuid from 'uuid/v4'
+import { getEventConfigurations } from './countryconfig'
 
 export enum EventType {
   Birth = 'birth',
@@ -70,15 +71,12 @@ export async function registerSystem(
         webhook: []
       }
     }
-    const token: ITokenPayload = getTokenPayload(
-      request.headers.authorization.split(' ')[1]
-    )
-    const userId = token.sub
-    const systemAdminUser: IUserModel | null = await User.findById(userId)
 
-    const existingSystem: ISystemModel | null = await System.findOne({
-      type: type
-    })
+    const authorization = request.headers.authorization as string
+    const token = getTokenPayload(authorization.split(' ')[1])
+    const userId = token.sub
+    const systemAdminUser = await User.findById(userId)
+    const existingSystem = await System.findOne({ type: type })
 
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
@@ -92,7 +90,19 @@ export async function registerSystem(
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-    const systemScopes: string[] = DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]
+
+    const systemScopes: string[] = [
+      ...DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type],
+      'cihan_test_scope'
+    ]
+
+    // TODO CIHAN: get event configurations
+    const eventConfigurations = await getEventConfigurations(authorization)
+    const eventConfigurationIds = eventConfigurations.map(
+      (eventConfig) => eventConfig.id
+    )
+
+    console.log('CIHAN laita nää sinne scopeet', eventConfigurationIds)
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
@@ -108,10 +118,7 @@ export async function registerSystem(
     const { hash, salt } = generateSaltedHash(clientSecret)
 
     const practitioner = createFhirPractitioner(systemAdminUser, true)
-    const practitionerId = await postFhir(
-      request.headers.authorization,
-      practitioner
-    )
+    const practitionerId = await postFhir(authorization, practitioner)
     if (!practitionerId) {
       throw new Error(
         'Practitioner resource not saved correctly, practitioner ID not returned'
@@ -122,7 +129,7 @@ export async function registerSystem(
       practitionerId,
       true
     )
-    const roleId = await postFhir(request.headers.authorization, role)
+    const roleId = await postFhir(authorization, role)
     if (!roleId) {
       throw new Error(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
