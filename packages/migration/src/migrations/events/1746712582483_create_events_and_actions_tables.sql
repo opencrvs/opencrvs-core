@@ -1,5 +1,12 @@
 -- Up Migration
 
+CREATE TABLE locations (
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  external_id text UNIQUE,
+  name text NOT NULL,
+  parent_id uuid REFERENCES locations(id)
+);
+
 CREATE TABLE events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   event_type text NOT NULL,
@@ -51,7 +58,7 @@ CREATE TABLE event_actions (
   original_action_id uuid REFERENCES event_actions(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
-  created_at_location text NOT NULL,
+  created_at_location uuid NOT NULL REFERENCES locations(id),
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
@@ -64,13 +71,13 @@ COMMENT ON COLUMN event_actions.original_action_id IS
 CREATE TABLE event_action_drafts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   transaction_id text UNIQUE NOT NULL,
-  event_id uuid NOT NULL REFERENCES events(id),
+  event_id uuid NOT NULL REFERENCES events(id) ON DELETE CASCADE,
   action_type text NOT NULL,
   declaration jsonb DEFAULT '{}'::jsonb NOT NULL,
   annotation jsonb DEFAULT '{}'::jsonb NOT NULL,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
-  created_at_location text NOT NULL,
+  created_at_location uuid NOT NULL REFERENCES locations(id),
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
@@ -84,3 +91,4 @@ DROP TABLE IF EXISTS event_actions;
 DROP TYPE IF EXISTS action_type;
 DROP TYPE IF EXISTS action_status;
 DROP TABLE IF EXISTS events;
+DROP TABLE IF EXISTS locations;

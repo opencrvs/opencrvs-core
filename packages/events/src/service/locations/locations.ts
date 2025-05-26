@@ -10,63 +10,28 @@
  */
 
 import { z } from 'zod'
+import { UUID } from '@opencrvs/commons'
+import * as locationsRepo from '@events/storage/postgres/events/locations'
 
 export const Location = z.object({
-  id: z.string(),
+  id: UUID,
   externalId: z.string().nullable(),
   name: z.string(),
-  partOf: z.string().nullable()
+  partOf: UUID.nullable()
 })
 
 export type Location = z.infer<typeof Location>
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
- * Clears all existing locations that are not in the incoming locations.
- *
- * @TODO: Consider removing the conditional logic after setting up dev environments for all devs.
- * In production it is run only once, and without transactions it is possible that the locations are not set correctly.
- *
  * @param incomingLocations - Locations to be set
  */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function setLocations(_incomingLocations: Array<Location>) {
-  // eslint-disable-next-line no-console
-  console.error('setLocations is not implemented yet')
-  // const db = await events.getClient()
-  // const currentLocations = await db
-  //   .collection<Location>('locations')
-  //   .find()
-  //   .toArray()
 
-  // const [locationsToKeep, locationsToRemove] = _.partition(
-  //   currentLocations,
-  //   (location) =>
-  //     incomingLocations.some(
-  //       (incomingLocation) => incomingLocation.id === location.id
-  //     )
-  // )
-
-  // const [, newLocations] = _.partition(incomingLocations, (location) =>
-  //   locationsToKeep.some((l) => l.id === location.id)
-  // )
-
-  // if (locationsToRemove.length > 0) {
-  //   await db
-  //     .collection('locations')
-  //     .deleteMany({ id: { $in: locationsToRemove.map((l) => l.id) } })
-  // }
-
-  // if (newLocations.length > 0) {
-  //   await db.collection('locations').insertMany(newLocations)
-  //}
+// @TODO: Check if the previous conditional logic made sense
+export async function setLocations(incomingLocations: Array<Location>) {
+  return locationsRepo.setLocations(incomingLocations)
 }
 
-export const getLocations = () => {
-  // eslint-disable-next-line no-console
-  console.error('getLocations is not implemented yet')
-  // const db = await events.getClient()
-
-  // return db.collection<Location>('locations').find().toArray()
-  return []
+export const getLocations = async () => {
+  return locationsRepo.getLocations()
 }
