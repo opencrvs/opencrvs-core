@@ -4,6 +4,10 @@
 
 - Fix migration issue discovered when restoring an OpenCRVS instance with a large number of records. `$push used too much memory and cannot spill to disk. Memory limit: 104857600 bytes` [#9116](https://github.com/opencrvs/opencrvs-core/issues/9116)
 
+### Bug fixes
+
+- Reconfigured Content Security Policy (CSP) to be more restrictive, enhancing protection against unauthorized content sources [#9594](https://github.com/opencrvs/opencrvs-core/issues/9584)
+
 ### Breaking changes
 
 - Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
