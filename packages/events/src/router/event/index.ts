@@ -305,7 +305,7 @@ export const eventRouter = router({
         summary: 'Import full event record',
         method: 'POST',
         path: '/events/import',
-        tags: ['Events']
+        tags: ['events']
       }
     })
     .input(EventDocument)
