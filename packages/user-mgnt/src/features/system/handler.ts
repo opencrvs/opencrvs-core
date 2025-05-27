@@ -11,14 +11,17 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES } from '@opencrvs/commons/authentication'
+import {
+  SystemIntegrationRole,
+  getSystemIntegrationRoleScopes
+} from '@opencrvs/commons/authentication'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger, stringifyScope } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import System, {
   ISystemModel,
   WebhookPermissions
@@ -48,7 +51,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES
+  type: SystemIntegrationRole
   integratingSystemType: string
 }
 
@@ -86,26 +89,15 @@ export async function registerSystem(
     if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
       throw new Error('System with NATIONAL_ID already exists !')
     }
-    if (!DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]) {
+
+    const eventConfigurations = await getEventConfigurations(authorization)
+    const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
+    const systemScopes = getSystemIntegrationRoleScopes(type, eventIds)
+
+    if (!systemScopes) {
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-
-    const systemScopes: string[] = [
-      ...DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]
-    ]
-
-    // TODO CIHAN: get event configurations
-    const eventConfigurations = await getEventConfigurations(authorization)
-    const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
-
-    console.log('CIHAN laita nää sinne scopeet', eventIds)
-    console.log(
-      stringifyScope({
-        type: 'record.notify',
-        options: { event: eventIds }
-      })
-    )
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
