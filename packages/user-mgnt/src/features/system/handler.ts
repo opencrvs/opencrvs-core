@@ -11,10 +11,7 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import {
-  SystemIntegrationRole,
-  getSystemIntegrationRoleScopes
-} from '@opencrvs/commons/authentication'
+import { SystemIntegrationRole, getSystemIntegrationRoleScopes } from './scopes'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
