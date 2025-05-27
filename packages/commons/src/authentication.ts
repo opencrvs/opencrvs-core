@@ -23,13 +23,6 @@ import {
 } from './scopes'
 export * from './scopes'
 
-/** All the scopes system/integration can be assigned to */
-export const SYSTEM_INTEGRATION_SCOPES = {
-  recordsearch: SCOPES.RECORDSEARCH,
-  webhook: SCOPES.WEBHOOK,
-  nationalId: SCOPES.NATIONALID
-} as const
-
 export const DEFAULT_ROLES_DEFINITION = [
   {
     id: 'FIELD_AGENT',
@@ -218,15 +211,6 @@ export function getSystemIntegrationRoleScopes(
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
-
-/** All the scopes user can be assigned to – old & new */
-export type UserScope =
-  | (typeof SCOPES)[keyof typeof SCOPES]
-  | 'profile.electronic-signature'
-
-export type SystemScope =
-  (typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES)[SystemIntegrationRole][number]
-
 export interface ITokenPayload {
   sub: string
   exp: string
