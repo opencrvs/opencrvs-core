@@ -63,3 +63,19 @@ export function useOnlineStatus() {
 export interface IndexMap<T> {
   [id: string]: T | undefined
 }
+
+// browser polyfill for 'querystring module's stringify function
+export function stringify(
+  obj: Record<string, string | number | boolean | null | undefined>
+): string {
+  const params = new URLSearchParams()
+
+  for (const key in obj) {
+    const value = obj[key]
+    if (value !== undefined && value !== null) {
+      params.append(key, String(value))
+    }
+  }
+
+  return params.toString()
+}

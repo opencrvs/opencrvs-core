@@ -26,7 +26,7 @@ import {
   generateGoToHomeTabUrl,
   generatePerformanceHomeUrl
 } from '@client/navigation'
-import { stringify } from 'querystring'
+import { stringify } from '@client/utils'
 import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
 
