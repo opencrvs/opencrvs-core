@@ -26,7 +26,7 @@ import { ActionType } from '../events/ActionType'
 import { ActionStatus } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
-import { TokenUserType } from 'src/authentication'
+import { TokenUserType } from '../authentication'
 
 /*  eslint-disable max-lines */
 
