@@ -13,7 +13,7 @@ import { createServer, IncomingMessage } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
-import { getSystem, getUser, logger } from '@opencrvs/commons'
+import { getUser, logger } from '@opencrvs/commons'
 import {
   getUserId,
   getUserTypeFromToken,
@@ -71,8 +71,6 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     const userType = getUserTypeFromToken(token)
 
     if (userType === TokenUserType.SYSTEM) {
-      await getSystem(env.USER_MANAGEMENT_URL, sub, token)
-
       return {
         userType: TokenUserType.SYSTEM,
         system: {

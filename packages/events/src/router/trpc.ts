@@ -21,8 +21,16 @@ export const t = initTRPC.context<Context>().meta<OpenApiMeta>().create({
 
 export const router = t.router
 
+/*
+ * System procedures are available to both system (API key) users and
+ * human users depending on the scopes they have
+ */
 export const systemProcedure = t.procedure
 
+/*
+ * Public procedures are only available to human users
+ * and will throw an error if a system user tries to access them
+ */
 export const publicProcedure = t.procedure.use(async (opts) => {
   if (opts.ctx.userType === TokenUserType.SYSTEM) {
     throw new Error('This procedure is only available for human users')
