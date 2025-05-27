@@ -45,14 +45,18 @@ import {
   requestActionConfirmation
 } from './actionConfirmationRequest'
 
+/**
+ * Configuration for an action procedure
+ * @interface ActionProcedureConfig
+ * @property {z.ZodType} inputSchema - The Zod schema for validating the action input
+ * @property {z.ZodType | undefined} notifyApiPayloadSchema - Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
+ * @property {boolean} validatePayload - Whether the payload should be strictly validated against the inputSchema schema
+ * @property {OpenApiMeta} [meta] - Meta information, incl. OpenAPI definition
+ */
 interface ActionProcedureConfig {
-  // The Zod schema for validating the action input
   inputSchema: z.ZodType
-  // Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
   notifyApiPayloadSchema: z.ZodType | undefined
-  // Whether the payload should be strictly validated against the inputSchema schema
   validatePayload: boolean
-  // Meta information, incl. OpenAPI definition
   meta?: OpenApiMeta
 }
 

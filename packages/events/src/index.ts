@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createServer } from 'http'
+import { createServer, IncomingMessage } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
@@ -33,16 +33,10 @@ appModulePath.addPath(path.join(__dirname, '../'))
 // This function normalizes the headers to a consistent format.
 function normalizeHeaders(
   headers: Headers | Record<string, string | string[] | undefined>
-): Record<string, string> {
-  if (headers instanceof Headers) {
-    const result: Record<string, string> = {}
-    headers.forEach((value, key) => {
-      result[key] = value
-    })
-    return result
-  }
-
-  return headers as Record<string, string>
+): Record<string, string | string[] | undefined> {
+  return headers instanceof Headers
+    ? Object.fromEntries(headers.entries())
+    : headers
 }
 
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
@@ -86,28 +80,19 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   }
 }
 
-// Check if the URL is a defined tRPC path
-function isTrpcUrl(url: URL) {
-  const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
-  const pathParts = pathName.split('.')
-
-  if (pathParts.length === 0) {
-    return false
+// Check if the request is a tRPC request
+function isTrpcRequest(req: IncomingMessage) {
+  if (!req.url) {
+    throw new Error('No URL provided')
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  let appRouterPath = appRouter as any
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
+  const trpcProcedurePaths = Object.keys(appRouter._def.procedures)
 
-  const appRouterHasPath = pathParts.every((part) => {
-    if (part in appRouterPath) {
-      appRouterPath = appRouterPath[part]
-      return true
-    }
-
-    return false
-  })
-
-  return url.search.startsWith('?input') || appRouterHasPath
+  return (
+    url.search.startsWith('?input') || trpcProcedurePaths.includes(pathName)
+  )
 }
 
 const restServer = createOpenApiHttpHandler(trpcConfig)
@@ -121,11 +106,11 @@ const server = createServer((req, res) => {
     return
   }
 
-  const url = new URL(req.url, `http://${req.headers.host}`)
-
-  if (isTrpcUrl(url)) {
+  // If it's a tRPC request, handle it with the tRPC server
+  if (isTrpcRequest(req)) {
     trpcServer(req, res)
   } else {
+    // If it's a REST request, handle it with the REST server
     // eslint-disable-next-line @typescript-eslint/no-floating-promises
     restServer(req, res)
   }

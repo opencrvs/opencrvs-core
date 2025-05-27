@@ -111,10 +111,13 @@ export function requiresAnyOfScopes(
     const token = setBearerForToken(opts.ctx.token)
     const authHeader = { Authorization: token }
 
+    // If the user has any of the allowd plain scopes, allow access
     if (inScope(authHeader, scopes)) {
       return opts.next()
     }
 
+    // If the user has any of the allowed configurable scopes, allow the user to continue
+    // and add the authorized entities to the context which are checked in later middleware
     if (configurableScopes) {
       const authorizedEntities = inConfigurableScopes(
         authHeader,
