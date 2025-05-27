@@ -15,7 +15,8 @@ import {
   USER_DETAILS,
   storeUserDetails,
   removeUserDetails,
-  UserDetails
+  UserDetails,
+  precacheUserSignature
 } from '@client/utils/userUtils'
 import {
   getTokenPayload,
@@ -146,6 +147,11 @@ export const profileReducer: LoopReducer<
             userDetails
           },
           Cmd.list([
+            /**
+             * User signature is precached for offline functionality. V1 signature URL is presigned. **Unsigned file URL** is cached.
+             * This is to support V2 offline functionality, without changing how the signature is handled in V1 state.
+             */
+            Cmd.run(() => precacheUserSignature(userDetails.signature?.data)),
             Cmd.run(() => storeUserDetails(userDetails)),
             Cmd.action(actions.userDetailsAvailable(userDetails))
           ])
