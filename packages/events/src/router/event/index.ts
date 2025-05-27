@@ -28,10 +28,10 @@ import {
   ACTION_ALLOWED_SCOPES,
   CONFIG_GET_ALLOWED_SCOPES,
   CONFIG_SEARCH_ALLOWED_SCOPES,
-  QueryType,
   DeleteActionInput,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  EventDocument
+  EventDocument,
+  QueryExpression
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -291,7 +291,21 @@ export const eventRouter = router({
       return getIndexedEvents(userId)
     }),
   search: publicProcedure
+    .meta({
+      openapi: {
+        summary: 'Search for events',
+        method: 'GET',
+        tags: ['Search'],
+        path: '/events/search'
+      }
+    })
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
-    .input(QueryType)
+    .input(
+      z.object({
+        type: z.literal('and').or(z.literal('or')),
+        clauses: z.preprocess((val) => val, z.array(QueryExpression))
+      })
+    )
+    .output(z.array(EventIndex))
     .query(async ({ input }) => getIndex(input))
 })
