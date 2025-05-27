@@ -43,8 +43,7 @@ paths:
   /events/search:
     post:
       operationId: event-search
-      summary: Event declaration search
-      description: Search for events based on various criteria.
+      summary: Search for events
       tags:
         - Search
       security:
@@ -60,51 +59,14 @@ paths:
                   anyOf:
                     - type: string
                       enum:
-                        - and
+                        - or
                     - type: string
                       enum:
-                        - or
+                        - and
                 clauses:
-                  type: object
-                  properties:
-                    eventType:
-                      type: string
-                    status:
-                      anyOf:
-                        - $ref: "#/components/schemas/AnyOfStatus"
-                        - $ref: "#/components/schemas/ExactStatus"
-                    createdAt:
-                      $ref: "#/components/schemas/DateCondition"
-                    updatedAt:
-                      $ref: "#/components/schemas/DateCondition"
-                    legalStatus.REGISTERED.createdAt:
-                      $ref: "#/components/schemas/DateCondition"
-                    legalStatus.REGISTERED.createdAtLocation:
-                      anyOf:
-                        - $ref: "#/components/schemas/Within"
-                        - $ref: "#/components/schemas/Exact"
-                    createAtLocation:
-                      anyOf:
-                        - $ref: "#/components/schemas/Within"
-                        - $ref: "#/components/schemas/Exact"
-                    updatedAtLocation:
-                      anyOf:
-                        - $ref: "#/components/schemas/Within"
-                        - $ref: "#/components/schemas/Exact"
-                    createdBy:
-                      $ref: "#/components/schemas/Exact"
-                    updatedBy:
-                      $ref: "#/components/schemas/Exact"
-                    trackingId:
-                      $ref: "#/components/schemas/Exact"
-                    flags:
-                      type: array
-                      items:
-                        anyOf:
-                          - $ref: "#/components/schemas/AnyOf"
-                          - $ref: "#/components/schemas/Not"
-                    data:
-                      $ref: "#/components/schemas/QueryInput"
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/QueryExpression"
               required:
                 - type
                 - clauses
@@ -43429,6 +43391,47 @@ components:
         code: INTERNAL_SERVER_ERROR
         message: Internal server error
         issues: []
+    QueryExpression:
+      type: object
+      properties:
+        eventType:
+          type: string
+        status:
+          anyOf:
+            - $ref: "#/components/schemas/AnyOfStatus"
+            - $ref: "#/components/schemas/ExactStatus"
+        createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        updatedAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatus.REGISTERED.createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatus.REGISTERED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        createAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        updatedAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        createdBy:
+          $ref: "#/components/schemas/Exact"
+        updatedBy:
+          $ref: "#/components/schemas/Exact"
+        trackingId:
+          $ref: "#/components/schemas/Exact"
+        flags:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/AnyOf"
+              - $ref: "#/components/schemas/Not"
+        data:
+          $ref: "#/components/schemas/QueryInput"
     AnyOfStatus:
       type: object
       properties:
