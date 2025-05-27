@@ -33,7 +33,9 @@ import {
   isRadioGroupFieldType,
   isSelectFieldType,
   isTextFieldType,
-  isNameFieldType
+  isNameFieldType,
+  isIdFieldType,
+  isPhoneFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -66,7 +68,12 @@ const Deleted = styled.del`
  *  @returns sensible default value for the field type given the field configuration.
  */
 export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
-  if (isEmailFieldType(field) || isTextFieldType(field)) {
+  if (
+    isEmailFieldType(field) ||
+    isIdFieldType(field) ||
+    isPhoneFieldType(field) ||
+    isTextFieldType(field)
+  ) {
     return Text.Output({ value: field.value })
   }
 
