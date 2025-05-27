@@ -18,7 +18,7 @@ import {
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@opencrvs/commons'
+import { logger, stringifyScope } from '@opencrvs/commons'
 import System, {
   ISystemModel,
   WebhookPermissions
@@ -92,17 +92,20 @@ export async function registerSystem(
     }
 
     const systemScopes: string[] = [
-      ...DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type],
-      'cihan_test_scope'
+      ...DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]
     ]
 
     // TODO CIHAN: get event configurations
     const eventConfigurations = await getEventConfigurations(authorization)
-    const eventConfigurationIds = eventConfigurations.map(
-      (eventConfig) => eventConfig.id
-    )
+    const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
 
-    console.log('CIHAN laita nää sinne scopeet', eventConfigurationIds)
+    console.log('CIHAN laita nää sinne scopeet', eventIds)
+    console.log(
+      stringifyScope({
+        type: 'record.notify',
+        options: { event: eventIds }
+      })
+    )
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
