@@ -22,6 +22,8 @@ import {
   DateRangeFieldValue
 } from './FieldValue'
 import { AddressFieldValue } from './CompositeFieldValue'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 const FieldId = z.string()
 
@@ -523,34 +525,39 @@ export type InferredInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
 
-export const FieldConfig = z.discriminatedUnion('type', [
-  Address,
-  TextField,
-  NumberField,
-  TextAreaField,
-  DateField,
-  DateRangeField,
-  Paragraph,
-  RadioGroup,
-  BulletList,
-  PageHeader,
-  Select,
-  NameField,
-  PhoneField,
-  IdField,
-  Checkbox,
-  File,
-  Country,
-  AdministrativeArea,
-  Divider,
-  Location,
-  Facility,
-  Office,
-  SignatureField,
-  EmailField,
-  FileUploadWithOptions,
-  DataField
-])
+export const FieldConfig = z
+  .discriminatedUnion('type', [
+    Address,
+    TextField,
+    NumberField,
+    TextAreaField,
+    DateField,
+    DateRangeField,
+    Paragraph,
+    RadioGroup,
+    BulletList,
+    PageHeader,
+    Select,
+    NameField,
+    PhoneField,
+    IdField,
+    Checkbox,
+    File,
+    Country,
+    AdministrativeArea,
+    Divider,
+    Location,
+    Facility,
+    Office,
+    SignatureField,
+    EmailField,
+    FileUploadWithOptions,
+    DataField
+  ])
+  .openapi({
+    description: 'Form field configuration',
+    ref: 'FieldConfig'
+  })
 
 export type SelectField = z.infer<typeof Select>
 export type NameField = z.infer<typeof NameField>
