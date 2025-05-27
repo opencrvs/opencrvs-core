@@ -217,8 +217,11 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_DATA_SEEDING)
 ])
 
+// Configurable scopes are for example:
+// - user.create[role=first-role|second-role]
+// - notify.event[event=v2.birth]
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z\.]+)\[((?:\w+=[\w-]+(?:\|[\w-]+)*)(:?,[\w-]+=[\w-]+(?:\|[\w-]+)*)*)\]$/
+  /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -264,12 +267,11 @@ export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
 ) {
-  return scopes
-    .map((rawScope) => parseScope(rawScope))
-    .find(
-      (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
-        parsedScope?.type === scopeType
-    )
+  const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
+  return parsedScopes.find(
+    (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
+      parsedScope?.type === scopeType
+  )
 }
 
 export function parseScope(scope: string) {
