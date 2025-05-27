@@ -292,7 +292,7 @@ export async function addAction(
 type AsyncRejectActionInput = Omit<
   z.infer<typeof AsyncRejectActionDocument>,
   'createdAt' | 'id' | 'status'
-> & { transactionId: string; eventId: UUID }
+> & { transactionId: string; eventId: UUID; originalActionId: UUID }
 
 export async function addAsyncRejectAction({
   transactionId,
