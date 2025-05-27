@@ -38,14 +38,14 @@ describe('event.actions.notify', () => {
     test('disallows access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const eventCreateClient = createTestClient(user, [
-        'notify.event[event=TENNIS_CLUB_MEMBERSHIP]'
+        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
       ])
 
       const event = await eventCreateClient.event.create(
         generator.event.create()
       )
 
-      const client = createTestClient(user, ['notify.event[event=some-event]'])
+      const client = createTestClient(user, ['record.notify[event=some-event]'])
 
       await expect(
         client.event.actions.notify.request(
@@ -57,7 +57,7 @@ describe('event.actions.notify', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [
-        'notify.event[event=TENNIS_CLUB_MEMBERSHIP]'
+        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
       ])
 
       await expect(

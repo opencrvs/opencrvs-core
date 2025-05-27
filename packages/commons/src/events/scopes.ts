@@ -83,8 +83,8 @@ export const ACTION_ALLOWED_SCOPES = {
 
 export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.READ]: [],
-  [ActionType.CREATE]: ['notify.event'],
-  [ActionType.NOTIFY]: ['notify.event'],
+  [ActionType.CREATE]: ['record.notify'],
+  [ActionType.NOTIFY]: ['record.notify'],
   [ActionType.DECLARE]: [],
   [ActionType.DELETE]: [],
   [ActionType.VALIDATE]: [],
