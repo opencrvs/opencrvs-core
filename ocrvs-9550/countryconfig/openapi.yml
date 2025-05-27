@@ -8207,8 +8207,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8536,8 +8538,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8866,8 +8870,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -9193,8 +9199,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -9515,7 +9523,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: f987c330-0212-4e39-8fa5-04f0d5fa888a
+        transactionId: 29ecd542-f2ef-40a2-b5a2-136cd16bda26
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -9524,8 +9532,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -9849,8 +9859,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -10174,8 +10186,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -10499,8 +10513,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -10824,8 +10840,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -11152,8 +11170,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -11480,8 +11500,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -11805,8 +11827,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -12130,8 +12154,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -12458,8 +12484,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -12786,8 +12814,10 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
+          format: uuid
         declaration:
           type: object
           additionalProperties:

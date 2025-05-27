@@ -57,6 +57,7 @@ paths:
               properties:
                 transactionId:
                   type: string
+                  format: uuid
                 type:
                   type: string
                 dateOfEvent:
@@ -70,7 +71,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: bbb4832a-d121-4672-a620-8d846958353b
+                transactionId: 9fa4f093-8af3-45fc-8a57-a16e9b4dd25b
                 type: v2.birth
       responses:
         "200":
@@ -120,8 +121,10 @@ paths:
               properties:
                 eventId:
                   type: string
+                  format: uuid
                 transactionId:
                   type: string
+                  format: uuid
                 declaration:
                   type: object
                   additionalProperties:
@@ -433,7 +436,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 4773aef2-bbd6-4448-a93c-5e2816dab2e5
+                transactionId: 76a07987-dc8f-48a3-937b-857de300392f
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
