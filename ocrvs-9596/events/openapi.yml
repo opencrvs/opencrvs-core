@@ -464,7 +464,7 @@ paths:
       operationId: event-import
       summary: Import full event record
       tags:
-        - Events
+        - events
       security:
         - Authorization: []
       requestBody:
