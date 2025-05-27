@@ -11,15 +11,20 @@
 
 import { JSONSchema } from '../conditionals/conditionals'
 import { z } from 'zod'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
 /*
  * Using JSONSchema directly here would cause a
  * "The inferred type of this node exceeds the maximum length the compiler will serialize."
  * error, so I've copied the type here
  */
-export const Conditional = z.custom<JSONSchema>(
-  (val) => typeof val === 'object' && val !== null
-)
+export const Conditional = z
+  .custom<JSONSchema>((val) => typeof val === 'object' && val !== null)
+  .openapi({
+    description: 'JSON schema conditional configuration',
+    ref: 'Conditional'
+  })
 
 /**
  * By default, when conditionals are undefined, action is visible and enabled to everyone.
@@ -103,13 +108,18 @@ export type InferredFieldConditional =
   | z.infer<typeof EnableConditional>
   | z.infer<typeof DisplayOnReviewConditional>
 
-export const FieldConditional = z.discriminatedUnion('type', [
-  // Field input can be shown / hidden
-  ShowConditional,
-  // Field input can be shown to the user but as disabled
-  EnableConditional,
-  // Field output can be shown / hidden on the review page
-  DisplayOnReviewConditional
-]) as unknown as z.ZodDiscriminatedUnion<'type', FieldConditionalType[]>
+export const FieldConditional = z
+  .discriminatedUnion('type', [
+    // Field input can be shown / hidden
+    ShowConditional,
+    // Field input can be shown to the user but as disabled
+    EnableConditional,
+    // Field output can be shown / hidden on the review page
+    DisplayOnReviewConditional
+  ])
+  .openapi({
+    description: 'Field conditional configuration',
+    ref: 'FieldConditional'
+  }) as unknown as z.ZodDiscriminatedUnion<'type', FieldConditionalType[]>
 
 export type FieldConditional = z.infer<typeof FieldConditional>

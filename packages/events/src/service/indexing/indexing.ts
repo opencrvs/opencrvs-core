@@ -233,8 +233,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists`)
-    logger.info(JSON.stringify(hasEventsIndex))
+    logger.info(`Index ${indexName} already exists.\n`)
   }
   return ensureAlias(indexName)
 }
