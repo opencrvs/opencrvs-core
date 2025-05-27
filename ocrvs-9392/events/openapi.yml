@@ -485,6 +485,7 @@ paths:
             type: array
             items:
               $ref: "#/components/schemas/QueryExpression"
+          required: true
       responses:
         "200":
           description: Successful response
