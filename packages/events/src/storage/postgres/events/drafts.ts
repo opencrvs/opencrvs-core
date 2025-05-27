@@ -77,7 +77,7 @@ export async function createDraft(
 
 export async function getDraftsByUserId(createdBy: string) {
   const db = await getClient()
-  // @TODO: Change the Draft type to be flat ?
+  // @TODO: Change the `Draft` type to be flat to avoid `json_build_object` ?
   const drafts = await db.any(sql.type(Draft)`
     SELECT
       id,

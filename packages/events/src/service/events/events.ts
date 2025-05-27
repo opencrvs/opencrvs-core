@@ -236,6 +236,9 @@ export async function addAction(
 
   await eventsRepo.createAction({
     eventId,
+    registrationNumber:
+      // @TODO: Can this be something else than register? `addAction` likely eventually gets quite bloated if not split up.
+      input.type === ActionType.REGISTER ? input.registrationNumber : undefined,
     transactionId: input.transactionId,
     type: input.type,
     declaration: input.declaration,

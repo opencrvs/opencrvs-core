@@ -16,7 +16,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { getEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
@@ -31,10 +31,10 @@ export async function validate(
     transactionId,
     createdAtLocation
   }: {
-    eventId: string
+    eventId: UUID
     createdBy: string
     createdByRole: string
-    createdAtLocation: string
+    createdAtLocation: UUID
     transactionId: string
     token: string
   }

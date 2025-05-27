@@ -42,15 +42,17 @@ async function getEventByIdInTransaction(
     SELECT
       id,
       transaction_id AS "transactionId",
-      ${formatTimestamp('created_at')} AS "createdAt",
-      created_by AS "createdBy",
-      created_by_role AS "createdByRole",
+      action_type AS "type",
+      registration_number AS "registrationNumber",
+      status,
       declaration,
       annotation,
+      assigned_to AS "assignedTo",
+      created_by AS "createdBy",
+      created_by_role AS "createdByRole",
+      original_action_id AS "originalActionId",
       created_at_location AS "createdAtLocation",
-      status,
-      action_type AS "type",
-      original_action_id AS "originalActionId"
+      ${formatTimestamp('created_at')} AS "createdAt"
     FROM
       event_actions
     WHERE
@@ -121,6 +123,7 @@ async function createActionInTransaction(
   {
     eventId,
     transactionId,
+    registrationNumber,
     type,
     status,
     createdBy,
@@ -133,6 +136,7 @@ async function createActionInTransaction(
   }: {
     eventId: UUID
     transactionId: string
+    registrationNumber?: string
     type: ActionType
     status: ActionStatus
     createdBy: string
@@ -153,6 +157,7 @@ async function createActionInTransaction(
       event_actions (
         event_id,
         transaction_id,
+        registration_number,
         action_type,
         assigned_to,
         status,
@@ -167,6 +172,7 @@ async function createActionInTransaction(
       (
         ${eventId},
         ${transactionId},
+        ${registrationNumber ?? null},
         ${type}::action_type,
         ${assignedTo ?? null},
         ${status}::action_status,

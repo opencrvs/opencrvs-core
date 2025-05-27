@@ -43,6 +43,7 @@ CREATE TYPE action_type AS ENUM (
 CREATE TABLE event_actions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   transaction_id text NOT NULL,
+  registration_number text UNIQUE,
   event_id uuid NOT NULL REFERENCES events(id),
   action_type action_type NOT NULL,
   assigned_to text,
@@ -64,7 +65,13 @@ CREATE TABLE event_actions (
       action_type = 'UNASSIGN'
       AND assigned_to IS NULL
     )
-    OR (action_type NOT IN ('ASSIGN', 'UNASSIGN'))
+    OR (
+      action_type = 'REGISTER'
+      AND registration_number IS NOT NULL
+    )
+    OR (
+      action_type NOT IN ('ASSIGN', 'UNASSIGN', 'REGISTER')
+    )
   )
 );
 
