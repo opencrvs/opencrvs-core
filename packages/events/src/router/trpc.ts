@@ -12,6 +12,7 @@
 import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
+import { TokenUserType } from '@opencrvs/commons'
 import { Context } from './middleware'
 
 export const t = initTRPC.context<Context>().meta<OpenApiMeta>().create({
@@ -19,4 +20,16 @@ export const t = initTRPC.context<Context>().meta<OpenApiMeta>().create({
 })
 
 export const router = t.router
-export const publicProcedure = t.procedure
+
+export const systemProcedure = t.procedure
+
+export const publicProcedure = t.procedure.use(async (opts) => {
+  if (opts.ctx.userType === TokenUserType.SYSTEM) {
+    throw new Error('This procedure is only available for human users')
+  }
+  return opts.next({
+    ctx: {
+      ...opts.ctx
+    }
+  })
+})

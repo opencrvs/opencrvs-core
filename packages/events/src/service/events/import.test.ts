@@ -12,11 +12,10 @@
 import { TRPCError } from '@trpc/server'
 import { ActionType, generateEventDocument, SCOPES } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { createSystemTestClient } from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [])
+  const client = createSystemTestClient('test-system', [])
 
   await expect(
     client.event.import(
@@ -29,8 +28,7 @@ test(`prevents forbidden access if missing required scope`, async () => {
 })
 
 test('allows access with import scope', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.RECORD_IMPORT])
+  const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
 
   await expect(
     client.event.import(
@@ -43,8 +41,7 @@ test('allows access with import scope', async () => {
 })
 
 test('importing an event indexes it into Elasticsearch', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [
+  const client = createSystemTestClient('test-system', [
     SCOPES.RECORD_IMPORT,
     SCOPES.RECORD_READ
   ])
@@ -60,8 +57,7 @@ test('importing an event indexes it into Elasticsearch', async () => {
 })
 
 test('importing the same event twice overwrites the previous one', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [
+  const client = createSystemTestClient('test-system', [
     SCOPES.RECORD_IMPORT,
     SCOPES.RECORD_READ
   ])

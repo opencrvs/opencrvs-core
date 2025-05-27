@@ -42,10 +42,11 @@ export const TEST_USER_DEFAULT_SCOPES = [
 
 export function createTestToken(
   userId: string,
-  scopes: Scope[]
+  scopes: Scope[],
+  userType: TokenUserType = TokenUserType.USER
 ): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes, sub: userId },
+    { scope: scopes, sub: userId, userType },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -57,9 +58,25 @@ export function createTestToken(
   return `Bearer ${token}`
 }
 
+export function createSystemTestClient(
+  systemId: string,
+  scopes: string[] = TEST_USER_DEFAULT_SCOPES
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTestToken(systemId, scopes, TokenUserType.SYSTEM)
+
+  const caller = createCaller({
+    userType: TokenUserType.SYSTEM,
+    system: {
+      id: systemId
+    },
+    token
+  })
+  return caller
+}
 export function createTestClient(
   user: CreatedUser,
-  scopes: Scope[] = TEST_USER_DEFAULT_SCOPES
+  scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken(user.id, scopes)

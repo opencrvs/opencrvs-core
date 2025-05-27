@@ -364,7 +364,6 @@ describe('getCurrentEventState()', () => {
     }
 
     const state = getCurrentEventState(event)
-
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,

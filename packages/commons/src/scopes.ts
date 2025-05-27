@@ -221,8 +221,11 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_DATA_SEEDING)
 ])
 
+// Configurable scopes are for example:
+// - user.create[role=first-role|second-role]
+// - notify.event[event=v2.birth]
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z]+\.[a-zA-Z]+)\[((?:\w+=\w+(?:\|\w+)*)(:?,\w+=\w+(?:\|\w+)*)*)\]$/
+  /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -240,23 +243,39 @@ const EditUserScope = z.object({
   })
 })
 
+const WorkqueueScope = z.object({
+  type: z.literal('workqueue'),
+  options: z.object({
+    id: z.array(z.string())
+  })
+})
+
+const NotifyEventScope = z.object({
+  type: z.literal('notify.event'),
+  options: z.object({
+    event: z.array(z.string())
+  })
+})
+
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
-  EditUserScope
+  EditUserScope,
+  WorkqueueScope,
+  NotifyEventScope
 ])
 
-type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
+export type ConfigurableScopeType = ConfigurableScopes['type']
+export type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
-export function findScope(
+export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
-  scopeType: ConfigurableScopes['type']
+  scopeType: T
 ) {
-  return scopes
-    .map((rawScope) => parseScope(rawScope))
-    .find(
-      (parsedScope): parsedScope is ConfigurableScopes =>
-        parsedScope?.type === scopeType
-    )
+  const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
+  return parsedScopes.find(
+    (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
+      parsedScope?.type === scopeType
+  )
 }
 
 export function parseScope(scope: string) {
@@ -266,25 +285,32 @@ export function parseScope(scope: string) {
       type: maybeLiteralScope.data
     }
   }
+
   const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
-  if (maybeConfigurableScope.success) {
-    const rawScope = maybeConfigurableScope.data
-    const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
-    const options = rawOptions.split(',').reduce((acc, option) => {
+  if (!maybeConfigurableScope.success) {
+    return
+  }
+
+  const rawScope = maybeConfigurableScope.data
+  const [, type, rawOptions] = rawScope.match(rawConfigurableScopeRegex) ?? []
+
+  // Different options are separated by commas, and each option value is separated by a pipe e.g.:
+  // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
+  const options = rawOptions
+    .split(',')
+    .reduce((acc: Record<string, string[]>, option) => {
       const [key, value] = option.split('=')
       acc[key] = value.split('|')
       return acc
-    }, {} as Record<string, string[]>)
-    const parsedScope = {
-      type,
-      options
-    }
-    const result = ConfigurableScopes.safeParse(parsedScope)
-    if (result.success) {
-      return result.data
-    }
+    }, {})
+
+  const parsedScope = {
+    type,
+    options
   }
-  return undefined
+
+  const result = ConfigurableScopes.safeParse(parsedScope)
+  return result.success ? result.data : undefined
 }
 
 /*

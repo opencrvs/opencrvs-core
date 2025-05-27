@@ -30,11 +30,12 @@ import {
   QueryType,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
-  UnassignActionInput
+  UnassignActionInput,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import { publicProcedure, router } from '@events/router/trpc'
+import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import { getEventConfigurations } from '@events/service/config/config'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { assignRecord } from '@events/service/events/actions/assign'
@@ -75,8 +76,9 @@ export const eventRouter = router({
         openapi: {
           summary: 'List event configurations',
           method: 'GET',
-          path: '/events/config',
-          tags: ['Events']
+          path: '/config',
+          tags: ['events'],
+          protect: true
         }
       })
       .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
@@ -87,8 +89,24 @@ export const eventRouter = router({
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.CREATE]))
+    .meta({
+      openapi: {
+        summary: 'Create event',
+        method: 'POST',
+        path: '/events',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .use(
+      requiresAnyOfScopes(
+        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
+        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
+      )
+    )
     .input(EventInput)
+    .use(middleware.eventTypeAuthorization)
+    .output(EventDocument)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)
@@ -141,21 +159,9 @@ export const eventRouter = router({
     }),
   draft: router({
     list: publicProcedure.output(z.array(Draft)).query(async (options) => {
-      if (options.ctx.userType === TokenUserType.SYSTEM) {
-        throw new TRPCError({
-          code: 'NOT_IMPLEMENTED',
-          message: 'Drafts are not supported for system users'
-        })
-      }
       return getDraftsByUserId(options.ctx.user.id)
     }),
     create: publicProcedure.input(DraftInput).mutation(async (options) => {
-      if (options.ctx.userType === TokenUserType.SYSTEM) {
-        throw new TRPCError({
-          code: 'NOT_IMPLEMENTED',
-          message: 'Drafts are not supported for system users'
-        })
-      }
       const eventId = options.input.eventId
       await getEventById(eventId)
 
@@ -278,10 +284,13 @@ export const eventRouter = router({
         })
     })
   }),
-  list: publicProcedure
+  list: systemProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
+      if (ctx.userType === TokenUserType.SYSTEM) {
+        return getIndexedEvents(ctx.system.id)
+      }
       const userId = ctx.user.id
       return getIndexedEvents(userId)
     }),
@@ -289,7 +298,7 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
     .query(async ({ input }) => getIndex(input)),
-  import: publicProcedure
+  import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({
       openapi: {
