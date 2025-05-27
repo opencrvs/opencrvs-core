@@ -14,13 +14,7 @@ import decode from 'jwt-decode'
 import { Nominal } from './nominal'
 import { z } from 'zod'
 
-import {
-  ConfigurableScopeType,
-  RawScopes,
-  Scope,
-  SCOPES,
-  stringifyScope
-} from './scopes'
+import { RawScopes, Scope, SCOPES } from './scopes'
 export * from './scopes'
 
 export const DEFAULT_ROLES_DEFINITION = [
@@ -169,43 +163,6 @@ export const DEFAULT_ROLES_DEFINITION = [
   label: { defaultMessage: string; description: string; id: string }
   scopes: Scope[]
 }>
-
-export type SystemIntegrationRole =
-  | 'HEALTH'
-  | 'NATIONAL_ID'
-  | 'RECORD_SEARCH'
-  | 'WEBHOOK'
-
-const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
-  HEALTH: [SCOPES.NOTIFICATION_API],
-  NATIONAL_ID: [SCOPES.NATIONALID],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH],
-  WEBHOOK: [SCOPES.WEBHOOK]
-} satisfies Record<SystemIntegrationRole, Scope[]>
-
-const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
-  HEALTH: ['record.notify'],
-  NATIONAL_ID: [],
-  RECORD_SEARCH: [],
-  WEBHOOK: []
-} satisfies Record<SystemIntegrationRole, ConfigurableScopeType[]>
-
-export function getSystemIntegrationRoleScopes(
-  type: SystemIntegrationRole,
-  eventIds: string[]
-): string[] {
-  const literalScopes = DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]
-
-  const configurableScopes =
-    DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES[type].map((scope) =>
-      stringifyScope({
-        type: scope,
-        options: { event: eventIds }
-      })
-    )
-
-  return [...literalScopes, ...configurableScopes]
-}
 
 /*
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
