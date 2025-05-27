@@ -46,7 +46,6 @@ import {
   omitHiddenFields,
   omitHiddenPaginatedFields
 } from './utils'
-import { FieldValue } from './FieldValue'
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
@@ -501,7 +500,7 @@ export function generateEventDocument({
 export function generateEventDraftDocument(
   eventId: string,
   actionType: ActionType = ActionType.DECLARE,
-  declaration: Record<string, FieldValue> = {}
+  declaration: EventState = {}
 ): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,

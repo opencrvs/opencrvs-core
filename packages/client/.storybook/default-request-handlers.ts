@@ -1094,6 +1094,9 @@ export const handlers = {
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
+    }),
+    tRPCMsw.event.search.query(() => {
+      return [tennisClubMembershipEventIndex]
     })
   ],
   locations: [
