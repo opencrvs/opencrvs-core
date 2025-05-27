@@ -15,6 +15,8 @@ import { LANG_EN } from './constants'
 import { useSelector } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { ITokenPayload } from './authUtils'
+import { dataUrlToFile } from './imageUtils'
+import { cacheFile, extractFilenameFromUrl } from './persistence/fileCache'
 
 export const USER_DETAILS = 'USER_DETAILS'
 
@@ -33,6 +35,30 @@ export async function storeUserDetails(userDetails: UserDetails) {
 }
 export async function removeUserDetails() {
   storage.removeItem(USER_DETAILS)
+}
+
+/**
+ * Precache the user signature file from url.
+ * NOTE: Required for events v2 offline functionality for user signature (declaration, printing)
+ * NOTE: Precaching is done for the url **WITHOUT** the search params (signature part.)
+ * @param presignedUrl - The presigned URL for the user signature
+ */
+export const precacheUserSignature = async (
+  presignedUrl: string | undefined | null
+): Promise<string | undefined> => {
+  if (!presignedUrl) {
+    return
+  }
+
+  try {
+    const filename = extractFilenameFromUrl(presignedUrl)
+    const file = await dataUrlToFile(presignedUrl, filename)
+
+    await cacheFile({ filename, file })
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error precaching user signature:', error)
+  }
 }
 
 export function getIndividualNameObj(

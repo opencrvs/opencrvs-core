@@ -20,9 +20,8 @@ import {
   FieldValue,
   SystemVariables
 } from '@opencrvs/commons/client'
-
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
+import { useUser } from '@client/v2-events/hooks/useUser'
 import { handleDefaultValue } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
 import {
@@ -80,7 +79,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
-    const user = useUserAddress()
+    const user = useUser()
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({

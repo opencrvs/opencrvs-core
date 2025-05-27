@@ -323,7 +323,6 @@ export const isFileFieldWithOptionType = (field: {
   value: FileFieldWithOptionValue
   config: FileUploadWithOptions
 } => {
-  // @TODO? (same as FILE?)
   return field.config.type === FieldType.FILE_WITH_OPTIONS
 }
 

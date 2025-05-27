@@ -68,6 +68,7 @@ import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { SignatureField } from '@client/v2-events/components/forms/inputs/Signature/SignatureField'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
@@ -380,9 +381,13 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isSignatureFieldType(field)) {
-      return readonlyMode ? null : (
+      console.log('Signature field', field)
+
+      return (
         <InputField {...inputFieldProps}>
-          <SignatureUploader
+          <SignatureField
+            {...field.config}
+            maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
             value={field.value}

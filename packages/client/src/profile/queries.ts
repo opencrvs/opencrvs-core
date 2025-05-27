@@ -58,6 +58,10 @@ const FETCH_USER = gql`
           type
         }
       }
+      signature {
+        data
+        type
+      }
       avatar {
         type
         data

@@ -16,7 +16,8 @@ import {
   FileFieldWithOptionValue,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { precacheFile, removeCached } from './useFileUpload'
+import { removeCached } from '@client/utils/persistence/fileCache'
+import { precacheFile } from './useFileUpload'
 
 function getFileNames(actions: ActionDocument[]): string[] {
   return actions.flatMap((action) =>

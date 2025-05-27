@@ -2714,6 +2714,11 @@ export type FetchUserQuery = {
       alias?: Array<string> | null
       status?: string | null
     }
+    signature?: {
+      __typename?: 'Signature'
+      data?: string | null
+      type?: string | null
+    } | null
     localRegistrar?: {
       __typename?: 'LocalRegistrar'
       role?: string | null
