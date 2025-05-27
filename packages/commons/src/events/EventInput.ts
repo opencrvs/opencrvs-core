@@ -13,7 +13,7 @@ import { v4 as uuidv4 } from 'uuid'
 
 export const EventInput = z
   .object({
-    transactionId: z.string(),
+    transactionId: z.string().uuid(),
     type: z.string(),
     dateOfEvent: z.object({ fieldId: z.string() }).optional()
   })

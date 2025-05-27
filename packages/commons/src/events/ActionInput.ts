@@ -17,8 +17,8 @@ import { v4 as uuidv4 } from 'uuid'
 extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
-  eventId: z.string(),
-  transactionId: z.string(),
+  eventId: z.string().uuid(),
+  transactionId: z.string().uuid(),
   declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
   originalActionId: z.string().optional(),
