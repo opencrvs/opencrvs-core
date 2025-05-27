@@ -9,14 +9,23 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from '@user-mgnt/environment'
-import { fetchJSON, joinURL, EventConfig } from '@opencrvs/commons'
+import { EventConfig, joinURL } from '@opencrvs/commons'
+import fetch from 'node-fetch'
 
 export async function getEventConfigurations(authorization: string) {
   const url = joinURL(env.COUNTRY_CONFIG_URL, '/events')
-  return fetchJSON<EventConfig[]>(url, {
+
+  const res = await fetch(url, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: authorization
     }
   })
+
+  if (!res.ok) {
+    throw new Error(`Failed to fetch event configurations: ${res.statusText}`)
+  }
+
+  const json = await res.json()
+  return json as EventConfig[]
 }
