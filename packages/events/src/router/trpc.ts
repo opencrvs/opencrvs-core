@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { TokenUserType } from '@opencrvs/commons'
@@ -33,11 +33,8 @@ export const systemProcedure = t.procedure
  */
 export const publicProcedure = t.procedure.use(async (opts) => {
   if (opts.ctx.userType === TokenUserType.SYSTEM) {
-    throw new Error('This procedure is only available for human users')
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
-  return opts.next({
-    ctx: {
-      ...opts.ctx
-    }
-  })
+
+  return opts.next({ ctx: opts.ctx })
 })
