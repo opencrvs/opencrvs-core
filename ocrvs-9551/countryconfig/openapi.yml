@@ -3085,6 +3085,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -3391,12 +3397,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum:
@@ -3415,8 +3415,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     ValidateAction:
@@ -3433,6 +3433,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -3739,12 +3745,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -3759,8 +3759,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     RejectAction:
@@ -3777,6 +3777,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4083,12 +4089,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -4103,8 +4103,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     MarkAsDuplicateAction:
@@ -4121,6 +4121,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4427,12 +4433,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -4447,8 +4447,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     ArchiveAction:
@@ -4465,6 +4465,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4771,12 +4777,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -4791,8 +4791,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     NotifiedAction:
@@ -4809,6 +4809,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5115,12 +5121,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -5135,8 +5135,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     RegisterAction:
@@ -5153,6 +5153,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5459,12 +5465,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -5481,8 +5481,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     DeclareAction:
@@ -5499,6 +5499,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5805,12 +5811,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -5825,8 +5825,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     AssignedAction:
@@ -5843,6 +5843,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6149,12 +6155,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -6171,8 +6171,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
         - assignedTo
@@ -6190,6 +6190,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6496,12 +6502,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -6516,8 +6516,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     ApprovedCorrectionAction:
@@ -6534,6 +6534,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6840,12 +6846,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -6862,8 +6862,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
         - requestId
@@ -6881,6 +6881,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7187,12 +7193,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -7209,8 +7209,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
         - requestId
@@ -7228,6 +7228,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7534,12 +7540,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -7556,8 +7556,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
         - assignedTo
@@ -7575,6 +7575,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7881,12 +7887,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -7901,8 +7901,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     ReadAction:
@@ -7919,6 +7919,12 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         declaration:
           type: object
           additionalProperties:
@@ -8225,12 +8231,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type:
-            - string
-            - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         status:
           type: string
           enum: *a9
@@ -8245,8 +8245,8 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - declaration
         - createdAtLocation
+        - declaration
         - status
         - type
     ActionInput:
@@ -8593,6 +8593,8 @@ components:
           type:
             - string
             - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
       required:
         - eventId
         - transactionId
