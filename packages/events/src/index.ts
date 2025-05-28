@@ -26,6 +26,7 @@ import { appRouter } from './router/router'
 import { getAnonymousToken } from './service/auth'
 import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
+import { UserDetails } from './router/middleware'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -49,6 +50,46 @@ function stringifyRequest(req: IncomingMessage) {
   return `'${req.method} ${url.pathname}'`
 }
 
+async function resolveUserDetails(
+  token: `Bearer ${string}`
+): Promise<UserDetails> {
+  const sub = getUserId(token)
+
+  if (!sub) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED'
+    })
+  }
+
+  const userType = getUserTypeFromToken(token)
+
+  if (userType === TokenUserType.SYSTEM) {
+    return {
+      userType: TokenUserType.SYSTEM,
+      user: {
+        id: sub,
+        primaryOfficeId: undefined,
+        role: 'TODO'
+      }
+    }
+  }
+
+  const { primaryOfficeId, role } = await getUser(
+    env.USER_MANAGEMENT_URL,
+    sub,
+    token
+  )
+
+  return {
+    userType: TokenUserType.USER,
+    user: {
+      id: sub,
+      primaryOfficeId,
+      role
+    }
+  }
+}
+
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
   middleware: (req, _, next) => {
@@ -61,11 +102,8 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
       error.stack
     ),
   createContext: async function createContext(opts) {
-    const normalizedHeaders = normalizeHeaders(opts.req.headers)
-
-    const parseResult = TokenWithBearer.safeParse(
-      normalizedHeaders.authorization
-    )
+    const { authorization } = normalizeHeaders(opts.req.headers)
+    const parseResult = TokenWithBearer.safeParse(authorization)
 
     if (!parseResult.success) {
       throw new TRPCError({
@@ -75,42 +113,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
 
     const token = parseResult.data
 
-    const sub = getUserId(token)
-    if (!sub) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED'
-      })
-    }
-
-    const userType = getUserTypeFromToken(token)
-
-    console.log('CIHAN TESTAA 1', userType, sub)
-
-    if (userType === TokenUserType.SYSTEM) {
-      return {
-        userType: TokenUserType.SYSTEM,
-        system: {
-          id: sub
-        },
-        token: token
-      }
-    }
-
-    const { primaryOfficeId, role } = await getUser(
-      env.USER_MANAGEMENT_URL,
-      sub,
-      token
-    )
-
-    return {
-      userType: TokenUserType.USER,
-      user: {
-        id: sub,
-        primaryOfficeId,
-        role
-      },
-      token: token
-    }
+    return { token, ...(await resolveUserDetails(token)) }
   }
 }
 

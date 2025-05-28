@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { getUUID, SCOPES, TokenUserType } from '@opencrvs/commons'
+import { getUUID, SCOPES } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -107,36 +107,21 @@ export const eventRouter = router({
     .input(EventInput)
     .use(middleware.eventTypeAuthorization)
     .output(EventDocument)
-    .mutation(async (options) => {
-      const config = await getEventConfigurations(options.ctx.token)
+    .mutation(async ({ input, ctx }) => {
+      const config = await getEventConfigurations(ctx.token)
       const eventIds = config.map((c) => c.id)
 
       validateEventType({
         eventTypes: eventIds,
-        eventInputType: options.input.type
+        eventInputType: input.type
       })
 
-      console.log('CIHAN TODO', options.ctx)
-
-      const { createdBy, createdByRole, createdAtLocation } =
-        options.ctx.userType === TokenUserType.USER
-          ? {
-              createdBy: options.ctx.user.id,
-              createdByRole: options.ctx.user.role,
-              createdAtLocation: options.ctx.user.primaryOfficeId
-            }
-          : {
-              createdBy: options.ctx.system.id,
-              createdByRole: 'TODO',
-              createdAtLocation: 'TODO'
-            }
-
       return createEvent({
-        transactionId: options.input.transactionId,
-        eventInput: options.input,
-        createdBy,
-        createdByRole,
-        createdAtLocation
+        transactionId: input.transactionId,
+        eventInput: input,
+        createdBy: ctx.user.id,
+        createdByRole: ctx.user.role,
+        createdAtLocation: ctx.user.primaryOfficeId
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
@@ -303,9 +288,6 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
-      if (ctx.userType === TokenUserType.SYSTEM) {
-        return getIndexedEvents(ctx.system.id)
-      }
       const userId = ctx.user.id
       return getIndexedEvents(userId)
     }),

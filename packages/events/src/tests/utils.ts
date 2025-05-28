@@ -67,8 +67,10 @@ export function createSystemTestClient(
 
   const caller = createCaller({
     userType: TokenUserType.SYSTEM,
-    system: {
-      id: systemId
+    user: {
+      id: systemId,
+      role: 'HEALTH',
+      primaryOfficeId: undefined
     },
     token
   })

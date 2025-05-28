@@ -165,7 +165,7 @@ export async function createEvent({
   eventInput: z.infer<typeof EventInput>
   createdBy: string
   createdByRole: string
-  createdAtLocation: string
+  createdAtLocation: string | undefined
   transactionId: string
 }): Promise<EventDocument> {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -284,7 +284,7 @@ export async function addAction(
     /**
      * The location where the action was created. This is used for auditing purposes.
      */
-    createdAtLocation: string
+    createdAtLocation: string | undefined
     token: string
     transactionId: string
     status: ActionStatus
