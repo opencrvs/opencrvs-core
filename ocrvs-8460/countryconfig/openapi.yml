@@ -3147,13 +3147,6 @@ components:
           type: string
         type:
           type: string
-        dateOfEvent:
-          type: object
-          properties:
-            fieldId:
-              type: string
-          required:
-            - fieldId
         createdAt:
           type: string
           format: date-time
