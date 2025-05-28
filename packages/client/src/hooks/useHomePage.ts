@@ -18,7 +18,7 @@ import {
   PERFORMANCE_STATISTICS,
   PERFORMANCE_DASHBOARD
 } from '@client/navigation/routes'
-import { Path, useLocation } from 'react-router'
+import { Path } from 'react-router'
 import { useNavigation } from './useNavigation'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import {
@@ -29,6 +29,7 @@ import {
 import { stringify } from '@client/utils'
 import { useSelector } from 'react-redux'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { useLocation } from 'react-router-dom'
 
 export const useHomePage = () => {
   const { pathname } = useLocation()
