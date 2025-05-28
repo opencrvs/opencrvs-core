@@ -459,6 +459,123 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/import:
+    post:
+      operationId: event-import
+      summary: Import full event record
+      tags:
+        - events
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                dateOfEvent:
+                  type: object
+                  properties:
+                    fieldId:
+                      type: string
+                  required:
+                    - fieldId
+                createdAt:
+                  type: string
+                  format: date-time
+                updatedAt:
+                  type: string
+                  format: date-time
+                actions:
+                  type: array
+                  items:
+                    anyOf:
+                      - $ref: "#/components/schemas/ActionDocument"
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                          transactionId:
+                            type: string
+                          createdAt:
+                            type: string
+                            format: date-time
+                          createdBy:
+                            type: string
+                          createdByRole:
+                            type: string
+                          createdAtLocation:
+                            type: string
+                          status:
+                            type: string
+                            enum:
+                              - Rejected
+                          originalActionId:
+                            type: string
+                          type:
+                            type: string
+                            enum: &a9
+                              - NOTIFY
+                              - DECLARE
+                              - VALIDATE
+                              - REGISTER
+                              - REJECT
+                              - ARCHIVE
+                              - PRINT_CERTIFICATE
+                        required:
+                          - id
+                          - transactionId
+                          - createdAt
+                          - createdBy
+                          - createdByRole
+                          - createdAtLocation
+                          - status
+                          - type
+                trackingId:
+                  type: string
+              required:
+                - id
+                - type
+                - createdAt
+                - updatedAt
+                - actions
+                - trackingId
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
 components:
   securitySchemes:
     Authorization:
@@ -3557,14 +3674,7 @@ components:
                     type: string
                   type:
                     type: string
-                    enum:
-                      - NOTIFY
-                      - DECLARE
-                      - VALIDATE
-                      - REGISTER
-                      - REJECT
-                      - ARCHIVE
-                      - PRINT_CERTIFICATE
+                    enum: *a9
                 required:
                   - id
                   - transactionId
@@ -3932,7 +4042,7 @@ components:
           type: string
         status:
           type: string
-          enum: &a9
+          enum: &a10
             - Requested
             - Accepted
             - Rejected
@@ -4266,7 +4376,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -4597,7 +4707,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -4928,7 +5038,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5259,7 +5369,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5590,7 +5700,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5921,7 +6031,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6254,7 +6364,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6585,7 +6695,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6919,7 +7029,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7250,7 +7360,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7584,7 +7694,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7918,7 +8028,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -8252,7 +8362,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -8583,7 +8693,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
