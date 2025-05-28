@@ -13,7 +13,7 @@ import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { ActionUpdate } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { UUID } from '../uuid'
+import { UUID, getUUID } from '../uuid'
 extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
@@ -54,7 +54,15 @@ export const NotifyActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
   })
-)
+).openapi({
+  default: {
+    eventId: '<event-id-here>',
+    transactionId: getUUID(),
+    declaration: {},
+    annotation: {},
+    type: ActionType.NOTIFY
+  }
+})
 
 export type NotifyActionInput = z.infer<typeof NotifyActionInput>
 

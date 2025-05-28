@@ -10,17 +10,29 @@
  */
 
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
-import { ActionInputWithType, TokenWithBearer, UUID } from '@opencrvs/commons'
+import {
+  ActionInputWithType,
+  TokenWithBearer,
+  TokenUserType,
+  UUID
+} from '@opencrvs/commons'
 
-export interface Context {
-  user: {
-    id: string
-    primaryOfficeId: UUID
-    role: string
-  }
-  token: TokenWithBearer
-}
-
+export type Context = { token: TokenWithBearer } & (
+  | {
+      userType: TokenUserType.USER
+      user: {
+        id: string
+        primaryOfficeId: UUID
+        role: string
+      }
+    }
+  | {
+      userType: TokenUserType.SYSTEM
+      system: {
+        id: string
+      }
+    }
+)
 /**
  * TRPC Middleware options with correct context.
  * Actual middleware type definition is only for internal use within TRPC.
