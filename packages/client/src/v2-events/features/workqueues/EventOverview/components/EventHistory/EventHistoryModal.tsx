@@ -18,8 +18,7 @@ import {
   ActionType,
   ActionUpdate
 } from '@opencrvs/commons/client'
-import { ResolvedUser } from '@opencrvs/commons/client'
-import { getUsersFullName, joinValues } from '@client/v2-events/utils'
+import { joinValues } from '@client/v2-events/utils'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
@@ -62,16 +61,14 @@ function prepareComments(action: ActionType, annotation: ActionUpdate) {
  */
 export function EventHistoryModal({
   history,
-  user,
+  userName,
   close
 }: {
   history: ActionDocument
-  user: ResolvedUser
+  userName: string
   close: () => void
 }) {
   const intl = useIntl()
-
-  const userName = getUsersFullName(user.name, intl.locale)
   const title = intl.formatMessage(eventHistoryStatusMessage, {
     status: history.type
   })
