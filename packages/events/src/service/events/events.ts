@@ -260,8 +260,7 @@ export async function addAction(
       status,
       createdBy,
       createdByRole,
-      createdAtLocation,
-      originalActionId: input.originalActionId
+      createdAtLocation
     })
   }
 
