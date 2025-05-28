@@ -2997,8 +2997,6 @@ components:
                     type: string
                   createdByRole:
                     type: string
-                  createdByUserType:
-                    type: string
                   createdAtLocation:
                     type:
                       - string
@@ -3026,7 +3024,7 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdByUserType
+                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -3393,8 +3391,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -3420,7 +3416,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -3743,8 +3739,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -3766,7 +3760,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -4089,8 +4083,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -4112,7 +4104,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     MarkAsDuplicateAction:
@@ -4435,8 +4427,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -4458,7 +4448,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -4781,8 +4771,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -4804,7 +4792,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     NotifiedAction:
@@ -5127,8 +5115,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -5150,7 +5136,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -5473,8 +5459,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -5498,7 +5482,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -5821,8 +5805,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -5844,7 +5826,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -6167,8 +6149,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -6192,7 +6172,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -6516,8 +6496,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -6539,7 +6517,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -6862,8 +6840,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -6887,7 +6863,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
         - requestId
@@ -7211,8 +7187,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -7236,7 +7210,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
         - requestId
@@ -7560,8 +7534,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -7585,7 +7557,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -7909,8 +7881,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -7932,7 +7902,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -8255,8 +8225,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdByUserType:
-          type: string
         createdAtLocation:
           type:
             - string
@@ -8278,7 +8246,7 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdByUserType
+        - createdAtLocation
         - status
         - type
     ActionInput:
@@ -8628,6 +8596,7 @@ components:
       required:
         - eventId
         - transactionId
+        - createdAtLocation
     ValidateActionInput:
       type: object
       properties:
