@@ -52,12 +52,12 @@ function stringifyRequest(req: IncomingMessage) {
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
   middleware: (req, _, next) => {
-    logger.info(`Request: '${stringifyRequest(req)}'`)
+    logger.info(`Request: ${stringifyRequest(req)}`)
     return next()
   },
   onError: ({ req, error }) =>
     logger.warn(
-      `Error for request: '${stringifyRequest(req)}'. Error: '${error.message}'`,
+      `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`,
       error.stack
     ),
   createContext: async function createContext(opts) {
