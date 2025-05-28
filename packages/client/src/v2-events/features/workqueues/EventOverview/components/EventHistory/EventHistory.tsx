@@ -90,10 +90,6 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
       const location = getLocation(item.createdAtLocation)
 
       return {
-        date: format(
-          new Date(item.createdAt),
-          intl.formatMessage(messages.timeFormat)
-        ),
         action: (
           <Link
             font="bold14"
@@ -105,6 +101,10 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
               status: item.type
             })}
           </Link>
+        ),
+        date: format(
+          new Date(item.createdAt),
+          intl.formatMessage(messages.timeFormat)
         ),
         user: (
           <Link
@@ -176,6 +176,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
       key: 'location'
     }
   ]
+
   return (
     <>
       <Divider />

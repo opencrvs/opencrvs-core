@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -167,7 +167,7 @@ export function getDefaultActionProcedures(
       .use(validatePayloadMiddleware)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
+        const { token, user, userType, system } = ctx
         const { eventId, transactionId } = input
         const actionId = getUUID()
 
@@ -217,13 +217,26 @@ export function getDefaultActionProcedures(
           }
         }
 
+        const { createdBy, createdByRole, createdAtLocation } =
+          userType === TokenUserType.USER
+            ? {
+                createdBy: user.id,
+                createdByRole: user.role,
+                createdAtLocation: user.primaryOfficeId
+              }
+            : {
+                createdBy: system.id,
+                createdByRole: 'TODO',
+                createdAtLocation: 'TODO'
+              }
+
         return addAction(
           { ...input, ...parsedBody },
           {
             eventId,
-            createdBy: user.id,
-            createdByRole: user.role,
-            createdAtLocation: user.primaryOfficeId,
+            createdBy,
+            createdByRole,
+            createdAtLocation,
             token,
             transactionId,
             status
