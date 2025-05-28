@@ -3024,7 +3024,6 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -3415,7 +3414,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -3759,7 +3757,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -4103,7 +4100,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -4447,7 +4443,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -4791,7 +4786,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -5135,7 +5129,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -5481,7 +5474,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -5825,7 +5817,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -6171,7 +6162,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -6516,7 +6506,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -6862,7 +6851,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -7209,7 +7197,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -7556,7 +7543,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -7901,7 +7887,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -8245,7 +8230,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -8598,7 +8582,6 @@ components:
       required:
         - eventId
         - transactionId
-        - createdAtLocation
     ValidateActionInput:
       type: object
       properties:
@@ -9583,7 +9566,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: b8ceee2d-9bed-4ca9-9db8-3e0412ca55ee
+        transactionId: 7c4e1649-5269-4037-a6f0-2cad2689a9e0
         declaration: {}
         annotation: {}
         type: NOTIFY

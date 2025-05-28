@@ -70,7 +70,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: e66aaade-a292-492b-bd30-c2a2b77fddec
+                transactionId: 0b0f9905-5bcf-45b4-b42e-762b83babdd6
                 type: v2.birth
       responses:
         "200":
@@ -433,7 +433,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 1b8d274d-96a2-440a-a994-0344ff00796c
+                transactionId: 6834c803-097c-43d0-a7b9-346d3e30614a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -545,7 +545,6 @@ paths:
                           - createdAt
                           - createdBy
                           - createdByRole
-                          - createdAtLocation
                           - status
                           - type
                 trackingId:
@@ -3696,7 +3695,6 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -4076,7 +4074,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -4410,7 +4407,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -4744,7 +4740,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -5078,7 +5073,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -5412,7 +5406,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -5746,7 +5739,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -6082,7 +6074,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -6416,7 +6407,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -6752,7 +6742,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -7087,7 +7076,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -7423,7 +7411,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -7760,7 +7747,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -8097,7 +8083,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -8432,7 +8417,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
@@ -8766,7 +8750,6 @@ components:
         - createdAt
         - createdBy
         - createdByRole
-        - createdAtLocation
         - declaration
         - status
         - type
