@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { CreatedAtLocation } from './CreatedAtLocation'
 extendZodWithOpenApi(z)
 
 /**
@@ -41,14 +42,9 @@ export const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdByRole: z.string(),
+  createdAtLocation: CreatedAtLocation,
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z
-    .string()
-    .nullable()
-    .describe(
-      'Location of the user who created the action. This is null for system users.'
-    ),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,

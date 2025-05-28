@@ -13,7 +13,7 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionDocument'
-// import { TokenUserType } from 'src/authentication'
+import { CreatedAtLocation } from './CreatedAtLocation'
 
 /**
  * Event statuses recognized by the system
@@ -73,12 +73,7 @@ export const ActionCreationMetadata = z.object({
   createdBy: z
     .string()
     .describe('ID of the user who created the action request.'),
-  createdAtLocation: z
-    .string()
-    .nullable()
-    .describe(
-      'Location of the user who created the action request. Null for system users.'
-    ),
+  createdAtLocation: CreatedAtLocation,
   acceptedAt: z
     .string()
     .datetime()
@@ -131,12 +126,7 @@ export const EventMetadata = z.object({
   updatedByUserRole: z
     .string()
     .describe('Role of the user who last updated the declaration.'),
-  createdAtLocation: z
-    .string()
-    .nullish()
-    .describe(
-      'Location of the user who created the event. This is null for system users.'
-    ),
+  createdAtLocation: CreatedAtLocation,
   updatedAtLocation: z
     .string()
     .nullish()
