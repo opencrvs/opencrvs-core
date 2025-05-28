@@ -247,7 +247,9 @@ export async function addAction(
     createdBy,
     createdByRole,
     createdAtLocation,
-    originalActionId: input.originalActionId
+    originalActionId: input.originalActionId,
+    // @TODO: ^ Split this function
+    assignedTo: input.type === ActionType.ASSIGN ? input.assignedTo : undefined
   })
 
   if (isWriteAction(input.type) && !input.keepAssignment) {
