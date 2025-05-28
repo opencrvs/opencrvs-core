@@ -1027,7 +1027,10 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 7 days',
       id: 'form.section.label.timePeriodLast7Days'
     },
-    value: `${format(subDays(new Date(), 7), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subDays(new Date(), 7), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   },
   {
     label: {
@@ -1035,7 +1038,10 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 30 days',
       id: 'form.section.label.timePeriodLast30Days'
     },
-    value: `${format(subMonths(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subMonths(new Date(), 1), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   },
   {
     label: {
@@ -1043,7 +1049,10 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 90 days',
       id: 'form.section.label.timePeriodLast90Days'
     },
-    value: `${format(subQuarters(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subQuarters(new Date(), 1), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   },
   {
     label: {
@@ -1051,7 +1060,10 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last year',
       id: 'form.section.label.timePeriodLastYear'
     },
-    value: `${format(subYears(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subYears(new Date(), 1), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   }
 ]
 
@@ -1461,6 +1473,7 @@ export const tennisClubMembershipEvent = defineConfig({
 
 export const WorkqueueFixture = defineWorkqueues([
   {
+    columns: [],
     slug: 'in-progress',
     name: {
       id: 'workqueues.inProgress.title',

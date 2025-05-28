@@ -17,7 +17,10 @@ import {
   defineWorkqueuesColumns,
   WorkqueueColumn
 } from './WorkqueueColumnConfig'
-import { CountryConfigQueryType } from './CountryConfigQueryInput'
+import {
+  CountryConfigQueryInputType,
+  CountryConfigQueryType
+} from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
 
@@ -53,11 +56,30 @@ export const WorkqueueConfig = z
   })
   .describe('Configuration for workqueue.')
 
-export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
-export type WorkqueueConfigInput = z.input<typeof WorkqueueConfig>
+export const WorkqueueConfigInput = z.object({
+  slug: z.string().describe('Determines the url of the workqueue.'),
+  name: TranslationConfig.describe(
+    'Title of the workflow (both in navigation and on the page)'
+  ),
+  query: CountryConfigQueryInputType,
+  actions: z.array(
+    z.object({
+      type: z.string(),
+      conditionals: z.array(Conditional).optional()
+    })
+  ),
+  columns: z.array(WorkqueueColumn).default(defaultThirdColumn),
+  icon: AvailableIcons
+})
 
-export function defineWorkqueue(workqueue: WorkqueueConfigInput) {
-  return WorkqueueConfig.parse(workqueue)
+export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
+export type WorkqueueConfigInput = z.input<typeof WorkqueueConfigInput>
+
+export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {
+  const queryInput = workqueueInput.query
+  const query: CountryConfigQueryType =
+    'type' in queryInput ? queryInput : { type: 'and', clauses: [queryInput] }
+  return WorkqueueConfig.parse({ ...workqueueInput, query })
 }
 
 export function defineWorkqueues(workqueues: WorkqueueConfigInput[]) {

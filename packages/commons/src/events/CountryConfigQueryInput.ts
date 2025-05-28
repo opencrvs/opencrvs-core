@@ -97,3 +97,12 @@ export type SerializedQueryExpression = z.infer<
 
 export const CountryConfigQueryType = z.discriminatedUnion('type', [And, Or])
 export type CountryConfigQueryType = z.infer<typeof CountryConfigQueryType>
+
+export const CountryConfigQueryInputType = z.union([
+  SerializedQueryExpression,
+  And,
+  Or
+])
+export type CountryConfigQueryInputType = z.infer<
+  typeof CountryConfigQueryInputType
+>
