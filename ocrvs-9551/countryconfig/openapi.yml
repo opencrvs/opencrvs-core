@@ -2998,7 +2998,11 @@ components:
                   createdByRole:
                     type: string
                   createdAtLocation:
-                    type: string
+                    type:
+                      - string
+                      - "null"
+                    description: Location of the user who created the action. This is null for
+                      system users.
                   status:
                     type: string
                     const: Rejected
@@ -3387,7 +3391,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum:
@@ -3730,7 +3738,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -4069,7 +4081,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -4408,7 +4424,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -4747,7 +4767,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -5086,7 +5110,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -5425,7 +5453,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -5766,7 +5798,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -6105,7 +6141,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -6447,7 +6487,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -6786,7 +6830,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -7128,7 +7176,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -7470,7 +7522,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -7812,7 +7868,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -8151,7 +8211,11 @@ components:
                   - state
                   - district2
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a9
@@ -8510,11 +8574,12 @@ components:
           const: CREATE
           default: CREATE
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
       required:
         - eventId
         - transactionId
-        - createdAtLocation
     ValidateActionInput:
       type: object
       properties:

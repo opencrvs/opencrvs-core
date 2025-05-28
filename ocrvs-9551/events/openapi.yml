@@ -511,6 +511,9 @@ paths:
                             type: string
                           createdAtLocation:
                             type: string
+                            nullable: true
+                            description: Location of the user who created the action. This is null for
+                              system users.
                           status:
                             type: string
                             enum:
@@ -3665,6 +3668,9 @@ components:
                     type: string
                   createdAtLocation:
                     type: string
+                    nullable: true
+                    description: Location of the user who created the action. This is null for
+                      system users.
                   status:
                     type: string
                     enum:
@@ -4038,6 +4044,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: &a10
@@ -4371,6 +4380,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -4701,6 +4713,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -5031,6 +5046,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -5361,6 +5379,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -5691,6 +5712,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -6021,6 +6045,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -6353,6 +6380,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -6683,6 +6713,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -7016,6 +7049,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -7346,6 +7382,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -7679,6 +7718,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -8012,6 +8054,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -8345,6 +8390,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
@@ -8675,6 +8723,9 @@ components:
                   - district2
         createdAtLocation:
           type: string
+          nullable: true
+          description: Location of the user who created the action. This is null for
+            system users.
         status:
           type: string
           enum: *a10
