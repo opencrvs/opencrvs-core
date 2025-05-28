@@ -441,7 +441,7 @@ export function generateActionDocument({
     case ActionType.UNASSIGN:
       return { ...actionBase, type: action, assignedTo: null }
     case ActionType.ASSIGN:
-      return { ...actionBase, assignedTo: getUUID(), type: action }
+      return { ...actionBase, assignedTo: getUUID() as string, type: action }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
@@ -598,12 +598,12 @@ function createPseudoRandomNumberGenerator(seed: number) {
   }
 }
 
-function generateUuid(rng: () => number): string {
+function generateUuid(rng: () => number) {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.floor(rng() * 16)
     const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
-  })
+  }) as UUID
 }
 
 function generateTrackingId(rng: () => number): string {

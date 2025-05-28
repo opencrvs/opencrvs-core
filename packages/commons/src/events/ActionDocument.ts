@@ -43,7 +43,7 @@ export const ActionBase = z.object({
   createdBy: z.string(),
   createdByRole: z.string(),
   declaration: ActionUpdate,
-  annotation: ActionUpdate.nullable(),
+  annotation: ActionUpdate.optional().nullable(),
   createdAtLocation: UUID,
   status: z.enum([
     ActionStatus.Requested,
@@ -51,7 +51,7 @@ export const ActionBase = z.object({
     ActionStatus.Rejected
   ]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
-  originalActionId: UUID.nullable()
+  originalActionId: UUID.optional().nullable()
 })
 
 export type ActionBase = z.infer<typeof ActionBase>
