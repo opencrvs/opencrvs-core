@@ -312,7 +312,7 @@ export function getDefaultActionProcedures(
           type: actionType,
           createdBy: ctx.user.id,
           createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId
+          createdAtLocation: ctx.user.primaryOfficeId ?? undefined
         })
       })
   }

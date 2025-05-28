@@ -69,7 +69,7 @@ async function resolveUserDetails(
     return {
       type: TokenUserType.SYSTEM,
       id: sub,
-      primaryOfficeId: null,
+      primaryOfficeId: undefined,
       role: type
     }
   }

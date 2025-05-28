@@ -19,7 +19,7 @@ import {
 export interface UserDetails {
   type: TokenUserType.USER | TokenUserType.SYSTEM
   id: string
-  primaryOfficeId: string | null
+  primaryOfficeId: string | undefined
   role: string
 }
 

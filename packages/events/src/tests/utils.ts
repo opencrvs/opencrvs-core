@@ -69,7 +69,7 @@ export function createSystemTestClient(
     user: {
       id: systemId,
       role: 'HEALTH',
-      primaryOfficeId: null,
+      primaryOfficeId: undefined,
       type: TokenUserType.SYSTEM
     },
     token
