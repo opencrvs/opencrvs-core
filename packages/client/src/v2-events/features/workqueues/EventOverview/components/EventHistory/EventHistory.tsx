@@ -123,9 +123,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
           id="profile-link"
           onClick={() =>
             navigate(
-              formatUrl(routes.USER_PROFILE, {
-                userId: action.createdBy
-              })
+              formatUrl(routes.USER_PROFILE, { userId: action.createdBy })
             )
           }
         >
@@ -137,6 +135,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
           />
         </Link>
       ) : (
+        // TODO CIHAN: show box here
         <UserAvatar avatar={undefined} locale={intl.locale} names={userName} />
       )
 
