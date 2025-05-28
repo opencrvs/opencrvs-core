@@ -88,6 +88,7 @@ export function EventHistoryModal({
       autoHeight
       actions={[]}
       handleClose={close}
+      id="event-history-modal"
       responsive={true}
       show={true}
       title={title}
