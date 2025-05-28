@@ -13,21 +13,17 @@ import { DraftInput, Draft } from '@opencrvs/commons/events'
 
 import { getUUID } from '@opencrvs/commons'
 import * as events from '@events/storage/mongodb/events'
+import { UserDetails } from '@events/router/middleware/utils'
 
 export async function createDraft(
   input: DraftInput,
   {
     eventId,
-    createdBy,
-    createdByRole,
-    createdAtLocation,
+    userDetails,
     transactionId
   }: {
     eventId: string
-    createdBy: string
-    createdByRole: string
-    createdAtLocation: string
-    token: string
+    userDetails: UserDetails
     transactionId: string
   }
 ) {
@@ -42,10 +38,11 @@ export async function createDraft(
     action: {
       ...input,
       type: input.type,
-      createdBy,
-      createdByRole,
+      createdBy: userDetails.user.id,
+      createdByRole: userDetails.user.role,
       createdAt: now,
-      createdAtLocation
+      createdAtLocation: userDetails.user.primaryOfficeId,
+      createdByUserType: userDetails.userType
     }
   }
 

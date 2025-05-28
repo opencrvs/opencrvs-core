@@ -221,9 +221,10 @@ export function getDefaultActionProcedures(
           { ...input, ...parsedBody },
           {
             eventId,
-            createdBy: user.id,
-            createdByRole: user.role,
-            createdAtLocation: user.primaryOfficeId,
+            userDetails: {
+              user: user,
+              userType: ctx.userType
+            },
             token,
             transactionId,
             status
@@ -270,9 +271,10 @@ export function getDefaultActionProcedures(
           { ...input, originalActionId: actionId },
           {
             eventId,
-            createdBy: user.id,
-            createdByRole: user.role,
-            createdAtLocation: user.primaryOfficeId,
+            userDetails: {
+              user: user,
+              userType: ctx.userType
+            },
             token,
             transactionId,
             status: ActionStatus.Accepted
@@ -318,7 +320,8 @@ export function getDefaultActionProcedures(
           type: actionType,
           createdBy: ctx.user.id,
           createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId
+          createdAtLocation: ctx.user.primaryOfficeId,
+          createdByUserType: ctx.userType
         })
       })
   }

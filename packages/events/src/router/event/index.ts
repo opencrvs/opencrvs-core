@@ -116,12 +116,15 @@ export const eventRouter = router({
         eventInputType: input.type
       })
 
+      const userDetails = {
+        user: ctx.user,
+        userType: ctx.userType
+      }
+
       return createEvent({
         transactionId: input.transactionId,
         eventInput: input,
-        createdBy: ctx.user.id,
-        createdByRole: ctx.user.role,
-        createdAtLocation: ctx.user.primaryOfficeId
+        userDetails
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
@@ -139,9 +142,10 @@ export const eventRouter = router({
         },
         {
           eventId: event.id,
-          createdBy: ctx.user.id,
-          createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId,
+          userDetails: {
+            user: ctx.user,
+            userType: ctx.userType
+          },
           token: ctx.token,
           transactionId: getUUID(),
           status: ActionStatus.Accepted
@@ -167,10 +171,10 @@ export const eventRouter = router({
 
       return createDraft(options.input, {
         eventId,
-        createdBy: options.ctx.user.id,
-        createdByRole: options.ctx.user.role,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        token: options.ctx.token,
+        userDetails: {
+          user: options.ctx.user,
+          userType: options.ctx.userType
+        },
         transactionId: options.input.transactionId
       })
     })
@@ -192,9 +196,10 @@ export const eventRouter = router({
         .mutation(async (options) => {
           return assignRecord({
             input: options.input,
-            createdBy: options.ctx.user.id,
-            createdByRole: options.ctx.user.role,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            userDetails: {
+              user: options.ctx.user,
+              userType: options.ctx.userType
+            },
             token: options.ctx.token
           })
         }),
@@ -204,9 +209,10 @@ export const eventRouter = router({
         .mutation(async (options) => {
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdByRole: options.ctx.user.role,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            userDetails: {
+              user: options.ctx.user,
+              userType: options.ctx.userType
+            },
             token: options.ctx.token,
             transactionId: options.input.transactionId
           })
@@ -229,9 +235,10 @@ export const eventRouter = router({
 
           return addAction(input, {
             eventId: input.eventId,
-            createdBy: ctx.user.id,
-            createdByRole: ctx.user.role,
-            createdAtLocation: ctx.user.primaryOfficeId,
+            userDetails: {
+              user: ctx.user,
+              userType: ctx.userType
+            },
             token: ctx.token,
             transactionId: input.transactionId,
             status: ActionStatus.Accepted
@@ -252,9 +259,10 @@ export const eventRouter = router({
           }
           return approveCorrection(input, {
             eventId: input.eventId,
-            createdBy: ctx.user.id,
-            createdByRole: ctx.user.role,
-            createdAtLocation: ctx.user.primaryOfficeId,
+            userDetails: {
+              user: ctx.user,
+              userType: ctx.userType
+            },
             token: ctx.token,
             transactionId: input.transactionId
           })
@@ -275,9 +283,10 @@ export const eventRouter = router({
 
           return rejectCorrection(input, {
             eventId: input.eventId,
-            createdBy: ctx.user.id,
-            createdByRole: ctx.user.role,
-            createdAtLocation: ctx.user.primaryOfficeId,
+            userDetails: {
+              user: ctx.user,
+              userType: ctx.userType
+            },
             token: ctx.token,
             transactionId: input.transactionId
           })

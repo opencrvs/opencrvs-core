@@ -203,7 +203,9 @@ export function createEmptyDraft(
       createdAtLocation: '@todo',
       status: ActionStatus.Accepted,
       transactionId: '@todo',
-      createdByRole: '@todo'
+      createdByRole: '@todo',
+      // TODO CIHAN: type
+      createdByUserType: 'user'
     }
   }
 }

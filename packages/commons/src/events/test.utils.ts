@@ -155,7 +155,8 @@ export const eventPayloadGenerator = {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByRole: '@todo',
-          createdAtLocation: '@todo'
+          createdAtLocation: '@todo',
+          createdByUserType: 'user'
         }
       } satisfies Draft,
       input
@@ -427,6 +428,8 @@ export function generateActionDocument({
     annotation: {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
+    // TODO CIHAN: type
+    createdByUserType: 'user',
     ...defaults
   } satisfies ActionBase
 

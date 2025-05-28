@@ -43,6 +43,8 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
+  // TODO CIHAN: type
+  createdByUserType: z.string(),
   createdAtLocation: z
     .string()
     .nullish()

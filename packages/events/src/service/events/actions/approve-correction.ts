@@ -14,22 +14,19 @@ import {
   ApproveCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
+import { UserDetails } from '@events/router/middleware'
 import { RequestNotFoundError } from './correction'
 
 export async function approveCorrection(
   input: ApproveCorrectionActionInput,
   {
     eventId,
-    createdBy,
-    createdByRole,
+    userDetails,
     token,
-    createdAtLocation,
     transactionId
   }: {
     eventId: string
-    createdBy: string
-    createdByRole: string
-    createdAtLocation: string
+    userDetails: UserDetails
     token: string
     transactionId: string
   }
@@ -46,10 +43,8 @@ export async function approveCorrection(
 
   return addAction(input, {
     eventId,
-    createdBy,
-    createdByRole,
+    userDetails,
     token,
-    createdAtLocation,
     transactionId,
     status: ActionStatus.Accepted
   })
