@@ -8,15 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
-import { v4 as uuidv4 } from 'uuid'
+import { EventDocument } from '@opencrvs/commons'
+import * as events from '@events/storage/mongodb/events'
+import { indexEvent } from '@events/service/indexing/indexing'
 
-export const EventInput = z
-  .object({
-    transactionId: z.string(),
-    type: z.string(),
-    dateOfEvent: z.object({ fieldId: z.string() }).optional()
-  })
-  .openapi({ default: { transactionId: uuidv4(), type: 'v2.birth' } })
-
-export type EventInput = z.infer<typeof EventInput>
+export async function importEvent(event: EventDocument) {
+  const db = await events.getClient()
+  const collection = db.collection<EventDocument>('events')
+  await collection.replaceOne({ id: event.id }, event, { upsert: true })
+  await indexEvent(event)
+  return event
+}
