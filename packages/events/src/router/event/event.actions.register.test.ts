@@ -179,7 +179,7 @@ test('Prevents adding birth date in future', async () => {
   ).rejects.matchSnapshot()
 })
 
-export const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
+const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 
 describe('Request and confirmation flow', () => {
   let actionId: string
