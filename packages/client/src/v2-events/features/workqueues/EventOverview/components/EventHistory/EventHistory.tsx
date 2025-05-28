@@ -20,6 +20,7 @@ import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
@@ -76,6 +77,24 @@ function isUserAction(
 ): item is ActionDocument & { createdAtLocation: string } {
   return Boolean(item.createdAtLocation)
 }
+
+const SystemName = styled.div`
+  display: flex;
+  align-items: center;
+
+  > div {
+    flex-grow: 0;
+    flex-shrink: 0;
+    border-radius: 100%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    justify-content: center;
+    background-color: ${({ theme }) => theme.colors.grey200};
+  }
+`
 
 /**
  *  Renders the event history table. Used for audit trail.
@@ -135,8 +154,12 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
           />
         </Link>
       ) : (
-        // TODO CIHAN: show box here
-        <UserAvatar avatar={undefined} locale={intl.locale} names={userName} />
+        <SystemName>
+          <div>
+            <Box />
+          </div>
+          {userName}
+        </SystemName>
       )
 
       const actionElement = (
