@@ -210,11 +210,15 @@ const messagesToDefine = {
     defaultMessage: 'National id',
     description: 'Label for national id'
   },
-
   webhook: {
     id: 'integrations.type.webhook',
     defaultMessage: 'Webhook',
     description: 'Label for web hook'
+  },
+  import: {
+    id: 'integrations.type.import',
+    defaultMessage: 'Import',
+    description: 'Label for import type system'
   },
   healthSystem: {
     id: 'integrations.type.healthSystem',
