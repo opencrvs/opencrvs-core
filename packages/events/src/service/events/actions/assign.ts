@@ -45,7 +45,6 @@ export async function assignRecord({
     eventId: input.eventId,
     userDetails,
     token,
-    transactionId: input.transactionId,
     status: ActionStatus.Accepted
   })
 }

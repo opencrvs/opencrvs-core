@@ -168,7 +168,7 @@ export function getDefaultActionProcedures(
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
-        const { eventId, transactionId } = input
+        const { eventId } = input
         const actionId = getUUID()
 
         if (ctx.isDuplicateAction) {
@@ -226,7 +226,6 @@ export function getDefaultActionProcedures(
               userType: ctx.userType
             },
             token,
-            transactionId,
             status
           },
           actionId
@@ -239,7 +238,7 @@ export function getDefaultActionProcedures(
       .use(validatePayloadMiddleware)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
-        const { eventId, actionId, transactionId } = input
+        const { eventId, actionId } = input
         const event = await getEventById(eventId)
         const originalAction = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
@@ -276,7 +275,6 @@ export function getDefaultActionProcedures(
               userType: ctx.userType
             },
             token,
-            transactionId,
             status: ActionStatus.Accepted
           }
         )
@@ -320,8 +318,7 @@ export function getDefaultActionProcedures(
           type: actionType,
           createdBy: ctx.user.id,
           createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId,
-          createdByUserType: ctx.userType
+          createdAtLocation: ctx.user.primaryOfficeId
         })
       })
   }

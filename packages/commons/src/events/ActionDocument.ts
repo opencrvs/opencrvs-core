@@ -43,11 +43,9 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  // TODO CIHAN: type
-  createdByUserType: z.string(),
   createdAtLocation: z
     .string()
-    .nullish()
+    .nullable()
     .describe(
       'Location of the user who created the action. This is null for system users.'
     ),

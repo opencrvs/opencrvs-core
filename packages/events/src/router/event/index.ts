@@ -147,7 +147,6 @@ export const eventRouter = router({
             userType: ctx.userType
           },
           token: ctx.token,
-          transactionId: getUUID(),
           status: ActionStatus.Accepted
         }
       )
@@ -213,8 +212,7 @@ export const eventRouter = router({
               user: options.ctx.user,
               userType: options.ctx.userType
             },
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+            token: options.ctx.token
           })
         })
     }),
@@ -240,7 +238,6 @@ export const eventRouter = router({
               userType: ctx.userType
             },
             token: ctx.token,
-            transactionId: input.transactionId,
             status: ActionStatus.Accepted
           })
         }),
@@ -263,8 +260,7 @@ export const eventRouter = router({
               user: ctx.user,
               userType: ctx.userType
             },
-            token: ctx.token,
-            transactionId: input.transactionId
+            token: ctx.token
           })
         }),
       reject: publicProcedure
@@ -287,8 +283,7 @@ export const eventRouter = router({
               user: ctx.user,
               userType: ctx.userType
             },
-            token: ctx.token,
-            transactionId: input.transactionId
+            token: ctx.token
           })
         })
     })

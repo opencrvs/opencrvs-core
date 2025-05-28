@@ -59,6 +59,10 @@ const messages = defineMessages({
   }
 })
 
+const Header = styled(Text)`
+  margin-bottom: 20px;
+`
+
 /**
  *  Renders the event history table. Used for audit trail.
  */
@@ -86,6 +90,11 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
     .map((item) => {
+      if (!item.createdAtLocation) {
+        // TODO CIHAN: machine user
+        return null
+      }
+
       const user = getUser(item.createdBy)
       const location = getLocation(item.createdAtLocation)
 
@@ -180,9 +189,9 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
   return (
     <>
       <Divider />
-      <Text color="copy" element="h3" variant="h3">
+      <Header color="copy" element="h3" variant="h3">
         {intl.formatMessage(constantsMessages.history)}
-      </Text>
+      </Header>
       <TableDiv>
         <Table
           highlightRowOnMouseOver

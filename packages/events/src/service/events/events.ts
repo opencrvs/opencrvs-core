@@ -182,7 +182,6 @@ export async function createEvent({
     createdBy: userDetails.user.id,
     createdByRole: userDetails.user.role,
     createdAtLocation: userDetails.user.primaryOfficeId,
-    createdByUserType: userDetails.userType
   }
 
   await collection.insertOne({
@@ -274,14 +273,12 @@ export async function addAction(
     eventId,
     userDetails,
     token,
-    status,
-    transactionId
+    status
   }: {
     eventId: string
     userDetails: UserDetails
     token: string
     status: ActionStatus
-    transactionId: string
   },
   actionId = getUUID()
 ): Promise<EventDocument> {
@@ -310,7 +307,6 @@ export async function addAction(
     createdBy: userDetails.user.id,
     createdByRole: userDetails.user.role,
     createdAtLocation: userDetails.user.primaryOfficeId,
-    createdByUserType: userDetails.userType
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {

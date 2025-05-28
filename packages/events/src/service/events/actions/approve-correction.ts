@@ -22,13 +22,11 @@ export async function approveCorrection(
   {
     eventId,
     userDetails,
-    token,
-    transactionId
+    token
   }: {
     eventId: string
     userDetails: UserDetails
     token: string
-    transactionId: string
   }
 ) {
   const storedEvent = await getEventById(eventId)
@@ -45,7 +43,6 @@ export async function approveCorrection(
     eventId,
     userDetails,
     token,
-    transactionId,
     status: ActionStatus.Accepted
   })
 }

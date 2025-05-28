@@ -41,8 +41,7 @@ export async function createDraft(
       createdBy: userDetails.user.id,
       createdByRole: userDetails.user.role,
       createdAt: now,
-      createdAtLocation: userDetails.user.primaryOfficeId,
-      createdByUserType: userDetails.userType
+      createdAtLocation: userDetails.user.primaryOfficeId
     }
   }
 
