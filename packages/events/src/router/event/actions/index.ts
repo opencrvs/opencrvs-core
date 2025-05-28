@@ -33,7 +33,7 @@ import {
   MiddlewareOptions,
   requiresAnyOfScopes
 } from '@events/router/middleware'
-import { publicProcedure } from '@events/router/trpc'
+import { publicProcedure, systemProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -158,7 +158,7 @@ export function getDefaultActionProcedures(
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   return {
-    request: publicProcedure
+    request: systemProcedure
       .meta(meta)
       .use(requireScopesMiddleware)
       .input(inputSchema)
@@ -232,7 +232,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
-    accept: publicProcedure
+    accept: systemProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
       .use(validatePayloadMiddleware)
@@ -280,6 +280,7 @@ export function getDefaultActionProcedures(
         )
       }),
 
+    // TODO CIHAN
     reject: publicProcedure
       .use(requireScopesMiddleware)
       .input(

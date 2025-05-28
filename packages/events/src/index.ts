@@ -44,8 +44,22 @@ function normalizeHeaders(
     : headers
 }
 
+function stringifyRequest(req: IncomingMessage) {
+  const url = new URL(req.url || '', `http://${req.headers.host}`)
+  return `'${req.method} ${url.pathname}'`
+}
+
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
+  middleware: (req, _, next) => {
+    logger.info(`Request: '${stringifyRequest(req)}'`)
+    return next()
+  },
+  onError: ({ req, error }) =>
+    logger.warn(
+      `Error for request: '${stringifyRequest(req)}'. Error: '${error.message}'`,
+      error.stack
+    ),
   createContext: async function createContext(opts) {
     const normalizedHeaders = normalizeHeaders(opts.req.headers)
 
@@ -69,6 +83,8 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     }
 
     const userType = getUserTypeFromToken(token)
+
+    console.log('CIHAN TESTAA 1', userType, sub)
 
     if (userType === TokenUserType.SYSTEM) {
       return {

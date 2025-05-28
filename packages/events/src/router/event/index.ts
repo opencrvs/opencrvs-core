@@ -88,7 +88,7 @@ export const eventRouter = router({
         return getEventConfigurations(options.ctx.token)
       })
   }),
-  create: publicProcedure
+  create: systemProcedure
     .meta({
       openapi: {
         summary: 'Create event',
@@ -116,12 +116,27 @@ export const eventRouter = router({
         eventInputType: options.input.type
       })
 
+      console.log('CIHAN TODO', options.ctx)
+
+      const { createdBy, createdByRole, createdAtLocation } =
+        options.ctx.userType === TokenUserType.USER
+          ? {
+              createdBy: options.ctx.user.id,
+              createdByRole: options.ctx.user.role,
+              createdAtLocation: options.ctx.user.primaryOfficeId
+            }
+          : {
+              createdBy: options.ctx.system.id,
+              createdByRole: 'TODO',
+              createdAtLocation: 'TODO'
+            }
+
       return createEvent({
+        transactionId: options.input.transactionId,
         eventInput: options.input,
-        createdBy: options.ctx.user.id,
-        createdByRole: options.ctx.user.role,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        transactionId: options.input.transactionId
+        createdBy,
+        createdByRole,
+        createdAtLocation
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
