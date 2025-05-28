@@ -3,7 +3,7 @@ info:
   title: OpenCRVS API
   version: 1.8.0
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:3000/api/events
 paths:
   /config:
     get:
@@ -69,6 +69,9 @@ paths:
               required:
                 - transactionId
                 - type
+              default:
+                transactionId: e357cb02-bf83-40bf-b941-e5b197050495
+                type: v2.birth
       responses:
         "200":
           description: Successful response
@@ -428,6 +431,12 @@ paths:
               required:
                 - eventId
                 - transactionId
+              default:
+                eventId: <event-id-here>
+                transactionId: b7745506-8d36-4bc8-ab4c-b760512a4f7c
+                declaration: {}
+                annotation: {}
+                type: NOTIFY
       responses:
         "200":
           description: Successful response
