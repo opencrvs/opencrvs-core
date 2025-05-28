@@ -158,11 +158,11 @@ type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
 
 export async function createEvent({
   eventInput,
-  userDetails,
+  user,
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
-  userDetails: UserDetails
+  user: UserDetails
   transactionId: string
 }): Promise<EventDocument> {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -179,9 +179,9 @@ export async function createEvent({
   const trackingId = generateTrackingId()
 
   const createdByDetails = {
-    createdBy: userDetails.user.id,
-    createdByRole: userDetails.user.role,
-    createdAtLocation: userDetails.user.primaryOfficeId,
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
   }
 
   await collection.insertOne({
@@ -271,12 +271,12 @@ export async function addAction(
   input: ActionInputWithType,
   {
     eventId,
-    userDetails,
+    user,
     token,
     status
   }: {
     eventId: string
-    userDetails: UserDetails
+    user: UserDetails
     token: string
     status: ActionStatus
   },
@@ -304,9 +304,9 @@ export async function addAction(
   }
 
   const createdByDetails = {
-    createdBy: userDetails.user.id,
-    createdByRole: userDetails.user.role,
-    createdAtLocation: userDetails.user.primaryOfficeId,
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {

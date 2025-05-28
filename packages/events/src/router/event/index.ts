@@ -116,15 +116,10 @@ export const eventRouter = router({
         eventInputType: input.type
       })
 
-      const userDetails = {
-        user: ctx.user,
-        userType: ctx.userType
-      }
-
       return createEvent({
         transactionId: input.transactionId,
         eventInput: input,
-        userDetails
+        user: ctx.user
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
@@ -142,10 +137,7 @@ export const eventRouter = router({
         },
         {
           eventId: event.id,
-          userDetails: {
-            user: ctx.user,
-            userType: ctx.userType
-          },
+          user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted
         }
@@ -164,19 +156,18 @@ export const eventRouter = router({
     list: publicProcedure.output(z.array(Draft)).query(async (options) => {
       return getDraftsByUserId(options.ctx.user.id)
     }),
-    create: publicProcedure.input(DraftInput).mutation(async (options) => {
-      const eventId = options.input.eventId
-      await getEventById(eventId)
+    create: publicProcedure
+      .input(DraftInput)
+      .mutation(async ({ input, ctx }) => {
+        const { eventId } = input
+        await getEventById(eventId)
 
-      return createDraft(options.input, {
-        eventId,
-        userDetails: {
-          user: options.ctx.user,
-          userType: options.ctx.userType
-        },
-        transactionId: options.input.transactionId
+        return createDraft(input, {
+          eventId,
+          user: ctx.user,
+          transactionId: input.transactionId
+        })
       })
-    })
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
@@ -195,10 +186,7 @@ export const eventRouter = router({
         .mutation(async (options) => {
           return assignRecord({
             input: options.input,
-            userDetails: {
-              user: options.ctx.user,
-              userType: options.ctx.userType
-            },
+            user: options.ctx.user,
             token: options.ctx.token
           })
         }),
@@ -208,10 +196,7 @@ export const eventRouter = router({
         .mutation(async (options) => {
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
-            userDetails: {
-              user: options.ctx.user,
-              userType: options.ctx.userType
-            },
+            user: options.ctx.user,
             token: options.ctx.token
           })
         })
@@ -233,10 +218,7 @@ export const eventRouter = router({
 
           return addAction(input, {
             eventId: input.eventId,
-            userDetails: {
-              user: ctx.user,
-              userType: ctx.userType
-            },
+            user: ctx.user,
             token: ctx.token,
             status: ActionStatus.Accepted
           })
@@ -256,10 +238,7 @@ export const eventRouter = router({
           }
           return approveCorrection(input, {
             eventId: input.eventId,
-            userDetails: {
-              user: ctx.user,
-              userType: ctx.userType
-            },
+            user: ctx.user,
             token: ctx.token
           })
         }),
@@ -279,10 +258,7 @@ export const eventRouter = router({
 
           return rejectCorrection(input, {
             eventId: input.eventId,
-            userDetails: {
-              user: ctx.user,
-              userType: ctx.userType
-            },
+            user: ctx.user,
             token: ctx.token
           })
         })

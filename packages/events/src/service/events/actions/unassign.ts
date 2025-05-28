@@ -24,11 +24,11 @@ export async function unassignRecord(
   input: UnassignActionInput,
   {
     eventId,
-    userDetails,
+    user,
     token
   }: {
     eventId: string
-    userDetails: UserDetails
+    user: UserDetails
     token: string
   }
 ) {
@@ -37,7 +37,7 @@ export async function unassignRecord(
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
     if (
-      lastAssignmentAction.assignedTo !== userDetails.user.id &&
+      lastAssignmentAction.assignedTo !== user.id &&
       !inScope({ Authorization: setBearerForToken(token) }, [
         SCOPES.RECORD_UNASSIGN_OTHERS
       ])
@@ -49,7 +49,7 @@ export async function unassignRecord(
 
     return addAction(input, {
       eventId,
-      userDetails,
+      user,
       token,
       status: ActionStatus.Accepted
     })

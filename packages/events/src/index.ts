@@ -67,12 +67,10 @@ async function resolveUserDetails(
     const { type } = await getSystem(env.USER_MANAGEMENT_URL, sub, token)
 
     return {
-      userType: TokenUserType.SYSTEM,
-      user: {
-        id: sub,
-        primaryOfficeId: null,
-        role: type
-      }
+      type: TokenUserType.SYSTEM,
+      id: sub,
+      primaryOfficeId: null,
+      role: type
     }
   }
 
@@ -83,12 +81,10 @@ async function resolveUserDetails(
   )
 
   return {
-    userType: TokenUserType.USER,
-    user: {
-      id: sub,
-      primaryOfficeId,
-      role
-    }
+    type: TokenUserType.USER,
+    id: sub,
+    primaryOfficeId,
+    role
   }
 }
 
@@ -115,7 +111,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     }
 
     const token = parseResult.data
-    return { token, ...(await resolveUserDetails(token)) }
+    return { token, user: await resolveUserDetails(token) }
   }
 }
 

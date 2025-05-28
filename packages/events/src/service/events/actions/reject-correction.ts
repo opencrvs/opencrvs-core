@@ -21,11 +21,11 @@ export async function rejectCorrection(
   input: RejectCorrectionActionInput,
   {
     eventId,
-    userDetails,
+    user,
     token
   }: {
     eventId: string
-    userDetails: UserDetails
+    user: UserDetails
     token: string
   }
 ) {
@@ -41,7 +41,7 @@ export async function rejectCorrection(
 
   return addAction(input, {
     eventId,
-    userDetails,
+    user,
     token,
     status: ActionStatus.Accepted
   })

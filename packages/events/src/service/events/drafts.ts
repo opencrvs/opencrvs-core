@@ -19,11 +19,11 @@ export async function createDraft(
   input: DraftInput,
   {
     eventId,
-    userDetails,
+    user,
     transactionId
   }: {
     eventId: string
-    userDetails: UserDetails
+    user: UserDetails
     transactionId: string
   }
 ) {
@@ -38,10 +38,10 @@ export async function createDraft(
     action: {
       ...input,
       type: input.type,
-      createdBy: userDetails.user.id,
-      createdByRole: userDetails.user.role,
+      createdBy: user.id,
+      createdByRole: user.role,
       createdAt: now,
-      createdAtLocation: userDetails.user.primaryOfficeId
+      createdAtLocation: user.primaryOfficeId
     }
   }
 

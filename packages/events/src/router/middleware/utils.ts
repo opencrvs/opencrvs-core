@@ -17,15 +17,13 @@ import {
 } from '@opencrvs/commons'
 
 export interface UserDetails {
-  userType: TokenUserType.USER | TokenUserType.SYSTEM
-  user: {
-    id: string
-    primaryOfficeId: string | null
-    role: string
-  }
+  type: TokenUserType.USER | TokenUserType.SYSTEM
+  id: string
+  primaryOfficeId: string | null
+  role: string
 }
 
-export type Context = { token: TokenWithBearer } & UserDetails
+export type Context = { token: TokenWithBearer; user: UserDetails }
 /**
  * TRPC Middleware options with correct context.
  * Actual middleware type definition is only for internal use within TRPC.

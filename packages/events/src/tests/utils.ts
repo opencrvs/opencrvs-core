@@ -66,11 +66,11 @@ export function createSystemTestClient(
   const token = createTestToken(systemId, scopes, TokenUserType.SYSTEM)
 
   const caller = createCaller({
-    userType: TokenUserType.SYSTEM,
     user: {
       id: systemId,
       role: 'HEALTH',
-      primaryOfficeId: null
+      primaryOfficeId: null,
+      type: TokenUserType.SYSTEM
     },
     token
   })
@@ -84,11 +84,9 @@ export function createTestClient(
   const token = createTestToken(user.id, scopes)
 
   const caller = createCaller({
-    userType: TokenUserType.USER,
     user: {
-      id: user.id,
-      primaryOfficeId: user.primaryOfficeId,
-      role: user.role
+      ...user,
+      type: TokenUserType.USER
     },
     token
   })

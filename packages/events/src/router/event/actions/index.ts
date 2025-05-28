@@ -221,10 +221,7 @@ export function getDefaultActionProcedures(
           { ...input, ...parsedBody },
           {
             eventId,
-            userDetails: {
-              user: user,
-              userType: ctx.userType
-            },
+            user,
             token,
             status
           },
@@ -270,10 +267,7 @@ export function getDefaultActionProcedures(
           { ...input, originalActionId: actionId },
           {
             eventId,
-            userDetails: {
-              user: user,
-              userType: ctx.userType
-            },
+            user,
             token,
             status: ActionStatus.Accepted
           }

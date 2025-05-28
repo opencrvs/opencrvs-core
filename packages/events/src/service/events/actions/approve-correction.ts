@@ -21,11 +21,11 @@ export async function approveCorrection(
   input: ApproveCorrectionActionInput,
   {
     eventId,
-    userDetails,
+    user,
     token
   }: {
     eventId: string
-    userDetails: UserDetails
+    user: UserDetails
     token: string
   }
 ) {
@@ -41,7 +41,7 @@ export async function approveCorrection(
 
   return addAction(input, {
     eventId,
-    userDetails,
+    user,
     token,
     status: ActionStatus.Accepted
   })

@@ -20,16 +20,15 @@ import { addAction, getEventById } from '@events/service/events/events'
 import { UserDetails } from '@events/router/middleware'
 
 export async function assignRecord({
-  userDetails,
+  user,
   token,
   input
 }: {
-  userDetails: UserDetails
+  user: UserDetails
   token: string
   input: AssignActionInput
 }) {
   const storedEvent = await getEventById(input.eventId)
-
   const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
@@ -43,7 +42,7 @@ export async function assignRecord({
 
   return addAction(input, {
     eventId: input.eventId,
-    userDetails,
+    user,
     token,
     status: ActionStatus.Accepted
   })

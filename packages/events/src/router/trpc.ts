@@ -32,7 +32,7 @@ export const systemProcedure = t.procedure
  * and will throw an error if a system user tries to access them
  */
 export const publicProcedure = t.procedure.use(async (opts) => {
-  if (opts.ctx.userType === TokenUserType.SYSTEM) {
+  if (opts.ctx.user.type === TokenUserType.SYSTEM) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 

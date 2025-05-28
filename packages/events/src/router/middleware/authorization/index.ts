@@ -206,7 +206,7 @@ export const requireAssignment = experimental_standaloneMiddleware<{
     )
   )
 
-  if (ctx.userType === TokenUserType.SYSTEM) {
+  if (ctx.user.type === TokenUserType.SYSTEM) {
     return next()
   }
 
