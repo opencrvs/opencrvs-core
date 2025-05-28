@@ -12,12 +12,12 @@
 if [[ "$1" =~ ^(hearth|events|application-config|openhim|performance|user-mgnt)$ ]]; then
   TARGET_FOLDER="${BASH_REMATCH[1]}"
 else
-  echo "Example usage: yarn create:hearth <filename>"
+  echo "Example usage: pnpm create:hearth <filename>"
   exit 1
 fi
 
 if [ -z "$2" ]; then
-  echo "Example usage: yarn create:hearth <filename>"
+  echo "Example usage: pnpm create:hearth <filename>"
   exit 1
 fi
 

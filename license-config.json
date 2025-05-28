@@ -52,7 +52,9 @@
     "packages/toolkit/.npmignore",
     "packages/toolkit/tsconfig.tsbuildinfo",
     "packages/commons/src/events/EventConfig.mermaid",
-    "packages/commons/src/events/EventUpdateFlow.mermaid"
+    "packages/commons/src/events/EventUpdateFlow.mermaid",
+    "pnpm-lock.yaml",
+    "pnpm-workspace.yaml"
   ],
   "license": "license-header.txt",
   "licenseFormats": {
