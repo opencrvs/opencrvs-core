@@ -70,7 +70,7 @@ export function createSystemTestClient(
     user: {
       id: systemId,
       role: 'HEALTH',
-      primaryOfficeId: undefined
+      primaryOfficeId: null
     },
     token
   })

@@ -29,7 +29,7 @@ export type UserDetails =
       userType: TokenUserType.SYSTEM
       user: {
         id: string
-        primaryOfficeId: undefined
+        primaryOfficeId: null
         role: string
       }
     }

@@ -27,7 +27,7 @@ export const BaseActionInput = z.object({
 const CreateActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.CREATE).default(ActionType.CREATE),
-    createdAtLocation: z.string()
+    createdAtLocation: z.string().nullish()
   })
 )
 

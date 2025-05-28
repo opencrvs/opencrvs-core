@@ -43,7 +43,12 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string().optional(), // This is optional because system users don't have a specific location
+  createdAtLocation: z
+    .string()
+    .nullish()
+    .describe(
+      'Location of the user who created the action. This is null for system users.'
+    ),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,

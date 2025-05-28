@@ -13,7 +13,7 @@ import { createServer, IncomingMessage } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
-import { getUser, logger } from '@opencrvs/commons'
+import { getSystem, getUser, logger } from '@opencrvs/commons'
 import {
   getUserId,
   getUserTypeFromToken,
@@ -64,12 +64,14 @@ async function resolveUserDetails(
   const userType = getUserTypeFromToken(token)
 
   if (userType === TokenUserType.SYSTEM) {
+    const { type } = await getSystem(env.USER_MANAGEMENT_URL, sub, token)
+
     return {
       userType: TokenUserType.SYSTEM,
       user: {
         id: sub,
-        primaryOfficeId: undefined,
-        role: 'TODO'
+        primaryOfficeId: null,
+        role: type
       }
     }
   }
@@ -96,11 +98,12 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     logger.info(`Request: ${stringifyRequest(req)}`)
     return next()
   },
-  onError: ({ req, error }) =>
+  onError: ({ req, error }) => {
     logger.warn(
       `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`,
       error.stack
-    ),
+    )
+  },
   createContext: async function createContext(opts) {
     const { authorization } = normalizeHeaders(opts.req.headers)
     const parseResult = TokenWithBearer.safeParse(authorization)
@@ -112,7 +115,6 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     }
 
     const token = parseResult.data
-
     return { token, ...(await resolveUserDetails(token)) }
   }
 }

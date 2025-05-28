@@ -129,7 +129,10 @@ export const EventMetadata = z.object({
     .describe('Role of the user who last updated the declaration.'),
   createdAtLocation: z
     .string()
-    .describe('Location of the user who created the event.'),
+    .nullish()
+    .describe(
+      'Location of the user who created the event. This is null for system users.'
+    ),
   updatedAtLocation: z
     .string()
     .nullish()
