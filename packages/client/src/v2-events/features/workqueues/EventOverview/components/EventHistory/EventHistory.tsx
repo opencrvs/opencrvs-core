@@ -63,6 +63,17 @@ const Header = styled(Text)`
   margin-bottom: 20px;
 `
 
+/*
+ * At first we tried adding a field such as 'userType' to all actions etc,
+ * but that would have caused file changes to like 20 files.
+ * So lets Keep It Stupid Simple and just check it there is no location -> machine user.
+ */
+function isUserAction(
+  item: ActionDocument
+): item is ActionDocument & { createdAtLocation: string } {
+  return Boolean(item.createdAtLocation)
+}
+
 /**
  *  Renders the event history table. Used for audit trail.
  */
@@ -89,30 +100,28 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
-    .map((item) => {
-      if (!item.createdAtLocation) {
-        // TODO CIHAN: machine user
-        return null
-      }
-
-      const user = getUser(item.createdBy)
-      const location = getLocation(item.createdAtLocation)
+    .map((action) => {
+      const userAction = isUserAction(action)
+      const user = getUser(action.createdBy)
+      const location = userAction
+        ? getLocation(action.createdAtLocation)
+        : undefined
 
       return {
         action: (
           <Link
             font="bold14"
             onClick={() => {
-              onHistoryRowClick(item, user)
+              onHistoryRowClick(action, user)
             }}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
-              status: item.type
+              status: action.type
             })}
           </Link>
         ),
         date: format(
-          new Date(item.createdAt),
+          new Date(action.createdAt),
           intl.formatMessage(messages.timeFormat)
         ),
         user: (
@@ -122,7 +131,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
             onClick={() =>
               navigate(
                 formatUrl(routes.USER_PROFILE, {
-                  userId: item.createdBy
+                  userId: action.createdBy
                 })
               )
             }
@@ -145,7 +154,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
               navigate({
                 pathname: routes.TEAM_USER_LIST,
                 search: stringify({
-                  locationId: item.createdAtLocation
+                  locationId: action.createdAtLocation
                 })
               })
             }}
