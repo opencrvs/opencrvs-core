@@ -45,7 +45,7 @@ export const EventOverviewProvider = ({
 }) => {
   const getUser = (id: string) => {
     const user = users.find((u) => u.id === id)
-    return user ? user : MISSING_USER
+    return user ?? MISSING_USER
   }
 
   const getLocation = (id: string) => {
