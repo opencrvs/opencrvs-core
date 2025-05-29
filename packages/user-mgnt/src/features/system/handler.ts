@@ -11,7 +11,7 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES } from '@opencrvs/commons/authentication'
+import { SystemIntegrationRole, getSystemIntegrationRoleScopes } from './scopes'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
@@ -19,17 +19,15 @@ import {
   postFhir
 } from '@user-mgnt/features/createUser/service'
 import { logger } from '@opencrvs/commons'
-import System, {
-  ISystemModel,
-  WebhookPermissions
-} from '@user-mgnt/model/system'
-import User, { IUserModel } from '@user-mgnt/model/user'
+import System, { WebhookPermissions } from '@user-mgnt/model/system'
+import User from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
 import { pickSystem, types } from '@user-mgnt/utils/system'
 import { getTokenPayload, ITokenPayload } from '@user-mgnt/utils/token'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import * as Joi from 'joi'
 import uuid from 'uuid/v4'
+import { getEventConfigurations } from './countryconfig'
 
 export enum EventType {
   Birth = 'birth',
@@ -47,7 +45,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES
+  type: SystemIntegrationRole
   integratingSystemType: string
 }
 
@@ -55,9 +53,10 @@ export async function registerSystem(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { name, type, integratingSystemType } =
-    request.payload as IRegisterSystemPayload
-  let { settings } = request.payload as IRegisterSystemPayload
+  const payload = request.payload as IRegisterSystemPayload
+  const { name, type, integratingSystemType } = payload
+  let { settings } = payload
+
   try {
     if (type === types.WEBHOOK && !settings) {
       logger.error('Webhook payloads are required !')
@@ -70,15 +69,12 @@ export async function registerSystem(
         webhook: []
       }
     }
-    const token: ITokenPayload = getTokenPayload(
-      request.headers.authorization.split(' ')[1]
-    )
-    const userId = token.sub
-    const systemAdminUser: IUserModel | null = await User.findById(userId)
 
-    const existingSystem: ISystemModel | null = await System.findOne({
-      type: type
-    })
+    const authorization = request.headers.authorization as string
+    const token = getTokenPayload(authorization.split(' ')[1])
+    const userId = token.sub
+    const systemAdminUser = await User.findById(userId)
+    const existingSystem = await System.findOne({ type: type })
 
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
@@ -88,11 +84,15 @@ export async function registerSystem(
     if (existingSystem && existingSystem.type === types.NATIONAL_ID) {
       throw new Error('System with NATIONAL_ID already exists !')
     }
-    if (!DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]) {
+
+    const eventConfigurations = await getEventConfigurations(authorization)
+    const eventIds = eventConfigurations.map((eventConfig) => eventConfig.id)
+    const systemScopes = getSystemIntegrationRoleScopes(type, eventIds)
+
+    if (!systemScopes) {
       logger.error('scope doesnt exist')
       return h.response().code(400)
     }
-    const systemScopes: string[] = DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]
 
     if (
       (process.env.NODE_ENV === 'development' || QA_ENV) &&
@@ -104,25 +104,22 @@ export async function registerSystem(
     const client_id = uuid()
     const clientSecret = uuid()
     const sha_secret = uuid()
-
     const { hash, salt } = generateSaltedHash(clientSecret)
 
     const practitioner = createFhirPractitioner(systemAdminUser, true)
-    const practitionerId = await postFhir(
-      request.headers.authorization,
-      practitioner
-    )
+    const practitionerId = await postFhir(authorization, practitioner)
     if (!practitionerId) {
       throw new Error(
         'Practitioner resource not saved correctly, practitioner ID not returned'
       )
     }
+
     const role = await createFhirPractitionerRole(
       systemAdminUser,
       practitionerId,
       true
     )
-    const roleId = await postFhir(request.headers.authorization, role)
+    const roleId = await postFhir(authorization, role)
     if (!roleId) {
       throw new Error(
         'PractitionerRole resource not saved correctly, practitionerRole ID not returned'
@@ -198,7 +195,7 @@ export async function deactivateSystem(
       request.headers.authorization.split(' ')[1]
     )
     const userId = token.sub
-    const systemAdminUser: IUserModel | null = await User.findById(userId)
+    const systemAdminUser = await User.findById(userId)
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('Active system admin user details cannot be found')
       throw unauthorized()
@@ -206,9 +203,7 @@ export async function deactivateSystem(
 
     const { clientId } = request.payload as SystemClientIdPayload
 
-    const system: ISystemModel | null = await System.findOne({
-      client_id: clientId
-    })
+    const system = await System.findOne({ client_id: clientId })
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${clientId}`
@@ -237,11 +232,9 @@ export async function reactivateSystem(
   h: Hapi.ResponseToolkit
 ) {
   try {
-    const token: ITokenPayload = getTokenPayload(
-      request.headers.authorization.split(' ')[1]
-    )
+    const token = getTokenPayload(request.headers.authorization.split(' ')[1])
     const userId = token.sub
-    const systemAdminUser: IUserModel | null = await User.findById(userId)
+    const systemAdminUser = await User.findById(userId)
     if (!systemAdminUser || systemAdminUser.status !== statuses.ACTIVE) {
       logger.error('active system admin user details cannot be found')
       throw unauthorized()
@@ -249,9 +242,7 @@ export async function reactivateSystem(
 
     const { clientId } = request.payload as SystemClientIdPayload
 
-    const system: ISystemModel | null = await System.findOne({
-      client_id: clientId
-    })
+    const system = await System.findOne({ client_id: clientId })
     if (!system) {
       logger.error(
         `No system details found for requested client_id: ${clientId}`
@@ -288,11 +279,10 @@ interface IVerifyResponse {
 
 export async function verifySystemHandler(
   request: Hapi.Request,
-  h: Hapi.ResponseToolkit
-) {
+  _: Hapi.ResponseToolkit
+): Promise<IVerifyResponse> {
   const { client_id, client_secret } = request.payload as IVerifyPayload
-
-  const system: ISystemModel | null = await System.findOne({ client_id })
+  const system = await System.findOne({ client_id })
 
   if (!system) {
     // Don't return a 404 as this gives away that this user account exists
@@ -303,12 +293,11 @@ export async function verifySystemHandler(
     throw unauthorized()
   }
 
-  const response: IVerifyResponse = {
+  return {
     scope: system.scope,
     status: system.status,
     id: system.id
   }
-  return response
 }
 
 export const verifySystemReqSchema = Joi.object({
@@ -340,7 +329,7 @@ export async function getSystemHandler(
     criteria = { ...criteria, client_id: clientId }
   }
 
-  const system: ISystemModel | null = await System.findOne(criteria)
+  const system = await System.findOne(criteria)
 
   if (!system) {
     // Don't return a 404 as this gives away that this user account exists
@@ -426,9 +415,7 @@ export async function updatePermissions(
   try {
     const { clientId, webhook } = request.payload as IUpdateSystemPayload
 
-    const existingSystem: ISystemModel | null = await System.findOne({
-      client_id: clientId
-    })
+    const existingSystem = await System.findOne({ client_id: clientId })
 
     if (!existingSystem) {
       logger.error('No system client is found !')
@@ -472,9 +459,7 @@ export async function refreshSystemSecretHandler(
   try {
     const { clientId } = request.payload as SystemClientIdPayload
 
-    const systemUser: ISystemModel | null = await System.findOne({
-      client_id: clientId
-    })
+    const systemUser = await System.findOne({ client_id: clientId })
 
     if (!systemUser) {
       logger.error(`No user details found by given clientId: ${clientId}`)
@@ -516,9 +501,7 @@ export async function deleteSystem(
   try {
     const { clientId } = request.payload as SystemClientIdPayload
 
-    const system = await System.findOneAndDelete({
-      client_id: clientId
-    })
+    const system = await System.findOneAndDelete({ client_id: clientId })
 
     if (system) {
       logger.info(`System has been deleted by clientId ${clientId}`)

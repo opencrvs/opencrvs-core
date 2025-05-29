@@ -16,7 +16,7 @@ describe('findScope()', () => {
     SCOPES.USER_CREATE,
     SCOPES.USER_READ,
     'user.create[role=first-role|second-role]',
-    'notify.event[event=v2.birth]'
+    'record.notify[event=v2.birth]'
   ]
 
   it('successfully finds a configurable scope', () => {
@@ -28,9 +28,9 @@ describe('findScope()', () => {
   })
 
   it('successfully finds a configurable scope, even if config value includes special characters', () => {
-    const result = findScope(userScopes, 'notify.event')
+    const result = findScope(userScopes, 'record.notify')
     expect(result).toEqual({
-      type: 'notify.event',
+      type: 'record.notify',
       options: { event: ['v2.birth'] }
     })
   })

@@ -26,6 +26,7 @@ import { ActionType } from '../events/ActionType'
 import { ActionStatus } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
+import { TokenUserType } from '../authentication'
 
 /*  eslint-disable max-lines */
 
@@ -505,6 +506,7 @@ describe('"user" conditionals', () => {
       scope: ['record.register', 'record.registration-correct'],
       exp: '1739881718',
       algorithm: 'RS256',
+      userType: TokenUserType.USER,
       sub: '677b33fea7efb08730f3abfa33'
     },
     $now: formatISO(new Date(), { representation: 'date' })
