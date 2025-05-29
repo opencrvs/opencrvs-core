@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { extendZodWithOpenApi } from 'zod-openapi'
 import { getUUID, SCOPES, TokenUserType } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
@@ -51,6 +52,8 @@ import {
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { getDefaultActionProcedures } from './actions'
+
+extendZodWithOpenApi(z)
 
 function validateEventType({
   eventTypes,
