@@ -133,6 +133,49 @@ describe('"universal" conditionals', () => {
   })
 })
 
+describe('object combinator', () => {
+  it('can be used for validation composite inputs that produce objects', () => {
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams({
+          'child.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams()
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams({
+          'child.name': {
+            firstname: 'John'
+          }
+        })
+      )
+    ).toBe(false)
+  })
+})
+
 describe('"field" conditionals', () => {
   it('validates "field.isAfter" conditional', () => {
     expect(

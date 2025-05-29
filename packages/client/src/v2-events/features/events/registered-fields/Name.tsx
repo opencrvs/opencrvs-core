@@ -13,20 +13,20 @@ import {
   FieldConfig,
   FieldType,
   getValidatorsForField,
-  JSONSchema,
   NameFieldValue
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { joinValues } from '@client/v2-events/utils'
 
 interface Props {
+  id: string
   onChange: (newValue: NameFieldValue) => void
   validation: FieldConfig['validation']
   value?: NameFieldValue
 }
 
 function NameInput(props: Props) {
-  const { onChange, value = {} } = props
+  const { id, onChange, value = {} } = props
   const validators = props.validation || []
 
   const fields = [
@@ -57,7 +57,7 @@ function NameInput(props: Props) {
   return (
     <FormFieldGenerator
       fields={fields}
-      id="sdf"
+      id={id}
       initialValues={{ ...value }}
       onChange={(values) => onChange(values as NameFieldValue)}
     />
