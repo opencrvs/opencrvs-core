@@ -12,7 +12,7 @@ import * as React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
+import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
 
 const meta: Meta<typeof SearchCriteriaPanel> = {
   title: 'Components/SearchCriteriaPanel',

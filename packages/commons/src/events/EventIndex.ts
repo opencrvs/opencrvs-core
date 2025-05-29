@@ -93,6 +93,7 @@ const QueryExpression = z
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
+    registrationNumber: z.optional(Exact),
     flags: z.optional(z.array(z.union([AnyOf, Not]))),
     data: QueryInput
   })

@@ -41,9 +41,14 @@ import {
   isEmailFieldType,
   isDataFieldType,
   EventConfig,
-  getDeclarationFields
+  getDeclarationFields,
+  isNameFieldType,
+  isPhoneFieldType,
+  isIdFieldType,
+  getValidatorsForField
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { NameFieldValue } from '@opencrvs/commons/client'
 import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
 import { InputField } from '@client/components/form/InputField'
 
@@ -68,6 +73,8 @@ import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
@@ -156,6 +163,52 @@ export const GeneratedInputField = React.memo(
       inputFieldProps,
       config: fieldDefinition,
       value
+    }
+
+    if (isNameFieldType(field)) {
+      const validation = getValidatorsForField(
+        makeFormikFieldIdOpenCRVSCompatible(field.config.id),
+        field.config.validation || []
+      )
+
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Name.Input
+            id={fieldDefinition.id}
+            validation={validation}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isPhoneFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            type="text"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isIdFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            type="text"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
     }
 
     if (isDateFieldType(field)) {

@@ -36,10 +36,26 @@ function generateQuery(
     }
 
     if (value.type === 'fuzzy') {
+      /**
+       * Keys ending in 'name' are matched against `fullname`, a concatenation
+       * of first and last names, to enable fuzzy search despite typos or variations.
+       */
+      if (key.endsWith('.name')) {
+        return {
+          match: {
+            [`${field}.fullname`]: {
+              query: value.term,
+              fuzziness: 'AUTO'
+            }
+          }
+        }
+      }
+
       return {
-        fuzzy: {
+        match: {
           [field]: {
-            value: value.term
+            query: value.term,
+            fuzziness: 'AUTO'
           }
         }
       }
@@ -122,6 +138,15 @@ function buildClause(clause: QueryExpression) {
         }
       })
     }
+  }
+
+  if (clause.registrationNumber) {
+    must.push({
+      term: {
+        'legalStatuses.REGISTERED.registrationNumber':
+          clause.registrationNumber.term
+      }
+    })
   }
 
   if (clause.createdAt) {
@@ -214,14 +239,15 @@ export function buildElasticQueryFromSearchPayload(
     case 'or': {
       const should = input.clauses.flatMap((clause) => ({
         bool: {
-          must: buildClause(clause)
+          must: buildClause(clause),
+          should: undefined
         }
       }))
       return {
         bool: {
           should
         }
-      } as estypes.QueryDslQueryContainer
+      }
     }
     // default fallback (shouldn't happen if input is validated correctly)
     default:

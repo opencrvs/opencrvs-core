@@ -25,6 +25,7 @@ import {
 } from '@opencrvs/commons/client'
 
 import {
+  findLocalEventConfig,
   invalidateEventsList,
   setEventData,
   setEventListData
@@ -87,7 +88,12 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
 
     setEventData(newEvent.transactionId, optimisticEvent)
     setEventListData((eventIndices) =>
-      eventIndices?.concat(getCurrentEventState(optimisticEvent))
+      eventIndices?.concat(
+        getCurrentEventState(
+          optimisticEvent,
+          findLocalEventConfig(optimisticEvent.type)
+        )
+      )
     )
     return optimisticEvent
   },

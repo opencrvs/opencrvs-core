@@ -22,3 +22,5 @@ export const workqueues = {
   registered: registeredWorkqueue,
   'in-review': inReviewWorkqueue
 }
+
+export type WorkQueueTypes = keyof typeof workqueues

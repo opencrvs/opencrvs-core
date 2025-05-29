@@ -42,8 +42,11 @@ import {
 } from './utils'
 import { buildElasticQueryFromSearchPayload } from './query'
 
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
+function eventToEventIndex(
+  event: EventDocument,
+  config: EventConfig
+): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event, config))
 }
 
 /*
@@ -90,6 +93,8 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.ID:
+    case FieldType.PHONE:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -125,6 +130,15 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           filename: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.NAME:
+      return {
+        type: 'object',
+        properties: {
+          firstname: { type: 'keyword' },
+          surname: { type: 'keyword' },
+          fullname: { type: 'keyword' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -264,7 +278,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     readableObjectMode: true,
     writableObjectMode: true,
     transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record))
+      callback(null, eventToEventIndex(record, eventConfiguration))
     }
   })
 
@@ -282,7 +296,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   })
 }
 
-export async function indexEvent(event: EventDocument) {
+export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
@@ -290,7 +304,7 @@ export async function indexEvent(event: EventDocument) {
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event),
+    document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
 }
@@ -358,20 +372,14 @@ export async function getIndexedEvents(userId: string) {
 }
 
 export async function getIndex(eventParams: QueryType) {
-  const esClient = getOrCreateClient()
-
-  if (eventParams.type === 'or') {
-    const { clauses } = eventParams
-    // @todo: implement or query for quick search
-    // eslint-disable-next-line no-console
-    console.log({ clauses })
-    return []
-  }
-
-  if (Object.values(eventParams).length === 0) {
+  if (
+    Object.values(eventParams).length === 0 ||
+    eventParams.clauses.length === 0
+  ) {
     throw new Error('No search params provided')
   }
 
+  const esClient = getOrCreateClient()
   const query = buildElasticQueryFromSearchPayload(eventParams)
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -388,6 +396,4 @@ export async function getIndex(eventParams: QueryType) {
   )
 
   return events
-
-  return []
 }

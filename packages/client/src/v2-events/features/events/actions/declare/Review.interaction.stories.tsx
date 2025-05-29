@@ -38,7 +38,10 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
+      formValues: getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
     })
   }
 }

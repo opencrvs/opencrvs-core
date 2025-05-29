@@ -12,6 +12,7 @@
 import {
   ActionType,
   Draft,
+  EventConfig,
   EventDocument,
   EventIndex,
   findLastAssignmentAction
@@ -23,6 +24,12 @@ export function findLocalEventData(eventId: string) {
   return queryClient.getQueryData(
     trpcOptionsProxy.event.get.queryKey(eventId)
   ) as EventDocument | undefined
+}
+
+export function findLocalEventConfig(eventType: string) {
+  return queryClient
+    .getQueryData(trpcOptionsProxy.event.config.get.queryKey())
+    ?.find(({ id }: EventConfig) => id === eventType) as EventConfig | undefined
 }
 
 export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {

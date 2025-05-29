@@ -48,7 +48,6 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
         }
       })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
-      /*  eslint-disable-next-line @typescript-eslint/no-unnecessary-condition */
     } else if (typeof value === 'object' && value !== null) {
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {

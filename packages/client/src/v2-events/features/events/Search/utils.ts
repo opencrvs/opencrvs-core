@@ -18,15 +18,17 @@ import {
   EventFieldId,
   SearchQueryParams,
   Inferred,
-  EventState
+  EventState,
+  FieldType,
+  QueryExpression,
+  QueryType
 } from '@opencrvs/commons/client'
-import { FieldType } from '@opencrvs/commons/client'
-import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
+import { getAllUniqueFields } from '@client/v2-events/utils'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -165,7 +167,31 @@ type Condition =
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
 
-export const ADVANCED_SEARCH_KEY = 'and'
+const ADVANCED_SEARCH_KEY = 'and' as const
+const QUICK_SEARCH_KEY = 'or' as const
+
+export function toAdvancedSearchQueryType(
+  searchParams: QueryInputType,
+  eventType?: string,
+  type = ADVANCED_SEARCH_KEY
+): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (key.startsWith('event')) {
+      const strippedKey = key.replace(/^event____/, '')
+      topLevelFields[strippedKey] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+  }
+}
 
 function buildCondition(
   value: string,
@@ -357,4 +383,92 @@ export function parseFieldSearchParams(
     )
   )
   return filteredSearchParams
+}
+
+const searchFieldTypeMapping = {
+  [FieldType.NAME]: 'fuzzy',
+  [FieldType.ID]: 'exact',
+  [FieldType.EMAIL]: 'exact',
+  [FieldType.PHONE]: 'exact'
+} as const
+
+const searchFields = Object.keys(
+  searchFieldTypeMapping
+) as (keyof typeof searchFieldTypeMapping)[]
+
+function metadataFieldTypeMapping(value: string) {
+  return [
+    {
+      trackingId: {
+        term: value,
+        type: 'exact' as const
+      },
+      registrationNumber: {
+        term: value,
+        type: 'exact' as const
+      }
+    }
+  ]
+}
+
+function addMetadataFieldsInQuickSearchQuery(
+  clauses: QueryExpression[],
+  terms: string[]
+) {
+  for (const term of terms) {
+    const mappings = metadataFieldTypeMapping(term)
+
+    for (const mapping of mappings) {
+      for (const [field, config] of Object.entries(mapping)) {
+        clauses.push({
+          [field]: config
+        })
+      }
+    }
+  }
+}
+
+function buildQueryFromQuickSearchFields(
+  searchableFields: Inferred[],
+  terms: string[]
+): QueryType {
+  const clauses: QueryExpression[] = []
+
+  for (const field of searchableFields) {
+    const matchType =
+      searchFieldTypeMapping[field.type as keyof typeof searchFieldTypeMapping]
+
+    for (const term of terms) {
+      const queryClause: QueryExpression = Object.keys(
+        searchFieldTypeMapping
+      ).includes(field.type) // Check if the field type is in the mapping to determine if it's a declaration field
+        ? { data: { [field.id]: { type: matchType, term } } }
+        : { [field.id]: { type: matchType, term } }
+
+      clauses.push(queryClause)
+    }
+  }
+  addMetadataFieldsInQuickSearchQuery(clauses, terms)
+
+  return {
+    type: QUICK_SEARCH_KEY,
+    clauses
+  }
+}
+
+export function buildQuickSearchQuery(
+  searchParams: Record<string, string>,
+  events: EventConfig[]
+): QueryType {
+  const fieldsOfEvents = events.reduce<Inferred[]>((acc, event) => {
+    const fields = getAllUniqueFields(event)
+    return [...acc, ...fields]
+  }, [])
+
+  const fieldsToSearch = fieldsOfEvents.filter((field) =>
+    searchFields.includes(field.type as keyof typeof searchFieldTypeMapping)
+  )
+  const terms = Object.values(searchParams).filter(Boolean)
+
+  return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
 }
