@@ -119,15 +119,15 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
 export function getAssignedUserSignatureFromActions(
   actions: Array<ActionDocument>
 ) {
-  return actions.reduce<null | string>((user, action) => {
+  return actions.reduce<null | string>((signature, action) => {
     if (action.type === ActionType.ASSIGN) {
-      return action.assignedToSignature || null
+      return action.createdBySignature || null
     }
     if (action.type === ActionType.UNASSIGN) {
       return null
     }
 
-    return user
+    return signature
   }, null)
 }
 
@@ -257,7 +257,6 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
-    // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
     updatedByUserRole: declarationUpdateMetadata.createdByRole,
     dateOfEvent,
     flags: getFlagsFromActions(event.actions)

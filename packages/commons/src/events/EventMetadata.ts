@@ -128,6 +128,10 @@ export const EventMetadata = z.object({
     .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
   createdBy: z.string().describe('ID of the user who created the event.'),
+  createdBySignature: z
+    .string()
+    .nullish()
+    .describe('Signature of the user who created the event.'),
   updatedByUserRole: z
     .string()
     .describe('Role of the user who last updated the declaration.'),

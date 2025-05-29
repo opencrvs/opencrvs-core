@@ -43,7 +43,7 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   createdBySignature: z
     .string()
-    .optional()
+    .nullish() // @TODO: Check where the null comes from
     .describe('URL to Signature file of the user who created the action'),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
@@ -62,24 +62,21 @@ export type ActionBase = z.infer<typeof ActionBase>
 const AssignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN),
-    assignedTo: z.string(),
-    assignedToSignature: z.string().optional()
+    assignedTo: z.string()
   })
 )
 
 const UnassignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.UNASSIGN),
-    assignedTo: z.literal(null),
-    assignedToSignature: z.literal(null)
+    assignedTo: z.literal(null)
   })
 )
 
 export const RegisterAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    registrationNumber: z.string().optional(),
-    signature: z.string().optional()
+    registrationNumber: z.string().optional()
   })
 )
 

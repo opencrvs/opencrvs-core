@@ -160,12 +160,14 @@ export async function createEvent({
   createdAtLocation,
   createdBy,
   createdByRole,
+  createdBySignature,
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
   createdBy: string
   createdByRole: string
   createdAtLocation: string
+  createdBySignature?: string
   transactionId: string
 }): Promise<EventDocument> {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -194,6 +196,7 @@ export async function createEvent({
         createdAt: now,
         createdBy,
         createdByRole,
+        createdBySignature,
         createdAtLocation,
         id: getUUID(),
         declaration: {},
@@ -210,6 +213,7 @@ export async function createEvent({
     createdBy,
     createdByRole,
     createdAt: now,
+    createdBySignature,
     createdAtLocation,
     id,
     status: ActionStatus.Accepted,

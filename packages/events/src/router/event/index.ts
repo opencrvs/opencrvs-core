@@ -121,6 +121,7 @@ export const eventRouter = router({
         createdBy: options.ctx.user.id,
         createdByRole: options.ctx.user.role,
         createdAtLocation: options.ctx.user.primaryOfficeId,
+        createdBySignature: options.ctx.user.signature,
         transactionId: options.input.transactionId
       })
     }),

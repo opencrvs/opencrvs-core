@@ -22,6 +22,7 @@ import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
+import { Context } from '../router/middleware'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 const { createCallerFactory } = t
@@ -76,7 +77,8 @@ export function createSystemTestClient(
 }
 export function createTestClient(
   user: CreatedUser,
-  scopes: string[] = TEST_USER_DEFAULT_SCOPES
+  scopes: string[] = TEST_USER_DEFAULT_SCOPES,
+  contextOverrides: Partial<Context> = {}
 ) {
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken(user.id, scopes)
@@ -86,7 +88,8 @@ export function createTestClient(
     user: {
       id: user.id,
       primaryOfficeId: user.primaryOfficeId,
-      role: user.role
+      role: user.role,
+      ...contextOverrides
     },
     token
   })

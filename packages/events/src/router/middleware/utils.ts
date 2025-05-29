@@ -23,6 +23,7 @@ export type Context = { token: TokenWithBearer } & (
         id: string
         primaryOfficeId: string
         role: string
+        signature?: string
       }
     }
   | {
