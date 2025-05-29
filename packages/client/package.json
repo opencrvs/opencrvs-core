@@ -155,6 +155,7 @@
     "@types/enzyme": "^3.1.13",
     "@types/fetch-mock": "^7.3.0",
     "@types/fhir": "^0.0.30",
+    "@types/glob": "^8.1.0",
     "@types/google-libphonenumber": "^7.4.23",
     "@types/handlebars": "^4.1.0",
     "@types/jsonwebtoken": "^9.0.7",
