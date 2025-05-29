@@ -70,7 +70,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2c1c6014-29f9-49a8-8e47-108a28b7c7f7
+                transactionId: a9f395f8-2eb9-43e7-8f79-02e14d0efe90
                 type: v2.birth
       responses:
         "200":
@@ -433,7 +433,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 9df32321-aa61-48cc-a9be-0adc8edc0b4e
+                transactionId: c829e5cd-3835-4e0e-9c51-c43b58a0da60
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -487,6 +487,7 @@ paths:
               - type: string
                 enum:
                   - or
+            default: and
           required: true
         - in: query
           name: clauses
@@ -494,6 +495,24 @@ paths:
             type: array
             items:
               $ref: "#/components/schemas/QueryExpression"
+            default:
+              - eventType: tennis-club-membership
+                status:
+                  type: anyOf
+                  terms:
+                    - CREATED
+                    - NOTIFIED
+                    - DECLARED
+                    - VALIDATED
+                    - REGISTERED
+                    - CERTIFIED
+                    - REJECTED
+                    - ARCHIVED
+                updatedAt:
+                  type: range
+                  gte: 2025-05-22
+                  lte: 2025-05-29
+                data: {}
           required: true
       responses:
         "200":
