@@ -13,7 +13,8 @@
 - Filter out inactive locations in the Organisations menu [#8782](https://github.com/opencrvs/opencrvs-core/issues/8782)
 - Improve quick search results when searching by name [#9272](https://github.com/opencrvs/opencrvs-core/issues/9272)
 - Fix practitioner role history entries from being created with every view and download [#9462](https://github.com/opencrvs/opencrvs-core/issues/9462)
-- Fix a child's NID form field cannot be added eithe rmanually or via ESignet. A father section cannot be placed before a mother section if you wish to use a radio button to control mapping addresses from one individual to aother to make data entry easier [#9582](https://github.com/opencrvs/opencrvs-core/issues/9582)
+- Fix a child's NID form field cannot be added either manually or via ESignet. A father section cannot be placed before a mother section if you wish to use a radio button to control mapping addresses from one individual to another to make data entry easier [#9582](https://github.com/opencrvs/opencrvs-core/issues/9582)
+- Fix record not getting unassigned when validating an already validated record again [#9648](https://github.com/opencrvs/opencrvs-core/issues/9648)
 
 ## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
 
