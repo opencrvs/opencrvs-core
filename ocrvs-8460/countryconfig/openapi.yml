@@ -10105,6 +10105,12 @@ components:
       required:
         - eventId
         - transactionId
+      default:
+        eventId: <event-id-here>
+        transactionId: a2914637-7168-4175-9846-5aff3e3f5b25
+        declaration: {}
+        annotation: {}
+        type: NOTIFY
     DeclareActionInput:
       type: object
       properties:
