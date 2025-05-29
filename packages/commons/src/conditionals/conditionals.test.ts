@@ -174,6 +174,61 @@ describe('object combinator', () => {
       )
     ).toBe(false)
   })
+  it('fully supports global variables like $now even in the nested levels', () => {
+    expect(
+      validate(
+        field('child.details').object({
+          dob: field('dob').isBefore().now()
+        }),
+        getFieldParams({
+          'child.details': {
+            dob: new Date('2125-01-01').toISOString().split('T')[0]
+          }
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.details').object({
+          dob: field('dob').isBefore().now()
+        }),
+        getFieldParams({
+          'child.details': {
+            dob: new Date('2020-01-01').toISOString().split('T')[0]
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('child.details').object({
+          nested: field('nested').isEqualTo(field('random'))
+        }),
+        getFieldParams({
+          random: 'value',
+          'child.details': {
+            nested: 'value1'
+          }
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.details').object({
+          nested: field('nested').isEqualTo(field('random'))
+        }),
+        getFieldParams({
+          random: 'value',
+          'child.details': {
+            nested: 'value'
+          }
+        })
+      )
+    ).toBe(true)
+  })
 })
 
 describe('"field" conditionals', () => {

@@ -332,7 +332,7 @@ export function createFieldConditionals(fieldId: string) {
           properties: {
             [fieldId]: {
               type: ['string', 'boolean'],
-              const: { $data: `1/${comparedFieldId}` }
+              const: { $data: `/$form/${comparedFieldId}` }
             },
             [comparedFieldId]: { type: ['string', 'boolean'] }
           },
@@ -467,8 +467,7 @@ export function createFieldConditionals(fieldId: string) {
               })
             ),
             required: Object.keys(options)
-          },
-          ...options
+          }
         },
         required: [fieldId]
       })
