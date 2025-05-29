@@ -168,11 +168,17 @@ export const DEFAULT_ROLES_DEFINITION = [
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
+
+export enum TokenUserType {
+  USER = 'user',
+  SYSTEM = 'system'
+}
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
   scope: Scope[]
+  userType: TokenUserType
 }
 
 export function getScopes(authHeader: IAuthHeader): RawScopes[] {
@@ -207,6 +213,11 @@ export const getTokenPayload = (token: string): ITokenPayload => {
 export const getUserId = (token: TokenWithBearer): string => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
   return tokenPayload.sub
+}
+
+export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+  return tokenPayload.userType
 }
 
 export const TokenWithBearer = z
