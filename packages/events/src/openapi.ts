@@ -16,7 +16,7 @@ import { appRouter } from './router/router'
 export const openApiDocument = generateOpenApiDocument(appRouter, {
   title: 'OpenCRVS API',
   version: '1.8.0',
-  baseUrl: 'http://localhost:3000'
+  baseUrl: 'http://localhost:3000/api/events'
 })
 
 // eslint-disable-next-line no-console

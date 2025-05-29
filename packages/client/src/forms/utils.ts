@@ -387,6 +387,7 @@ export function getNextSectionIds(
 export const getVisibleGroupFields = (group: IFormSectionGroup) => {
   return group.fields.filter((field) => !field.hidden)
 }
+
 const getFieldOptionsSlow = (
   _sectionName: string,
   field:
