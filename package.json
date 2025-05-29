@@ -12,7 +12,6 @@
     "yarn": "Please use pnpm. Install pnpm with 'npm install -g pnpm'."
   },
   "scripts": {
-    "postinstall": "patch-package",
     "start": "lerna run build --scope @opencrvs/commons && lerna run build --scope @opencrvs/components && lerna run --stream --parallel --ignore @opencrvs/dashboards --ignore @opencrvs/mobile-proxy $OTHER_LERNA_FLAGS start",
     "start:prod": "pnpm build && lerna run --stream --parallel --ignore @opencrvs/components --ignore @opencrvs/dashboards --ignore @opencrvs/mobile-proxy $OTHER_LERNA_FLAGS start:prod",
     "dev": "bash development-environment/dev.sh",
@@ -49,7 +48,6 @@
     "@types/react-signature-canvas": "^1.0.2",
     "license-check-and-add": "^3.0.3",
     "opener": "^1.5.1",
-    "patch-package": "^6.1.2",
     "postinstall-postinstall": "^2.0.0",
     "react-signature-canvas": "^1.0.6"
   },

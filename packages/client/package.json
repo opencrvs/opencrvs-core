@@ -5,7 +5,6 @@
   "license": "MPL-2.0",
   "private": true,
   "scripts": {
-    "postinstall": "patch-package",
     "start": "vite --port=3000",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
@@ -92,7 +91,6 @@
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "msw-storybook-addon": "^2.0.4",
-    "patch-package": "^6.1.2",
     "pdfmake": "^0.2.5",
     "postinstall-postinstall": "^2.0.0",
     "query-string": "^6.1.0",

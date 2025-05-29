@@ -31,7 +31,6 @@
     "localforage": "^1.7.2",
     "lodash": "^4.17.10",
     "lodash-es": "^4.17.0",
-    "patch-package": "^6.1.2",
     "postinstall-postinstall": "^2.0.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -46,7 +45,6 @@
     "webfontloader": "^1.6.28"
   },
   "scripts": {
-    "postinstall": "patch-package",
     "start": "vite --port=3020",
     "preview": "vite preview",
     "build": "NODE_OPTIONS=--max_old_space_size=8000 vite build",
