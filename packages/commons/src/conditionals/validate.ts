@@ -304,3 +304,60 @@ export function runFieldValidations({
     errors: [...fieldValidationResult, ...customValidationResults]
   }
 }
+
+export function getValidatorsForField(
+  fieldId: FieldConfig['id'],
+  validations: NonNullable<FieldConfig['validation']>
+): NonNullable<FieldConfig['validation']> {
+  return validations
+    .map(({ validator, message }) => {
+      const jsonSchema = validator as any
+
+      const $form = jsonSchema.properties.$form
+
+      /*
+       * If you are working with nested "composite fields" like address or name,
+       * It is useful to change the validation to only include the specific fields without the parent layer
+       * for the full form field so
+       *
+       * {'some.field.id': {'properties': {a: Validator, b: Validator}}} will be transformed to
+       * {a: Validator, b: Validator}
+       */
+      if ($form.properties?.[fieldId]?.type === 'object') {
+        return {
+          message,
+          validator: {
+            ...jsonSchema,
+            properties: {
+              $form: {
+                type: 'object',
+                properties: $form.properties?.[fieldId]?.properties || {},
+                required: $form.properties?.[fieldId]?.required || []
+              }
+            }
+          }
+        }
+      }
+
+      if (!$form.properties?.[fieldId]) {
+        return null
+      }
+
+      return {
+        message,
+        validator: {
+          ...jsonSchema,
+          properties: {
+            $form: {
+              type: 'object',
+              properties: {
+                [fieldId]: $form.properties?.[fieldId]
+              },
+              required: $form.required?.includes(fieldId) ? [fieldId] : []
+            }
+          }
+        }
+      }
+    })
+    .filter((x) => x !== null) as NonNullable<FieldConfig['validation']>
+}

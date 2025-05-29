@@ -9,51 +9,58 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { NameFieldUpdateValue, NameFieldValue } from '@opencrvs/commons/client'
+import {
+  FieldConfig,
+  FieldType,
+  getValidatorsForField,
+  NameFieldValue
+} from '@opencrvs/commons/client'
+import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { joinValues } from '@client/v2-events/utils'
-import { Text } from '@client/v2-events/features/events/registered-fields'
 
 interface Props {
+  id: string
   onChange: (newValue: NameFieldValue) => void
-  value?: NameFieldUpdateValue
-  maxLength?: number
+  validation: FieldConfig['validation']
+  value?: NameFieldValue
 }
 
 function NameInput(props: Props) {
-  const { onChange, value } = props
-  const firstname = value?.firstname ?? ''
-  const surname = value?.surname ?? ''
+  const { id, onChange, value = {} } = props
+  const validators = props.validation || []
+
+  const fields = [
+    {
+      id: 'firstname',
+      type: FieldType.TEXT,
+      required: true,
+      label: {
+        defaultMessage: 'First name(s)',
+        description: 'This is the label for the field',
+        id: 'v2.field.name.firstname.label'
+      },
+      validation: getValidatorsForField('firstname', validators)
+    },
+    {
+      id: 'surname',
+      type: FieldType.TEXT,
+      required: true,
+      label: {
+        defaultMessage: 'Last name',
+        description: 'This is the label for the field',
+        id: 'v2.field.name.surname.label'
+      },
+      validation: getValidatorsForField('surname', validators)
+    }
+  ]
 
   return (
-    <>
-      <Text.Input
-        maxLength={props.maxLength}
-        type={'text'}
-        value={firstname}
-        onChange={(val) =>
-          val &&
-          onChange({
-            firstname: val,
-            surname,
-            fullname: [firstname, val].filter(Boolean).join(' ')
-          })
-        }
-      />
-
-      <Text.Input
-        maxLength={props.maxLength}
-        type={'text'}
-        value={surname}
-        onChange={(val) =>
-          val &&
-          onChange({
-            firstname,
-            surname: val,
-            fullname: [firstname, val].filter(Boolean).join(' ')
-          })
-        }
-      />
-    </>
+    <FormFieldGenerator
+      fields={fields}
+      id={id}
+      initialValues={{ ...value }}
+      onChange={(values) => onChange(values as NameFieldValue)}
+    />
   )
 }
 

@@ -453,6 +453,24 @@ export function createFieldConditionals(fieldId: string) {
         },
         required: [fieldId]
       }),
-    getId: () => ({ fieldId })
+    getId: () => ({ fieldId }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    object: (options: Record<string, any>) =>
+      defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: {
+            type: 'object',
+            properties: Object.fromEntries(
+              Object.entries(options).map(([key, value]) => {
+                return [key, value.properties.$form.properties[key]]
+              })
+            ),
+            required: Object.keys(options)
+          },
+          ...options
+        },
+        required: [fieldId]
+      })
   }
 }
