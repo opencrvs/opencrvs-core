@@ -1,3 +1,5 @@
 packages:
-  - 'packages/*'
+  - packages/*
 linkWorkspacePackages: true
+patchedDependencies:
+  pdfmake@0.2.20: patches/pdfmake@0.2.20.patch
