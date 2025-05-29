@@ -837,7 +837,9 @@ export const mockOfflineDataDispatch = {
   templates: mockOfflineData.templates,
   locations: mockOfflineData.locations,
   facilities: mockOfflineData.facilities,
+  activeFacilities: mockOfflineData.facilities,
   offices: mockOfflineData.offices,
+  activeOffices: mockOfflineData.offices,
   assets: mockOfflineData.assets,
   config: mockOfflineData.config,
   anonymousConfig: mockOfflineData.anonymousConfig,
@@ -1808,7 +1810,11 @@ export const mockUserGraphqlOperation = {
       { user: mockCompleteFormData },
       '',
       userDetails,
-      mockOfflineData
+      {
+        ...mockOfflineData,
+        activeFacilities: mockOfflineData.facilities,
+        activeOffices: mockOfflineData.offices
+      }
     )
   },
   result: {
