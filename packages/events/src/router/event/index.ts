@@ -297,7 +297,7 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
-      if (ctx.userType === TokenUserType.SYSTEM) {
+      if (ctx.userType === TokenUserType.enum.system) {
         return getIndexedEvents(ctx.system.id)
       }
       const userId = ctx.user.id

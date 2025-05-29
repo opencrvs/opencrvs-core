@@ -23,6 +23,25 @@ import {
 } from '@opencrvs/commons'
 import { env } from './environment'
 
+// @TODO: Unify with zod
+export type Context = { token: TokenWithBearer } & (
+  | {
+      userType: 'user'
+      user: {
+        id: string
+        primaryOfficeId: string
+        role: string
+        signature?: string
+      }
+    }
+  | {
+      userType: 'system'
+      system: {
+        id: string
+      }
+    }
+)
+
 const UserContext = z.object({
   id: z.string(),
   primaryOfficeId: z.string(),

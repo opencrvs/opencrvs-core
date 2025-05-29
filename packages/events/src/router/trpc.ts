@@ -13,7 +13,7 @@ import { initTRPC } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { TokenUserType } from '@opencrvs/commons'
-import { Context } from './middleware'
+import { Context } from '@events/context'
 
 export const t = initTRPC.context<Context>().meta<OpenApiMeta>().create({
   transformer: superjson
@@ -32,9 +32,10 @@ export const systemProcedure = t.procedure
  * and will throw an error if a system user tries to access them
  */
 export const publicProcedure = t.procedure.use(async (opts) => {
-  if (opts.ctx.userType === TokenUserType.SYSTEM) {
+  if (opts.ctx.userType === TokenUserType.enum.system) {
     throw new Error('This procedure is only available for human users')
   }
+
   return opts.next({
     ctx: {
       ...opts.ctx
