@@ -27,6 +27,7 @@ import {
   svgToPdfTemplate
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
+import { useEventConfiguration } from '../features/events/useEventConfiguration'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -70,7 +71,12 @@ export const usePrintableCertificate = ({
   certificateConfig?: CertificateTemplateConfig
   language?: LanguageConfig
 }) => {
-  const { declaration, ...metadata } = getCurrentEventState(event)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const { declaration, ...metadata } = getCurrentEventState(
+    event,
+    eventConfiguration
+  )
+
   const modifiedMetadata = {
     ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
@@ -99,7 +105,7 @@ export const usePrintableCertificate = ({
 
   const handleCertify = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
-      getCurrentEventState(updatedEvent)
+      getCurrentEventState(updatedEvent, eventConfiguration)
     const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
       updatedDeclaration,
       config

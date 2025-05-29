@@ -92,7 +92,10 @@ const mockUser = {
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
+      formValues: getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
     })
   },
   parameters: {

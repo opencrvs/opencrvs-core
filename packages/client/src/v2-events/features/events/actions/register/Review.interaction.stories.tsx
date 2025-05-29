@@ -89,7 +89,10 @@ const validateEventDocument = generateEventDocument({
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(validateEventDocument).declaration
+      formValues: getCurrentEventState(
+        validateEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
     })
   },
   parameters: {

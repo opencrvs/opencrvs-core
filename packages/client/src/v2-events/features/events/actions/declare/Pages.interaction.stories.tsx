@@ -99,7 +99,12 @@ export const SaveAndExit: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
-            return [getCurrentEventState(undeclaredDraftEvent)]
+            return [
+              getCurrentEventState(
+                undeclaredDraftEvent,
+                tennisClubMembershipEvent
+              )
+            ]
           })
         ],
         event: [
