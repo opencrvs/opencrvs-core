@@ -22,24 +22,14 @@ import {
  *
  * @returns System variable compatible user object.
  */
-export function useUser(): {
+export function useUserAddress(): {
   district: string
   province: string
-  /**
-   * Precached signature URL for the user.
-   * Unsigned file that can be used to display the signature and as an annotation payload.
-   */
-  signature?: string
 } {
   const userDetails = useSelector(getUserDetails)
   const locations = useSelector(getLocations)
 
   const primaryOfficeId = userDetails?.primaryOffice.id
-
-  // V1 backend sends the data url as presigned.
-  const signature = userDetails?.signature?.data
-    ? getUnsignedFileUrl(extractFilenameFromUrl(userDetails.signature.data))
-    : undefined
 
   if (primaryOfficeId) {
     const primaryOfficeLocation = locations[primaryOfficeId]
@@ -51,14 +41,12 @@ export function useUser(): {
 
     return {
       district: districtId ?? '',
-      province: provinceId ?? '',
-      signature
+      province: provinceId ?? ''
     }
   }
 
   return {
     district: '',
-    province: '',
-    signature
+    province: ''
   }
 }

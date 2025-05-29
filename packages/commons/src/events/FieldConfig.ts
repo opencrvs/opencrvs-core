@@ -132,8 +132,6 @@ const SignatureField = BaseField.extend({
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
-  defaultValue: NonEmptyTextValue.optional(),
-  conditionals: z.array(FieldConditional).default([]).optional(),
   configuration: z
     .object({
       maxFileSize: z
