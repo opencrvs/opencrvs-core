@@ -27,7 +27,6 @@
     "noImplicitAny": true,
     "strictNullChecks": true,
     "noUnusedLocals": true,
-    "types": [],
     "esModuleInterop": true
   }
 }
