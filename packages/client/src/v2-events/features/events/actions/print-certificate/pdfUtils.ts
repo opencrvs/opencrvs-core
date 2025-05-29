@@ -184,8 +184,8 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 function formatAllNonStringValues(
   templateData: EventState,
   intl: IntlShape
-): Record<string, FieldValue> {
-  const formattedData: Record<string, FieldValue> = {}
+): EventState {
+  const formattedData: EventState = {}
 
   for (const key of Object.keys(templateData)) {
     const value = templateData[key]

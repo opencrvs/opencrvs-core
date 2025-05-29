@@ -19,6 +19,7 @@ import {
   removeCached
 } from '@client/utils/persistence/fileCache'
 import { dataUrlToFile } from '@client/utils/imageUtils'
+import { joinValues } from '../../utils'
 
 async function uploadFile({
   file,
@@ -66,7 +67,8 @@ const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(fileUri: string) {
-  const url = `/api/presigned-url/` + fileUri
+  const url = joinValues(['/api/presigned-url', fileUri], '/')
+
   const response = await fetch(url, {
     method: 'GET',
     headers: {

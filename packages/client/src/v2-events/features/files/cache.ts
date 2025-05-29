@@ -11,6 +11,7 @@
 
 import {
   ActionDocument,
+  Draft,
   EventDocument,
   FileFieldValue,
   FileFieldWithOptionValue,
@@ -19,7 +20,9 @@ import {
 import { removeCached } from '@client/utils/persistence/fileCache'
 import { precacheFile } from './useFileUpload'
 
-function getFileNames(actions: ActionDocument[]): string[] {
+export function getFileNames(
+  actions: ActionDocument[] | Draft['action'][]
+): string[] {
   return actions.flatMap((action) =>
     Object.values(action.declaration).flatMap((value) => {
       // Handle single file field

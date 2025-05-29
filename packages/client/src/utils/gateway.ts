@@ -2142,6 +2142,7 @@ export enum SystemType {
   Health = 'HEALTH',
   NationalId = 'NATIONAL_ID',
   RecordSearch = 'RECORD_SEARCH',
+  Import = 'IMPORT',
   Webhook = 'WEBHOOK'
 }
 

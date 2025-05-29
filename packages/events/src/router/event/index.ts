@@ -11,32 +11,36 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, SCOPES, TokenUserType } from '@opencrvs/commons'
 import {
-  ActionType,
-  Draft,
-  DraftInput,
-  EventIndex,
-  EventInput,
-  ActionStatus,
-  ApproveCorrectionActionInput,
-  EventConfig,
-  RejectCorrectionActionInput,
-  RequestCorrectionActionInput,
-  AssignActionInput,
-  UnassignActionInput,
   ACTION_ALLOWED_SCOPES,
+  ActionStatus,
+  ActionType,
+  ApproveCorrectionActionInput,
+  AssignActionInput,
   CONFIG_GET_ALLOWED_SCOPES,
   CONFIG_SEARCH_ALLOWED_SCOPES,
+  DeleteActionInput,
+  Draft,
+  DraftInput,
+  EventConfig,
+  EventDocument,
+  EventIndex,
+  EventInput,
   QueryType,
-  DeleteActionInput
+  RejectCorrectionActionInput,
+  RequestCorrectionActionInput,
+  UnassignActionInput,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import { publicProcedure, router } from '@events/router/trpc'
+import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import { getEventConfigurations } from '@events/service/config/config'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
+import { assignRecord } from '@events/service/events/actions/assign'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
+import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
@@ -44,9 +48,8 @@ import {
   deleteEvent,
   getEventById
 } from '@events/service/events/events'
+import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
-import { assignRecord } from '@events/service/events/actions/assign'
-import { unassignRecord } from '@events/service/events/actions/unassign'
 import { getDefaultActionProcedures } from './actions'
 
 function validateEventType({
@@ -73,8 +76,9 @@ export const eventRouter = router({
         openapi: {
           summary: 'List event configurations',
           method: 'GET',
-          path: '/events/config',
-          tags: ['Events']
+          path: '/config',
+          tags: ['events'],
+          protect: true
         }
       })
       .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
@@ -85,8 +89,24 @@ export const eventRouter = router({
       })
   }),
   create: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.CREATE]))
+    .meta({
+      openapi: {
+        summary: 'Create event',
+        method: 'POST',
+        path: '/events',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .use(
+      requiresAnyOfScopes(
+        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
+        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
+      )
+    )
     .input(EventInput)
+    .use(middleware.eventTypeAuthorization)
+    .output(EventDocument)
     .mutation(async (options) => {
       const config = await getEventConfigurations(options.ctx.token)
       const eventIds = config.map((c) => c.id)
@@ -272,15 +292,31 @@ export const eventRouter = router({
         })
     })
   }),
-  list: publicProcedure
+  list: systemProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
+      if (ctx.userType === TokenUserType.SYSTEM) {
+        return getIndexedEvents(ctx.system.id)
+      }
       const userId = ctx.user.id
       return getIndexedEvents(userId)
     }),
   search: publicProcedure
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
-    .query(async ({ input }) => getIndex(input))
+    .query(async ({ input }) => getIndex(input)),
+  import: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .meta({
+      openapi: {
+        summary: 'Import full event record',
+        method: 'POST',
+        path: '/events/import',
+        tags: ['events']
+      }
+    })
+    .input(EventDocument)
+    .output(EventDocument)
+    .mutation(async ({ input }) => importEvent(input))
 })
