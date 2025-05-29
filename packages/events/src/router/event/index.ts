@@ -306,8 +306,44 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(
       z.object({
-        type: z.literal('and').or(z.literal('or')),
-        clauses: z.preprocess((val) => val, z.array(QueryExpression))
+        type: z.literal('and').or(z.literal('or')).openapi({ default: 'and' }),
+        clauses: z.preprocess(
+          (val) => {
+            if (typeof val === 'string') {
+              return [JSON.parse(val)]
+            }
+            if (Array.isArray(val)) {
+              return val.map((v) => (typeof v === 'string' ? JSON.parse(v) : v))
+            }
+            return val
+          },
+          z.array(QueryExpression).openapi({
+            default: [
+              {
+                eventType: 'tennis-club-membership',
+                status: {
+                  type: 'anyOf',
+                  terms: [
+                    'CREATED',
+                    'NOTIFIED',
+                    'DECLARED',
+                    'VALIDATED',
+                    'REGISTERED',
+                    'CERTIFIED',
+                    'REJECTED',
+                    'ARCHIVED'
+                  ]
+                },
+                updatedAt: {
+                  type: 'range',
+                  gte: '2025-05-22',
+                  lte: '2025-05-29'
+                },
+                data: {}
+              }
+            ]
+          })
+        )
       })
     )
     .output(z.array(EventIndex))
