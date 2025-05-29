@@ -114,3 +114,24 @@ jobs:
           git add CHANGELOG.md
           git commit -m "docs: update changelog for ${{ inputs.version }} release candidate"
           git push origin "release/${{ inputs.version }}"
+
+      - name: Create a draft release
+        run: |
+          cd "$GITHUB_WORKSPACE"
+          TAG_NAME="v${{ inputs.version }}"
+          TITLE="OpenCRVS - $TAG_NAME"
+          NOTES="Release notes for version ${{ inputs.version }}"
+          git tag "$TAG_NAME"
+          git push origin "$TAG_NAME"
+          gh release create "$TAG_NAME" \
+            --title "$TITLE" \
+            --notes "$NOTES" \
+            --draft 
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
+      - name: Delete the tag
+        run: | 
+          TAG_NAME="v${{ inputs.version }}"
+          git tag -d "$TAG_NAME"
+          git push origin ":refs/tags/$TAG_NAME"
