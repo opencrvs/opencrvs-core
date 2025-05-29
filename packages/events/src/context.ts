@@ -41,43 +41,43 @@ export function normalizeHeaders(
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
 
-  const parseResult = TokenWithBearer.safeParse(normalizedHeaders.authorization)
+  const token = TokenWithBearer.parse(normalizedHeaders.authorization)
+  let userId: string | undefined
+  let userType: TokenUserType
 
-  if (!parseResult.success) {
+  // Parsing the token does not prove it has valid contents.
+  try {
+    userId = getUserId(token)
+    userType = getUserTypeFromToken(token)
+  } catch {
+    logger.error('Error while parsing token')
+
     throw new TRPCError({ code: 'UNAUTHORIZED' })
   }
 
-  const token = parseResult.data
-  const sub = getUserId(token)
-
-  if (!sub) {
-    throw new TRPCError({ code: 'UNAUTHORIZED' })
-  }
-
-  const userType = getUserTypeFromToken(token)
-
-  if (userType === TokenUserType.SYSTEM) {
+  // @todo: could we use capital casing as for other types?
+  if (userType === TokenUserType.enum.system) {
     return {
       userType,
-      system: { id: sub },
+      system: { id: userId },
       token
     }
   }
 
   try {
-    const user = await getUser(env.USER_MANAGEMENT_URL, sub, token)
+    const user = await getUser(env.USER_MANAGEMENT_URL, userId, token)
 
     // We should not trust external services to return the user in the expected format.
     const { primaryOfficeId, role, signature } = UserContext.parse(user)
 
     return {
       userType,
-      user: { id: sub, primaryOfficeId, role, signature },
+      user: { id: userId, primaryOfficeId, role, signature },
       token
     }
   } catch (error) {
     logger.error(
-      `Error retrieving user details for userId ${sub}: ${JSON.stringify(error)}`
+      `Error retrieving user details for userId ${userId}: ${JSON.stringify(error)}`
     )
 
     throw new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })

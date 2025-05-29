@@ -161,3 +161,57 @@ test('Server will accept requests after error', async () => {
 
   await expect(createEvent()).resolves.toBeDefined()
 })
+
+test('Throws when dependency payload returns malformed data', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+
+  mswServer.use(
+    http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
+      return HttpResponse.json({ allNeededPropertiesMissing: true })
+    })
+  )
+
+  const createEvent = async () =>
+    customClient.event.create.mutate(
+      {
+        transactionId: getUUID(),
+        type: 'TENNIS_CLUB_MEMBERSHIP'
+      },
+      {
+        context: {
+          headers: {
+            authorization: `Bearer ${BearerTokenByUserType.localRegistrar}`
+          }
+        }
+      }
+    )
+
+  await expect(createEvent()).rejects.toMatchObject(
+    new TRPCError({ code: 'INTERNAL_SERVER_ERROR' })
+  )
+})
+
+test('Throws with malformed token', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+
+  const createEvent = async () =>
+    customClient.event.create.mutate(
+      {
+        transactionId: getUUID(),
+        type: 'TENNIS_CLUB_MEMBERSHIP'
+      },
+      {
+        context: {
+          headers: {
+            authorization: `Bearer bad-token`
+          }
+        }
+      }
+    )
+
+  await expect(createEvent()).rejects.toMatchObject(
+    new TRPCError({ code: 'UNAUTHORIZED' })
+  )
+})
