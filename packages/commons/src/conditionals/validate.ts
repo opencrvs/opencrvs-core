@@ -311,6 +311,7 @@ export function getValidatorsForField(
 ): NonNullable<FieldConfig['validation']> {
   return validations
     .map(({ validator, message }) => {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const jsonSchema = validator as any
 
       const $form = jsonSchema.properties.$form

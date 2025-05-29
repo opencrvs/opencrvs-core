@@ -146,7 +146,8 @@ export const SearchTool = () => {
       }
     )
     const navigateTo = ROUTES.V2.SEARCH.buildPath({})
-    navigate(`${navigateTo}?${stringifiedSearchParams.toString()}`)
+    stringifiedSearchParams &&
+      navigate(`${navigateTo}?${stringifiedSearchParams.toString()}`)
   }
 
   return (

@@ -37,7 +37,7 @@ describe('event.create', () => {
     test('dont allow access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'notify.event[event=some-event-type]'
+        'record.notify[event=some-event-type]'
       ])
 
       await expect(
@@ -48,7 +48,7 @@ describe('event.create', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'notify.event[event=TENNIS_CLUB_MEMBERSHIP]'
+        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
       ])
 
       await expect(

@@ -39,6 +39,9 @@ export const SCOPES = {
   RECORD_DECLARE: 'record.declare-birth',
 
   // declare
+  RECORD_IMPORT: 'record.import',
+
+  // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_DEATH: 'record.declare-death',
@@ -155,6 +158,7 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.NATIONALID),
   z.literal(SCOPES.NOTIFICATION_API),
   z.literal(SCOPES.RECORDSEARCH),
+  z.literal(SCOPES.RECORD_IMPORT),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.RECORD_DECLARE_DEATH),
@@ -219,7 +223,7 @@ const LiteralScopes = z.union([
 
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
-// - notify.event[event=v2.birth]
+// - record.notify[event=v2.birth]
 const rawConfigurableScopeRegex =
   /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
@@ -246,8 +250,8 @@ const WorkqueueScope = z.object({
   })
 })
 
-const NotifyEventScope = z.object({
-  type: z.literal('notify.event'),
+const NotifyRecordScope = z.object({
+  type: z.literal('record.notify'),
   options: z.object({
     event: z.array(z.string())
   })
@@ -257,7 +261,7 @@ const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  NotifyEventScope
+  NotifyRecordScope
 ])
 
 export type ConfigurableScopeType = ConfigurableScopes['type']
@@ -274,6 +278,14 @@ export function findScope<T extends ConfigurableScopeType>(
   )
 }
 
+/**
+ * Parses a configurable scope string into a ConfigurableScopes object.
+ * @param {string} scope - The scope string to parse
+ * @returns {ConfigurableScopes | undefined} The parsed scope object if valid, undefined otherwise
+ * @example
+ * parseScope("user.create[role=field-agent|registration-agent]")
+ * // Returns: { type: "user.create", options: { role: ["field-agent", "registration-agent"] } }
+ */
 export function parseScope(scope: string) {
   const maybeLiteralScope = LiteralScopes.safeParse(scope)
   if (maybeLiteralScope.success) {
@@ -309,6 +321,24 @@ export function parseScope(scope: string) {
   return result.success ? result.data : undefined
 }
 
+/**
+ * Stringifies a ConfigurableScopes object into a scope string.
+ * @param {ConfigurableScopes} scope - The scope object to stringify
+ * @returns {string} The stringified scope in format "type[key1=value1|value2,key2=value3|value4]"
+ * @example
+ * stringifyScope({
+ *   type: "record.notify",
+ *   options: { event: ["v2.birth", "tennis-club-membership"] }
+ * })
+ * // Returns: "record.notify[event=v2.birth|tennis-club-membership]"
+ */
+export function stringifyScope(scope: ConfigurableScopes) {
+  const options = Object.entries(scope.options)
+    .map(([key, value]) => `${key}=${value.join('|')}`)
+    .join(',')
+
+  return `${scope.type}[${options}]`
+}
 /*
  * @deprecated
  * scopes are configurable so all possible

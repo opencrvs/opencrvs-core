@@ -10,6 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { merge, omitBy, isString } from 'lodash'
+import addDays from 'date-fns/addDays'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import {
@@ -48,7 +49,7 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { EventStatus } from './EventMetadata'
+import { eventStatuses } from './EventMetadata'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -519,23 +520,24 @@ export function generateEventDraftDocument(
   }
 }
 
-function getEventStatus(): EventStatus {
-  const statuses: EventStatus[] = [
-    EventStatus.CREATED,
-    EventStatus.REGISTERED,
-    EventStatus.DECLARED
-  ]
-  const randomIndex = Math.floor(Math.random() * 3)
-  return statuses[randomIndex]
+function pickRandom<T>(rng: () => number, items: T[]): T {
+  return items[Math.floor(rng() * items.length)]
 }
 
-function getTrackingId(): string {
-  const uuid = getUUID().replace(/-/g, '')
-  const trackingId = uuid.slice(0, 6).toUpperCase()
-  return trackingId
+export function getRandomDatetime(
+  rng: () => number,
+  start: Date,
+  end: Date
+): string {
+  const range = end.getTime() - start.getTime()
+  const offset = Math.floor(rng() * range)
+  const randomDate = new Date(start.getTime() + offset)
+  return randomDate.toISOString()
 }
 
-function getRandomApplicant(): Record<string, string | boolean> {
+function generateRandomApplicant(
+  rng: () => number
+): Record<string, string | boolean> {
   const firstNames = [
     'Danny',
     'John',
@@ -546,6 +548,7 @@ function getRandomApplicant(): Record<string, string | boolean> {
     'Chris',
     'Jessica'
   ]
+
   const surnames = [
     'Doe',
     'Smith',
@@ -557,20 +560,13 @@ function getRandomApplicant(): Record<string, string | boolean> {
     'Miller'
   ]
 
-  function getRandomDate(start: Date, end: Date): string {
-    const randomDate = new Date(
-      start.getTime() + Math.random() * (end.getTime() - start.getTime())
-    )
-    return randomDate.toISOString().split('T')[0]
-  }
-
-  const randomFirstName =
-    firstNames[Math.floor(Math.random() * firstNames.length)]
-  const randomSurname = surnames[Math.floor(Math.random() * surnames.length)]
-  const randomDob = getRandomDate(
+  const randomFirstName = pickRandom(rng, firstNames)
+  const randomSurname = pickRandom(rng, surnames)
+  const randomDob = getRandomDatetime(
+    rng,
     new Date('1990-01-01'),
     new Date('2010-12-31')
-  )
+  ).split('T')[0]
 
   return {
     'recommender.none': true,
@@ -580,25 +576,72 @@ function getRandomApplicant(): Record<string, string | boolean> {
   }
 }
 
+/**
+ * Useful for testing when we need deterministic outcome.
+ * @param seed - Seed value for the pseudo-random number generator
+ *
+ * @returns A function that generates pseudo-random numbers between 0 and 1
+ */
+function createPseudoRandomNumberGenerator(seed: number) {
+  // Parameters are not arbirary. Reference: https://en.wikipedia.org/wiki/Linear_congruential_generator
+  const MODULUS = 2 ** 32
+  const MULTIPLIER = 1664525
+  const INCREMENT = 1013904223
+
+  // converts seed to 32-bit unsigned integer (It needs to fit in to MODULUS)
+  let state = seed >>> 0
+
+  return () => {
+    state = (MULTIPLIER * state + INCREMENT) % MODULUS
+    return state / MODULUS
+  }
+}
+
+function generateUuid(rng: () => number): string {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
+    const r = Math.floor(rng() * 16)
+    const v = c === 'x' ? r : (r & 0x3) | 0x8
+    return v.toString(16)
+  })
+}
+
+function generateTrackingId(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const trackingId = uuid.slice(0, 6).toUpperCase()
+  return trackingId
+}
+
 export const eventQueryDataGenerator = (
-  overrides: Partial<EventIndex> = {}
-): EventIndex => ({
-  id: overrides.id ?? getUUID(),
-  type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
-  status: overrides.status ?? getEventStatus(),
-  createdAt: overrides.createdAt ?? new Date().toISOString(),
-  createdBy: overrides.createdBy ?? getUUID(),
-  createdAtLocation: overrides.createdAtLocation ?? getUUID(),
-  updatedAtLocation: overrides.updatedAtLocation ?? getUUID(),
-  updatedAt: overrides.updatedAt ?? new Date().toISOString(),
-  assignedTo: overrides.assignedTo ?? null,
-  updatedBy: overrides.updatedBy ?? getUUID(),
-  updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
-  flags: [],
-  legalStatuses: overrides.legalStatuses ?? {},
-  declaration: overrides.declaration ?? getRandomApplicant(),
-  trackingId: overrides.trackingId ?? getTrackingId()
-})
+  overrides: Partial<EventIndex> = {},
+  seed: number = 1
+): EventIndex => {
+  const rng = createPseudoRandomNumberGenerator(seed)
+
+  const createdAt = getRandomDatetime(
+    rng,
+    new Date('2024-01-01'),
+    new Date('2024-12-31')
+  )
+
+  return {
+    id: overrides.id ?? generateUuid(rng),
+    type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+    status: overrides.status ?? pickRandom(rng, eventStatuses),
+    createdAt: overrides.createdAt ?? createdAt,
+    createdBy: overrides.createdBy ?? generateUuid(rng),
+    createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),
+    updatedAtLocation: overrides.updatedAtLocation ?? generateUuid(rng),
+    updatedAt:
+      overrides.updatedAt ?? addDays(new Date(createdAt), 1).toISOString(),
+    assignedTo: overrides.assignedTo ?? null,
+    updatedBy: overrides.updatedBy ?? generateUuid(rng),
+    updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
+    flags: [],
+    legalStatuses: overrides.legalStatuses ?? {},
+    declaration: overrides.declaration ?? generateRandomApplicant(rng),
+    trackingId: overrides.trackingId ?? generateTrackingId(rng)
+  }
+}
 
 export const generateTranslationConfig = (
   message: string
