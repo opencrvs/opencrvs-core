@@ -1,5 +1,5 @@
 {
-  "extends": "./tsconfig.json",
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
     "types": [],
   },
@@ -12,6 +12,7 @@
     "acceptance-tests",
     "src/tests/**.ts",
     "src/**/*.test.ts",
-    "src/**/__mocks__/*"
+    "src/**/__mocks__/*",
+    "src/**/__snapshots__/*",
   ],
 }
