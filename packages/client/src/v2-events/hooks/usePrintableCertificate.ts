@@ -28,33 +28,6 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 
-async function replaceMinioUrlWithBase64(
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  declaration: Record<string, any>,
-  config: EventConfig
-) {
-  const fileFieldIds = config.declaration.pages
-    .flatMap((page) => page.fields)
-    .filter((field) => field.type === FieldType.FILE)
-    .map((field) => field.id)
-
-  for (const fieldId of fileFieldIds) {
-    const fieldValue = declaration[fieldId]
-    if (
-      fieldValue &&
-      typeof fieldValue === 'object' &&
-      'filename' in fieldValue &&
-      isMinioUrl(fieldValue.filename)
-    ) {
-      declaration[fieldId].filename = await fetchImageAsBase64(
-        // this should be a presigned minio url
-        fieldValue.filename
-      )
-    }
-  }
-  return declaration
-}
-
 export const usePrintableCertificate = ({
   event,
   config,
@@ -97,28 +70,9 @@ export const usePrintableCertificate = ({
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async (updatedEvent: EventDocument) => {
+  const handleCertify = (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent)
-    const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
-      updatedDeclaration,
-      config
-    )
-
-    const base64ReplacedUsersWithSignature = await Promise.all(
-      users.map(async (user) => {
-        if (user.signatureFilename && isMinioUrl(user.signatureFilename)) {
-          const base64Signature = await fetchImageAsBase64(
-            user.signatureFilename
-          )
-          return {
-            ...user,
-            signatureFilename: base64Signature
-          }
-        }
-        return user
-      })
-    )
 
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
@@ -128,9 +82,9 @@ export const usePrintableCertificate = ({
         // the current certification date in the certificate preview on the review page.
         modifiedAt: new Date().toISOString()
       },
-      $declaration: declarationWithResolvedImages,
+      $declaration: declaration,
       locations,
-      users: base64ReplacedUsersWithSignature,
+      users: users,
       language,
       config
     })

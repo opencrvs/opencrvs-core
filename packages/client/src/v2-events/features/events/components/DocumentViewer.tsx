@@ -21,12 +21,12 @@ import {
   isFileFieldWithOptionType,
   FieldType
 } from '@opencrvs/commons/client'
-import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
 import {
   DocumentViewer as DocumentViewerComponent,
   DocumentViewerOptionValue
 } from '@client/v2-events/components/forms/inputs/DocumentViewer'
 import { Option } from '@client/v2-events/utils'
+import { getUnsignedFileUrl } from '@client/utils/persistence/fileCache'
 
 /**
  * Based on form and configuration, searches through fields to find files in the current form.
@@ -69,7 +69,7 @@ function getFileOptions(
         {
           value: {
             filename: field.value.filename,
-            url: getFullUrl(field.value.filename),
+            url: getUnsignedFileUrl(field.value.filename),
             id: field.config.id
           },
           label
@@ -93,7 +93,7 @@ function getFileOptions(
           return {
             value: {
               filename: formVal.filename,
-              url: getFullUrl(formVal.filename),
+              url: getUnsignedFileUrl(formVal.filename),
               id: `${field.config.id}-${formVal.option}`
             },
             label: `${fieldLabel} (${optionLabel})`

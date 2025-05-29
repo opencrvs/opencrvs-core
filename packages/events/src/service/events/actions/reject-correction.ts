@@ -22,6 +22,7 @@ export async function rejectCorrection(
     eventId,
     createdBy,
     createdByRole,
+    createdBySignature,
     token,
     createdAtLocation,
     transactionId
@@ -30,6 +31,7 @@ export async function rejectCorrection(
     createdBy: string
     createdByRole: string
     createdAtLocation: string
+    createdBySignature?: string
     token: string
     transactionId: string
   }
@@ -48,6 +50,7 @@ export async function rejectCorrection(
     eventId,
     createdBy,
     createdByRole,
+    createdBySignature,
     token,
     createdAtLocation,
     transactionId,

@@ -11,6 +11,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
+import { uniq } from 'lodash'
 import {
   EventDocument,
   EventIndex,
@@ -20,8 +21,22 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { extractFilenameFromUrl } from '../../../../../utils/persistence/fileCache'
+import { precacheFile } from '../../../files/useFileUpload'
 import { setQueryDefaults } from './utils'
 
+async function cacheUserSignatures(eventDocument: EventDocument) {
+  const signatureFilenames = uniq(
+    eventDocument.actions
+      .map((action) => action.createdBySignature)
+      .filter((signature): signature is string => Boolean(signature))
+      .map((storageKey) => extractFilenameFromUrl(storageKey))
+  )
+
+  console.log('signatureFilenames', signatureFilenames)
+
+  await Promise.all(signatureFilenames.map(precacheFile))
+}
 /*
  * This logic overrides the default behaviour of "api.event.get"
  * by making it so all "FILE" or "FILE_WITH_OPTIONS" type data points
@@ -57,8 +72,10 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 
     await Promise.all([
       cacheFiles(eventDocument),
+      cacheUserSignatures(eventDocument),
       cacheUsersFromEventDocument(eventDocument)
     ])
+
     return eventDocument
   }
 })

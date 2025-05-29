@@ -39,6 +39,10 @@ export function extractFilenameFromUrl(url: string) {
   throw new Error('Could not extract filename from URL: ' + url)
 }
 
+/**
+ * Based on filename, returns the unsigned URL for the file.
+ * When used in views, ensure file is cached first.
+ */
 export function getUnsignedFileUrl(filename: string) {
   const minioURL = window.config.MINIO_URL
   if (minioURL && typeof minioURL === 'string') {
@@ -73,6 +77,8 @@ export async function cacheFile({
   }
 
   const cache = await caches.open(cacheKey)
+
+  console.log('caching', getUnsignedFileUrl(filename))
 
   return cache.put(
     getUnsignedFileUrl(filename),

@@ -23,11 +23,13 @@ export async function assignRecord({
   createdByRole,
   token,
   createdAtLocation,
+  createdBySignature,
   input
 }: {
   createdBy: string
   createdByRole: string
   createdAtLocation: string
+  createdBySignature?: string
   token: string
   input: AssignActionInput
 }) {
@@ -48,6 +50,7 @@ export async function assignRecord({
     eventId: input.eventId,
     createdBy,
     createdByRole,
+    createdBySignature,
     token,
     createdAtLocation,
     transactionId: input.transactionId,

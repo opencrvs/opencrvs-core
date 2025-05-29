@@ -21,7 +21,7 @@ import PanViewer from '@opencrvs/components/lib/DocumentViewer/components/PanVie
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { FileFieldValueWithOption } from '@opencrvs/commons/client'
-import { getFullUrl } from '@client/v2-events/features/files/useFileUpload'
+import { getUnsignedFileUrl } from '../../../../../utils/persistence/fileCache'
 
 const ViewerWrapper = styled.div`
   position: fixed;
@@ -152,7 +152,7 @@ export function DocumentPreview({
         <PanViewer
           key={Math.random()}
           id="document_image"
-          image={getFullUrl(previewImage.filename)}
+          image={getUnsignedFileUrl(previewImage.filename)}
           rotation={rotation}
           zoom={zoom}
         />

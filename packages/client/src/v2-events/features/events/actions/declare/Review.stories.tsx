@@ -59,8 +59,7 @@ const mockUser = {
       family: 'Bwalya'
     }
   ],
-  role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  role: 'SOCIAL_WORKER'
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {

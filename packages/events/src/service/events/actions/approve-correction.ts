@@ -22,6 +22,7 @@ export async function approveCorrection(
     eventId,
     createdBy,
     createdByRole,
+    createdBySignature,
     token,
     createdAtLocation,
     transactionId
@@ -29,6 +30,7 @@ export async function approveCorrection(
     eventId: string
     createdBy: string
     createdByRole: string
+    createdBySignature?: string
     createdAtLocation: string
     token: string
     transactionId: string
@@ -48,6 +50,7 @@ export async function approveCorrection(
     eventId,
     createdBy,
     createdByRole,
+    createdBySignature,
     token,
     createdAtLocation,
     transactionId,

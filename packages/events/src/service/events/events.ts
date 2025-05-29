@@ -274,6 +274,7 @@ export async function addAction(
     eventId,
     createdBy,
     createdByRole,
+    createdBySignature,
     token,
     createdAtLocation,
     status
@@ -285,6 +286,7 @@ export async function addAction(
      * The location where the action was created. This is used for auditing purposes.
      */
     createdAtLocation: string
+    createdBySignature?: string
     token: string
     transactionId: string
     status: ActionStatus
@@ -328,6 +330,7 @@ export async function addAction(
             type: ActionType.MARKED_AS_DUPLICATE,
             createdBy,
             createdByRole,
+            createdBySignature,
             createdAt: now,
             createdAtLocation,
             id: getUUID(),
@@ -345,6 +348,7 @@ export async function addAction(
     ...input,
     createdBy,
     createdByRole,
+    createdBySignature,
     createdAt: now,
     createdAtLocation,
     id: actionId,

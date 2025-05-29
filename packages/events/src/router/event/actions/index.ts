@@ -200,6 +200,7 @@ export function getDefaultActionProcedures(
             createdBy: user.id,
             createdByRole: user.role,
             createdAtLocation: user.primaryOfficeId,
+            createdBySignature: user.signature,
             token,
             transactionId,
             status
@@ -249,6 +250,7 @@ export function getDefaultActionProcedures(
             createdBy: user.id,
             createdByRole: user.role,
             createdAtLocation: user.primaryOfficeId,
+            createdBySignature: user.signature,
             token,
             transactionId,
             status: ActionStatus.Accepted
@@ -294,6 +296,7 @@ export function getDefaultActionProcedures(
           type: actionType,
           createdBy: ctx.user.id,
           createdByRole: ctx.user.role,
+          createdBySignature: ctx.user.signature,
           createdAtLocation: ctx.user.primaryOfficeId
         })
       })

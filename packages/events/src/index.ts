@@ -50,17 +50,16 @@ const server = createHTTPServer({
       })
     }
 
-    const { primaryOfficeId, role } = await getUser(
-      env.USER_MANAGEMENT_URL,
-      userId,
-      token
-    )
+    const user = await getUser(env.USER_MANAGEMENT_URL, userId, token)
+
+    const { primaryOfficeId, role, signature } = user
 
     return {
       user: {
         id: userId,
         primaryOfficeId,
-        role
+        role,
+        signature
       },
       token: token
     }

@@ -26,6 +26,7 @@ export async function unassignRecord(
     eventId,
     createdBy,
     createdByRole,
+    createdBySignature,
     token,
     createdAtLocation,
     transactionId
@@ -34,6 +35,7 @@ export async function unassignRecord(
     createdBy: string
     createdByRole: string
     createdAtLocation: string
+    createdBySignature?: string
     token: string
     transactionId: string
   }
@@ -56,6 +58,7 @@ export async function unassignRecord(
       eventId,
       createdBy,
       createdByRole,
+      createdBySignature,
       token,
       createdAtLocation,
       transactionId,

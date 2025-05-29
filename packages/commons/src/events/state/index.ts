@@ -116,6 +116,20 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
     return user
   }, null)
 }
+export function getAssignedUserSignatureFromActions(
+  actions: Array<ActionDocument>
+) {
+  return actions.reduce<null | string>((user, action) => {
+    if (action.type === ActionType.ASSIGN) {
+      return action.assignedToSignature || null
+    }
+    if (action.type === ActionType.UNASSIGN) {
+      return null
+    }
+
+    return user
+  }, null)
+}
 
 function aggregateActionDeclarations(
   actions: Array<ActionDocument>
@@ -238,6 +252,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     createdAtLocation: creationAction.createdAtLocation,
     updatedAt: declarationUpdateMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
+    assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: declarationUpdateMetadata.createdBy,
     updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
     declaration,

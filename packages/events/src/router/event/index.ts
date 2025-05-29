@@ -122,6 +122,7 @@ export const eventRouter = router({
           createdBy: ctx.user.id,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId,
+          createdBySignature: ctx.user.signature,
           token: ctx.token,
           transactionId: getUUID(),
           status: ActionStatus.Accepted
@@ -174,6 +175,7 @@ export const eventRouter = router({
             input: options.input,
             createdBy: options.ctx.user.id,
             createdByRole: options.ctx.user.role,
+            createdBySignature: options.ctx.user.signature,
             createdAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token
           })
@@ -186,6 +188,7 @@ export const eventRouter = router({
             eventId: options.input.eventId,
             createdBy: options.ctx.user.id,
             createdByRole: options.ctx.user.role,
+            createdBySignature: options.ctx.user.signature,
             createdAtLocation: options.ctx.user.primaryOfficeId,
             token: options.ctx.token,
             transactionId: options.input.transactionId
@@ -207,11 +210,14 @@ export const eventRouter = router({
             return ctx.event
           }
 
+          console.log('ctx.user', ctx.user)
+
           return addAction(input, {
             eventId: input.eventId,
             createdBy: ctx.user.id,
             createdByRole: ctx.user.role,
             createdAtLocation: ctx.user.primaryOfficeId,
+            createdBySignature: ctx.user.signature,
             token: ctx.token,
             transactionId: input.transactionId,
             status: ActionStatus.Accepted
@@ -234,6 +240,7 @@ export const eventRouter = router({
             eventId: input.eventId,
             createdBy: ctx.user.id,
             createdByRole: ctx.user.role,
+            createdBySignature: ctx.user.signature,
             createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId
@@ -257,6 +264,7 @@ export const eventRouter = router({
             eventId: input.eventId,
             createdBy: ctx.user.id,
             createdByRole: ctx.user.role,
+            createdBySignature: ctx.user.signature,
             createdAtLocation: ctx.user.primaryOfficeId,
             token: ctx.token,
             transactionId: input.transactionId

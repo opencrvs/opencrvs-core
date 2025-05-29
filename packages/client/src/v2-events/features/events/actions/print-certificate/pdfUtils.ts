@@ -64,8 +64,7 @@ function findUserById(userId: string, users: User[]) {
   }
 
   return {
-    name: getUsersFullName(user.name, 'en'),
-    signature: user.signatureFilename ?? ''
+    name: getUsersFullName(user.name, 'en')
   }
 }
 

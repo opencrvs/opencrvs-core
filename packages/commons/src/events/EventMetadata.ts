@@ -81,7 +81,11 @@ export const ActionCreationMetadata = z.object({
     .describe('Timestamp when the action request was accepted.'),
   createdByRole: z
     .string()
-    .describe('Role of the user at the time of action request creation.')
+    .describe('Role of the user at the time of action request creation.'),
+  createdBySignature: z
+    .string()
+    .nullish()
+    .describe('Signature of the user who created the action request.')
 })
 
 export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>
@@ -142,6 +146,10 @@ export const EventMetadata = z.object({
     .string()
     .nullish()
     .describe('ID of the user currently assigned to the event.'),
+  assignedToSignature: z
+    .string()
+    .nullish()
+    .describe('Signature of the user currently assigned to the event.'),
   updatedBy: z
     .string()
     .nullish()

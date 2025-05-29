@@ -41,6 +41,10 @@ export const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdByRole: z.string(),
+  createdBySignature: z
+    .string()
+    .optional()
+    .describe('URL to Signature file of the user who created the action'),
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
   createdAtLocation: z.string(),
@@ -58,14 +62,16 @@ export type ActionBase = z.infer<typeof ActionBase>
 const AssignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN),
-    assignedTo: z.string()
+    assignedTo: z.string(),
+    assignedToSignature: z.string().optional()
   })
 )
 
 const UnassignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.UNASSIGN),
-    assignedTo: z.literal(null)
+    assignedTo: z.literal(null),
+    assignedToSignature: z.literal(null)
   })
 )
 

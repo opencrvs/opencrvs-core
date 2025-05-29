@@ -19,7 +19,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { MimeType } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
-import { validationMessages } from '@client/i18n/messages'
+import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { dataUrlToFile, getBase64String } from '@client/utils/imageUtils'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
@@ -32,10 +32,8 @@ const SignaturePreview = styled.img`
   display: block;
 `
 
-export type SignatureFieldProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  'onChange' | 'value' | 'type'
-> & {
+export interface SignatureFieldProps {
+  disabled?: boolean
   name: string
   value?: string
   onChange: (fileSrc: string) => void
@@ -52,7 +50,8 @@ export function SignatureField({
   modalTitle,
   maxFileSize,
   acceptedFileTypes = ['image/png'],
-  ...props
+  disabled,
+  required
 }: SignatureFieldProps) {
   const intl = useIntl()
 
@@ -66,7 +65,7 @@ export function SignatureField({
   const [dataUrl, setDataUrl] = useState<string | undefined>(value)
 
   const requiredError =
-    props.required &&
+    required &&
     !Boolean(value) &&
     intl.formatMessage(validationMessages.required)
 
@@ -97,26 +96,23 @@ export function SignatureField({
   return (
     <>
       {!value && (
-        <>
-          <Stack gap={8}>
-            <Button
-              disabled={props.disabled}
-              size="medium"
-              type="secondary"
-              onClick={() => setIsModalOpen(true)}
-            >
-              <Icon name="Pen" />
-              {intl.formatMessage(messages.signatureOpenSignatureInput)}
-            </Button>
-            <ImageUploader
-              {...props}
-              onChange={handleFileChange}
-            ></ImageUploader>
-          </Stack>
-        </>
+        <Stack gap={8}>
+          <Button
+            disabled={disabled}
+            size="medium"
+            type="secondary"
+            onClick={() => setIsModalOpen(true)}
+          >
+            <Icon name="Pen" />
+            {intl.formatMessage(messages.signatureOpenSignatureInput)}
+          </Button>
+          <ImageUploader name={name} onChange={handleFileChange}>
+            {intl.formatMessage(buttonMessages.upload)}
+          </ImageUploader>
+        </Stack>
       )}
       {value && <SignaturePreview alt={modalTitle} src={dataUrl} />}
-      {value && !props.disabled && (
+      {value && !disabled && (
         <Button
           size="medium"
           type="tertiary"
