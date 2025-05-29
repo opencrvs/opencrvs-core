@@ -8,83 +8,84 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { IDeclaration } from '@client/declarations'
 import {
-  IFormField,
-  Ii18nFormField,
-  ISelectOption,
-  IFormSectionData,
-  SELECT_WITH_OPTIONS,
-  RADIO_GROUP,
+  BULLET_LIST,
+  BUTTON,
   CHECKBOX_GROUP,
-  IRadioOption,
+  DATE,
+  DependencyInfo,
+  DOCUMENT_UPLOADER_WITH_OPTION,
+  FETCH_BUTTON,
+  FIELD_WITH_DYNAMIC_DEFINITIONS,
+  HIDDEN,
+  HTTP,
+  IButtonFormField,
   ICheckboxOption,
-  ISelectFormFieldWithDynamicOptions,
-  INFORMATIVE_RADIO_GROUP,
-  PARAGRAPH,
+  IDateFormField,
+  IDocumentUploaderWithOptionsFormField,
+  IDynamicFormField,
+  IDynamicFormFieldValidators,
   IDynamicListFormField,
   IDynamicValueMapper,
-  IFormData,
-  IDynamicFormFieldValidators,
-  IDynamicFormField,
-  FETCH_BUTTON,
-  ILoaderButton,
   IFieldInput,
-  IFormSection,
-  IQuery,
-  DATE,
-  IDateFormField,
-  IFormSectionGroup,
-  IRadioGroupFormField,
-  RADIO_GROUP_WITH_NESTED_FIELDS,
-  DOCUMENT_UPLOADER_WITH_OPTION,
+  IFormData,
+  IFormField,
   IFormFieldValue,
-  FIELD_WITH_DYNAMIC_DEFINITIONS,
-  IRadioGroupWithNestedFieldsFormField,
-  ISelectFormFieldWithOptions,
-  NID_VERIFICATION_BUTTON,
-  INidVerificationButton,
-  BULLET_LIST,
-  HIDDEN,
-  Ii18nHiddenFormField,
-  IDocumentUploaderWithOptionsFormField,
-  HTTP,
-  InitialValue,
-  DependencyInfo,
+  IFormSection,
+  IFormSectionData,
+  IFormSectionGroup,
   IHttpFormField,
-  IButtonFormField,
-  BUTTON,
   Ii18nButtonFormField,
+  Ii18nFormField,
+  Ii18nHiddenFormField,
+  ILoaderButton,
+  INFORMATIVE_RADIO_GROUP,
+  INidVerificationButton,
+  InitialValue,
+  IQuery,
+  IRadioGroupFormField,
+  IRadioGroupWithNestedFieldsFormField,
+  IRadioOption,
   IRedirectFormField,
+  ISelectFormFieldWithDynamicOptions,
+  ISelectFormFieldWithOptions,
+  ISelectOption,
+  NID_VERIFICATION_BUTTON,
+  PARAGRAPH,
+  RADIO_GROUP,
+  RADIO_GROUP_WITH_NESTED_FIELDS,
   REDIRECT,
-  SELECT_WITH_DYNAMIC_OPTIONS
+  ResourceType,
+  SELECT_WITH_DYNAMIC_OPTIONS,
+  SELECT_WITH_OPTIONS
 } from '@client/forms'
-import { IntlShape, MessageDescriptor } from 'react-intl'
 import {
+  Errors,
   getValidationErrorsForForm,
-  IFieldErrors,
-  Errors
+  IFieldErrors
 } from '@client/forms/validation'
-import {
-  OFFLINE_LOCATIONS_KEY,
-  OFFLINE_FACILITIES_KEY,
-  ILocation,
-  IOfflineData
-} from '@client/offline/reducer'
-import {
-  Validation,
-  isAValidDateFormat,
-  isDateNotInFuture
-} from '@client/utils/validate'
-import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
 import { IDynamicValues } from '@client/navigation'
-import { callingCountries } from 'country-data'
-import { IDeclaration } from '@client/declarations'
-import differenceInDays from 'date-fns/differenceInDays'
-import { PhoneNumberUtil, PhoneNumberFormat } from 'google-libphonenumber'
-import { Conditional } from './conditionals'
+import {
+  ILocation,
+  IOfflineData,
+  OFFLINE_FACILITIES_KEY,
+  OFFLINE_LOCATIONS_KEY
+} from '@client/offline/reducer'
 import { UserDetails } from '@client/utils/userUtils'
+import {
+  isAValidDateFormat,
+  isDateNotInFuture,
+  Validation
+} from '@client/utils/validate'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
+import { IRadioOption as CRadioOption } from '@opencrvs/components/lib/Radio'
+import { callingCountries } from 'country-data'
+import differenceInDays from 'date-fns/differenceInDays'
+import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
 import { memoize } from 'lodash'
+import { IntlShape, MessageDescriptor } from 'react-intl'
+import { Conditional } from './conditionals'
 
 export const VIEW_TYPE = {
   FORM: 'form',
@@ -569,10 +570,7 @@ export function isDefaultCountry(countryCode: string): boolean {
 
 export function getListOfLocations(
   resource: IOfflineData,
-  resourceType: Extract<
-    keyof IOfflineData,
-    'facilities' | 'locations' | 'offices'
-  >
+  resourceType: ResourceType
 ) {
   return resource[resourceType]
 }
