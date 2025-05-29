@@ -9,8 +9,7 @@
   ],
   "engines": {
     "node": "22.x.x",
-    "npm": "Please use pnpm",
-    "yarn": "Please use pnpm"
+    "yarn": "Please use pnpm. Install pnpm with 'npm install -g pnpm'."
   },
   "scripts": {
     "postinstall": "patch-package",
