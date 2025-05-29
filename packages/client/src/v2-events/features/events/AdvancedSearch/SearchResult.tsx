@@ -53,17 +53,17 @@ const FabContainer = styled.div`
 const COLUMNS = {
   ICON_WITH_NAME: 'iconWithName',
   ICON_WITH_NAME_EVENT: 'iconWithNameEvent',
-  EVENT: 'event',
+  EVENT: 'type',
   DATE_OF_EVENT: 'dateOfEvent',
   SENT_FOR_REVIEW: 'sentForReview',
   SENT_FOR_UPDATES: 'sentForUpdates',
   SENT_FOR_APPROVAL: 'sentForApproval',
   SENT_FOR_VALIDATION: 'sentForValidation',
   REGISTERED: 'registered',
-  LAST_UPDATED: 'lastUpdated',
+  LAST_UPDATED: 'updatedAt',
   ACTIONS: 'actions',
   NOTIFICATION_SENT: 'notificationSent',
-  NAME: 'name',
+  NAME: 'title',
   TRACKING_ID: 'trackingId',
   REGISTRATION_NO: 'registrationNumber',
   NONE: 'none'
@@ -215,10 +215,10 @@ export const SearchResultComponent = ({
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
-  >(COLUMNS.NONE)
+  >(COLUMNS.LAST_UPDATED)
   const [sortOrder, setSortOrder] = useState<
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
-  >(SORT_ORDER.ASCENDING)
+  >(SORT_ORDER.DESCENDING)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -345,7 +345,9 @@ export const SearchResultComponent = ({
     }
   }
 
-  const allResults = transformData(queryData)
+  const sortedResult = orderBy(queryData, sortedCol, sortOrder)
+
+  const allResults = transformData(sortedResult)
 
   const totalPages = allResults.length
     ? Math.ceil(allResults.length / limit)
@@ -368,7 +370,10 @@ export const SearchResultComponent = ({
     >
       <Workqueue
         columns={[...getDefaultColumns(), ...getColumns()]}
-        content={orderBy(allResults, sortedCol, sortOrder)}
+        content={allResults.slice(
+          limit * (currentPageNumber - 1),
+          limit * currentPageNumber
+        )}
         hideLastBorder={!isShowPagination}
         sortOrder={sortOrder}
       />

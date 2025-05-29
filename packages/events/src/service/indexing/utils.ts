@@ -21,7 +21,7 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
-export const DEFAULT_SIZE = 10
+export const DEFAULT_SIZE = 100
 
 export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
   return {
