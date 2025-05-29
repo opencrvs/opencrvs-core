@@ -3,7 +3,7 @@ info:
   title: OpenCRVS API
   version: 1.8.0
 servers:
-  - url: http://localhost:3000
+  - url: http://localhost:3000/api/events
 paths:
   /config:
     get:
@@ -69,6 +69,9 @@ paths:
               required:
                 - transactionId
                 - type
+              default:
+                transactionId: 2c1c6014-29f9-49a8-8e47-108a28b7c7f7
+                type: v2.birth
       responses:
         "200":
           description: Successful response
@@ -428,6 +431,12 @@ paths:
               required:
                 - eventId
                 - transactionId
+              default:
+                eventId: <event-id-here>
+                transactionId: 9df32321-aa61-48cc-a9be-0adc8edc0b4e
+                declaration: {}
+                annotation: {}
+                type: NOTIFY
       responses:
         "200":
           description: Successful response
@@ -519,6 +528,123 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.NOT_FOUND"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/import:
+    post:
+      operationId: event-import
+      summary: Import full event record
+      tags:
+        - events
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                type:
+                  type: string
+                dateOfEvent:
+                  type: object
+                  properties:
+                    fieldId:
+                      type: string
+                  required:
+                    - fieldId
+                createdAt:
+                  type: string
+                  format: date-time
+                updatedAt:
+                  type: string
+                  format: date-time
+                actions:
+                  type: array
+                  items:
+                    anyOf:
+                      - $ref: "#/components/schemas/ActionDocument"
+                      - type: object
+                        properties:
+                          id:
+                            type: string
+                          transactionId:
+                            type: string
+                          createdAt:
+                            type: string
+                            format: date-time
+                          createdBy:
+                            type: string
+                          createdByRole:
+                            type: string
+                          createdAtLocation:
+                            type: string
+                          status:
+                            type: string
+                            enum:
+                              - Rejected
+                          originalActionId:
+                            type: string
+                          type:
+                            type: string
+                            enum: &a9
+                              - NOTIFY
+                              - DECLARE
+                              - VALIDATE
+                              - REGISTER
+                              - REJECT
+                              - ARCHIVE
+                              - PRINT_CERTIFICATE
+                        required:
+                          - id
+                          - transactionId
+                          - createdAt
+                          - createdBy
+                          - createdByRole
+                          - createdAtLocation
+                          - status
+                          - type
+                trackingId:
+                  type: string
+              required:
+                - id
+                - type
+                - createdAt
+                - updatedAt
+                - actions
+                - trackingId
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
         "500":
           description: Internal server error
           content:
@@ -3623,14 +3749,7 @@ components:
                     type: string
                   type:
                     type: string
-                    enum:
-                      - NOTIFY
-                      - DECLARE
-                      - VALIDATE
-                      - REGISTER
-                      - REJECT
-                      - ARCHIVE
-                      - PRINT_CERTIFICATE
+                    enum: *a9
                 required:
                   - id
                   - transactionId
@@ -3998,7 +4117,7 @@ components:
           type: string
         status:
           type: string
-          enum: &a9
+          enum: &a10
             - Requested
             - Accepted
             - Rejected
@@ -4332,7 +4451,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -4663,7 +4782,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -4994,7 +5113,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5325,7 +5444,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5656,7 +5775,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5987,7 +6106,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6320,7 +6439,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6651,7 +6770,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6985,7 +7104,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7316,7 +7435,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7650,7 +7769,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7984,7 +8103,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -8318,7 +8437,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -8649,7 +8768,7 @@ components:
           type: string
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -8749,7 +8868,7 @@ components:
           type: array
           items:
             type: string
-            enum: &a10
+            enum: &a11
               - CREATED
               - NOTIFIED
               - DECLARED
@@ -8770,7 +8889,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a10
+          enum: *a11
       required:
         - type
         - term

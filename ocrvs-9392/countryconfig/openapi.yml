@@ -9513,6 +9513,12 @@ components:
       required:
         - eventId
         - transactionId
+      default:
+        eventId: <event-id-here>
+        transactionId: 3c550de7-920a-48c1-b4fa-a83e6f8f8276
+        declaration: {}
+        annotation: {}
+        type: NOTIFY
     DeclareActionInput:
       type: object
       properties:
