@@ -9,29 +9,48 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import '@opencrvs/commons/monitoring'
-
-import { createHTTPServer } from '@trpc/server/adapters/standalone'
+import { createServer, IncomingMessage } from 'http'
+import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
+import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import { getUser, logger } from '@opencrvs/commons'
-import { appRouter } from './router/router'
+import {
+  getUserId,
+  getUserTypeFromToken,
+  TokenUserType,
+  TokenWithBearer
+} from '@opencrvs/commons/authentication'
+import '@opencrvs/commons/monitoring'
 import { env } from './environment'
-import { getEventConfigurations } from './service/config/config'
+import { appRouter } from './router/router'
 import { getAnonymousToken } from './service/auth'
+import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 
-/* eslint-disable @typescript-eslint/no-require-imports */
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const appModulePath = require('app-module-path')
 
 appModulePath.addPath(path.join(__dirname, '../'))
 
-const server = createHTTPServer({
+// When making requests via different clients, the headers are not always in the same format.
+// This function normalizes the headers to a consistent format.
+function normalizeHeaders(
+  headers: Headers | Record<string, string | string[] | undefined>
+): Record<string, string | string[] | undefined> {
+  return headers instanceof Headers
+    ? Object.fromEntries(headers.entries())
+    : headers
+}
+
+const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
   createContext: async function createContext(opts) {
+    const normalizedHeaders = normalizeHeaders(opts.req.headers)
+
     const parseResult = TokenWithBearer.safeParse(
-      opts.req.headers.authorization
+      normalizedHeaders.authorization
     )
 
     if (!parseResult.success) {
@@ -42,30 +61,79 @@ const server = createHTTPServer({
 
     const token = parseResult.data
 
-    const userId = getUserId(token)
-
-    if (!userId) {
+    const sub = getUserId(token)
+    if (!sub) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
       })
     }
 
+    const userType = getUserTypeFromToken(token)
+
+    if (userType === TokenUserType.SYSTEM) {
+      return {
+        userType: TokenUserType.SYSTEM,
+        system: {
+          id: sub
+        },
+        token: token
+      }
+    }
+
     const { primaryOfficeId, role } = await getUser(
       env.USER_MANAGEMENT_URL,
-      userId,
+      sub,
       token
     )
 
     return {
+      userType: TokenUserType.USER,
       user: {
-        id: userId,
+        id: sub,
         primaryOfficeId,
         role
       },
       token: token
     }
   }
+}
+
+// Check if the request is a tRPC request
+function isTrpcRequest(req: IncomingMessage) {
+  if (!req.url) {
+    throw new Error('No URL provided')
+  }
+
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
+  const trpcProcedurePaths = Object.keys(appRouter._def.procedures)
+
+  return (
+    url.search.startsWith('?input') || trpcProcedurePaths.includes(pathName)
+  )
+}
+
+const restServer = createOpenApiHttpHandler(trpcConfig)
+const trpcServer = createHTTPHandler(trpcConfig)
+
+// Server which handles both tRPC and REST requests
+const server = createServer((req, res) => {
+  if (!req.url) {
+    res.writeHead(500)
+    res.end('No URL provided')
+    return
+  }
+
+  // If it's a tRPC request, handle it with the tRPC server
+  if (isTrpcRequest(req)) {
+    trpcServer(req, res)
+  } else {
+    // If it's a REST request, handle it with the REST server
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    restServer(req, res)
+  }
 })
+
 export async function main() {
   try {
     const configurations = await getEventConfigurations(
@@ -86,7 +154,6 @@ export async function main() {
     setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
     return
   }
-
   server.listen(5555)
 }
 
