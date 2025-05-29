@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  
+
+**Table of Contents**
 
 - [OpenCRVS Authentication service](#opencrvs-authentication-service)
   - [Dev guide](#dev-guide)
@@ -15,15 +16,15 @@ A microservice to manage authentication concerns such as user sessions, token ge
 
 ## Dev guide
 
-Start the service with `yarn start`
+Start the service with `pnpm start`
 
-Watch the tests with `yarn test:watch`
+Watch the tests with `pnpm test:watch`
 
 When in dev mode swagger API docs are available at `http://localhost:4040/documentation`
 
 ## Generating new tokens for tests
 
-`yarn generate-test-token <user id> <role> <expiry delta from now>`
+`pnpm generate-test-token <user id> <role> <expiry delta from now>`
 
 ## Configuration Props
 

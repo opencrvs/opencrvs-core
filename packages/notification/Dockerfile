@@ -5,6 +5,6 @@ USER node
 
 WORKDIR /app/packages/notification
 COPY --chown=node:node packages/notification /app/packages/notification
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "pnpm", "start:prod" ]

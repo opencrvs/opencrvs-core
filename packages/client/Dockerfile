@@ -9,13 +9,13 @@ COPY --chown=node:node packages/events /app/packages/events
 WORKDIR /app/packages/components
 COPY --chown=node:node packages/components /app/packages/components
 
-RUN yarn install --frozen-lockfile  && yarn build
+RUN pnpm install --frozen-lockfile  && pnpm build
 ENV CONTENT_SECURITY_POLICY_WILDCARD "{{CONTENT_SECURITY_POLICY_WILDCARD}}"
 ENV COUNTRY_CONFIG_URL_INTERNAL "{{COUNTRY_CONFIG_URL_INTERNAL}}"
 ENV GATEWAY_URL_INTERNAL "{{GATEWAY_URL_INTERNAL}}"
 WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
 FROM nginx:1.27
 RUN apt-get update && apt-get upgrade -y

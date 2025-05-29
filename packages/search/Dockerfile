@@ -5,8 +5,8 @@ USER node
 
 WORKDIR /app/packages/search
 COPY --chown=node:node packages/search /app/packages/search
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "pnpm", "start:prod" ]
 

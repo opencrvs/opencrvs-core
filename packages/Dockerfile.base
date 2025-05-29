@@ -12,11 +12,11 @@ WORKDIR /app
 COPY --chown=node:node *.json .
 COPY --chown=node:node pnpm-lock.yaml .
 
-RUN yarn install --production --frozen-lockfile
+RUN pnpm install --production --frozen-lockfile
 
 COPY --chown=node:node packages/commons /app/packages/commons
 
 WORKDIR /app/packages/commons
 
-RUN yarn install --frozen-lockfile
-RUN yarn build
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
