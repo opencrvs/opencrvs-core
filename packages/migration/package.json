@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/migration",
-  "version": "1.8.0",
+  "version": "0.3.0",
   "description": "OpenCRVS migration microservice",
   "homepage": "https://github.com/opencrvs/opencrvs-core#readme",
   "type": "module",
@@ -46,13 +46,13 @@
     "@types/fhir": "0.0.30",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
-    "mongodb": "^4.17.1",
-    "prettier": "3.5.3",
     "eslint": "^9.23.0",
     "eslint-config-prettier": "^10.1.1",
     "eslint-import-resolver-typescript": "^4.2.5",
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.5",
+    "mongodb": "^4.17.1",
+    "prettier": "3.5.3",
     "rimraf": "^5.0.0",
     "typescript": "5.6.3"
   },
