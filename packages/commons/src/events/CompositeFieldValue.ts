@@ -64,33 +64,16 @@ export const UrbanAddressUpdateValue = AdminStructure.extend({
 
 export const NameFieldValue = z
   .object({
-    firstname: z.string().min(1, {
-      //@ts-ignore
-      message: {
-        message: {
-          defaultMessage: 'Custom message firstname',
-          id: 'sdsadd-firstname',
-          description: 'dasdsad'
-        }
-      }
-    }),
-    surname: z.string().min(1, {
-      //@ts-ignore
-      message: {
-        message: {
-          defaultMessage: 'Custom message surname',
-          id: 'sdsadd-surname',
-          description: 'dasdsad'
-        }
-      }
-    })
+    firstname: z.string(),
+    surname: z.string(),
+    fullname: z.string()
   })
   .or(z.undefined())
-
 export const NameFieldUpdateValue = z
   .object({
     firstname: z.string(),
-    surname: z.string()
+    surname: z.string(),
+    fullname: z.string()
   })
   .nullish()
 
