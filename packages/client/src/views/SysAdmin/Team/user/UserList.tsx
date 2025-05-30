@@ -68,7 +68,7 @@ import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
 import { UserSection } from '@client/forms'
-import { stringify } from 'querystring'
+import { stringify } from '@client/utils'
 
 const DEFAULT_FIELD_AGENT_LIST_SIZE = 10
 const DEFAULT_PAGE_NUMBER = 1

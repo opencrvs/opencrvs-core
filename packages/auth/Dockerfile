@@ -5,8 +5,8 @@ USER node
 
 WORKDIR /app/packages/auth
 COPY --chown=node:node packages/auth/*.json /app/packages/auth/
-RUN yarn install --frozen-lockfile
+RUN pnpm install --frozen-lockfile
 COPY --chown=node:node packages/auth /app/packages/auth
-RUN yarn build
+RUN pnpm build
 
-CMD ["yarn", "start:prod"]
+CMD ["pnpm", "start:prod"]

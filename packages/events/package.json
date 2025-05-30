@@ -7,7 +7,7 @@
   "scripts": {
     "start": "cross-env NODE_ENV=development NODE_OPTIONS=--dns-result-order=ipv4first  nodemon --exec ts-node -r tsconfig-paths/register src/index.ts",
     "start:prod": "TS_NODE_BASEURL=./build/dist/src node -r tsconfig-paths/register build/dist/src/index.js",
-    "test": "yarn test:compilation && vitest run",
+    "test": "pnpm test:compilation && vitest run",
     "test:watch": "vitest",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "precommit": "lint-staged",
@@ -26,7 +26,7 @@
     "mongodb": "6.9.0",
     "msw": "^2.7.3",
     "superjson": "1.9.0-0",
-    "trpc-to-openapi": "^2.1.5",
+    "trpc-to-openapi": "2.1.5",
     "tsconfig-paths": "^3.13.0",
     "zod": "^3.23.8",
     "zod-openapi": "^4.2.4"
@@ -52,6 +52,7 @@
     "testcontainers": "^10.15.0",
     "ts-jest": "27.1.4",
     "ts-node": "^6.1.1",
+    "tsx": "^4.19.4",
     "typescript": "5.6.3",
     "vite-tsconfig-paths": "^3.5.0",
     "vitest": "^2.1.5",

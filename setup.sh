@@ -83,7 +83,7 @@ function ask_yes_or_no() {
         *)     echo "no" ;;
     esac
 }
-if [[ "no" == $(ask_yes_or_no "OpenCRVS can ONLY run on Ubuntu, WSL or Mac OSX.  This is a ONE TIME USE ONLY setup command for OpenCRVS and resets OpenCRVS to factory settings.  If you have already successfully installed OpenCRVS, you should use 'yarn dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, your OS must be Ubuntu or Mac and you must have at least 30 minutes available as the process cannot be interrupted.  You must also have at least 20GB of available disk space and at least 16GB of RAM.  Type: yes to continue.") ]]
+if [[ "no" == $(ask_yes_or_no "OpenCRVS can ONLY run on Ubuntu, WSL or Mac OSX.  This is a ONE TIME USE ONLY setup command for OpenCRVS and resets OpenCRVS to factory settings.  If you have already successfully installed OpenCRVS, you should use 'pnpm dev' to start OpenCRVS again.  Type: no to exit.  If you want to continue, your OS must be Ubuntu or Mac and you must have at least 30 minutes available as the process cannot be interrupted.  You must also have at least 20GB of available disk space and at least 16GB of RAM.  Type: yes to continue.") ]]
 then
     echo "Exiting OpenCRVS setup."
     exit 0
@@ -170,7 +170,7 @@ echo
 # Reads .nvmrc and trims the whitespace
 nvmVersion=$(cat .nvmrc | tr -d '[:space:]')
 
-dependencies=( "docker" "node" "yarn" "tmux")
+dependencies=( "docker" "node" "pnpm" "tmux")
 
 for i in "${dependencies[@]}"
 do
@@ -210,9 +210,9 @@ do
             echo
             echo "nvm alias default $nvmVersion"
         fi
-        if [ $i == "yarn" ] ; then
-           echo "You need to install the Yarn Package Manager for Node."
-           echo "The documentation is here: https://classic.yarnpkg.com/en/docs/install"
+        if [ $i == "pnpm" ] ; then
+           echo "You need to install the pnpm Package Manager for Node."
+           echo "The documentation is here: https://pnpm.io/cli/install"
         fi
         if [ $i == "tmux" ] ; then
           if [ $OS == "UBUNTU" ]; then
@@ -332,7 +332,7 @@ else
   echo "wait-on not found"
   npm install -g wait-on
 fi
-yarn install
+pnpm install
 
 echo -e "\033[32m:::::::::::::::::::::: Setting hooks path to .husky ::::::::::::::::::::::\033[0m"
 echo
@@ -361,7 +361,7 @@ echo
 if [ $OS == "MAC" ]; then
  export LOCAL_IP=host-gateway
 fi
-yarn compose:deps:detached
+pnpm compose:deps:detached
 
 # As this script is also used when setting up E2E tests,
 # where we don't want to start the app in tmux. This script ends.
@@ -390,7 +390,7 @@ fi
 tmux set -p @mytitle "opencrvs-core-working"
 tmux send-keys -t opencrvs "bash development-environment/summary.sh" C-m
 tmux split-window -h -l '30%'
-tmux send-keys -t opencrvs "LANGUAGES=en && yarn start" C-m
+tmux send-keys -t opencrvs "LANGUAGES=en && pnpm start" C-m
 tmux set -p @mytitle "opencrvs-core"
 tmux split-window -v
 tmux set -p @mytitle "opencrvs-countryconfig"

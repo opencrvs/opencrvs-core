@@ -18,7 +18,7 @@ echo -e "\033[32m::::::::::::::::::::::::: PLEASE WAIT FOR THE LOGO ::::::::::::
 echo
 echo "Waiting till contry config server is running before seeding data." && wait-on -l tcp:3040
 echo
-yarn seed:dev
+pnpm seed:dev
 echo -e "
 
 

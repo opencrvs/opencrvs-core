@@ -26,8 +26,11 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install
 
       - name: Generate OpenAPI
         run: bash build.sh

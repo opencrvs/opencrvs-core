@@ -24,7 +24,7 @@ import {
   setInitialDeclarations
 } from '@client/declarations'
 import { v4 as uuid } from 'uuid'
-import { REVIEW_EVENT_PARENT_FORM_PAGE_GROUP } from '@opencrvs/client/src/navigation/routes'
+import { REVIEW_EVENT_PARENT_FORM_PAGE_GROUP } from '@client/navigation/routes'
 import { SCOPES } from '@opencrvs/commons/client'
 import { EventType } from '@client/utils/gateway'
 import { vi } from 'vitest'

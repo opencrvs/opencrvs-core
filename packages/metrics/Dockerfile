@@ -5,6 +5,6 @@ USER node
 
 WORKDIR /app/packages/metrics
 COPY --chown=node:node packages/metrics /app/packages/metrics
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
-CMD ["yarn", "start:prod"]
+CMD ["pnpm", "start:prod"]
