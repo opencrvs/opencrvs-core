@@ -14,7 +14,8 @@ import {
   getUser,
   getUserId,
   getUserTypeFromToken,
-  TokenUserType
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons'
 import { env } from './environment'
 
@@ -22,13 +23,13 @@ export type UserDetails =
   | {
       type: TokenUserType.USER
       id: string
-      primaryOfficeId: string
+      primaryOfficeId: UUID
       role: string
     }
   | {
       type: TokenUserType.SYSTEM
       id: string
-      primaryOfficeId: undefined
+      primaryOfficeId: UUID
       role: string
     }
 

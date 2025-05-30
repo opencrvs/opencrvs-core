@@ -42,7 +42,10 @@ import { approveCorrection } from '@events/service/events/actions/approve-correc
 import { assignRecord } from '@events/service/events/actions/assign'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import { unassignRecord } from '@events/service/events/actions/unassign'
-import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
+import {
+  createDraft,
+  getDraftsByUserId
+} from '@events/storage/postgres/events/drafts'
 import {
   addAction,
   createEvent,
@@ -128,7 +131,7 @@ export const eventRouter = router({
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
-    .input(z.string())
+    .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const updatedEvent = await addAction(

@@ -228,6 +228,8 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
         : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
     ).data ?? null
 
+  // @TODO: Typing issue here with branded values (UUID)
+  // @ts-ignore
   return deepDropNulls({
     id: event.id,
     type: event.type,

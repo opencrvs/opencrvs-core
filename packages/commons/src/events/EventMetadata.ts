@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionDocument'
+import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
 
 /**
@@ -111,7 +112,7 @@ export const LegalStatuses = z.object({
  * Accessed through `event.` in configuration.
  */
 export const EventMetadata = z.object({
-  id: z.string(),
+  id: UUID,
   type: z
     .string()
     .describe('The type of event, such as birth, death, or marriage.'),
@@ -131,10 +132,9 @@ export const EventMetadata = z.object({
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the event.'
   ),
-  updatedAtLocation: z
-    .string()
-    .nullish()
-    .describe('Location of the user who last updated the declaration.'),
+  updatedAtLocation: UUID.nullish().describe(
+    'Location of the user who last updated the declaration.'
+  ),
   updatedAt: z
     .string()
     .datetime()

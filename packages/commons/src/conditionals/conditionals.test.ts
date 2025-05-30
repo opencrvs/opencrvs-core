@@ -27,6 +27,7 @@ import { ActionStatus } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
+import { UUID } from '../uuid'
 
 /*  eslint-disable max-lines */
 
@@ -484,7 +485,7 @@ describe('"event" conditionals', () => {
     const eventParams = {
       $now: now,
       $event: {
-        id: '123',
+        id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
         createdAt: now,
@@ -492,13 +493,13 @@ describe('"event" conditionals', () => {
         dateOfEvent: { fieldId: 'child.dob' },
         actions: [
           {
-            id: '1234',
+            id: '1234' as UUID,
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
             createdByRole: 'some-role',
             declaration: {},
-            createdAtLocation: '123456',
+            createdAtLocation: '123456' as UUID,
             status: ActionStatus.Accepted,
             transactionId: '123456'
           }
