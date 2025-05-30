@@ -19,7 +19,6 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
-  title: 'John Doe',
   type: 'tennis-club-membership',
   trackingId: 'TEST12',
   status: 'CREATED',

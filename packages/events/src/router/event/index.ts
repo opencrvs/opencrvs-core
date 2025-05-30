@@ -37,7 +37,10 @@ import {
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
-import { getEventConfigurations } from '@events/service/config/config'
+import {
+  getEventConfigurationById,
+  getEventConfigurations
+} from '@events/service/config/config'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { assignRecord } from '@events/service/events/actions/assign'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
@@ -54,23 +57,6 @@ import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
-
-function validateEventType({
-  eventTypes,
-  eventInputType
-}: {
-  eventTypes: string[]
-  eventInputType: string
-}) {
-  if (!eventTypes.includes(eventInputType)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: `Invalid event type ${eventInputType}. Valid event types are: ${eventTypes.join(
-        ', '
-      )}`
-    })
-  }
-}
 
 export const eventRouter = router({
   config: router({
@@ -111,14 +97,10 @@ export const eventRouter = router({
     .use(middleware.eventTypeAuthorization)
     .output(EventDocument)
     .mutation(async ({ input, ctx }) => {
-      const config = await getEventConfigurations(ctx.token)
-      const eventIds = config.map((c) => c.id)
-
-      validateEventType({
-        eventTypes: eventIds,
-        eventInputType: input.type
+      const config = await getEventConfigurationById({
+        token: ctx.token,
+        eventType: input.type
       })
-
       return createEvent({
         transactionId: input.transactionId,
         config,

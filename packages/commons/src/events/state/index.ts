@@ -207,7 +207,7 @@ export const DEFAULT_DATE_OF_EVENT_PROPERTY =
  */
 export function getCurrentEventState(
   event: EventDocument,
-  config: EventConfig
+  config: Partial<EventConfig>
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
