@@ -8,12 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { ActionUpdate } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { CreatedAtLocation } from './CreatedAtLocation'
 import { v4 as uuidv4 } from 'uuid'
+import { CreatedAtLocation } from './CreatedAtLocation'
 extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
@@ -28,14 +29,14 @@ export const BaseActionInput = z.object({
 const CreateActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.CREATE).default(ActionType.CREATE),
-    createdAtLocation: CreatedAtLocation
+    createdAtLocation: CreatedAtLocation // @TODO: should not be part of the input
   })
 )
 
 export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
-    registrationNumber: z.string().optional()
+    registrationNumber: z.string().optional() // @TODO: Should only be allowed by the system user?
   })
 )
 
@@ -112,7 +113,7 @@ export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
 export const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
-    assignedTo: z.string()
+    assignedTo: z.string() // @TODO: Could this be set to UUID?
   })
 )
 

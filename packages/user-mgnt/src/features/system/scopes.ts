@@ -13,7 +13,7 @@ import {
   Scope,
   SCOPES,
   stringifyScope,
-  SystemType
+  SystemRole
 } from '@opencrvs/commons'
 
 const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
@@ -22,7 +22,7 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
   RECORD_SEARCH: [SCOPES.RECORDSEARCH],
   IMPORT: [SCOPES.RECORD_IMPORT],
   WEBHOOK: [SCOPES.WEBHOOK]
-} satisfies Record<SystemType, Scope[]>
+} satisfies Record<SystemRole, Scope[]>
 
 const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
   HEALTH: ['record.notify'],
@@ -30,16 +30,16 @@ const DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES = {
   NATIONAL_ID: [],
   RECORD_SEARCH: [],
   WEBHOOK: []
-} satisfies Record<SystemType, ConfigurableScopeType[]>
+} satisfies Record<SystemRole, ConfigurableScopeType[]>
 
 export function getSystemIntegrationRoleScopes(
-  type: SystemType,
+  role: SystemRole,
   eventIds: string[]
 ): string[] {
-  const literalScopes = DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[type]
+  const literalScopes = DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES[role]
 
   const configurableScopes =
-    DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES[type].map((scope) =>
+    DEFAULT_SYSTEM_INTEGRATION_ROLE_CONFIGURABLE_SCOPES[role].map((scope) =>
       stringifyScope({
         type: scope,
         options: { event: eventIds }

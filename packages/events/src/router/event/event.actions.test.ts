@@ -38,7 +38,7 @@ test('actions can be added to created events', async () => {
   ])
 })
 
-test('Action data can be retrieved', async () => {
+test('Event document contains all created actions', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -85,6 +85,31 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.READ })
   ])
+
+  updatedEvent.actions.forEach((action) => {
+    expect(action.createdAtLocation).toBe(user.primaryOfficeId)
+    expect(action.createdByRole).toBe(user.role)
+    expect(action.createdBySignature).toBe(user.signature)
+
+    expect(action).toHaveProperty('createdAt')
+    expect(action).toHaveProperty('createdBy')
+
+    expect(action).toHaveProperty('id')
+    expect(action).toHaveProperty('transactionId')
+
+    expect(action).toHaveProperty('declaration')
+    expect(action).toHaveProperty('status')
+
+    const actionsWithoutAnnotatation = [
+      ActionType.CREATE,
+      ActionType.READ,
+      ActionType.ASSIGN,
+      ActionType.UNASSIGN
+    ]
+    if (actionsWithoutAnnotatation.every((ac) => ac !== action.type)) {
+      expect(action).toHaveProperty('annotation')
+    }
+  })
 })
 
 test('Action data accepts partial changes', async () => {
@@ -186,6 +211,7 @@ test('Action data accepts partial changes', async () => {
           createdByRole: user.role,
           createdBy: user.id,
           createdAtLocation: user.primaryOfficeId
+          // createdBySignature: user.signature
         }
       }
     } satisfies EventIndex

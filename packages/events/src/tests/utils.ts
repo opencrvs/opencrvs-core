@@ -13,9 +13,11 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
+  createPseudoRandomNumberGenerator,
+  generateRandomSignature,
   Scope,
   SCOPES,
-  SystemType,
+  SystemRole,
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons'
@@ -23,6 +25,7 @@ import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
+import { UserContext } from '@events/context'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 const { createCallerFactory } = t
@@ -44,7 +47,7 @@ export const TEST_USER_DEFAULT_SCOPES = [
 export function createTestToken(
   userId: string,
   scopes: Scope[],
-  userType: TokenUserType = TokenUserType.USER
+  userType: TokenUserType = TokenUserType.enum.user
 ): TokenWithBearer {
   const token = jwt.sign(
     { scope: scopes, sub: userId, userType },
@@ -61,22 +64,27 @@ export function createTestToken(
 
 export function createSystemTestClient(
   systemId: string,
-  scopes: string[] = TEST_USER_DEFAULT_SCOPES
+  scopes: string[] = TEST_USER_DEFAULT_SCOPES,
+  seed?: number
 ) {
+  const rng = createPseudoRandomNumberGenerator(seed ?? 101)
   const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(systemId, scopes, TokenUserType.SYSTEM)
+  const token = createTestToken(systemId, scopes, TokenUserType.enum.system)
 
   const caller = createCaller({
-    user: {
+    user: UserContext.parse({
       id: systemId,
-      role: SystemType.Health,
+      role: SystemRole.enum.HEALTH,
       primaryOfficeId: undefined,
-      type: TokenUserType.SYSTEM
-    },
+      type: TokenUserType.enum.system,
+      signature: generateRandomSignature(rng)
+    }),
     token
   })
+
   return caller
 }
+
 export function createTestClient(
   user: CreatedUser,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
@@ -87,7 +95,7 @@ export function createTestClient(
   const caller = createCaller({
     user: {
       ...user,
-      type: TokenUserType.USER
+      type: TokenUserType.enum.user
     },
     token
   })
@@ -102,6 +110,8 @@ export const setupTestCase = async () => {
   const eventsDb = await events.getClient()
   const userMgntDb = await userMgnt.getClient()
 
+  const rng = createPseudoRandomNumberGenerator(101)
+
   const seed = seeder()
   const locations = generator.locations.set(5)
   await seed.locations(eventsDb, locations)
@@ -115,7 +125,10 @@ export const setupTestCase = async () => {
 
   return {
     locations,
-    user,
+    user: {
+      ...user,
+      signature: generateRandomSignature(rng)
+    },
     eventsDb,
     userMgntDb,
     seed,
