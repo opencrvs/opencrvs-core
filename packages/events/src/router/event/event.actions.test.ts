@@ -18,7 +18,12 @@ import {
   getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  sanitizeForSnapshot,
+  setupTestCase,
+  UNSTABLE_EVENT_FIELDS
+} from '@events/tests/utils'
 
 test('actions can be added to created events', async () => {
   const { user, generator } = await setupTestCase()
@@ -91,25 +96,21 @@ test('Event document contains all created actions', async () => {
     expect(action.createdByRole).toBe(user.role)
     expect(action.createdBySignature).toBe(user.signature)
 
-    expect(action).toHaveProperty('createdAt')
-    expect(action).toHaveProperty('createdBy')
-
-    expect(action).toHaveProperty('id')
-    expect(action).toHaveProperty('transactionId')
-
-    expect(action).toHaveProperty('declaration')
-    expect(action).toHaveProperty('status')
-
     const actionsWithoutAnnotatation = [
       ActionType.CREATE,
       ActionType.READ,
       ActionType.ASSIGN,
       ActionType.UNASSIGN
     ]
+
     if (actionsWithoutAnnotatation.every((ac) => ac !== action.type)) {
       expect(action).toHaveProperty('annotation')
     }
   })
+
+  expect(
+    sanitizeForSnapshot(updatedEvent, UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
 })
 
 test('Action data accepts partial changes', async () => {
