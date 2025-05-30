@@ -38,14 +38,12 @@ security_enabled = True
 if not os.path.exists('../infrastructure'):
     local("git clone git@github.com:opencrvs/infrastructure.git ../infrastructure")
 
-############################################################
-# What common Tiltfile does?
-# - Group resources by label on UI: http://localhost:10350/
-include('../infrastructure/tilt/Tiltfile.common')
-
 # Load extensions for namespace and helm operations
-load('ext://namespace', 'namespace_create', 'namespace_inject')
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
+load('ext://namespace', 'namespace_create', 'namespace_inject')
+load("../infrastructure/tilt/lib.tilt", "copy_secrets", "reset_environment", "seed_data")
+
+include('../infrastructure/tilt/common.tilt')
 
 # If your machine is powerful feel free to change parallel updates from default 3
 update_settings(max_parallel_updates=1)
@@ -111,19 +109,10 @@ build_services()
 ############################################################
 
 # Create namespaces:
-# - traefik, ingress controller (https://opencrvs.localhost)
 # - opencrvs-deps-dev, dependencies namespace
 # - opencrvs-dev, main namespace
-namespace_create('traefik')
 namespace_create(dependencies_namespace)
 namespace_create(opencrvs_namespace)
-
-
-# Install Traefik GW
-helm_repo('traefik-repo', 'https://traefik.github.io/charts', labels=['Dependencies'])
-helm_resource(
-  'traefik', 'traefik-repo/traefik', namespace='traefik', resource_deps=['traefik-repo'],
-  flags=['--values=../infrastructure/infrastructure/localhost/traefik/values.yaml'])
 
 ######################################################
 # OpenCRVS Dependencies Deployment
@@ -152,26 +141,13 @@ k8s_yaml(
       )
 )
 
-if security_enabled:
-    local_resource(
-      "copy_secrets",
-      cmd="""kubectl get secret redis-opencrvs-users minio-opencrvs-users -n {0} -o yaml \
-          | sed "s#namespace: {0}#namespace: {1}#" | grep -v 'resourceVersion\\|uid\\|creationTimestamp' \
-          | kubectl replace -n {1} -f -""".format(dependencies_namespace, opencrvs_namespace),
-      resource_deps=["minio", "redis"])
+#######################################################
+# Add Data Tasks to Tilt Dashboard
+reset_environment(opencrvs_namespace, opencrvs_configuration_file)
 
-######################################################
-# Data management tasks:
-# - Reset database: This task is not part of helm deployment to avoid accidental data loss
-# - Seed data: is part of helm install post-deploy hook, but it is a manual task as well
-# - Run migration job, is part of helm install/upgrade post-deploy hook
-cleanup_command = "../infrastructure/infrastructure/clear-all-data.k8s.sh --dependencies-namespace {1} -o {0}".format(
-  opencrvs_namespace, dependencies_namespace
-)
-local_resource(
-    'Reset database',
-    labels=['2.Data-tasks'],
-    auto_init=False,
-    cmd=cleanup_command,
-    trigger_mode=TRIGGER_MODE_MANUAL,
-)
+seed_data(opencrvs_namespace, opencrvs_configuration_file)
+
+if security_enabled:
+    copy_secrets(dependencies_namespace, opencrvs_namespace)
+
+print("✅ Tiltfile configuration loaded successfully.")
