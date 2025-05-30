@@ -11,7 +11,11 @@
 
 import { TRPCError } from '@trpc/server'
 import { ActionType, getAcceptedActions, SCOPES } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 describe('event.actions.notify', () => {
   describe('authorization', () => {
@@ -86,6 +90,10 @@ describe('event.actions.notify', () => {
       activeActions.find((action) => action.type === ActionType.NOTIFY)
         ?.declaration
     ).toMatchSnapshot()
+
+    expect(
+      activeActions.find((action) => action.type === ActionType.UNASSIGN)
+    ).toBeDefined()
   })
 
   test(`${ActionType.NOTIFY} is idempotent`, async () => {
@@ -104,5 +112,36 @@ describe('event.actions.notify', () => {
     const secondResponse =
       await client.event.actions.notify.request(notifyPayload)
     expect(firstResponse).toEqual(secondResponse)
+  })
+
+  describe('system user', () => {
+    test('should not require assignment or create unassign action for system user', async () => {
+      const { generator } = await setupTestCase()
+
+      let client = createSystemTestClient('test-system', [
+        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+      ])
+
+      const event = await client.event.create(generator.event.create())
+
+      client = createSystemTestClient('test-system-2', [
+        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+      ])
+
+      await client.event.actions.notify.request(
+        generator.event.actions.notify(event.id)
+      )
+
+      const { user } = await setupTestCase()
+      client = createTestClient(user)
+
+      const fetchedEvent = await client.event.get(event.id)
+      expect(fetchedEvent.actions.length).toEqual(3)
+      expect(fetchedEvent.actions).toEqual([
+        expect.objectContaining({ type: ActionType.CREATE }),
+        expect.objectContaining({ type: ActionType.NOTIFY }),
+        expect.objectContaining({ type: ActionType.READ })
+      ])
+    })
   })
 })
