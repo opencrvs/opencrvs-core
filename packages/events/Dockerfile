@@ -5,7 +5,7 @@ USER node
 
 WORKDIR /app/packages/events
 COPY --chown=node:node packages/events/*.json /app/packages/events/
-RUN yarn install --frozen-lockfile
+RUN NODE_ENV=production yarn install --frozen-lockfile
 COPY --chown=node:node packages/events /app/packages/events
 RUN yarn build
 

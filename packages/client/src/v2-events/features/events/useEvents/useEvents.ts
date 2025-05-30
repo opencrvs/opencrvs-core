@@ -13,6 +13,7 @@ import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
 import { QueryInputType, QueryType, getUUID } from '@opencrvs/commons/client'
 import { useTRPC } from '@client/v2-events/trpc'
+import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { useGetEvent, useGetEventState } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -32,10 +33,11 @@ function toQueryType(
   const topLevelFields: Record<string, unknown> = {}
   const dataFields: Record<string, unknown> = {}
 
-  Object.entries(searchParams).forEach(([key, value]) => {
-    if (key.startsWith('event')) {
-      const strippedKey = key.replace(/^event____/, '')
-      topLevelFields[strippedKey] = value
+  Object.entries(searchParams).forEach(([_, value]) => {
+    const key = _.replace(/^event____/, '').replaceAll(FIELD_SEPARATOR, '.')
+
+    if (_.startsWith('event____')) {
+      topLevelFields[key] = value
     } else {
       dataFields[key] = value
     }
