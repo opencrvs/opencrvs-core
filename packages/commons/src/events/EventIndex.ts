@@ -144,8 +144,53 @@ export const QueryExpression = z
 
 export const QueryType = z
   .object({
-    type: z.literal('and').or(z.literal('or')),
-    clauses: z.array(QueryExpression)
+    type: z.literal('and').or(z.literal('or')).openapi({ default: 'and' }),
+    clauses: z.preprocess(
+      (val) => {
+        // When `QueryType` is used as a query parameter in a REST API:
+
+        // If `clauses` contains a single item, it may be sent as a JSON string instead of an array.
+        // We wrap it in an array and parse it.
+        if (typeof val === 'string') {
+          return [JSON.parse(val)]
+        }
+        // If `clauses` contains multiple items, each item may still be sent as a separate JSON string.
+        // We parse each string into its corresponding object.
+        if (Array.isArray(val)) {
+          return val.map((v) => (typeof v === 'string' ? JSON.parse(v) : v))
+        }
+        // If `clauses` is already passed correctly (e.g., via tRPC), we return it as-is.
+        return val
+
+        // This preprocessing ensures consistent handling of `clauses` regardless of how the client submits the data.
+      },
+      z.array(QueryExpression).openapi({
+        default: [
+          {
+            eventType: 'tennis-club-membership',
+            status: {
+              type: 'anyOf',
+              terms: [
+                'CREATED',
+                'NOTIFIED',
+                'DECLARED',
+                'VALIDATED',
+                'REGISTERED',
+                'CERTIFIED',
+                'REJECTED',
+                'ARCHIVED'
+              ]
+            },
+            updatedAt: {
+              type: 'range',
+              gte: '2025-05-22',
+              lte: '2025-05-29'
+            },
+            data: {}
+          }
+        ]
+      })
+    )
   })
   .openapi({
     ref: 'QueryType'
