@@ -168,3 +168,99 @@ export const WithRejectedAction: Story = {
     }
   }
 }
+
+export const WithSystemUserActions: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return {
+              ...tennisClubMembershipEventDocument,
+              actions: [
+                {
+                  type: ActionType.CREATE,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: new Date().toISOString(),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: 'HEALTH',
+                  assignedTo: '010101',
+                  declaration: {}
+                },
+                {
+                  type: ActionType.ASSIGN,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: new Date().toISOString(),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: 'HEALTH',
+                  assignedTo: '010101',
+                  declaration: {}
+                },
+                {
+                  type: ActionType.NOTIFY,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: new Date().toISOString(),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: 'HEALTH',
+                  declaration: {}
+                },
+                {
+                  type: ActionType.UNASSIGN,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: new Date().toISOString(),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: 'HEALTH',
+                  assignedTo: null,
+                  declaration: {}
+                },
+                {
+                  type: ActionType.DECLARE,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: new Date().toISOString(),
+                  createdBy: '123',
+                  createdAtLocation: '123',
+                  createdByRole: 'HEALTH',
+                  declaration: {}
+                }
+              ]
+            }
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument(
+                tennisClubMembershipEventDocument.id,
+                ActionType.REGISTER,
+                {
+                  'applicant.firstname': 'Riku',
+                  'applicant.surname': 'This value is from a draft'
+                }
+              )
+            ]
+          })
+        ]
+      }
+    }
+  }
+}

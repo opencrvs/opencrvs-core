@@ -67,11 +67,8 @@ const Header = styled(Text)`
   margin-bottom: 20px;
 `
 
-/*
- * At first we tried adding a field such as 'userType' to all actions etc,
- * but that would have caused file changes to like 20 files.
- * So lets Keep It Stupid Simple and just check it there is no location -> machine user.
- */
+// At first we tried adding a field such as 'userType' to all actions etc, but that would have caused file changes to like 20 files.
+// So lets Keep It Stupid Simple and just check it there is no location -> machine user.
 function isUserAction(
   item: ActionDocument
 ): item is ActionDocument & { createdAtLocation: string } {
