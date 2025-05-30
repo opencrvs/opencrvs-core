@@ -19,7 +19,7 @@ import {
   ActionStatus,
   getUUID
 } from '@opencrvs/commons/client'
-import { SystemType } from '@opencrvs/commons/client'
+import { SystemRole } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -193,7 +193,7 @@ export const WithSystemUserActions: Story = {
                   createdAt: new Date().toISOString(),
                   createdBy: '010101',
                   createdAtLocation: undefined,
-                  createdByRole: SystemType.Health,
+                  createdByRole: SystemRole.enum.HEALTH,
                   assignedTo: '010101',
                   declaration: {}
                 },
@@ -205,7 +205,7 @@ export const WithSystemUserActions: Story = {
                   createdAt: new Date().toISOString(),
                   createdBy: '010101',
                   createdAtLocation: undefined,
-                  createdByRole: SystemType.Health,
+                  createdByRole: SystemRole.enum.HEALTH,
                   assignedTo: '010101',
                   declaration: {}
                 },
@@ -217,7 +217,7 @@ export const WithSystemUserActions: Story = {
                   createdAt: new Date().toISOString(),
                   createdBy: '010101',
                   createdAtLocation: undefined,
-                  createdByRole: SystemType.Health,
+                  createdByRole: SystemRole.enum.HEALTH,
                   declaration: {}
                 },
                 {
@@ -228,7 +228,7 @@ export const WithSystemUserActions: Story = {
                   createdAt: new Date().toISOString(),
                   createdBy: '010101',
                   createdAtLocation: undefined,
-                  createdByRole: SystemType.Health,
+                  createdByRole: SystemRole.enum.HEALTH,
                   assignedTo: null,
                   declaration: {}
                 },
