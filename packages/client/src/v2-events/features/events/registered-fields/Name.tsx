@@ -10,10 +10,12 @@
  */
 import React from 'react'
 import {
+  field,
   FieldConfig,
   FieldType,
   getValidatorsForField,
-  NameFieldValue
+  NameFieldValue,
+  TextField
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { joinValues } from '@client/v2-events/utils'
@@ -21,18 +23,22 @@ import { joinValues } from '@client/v2-events/utils'
 interface Props {
   id: string
   onChange: (newValue: NameFieldValue) => void
+  maxLength?: number
   validation: FieldConfig['validation']
   value?: NameFieldValue
 }
 
 function NameInput(props: Props) {
-  const { id, onChange, value = {} } = props
+  const { id, onChange, value = {}, maxLength } = props
   const validators = props.validation || []
 
-  const fields = [
+  const fields: TextField[] = [
     {
       id: 'firstname',
       type: FieldType.TEXT,
+      configuration: {
+        maxLength
+      },
       required: true,
       label: {
         defaultMessage: 'First name(s)',
@@ -45,6 +51,9 @@ function NameInput(props: Props) {
       id: 'surname',
       type: FieldType.TEXT,
       required: true,
+      configuration: {
+        maxLength
+      },
       label: {
         defaultMessage: 'Last name',
         description: 'This is the label for the field',
@@ -52,7 +61,7 @@ function NameInput(props: Props) {
       },
       validation: getValidatorsForField('surname', validators)
     }
-  ]
+  ] satisfies TextField[]
 
   return (
     <FormFieldGenerator

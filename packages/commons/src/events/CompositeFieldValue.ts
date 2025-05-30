@@ -65,14 +65,16 @@ export const UrbanAddressUpdateValue = AdminStructure.extend({
 export const NameFieldValue = z
   .object({
     firstname: z.string(),
-    surname: z.string()
+    surname: z.string(),
+    middlename: z.string().optional()
   })
   .or(z.undefined())
 
 export const NameFieldUpdateValue = z
   .object({
     firstname: z.string(),
-    surname: z.string()
+    surname: z.string(),
+    middlename: z.string().optional()
   })
   .nullish()
 
