@@ -11,14 +11,14 @@
 
 import { unauthorized } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
-import { SystemIntegrationRole, getSystemIntegrationRoleScopes } from './scopes'
+import { getSystemIntegrationRoleScopes } from './scopes'
 import { QA_ENV, RECORD_SEARCH_QUOTA } from '@user-mgnt/constants'
 import {
   createFhirPractitioner,
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger } from '@opencrvs/commons'
+import { logger, SystemType } from '@opencrvs/commons'
 import System, { WebhookPermissions } from '@user-mgnt/model/system'
 import User from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
@@ -45,7 +45,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: SystemIntegrationRole
+  type: SystemType
   integratingSystemType: string
 }
 
