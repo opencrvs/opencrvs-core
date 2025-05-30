@@ -516,23 +516,23 @@ export function SystemList() {
                   onChange={(val) => {
                     setNewSystemType(val as SystemRole)
                   }}
-                  value={newSystemType ?? SystemRole.Enum.HEALTH}
+                  value={newSystemType ?? SystemRole.enum.HEALTH}
                   options={[
                     {
                       label: intl.formatMessage(
                         integrationMessages.eventNotification
                       ),
-                      value: SystemRole.Enum.HEALTH
+                      value: SystemRole.enum.HEALTH
                     },
                     {
                       label: intl.formatMessage(
                         integrationMessages.recordSearch
                       ),
-                      value: SystemRole.Enum.RECORD_SEARCH
+                      value: SystemRole.enum.RECORD_SEARCH
                     },
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
-                      value: SystemRole.Enum.WEBHOOK
+                      value: SystemRole.enum.WEBHOOK
                     }
                   ]}
                   id={'permissions-selectors'}
@@ -540,7 +540,7 @@ export function SystemList() {
               </InputField>
             </Field>
 
-            {newSystemType === SystemRole.Enum.HEALTH && (
+            {newSystemType === SystemRole.enum.HEALTH && (
               <PaddedAlert type="info">
                 {intl.formatMessage(
                   integrationMessages.healthnotificationAlertDescription
