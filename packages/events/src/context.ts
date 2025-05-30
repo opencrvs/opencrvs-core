@@ -48,6 +48,12 @@ type SystemContext = z.infer<typeof SystemContext>
 
 export type TrpcUserContext = SystemContext | UserContext
 
+export const TrpcContext = z.object({
+  token: TokenWithBearer,
+  user: z.union([SystemContext, UserContext])
+})
+export type TrpcContext = z.infer<typeof TrpcContext>
+
 export function normalizeHeaders(
   headers: Headers | Record<string, string | string[] | undefined>
 ): Record<string, string | string[] | undefined> {

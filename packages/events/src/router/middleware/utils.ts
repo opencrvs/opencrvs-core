@@ -10,7 +10,7 @@
  */
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
 import { ActionInputWithType } from '@opencrvs/commons'
-import { TrpcUserContext } from '@events/context'
+import { TrpcContext } from '@events/context'
 
 /**
  * TRPC Middleware options with correct context.
@@ -19,7 +19,7 @@ import { TrpcUserContext } from '@events/context'
 export type MiddlewareOptions = Omit<
   Parameters<AnyTRPCMiddlewareFunction>[0],
   'ctx'
-> & { ctx: TrpcUserContext }
+> & { ctx: TrpcContext }
 
 export type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType
