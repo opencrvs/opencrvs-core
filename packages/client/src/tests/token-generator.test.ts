@@ -12,7 +12,7 @@
 import { testDataGenerator } from './test-data-generators'
 import { generateToken } from './util'
 
-it.skip('Generates tokens', () => {
+it('Generates tokens', () => {
   const generator = testDataGenerator()
   const token = {
     fieldAgent: generateToken(
@@ -28,6 +28,7 @@ it.skip('Generates tokens', () => {
       generator.user.id.localRegistrar
     )
   }
-  // eslint-disable-next-line no-console
-  console.log({ token })
+  expect(token.fieldAgent).toMatchSnapshot('fieldAgent token')
+  expect(token.registrationAgent).toMatchSnapshot('registrationAgent token')
+  expect(token.localRegistrar).toMatchSnapshot('localRegistrar token')
 })

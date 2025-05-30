@@ -11,9 +11,20 @@
 import {
   eventPayloadGenerator,
   getUUID,
-  SCOPES
+  SCOPES as Scopes
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
+
+const SCOPES = {
+  ...Scopes,
+  WORKQUEUE_LOCAL_REGISTRAR:
+    'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]',
+  WORKQUEUE_REGISTRATION_AGENT:
+    'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]',
+  WORKQUEUE_FIELD_AGENT:
+    'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]'
+}
+
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
@@ -21,11 +32,17 @@ export function testDataGenerator() {
   const user = {
     token: {
       /**
-       * If you update the scopes or id values below,
-       * you must regenerate the JWT tokens to match the new values.
-       * To do this, run the script:
-       *   packages/client/src/tests/token-generator.test.ts
-       * Then copy the new tokens here.
+       * IMPORTANT: If you update the scopes or id values below,
+       * you MUST regenerate the JWT tokens so they match the new values.
+       *
+       * To regenerate tokens:
+       *   1. Update the snapshot in:
+       *        packages/client/src/tests/token-generator.test.ts
+       *   2. Copy the new tokens from the updated snapshot into this file.
+       *
+       * Note: Token generation cannot be done here because it requires
+       * `jsonwebtoken`, which depends on Node's `crypto` module and is
+       * not supported in the browser.
        */
       fieldAgent:
         'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQuZGVjbGFyZS1iaXJ0aCIsInJlY29yZC5kZWNsYXJlLWRlYXRoIiwicmVjb3JkLmRlY2xhcmUtbWFycmlhZ2UiLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWluY29tcGxldGUiLCJyZWNvcmQuZGVjbGFyYXRpb24tc3VibWl0LWZvci1yZXZpZXciLCJzZWFyY2guYmlydGgiLCJzZWFyY2guZGVhdGgiLCJzZWFyY2gubWFycmlhZ2UiLCJ3b3JrcXVldWVbaWQ9YWxsLWV2ZW50c3xhc3NpZ25lZC10by15b3V8cmVjZW50fHJlcXVpcmVzLXVwZGF0ZXN8c2VudC1mb3ItcmV2aWV3XSJdLCJpYXQiOjE0ODcwNzY3MDgsImF1ZCI6Im9wZW5jcnZzOmdhdGV3YXktdXNlciIsImlzcyI6Im9wZW5jcnZzOmF1dGgtc2VydmljZSIsInN1YiI6IjY3ZWY3ZjgzZDZhOWNiOTJlOWVkYWE5OSJ9.p8TkRnoQ_S18jPN6PEfxQApVMwAEr2wZ0cefx4XSbM7I-By47hq7Tj9Dfjdr4uGLIty33M7cKEbHXDVFp2VbtvTHqMZfzrwiXc_dbbVIDz7MYiPeEcsSrtuUGDlbazTENwHqitAKecapp8e4IEmRv-gtbX2EvtEr4F0yd5kwhZXsE44UcSYnn0uLMhKywM-FTQ4soz-bB4pe3KD-Co9b_pPWxLwyZONrRAIOkgDlqBaYncI0f9Yupw4Z8AeSitUbJ74HBAvNCoVfMsAyQx36sq7YQDWtjoLZ9JRdMaEqlfDXhzPOj3pqgbF5BsTIMhK-T0Ql5yYwHyENcMe0ujZTh7B10bW5Bsv5SZEen-Mfdv6abAr4eyqD4uGP2-3jMrpbH7N6_q8tMrU-iXuhM8WFH7utw8c9BeCl-v13G7SuAEmV3mesHVclwAlG_Z-DdP_hTFDmR4lDu2IspoSlKYzgIKBnh7dvKDk0JPjgbladshjrMoT3s32ZqJgaULGYY-yrLy1uRrIAVctfvt_uIVs7pqhs7OUb0da3pQaK7ajfdxxHykWa_QhUxmEsDGvW2PSII4vApoRQkQBMls1JjnDfX7CxRmuYoei7vOBHQodRCB5pp6qbcoV8oxiy028F64aP5ymo1OxQ0E4l76IMizYWXdYgYDB95PrMnhrV_sms9g0',
@@ -169,6 +186,10 @@ export function testDataGenerator() {
         __typename: 'User'
       }) satisfies FetchUserQuery['getUser'],
     scopes: {
+      /**
+       * scopes are same as countryconfig/src/data-seeding/roles/roles.ts
+       * except for workque scope that has an extra workqueue: all-events
+       */
       localRegistrar: [
         SCOPES.RECORD_READ,
         SCOPES.RECORD_DECLARE_BIRTH,
@@ -194,7 +215,7 @@ export function testDataGenerator() {
         SCOPES.SEARCH_BIRTH,
         SCOPES.SEARCH_DEATH,
         SCOPES.SEARCH_MARRIAGE,
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review-all|in-external-validation|ready-to-print|ready-to-issue]'
+        SCOPES.WORKQUEUE_LOCAL_REGISTRAR
       ],
       registrationAgent: [
         SCOPES.RECORD_READ,
@@ -216,7 +237,7 @@ export function testDataGenerator() {
         SCOPES.SEARCH_BIRTH,
         SCOPES.SEARCH_DEATH,
         SCOPES.SEARCH_MARRIAGE,
-        'workqueue[id=all-events|assigned-to-you|recent|requires-completion|requires-updates|in-review|sent-for-approval|in-external-validation|ready-to-print|ready-to-issue]'
+        SCOPES.WORKQUEUE_REGISTRATION_AGENT
       ],
       fieldAgent: [
         SCOPES.RECORD_DECLARE_BIRTH,
@@ -227,7 +248,7 @@ export function testDataGenerator() {
         SCOPES.SEARCH_BIRTH,
         SCOPES.SEARCH_DEATH,
         SCOPES.SEARCH_MARRIAGE,
-        'workqueue[id=all-events|assigned-to-you|recent|requires-updates|sent-for-review]'
+        SCOPES.WORKQUEUE_FIELD_AGENT
       ]
     }
   }
