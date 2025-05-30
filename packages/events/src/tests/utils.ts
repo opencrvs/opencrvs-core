@@ -119,7 +119,6 @@ export function createSystemTestClient(
   scopes: string[] = TEST_USER_DEFAULT_SCOPES,
   seed?: number
 ) {
-  const rng = createPseudoRandomNumberGenerator(seed ?? 101)
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken(systemId, scopes, TokenUserType.enum.system)
 
@@ -128,8 +127,7 @@ export function createSystemTestClient(
       id: systemId,
       role: SystemRole.enum.HEALTH,
       primaryOfficeId: undefined,
-      type: TokenUserType.enum.system,
-      signature: generateRandomSignature(rng)
+      type: TokenUserType.enum.system
     }),
     token
   })
