@@ -37,6 +37,7 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
+import { UserDetails } from '@events/user'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {
@@ -158,16 +159,12 @@ type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
 
 export async function createEvent({
   eventInput,
-  createdAtLocation,
-  createdBy,
-  createdByRole,
+  user,
   transactionId,
   config
 }: {
   eventInput: z.infer<typeof EventInput>
-  createdBy: string
-  createdByRole: string
-  createdAtLocation: string
+  user: UserDetails
   transactionId: string
   config: EventConfig
 }): Promise<EventDocument> {
@@ -184,6 +181,12 @@ export async function createEvent({
   const id = getUUID()
   const trackingId = generateTrackingId()
 
+  const createdByDetails = {
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
+  }
+
   await collection.insertOne({
     ...eventInput,
     id,
@@ -193,11 +196,9 @@ export async function createEvent({
     trackingId,
     actions: [
       {
+        ...createdByDetails,
         type: ActionType.CREATE,
         createdAt: now,
-        createdBy,
-        createdByRole,
-        createdAtLocation,
         id: getUUID(),
         declaration: {},
         status: ActionStatus.Accepted,
@@ -207,13 +208,11 @@ export async function createEvent({
   })
 
   const action: ActionDocument = {
+    ...createdByDetails,
     type: ActionType.ASSIGN,
-    assignedTo: createdBy,
+    assignedTo: createdByDetails.createdBy,
     declaration: {},
-    createdBy,
-    createdByRole,
     createdAt: now,
-    createdAtLocation,
     id,
     status: ActionStatus.Accepted,
     transactionId: getUUID()
@@ -275,21 +274,13 @@ export async function addAction(
   input: ActionInputWithType,
   {
     eventId,
-    createdBy,
-    createdByRole,
+    user,
     token,
-    createdAtLocation,
     status
   }: {
     eventId: string
-    createdBy: string
-    createdByRole: string
-    /**
-     * The location where the action was created. This is used for auditing purposes.
-     */
-    createdAtLocation: string
+    user: UserDetails
     token: string
-    transactionId: string
     status: ActionStatus
   },
   actionId = getUUID()
@@ -315,6 +306,12 @@ export async function addAction(
     }
   }
 
+  const createdByDetails = {
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
+  }
+
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
     await db.collection<EventDocument>('events').updateOne(
       {
@@ -327,12 +324,10 @@ export async function addAction(
         $push: {
           actions: {
             ...input,
+            ...createdByDetails,
             transactionId: getUUID(),
             type: ActionType.MARKED_AS_DUPLICATE,
-            createdBy,
-            createdByRole,
             createdAt: now,
-            createdAtLocation,
             id: getUUID(),
             status
           }
@@ -346,10 +341,8 @@ export async function addAction(
 
   const action: ActionDocument = {
     ...input,
-    createdBy,
-    createdByRole,
+    ...createdByDetails,
     createdAt: now,
-    createdAtLocation,
     id: actionId,
     status: status
   }
@@ -368,14 +361,12 @@ export async function addAction(
         $push: {
           actions: {
             ...input,
+            ...createdByDetails,
             transactionId: getUUID(),
             type: ActionType.UNASSIGN,
             declaration: {},
             assignedTo: null,
-            createdBy,
-            createdByRole,
             createdAt: now,
-            createdAtLocation,
             id: actionId,
             status
           }
@@ -385,7 +376,11 @@ export async function addAction(
     )
   }
 
-  const drafts = await getDraftsForAction(eventId, createdBy, input.type)
+  const drafts = await getDraftsForAction(
+    eventId,
+    createdByDetails.createdBy,
+    input.type
+  )
 
   await cleanUnreferencedAttachmentsFromPreviousDrafts(
     token,

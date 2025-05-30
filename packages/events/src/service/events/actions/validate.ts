@@ -20,22 +20,17 @@ import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
+import { UserDetails } from '@events/user'
 
 export async function validate(
   input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
   {
     eventId,
-    createdBy,
-    createdByRole,
-    token,
-    transactionId,
-    createdAtLocation
+    user,
+    token
   }: {
     eventId: string
-    createdBy: string
-    createdByRole: string
-    createdAtLocation: string
-    transactionId: string
+    user: UserDetails
     token: string
   }
 ) {
@@ -50,6 +45,10 @@ export async function validate(
   }
 
   let duplicates: EventIndex[] = []
+
+  const createdBy = user.id
+  const createdByRole = user.role
+  const createdAtLocation = user.primaryOfficeId
 
   const futureEventState = getCurrentEventState(
     {
@@ -97,11 +96,8 @@ export async function validate(
     { ...input, duplicates: duplicates.map((d) => d.id) },
     {
       eventId,
-      createdBy,
-      createdByRole,
-      transactionId,
+      user,
       token,
-      createdAtLocation,
       status: ActionStatus.Accepted
     }
   )

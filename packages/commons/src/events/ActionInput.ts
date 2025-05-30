@@ -8,11 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { ActionUpdate } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { CreatedAtLocation } from './CreatedAtLocation'
 import { v4 as uuidv4 } from 'uuid'
 extendZodWithOpenApi(z)
 
@@ -28,7 +28,7 @@ export const BaseActionInput = z.object({
 const CreateActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.CREATE).default(ActionType.CREATE),
-    createdAtLocation: z.string()
+    createdAtLocation: CreatedAtLocation
   })
 )
 

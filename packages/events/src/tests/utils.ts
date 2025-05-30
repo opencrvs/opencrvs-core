@@ -15,6 +15,7 @@ import * as jwt from 'jsonwebtoken'
 import {
   Scope,
   SCOPES,
+  SystemType,
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons'
@@ -67,9 +68,11 @@ export function createSystemTestClient(
   const token = createTestToken(systemId, scopes, TokenUserType.SYSTEM)
 
   const caller = createCaller({
-    userType: TokenUserType.SYSTEM,
-    system: {
-      id: systemId
+    user: {
+      id: systemId,
+      role: SystemType.Health,
+      primaryOfficeId: undefined,
+      type: TokenUserType.SYSTEM
     },
     token
   })
@@ -83,11 +86,9 @@ export function createTestClient(
   const token = createTestToken(user.id, scopes)
 
   const caller = createCaller({
-    userType: TokenUserType.USER,
     user: {
-      id: user.id,
-      primaryOfficeId: user.primaryOfficeId,
-      role: user.role
+      ...user,
+      type: TokenUserType.USER
     },
     token
   })
