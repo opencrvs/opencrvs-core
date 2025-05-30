@@ -23,14 +23,6 @@ import { requireScopeForWorkqueues } from '@events/router/middleware'
 export const workqueueRouter = router({
   config: router({
     list: publicProcedure
-      .meta({
-        openapi: {
-          summary: 'List workqueue configurations',
-          method: 'GET',
-          path: '/events/workqueue/config',
-          tags: ['Workqueues']
-        }
-      })
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {

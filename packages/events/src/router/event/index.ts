@@ -301,5 +301,5 @@ export const eventRouter = router({
     })
     .input(EventDocument)
     .output(EventDocument)
-    .mutation(async ({ input }) => importEvent(input))
+    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token))
 })

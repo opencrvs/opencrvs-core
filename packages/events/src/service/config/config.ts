@@ -29,7 +29,7 @@ export async function getEventConfigurations(token: string) {
   return array(EventConfig).parse(await res.json())
 }
 
-async function findEventConfigurationById({
+export async function findEventConfigurationById({
   token,
   eventType
 }: {
