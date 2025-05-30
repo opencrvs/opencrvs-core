@@ -8,27 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
-import {
-  ActionInputWithType,
-  TokenWithBearer,
-  TokenUserType
-} from '@opencrvs/commons'
-
-export type UserDetails =
-  | {
-      type: TokenUserType.USER
-      id: string
-      primaryOfficeId: string
-      role: string
-    }
-  | {
-      type: TokenUserType.SYSTEM
-      id: string
-      primaryOfficeId: undefined
-      role: string
-    }
+import { ActionInputWithType, TokenWithBearer } from '@opencrvs/commons'
+import { UserDetails } from '@events/user'
 
 export type Context = {
   token: TokenWithBearer

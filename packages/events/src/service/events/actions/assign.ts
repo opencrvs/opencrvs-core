@@ -17,7 +17,7 @@ import {
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
-import { UserDetails } from '@events/router/middleware'
+import { UserDetails } from '@events/user'
 
 export async function assignRecord({
   user,

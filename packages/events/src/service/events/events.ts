@@ -36,7 +36,7 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { UserDetails } from '@events/router/middleware'
+import { UserDetails } from '@events/user'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {

@@ -18,7 +18,8 @@ import {
 } from '@opencrvs/commons/events'
 import { inScope, SCOPES } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
-import { setBearerForToken, UserDetails } from '@events/router/middleware'
+import { setBearerForToken } from '@events/router/middleware'
+import { UserDetails } from '@events/user'
 
 export async function unassignRecord(
   input: UnassignActionInput,

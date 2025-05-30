@@ -13,20 +13,15 @@ import { createServer, IncomingMessage } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
-import { getSystem, getUser, logger } from '@opencrvs/commons'
-import {
-  getUserId,
-  getUserTypeFromToken,
-  TokenUserType,
-  TokenWithBearer
-} from '@opencrvs/commons/authentication'
+import { logger } from '@opencrvs/commons'
+import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { appRouter } from './router/router'
 import { getAnonymousToken } from './service/auth'
 import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
-import { UserDetails } from './router/middleware'
+import { resolveUserDetails } from './user'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -48,44 +43,6 @@ function normalizeHeaders(
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
   return `'${req.method} ${url.pathname}'`
-}
-
-async function resolveUserDetails(
-  token: `Bearer ${string}`
-): Promise<UserDetails> {
-  const sub = getUserId(token)
-
-  if (!sub) {
-    throw new TRPCError({
-      code: 'UNAUTHORIZED'
-    })
-  }
-
-  const userType = getUserTypeFromToken(token)
-
-  if (userType === TokenUserType.SYSTEM) {
-    const { type } = await getSystem(env.USER_MANAGEMENT_URL, sub, token)
-
-    return {
-      type: TokenUserType.SYSTEM,
-      id: sub,
-      primaryOfficeId: undefined,
-      role: type
-    }
-  }
-
-  const { primaryOfficeId, role } = await getUser(
-    env.USER_MANAGEMENT_URL,
-    sub,
-    token
-  )
-
-  return {
-    type: TokenUserType.USER,
-    id: sub,
-    primaryOfficeId,
-    role
-  }
 }
 
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {

@@ -14,7 +14,7 @@ import {
   ApproveCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
-import { UserDetails } from '@events/router/middleware'
+import { UserDetails } from '@events/user'
 import { RequestNotFoundError } from './correction'
 
 export async function approveCorrection(
