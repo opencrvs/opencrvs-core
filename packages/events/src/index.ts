@@ -20,7 +20,6 @@ import {
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons/authentication'
-import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { appRouter } from './router/router'
 import { getAnonymousToken } from './service/auth'
