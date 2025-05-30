@@ -14,6 +14,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionDocument'
 import { UUID } from '../uuid'
+import { CreatedAtLocation } from './CreatedAtLocation'
 
 /**
  * Event statuses recognized by the system
@@ -73,9 +74,9 @@ export const ActionCreationMetadata = z.object({
   createdBy: z
     .string()
     .describe('ID of the user who created the action request.'),
-  createdAtLocation: z
-    .string()
-    .describe('Location of the user who created the action request.'),
+  createdAtLocation: CreatedAtLocation.describe(
+    'Location of the user who created the action request.'
+  ),
   acceptedAt: z
     .string()
     .datetime()
@@ -128,7 +129,7 @@ export const EventMetadata = z.object({
   updatedByUserRole: z
     .string()
     .describe('Role of the user who last updated the declaration.'),
-  createdAtLocation: UUID.describe(
+  createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the event.'
   ),
   updatedAtLocation: UUID.nullish().describe(

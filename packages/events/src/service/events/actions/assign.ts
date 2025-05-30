@@ -16,24 +16,19 @@ import {
   AssignActionInput,
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
-import { UUID } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
+import { UserDetails } from '@events/user'
 
 export async function assignRecord({
-  createdBy,
-  createdByRole,
+  user,
   token,
-  createdAtLocation,
   input
 }: {
-  createdBy: string
-  createdByRole: string
-  createdAtLocation: UUID
+  user: UserDetails
   token: string
   input: AssignActionInput
 }) {
   const storedEvent = await getEventById(input.eventId)
-
   const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
@@ -47,11 +42,8 @@ export async function assignRecord({
 
   return addAction(input, {
     eventId: input.eventId,
-    createdBy,
-    createdByRole,
+    user,
     token,
-    createdAtLocation,
-    transactionId: input.transactionId,
     status: ActionStatus.Accepted
   })
 }

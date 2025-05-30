@@ -8,11 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { UUID } from '../uuid'
 
-{
-  "compilerOptions": {
-    "paths": {
-      "@events/*": ["./*"]
-    }
-  }
-}
+export const CreatedAtLocation = UUID.nullish()

@@ -110,9 +110,7 @@ function generateTrackingId(): string {
 
 export async function createEvent({
   eventInput,
-  createdAtLocation,
-  createdBy,
-  createdByRole,
+  user,
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
@@ -182,10 +180,8 @@ export async function addAction(
   input: ActionInputWithType,
   {
     eventId,
-    createdBy,
-    createdByRole,
+    user,
     token,
-    createdAtLocation,
     status
   }: {
     eventId: UUID
@@ -196,7 +192,6 @@ export async function addAction(
      */
     createdAtLocation: UUID
     token: string
-    transactionId: string
     status: ActionStatus
   }
 ): Promise<EventDocument> {
@@ -217,6 +212,12 @@ export async function addAction(
     if (!(await fileExists(file.file.filename, token))) {
       throw new Error(`File not found: ${file.file.filename}`)
     }
+  }
+
+  const createdByDetails = {
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
