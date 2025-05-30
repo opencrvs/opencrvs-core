@@ -15,7 +15,11 @@ import {
   EventDocument,
   getCurrentEventState
 } from '@opencrvs/commons/client'
-import { setEventListData } from '@client/v2-events/features/events/useEvents/api'
+import { EventConfig } from '@opencrvs/commons/client'
+import {
+  findLocalEventConfig,
+  setEventListData
+} from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
@@ -29,6 +33,12 @@ export function updateEventOptimistically<T extends ActionInput>(
     if (!localEvent) {
       return
     }
+
+    const eventConfig = findLocalEventConfig(localEvent.type)
+    if (!eventConfig) {
+      return
+    }
+
     const optimisticEvent: EventDocument = {
       ...localEvent,
       actions: [
@@ -48,7 +58,7 @@ export function updateEventOptimistically<T extends ActionInput>(
     setEventListData((eventIndices) =>
       eventIndices
         ?.filter((ei) => ei.id !== optimisticEvent.id)
-        .concat(getCurrentEventState(optimisticEvent))
+        .concat(getCurrentEventState(optimisticEvent, eventConfig))
     )
   }
 }

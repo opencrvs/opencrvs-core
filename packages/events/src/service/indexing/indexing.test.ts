@@ -32,7 +32,7 @@ test('indexes all records from MongoDB with one function call', async () => {
   }
 
   const body = await esClient.search({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+    index: getEventIndexName('tennis-club-membership'),
     body: {
       query: {
         match_all: {}
@@ -51,7 +51,7 @@ test('records are automatically indexed when they are created', async () => {
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+    index: getEventIndexName('tennis-club-membership'),
     body: {
       query: {
         match_all: {}
@@ -127,7 +127,7 @@ const fullAndPayload: QueryType = {
       trackingId: { type: 'exact', term: 'ABC123' },
       createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
       updatedAt: { type: 'exact', term: '2024-06-01' },
-      createAtLocation: { type: 'exact', term: 'some-location-id' },
+      createdAtLocation: { type: 'exact', term: 'some-location-id' },
       updatedAtLocation: {
         type: 'within',
         location: 'some-location-id'

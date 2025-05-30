@@ -27,7 +27,7 @@ async function resetESServer() {
     // @ts-expect-error - "Cannot find module '@events/storage/elasticsearch' or its corresponding type declarations."
     '@events/storage/elasticsearch'
   )
-  const index = 'events_tennis_club_membership' + Date.now() + Math.random()
+  const index = 'events_tennis-club-membership' + Date.now() + Math.random()
   getEventIndexName.mockReturnValue(index)
   getEventAliasName.mockReturnValue('events_' + +Date.now() + Math.random())
   await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))

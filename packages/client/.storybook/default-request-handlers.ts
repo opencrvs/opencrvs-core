@@ -21,9 +21,23 @@ import {
   TestImage
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
-import { ensureCacheExists } from '@client/v2-events/cache'
+import {
+  generateWorkqueues,
+  tennisClubMembershipEvent,
+  WorkqueueFixture
+} from '@opencrvs/commons/client'
 
+async function ensureCacheExists(cacheName: string) {
+  const cacheNames = await caches.keys()
+  if (!cacheNames.includes(cacheName)) {
+    await caches.open(cacheName)
+    // eslint-disable-next-line no-console
+    console.log(`Cache "${cacheName}" created.`)
+  } else {
+    // eslint-disable-next-line no-console
+    console.log(`Cache "${cacheName}" already exists.`)
+  }
+}
 const FAKE_CACHE_NAME = 'workbox-runtime'
 ensureCacheExists(FAKE_CACHE_NAME)
 
@@ -1080,7 +1094,7 @@ export const handlers = {
     tRPCMsw.user.list.query(() => {
       return [
         {
-          id: '6780dbf7a263c6515c7b97d2',
+          id: '6821c175dce4d7886d4e8210',
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
           signatureFilename: undefined
@@ -1095,8 +1109,16 @@ export const handlers = {
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
     }),
-    tRPCMsw.event.search.query(() => {
+    tRPCMsw.event.search.query((input) => {
       return [tennisClubMembershipEventIndex]
+    }),
+    tRPCMsw.workqueue.config.list.query(() => {
+      return generateWorkqueues()
+    }),
+    tRPCMsw.workqueue.count.query((input) => {
+      return input.reduce((acc, { slug }) => {
+        return { ...acc, [slug]: 7 }
+      }, {})
     })
   ],
   locations: [
@@ -2005,7 +2027,7 @@ export const handlers = {
         certificates: [
           {
             id: 'tennis-club-membership-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            event: 'tennis-club-membership',
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
               defaultMessage: 'Tennis Club Membership Certificate copy',
@@ -2030,7 +2052,7 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            event: 'tennis-club-membership',
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',
               defaultMessage:

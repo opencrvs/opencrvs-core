@@ -50,6 +50,7 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
 import { eventStatuses } from './EventMetadata'
+import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -122,11 +123,11 @@ export function generateActionAnnotationInput(
 export const eventPayloadGenerator = {
   create: (input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP'
+    type: input.type ?? 'tennis-club-membership'
   }),
   patch: (id: string, input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+    type: input.type ?? 'tennis-club-membership',
     id
   }),
   draft: (
@@ -492,8 +493,7 @@ export function generateEventDocument({
     id: getUUID(),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    updatedAt: new Date(Date.now() - 1000).toISOString(),
-    dateOfEvent: configuration.dateOfEvent
+    updatedAt: new Date(Date.now() - 1000).toISOString()
   }
 }
 
@@ -626,7 +626,7 @@ export const eventQueryDataGenerator = (
 
   return {
     id: overrides.id ?? generateUuid(rng),
-    type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+    type: overrides.type ?? 'tennis-club-membership',
     status: overrides.status ?? pickRandom(rng, eventStatuses),
     createdAt: overrides.createdAt ?? createdAt,
     createdBy: overrides.createdBy ?? generateUuid(rng),
@@ -643,7 +643,6 @@ export const eventQueryDataGenerator = (
     trackingId: overrides.trackingId ?? generateTrackingId(rng)
   }
 }
-
 export const generateTranslationConfig = (
   message: string
 ): TranslationConfig => ({
@@ -651,3 +650,25 @@ export const generateTranslationConfig = (
   description: 'Description for ${message}',
   id: message
 })
+
+export const generateWorkqueues = (
+  slug: string = 'all-events'
+): WorkqueueConfig[] =>
+  defineWorkqueues([
+    {
+      slug,
+      name: {
+        id: 'workqueues.inProgress.title',
+        defaultMessage:
+          slug.charAt(0).toUpperCase() + slug.slice(1).split('-').join(' '),
+        description: 'Title of in progress workqueue'
+      },
+      query: {
+        type: 'and',
+        clauses: [{ eventType: tennisClubMembershipEvent.id }]
+      },
+      actions: [],
+      icon: 'Draft',
+      columns: []
+    }
+  ])

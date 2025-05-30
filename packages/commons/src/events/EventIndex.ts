@@ -129,8 +129,9 @@ export const QueryExpression = z
     'legalStatus.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
-    createAtLocation: z.optional(z.union([Within, Exact])),
+    createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
+    assignedTo: z.optional(Exact),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),

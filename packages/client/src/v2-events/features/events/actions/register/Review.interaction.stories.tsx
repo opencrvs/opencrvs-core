@@ -89,7 +89,10 @@ const validateEventDocument = generateEventDocument({
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(validateEventDocument).declaration
+      formValues: getCurrentEventState(
+        validateEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
     })
   },
   parameters: {
@@ -142,7 +145,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      await expect(
+        await within(canvasElement).findAllByText('All events')
+      ).toHaveLength(2)
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -263,8 +268,8 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
 
       await waitFor(async () =>
         expect(
-          within(canvasElement).getByText('All events')
-        ).toBeInTheDocument()
+          await within(canvasElement).findAllByText('All events')
+        ).toHaveLength(2)
       )
 
       await waitFor(async () => {
@@ -387,7 +392,9 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
       await expect(sendForUpdateButton).not.toBeDisabled()
 
       await userEvent.click(sendForUpdateButton)
-      await within(canvasElement).findByText('All events')
+      await expect(
+        await within(canvasElement).findAllByText('All events')
+      ).toHaveLength(2)
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({

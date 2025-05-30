@@ -20,6 +20,7 @@ import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { getScope } from '@client/profile/profileSelectors'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({
@@ -34,7 +35,12 @@ export function ActionMenu({
   const scopes = useSelector(getScope)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
-  const eventState = useMemo(() => getCurrentEventState(event), [event])
+  const { eventConfiguration } = useEventConfiguration(event.type)
+
+  const eventState = useMemo(
+    () => getCurrentEventState(event, eventConfiguration),
+    [event, eventConfiguration]
+  )
 
   const actionMenuItems = useActionMenuItems(eventState, scopes ?? [])
 

@@ -12,8 +12,11 @@
 import { createEventConditionals } from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
 import { EventFieldId } from './AdvancedSearchConfig'
-import { EventMetadataKeys, EventMetadataParameter } from './EventMetadata'
 import { SelectOption } from './FieldConfig'
+import {
+  WorkqueueColumnKeys,
+  WorkqueueColumnValue
+} from './WorkqueueColumnConfig'
 
 /**
  * Creates a function that acts like a callable + static method container.
@@ -29,7 +32,7 @@ function eventFn(fieldId: EventFieldId, options?: SelectOption[]) {
 // Attach conditional helpers directly to the function
 const event = Object.assign(eventFn, {
   ...createEventConditionals(),
-  field(field: EventMetadataKeys): EventMetadataParameter {
+  field(field: WorkqueueColumnKeys): WorkqueueColumnValue {
     return {
       $event: field
     }

@@ -38,7 +38,10 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
+      formValues: getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
     })
   }
 }
@@ -148,7 +151,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      await expect(
+        await within(canvasElement).findAllByText('All events')
+      ).toHaveLength(2)
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -223,7 +228,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      await expect(
+        await within(canvasElement).findAllByText('All events')
+      ).toHaveLength(2)
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -296,7 +303,9 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      await expect(
+        await within(canvasElement).findAllByText('All events')
+      ).toHaveLength(2)
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -379,7 +388,9 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      await expect(
+        await within(canvasElement).findAllByText('All events')
+      ).toHaveLength(2)
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({

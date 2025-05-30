@@ -16,6 +16,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
   eventQueryDataGenerator,
   EventStatus,
+  generateWorkqueues,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -81,7 +82,7 @@ export const AllEventsWorkqueueWithPagination: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-        slug: 'all'
+        slug: 'recent'
       })
     },
     parameters: {
@@ -95,6 +96,17 @@ export const AllEventsWorkqueueWithPagination: Story = {
           }),
           tRPCMsw.event.list.query(() => {
             return queryData
+          }),
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return queryData
           })
         ]
       }
@@ -107,7 +119,7 @@ export const ReadyToPrintWorkqueue: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-        slug: 'registered'
+        slug: 'ready-to-print'
       })
     },
     parameters: {
@@ -123,33 +135,23 @@ export const ReadyToPrintWorkqueue: Story = {
             return queryData.filter(
               (record) => record.status === EventStatus.REGISTERED
             )
-          })
-        ]
-      }
-    }
-  }
-}
-
-export const ReadyForReviewWorkqueue: Story = {
-  parameters: {
-    reactRouter: {
-      router: routesConfig,
-      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-        slug: 'in-review'
-      })
-    },
-    parameters: {
-      chromatic: { disableSnapshot: true }
-    },
-    msw: {
-      handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
           }),
-          tRPCMsw.event.list.query(() => {
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('ready-to-print')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return {
+                ...acc,
+                [slug]: queryData.filter(
+                  (record) => record.status === EventStatus.REGISTERED
+                ).length
+              }
+            }, {})
+          }),
+          tRPCMsw.event.search.query((input) => {
             return queryData.filter(
-              (record) => record.status === EventStatus.DECLARED
+              (record) => record.status === EventStatus.REGISTERED
             )
           })
         ]
@@ -163,7 +165,7 @@ export const NoResults: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
-        slug: 'in-review'
+        slug: 'recent'
       })
     },
     msw: {
@@ -173,6 +175,17 @@ export const NoResults: Story = {
             return [tennisClubMembershipEvent]
           }),
           tRPCMsw.event.list.query(() => {
+            return []
+          }),
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 0 }
+            }, {})
+          }),
+          tRPCMsw.event.search.query((input) => {
             return []
           })
         ]

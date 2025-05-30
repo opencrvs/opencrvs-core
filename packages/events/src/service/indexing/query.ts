@@ -94,6 +94,24 @@ function buildClause(clause: QueryExpression) {
     })
   }
 
+  if (clause.assignedTo) {
+    must.push({
+      term: { assignedTo: clause.assignedTo.term }
+    })
+  }
+
+  if (clause.createdBy) {
+    must.push({
+      term: { createdBy: clause.createdBy.term }
+    })
+  }
+
+  if (clause.updatedBy) {
+    must.push({
+      term: { updatedBy: clause.updatedBy.term }
+    })
+  }
+
   if (clause['legalStatus.REGISTERED.createdAt']) {
     if (clause['legalStatus.REGISTERED.createdAt'].type === 'exact') {
       must.push({
@@ -154,14 +172,14 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  if (clause.createAtLocation) {
-    if (clause.createAtLocation.type === 'exact') {
-      must.push({ term: { createdAtLocation: clause.createAtLocation.term } })
+  if (clause.createdAtLocation) {
+    if (clause.createdAtLocation.type === 'exact') {
+      must.push({ term: { createdAtLocation: clause.createdAtLocation.term } })
     } else {
       must.push({
         geo_distance: {
           distance: '10km',
-          location: clause.createAtLocation.location
+          location: clause.createdAtLocation.location
         }
       })
     }

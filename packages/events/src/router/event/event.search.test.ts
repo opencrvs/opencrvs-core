@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -41,7 +42,7 @@ test('Throws error without proper scope', async () => {
       type: 'and',
       clauses: [
         {
-          eventType: 'TENNIS_CLUB_MEMBERSHIP',
+          eventType: 'tennis-club-membership',
           data: {
             'applicant.firstname': 'Unique'
           }
@@ -86,7 +87,7 @@ test('Returns empty list when no events match search criteria', async () => {
     type: 'and',
     clauses: [
       {
-        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        eventType: 'tennis-club-membership',
         data: {
           applicant____firstname: { type: 'exact', term: 'Johnson' }
         }
@@ -174,7 +175,7 @@ test('Returns events that match the text field criteria of applicant', async () 
     type: 'and',
     clauses: [
       {
-        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        eventType: 'tennis-club-membership',
         data: {
           applicant____firstname: { type: 'exact', term: 'John' },
           applicant____dob: { type: 'exact', term: '2000-01-01' }
@@ -242,7 +243,7 @@ test('Returns events that match date of birth of applicant', async () => {
     type: 'and',
     clauses: [
       {
-        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        eventType: 'tennis-club-membership',
         data: {
           applicant____dob: { type: 'exact', term: '2000-01-01' }
         }
@@ -309,7 +310,7 @@ test('Does not return events when searching with a similar but different date of
     type: 'and',
     clauses: [
       {
-        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        eventType: 'tennis-club-membership',
         data: {
           applicant____dob: { type: 'exact', term: '1999-11-11' } // search with same day and month
         }
@@ -351,7 +352,7 @@ test('Returns single document after creation', async () => {
     type: 'and',
     clauses: [
       {
-        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        eventType: 'tennis-club-membership',
         data: {
           applicant____firstname: {
             type: 'exact',
@@ -436,7 +437,7 @@ test('Returns multiple documents after creation', async () => {
     type: 'and',
     clauses: [
       {
-        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        eventType: 'tennis-club-membership',
         data: {
           applicant____firstname: {
             type: 'exact',
@@ -526,7 +527,7 @@ test('Returns no documents when search params are not matched', async () => {
     type: 'and',
     clauses: [
       {
-        eventType: 'TENNIS_CLUB_MEMBERSHIP',
+        eventType: 'tennis-club-membership',
         data: {
           applicant____firstname: {
             type: 'exact',
@@ -577,7 +578,7 @@ test('Throws error when search params are not matching proper schema', async () 
       type: 'and',
       clauses: [
         {
-          eventType: 'TENNIS_CLUB_MEMBERSHIP',
+          eventType: 'tennis-club-membership',
           data: {
             applicant____firstname: 'Johnny' // invalid schema
           }
@@ -585,4 +586,90 @@ test('Throws error when search params are not matching proper schema', async () 
       ]
     })
   ).rejects.toThrowError()
+})
+
+test('Returns events assigned to a specific user', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search.birth',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const WindmillVillage = {
+    country: 'FAR',
+    addressType: AddressType.DOMESTIC,
+    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+    urbanOrRural: 'RURAL' as const,
+    village: 'Windmill village, Kingdom of Goa'
+  }
+
+  const record1 = {
+    'applicant.firstname': 'Ace',
+    'applicant.surname': 'Portgues D',
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': WindmillVillage
+  }
+
+  const record2 = {
+    'applicant.firstname': 'Luffy',
+    'applicant.surname': 'Monkey D',
+    'applicant.dob': '2002-02-03',
+    'recommender.none': true,
+    'applicant.address': WindmillVillage
+  }
+
+  const record3 = {
+    'applicant.firstname': 'Sabo',
+    'applicant.surname': 'Archipelago D',
+    'applicant.dob': '2001-06-07',
+    'recommender.none': true,
+    'applicant.address': WindmillVillage
+  }
+
+  const event1 = await client.event.create(generator.event.create())
+  const event2 = await client.event.create(generator.event.create())
+  const event3 = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event1.id, { declaration: record1 })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event2.id, {
+      declaration: record2
+    })
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event3.id, {
+      declaration: record3
+    })
+  )
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event2.id, {
+      assignedTo: user.id
+    })
+  )
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event3.id, {
+      assignedTo: user.id
+    })
+  )
+
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        eventType: 'tennis-club-membership',
+        assignedTo: { type: 'exact', term: user.id }
+      }
+    ]
+  })
+
+  expect(fetchedEvents).toHaveLength(2)
+  expect(fetchedEvents.every(({ assignedTo }) => assignedTo === user.id)).toBe(
+    true
+  )
 })

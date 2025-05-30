@@ -11,10 +11,11 @@
 import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
+  defaultThirdColumn,
   eventQueryDataGenerator,
   EventStatus,
   tennisClubMembershipEvent,
-  workqueues
+  WorkqueueFixture
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchResult } from './SearchResult'
@@ -50,7 +51,7 @@ const mockSearchParams = {
 export const DefaultSearchResult: Story = {
   name: 'Default Search Result',
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: [
       eventQueryDataGenerator({
         declaration: {
@@ -63,7 +64,7 @@ export const DefaultSearchResult: Story = {
       })
     ],
     searchParams: mockSearchParams,
-    workqueueConfig: workqueues['all']
+    columns: defaultThirdColumn
   }
 }
 
@@ -73,18 +74,18 @@ export const SearchResultWithMultipleItems: Story = {
     chromatic: { disableSnapshot: true }
   },
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
     searchParams: { status: EventStatus.REGISTERED },
-    workqueueConfig: workqueues['all']
+    columns: defaultThirdColumn
   }
 }
 export const NoSearchResult: Story = {
   name: 'No Search Result',
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: [],
     searchParams: mockSearchParams,
-    workqueueConfig: workqueues['all']
+    columns: defaultThirdColumn
   }
 }

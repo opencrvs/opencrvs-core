@@ -11,11 +11,16 @@
 import { EventDocument } from '@opencrvs/commons'
 import * as events from '@events/storage/mongodb/events'
 import { indexEvent } from '@events/service/indexing/indexing'
+import { getEventConfigurationById } from '../config/config'
 
-export async function importEvent(event: EventDocument) {
+export async function importEvent(event: EventDocument, token: string) {
   const db = await events.getClient()
   const collection = db.collection<EventDocument>('events')
   await collection.replaceOne({ id: event.id }, event, { upsert: true })
-  await indexEvent(event)
+  const config = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
+  await indexEvent(event, config)
   return event
 }

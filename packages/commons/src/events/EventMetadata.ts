@@ -52,7 +52,11 @@ export const Flag = z
   .string()
   .regex(
     new RegExp(
-      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(
+        ActionStatus
+      )
+        .join('|')
+        .toLowerCase()})$`
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
@@ -157,7 +161,7 @@ export const EventMetadata = z.object({
 
 export type EventMetadata = z.infer<typeof EventMetadata>
 
-export const EventMetadataKeys = z.enum([
+export const EventMetadataKeysArray = [
   'id',
   'type',
   'status',
@@ -173,17 +177,10 @@ export const EventMetadataKeys = z.enum([
   'trackingId',
   'legalStatuses',
   'flags'
-])
-export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
+] as const
 
-/**
- * This ensures `event.field()` takes a key from `EventMetadata`
- */
-export const EventMetadataParameter = z.object({
-  // @TODO: Reconcile with the event metadata definition. How could we derive one from the other?
-  $event: EventMetadataKeys
-})
-export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
+export const EventMetadataKeys = z.enum(EventMetadataKeysArray)
+export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
 
 /**
  * Mapping of event metadata keys to translation configuration.

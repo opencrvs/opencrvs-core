@@ -17,12 +17,13 @@ import {
   ActionInputWithType,
   ActionType,
   DeleteActionInput,
+  findScope,
   getAssignedUserFromActions,
   getScopes,
   inScope,
   Scope,
   TokenUserType,
-  findScope,
+  WorkqueueCountInput,
   ConfigurableScopeType,
   ConfigurableScopes,
   IAuthHeader,
@@ -218,6 +219,23 @@ export const requireAssignment: MiddlewareFunction<
       code: 'CONFLICT',
       message: JSON.stringify('You are not assigned to this event')
     })
+  }
+  return next()
+}
+
+export const requireScopeForWorkqueues: MiddlewareFunction<
+  Context,
+  OpenApiMeta,
+  Context,
+  Context,
+  WorkqueueCountInput
+> = async ({ next, ctx, input }) => {
+  const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
+
+  const availableWorkqueues = findScope(scopes, 'workqueue')?.options.id ?? []
+
+  if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
   }
   return next()
 }
