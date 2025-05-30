@@ -29,10 +29,7 @@ import {
   ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import {
-  MiddlewareOptions,
-  requiresAnyOfScopes
-} from '@events/router/middleware'
+import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
 
 import {
@@ -151,10 +148,6 @@ export function getDefaultActionProcedures(
     ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
   )
 
-  const validatePayloadMiddleware = validatePayload
-    ? middleware.validateAction(actionType)
-    : async ({ next }: MiddlewareOptions) => next()
-
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   return {
@@ -164,7 +157,11 @@ export function getDefaultActionProcedures(
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
-      .use(validatePayloadMiddleware)
+      .use(
+        validatePayload
+          ? middleware.validateAction(actionType)
+          : async ({ next }) => next()
+      )
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -232,7 +229,11 @@ export function getDefaultActionProcedures(
     accept: systemProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(validatePayloadMiddleware)
+      .use(
+        validatePayload
+          ? middleware.validateAction(actionType)
+          : async ({ next }) => next()
+      )
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input

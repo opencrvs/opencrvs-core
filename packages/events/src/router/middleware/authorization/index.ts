@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { experimental_standaloneMiddleware, TRPCError } from '@trpc/server'
+import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import {
@@ -25,7 +25,8 @@ import {
   findScope,
   ConfigurableScopeType,
   ConfigurableScopes,
-  IAuthHeader
+  IAuthHeader,
+  EventDocument
 } from '@opencrvs/commons'
 import { Context } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
@@ -183,11 +184,13 @@ export const eventTypeAuthorization: MiddlewareFunction<
   return next()
 }
 
-/**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
-export const requireAssignment = experimental_standaloneMiddleware<{
-  input: ActionInputWithType | DeleteActionInput
-  ctx: Context
-}>().create(async ({ next, ctx, input }) => {
+export const requireAssignment: MiddlewareFunction<
+  Context,
+  OpenApiMeta,
+  Context,
+  Context & { isDuplicateAction?: boolean; event: EventDocument },
+  ActionInputWithType | DeleteActionInput
+> = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
   if (
     'transactionId' in input &&
@@ -217,4 +220,4 @@ export const requireAssignment = experimental_standaloneMiddleware<{
     })
   }
   return next()
-})
+}

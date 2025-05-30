@@ -30,7 +30,10 @@ export type UserDetails =
       role: string
     }
 
-export type Context = { token: TokenWithBearer; user: UserDetails }
+export type Context = {
+  token: TokenWithBearer
+  user: UserDetails
+}
 /**
  * TRPC Middleware options with correct context.
  * Actual middleware type definition is only for internal use within TRPC.
