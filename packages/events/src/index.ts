@@ -53,8 +53,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   },
   onError: ({ req, error }) => {
     logger.warn(
-      `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`,
-      error.stack
+      `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`
     )
   },
   createContext: async function createContext(opts) {
