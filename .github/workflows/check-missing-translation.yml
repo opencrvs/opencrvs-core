@@ -75,12 +75,15 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Install pnpm
+        run: npm install -g pnpm
+
       - name: Install dependencies and check for missing translations
         run: |
           export COUNTRY_CONFIG_PATH=${{steps.set_branch.outputs.countryconfig_path}}
-          yarn install
+          pnpm install
           cd ./packages/client
-          CI=true yarn extract:translations 2>&1 | tee output.txt
+          CI=true pnpm extract:translations 2>&1 | tee output.txt
           if grep -q "Missing translations" output.txt; then
              awk '/You are missing the following content keys from your country configuration package:/ {flag=1; next} /Add them to this file and run again:/ {flag=0} flag' output.txt > missing_translations.txt
              sed -i '/^$/d' missing_translations.txt
