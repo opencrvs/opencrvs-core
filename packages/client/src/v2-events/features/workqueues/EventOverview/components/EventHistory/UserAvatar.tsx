@@ -24,6 +24,7 @@ const NameAvatar = styled.div`
 `
 
 /**
+ * @prop names - Name of the user. Can be a plain string or a localisation specific name object
  * @returns Avatar with full name of the user.
  */
 export function UserAvatar({
@@ -31,11 +32,12 @@ export function UserAvatar({
   avatar,
   locale
 }: {
-  names: ResolvedUser['name']
+  names: ResolvedUser['name'] | string
   avatar?: Maybe<Avatar>
   locale: string
 }) {
-  const name = getUsersFullName(names, locale)
+  const name =
+    typeof names === 'string' ? names : getUsersFullName(names, locale)
 
   return (
     <NameAvatar>

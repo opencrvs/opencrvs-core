@@ -13,19 +13,15 @@ import { createServer, IncomingMessage } from 'http'
 import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
-import { getUser, logger } from '@opencrvs/commons'
-import {
-  getUserId,
-  getUserTypeFromToken,
-  TokenUserType,
-  TokenWithBearer
-} from '@opencrvs/commons/authentication'
+import { logger } from '@opencrvs/commons'
+import { TokenWithBearer } from '@opencrvs/commons/authentication'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { appRouter } from './router/router'
 import { getAnonymousToken } from './service/auth'
 import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
+import { resolveUserDetails } from './user'
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')
@@ -44,14 +40,26 @@ function normalizeHeaders(
     : headers
 }
 
+function stringifyRequest(req: IncomingMessage) {
+  const url = new URL(req.url || '', `http://${req.headers.host}`)
+  return `'${req.method} ${url.pathname}'`
+}
+
 const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
-  createContext: async function createContext(opts) {
-    const normalizedHeaders = normalizeHeaders(opts.req.headers)
-
-    const parseResult = TokenWithBearer.safeParse(
-      normalizedHeaders.authorization
+  middleware: (req, _, next) => {
+    logger.info(`Request: ${stringifyRequest(req)}`)
+    return next()
+  },
+  onError: ({ req, error }) => {
+    logger.warn(
+      `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`,
+      error.stack
     )
+  },
+  createContext: async function createContext(opts) {
+    const { authorization } = normalizeHeaders(opts.req.headers)
+    const parseResult = TokenWithBearer.safeParse(authorization)
 
     if (!parseResult.success) {
       throw new TRPCError({
@@ -60,41 +68,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     }
 
     const token = parseResult.data
-
-    const sub = getUserId(token)
-    if (!sub) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED'
-      })
-    }
-
-    const userType = getUserTypeFromToken(token)
-
-    if (userType === TokenUserType.SYSTEM) {
-      return {
-        userType: TokenUserType.SYSTEM,
-        system: {
-          id: sub
-        },
-        token: token
-      }
-    }
-
-    const { primaryOfficeId, role } = await getUser(
-      env.USER_MANAGEMENT_URL,
-      sub,
-      token
-    )
-
-    return {
-      userType: TokenUserType.USER,
-      user: {
-        id: sub,
-        primaryOfficeId,
-        role
-      },
-      token: token
-    }
+    return { token, user: await resolveUserDetails(token) }
   }
 }
 
