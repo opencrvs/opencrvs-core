@@ -51,7 +51,11 @@ export const Flag = z
   .string()
   .regex(
     new RegExp(
-      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(
+        ActionStatus
+      )
+        .join('|')
+        .toLowerCase()})$`
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
@@ -111,7 +115,6 @@ export const LegalStatuses = z.object({
  */
 export const EventMetadata = z.object({
   id: z.string(),
-  title: z.string(),
   type: z
     .string()
     .describe('The type of event, such as birth, death, or marriage.'),
@@ -157,9 +160,8 @@ export const EventMetadata = z.object({
 
 export type EventMetadata = z.infer<typeof EventMetadata>
 
-export const EventMetadataKeys = z.enum([
+export const EventMetadataKeysArray = [
   'id',
-  'title',
   'type',
   'status',
   'createdAt',
@@ -174,17 +176,10 @@ export const EventMetadataKeys = z.enum([
   'trackingId',
   'legalStatuses',
   'flags'
-])
-export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
+] as const
 
-/**
- * This ensures `event.field()` takes a key from `EventMetadata`
- */
-export const EventMetadataParameter = z.object({
-  // @TODO: Reconcile with the event metadata definition. How could we derive one from the other?
-  $event: EventMetadataKeys
-})
-export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
+export const EventMetadataKeys = z.enum(EventMetadataKeysArray)
+export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
 
 /**
  * Mapping of event metadata keys to translation configuration.
@@ -199,11 +194,6 @@ export const eventMetadataLabelMap: Record<
     id: 'event.assignedTo.label',
     defaultMessage: 'Assigned To',
     description: 'Assigned To'
-  },
-  'event.title': {
-    id: 'event.title.label',
-    defaultMessage: 'Title',
-    description: 'Title'
   },
   'event.createdAt': {
     id: 'event.createdAt.label',

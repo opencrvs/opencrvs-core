@@ -80,7 +80,6 @@ export type QueryInputType = BaseInput | QueryMap
 
 export const QueryExpression = z
   .object({
-    title: z.string(),
     eventType: z.string(),
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),

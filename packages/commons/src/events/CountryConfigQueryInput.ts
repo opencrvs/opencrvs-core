@@ -61,7 +61,6 @@ const QueryInput: ZodType = z.lazy(() =>
 
 export const SerializedQueryExpression = z
   .object({
-    title: z.string(),
     eventType: z.string(),
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),

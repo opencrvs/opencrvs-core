@@ -626,7 +626,6 @@ export const eventQueryDataGenerator = (
 
   return {
     id: overrides.id ?? generateUuid(rng),
-    title: overrides.title ?? 'Danny Doe',
     type: overrides.type ?? 'tennis-club-membership',
     status: overrides.status ?? pickRandom(rng, eventStatuses),
     createdAt: overrides.createdAt ?? createdAt,

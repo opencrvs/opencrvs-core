@@ -11,14 +11,26 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { EventMetadataParameter } from './EventMetadata'
+import { EventMetadataKeysArray } from './EventMetadata'
+
+export const WorkqueueColumnKeysArray = [
+  ...EventMetadataKeysArray,
+  'title'
+] as const
+export const WorkqueueColumnKeys = z.enum(WorkqueueColumnKeysArray)
+export type WorkqueueColumnKeys = z.infer<typeof WorkqueueColumnKeys>
+
+export const WorkqueueColumnValue = z.object({
+  $event: WorkqueueColumnKeys
+})
+export type WorkqueueColumnValue = z.infer<typeof WorkqueueColumnValue>
 
 /**
  * Configuration for column header and value of cell of workqueue.
  */
 export const WorkqueueColumn = z.object({
   label: TranslationConfig,
-  value: EventMetadataParameter
+  value: WorkqueueColumnValue
 })
 export type WorkqueueColumn = z.infer<typeof WorkqueueColumn>
 export type WorkqueueColumnInput = z.infer<typeof WorkqueueColumn>
