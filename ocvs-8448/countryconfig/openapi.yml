@@ -2991,7 +2991,9 @@ components:
                   createdByRole:
                     type: string
                   createdAtLocation:
-                    type: string
+                    type:
+                      - string
+                      - "null"
                   status:
                     type: string
                     const: Rejected
@@ -3013,7 +3015,6 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -3074,6 +3075,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -3380,8 +3385,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum:
@@ -3401,7 +3404,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -3418,6 +3420,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -3724,8 +3730,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -3741,7 +3745,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -3758,6 +3761,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4064,8 +4071,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4081,7 +4086,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     MarkAsDuplicateAction:
@@ -4098,6 +4102,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4404,8 +4412,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4421,7 +4427,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -4438,6 +4443,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4744,8 +4753,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4761,7 +4768,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     NotifiedAction:
@@ -4778,6 +4784,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5084,8 +5094,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5101,7 +5109,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -5118,6 +5125,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5424,8 +5435,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5443,7 +5452,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -5460,6 +5468,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5766,8 +5778,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5783,7 +5793,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -5800,6 +5809,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6106,8 +6119,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6125,7 +6136,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -6143,6 +6153,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6449,8 +6463,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6466,7 +6478,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -6483,6 +6494,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6789,8 +6804,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6808,7 +6821,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -6826,6 +6838,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7132,8 +7148,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7151,7 +7165,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7169,6 +7182,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7475,8 +7492,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7494,7 +7509,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -7512,6 +7526,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7818,8 +7836,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7835,7 +7851,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -7852,6 +7867,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -8158,8 +8177,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -8175,7 +8192,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ActionInput:
@@ -8519,11 +8535,12 @@ components:
           const: CREATE
           default: CREATE
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
       required:
         - eventId
         - transactionId
-        - createdAtLocation
     ValidateActionInput:
       type: object
       properties:
@@ -9508,7 +9525,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: f87f095e-dbb8-4bd0-ba50-0ff415da9182
+        transactionId: a06937d1-f8f1-4351-a6cf-dcf99bcc6231
         declaration: {}
         annotation: {}
         type: NOTIFY

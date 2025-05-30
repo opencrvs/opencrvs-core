@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f7f5f3ad-f1d7-43df-80aa-1b7d664b790f
+                transactionId: de4b6533-81ee-4a26-aab7-5bc416ca5e4d
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a2914970-c0f3-4cac-ad29-3403b05cf3b7
+                transactionId: d07130f2-48ec-48e9-9b4b-a5449a2d5244
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -455,6 +455,91 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/search:
+    get:
+      operationId: event-search
+      summary: Search for events
+      tags:
+        - Search
+      security:
+        - Authorization: []
+      parameters:
+        - in: query
+          name: type
+          schema:
+            anyOf:
+              - type: string
+                enum:
+                  - and
+              - type: string
+                enum:
+                  - or
+            default: and
+          required: true
+        - in: query
+          name: clauses
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/QueryExpression"
+            default:
+              - eventType: tennis-club-membership
+                status:
+                  type: anyOf
+                  terms:
+                    - CREATED
+                    - NOTIFIED
+                    - DECLARED
+                    - VALIDATED
+                    - REGISTERED
+                    - CERTIFIED
+                    - REJECTED
+                    - ARCHIVED
+                updatedAt:
+                  type: range
+                  gte: 2025-05-22
+                  lte: 2025-05-29
+                data: {}
+          required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventIndex"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.NOT_FOUND"
         "500":
           description: Internal server error
           content:
@@ -506,6 +591,7 @@ paths:
                             type: string
                           createdAtLocation:
                             type: string
+                            nullable: true
                           status:
                             type: string
                             enum:
@@ -528,7 +614,6 @@ paths:
                           - createdAt
                           - createdBy
                           - createdByRole
-                          - createdAtLocation
                           - status
                           - type
                 trackingId:
@@ -3654,6 +3739,7 @@ components:
                     type: string
                   createdAtLocation:
                     type: string
+                    nullable: true
                   status:
                     type: string
                     enum:
@@ -3669,7 +3755,6 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -3730,6 +3815,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -4026,8 +4114,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: &a10
@@ -4047,7 +4133,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -4064,6 +4149,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -4360,8 +4448,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -4378,7 +4464,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -4395,6 +4480,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -4691,8 +4779,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -4709,7 +4795,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     MarkAsDuplicateAction:
@@ -4726,6 +4811,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -5022,8 +5110,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -5040,7 +5126,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -5057,6 +5142,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -5353,8 +5441,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -5371,7 +5457,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     NotifiedAction:
@@ -5388,6 +5473,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -5684,8 +5772,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -5702,7 +5788,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -5719,6 +5804,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -6015,8 +6103,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -6035,7 +6121,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -6052,6 +6137,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -6348,8 +6436,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -6366,7 +6452,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -6383,6 +6468,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -6679,8 +6767,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -6699,7 +6785,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -6717,6 +6802,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -7013,8 +7101,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -7031,7 +7117,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -7048,6 +7133,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -7344,8 +7432,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -7364,7 +7450,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7382,6 +7467,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -7678,8 +7766,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -7698,7 +7784,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7716,6 +7801,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -8012,8 +8100,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -8032,7 +8118,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -8050,6 +8135,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -8346,8 +8434,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -8364,7 +8450,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -8381,6 +8466,9 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
         declaration:
           type: object
           additionalProperties:
@@ -8677,8 +8765,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a10
@@ -8695,7 +8781,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     error.BAD_REQUEST:
@@ -8728,5 +8813,496 @@ components:
       example:
         code: BAD_REQUEST
         message: Invalid input data
+        issues: []
+    QueryExpression:
+      type: object
+      properties:
+        eventType:
+          type: string
+        status:
+          anyOf:
+            - $ref: "#/components/schemas/AnyOfStatus"
+            - $ref: "#/components/schemas/ExactStatus"
+        createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        updatedAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatus.REGISTERED.createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatus.REGISTERED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        updatedAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        assignedTo:
+          $ref: "#/components/schemas/Exact"
+        createdBy:
+          $ref: "#/components/schemas/Exact"
+        updatedBy:
+          $ref: "#/components/schemas/Exact"
+        trackingId:
+          $ref: "#/components/schemas/Exact"
+        flags:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/AnyOf"
+              - $ref: "#/components/schemas/Not"
+        data:
+          $ref: "#/components/schemas/QueryInput"
+    AnyOfStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum: &a11
+              - CREATED
+              - NOTIFIED
+              - DECLARED
+              - VALIDATED
+              - REGISTERED
+              - CERTIFIED
+              - REJECTED
+              - ARCHIVED
+      required:
+        - type
+        - terms
+    ExactStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          type: string
+          enum: *a11
+      required:
+        - type
+        - term
+    DateCondition:
+      anyOf:
+        - $ref: "#/components/schemas/Exact"
+        - $ref: "#/components/schemas/Range"
+    Exact:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          type: string
+      required:
+        - type
+        - term
+    Range:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - range
+        gte:
+          type: string
+        lte:
+          type: string
+      required:
+        - type
+        - gte
+        - lte
+    Within:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - within
+        location:
+          type: string
+      required:
+        - type
+        - location
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+    Not:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - not
+        term:
+          type: string
+      required:
+        - type
+        - term
+    QueryInput:
+      anyOf:
+        - oneOf:
+            - $ref: "#/components/schemas/Fuzzy"
+            - $ref: "#/components/schemas/Exact"
+            - $ref: "#/components/schemas/Range"
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/AnyOf"
+            - $ref: "#/components/schemas/Not"
+          discriminator:
+            propertyName: type
+            mapping:
+              fuzzy: "#/components/schemas/Fuzzy"
+              exact: "#/components/schemas/Exact"
+              range: "#/components/schemas/Range"
+              within: "#/components/schemas/Within"
+              anyOf: "#/components/schemas/AnyOf"
+              not: "#/components/schemas/Not"
+        - type: object
+          additionalProperties:
+            $ref: "#/components/schemas/QueryInput"
+    Fuzzy:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - fuzzy
+        term:
+          type: string
+      required:
+        - type
+        - term
+    EventIndex:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+          description: The type of event, such as birth, death, or marriage.
+        status:
+          type: string
+          enum:
+            - CREATED
+            - NOTIFIED
+            - DECLARED
+            - VALIDATED
+            - REGISTERED
+            - CERTIFIED
+            - REJECTED
+            - ARCHIVED
+        legalStatuses:
+          type: object
+          properties:
+            DECLARED:
+              type: object
+              nullable: true
+              properties:
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: The timestamp when the action request was created.
+                createdBy:
+                  type: string
+                  description: ID of the user who created the action request.
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  description: Location of the user who created the action request.
+                acceptedAt:
+                  type: string
+                  format: date-time
+                  description: Timestamp when the action request was accepted.
+                createdByRole:
+                  type: string
+                  description: Role of the user at the time of action request creation.
+              required:
+                - createdAt
+                - createdBy
+                - acceptedAt
+                - createdByRole
+            REGISTERED:
+              type: object
+              nullable: true
+              properties:
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: The timestamp when the action request was created.
+                createdBy:
+                  type: string
+                  description: ID of the user who created the action request.
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  description: Location of the user who created the action request.
+                acceptedAt:
+                  type: string
+                  format: date-time
+                  description: Timestamp when the action request was accepted.
+                createdByRole:
+                  type: string
+                  description: Role of the user at the time of action request creation.
+                registrationNumber:
+                  type: string
+                  description: Registration number of the event. Always present for accepted
+                    registrations.
+              required:
+                - createdAt
+                - createdBy
+                - acceptedAt
+                - createdByRole
+                - registrationNumber
+          description: Metadata related to the legal registration of the event, such as
+            who registered it and when.
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the event was first created and saved.
+        dateOfEvent:
+          type: string
+          nullable: true
+          format: date
+        createdBy:
+          type: string
+          description: ID of the user who created the event.
+        updatedByUserRole:
+          type: string
+          description: Role of the user who last updated the declaration.
+        createdAtLocation:
+          type: string
+          nullable: true
+          description: Location of the user who created the event.
+        updatedAtLocation:
+          type: string
+          nullable: true
+          description: Location of the user who last updated the declaration.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of the most recent declaration update.
+        assignedTo:
+          type: string
+          nullable: true
+          description: ID of the user currently assigned to the event.
+        updatedBy:
+          type: string
+          nullable: true
+          description: ID of the user who last updated the declaration.
+        trackingId:
+          type: string
+          description: System-generated tracking ID used by informants or registrars to
+            look up the event.
+        flags:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - certificate-printed
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                  residentialArea:
+                    type: string
+                  street:
+                    type: string
+                  number:
+                    type: string
+                  zipCode:
+                    type: string
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                  addressLine1:
+                    type: string
+                  addressLine2:
+                    type: string
+                  addressLine3:
+                    type: string
+                  postcodeOrZip:
+                    type: string
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+      required:
+        - id
+        - type
+        - status
+        - legalStatuses
+        - createdAt
+        - createdBy
+        - updatedByUserRole
+        - updatedAt
+        - trackingId
+        - flags
+        - declaration
+    error.NOT_FOUND:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+          example: Not found
+        code:
+          type: string
+          description: The error code
+          example: NOT_FOUND
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+          description: An array of issues that were responsible for the error
+          example: []
+      required:
+        - message
+        - code
+      title: Not found error (404)
+      description: The error information
+      example:
+        code: NOT_FOUND
+        message: Not found
         issues: []
 
