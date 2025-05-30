@@ -11,8 +11,8 @@
 import React from 'react'
 import format from 'date-fns/format'
 import styled from 'styled-components'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
+import { defineMessages, IntlShape, useIntl } from 'react-intl'
+import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -96,6 +96,39 @@ const SystemName = styled.div`
   }
 `
 
+function getUserAvatar(
+  intl: IntlShape,
+  name: string,
+  navigate: NavigateFunction,
+  userId: string
+) {
+  return (
+    <Link
+      font="bold14"
+      id="profile-link"
+      onClick={() => navigate(formatUrl(routes.USER_PROFILE, { userId }))}
+    >
+      <UserAvatar
+        // @TODO: extend v2-events User to include avatar
+        avatar={undefined}
+        locale={intl.locale}
+        names={name}
+      />
+    </Link>
+  )
+}
+
+function getSystemAvatar(name: string) {
+  return (
+    <SystemName>
+      <div>
+        <Box />
+      </div>
+      {name}
+    </SystemName>
+  )
+}
+
 /**
  *  Renders the event history table. Used for audit trail.
  */
@@ -125,58 +158,34 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     )
     .map((action) => {
       const userAction = isUserAction(action)
-      const user = userAction && getUser(action.createdBy)
+      const user = getUser(action.createdBy)
       const system = existingSystems.find((s) => s._id === action.createdBy)
 
       const location = userAction
         ? getLocation(action.createdAtLocation)
         : undefined
 
-      const userName = user
+      const userName = userAction
         ? getUsersFullName(user.name, intl.locale)
         : (system?.name ?? intl.formatMessage(messages.systemDefaultName))
 
-      const userElement = user ? (
-        <Link
-          font="bold14"
-          id="profile-link"
-          onClick={() =>
-            navigate(
-              formatUrl(routes.USER_PROFILE, { userId: action.createdBy })
-            )
-          }
-        >
-          <UserAvatar
-            // @TODO: extend v2-events User to include avatar
-            avatar={undefined}
-            locale={intl.locale}
-            names={userName}
-          />
-        </Link>
-      ) : (
-        <SystemName>
-          <div>
-            <Box />
-          </div>
-          {userName}
-        </SystemName>
-      )
-
-      const actionElement = (
-        <Link
-          font="bold14"
-          onClick={() => {
-            onHistoryRowClick(action, userName)
-          }}
-        >
-          {intl.formatMessage(eventHistoryStatusMessage, {
-            status: action.type
-          })}
-        </Link>
-      )
+      const userElement = userAction
+        ? getUserAvatar(intl, userName, navigate, action.createdBy)
+        : getSystemAvatar(userName)
 
       return {
-        action: actionElement,
+        action: (
+          <Link
+            font="bold14"
+            onClick={() => {
+              onHistoryRowClick(action, userName)
+            }}
+          >
+            {intl.formatMessage(eventHistoryStatusMessage, {
+              status: action.type
+            })}
+          </Link>
+        ),
         date: format(
           new Date(action.createdAt),
           intl.formatMessage(messages.timeFormat)
