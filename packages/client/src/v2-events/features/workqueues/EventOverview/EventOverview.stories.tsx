@@ -17,7 +17,9 @@ import {
   ActionType,
   generateEventDraftDocument,
   ActionStatus,
-  getUUID
+  getUUID,
+  createPseudoRandomNumberGenerator,
+  getRandomDatetime
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -182,6 +184,8 @@ export const WithSystemUserActions: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
+            const rng = createPseudoRandomNumberGenerator(1234)
+
             return {
               ...tennisClubMembershipEventDocument,
               actions: [
@@ -190,7 +194,11 @@ export const WithSystemUserActions: Story = {
                   status: ActionStatus.Accepted,
                   id: getUUID(),
                   transactionId: getUUID(),
-                  createdAt: new Date().toISOString(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-01-01'),
+                    new Date('2024-02-01')
+                  ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
                   createdByRole: SystemRole.enum.HEALTH,
@@ -202,7 +210,11 @@ export const WithSystemUserActions: Story = {
                   status: ActionStatus.Accepted,
                   id: getUUID(),
                   transactionId: getUUID(),
-                  createdAt: new Date().toISOString(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-02-01'),
+                    new Date('2024-03-01')
+                  ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
                   createdByRole: SystemRole.enum.HEALTH,
@@ -214,7 +226,11 @@ export const WithSystemUserActions: Story = {
                   status: ActionStatus.Accepted,
                   id: getUUID(),
                   transactionId: getUUID(),
-                  createdAt: new Date().toISOString(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-03-01'),
+                    new Date('2024-04-01')
+                  ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
                   createdByRole: SystemRole.enum.HEALTH,
@@ -225,7 +241,11 @@ export const WithSystemUserActions: Story = {
                   status: ActionStatus.Accepted,
                   id: getUUID(),
                   transactionId: getUUID(),
-                  createdAt: new Date().toISOString(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-04-01'),
+                    new Date('2024-05-01')
+                  ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
                   createdByRole: SystemRole.enum.HEALTH,
@@ -237,7 +257,11 @@ export const WithSystemUserActions: Story = {
                   status: ActionStatus.Accepted,
                   id: getUUID(),
                   transactionId: getUUID(),
-                  createdAt: new Date().toISOString(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-05-01'),
+                    new Date('2024-06-01')
+                  ),
                   createdBy: '123',
                   createdAtLocation: '123',
                   createdByRole: 'LOCAL_REGISTRAR',
