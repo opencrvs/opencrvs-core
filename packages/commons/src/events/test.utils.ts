@@ -447,7 +447,7 @@ export function generateActionDocument({
     case ActionType.ARCHIVE:
       return { ...actionBase, type: action }
     case ActionType.REJECT:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, reason: { message: '' } }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:

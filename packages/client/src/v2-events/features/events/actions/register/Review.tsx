@@ -10,7 +10,6 @@
  */
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
@@ -20,7 +19,8 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  EventStatus
+  EventStatus,
+  EventState
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -164,7 +164,7 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message }
+          annotation: { message } as EventState
         })
       }
 
@@ -173,7 +173,7 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message, isDuplicate }
+          annotation: { message, isDuplicate } as EventState
         })
       }
 

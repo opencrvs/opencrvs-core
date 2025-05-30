@@ -36,6 +36,11 @@ export const ActionStatus = {
 
 export type ActionStatus = keyof typeof ActionStatus
 
+const RejectionReason = z.object({
+  message: z.string().describe('Message describing reason for rejection'),
+  isDuplicate: z.boolean().optional().describe('If a declaration is duplicated')
+})
+
 export const ActionBase = z.object({
   id: z.string(),
   transactionId: z.string(),
@@ -93,7 +98,8 @@ const ValidateAction = ActionBase.merge(
 
 const RejectAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT),
+    reason: RejectionReason
   })
 )
 
@@ -143,7 +149,8 @@ const ApprovedCorrectionAction = ActionBase.merge(
 const RejectedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION),
-    requestId: z.string()
+    requestId: z.string(),
+    reason: RejectionReason
   })
 )
 
