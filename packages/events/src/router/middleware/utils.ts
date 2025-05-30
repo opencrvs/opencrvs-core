@@ -16,13 +16,19 @@ import {
   TokenUserType
 } from '@opencrvs/commons'
 
-export interface UserDetails {
-  type: TokenUserType.USER | TokenUserType.SYSTEM
-  id: string
-  // For system users, the primaryOfficeId is undefined
-  primaryOfficeId: string | undefined
-  role: string
-}
+export type UserDetails =
+  | {
+      type: TokenUserType.USER
+      id: string
+      primaryOfficeId: string
+      role: string
+    }
+  | {
+      type: TokenUserType.SYSTEM
+      id: string
+      primaryOfficeId: undefined
+      role: string
+    }
 
 export type Context = { token: TokenWithBearer; user: UserDetails }
 /**
