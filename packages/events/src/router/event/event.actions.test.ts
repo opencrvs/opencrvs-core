@@ -211,7 +211,6 @@ test('Action data accepts partial changes', async () => {
           createdByRole: user.role,
           createdBy: user.id,
           createdAtLocation: user.primaryOfficeId
-          // createdBySignature: user.signature
         }
       }
     } satisfies EventIndex

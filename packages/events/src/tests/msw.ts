@@ -53,7 +53,6 @@ const handlers = [
   ),
   http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
     return HttpResponse.json({
-      id: '67ef7f83d6a9cb92e9edaaa1',
       primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
       role: 'REGISTRATION_AGENT',
       signature: '/ocrvs/signature.png'
