@@ -70,7 +70,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: d944ac25-a036-4d54-947a-d30f722e5ea2
+                transactionId: fb5e1663-e749-4daf-93e0-b659c0a09e23
                 type: v2.birth
       responses:
         "200":
@@ -433,7 +433,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 74d036f4-3aa4-4805-8175-e8bce3251744
+                transactionId: 7e67e579-3eec-47df-b2bd-37f4b6242348
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -521,8 +521,6 @@ paths:
                           createdAtLocation:
                             type: string
                             nullable: true
-                            description: Location of the user who created the action. This is null for
-                              system users.
                           status:
                             type: string
                             enum:
@@ -3678,8 +3676,6 @@ components:
                   createdAtLocation:
                     type: string
                     nullable: true
-                    description: Location of the user who created the action. This is null for
-                      system users.
                   status:
                     type: string
                     enum:
@@ -3758,8 +3754,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4094,8 +4088,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4427,8 +4419,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4760,8 +4750,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5093,8 +5081,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5426,8 +5412,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5759,8 +5743,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6094,8 +6076,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6427,8 +6407,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6763,8 +6741,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7096,8 +7072,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7432,8 +7406,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7768,8 +7740,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -8104,8 +8074,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -8437,8 +8405,6 @@ components:
         createdAtLocation:
           type: string
           nullable: true
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:

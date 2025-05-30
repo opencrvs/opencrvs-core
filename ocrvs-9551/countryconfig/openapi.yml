@@ -3001,8 +3001,6 @@ components:
                     type:
                       - string
                       - "null"
-                    description: Location of the user who created the action. This is null for
-                      system users.
                   status:
                     type: string
                     const: Rejected
@@ -3088,8 +3086,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -3435,8 +3431,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -3778,8 +3772,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4121,8 +4113,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4464,8 +4454,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -4807,8 +4795,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5150,8 +5136,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5495,8 +5479,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -5838,8 +5820,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6184,8 +6164,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6527,8 +6505,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -6873,8 +6849,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7219,8 +7193,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7565,8 +7537,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -7908,8 +7878,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
         declaration:
           type: object
           additionalProperties:
@@ -8577,8 +8545,6 @@ components:
           type:
             - string
             - "null"
-          description: Location of the user who created the action. This is null for
-            system users.
       required:
         - eventId
         - transactionId
@@ -9566,7 +9532,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: fb42af4d-4ec2-486e-add4-5128f80f8b5e
+        transactionId: ba26b487-0f88-4417-ae78-a0d8318c8eb5
         declaration: {}
         annotation: {}
         type: NOTIFY
