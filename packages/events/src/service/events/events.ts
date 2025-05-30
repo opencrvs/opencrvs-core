@@ -36,7 +36,7 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {
@@ -162,7 +162,7 @@ export async function createEvent({
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
-  user: UserDetails
+  user: TrpcUserContext
   transactionId: string
 }): Promise<EventDocument> {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -181,7 +181,8 @@ export async function createEvent({
   const createdByDetails = {
     createdBy: user.id,
     createdByRole: user.role,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: user.primaryOfficeId,
+    createdBySignature: user.signature
   }
 
   await collection.insertOne({
@@ -276,7 +277,7 @@ export async function addAction(
     status
   }: {
     eventId: string
-    user: UserDetails
+    user: TrpcUserContext
     token: string
     status: ActionStatus
   },
@@ -306,7 +307,8 @@ export async function addAction(
   const createdByDetails = {
     createdBy: user.id,
     createdByRole: user.role,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: user.primaryOfficeId,
+    createdBySignature: user.signature
   }
 
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {

@@ -13,7 +13,7 @@ import { DraftInput, Draft } from '@opencrvs/commons/events'
 
 import { getUUID } from '@opencrvs/commons'
 import * as events from '@events/storage/mongodb/events'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 
 export async function createDraft(
   input: DraftInput,
@@ -23,7 +23,7 @@ export async function createDraft(
     transactionId
   }: {
     eventId: string
-    user: UserDetails
+    user: TrpcUserContext
     transactionId: string
   }
 ) {
@@ -41,7 +41,8 @@ export async function createDraft(
       createdBy: user.id,
       createdByRole: user.role,
       createdAt: now,
-      createdAtLocation: user.primaryOfficeId
+      createdAtLocation: user.primaryOfficeId,
+      createdBySignature: user.signature
     }
   }
 

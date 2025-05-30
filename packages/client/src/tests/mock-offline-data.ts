@@ -23,7 +23,7 @@ import {
 import forms from './forms.json'
 import languages from './languages.json'
 import templates from './templates.json'
-import { SystemType } from '@opencrvs/commons/client'
+import { SystemRole } from '@opencrvs/commons/client'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='
@@ -32,7 +32,7 @@ const systems: System[] = [
   {
     name: 'WebHook 1',
     status: SystemStatus.Active,
-    type: SystemType.Webhook,
+    type: SystemRole.enum.WEBHOOK,
     _id: '63998b6efbd0f8bad7708033',
     shaSecret: 'c37d4f5d-4c12-4016-9c7e-d810d2f871df',
     clientId: '4a7ba5bc-46c7-469e-8d61-20dd4d86e79a',
@@ -55,7 +55,7 @@ const systems: System[] = [
     name: 'Health Deactivation',
     shaSecret: '2569a6d4-1f38-4f53-8724-1bfcba8262f6',
     status: SystemStatus.Deactivated,
-    type: SystemType.Health,
+    type: SystemRole.enum.HEALTH,
     settings: {},
     __typename: 'System'
   }

@@ -169,10 +169,9 @@ export const DEFAULT_ROLES_DEFINITION = [
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
 
-export enum TokenUserType {
-  USER = 'user',
-  SYSTEM = 'system'
-}
+export const TokenUserType = z.enum(['user', 'system'])
+export type TokenUserType = z.infer<typeof TokenUserType>
+
 export interface ITokenPayload {
   sub: string
   exp: string
@@ -212,12 +211,13 @@ export const getTokenPayload = (token: string): ITokenPayload => {
 
 export const getUserId = (token: TokenWithBearer): string => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
-  return tokenPayload.sub
+  return z.string().parse(tokenPayload.sub)
 }
 
 export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
-  return tokenPayload.userType
+
+  return TokenUserType.parse(tokenPayload.userType)
 }
 
 export const TokenWithBearer = z

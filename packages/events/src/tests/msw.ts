@@ -33,11 +33,11 @@ const handlers = [
     ])
   }),
   // event.delete.test.ts
-  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
+  http.head(`${env.DOCUMENTS_URL}/files/:filename`, () => {
     return HttpResponse.json({ ok: true })
   }),
   // event.delete.test.ts
-  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
+  http.delete(`${env.DOCUMENTS_URL}/files/:filename`, () => {
     return HttpResponse.json({ ok: true })
   }),
   http.post(
@@ -50,7 +50,14 @@ const handlers = [
 
       return HttpResponse.json(payload)
     }
-  )
+  ),
+  http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
+    return HttpResponse.json({
+      primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
+      role: 'REGISTRATION_AGENT',
+      signature: '/ocrvs/signature.png'
+    })
+  })
 ]
 
 export const mswServer = setupServer(...handlers)

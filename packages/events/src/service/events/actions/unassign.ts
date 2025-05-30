@@ -19,7 +19,7 @@ import {
 import { inScope, SCOPES } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 import { setBearerForToken } from '@events/router/middleware'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 
 export async function unassignRecord(
   input: UnassignActionInput,
@@ -29,7 +29,7 @@ export async function unassignRecord(
     token
   }: {
     eventId: string
-    user: UserDetails
+    user: TrpcUserContext
     token: string
   }
 ) {

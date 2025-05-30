@@ -124,7 +124,7 @@ export async function createToken(
   audience: string[],
   issuer: string,
   temporary?: boolean,
-  userType: TokenUserType = TokenUserType.USER
+  userType: TokenUserType = TokenUserType.enum.user
 ): Promise<string> {
   return sign({ scope, userType }, cert, {
     subject: userId,

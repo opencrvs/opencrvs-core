@@ -8,10 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export enum SystemType {
-  Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
-  RecordSearch = 'RECORD_SEARCH',
-  Import = 'IMPORT',
-  Webhook = 'WEBHOOK'
-}
+
+import { z } from 'zod'
+
+export const SystemRole = z.enum([
+  'HEALTH',
+  'NATIONAL_ID',
+  'RECORD_SEARCH',
+  'IMPORT',
+  'WEBHOOK'
+])
+
+export type SystemRole = z.infer<typeof SystemRole>
+
+export const UserRole = z.enum([
+  'FIELD_AGENT',
+  'LOCAL_REGISTRAR',
+  'LOCAL_SYSTEM_ADMIN',
+  'NATIONAL_REGISTRAR',
+  'REGISTRATION_AGENT'
+])

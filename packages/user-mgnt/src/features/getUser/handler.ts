@@ -12,6 +12,7 @@ import * as Hapi from '@hapi/hapi'
 import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User from '@user-mgnt/model/user'
+import { getPractitionerSignature } from './service'
 
 interface IVerifyPayload {
   userId: string
@@ -24,6 +25,8 @@ export default async function getUser(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  const token = request.headers.authorization
+
   const { userId, practitionerId, mobile, email } =
     request.payload as IVerifyPayload
   let criteria = {}
@@ -46,7 +49,9 @@ export default async function getUser(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  return user
+  const signature = await getPractitionerSignature(token, user.practitionerId)
+
+  return { ...user.toObject(), signature }
 }
 
 export const getUserRequestSchema = Joi.object({

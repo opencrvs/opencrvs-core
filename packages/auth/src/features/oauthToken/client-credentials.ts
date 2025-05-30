@@ -54,7 +54,7 @@ export async function clientCredentialsHandler(
       : WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
     true,
-    TokenUserType.SYSTEM
+    TokenUserType.enum.system
   )
 
   return oauthResponse.success(h, token)

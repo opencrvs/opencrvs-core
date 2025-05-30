@@ -14,7 +14,7 @@ import {
   RejectCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 import { RequestNotFoundError } from './correction'
 
 export async function rejectCorrection(
@@ -25,7 +25,7 @@ export async function rejectCorrection(
     token
   }: {
     eventId: string
-    user: UserDetails
+    user: TrpcUserContext
     token: string
   }
 ) {
