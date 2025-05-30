@@ -76,7 +76,7 @@ export const Accordion = ({
   const [isActive, setIsActive] = useState<boolean>(expand || false)
 
   return (
-    <Container id={`${name}-accordion`}>
+    <Container id={`${name}-accordion`} data-testid={`accordion-${name}`}>
       <AccordionHeader
         id={`${name}-accordion-header`}
         onClick={() => setIsActive(!isActive)}

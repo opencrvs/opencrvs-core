@@ -17,13 +17,6 @@ import { z } from 'zod'
 import { RawScopes, Scope, SCOPES } from './scopes'
 export * from './scopes'
 
-/** All the scopes system/integration can be assigned to */
-export const SYSTEM_INTEGRATION_SCOPES = {
-  recordsearch: SCOPES.RECORDSEARCH,
-  webhook: SCOPES.WEBHOOK,
-  nationalId: SCOPES.NATIONALID
-} as const
-
 export const DEFAULT_ROLES_DEFINITION = [
   {
     id: 'FIELD_AGENT',
@@ -171,31 +164,21 @@ export const DEFAULT_ROLES_DEFINITION = [
   scopes: Scope[]
 }>
 
-export const DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES = {
-  HEALTH: [SCOPES.NOTIFICATION_API],
-  NATIONAL_ID: [SCOPES.NATIONALID],
-  RECORD_SEARCH: [SCOPES.RECORDSEARCH],
-  WEBHOOK: [SCOPES.WEBHOOK]
-} satisfies Record<string, Scope[]>
-
 /*
  * Describes a "legacy" user role such as FIELD_AGENT, REGISTRATION_AGENT, etc.
  * These are roles we are slowly sunsettings in favor of the new, more configurable user roles.
  */
 
-/** All the scopes user can be assigned to – old & new */
-export type UserScope =
-  | (typeof SCOPES)[keyof typeof SCOPES]
-  | 'profile.electronic-signature'
-
-export type SystemScope =
-  (typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES)[keyof typeof DEFAULT_SYSTEM_INTEGRATION_ROLE_SCOPES][number]
-
+export enum TokenUserType {
+  USER = 'user',
+  SYSTEM = 'system'
+}
 export interface ITokenPayload {
   sub: string
   exp: string
   algorithm: string
   scope: Scope[]
+  userType: TokenUserType
 }
 
 export function getScopes(authHeader: IAuthHeader): RawScopes[] {
@@ -230,6 +213,11 @@ export const getTokenPayload = (token: string): ITokenPayload => {
 export const getUserId = (token: TokenWithBearer): string => {
   const tokenPayload = getTokenPayload(token.split(' ')[1])
   return tokenPayload.sub
+}
+
+export const getUserTypeFromToken = (token: TokenWithBearer): TokenUserType => {
+  const tokenPayload = getTokenPayload(token.split(' ')[1])
+  return tokenPayload.userType
 }
 
 export const TokenWithBearer = z
