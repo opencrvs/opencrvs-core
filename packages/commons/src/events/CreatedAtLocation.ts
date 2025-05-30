@@ -10,9 +10,4 @@
  */
 import { z } from 'zod'
 
-export const CreatedAtLocation = z
-  .string()
-  .nullish()
-  .describe(
-    'Location of the user who created the action. This is null for system users.'
-  )
+export const CreatedAtLocation = z.string().nullish()

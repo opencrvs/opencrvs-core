@@ -73,7 +73,9 @@ export const ActionCreationMetadata = z.object({
   createdBy: z
     .string()
     .describe('ID of the user who created the action request.'),
-  createdAtLocation: CreatedAtLocation,
+  createdAtLocation: CreatedAtLocation.describe(
+    'Location of the user who created the action request.'
+  ),
   acceptedAt: z
     .string()
     .datetime()
@@ -126,7 +128,9 @@ export const EventMetadata = z.object({
   updatedByUserRole: z
     .string()
     .describe('Role of the user who last updated the declaration.'),
-  createdAtLocation: CreatedAtLocation,
+  createdAtLocation: CreatedAtLocation.describe(
+    'Location of the user who created the event.'
+  ),
   updatedAtLocation: z
     .string()
     .nullish()
