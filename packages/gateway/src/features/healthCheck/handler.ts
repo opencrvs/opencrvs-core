@@ -25,14 +25,9 @@ export async function checkServiceHealth(url: string) {
   const res = await fetch(url, {
     method: 'GET'
   })
-
-  const body = await res.json()
-
-  if (body.success === true) {
-    return true
+  return {
+    status: res.status
   }
-
-  return false
 }
 
 enum Services {
@@ -60,17 +55,30 @@ export default async function healthCheckHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const responses = {} as Record<keyof typeof SERVICES, boolean>
-
+  const responses = [] as Array<{
+    name: string
+    status: number
+    error?: string
+  }>
+  let stackAllOk = true
+  
   for (const [key, value] of Object.entries(SERVICES)) {
     try {
       const res = await checkServiceHealth(value)
-      responses[key as keyof typeof SERVICES] = res
+      responses.push({
+        name: key,
+        status: res.status
+      })
     } catch (err) {
-      responses[key as keyof typeof SERVICES] = false
+      stackAllOk = false
+      responses.push({ name: key, status: 500, error: err.message })
     }
   }
-  return responses
+  if (stackAllOk) {
+    return h.response(responses).code(200)
+  } else {
+    return h.response(responses).code(500)
+  }
 }
 
 export const querySchema = Joi.object({
