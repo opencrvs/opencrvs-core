@@ -15,6 +15,7 @@
 
 /* eslint-disable */
 import { PlainDate } from '@client/utils/date-formatting'
+import { SystemType } from '@opencrvs/commons'
 
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
@@ -2136,14 +2137,6 @@ export type SystemSettingsInput = {
 export enum SystemStatus {
   Active = 'active',
   Deactivated = 'deactivated'
-}
-
-export enum SystemType {
-  Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
-  RecordSearch = 'RECORD_SEARCH',
-  Import = 'IMPORT',
-  Webhook = 'WEBHOOK'
 }
 
 export enum TelecomSystem {

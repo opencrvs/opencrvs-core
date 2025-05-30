@@ -12,7 +12,7 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { TokenUserType } from '@opencrvs/commons'
+import { logger, TokenUserType } from '@opencrvs/commons'
 import { Context } from './middleware'
 
 export const t = initTRPC.context<Context>().meta<OpenApiMeta>().create({
@@ -33,6 +33,9 @@ export const systemProcedure = t.procedure
  */
 export const publicProcedure = t.procedure.use(async (opts) => {
   if (opts.ctx.user.type === TokenUserType.SYSTEM) {
+    logger.error(
+      `System user tried to access public procedure. User id: '${opts.ctx.user.id}'`
+    )
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
