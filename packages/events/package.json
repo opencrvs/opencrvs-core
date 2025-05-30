@@ -25,6 +25,7 @@
     "jsonwebtoken": "^9.0.0",
     "mongodb": "6.9.0",
     "msw": "^2.7.3",
+    "node-fetch": "^2.6.7",
     "superjson": "1.9.0-0",
     "trpc-to-openapi": "^2.1.5",
     "tsconfig-paths": "^3.13.0",
