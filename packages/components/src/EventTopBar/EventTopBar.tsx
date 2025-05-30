@@ -108,7 +108,7 @@ export const EventTopBar = (props: IEventTopBarProps) => {
             onClick={saveAction.handler}
             id="save_draft"
           >
-            <Icon name="Floppy" />
+            <Icon name="FloppyDisk" />
             {saveAction.label}
           </Button>
         )}

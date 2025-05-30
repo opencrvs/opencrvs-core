@@ -16,7 +16,7 @@
 
 - **UI enhancements**
 
-  - Replaced the `Download` icon with a `Floppy` save icon when saving an event as draft.
+  - Replaced the `Download` icon with a `FloppyDisk` save icon when saving an event as draft.
 
 ## 1.8.0 Release candidate
 

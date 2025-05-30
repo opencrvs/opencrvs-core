@@ -474,7 +474,7 @@ function FormAppBar({
                         size="small"
                         onClick={handleSaveAndExit}
                       >
-                        <Icon name="Floppy" />
+                        <Icon name="FloppyDisk" />
                         {intl.formatMessage(buttonMessages.saveExitButton)}
                       </Button>
                       {window.config.FEATURES.PRINT_DECLARATION && (
@@ -521,7 +521,7 @@ function FormAppBar({
               <>
                 {!duplicate && !isCorrection(declaration) && (
                   <Button type="icon" size="small" onClick={handleSaveAndExit}>
-                    <Icon name="Floppy" />
+                    <Icon name="FloppyDisk" />
                   </Button>
                 )}
                 <Button type="icon" size="small" onClick={handleExit}>
@@ -557,7 +557,7 @@ function FormAppBar({
                     disabled={!canSaveAndExit}
                     onClick={handleSaveAndExit}
                   >
-                    <Icon name="Floppy" />
+                    <Icon name="FloppyDisk" />
                     {intl.formatMessage(buttonMessages.saveExitButton)}
                   </Button>
                 )}
@@ -619,7 +619,7 @@ function FormAppBar({
                     disabled={!canSaveAndExit}
                     onClick={handleSaveAndExit}
                   >
-                    <Icon name="Floppy" />
+                    <Icon name="FloppyDisk" />
                   </Button>
                 )}
                 <Button type="icon" size="small" onClick={handleExit}>
