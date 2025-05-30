@@ -8,16 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { EventDocument } from '@opencrvs/commons'
+import * as events from '@events/storage/mongodb/events'
+import { indexEvent } from '@events/service/indexing/indexing'
 
-import { generateOpenApiDocument } from 'trpc-to-openapi'
-import * as yaml from 'yaml'
-import { appRouter } from './router/router'
-
-export const openApiDocument = generateOpenApiDocument(appRouter, {
-  title: 'OpenCRVS API',
-  version: '1.8.0',
-  baseUrl: 'http://localhost:3000/api/events'
-})
-
-// eslint-disable-next-line no-console
-console.log(yaml.stringify(openApiDocument))
+export async function importEvent(event: EventDocument) {
+  const db = await events.getClient()
+  const collection = db.collection<EventDocument>('events')
+  await collection.replaceOne({ id: event.id }, event, { upsert: true })
+  await indexEvent(event)
+  return event
+}

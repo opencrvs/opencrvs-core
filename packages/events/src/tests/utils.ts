@@ -12,7 +12,12 @@
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
-import { Scope, SCOPES, TokenWithBearer } from '@opencrvs/commons'
+import {
+  Scope,
+  SCOPES,
+  TokenUserType,
+  TokenWithBearer
+} from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
@@ -38,10 +43,11 @@ export const TEST_USER_DEFAULT_SCOPES = [
 
 export function createTestToken(
   userId: string,
-  scopes: Scope[]
+  scopes: Scope[],
+  userType: TokenUserType = TokenUserType.USER
 ): TokenWithBearer {
   const token = jwt.sign(
-    { scope: scopes, sub: userId },
+    { scope: scopes, sub: userId, userType },
     readFileSync(join(__dirname, './cert.key')),
     {
       algorithm: 'RS256',
@@ -53,6 +59,22 @@ export function createTestToken(
   return `Bearer ${token}`
 }
 
+export function createSystemTestClient(
+  systemId: string,
+  scopes: string[] = TEST_USER_DEFAULT_SCOPES
+) {
+  const createCaller = createCallerFactory(appRouter)
+  const token = createTestToken(systemId, scopes, TokenUserType.SYSTEM)
+
+  const caller = createCaller({
+    userType: TokenUserType.SYSTEM,
+    system: {
+      id: systemId
+    },
+    token
+  })
+  return caller
+}
 export function createTestClient(
   user: CreatedUser,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
@@ -61,6 +83,7 @@ export function createTestClient(
   const token = createTestToken(user.id, scopes)
 
   const caller = createCaller({
+    userType: TokenUserType.USER,
     user: {
       id: user.id,
       primaryOfficeId: user.primaryOfficeId,

@@ -131,3 +131,35 @@ export const tennisClubMembershipEventDocument: EventDocument = {
     }
   ]
 }
+
+export const TestImage = {
+  Box: `
+        <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M3 6C3 4.34315 4.34315 3 6 3H14C15.6569 3 17 4.34315 17 6V14C17 15.6569 15.6569 17 14 17H6C4.34315 17 3 15.6569 3 14V6Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M21 7V18C21 19.6569 19.6569 21 18 21H7" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <path d="M3 12.375L6.66789 8.70711C7.05842 8.31658 7.69158 8.31658 8.08211 8.70711L10.875 11.5M10.875 11.5L13.2304 9.1446C13.6209 8.75408 14.2541 8.75408 14.6446 9.14461L17 11.5M10.875 11.5L12.8438 13.4688" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      `,
+  Tree: `
+        <svg width="150" height="200" xmlns="http://www.w3.org/2000/svg">
+        <rect x="65" y="100" width="20" height="60" fill="#8B4513" />
+        <circle cx="75" cy="80" r="40" fill="green" />
+        <circle cx="55" cy="90" r="30" fill="darkgreen" />
+        <circle cx="95" cy="90" r="30" fill="darkgreen" />
+        <circle cx="75" cy="60" r="30" fill="darkgreen" />
+        </svg>`,
+  Fish: `
+        <svg width="150" height="100" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="75" cy="50" rx="50" ry="30" fill="#1E90FF" />
+        <polygon points="115,50 135,35 135,65" fill="#4682B4" />
+        <circle cx="55" cy="40" r="5" fill="white" />
+        <path d="M55,50 Q65,40 75,50 Q65,60 55,50" fill="lightblue" />
+        </svg>`,
+  Mountain: `
+          <svg width="200" height="150" xmlns="http://www.w3.org/2000/svg">
+          <rect width="200" height="80" y="70" fill="#98FB98" />
+          <polygon points="50,70 100,20 150,70" fill="#A9A9A9" />
+          <polygon points="70,70 120,30 170,70" fill="#808080" />
+          <circle cx="30" cy="30" r="20" fill="#FFD700" />
+          </svg>`
+} as const

@@ -1073,6 +1073,7 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
+  IMPORT
 }
 
 enum IntegratingSystemType {

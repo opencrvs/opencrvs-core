@@ -39,7 +39,9 @@ export default meta
 
 type Story = StoryObj<typeof SearchResult>
 
-const queryData = Array.from({ length: 12 }, () => eventQueryDataGenerator())
+const queryData = Array.from({ length: 12 }, (_, i) =>
+  eventQueryDataGenerator(undefined, i)
+)
 
 const mockSearchParams = {
   'applicant.firstname': 'Danny',

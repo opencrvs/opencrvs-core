@@ -213,7 +213,7 @@ test('READ action does not delete draft', async () => {
         filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
-    transactionId: 'transactionId',
+    transactionId: getUUID(),
     eventId: originalEvent.id,
     status: ActionStatus.Requested
   }
@@ -247,7 +247,7 @@ test('Action other than READ deletes draft', async () => {
         filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
-    transactionId: 'transactionId',
+    transactionId: getUUID(),
     eventId: originalEvent.id,
     status: ActionStatus.Requested
   }
@@ -294,7 +294,7 @@ test('partial declaration update accounts for conditional field values not in pa
       'applicant.age': 25
     },
     eventId: originalEvent.id,
-    transactionId: '123-123-124'
+    transactionId: getUUID()
   })
 
   const event = await client.event.get(originalEvent.id)

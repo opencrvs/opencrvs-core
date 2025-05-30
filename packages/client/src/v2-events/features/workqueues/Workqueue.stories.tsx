@@ -51,7 +51,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const queryData = Array.from({ length: 12 }, () => eventQueryDataGenerator())
+const queryData = Array.from(
+  { length: 15 },
+  (_, i) => eventQueryDataGenerator(undefined, i * 52) // quite literally a magic number. It gives a sample where the test workqueues are not empty
+)
 
 export const Workqueue: Story = {
   parameters: {

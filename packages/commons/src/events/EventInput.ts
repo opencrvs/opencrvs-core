@@ -9,10 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
+import { v4 as uuidv4 } from 'uuid'
 
-export const EventInput = z.object({
-  transactionId: z.string(),
-  type: z.string()
-})
+export const EventInput = z
+  .object({
+    transactionId: z.string(),
+    type: z.string()
+  })
+  .openapi({ default: { transactionId: uuidv4(), type: 'v2.birth' } })
 
 export type EventInput = z.infer<typeof EventInput>

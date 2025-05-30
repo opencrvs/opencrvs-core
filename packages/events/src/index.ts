@@ -14,7 +14,12 @@ import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import { getUser, logger } from '@opencrvs/commons'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
+import {
+  getUserId,
+  getUserTypeFromToken,
+  TokenUserType,
+  TokenWithBearer
+} from '@opencrvs/commons/authentication'
 import '@opencrvs/commons/monitoring'
 import { env } from './environment'
 import { appRouter } from './router/router'
@@ -55,23 +60,36 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     }
 
     const token = parseResult.data
-    const userId = getUserId(token)
 
-    if (!userId) {
+    const sub = getUserId(token)
+    if (!sub) {
       throw new TRPCError({
         code: 'UNAUTHORIZED'
       })
     }
 
+    const userType = getUserTypeFromToken(token)
+
+    if (userType === TokenUserType.SYSTEM) {
+      return {
+        userType: TokenUserType.SYSTEM,
+        system: {
+          id: sub
+        },
+        token: token
+      }
+    }
+
     const { primaryOfficeId, role } = await getUser(
       env.USER_MANAGEMENT_URL,
-      userId,
+      sub,
       token
     )
 
     return {
+      userType: TokenUserType.USER,
       user: {
-        id: userId,
+        id: sub,
         primaryOfficeId,
         role
       },

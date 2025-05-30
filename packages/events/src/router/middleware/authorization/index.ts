@@ -22,6 +22,7 @@ import {
   getScopes,
   inScope,
   Scope,
+  TokenUserType,
   WorkqueueCountInput,
   ConfigurableScopeType,
   ConfigurableScopes,
@@ -205,6 +206,10 @@ export const requireAssignment = experimental_standaloneMiddleware<{
         action.type === ActionType.ASSIGN || action.type === ActionType.UNASSIGN
     )
   )
+
+  if (ctx.userType === TokenUserType.SYSTEM) {
+    return next()
+  }
 
   if (ctx.user.id !== assignedTo) {
     throw new TRPCError({

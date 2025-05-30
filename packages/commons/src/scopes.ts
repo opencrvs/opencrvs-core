@@ -39,6 +39,9 @@ export const SCOPES = {
   RECORD_DECLARE: 'record.declare-birth',
 
   // declare
+  RECORD_IMPORT: 'record.import',
+
+  // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
   RECORD_DECLARE_DEATH: 'record.declare-death',
@@ -155,6 +158,7 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.NATIONALID),
   z.literal(SCOPES.NOTIFICATION_API),
   z.literal(SCOPES.RECORDSEARCH),
+  z.literal(SCOPES.RECORD_IMPORT),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.RECORD_DECLARE_DEATH),
