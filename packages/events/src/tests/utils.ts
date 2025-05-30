@@ -13,9 +13,7 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
-  ActionDocument,
   createPseudoRandomNumberGenerator,
-  EventDocument,
   generateRandomSignature,
   Scope,
   SCOPES,
@@ -67,7 +65,7 @@ export function sanitizeForSnapshot(data: unknown, fields: string[]) {
       return value.map(sanitize)
     }
 
-    if (value && typeof value === 'object' && value !== null) {
+    if (value && typeof value === 'object') {
       return Object.fromEntries(
         Object.entries(value).map(([key, val]) => [
           key,

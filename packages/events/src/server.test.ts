@@ -18,7 +18,8 @@ import {
   ActionType,
   BearerTokenByUserType,
   getTokenPayload,
-  getUUID
+  getUUID,
+  UserRole
 } from '@opencrvs/commons'
 import { AppRouter } from './router'
 import { server } from './server'
@@ -70,7 +71,7 @@ test('Server starts up and returns an event based on context dependency values',
 
   const mockUserResponse = {
     primaryOfficeId: getUUID(),
-    role: 'LOCAL_REGISTRAR',
+    role: UserRole.enum.LOCAL_REGISTRAR,
     signature: '/ocrvs/my-signature.png'
   }
 
@@ -147,7 +148,7 @@ test('Server will accept requests after error', async () => {
     http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
       return HttpResponse.json({
         primaryOfficeId: getUUID(),
-        role: 'LOCAL_REGISTRAR',
+        role: UserRole.enum.LOCAL_REGISTRAR,
         signature: '/ocrvs/my-signature.png'
       })
     })
