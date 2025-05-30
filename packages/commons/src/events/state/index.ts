@@ -251,6 +251,7 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
+    createdBySignature: creationAction.createdBySignature,
     updatedAt: declarationUpdateMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),

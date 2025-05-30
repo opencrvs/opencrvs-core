@@ -13,7 +13,9 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
+  ActionDocument,
   createPseudoRandomNumberGenerator,
+  EventDocument,
   generateRandomSignature,
   Scope,
   SCOPES,
@@ -27,6 +29,58 @@ import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { UserContext } from '@events/context'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
+
+/**
+ * Known unstable fields in events that should be sanitized for snapshot testing.
+ * We should aim to have stable ids based on the actual users and events in the system.
+ */
+export const UNSTABLE_EVENT_FIELDS = [
+  'createdAt',
+  'updatedAt',
+  'transactionId',
+  'id',
+  'trackingId',
+  'eventId',
+  'createdBy',
+  'createdAtLocation',
+  'assignedTo'
+]
+/**u
+ * Cleans up unstable fields in data for snapshot testing.
+ *
+ * @param data - The data to sanitize
+ * @param options - fields to sanitize and replacement value for them
+ *
+ * @example sanitizeForSnapshot({
+ *   name: 'John Doe',
+ *   createdAt: '2023-10-01T12:00:00Z'
+ * }, { fields: ['createdAt'] })
+ * // → { name: 'John Doe', createdAt: '[sanitized]' }
+ */
+export function sanitizeForSnapshot(data: unknown, fields: string[]) {
+  const replacement = '[sanitized]'
+  const keyMatches = (key: string) => fields.includes(key)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sanitize = (value: unknown): any => {
+    if (Array.isArray(value)) {
+      return value.map(sanitize)
+    }
+
+    if (value && typeof value === 'object' && value !== null) {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, val]) => [
+          key,
+          keyMatches(key) ? replacement : sanitize(val)
+        ])
+      )
+    }
+
+    return value
+  }
+
+  return sanitize(data)
+}
 
 const { createCallerFactory } = t
 
