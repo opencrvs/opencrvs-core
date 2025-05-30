@@ -1920,6 +1920,18 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
           )
         )
       }
+      if (declarationNextToUnassign) {
+        return loop(
+          state,
+          Cmd.action(
+            executeUnassignDeclaration(
+              declarationNextToUnassign.id,
+              action.payload.client,
+              action.payload.refetchQueries
+            )
+          )
+        )
+      }
       return state
     }
 
