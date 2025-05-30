@@ -85,7 +85,7 @@ export function FormHeader({
                 type="primary"
                 onClick={onSaveAndExit}
               >
-                <Icon name="DownloadSimple" />
+                <Icon name="Floppy" />
                 {intl.formatMessage(messages.saveExitButton)}
               </Button>
 
@@ -138,7 +138,7 @@ export function FormHeader({
                 type="icon"
                 onClick={onSaveAndExit}
               >
-                <Icon name="DownloadSimple" />
+                <Icon name="Floppy" />
               </Button>
               <Button size="small" type="icon" onClick={onExit}>
                 <Icon name="X" />

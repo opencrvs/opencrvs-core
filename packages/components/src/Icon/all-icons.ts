@@ -29,7 +29,7 @@ export {
   Copy,
   Database,
   DotsThreeVertical,
-  DownloadSimple,
+  FloppyDisk,
   ArrowCounterClockwise,
   MagnifyingGlassMinus,
   MagnifyingGlassPlus,
