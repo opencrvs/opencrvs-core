@@ -14,6 +14,10 @@
 
   - Use nvm to upgrade your local development environment to use node version `22.x.x.`
 
+- **UI enhancements**
+
+  - Replaced the `Download` icon with a `Floppy` save icon when saving an event as draft.
+
 ## 1.8.0 Release candidate
 
 ### New features
