@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { getUUID, SCOPES } from '@opencrvs/commons'
