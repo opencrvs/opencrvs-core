@@ -15,7 +15,7 @@ import type {
   Facility,
   IForms
 } from '@client/offline/reducer'
-import { System, SystemStatus, SystemType } from '@client/utils/gateway'
+import { System, SystemStatus } from '@client/utils/gateway'
 import {
   CertificateConfiguration,
   ICertificateData
@@ -23,6 +23,7 @@ import {
 import forms from './forms.json'
 import languages from './languages.json'
 import templates from './templates.json'
+import { SystemType } from '@opencrvs/commons/client'
 
 export const validImageB64String =
   'iVBORw0KGgoAAAANSUhEUgAAAAgAAAACCAYAAABllJ3tAAAABHNCSVQICAgIfAhkiAAAABl0RVh0U29mdHdhcmUAZ25vbWUtc2NyZWVuc2hvdO8Dvz4AAAAXSURBVAiZY1RWVv7PgAcw4ZNkYGBgAABYyAFsic1CfAAAAABJRU5ErkJggg=='

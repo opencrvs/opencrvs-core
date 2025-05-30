@@ -71,14 +71,6 @@ export async function getUser(
   return res.json() as Promise<User>
 }
 
-export enum SystemType {
-  Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
-  RecordSearch = 'RECORD_SEARCH',
-  Import = 'IMPORT',
-  Webhook = 'WEBHOOK'
-}
-
 export async function getSystem(
   userManagementHost: string,
   systemId: string,
