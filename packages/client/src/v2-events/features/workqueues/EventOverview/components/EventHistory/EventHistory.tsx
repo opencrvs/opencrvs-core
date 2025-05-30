@@ -14,6 +14,7 @@ import styled from 'styled-components'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
+import { useSelector } from 'react-redux'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
@@ -26,8 +27,8 @@ import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
-import { useSystems } from '@client/views/SysAdmin/Config/Systems/useSystems'
 import { getUsersFullName } from '@client/v2-events/utils'
+import { getOfflineData } from '@client/offline/selectors'
 import {
   EventHistoryModal,
   eventHistoryStatusMessage
@@ -131,7 +132,7 @@ function getSystemAvatar(name: string) {
  */
 export function EventHistory({ history }: { history: ActionDocument[] }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
-  const { existingSystems } = useSystems()
+  const { systems } = useSelector(getOfflineData)
 
   const intl = useIntl()
   const navigate = useNavigate()
@@ -156,7 +157,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
     .map((action) => {
       const userAction = isUserAction(action)
       const user = getUser(action.createdBy)
-      const system = existingSystems.find((s) => s._id === action.createdBy)
+      const system = systems.find((s) => s._id === action.createdBy)
 
       const location = userAction
         ? getLocation(action.createdAtLocation)
