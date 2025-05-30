@@ -54,7 +54,7 @@ export const TrpcContext = z.object({
 })
 export type TrpcContext = z.infer<typeof TrpcContext>
 
-export function normalizeHeaders(
+function normalizeHeaders(
   headers: Headers | Record<string, string | string[] | undefined>
 ): Record<string, string | string[] | undefined> {
   return headers instanceof Headers
