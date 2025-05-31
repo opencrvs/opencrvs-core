@@ -25,6 +25,7 @@ import {
   generateWorkqueues,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -1093,7 +1094,7 @@ export const handlers = {
     tRPCMsw.user.list.query(() => {
       return [
         {
-          id: '6821c175dce4d7886d4e8210',
+          id: testDataGenerator().user.id.localRegistrar,
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
           signatureFilename: undefined
