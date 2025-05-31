@@ -23,8 +23,7 @@ import {
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import {
   generateWorkqueues,
-  tennisClubMembershipEvent,
-  WorkqueueFixture
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 
 async function ensureCacheExists(cacheName: string) {
