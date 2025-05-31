@@ -188,7 +188,7 @@ export const SearchResultComponent = ({
   offset = 0,
   title: contentTitle,
   tabBarContent,
-  showPlusButton
+  showPlusButton // In mobile view of v1, plus button is visible for workqueue and not for searchResult
 }: {
   showPlusButton?: boolean
   columns: WorkqueueColumn[]
@@ -254,10 +254,10 @@ export const SearchResultComponent = ({
           const { declaration, ...rest } = event
 
           return {
-            ...rest,
             useFallbackTitle,
             title,
             label: eventConfig.label,
+            ...rest,
             ...declaration
           }
         })
