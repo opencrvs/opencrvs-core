@@ -23,6 +23,7 @@ import {
   EventDocument,
   EventInput,
   getUUID,
+  TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
@@ -57,7 +58,7 @@ const createHandler = trpcHandler(async ({ request }) => {
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
   return HttpResponse.json({
-    type: 'tennis-club-membership',
+    type: TENNIS_CLUB_MEMBERSHIP,
     id: '_REAL_UUID_',
     trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
@@ -170,7 +171,7 @@ describe('events that have unsynced actions', () => {
 
     // eslint-disable-next-line @typescript-eslint/await-thenable
     await createEventHook.result.current.mutate({
-      type: 'tennis-club-membership',
+      type: TENNIS_CLUB_MEMBERSHIP,
       transactionId: '_TEST_TRANSACTION_'
     })
 
@@ -189,7 +190,7 @@ describe('events that have unsynced actions', () => {
     createEventHook
   }) => {
     await createEventHook.result.current.mutateAsync({
-      type: 'tennis-club-membership',
+      type: TENNIS_CLUB_MEMBERSHIP,
       transactionId: '_TEST_TRANSACTION_'
     })
     // Wait for backend to sync

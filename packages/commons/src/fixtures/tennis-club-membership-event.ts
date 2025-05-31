@@ -1067,8 +1067,10 @@ const timePeriodOptions = [
   }
 ]
 
+export const TENNIS_CLUB_MEMBERSHIP = 'tennis-club-membership'
+
 export const tennisClubMembershipEvent = defineConfig({
-  id: 'tennis-club-membership',
+  id: TENNIS_CLUB_MEMBERSHIP,
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',

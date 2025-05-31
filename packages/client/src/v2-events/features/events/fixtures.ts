@@ -13,7 +13,8 @@ import {
   ActionStatus,
   ActionType,
   EventDocument,
-  EventIndex
+  EventIndex,
+  TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -21,7 +22,7 @@ const localRegistrarId = testDataGenerator().user.id.localRegistrar
 
 export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
-  type: 'tennis-club-membership',
+  type: TENNIS_CLUB_MEMBERSHIP,
   trackingId: 'TEST12',
   status: 'CREATED',
   createdAt: '2023-03-01T00:00:00.000Z',
@@ -42,7 +43,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
 }
 
 export const tennisClubMembershipEventDocument: EventDocument = {
-  type: 'tennis-club-membership',
+  type: TENNIS_CLUB_MEMBERSHIP,
   id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
   trackingId: 'TEST12',
   createdAt: '2025-01-23T05:30:02.615Z',

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('event config can be fetched', async () => {
@@ -16,8 +17,8 @@ test('event config can be fetched', async () => {
   const client = createTestClient(user)
   const config = await client.event.config.get()
 
-  expect(config[0].id).toEqual('tennis-club-membership')
-  expect(config[1].id).toEqual('tennis-club-membership_PREMIUM')
+  expect(config[0].id).toEqual(TENNIS_CLUB_MEMBERSHIP)
+  expect(config[1].id).toEqual('tennis-club-membership_premium')
 
   expect(config.length).toEqual(2)
 })

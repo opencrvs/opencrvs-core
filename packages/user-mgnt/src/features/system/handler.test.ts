@@ -17,6 +17,7 @@ import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/fixtures'
 
 const fetch = fetchMock as fetchMock.FetchMock
 
@@ -105,7 +106,7 @@ describe('registerSystem handler', () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     fetch.mockResponses(
       [
-        JSON.stringify([{ id: 'v2.birth' }, { id: 'tennis-club-membership' }]),
+        JSON.stringify([{ id: 'v2.birth' }, { id: TENNIS_CLUB_MEMBERSHIP }]),
         { status: 200 }
       ],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],

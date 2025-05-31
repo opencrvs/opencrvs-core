@@ -29,7 +29,7 @@ const handlers = [
   http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEvent,
-      { ...tennisClubMembershipEvent, id: 'tennis-club-membership_PREMIUM' }
+      { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
     ])
   }),
   // event.delete.test.ts

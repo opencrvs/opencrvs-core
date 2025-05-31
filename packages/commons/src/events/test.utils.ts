@@ -11,7 +11,7 @@
  */
 import { merge, omitBy, isString } from 'lodash'
 import addDays from 'date-fns/addDays'
-import { tennisClubMembershipEvent } from '../fixtures'
+import { TENNIS_CLUB_MEMBERSHIP, tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import {
   ActionBase,
@@ -123,11 +123,11 @@ export function generateActionAnnotationInput(
 export const eventPayloadGenerator = {
   create: (input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'tennis-club-membership'
+    type: input.type ?? TENNIS_CLUB_MEMBERSHIP
   }),
   patch: (id: string, input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'tennis-club-membership',
+    type: input.type ?? TENNIS_CLUB_MEMBERSHIP,
     id
   }),
   draft: (
@@ -626,7 +626,7 @@ export const eventQueryDataGenerator = (
 
   return {
     id: overrides.id ?? generateUuid(rng),
-    type: overrides.type ?? 'tennis-club-membership',
+    type: overrides.type ?? TENNIS_CLUB_MEMBERSHIP,
     status: overrides.status ?? pickRandom(rng, eventStatuses),
     createdAt: overrides.createdAt ?? createdAt,
     createdBy: overrides.createdBy ?? generateUuid(rng),

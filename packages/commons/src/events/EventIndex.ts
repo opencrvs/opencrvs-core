@@ -13,6 +13,7 @@ import { z, ZodType } from 'zod'
 import { EventMetadata, EventStatusEnum } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { TENNIS_CLUB_MEMBERSHIP } from '../fixtures'
 extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
@@ -168,7 +169,7 @@ export const QueryType = z
       z.array(QueryExpression).openapi({
         default: [
           {
-            eventType: 'tennis-club-membership',
+            eventType: TENNIS_CLUB_MEMBERSHIP,
             status: {
               type: 'anyOf',
               terms: [

@@ -9,7 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/fixtures'
 import { QueryType } from '@opencrvs/commons/events'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import {
@@ -32,7 +35,7 @@ test('indexes all records from MongoDB with one function call', async () => {
   }
 
   const body = await esClient.search({
-    index: getEventIndexName('tennis-club-membership'),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
     body: {
       query: {
         match_all: {}
@@ -51,7 +54,7 @@ test('records are automatically indexed when they are created', async () => {
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({
-    index: getEventIndexName('tennis-club-membership'),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
     body: {
       query: {
         match_all: {}
@@ -66,7 +69,7 @@ const exactStatusPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      eventType: 'tennis-club-membership',
+      eventType: TENNIS_CLUB_MEMBERSHIP,
       status: { type: 'exact', term: 'REGISTERED' }
     }
   ]
@@ -77,7 +80,7 @@ const exactRegisteredAtPayload: QueryType = {
   clauses: [
     {
       'legalStatus.REGISTERED.createdAt': { type: 'exact', term: '2024-01-01' },
-      eventType: 'tennis-club-membership'
+      eventType: TENNIS_CLUB_MEMBERSHIP
     }
   ]
 }
@@ -91,7 +94,7 @@ const rangeRegisteredAtPayload: QueryType = {
         gte: '2024-01-01',
         lte: '2024-12-31'
       },
-      eventType: 'tennis-club-membership'
+      eventType: TENNIS_CLUB_MEMBERSHIP
     }
   ]
 }
@@ -104,7 +107,7 @@ const exactRegisteredAtLocationPayload: QueryType = {
         type: 'exact',
         term: 'some-location-id'
       },
-      eventType: 'tennis-club-membership'
+      eventType: TENNIS_CLUB_MEMBERSHIP
     }
   ]
 }
@@ -122,7 +125,7 @@ const fullAndPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      eventType: 'tennis-club-membership',
+      eventType: TENNIS_CLUB_MEMBERSHIP,
       status: { type: 'exact', term: 'ARCHIVED' },
       trackingId: { type: 'exact', term: 'ABC123' },
       createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
@@ -147,7 +150,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         must: [
           {
             term: {
-              type: 'tennis-club-membership'
+              type: TENNIS_CLUB_MEMBERSHIP
             }
           },
           { term: { status: 'REGISTERED' } }
@@ -162,7 +165,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { type: 'tennis-club-membership' } },
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
           { term: { 'legalStatuses.REGISTERED.createdAt': '2024-01-01' } }
         ]
       }
@@ -174,7 +177,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { type: 'tennis-club-membership' } },
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
           {
             range: {
               'legalStatuses.REGISTERED.createdAt': {
@@ -195,7 +198,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { type: 'tennis-club-membership' } },
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
           {
             term: {
               'legalStatuses.REGISTERED.createdAtLocation': 'some-location-id'

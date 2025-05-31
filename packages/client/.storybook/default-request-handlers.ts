@@ -23,6 +23,7 @@ import {
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
 import {
   generateWorkqueues,
+  TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -2027,7 +2028,7 @@ export const handlers = {
         certificates: [
           {
             id: 'tennis-club-membership-certificate',
-            event: 'tennis-club-membership',
+            event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
               defaultMessage: 'Tennis Club Membership Certificate copy',
@@ -2052,7 +2053,7 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
-            event: 'tennis-club-membership',
+            event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',
               defaultMessage:

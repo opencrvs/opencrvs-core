@@ -37,4 +37,4 @@ exports[`event can be created and fetched 1`] = `
 }
 `;
 
-exports[`event with unknown type cannot be created 1`] = `[TRPCError: Invalid event type EVENT_TYPE_THAT_DOES_NOT_EXIST. Valid event types are: tennis-club-membership, tennis-club-membership_PREMIUM]`;
+exports[`event with unknown type cannot be created 1`] = `[TRPCError: Invalid event type EVENT_TYPE_THAT_DOES_NOT_EXIST. Valid event types are: tennis-club-membership, tennis-club-membership_premium]`;

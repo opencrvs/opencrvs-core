@@ -10,7 +10,10 @@
  */
 
 import { deepDropNulls, getCurrentEventState } from '.'
-import { tennisClubMembershipEvent } from '../../fixtures'
+import {
+  TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent
+} from '../../fixtures'
 import { getUUID } from '../../uuid'
 import { ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
@@ -402,7 +405,7 @@ describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
     const state = getCurrentEventState(
       {
-        type: 'tennis-club-membership',
+        type: TENNIS_CLUB_MEMBERSHIP,
         id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf',
         trackingId: 'TEST12',
         createdAt: '2025-01-23T02:21:38.343Z',
@@ -462,7 +465,7 @@ describe('correction requests', () => {
   test('proposed correction data is applied after the correction request is approved', () => {
     const state = getCurrentEventState(
       {
-        type: 'tennis-club-membership',
+        type: TENNIS_CLUB_MEMBERSHIP,
         id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf',
         trackingId: 'TEST12',
         createdAt: '2025-01-23T02:21:38.343Z',
