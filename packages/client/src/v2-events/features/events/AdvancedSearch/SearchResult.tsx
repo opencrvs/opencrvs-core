@@ -49,6 +49,9 @@ const FabContainer = styled.div`
     display: none;
   }
 `
+const WithTestId = styled.div.attrs({
+  'data-testid': 'search-result'
+})``
 
 const COLUMNS = {
   ICON_WITH_NAME: 'iconWithName',
@@ -354,38 +357,40 @@ export const SearchResultComponent = ({
   const isShowPagination = totalPages > 1
 
   return (
-    <WQContentWrapper
-      error={false}
-      isMobileSize={windowWidth < theme.grid.breakpoints.lg}
-      isShowPagination={isShowPagination}
-      noContent={allResults.length === 0}
-      noResultText={intl.formatMessage(messages.noResult)}
-      paginationId={currentPageNumber}
-      tabBarContent={tabBarContent}
-      title={contentTitle}
-      totalPages={totalPages}
-      onPageChange={(page) => setCurrentPageNumber(page)}
-    >
-      <Workqueue
-        columns={[...getDefaultColumns(), ...getColumns()]}
-        content={allResults.slice(
-          limit * (currentPageNumber - 1),
-          limit * currentPageNumber
+    <WithTestId>
+      <WQContentWrapper
+        error={false}
+        isMobileSize={windowWidth < theme.grid.breakpoints.lg}
+        isShowPagination={isShowPagination}
+        noContent={allResults.length === 0}
+        noResultText={intl.formatMessage(messages.noResult)}
+        paginationId={currentPageNumber}
+        tabBarContent={tabBarContent}
+        title={contentTitle}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPageNumber(page)}
+      >
+        <Workqueue
+          columns={[...getDefaultColumns(), ...getColumns()]}
+          content={allResults.slice(
+            limit * (currentPageNumber - 1),
+            limit * currentPageNumber
+          )}
+          hideLastBorder={!isShowPagination}
+          sortOrder={sortOrder}
+        />
+        {showPlusButton && (
+          <FabContainer>
+            <Link to={ROUTES.V2.EVENTS.CREATE.path}>
+              <FloatingActionButton
+                icon={() => <PlusTransparentWhite />}
+                id="new_event_declaration"
+              />
+            </Link>
+          </FabContainer>
         )}
-        hideLastBorder={!isShowPagination}
-        sortOrder={sortOrder}
-      />
-      {showPlusButton && (
-        <FabContainer>
-          <Link to={ROUTES.V2.EVENTS.CREATE.path}>
-            <FloatingActionButton
-              icon={() => <PlusTransparentWhite />}
-              id="new_event_declaration"
-            />
-          </Link>
-        </FabContainer>
-      )}
-    </WQContentWrapper>
+      </WQContentWrapper>
+    </WithTestId>
   )
 }
 

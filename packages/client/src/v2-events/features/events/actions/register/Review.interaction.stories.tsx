@@ -145,9 +145,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await expect(
-        await within(canvasElement).findAllByText('All events')
-      ).toHaveLength(2)
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -266,11 +266,9 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
       const archiveButton = modal.getByRole('button', { name: 'Archive' })
       await userEvent.click(archiveButton)
 
-      await waitFor(async () =>
-        expect(
-          await within(canvasElement).findAllByText('All events')
-        ).toHaveLength(2)
-      )
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -392,9 +390,9 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
       await expect(sendForUpdateButton).not.toBeDisabled()
 
       await userEvent.click(sendForUpdateButton)
-      await expect(
-        await within(canvasElement).findAllByText('All events')
-      ).toHaveLength(2)
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
