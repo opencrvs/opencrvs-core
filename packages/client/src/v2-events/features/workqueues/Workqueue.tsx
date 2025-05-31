@@ -18,7 +18,7 @@ import {
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import {
-  defaultThirdColumn,
+  dateOfEventColumn,
   findScope,
   deserializeQuery,
   QueryType
@@ -83,7 +83,7 @@ export function WorkqueueContainer() {
 
   return (
     <SearchResultComponent
-      columns={defaultThirdColumn}
+      columns={dateOfEventColumn}
       eventConfigs={eventConfigs}
       queryData={events}
       title={intl.formatMessage(workqueueConfig.name)}

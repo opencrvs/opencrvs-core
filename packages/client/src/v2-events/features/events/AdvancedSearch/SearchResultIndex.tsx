@@ -12,7 +12,7 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { SearchQueryParams, defaultThirdColumn } from '@opencrvs/commons/client'
+import { SearchQueryParams, dateOfEventColumn } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -44,10 +44,8 @@ export const SearchResultIndex = () => {
 
   return (
     <SearchResult
-      columns={defaultThirdColumn}
-      eventConfigs={[eventConfig]}
-      limit={10}
-      offset={0}
+      columns={dateOfEventColumn}
+      eventConfig={eventConfig}
       queryData={queryData}
       searchParams={searchParams}
     />

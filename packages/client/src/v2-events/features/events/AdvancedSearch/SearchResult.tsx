@@ -170,11 +170,9 @@ const messages = defineMessages(searchResultMessages)
 
 interface Props {
   columns: WorkqueueColumn[]
-  eventConfigs: EventConfig[]
+  eventConfig: EventConfig
   searchParams: EventState
   queryData: EventIndex[]
-  limit: number
-  offset: number
 }
 
 const ExtendedEventStatuses = {
@@ -186,8 +184,8 @@ export const SearchResultComponent = ({
   columns,
   queryData,
   eventConfigs,
-  limit,
-  offset,
+  limit = 10,
+  offset = 0,
   title: contentTitle,
   tabBarContent,
   showPlusButton
@@ -196,8 +194,8 @@ export const SearchResultComponent = ({
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
   queryData: EventIndex[]
-  limit: number
-  offset: number
+  limit?: number
+  offset?: number
   title: string
   tabBarContent?: React.ReactNode
 }) => {
@@ -393,11 +391,9 @@ export const SearchResultComponent = ({
 
 export const SearchResult = ({
   columns,
-  eventConfigs,
+  eventConfig,
   searchParams,
-  queryData,
-  limit,
-  offset
+  queryData
 }: Props) => {
   const intl = useIntl()
   const total = queryData.length
@@ -405,13 +401,11 @@ export const SearchResult = ({
   return (
     <SearchResultComponent
       columns={columns}
-      eventConfigs={eventConfigs}
-      limit={limit}
-      offset={offset}
+      eventConfigs={[eventConfig]}
       queryData={queryData}
       tabBarContent={
         <SearchCriteriaPanel
-          eventConfig={eventConfigs[0]}
+          eventConfig={eventConfig}
           searchParams={searchParams}
         />
       }

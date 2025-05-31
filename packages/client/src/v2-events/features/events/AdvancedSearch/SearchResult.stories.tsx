@@ -11,11 +11,10 @@
 import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
-  defaultThirdColumn,
+  dateOfEventColumn,
   eventQueryDataGenerator,
   EventStatus,
-  tennisClubMembershipEvent,
-  WorkqueueFixture
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchResult } from './SearchResult'
@@ -51,7 +50,7 @@ const mockSearchParams = {
 export const DefaultSearchResult: Story = {
   name: 'Default Search Result',
   args: {
-    eventConfigs: [tennisClubMembershipEvent],
+    eventConfig: tennisClubMembershipEvent,
     queryData: [
       eventQueryDataGenerator({
         declaration: {
@@ -64,28 +63,27 @@ export const DefaultSearchResult: Story = {
       })
     ],
     searchParams: mockSearchParams,
-    columns: defaultThirdColumn
+    columns: dateOfEventColumn
   }
 }
-
 export const SearchResultWithMultipleItems: Story = {
   name: 'Search Results With Multiple Items',
   parameters: {
     chromatic: { disableSnapshot: true }
   },
   args: {
-    eventConfigs: [tennisClubMembershipEvent],
-    queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
+    eventConfig: tennisClubMembershipEvent,
+    queryData: queryData.map((e) => ({ ...e, status: EventStatus.REGISTERED })),
     searchParams: { status: EventStatus.REGISTERED },
-    columns: defaultThirdColumn
+    columns: dateOfEventColumn
   }
 }
 export const NoSearchResult: Story = {
   name: 'No Search Result',
   args: {
-    eventConfigs: [tennisClubMembershipEvent],
+    eventConfig: tennisClubMembershipEvent,
     queryData: [],
     searchParams: mockSearchParams,
-    columns: defaultThirdColumn
+    columns: dateOfEventColumn
   }
 }

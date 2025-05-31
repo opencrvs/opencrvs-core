@@ -24,7 +24,7 @@ import {
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
 
-export const defaultThirdColumn = defineWorkqueuesColumns([
+export const dateOfEventColumn = defineWorkqueuesColumns([
   {
     label: {
       id: 'workqueues.dateOfEvent',
@@ -51,7 +51,7 @@ export const WorkqueueConfig = z
         conditionals: z.array(Conditional).optional()
       })
     ),
-    columns: z.array(WorkqueueColumn).default(defaultThirdColumn),
+    columns: z.array(WorkqueueColumn).default(dateOfEventColumn),
     icon: AvailableIcons
   })
   .describe('Configuration for workqueue.')
@@ -68,7 +68,7 @@ export const WorkqueueConfigInput = z.object({
       conditionals: z.array(Conditional).optional()
     })
   ),
-  columns: z.array(WorkqueueColumn).default(defaultThirdColumn),
+  columns: z.array(WorkqueueColumn).default(dateOfEventColumn),
   icon: AvailableIcons
 })
 
