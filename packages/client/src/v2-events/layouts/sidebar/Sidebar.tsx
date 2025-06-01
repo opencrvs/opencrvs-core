@@ -44,7 +44,7 @@ export const Sidebar = ({
   menuCollapse,
   navigationWidth
 }: {
-  menuCollapse?: () => void
+  menuCollapse?: () => void // Only relevant for mobile view
   navigationWidth?: number
 }) => {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
@@ -73,6 +73,15 @@ export const Sidebar = ({
   const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
   const runningVer = String(localStorage.getItem('running-version'))
+
+  const logout = async () => {
+    await storage.removeItem(SCREEN_LOCK)
+    removeToken()
+    await removeUserDetails()
+    window.location.assign(
+      `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}/${ROUTES.V2.buildPath({})}`
+    )
+  }
 
   return (
     <LeftNavigation
@@ -114,14 +123,7 @@ export const Sidebar = ({
           icon={() => <LogoutNavigation />}
           id={`navigation_${WORKQUEUE_TABS.logout}`}
           label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
-          onClick={async () => {
-            await storage.removeItem(SCREEN_LOCK)
-            removeToken()
-            await removeUserDetails()
-            window.location.assign(
-              `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}/v2`
-            )
-          }}
+          onClick={logout}
         />
       </NavigationGroup>
     </LeftNavigation>
