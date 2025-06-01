@@ -22,6 +22,31 @@ export const UserWithPrimaryOffice = User.extend({
 })
 export type UserWithPrimaryOffice = z.infer<typeof UserWithPrimaryOffice>
 
+/**
+ * Deserializes a user field from a serialized representation or a string.
+ *
+ * If the input is a string, it returns the string directly.
+ * If the input is an object with a `$userField` property of `'id'` or `'primaryOfficeId'`,
+ * it returns the corresponding property from the provided user object.
+ * For any other case, it returns `'ToDo'`.
+ *
+ * @param serializedUserField - Can be an actual string value or an serialized object: {$userField: field}
+ * @param user - The user object containing user properties, such as `id` and `primaryOfficeId`.
+ * @returns The deserialized user field as a string.
+ *
+ * @example
+ * {
+ *   "serializedUserField": { "$userField": "id" },
+ *   "user": { "id": "123", "primaryOfficeId": "456" }
+ * }
+ * // Returns: "123"
+ * @example
+ * {
+ *   "serializedUserField": "John Doe",
+ *   "user": { "id": "123", "primaryOfficeId": "456" }
+ * }
+ * // Returns: "John Doe"
+ */
 function userDeserializer(
   serializedUserField: SerializedUserField | string,
   user: UserWithPrimaryOffice
@@ -29,13 +54,15 @@ function userDeserializer(
   if (typeof serializedUserField === 'string') {
     return serializedUserField
   }
-  if (serializedUserField.$userField === 'id') {
-    return user[serializedUserField.$userField]
+  if (
+    serializedUserField.$userField === 'name' ||
+    serializedUserField.$userField === 'signatureFilename'
+  ) {
+    throw new Error(
+      `Deserializer for ${serializedUserField.$userField} is not implemented yet`
+    )
   }
-  if (serializedUserField.$userField === 'primaryOfficeId') {
-    return user[serializedUserField.$userField]
-  }
-  return 'ToDo'
+  return user[serializedUserField.$userField]
 }
 
 function deserializeQueryExpression(
