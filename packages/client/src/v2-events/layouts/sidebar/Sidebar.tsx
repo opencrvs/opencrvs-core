@@ -27,33 +27,50 @@ import { useWorkqueueConfigurations } from '@client/v2-events/features/events/us
 import { ROUTES } from '@client/v2-events/routes'
 import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
-import { removeUserDetails } from '@client/utils/userUtils'
+import {
+  getIndividualNameObj,
+  removeUserDetails
+} from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { getLanguage } from '@client/i18n/selectors'
+import { Avatar } from '@client/components/Avatar'
+import { joinValues } from '@client/v2-events/utils'
 
 const SCREEN_LOCK = 'screenLock'
 
 export const Sidebar = ({
   menuCollapse,
-  navigationWidth,
-  userInfo
+  navigationWidth
 }: {
   menuCollapse?: () => void
   navigationWidth?: number
-  userInfo?: {
-    name: string
-    role: string
-    avatar: React.JSX.Element
-  }
 }) => {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const workqueues = useWorkqueueConfigurations()
   const navigate = useNavigate()
   const offlineCountryConfig = useSelector(getOfflineData)
+  const userDetails = useSelector(getUserDetails)
+  const language = useSelector(getLanguage)
 
   const { getCount } = useWorkqueue(workqueueSlug)
   const counts = getCount.useSuspenseQuery()
+
+  let name = ''
+  if (userDetails?.name) {
+    const nameObj = getIndividualNameObj(userDetails.name, language)
+    if (nameObj) {
+      const { firstNames, familyName } = nameObj
+      name = joinValues([firstNames, familyName], ' ')
+    }
+  }
+
+  const role =
+    (userDetails?.role && intl.formatMessage(userDetails.role.label)) ?? ''
+
+  const avatar = <Avatar avatar={userDetails?.avatar} name={name} />
 
   const runningVer = String(localStorage.getItem('running-version'))
 
@@ -61,20 +78,20 @@ export const Sidebar = ({
     <LeftNavigation
       applicationName={offlineCountryConfig.config.APPLICATION_NAME}
       applicationVersion={runningVer}
-      avatar={() => userInfo && userInfo.avatar}
-      name={userInfo && userInfo.name}
+      avatar={() => avatar}
+      name={name}
       navigationWidth={navigationWidth}
-      role={userInfo && userInfo.role}
+      role={role}
     >
       <NavigationGroup>
-        {workqueues.map(({ name, slug, icon }) => (
+        {workqueues.map(({ name: label, slug, icon }) => (
           <NavigationItem
             key={slug}
             count={counts[slug] || 0}
             icon={() => <Icon name={icon} size="small" />}
             id={`navigation_workqueue_${slug}`}
             isSelected={slug === workqueueSlug}
-            label={intl.formatMessage(name)}
+            label={intl.formatMessage(label)}
             onClick={() => {
               navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: slug }))
               menuCollapse && menuCollapse()
