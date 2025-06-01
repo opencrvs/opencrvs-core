@@ -11,7 +11,6 @@
 
 import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { findScope } from '@opencrvs/commons/client'
 import { Loader } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueueConfigurations } from '../features/events/useWorkqueueConfiguration'
@@ -23,12 +22,15 @@ export const RedirectToWorkqueue = () => {
   useEffect(() => {
     if (workqueues.length) {
       navigate(
-        ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueues[0].slug })
+        ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: workqueues[0].slug }),
+        {
+          replace: true
+        }
       )
     } else {
       throw new Error('No workqueue is configured for this user')
     }
   }, [workqueues, navigate])
 
-  return <Loader id="redirectToWorkqueue" />
+  return <Loader id="redirect_to_workqueue" />
 }

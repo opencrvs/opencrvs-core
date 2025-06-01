@@ -20,7 +20,6 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
-import { deserializeQuery, QueryType } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
@@ -30,13 +29,11 @@ import { removeToken } from '@client/utils/authUtils'
 import * as routes from '@client/navigation/routes'
 import { removeUserDetails } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
-import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useUsers } from '../../hooks/useUsers'
+import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 
 const SCREEN_LOCK = 'screenLock'
 
-export const Navigation = ({
+export const Sidebar = ({
   menuCollapse,
   navigationWidth,
   userInfo
@@ -54,24 +51,9 @@ export const Navigation = ({
   const workqueues = useWorkqueueConfigurations()
   const navigate = useNavigate()
   const offlineCountryConfig = useSelector(getOfflineData)
-  const { getUsers } = useUsers()
-  const legacyUser = useSelector(getUserDetails)
-  const [[user]] = getUsers.useSuspenseQuery(legacyUser ? [legacyUser.id] : [])
-  const { useGetEventCounts } = useEvents()
 
-  const queries = workqueues.map(({ slug, query }) => ({
-    slug: slug,
-    query:
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      user && legacyUser
-        ? deserializeQuery(query, {
-            ...user,
-            primaryOfficeId: legacyUser.primaryOffice.id
-          })
-        : ({ type: 'and', clauses: [] } satisfies QueryType)
-  }))
-
-  const counts = useGetEventCounts().useSuspenseQuery(queries)
+  const { getCount } = useWorkqueue(workqueueSlug)
+  const counts = getCount.useSuspenseQuery()
 
   const runningVer = String(localStorage.getItem('running-version'))
 

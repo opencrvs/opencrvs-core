@@ -31,8 +31,8 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import * as routes from '@client/navigation/routes'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { advancedSearchMessages } from '@client/v2-events/features/events/AdvancedSearch/AdvancedSearch'
-import { Hamburger } from '../sideBar/Hamburger'
-import { Navigation } from '../sideBar/Navigation'
+import { Hamburger } from '../sidebar/Hamburger'
+import { Sidebar } from '../sidebar/Sidebar'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
@@ -117,7 +117,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           )}
         />
       }
-      navigation={<Navigation />}
+      navigation={<Sidebar />}
       skipToContentText="skip"
     >
       {children}

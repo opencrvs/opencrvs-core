@@ -18,7 +18,7 @@ import { getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { getIndividualNameObj } from '@client/utils/userUtils'
 import { Avatar } from '@client/components/Avatar'
-import { Navigation } from './Navigation'
+import { Sidebar } from './Sidebar'
 
 export function Hamburger() {
   const [showMenu, setShowMenu] = useState(false)
@@ -49,10 +49,10 @@ export function Hamburger() {
         <Icon color="primary" name="List" size="medium" />
       </Button>
       <ExpandingMenu
-        menuCollapse={() => toggleMenu()}
+        menuCollapse={toggleMenu}
         navigation={() => (
-          <Navigation
-            menuCollapse={() => toggleMenu()}
+          <Sidebar
+            menuCollapse={toggleMenu}
             navigationWidth={320}
             userInfo={userInfo}
           />
