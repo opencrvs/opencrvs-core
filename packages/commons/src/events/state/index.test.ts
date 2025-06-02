@@ -10,10 +10,7 @@
  */
 
 import { deepDropNulls, getCurrentEventState } from '.'
-import {
-  TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent
-} from '../../fixtures'
+import { tennisClubMembershipEvent } from '../../fixtures'
 import { getUUID } from '../../uuid'
 import { ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
@@ -21,6 +18,7 @@ import { AddressType } from '../CompositeFieldValue'
 import { EventStatus } from '../EventMetadata'
 import { generateActionDocument, generateEventDocument } from '../test.utils'
 import { EventIndex } from '../EventIndex'
+import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
 
 /* eslint-disable max-lines */
 
