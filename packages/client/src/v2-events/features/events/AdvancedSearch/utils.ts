@@ -368,10 +368,11 @@ export function toQueryType(
   const topLevelFields: Record<string, unknown> = {}
   const dataFields: Record<string, unknown> = {}
 
-  Object.entries(searchParams).forEach(([_, value]) => {
-    const key = _.replace(/^event____/, '').replaceAll(FIELD_SEPARATOR, '.')
+  const regex = new RegExp(`^event${FIELD_SEPARATOR}`)
+  Object.entries(searchParams).forEach(([encodedKey, value]) => {
+    const key = encodedKey.replace(regex, '').replaceAll(FIELD_SEPARATOR, '.')
 
-    if (_.startsWith('event____')) {
+    if (encodedKey.startsWith(`event${FIELD_SEPARATOR}`)) {
       topLevelFields[key] = value
     } else {
       dataFields[key] = value
