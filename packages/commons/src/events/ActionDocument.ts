@@ -94,6 +94,7 @@ const ValidateAction = ActionBase.merge(
 export const RejectionReason = z.object({
   message: z
     .string()
+    .min(1, { message: 'Message cannot be empty' })
     .describe('Message describing reason for rejection or archiving'),
   isDuplicate: z.boolean().optional().describe('If a declaration is duplicated')
 })

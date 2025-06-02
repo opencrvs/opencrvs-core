@@ -46,17 +46,12 @@ function prepareComments(history: ActionDocument) {
   const comments: { comment: string }[] = []
 
   if (
-    history.type === ActionType.REJECT &&
-    typeof history.reason.message === 'string'
+    history.type === ActionType.REJECT ||
+    history.type === ActionType.ARCHIVE
   ) {
     comments.push({ comment: history.reason.message })
   }
-  if (
-    history.type === ActionType.ARCHIVE &&
-    typeof history.reason.message === 'string'
-  ) {
-    comments.push({ comment: history.reason.message })
-  }
+
   return comments
 }
 
