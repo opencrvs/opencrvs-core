@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { ActionType } from './ActionType'
-import { ActionUpdate } from './ActionDocument'
+import { ActionUpdate, RejectionReason } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { CreatedAtLocation } from './CreatedAtLocation'
 import { v4 as uuidv4 } from 'uuid'
@@ -84,7 +84,8 @@ export type DeclareActionInput = z.infer<typeof DeclareActionInput>
 
 export const RejectDeclarationActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.REJECT).default(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT).default(ActionType.REJECT),
+    reason: RejectionReason
   })
 )
 export type RejectDeclarationActionInput = z.infer<
@@ -104,7 +105,8 @@ export type MarkedAsDuplicateActionInput = z.infer<
 
 export const ArchiveActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE),
+    reason: RejectionReason
   })
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>

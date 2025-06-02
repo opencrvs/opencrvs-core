@@ -445,9 +445,9 @@ export function generateActionDocument({
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, reason: { message: '' } }
     case ActionType.REJECT:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, reason: { message: '' } }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
@@ -459,7 +459,11 @@ export function generateActionDocument({
     case ActionType.APPROVE_CORRECTION:
       return { ...actionBase, requestId: getUUID(), type: action }
     case ActionType.REJECT_CORRECTION:
-      return { ...actionBase, requestId: getUUID(), type: action }
+      return {
+        ...actionBase,
+        requestId: getUUID(),
+        type: action
+      }
     case ActionType.REGISTER:
       return {
         ...actionBase,
