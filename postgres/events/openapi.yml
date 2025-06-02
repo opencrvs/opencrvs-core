@@ -70,7 +70,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a6b97b45-f824-4419-b9cd-4c4c5445f6cf
+                transactionId: 9ea804a7-01d1-4161-8206-ba0d432befb3
                 type: v2.birth
       responses:
         "200":
@@ -435,7 +435,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a6abf677-baf1-4862-9bde-5aae34edde26
+                transactionId: 0f4cb8a1-2529-4e99-969a-9961fc65dd9b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -464,6 +464,91 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/search:
+    get:
+      operationId: event-search
+      summary: Search for events
+      tags:
+        - Search
+      security:
+        - Authorization: []
+      parameters:
+        - in: query
+          name: type
+          schema:
+            anyOf:
+              - type: string
+                enum:
+                  - and
+              - type: string
+                enum:
+                  - or
+            default: and
+          required: true
+        - in: query
+          name: clauses
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/QueryExpression"
+            default:
+              - eventType: tennis-club-membership
+                status:
+                  type: anyOf
+                  terms:
+                    - CREATED
+                    - NOTIFIED
+                    - DECLARED
+                    - VALIDATED
+                    - REGISTERED
+                    - CERTIFIED
+                    - REJECTED
+                    - ARCHIVED
+                updatedAt:
+                  type: range
+                  gte: 2025-05-22
+                  lte: 2025-05-29
+                data: {}
+          required: true
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/EventIndex"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "404":
+          description: Not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.NOT_FOUND"
         "500":
           description: Internal server error
           content:
@@ -8819,5 +8904,499 @@ components:
       example:
         code: BAD_REQUEST
         message: Invalid input data
+        issues: []
+    QueryExpression:
+      type: object
+      properties:
+        eventType:
+          type: string
+        status:
+          anyOf:
+            - $ref: "#/components/schemas/AnyOfStatus"
+            - $ref: "#/components/schemas/ExactStatus"
+        createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        updatedAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatus.REGISTERED.createdAt:
+          $ref: "#/components/schemas/DateCondition"
+        legalStatus.REGISTERED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        createAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        updatedAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
+        createdBy:
+          $ref: "#/components/schemas/Exact"
+        updatedBy:
+          $ref: "#/components/schemas/Exact"
+        trackingId:
+          $ref: "#/components/schemas/Exact"
+        flags:
+          type: array
+          items:
+            anyOf:
+              - $ref: "#/components/schemas/AnyOf"
+              - $ref: "#/components/schemas/Not"
+        data:
+          $ref: "#/components/schemas/QueryInput"
+    AnyOfStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - anyOf
+        terms:
+          type: array
+          items:
+            type: string
+            enum: &a11
+              - CREATED
+              - NOTIFIED
+              - DECLARED
+              - VALIDATED
+              - REGISTERED
+              - CERTIFIED
+              - REJECTED
+              - ARCHIVED
+      required:
+        - type
+        - terms
+    ExactStatus:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          type: string
+          enum: *a11
+      required:
+        - type
+        - term
+    DateCondition:
+      anyOf:
+        - $ref: "#/components/schemas/Exact"
+        - $ref: "#/components/schemas/Range"
+    Exact:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          type: string
+      required:
+        - type
+        - term
+    Range:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - range
+        gte:
+          type: string
+        lte:
+          type: string
+      required:
+        - type
+        - gte
+        - lte
+    Within:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - within
+        location:
+          type: string
+      required:
+        - type
+        - location
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
+    Not:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - not
+        term:
+          type: string
+      required:
+        - type
+        - term
+    QueryInput:
+      anyOf:
+        - oneOf:
+            - $ref: "#/components/schemas/Fuzzy"
+            - $ref: "#/components/schemas/Exact"
+            - $ref: "#/components/schemas/Range"
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/AnyOf"
+            - $ref: "#/components/schemas/Not"
+          discriminator:
+            propertyName: type
+            mapping:
+              fuzzy: "#/components/schemas/Fuzzy"
+              exact: "#/components/schemas/Exact"
+              range: "#/components/schemas/Range"
+              within: "#/components/schemas/Within"
+              anyOf: "#/components/schemas/AnyOf"
+              not: "#/components/schemas/Not"
+        - type: object
+          additionalProperties:
+            $ref: "#/components/schemas/QueryInput"
+    Fuzzy:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - fuzzy
+        term:
+          type: string
+      required:
+        - type
+        - term
+    EventIndex:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          description: The type of event, such as birth, death, or marriage.
+        status:
+          type: string
+          enum:
+            - CREATED
+            - NOTIFIED
+            - DECLARED
+            - VALIDATED
+            - REGISTERED
+            - CERTIFIED
+            - REJECTED
+            - ARCHIVED
+        legalStatuses:
+          type: object
+          properties:
+            DECLARED:
+              type: object
+              nullable: true
+              properties:
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: The timestamp when the action request was created.
+                createdBy:
+                  type: string
+                  description: ID of the user who created the action request.
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: Location of the user who created the action request.
+                acceptedAt:
+                  type: string
+                  format: date-time
+                  description: Timestamp when the action request was accepted.
+                createdByRole:
+                  type: string
+                  description: Role of the user at the time of action request creation.
+              required:
+                - createdAt
+                - createdBy
+                - acceptedAt
+                - createdByRole
+            REGISTERED:
+              type: object
+              nullable: true
+              properties:
+                createdAt:
+                  type: string
+                  format: date-time
+                  description: The timestamp when the action request was created.
+                createdBy:
+                  type: string
+                  description: ID of the user who created the action request.
+                createdAtLocation:
+                  type: string
+                  nullable: true
+                  format: uuid
+                  description: Location of the user who created the action request.
+                acceptedAt:
+                  type: string
+                  format: date-time
+                  description: Timestamp when the action request was accepted.
+                createdByRole:
+                  type: string
+                  description: Role of the user at the time of action request creation.
+                registrationNumber:
+                  type: string
+                  description: Registration number of the event. Always present for accepted
+                    registrations.
+              required:
+                - createdAt
+                - createdBy
+                - acceptedAt
+                - createdByRole
+                - registrationNumber
+          description: Metadata related to the legal registration of the event, such as
+            who registered it and when.
+        createdAt:
+          type: string
+          format: date-time
+          description: The timestamp when the event was first created and saved.
+        dateOfEvent:
+          type: string
+          nullable: true
+          format: date
+        createdBy:
+          type: string
+          description: ID of the user who created the event.
+        updatedByUserRole:
+          type: string
+          description: Role of the user who last updated the declaration.
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
+          description: Location of the user who created the event.
+        updatedAtLocation:
+          type: string
+          nullable: true
+          format: uuid
+          description: Location of the user who last updated the declaration.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp of the most recent declaration update.
+        assignedTo:
+          type: string
+          nullable: true
+          description: ID of the user currently assigned to the event.
+        updatedBy:
+          type: string
+          nullable: true
+          description: ID of the user who last updated the declaration.
+        trackingId:
+          type: string
+          description: System-generated tracking ID used by informants or registrars to
+            look up the event.
+        flags:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - certificate-printed
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                  - type: array
+                    maxItems: 2
+                    minItems: 2
+                    items:
+                      oneOf:
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+                        - type: string
+                          format: date
+                          description: Date in the format YYYY-MM-DD
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    filename:
+                      type: string
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - filename
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                  residentialArea:
+                    type: string
+                  street:
+                    type: string
+                  number:
+                    type: string
+                  zipCode:
+                    type: string
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                  addressLine1:
+                    type: string
+                  addressLine2:
+                    type: string
+                  addressLine3:
+                    type: string
+                  postcodeOrZip:
+                    type: string
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+      required:
+        - id
+        - type
+        - status
+        - legalStatuses
+        - createdAt
+        - createdBy
+        - updatedByUserRole
+        - updatedAt
+        - trackingId
+        - flags
+        - declaration
+    error.NOT_FOUND:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The error message
+          example: Not found
+        code:
+          type: string
+          description: The error code
+          example: NOT_FOUND
+        issues:
+          type: array
+          items:
+            type: object
+            properties:
+              message:
+                type: string
+            required:
+              - message
+          description: An array of issues that were responsible for the error
+          example: []
+      required:
+        - message
+        - code
+      title: Not found error (404)
+      description: The error information
+      example:
+        code: NOT_FOUND
+        message: Not found
         issues: []
 
