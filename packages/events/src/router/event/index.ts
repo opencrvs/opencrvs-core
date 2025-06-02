@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { extendZodWithOpenApi } from 'zod-openapi'
 import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
@@ -27,11 +28,11 @@ import {
   EventDocument,
   EventIndex,
   EventInput,
-  QueryType,
   RejectCorrectionActionInput,
   RequestCorrectionActionInput,
   UnassignActionInput,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  QueryType
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -51,6 +52,8 @@ import {
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { getDefaultActionProcedures } from './actions'
+
+extendZodWithOpenApi(z)
 
 function validateEventType({
   eventTypes,
@@ -272,8 +275,17 @@ export const eventRouter = router({
       return getIndexedEvents(userId)
     }),
   search: publicProcedure
+    .meta({
+      openapi: {
+        summary: 'Search for events',
+        method: 'GET',
+        tags: ['Search'],
+        path: '/events/search'
+      }
+    })
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
+    .output(z.array(EventIndex))
     .query(async ({ input }) => getIndex(input)),
   import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))

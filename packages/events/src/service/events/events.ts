@@ -30,7 +30,7 @@ import {
   EventStatus,
   isWriteAction
 } from '@opencrvs/commons/events'
-import { UUID } from '@opencrvs/commons'
+import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
@@ -223,6 +223,22 @@ export async function addAction(
     })
   }
 
+  if (input.type === ActionType.ASSIGN) {
+    await eventsRepo.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      type: input.type,
+      declaration: input.declaration,
+      annotation: input.annotation,
+      status,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdAtLocation: user.primaryOfficeId,
+      originalActionId: input.originalActionId,
+      assignedTo: input.assignedTo
+    })
+  }
+
   await eventsRepo.createAction({
     eventId,
     registrationNumber:
@@ -236,12 +252,19 @@ export async function addAction(
     createdBy: user.id,
     createdByRole: user.role,
     createdAtLocation: user.primaryOfficeId,
-    originalActionId: input.originalActionId,
-    // @TODO: ^ Split this function
-    assignedTo: input.type === ActionType.ASSIGN ? input.assignedTo : undefined
+    originalActionId: input.originalActionId
   })
 
-  if (isWriteAction(input.type) && !input.keepAssignment) {
+  // We want to unassign only if:
+  // - Action is a write action, since we dont want to unassign from e.g. READ action
+  // - Keep assignment is false
+  // - User is not a system user, since system users dont partake in assignment
+  const shouldUnassign =
+    isWriteAction(input.type) &&
+    !input.keepAssignment &&
+    user.type !== TokenUserType.SYSTEM
+
+  if (shouldUnassign) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
