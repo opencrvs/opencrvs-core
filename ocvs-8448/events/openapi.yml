@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f7b4f39b-acc7-4c3b-8c93-7dc1bc788f71
+                transactionId: 437906d2-c8f6-4689-97cf-44f42f7aaff4
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 9f761be8-2714-4f1a-8aea-d8f77845c4e5
+                transactionId: fae79e5d-5c48-49cd-86a0-b80530811b10
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1116,6 +1116,7 @@ components:
       description: JSON schema conditional configuration
     ActionConfig:
       oneOf:
+        - $ref: "#/components/schemas/ReadActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RejectDeclarationActionConfig"
@@ -1130,6 +1131,7 @@ components:
       discriminator:
         propertyName: type
         mapping:
+          READ: "#/components/schemas/ReadActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REJECT: "#/components/schemas/RejectDeclarationActionConfig"
@@ -1141,7 +1143,7 @@ components:
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
           REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
           APPROVE_CORRECTION: "#/components/schemas/ApproveCorrectionActionConfig"
-    DeclareActionConfig:
+    ReadActionConfig:
       type: object
       properties:
         label:
@@ -1182,7 +1184,7 @@ components:
         type:
           type: string
           enum:
-            - DECLARE
+            - READ
         review:
           type: object
           properties:
@@ -2843,6 +2845,69 @@ components:
             within declaration forms, as they are the only ones with review
             pages.
       description: Field conditional configuration
+    DeclareActionConfig:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          type: array
+          items:
+            oneOf:
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    enum:
+                      - ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+          default: *a8
+        draft:
+          type: boolean
+        type:
+          type: string
+          enum:
+            - DECLARE
+        review:
+          type: object
+          properties:
+            title:
+              description: Title of the review page
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+              description: Fields to be rendered on the review page for annotations.
+          required:
+            - title
+            - fields
+          description: Configuration for **declaration** review page.
+      required:
+        - label
+        - conditionals
+        - type
+        - review
     ValidateActionConfig:
       type: object
       properties:
@@ -4788,6 +4853,18 @@ components:
           type: string
           enum:
             - REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4797,6 +4874,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     MarkAsDuplicateAction:
       type: object
       properties:
@@ -5450,6 +5528,18 @@ components:
           type: string
           enum:
             - ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -5459,6 +5549,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     NotifiedAction:
       type: object
       properties:
