@@ -27,18 +27,23 @@
 - **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
 - **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
 
-## 1.7.2 Release candidate
+## [1.7.2](https://github.com/opencrvs/opencrvs-core/compare/v1.7.1...v1.7.2)
 
 ### New features
 
 - **TimeField component with AM/PM support**: The `TimeField` component now supports both 12-hour (AM/PM) and 24-hour formats through a new prop, `use12HourFormat: boolean`. The logic has been refactored into two separate components, `TimeInput24` and `TimeInput12`. The `TimeField` component automatically selects the appropriate component based on the prop. [#8336](https://github.com/opencrvs/opencrvs-core/issues/8336)
 - **Configurable Scopes**: Introduce a new syntax for scopes which provides more customizability to the SI's via scopes. Two new scopes `user.create[role=a|b|c]` & `user.update[role=d|e|f]` are getting included in this release which can be used to restrict what the role of a newly created or updated user can be set to by the user of a particular role. Gradually most of the existing scopes will be migrated to use this new syntax.
+- **New Full Honorific Name Field**: An optional `fullHonorificName` field has been added to the user management page to capture the complete name of a user including their title or honorific. This field can be used for display purposes, including rendering the name appropriately on certificates.
 
 ### Bug fixes
 
 - Filter out inactive locations in the Organisations menu [#8782](https://github.com/opencrvs/opencrvs-core/issues/8782)
 - Improve quick search results when searching by name [#9272](https://github.com/opencrvs/opencrvs-core/issues/9272)
 - Fix practitioner role history entries from being created with every view and download [#9462](https://github.com/opencrvs/opencrvs-core/issues/9462)
+- Fix a child's NID form field cannot be added eithe rmanually or via ESignet. A father section cannot be placed before a mother section if you wish to use a radio button to control mapping addresses from one individual to aother to make data entry easier [#9582](https://github.com/opencrvs/opencrvs-core/issues/9582)
+- Fix the role of the certifier unable to get resolved for new users which in turn caused the download of the declaration to fail [#9643](https://github.com/opencrvs/opencrvs-core/issues/9643)
+- Fix one failing unassign blocking all other unassign actions from continuing [#9651](https://github.com/opencrvs/opencrvs-core/issues/9651)
+- Fix record not getting unassigned when validating an already validated record again [#9648](https://github.com/opencrvs/opencrvs-core/issues/9648)
 
 ## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
 
@@ -100,6 +105,12 @@
 - Fix the informant column on the Perfomance page showing "Other family member" when `Someone else` is selected for a registration [#6157](https://github.com/opencrvs/opencrvs-core/issues/6157)
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 - Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
+
+## [1.6.5](https://github.com/opencrvs/opencrvs-core/compare/v1.6.4...v1.6.5)
+
+### Breaking changes
+
+- Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
 ## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.3...v1.6.4)
 
