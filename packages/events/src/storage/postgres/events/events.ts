@@ -141,7 +141,7 @@ async function createActionInTransaction(
     status: ActionStatus
     createdBy: string
     createdByRole: string
-    createdAtLocation: UUID
+    createdAtLocation?: UUID
     declaration?: Record<string, SerializableValue>
     annotation?: Record<string, SerializableValue>
     originalActionId?: UUID
@@ -151,6 +151,8 @@ async function createActionInTransaction(
 ) {
   // @TODO: Some typing error here
   const originalActionIdx = originalActionId as string | undefined
+  // @TODO: Some typing error here
+  const createdAtLocationx = createdAtLocation as string | undefined
 
   const id = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
     INSERT INTO
@@ -180,7 +182,7 @@ async function createActionInTransaction(
         ${sql.jsonb(annotation ?? {})},
         ${createdBy},
         ${createdByRole},
-        ${createdAtLocation},
+        ${createdAtLocationx ?? null}::uuid,
         ${originalActionIdx ?? null}::uuid
       )
     ON CONFLICT (action_type, transaction_id) DO UPDATE -- no-op, DO NOTHING would not return the id
@@ -215,7 +217,7 @@ export const getOrCreateEvent = async ({
   fieldId?: string
   createdBy: string
   createdByRole: string
-  createdAtLocation: UUID
+  createdAtLocation?: UUID
 }) => {
   const db = await getClient()
 

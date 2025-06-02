@@ -95,8 +95,10 @@ module.exports = defineConfig([
     overrides: {
       types: {
         jsonb: 'JsonBinarySqlToken',
-        uuid: 'UUID',
-        uuid: 'string & BRAND<"UUID">',
+        uuid: {
+          parameter: 'string & BRAND<"UUID">',
+          return: 'UUID'
+        },
         action_type: 'ActionType',
         action_status: 'ActionStatus',
         'text[]': 'ArraySqlToken',

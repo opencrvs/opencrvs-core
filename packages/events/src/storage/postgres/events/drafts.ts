@@ -35,8 +35,11 @@ export async function createDraft({
   annotation: SerializableValue
   createdBy: string
   createdByRole: string
-  createdAtLocation: UUID | null
+  createdAtLocation?: UUID
 }) {
+  // @TODO: Some typing error here
+  const createdAtLocationx = createdAtLocation as string | undefined
+
   const db = await getClient()
 
   const draft = await db.one(sql.type(Draft)`
@@ -60,7 +63,7 @@ export async function createDraft({
         ${sql.jsonb(annotation)},
         ${createdBy},
         ${createdByRole},
-        ${createdAtLocation as UUID}
+        ${createdAtLocationx ?? null}::uuid
       )
     ON CONFLICT (transaction_id) DO UPDATE
     SET
