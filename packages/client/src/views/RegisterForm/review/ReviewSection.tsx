@@ -429,7 +429,7 @@ const renderValue = (
     const sectionData = draftData[sectionId]
 
     if (
-      sectionData[camelCase(`countryPrimary ${sectionId}`)] ===
+      sectionData?.[camelCase(`countryPrimary ${sectionId}`)] ===
       window.config.COUNTRY
     ) {
       const dynamicOption: IDynamicOptions = {
@@ -453,7 +453,7 @@ const renderValue = (
     }
 
     if (
-      sectionData[camelCase(`countrySecondary ${sectionId}`)] ===
+      sectionData?.[camelCase(`countrySecondary ${sectionId}`)] ===
       window.config.COUNTRY
     ) {
       const dynamicOption: IDynamicOptions = {

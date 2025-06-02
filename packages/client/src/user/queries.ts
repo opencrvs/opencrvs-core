@@ -24,6 +24,7 @@ export const SEARCH_USERS = gql`
         }
         mobile
         email
+        fullHonorificName
         primaryOffice {
           id
         }
@@ -99,6 +100,7 @@ export const GET_USER = gql`
       username
       mobile
       email
+      fullHonorificName
       identifier {
         system
         value

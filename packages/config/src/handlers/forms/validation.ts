@@ -215,6 +215,8 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
   child: [
     'middleNameEng',
     'attendantAtBirth',
+    'iD',
+    'childNidVerification',
     'birthType',
     'weightAtBirth',
     ...OPTIONAL_EVENT_ADDRESS_FIELDS.map((field) => `${field}Placeofbirth`)
@@ -231,6 +233,7 @@ const OPTIONAL_FIELDS_IN_SECTION: Record<string, string[] | undefined> = {
     'occupation',
     'educationalAttainment',
     'nationality',
+    'primaryAddressSameAsOtherPrimary',
     ...OPTIONAL_PRIMARY_ADDRESS_FIELDS.map((field) => `${field}Mother`)
   ],
   father: [
