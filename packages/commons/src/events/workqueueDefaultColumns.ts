@@ -28,13 +28,5 @@ export const defaultWorkqueueColumns: WorkqueueColumn[] = [
       id: 'workqueue.default.column.event'
     },
     value: event.field('type')
-  },
-  {
-    label: {
-      defaultMessage: 'Last updated',
-      description: 'This is the label for the workqueue column',
-      id: 'workqueue.default.column.modifiedAt'
-    },
-    value: event.field('updatedAt')
   }
 ]

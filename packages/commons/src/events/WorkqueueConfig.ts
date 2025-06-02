@@ -32,6 +32,14 @@ export const dateOfEventColumn = defineWorkqueuesColumns([
       description: 'Label for workqueue column: dateOfEvent'
     },
     value: event.field('dateOfEvent')
+  },
+  {
+    label: {
+      defaultMessage: 'Last updated',
+      description: 'This is the label for the workqueue column',
+      id: 'workqueue.default.column.modifiedAt'
+    },
+    value: event.field('updatedAt')
   }
 ])
 
