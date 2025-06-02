@@ -11,7 +11,7 @@
  */
 import { merge, omitBy, isString } from 'lodash'
 import addDays from 'date-fns/addDays'
-import { TENNIS_CLUB_MEMBERSHIP, tennisClubMembershipEvent } from '../fixtures'
+import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import {
   ActionBase,
@@ -51,6 +51,7 @@ import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
 import { eventStatuses } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
+import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(

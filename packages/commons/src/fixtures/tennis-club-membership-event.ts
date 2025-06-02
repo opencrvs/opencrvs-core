@@ -23,6 +23,7 @@ import { defineWorkqueues } from '../events'
 import { event } from '../events/event'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
 import { EventStatus } from '../events/EventMetadata'
+import { TENNIS_CLUB_MEMBERSHIP } from '../events/Constants'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -1066,8 +1067,6 @@ const timePeriodOptions = [
     )}`
   }
 ]
-
-export const TENNIS_CLUB_MEMBERSHIP = 'tennis-club-membership'
 
 export const tennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
