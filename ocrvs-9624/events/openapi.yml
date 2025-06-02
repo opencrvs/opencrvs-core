@@ -70,7 +70,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 33f7e77d-0515-4b8a-ad27-692ffc90ab74
+                transactionId: d27eebda-d59f-4b27-8380-5d692c2d0789
                 type: v2.birth
       responses:
         "200":
@@ -433,7 +433,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5fcd550d-d617-4044-aa7b-07c23a7630e4
+                transactionId: 07a263b6-b40c-4502-8d8d-26f3f5d850d6
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4814,6 +4814,7 @@ components:
           properties:
             message:
               type: string
+              minLength: 1
               description: Message describing reason for rejection or archiving
             isDuplicate:
               type: boolean
@@ -5488,6 +5489,7 @@ components:
           properties:
             message:
               type: string
+              minLength: 1
               description: Message describing reason for rejection or archiving
             isDuplicate:
               type: boolean

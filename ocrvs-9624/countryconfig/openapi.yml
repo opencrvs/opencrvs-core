@@ -4091,6 +4091,7 @@ components:
           properties:
             message:
               type: string
+              minLength: 1
               description: Message describing reason for rejection or archiving
             isDuplicate:
               type: boolean
@@ -4785,6 +4786,7 @@ components:
           properties:
             message:
               type: string
+              minLength: 1
               description: Message describing reason for rejection or archiving
             isDuplicate:
               type: boolean
@@ -9556,7 +9558,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: dd3fce3e-4abe-4bad-a1f5-0d1bf5e74ec5
+        transactionId: 9474271c-28b6-4e0b-9fe6-f3074345a9fe
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10212,6 +10214,7 @@ components:
           properties:
             message:
               type: string
+              minLength: 1
               description: Message describing reason for rejection or archiving
             isDuplicate:
               type: boolean
@@ -10874,6 +10877,7 @@ components:
           properties:
             message:
               type: string
+              minLength: 1
               description: Message describing reason for rejection or archiving
             isDuplicate:
               type: boolean
