@@ -350,7 +350,7 @@ export async function getIndexedEvents(userId: string) {
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: 10000,
+    size: DEFAULT_SIZE,
     request_cache: false
   })
 
