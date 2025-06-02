@@ -37,7 +37,7 @@ export const UserContext = z.object({
 })
 type UserContext = z.infer<typeof UserContext>
 
-export const SystemContext = z.object({
+const SystemContext = z.object({
   id: z.string(),
   role: SystemRole,
   type: TokenUserType.extract(['system']),
@@ -63,7 +63,7 @@ function normalizeHeaders(
 }
 
 export async function resolveUserDetails(
-  token: `Bearer ${string}`
+  token: TokenWithBearer
 ): Promise<TrpcUserContext> {
   let userId: string | undefined
   let userType: TokenUserType
@@ -78,7 +78,6 @@ export async function resolveUserDetails(
   }
 
   try {
-    // @todo: could we use capital casing as for other types?
     if (userType === TokenUserType.Enum.system) {
       const { type } = await getSystem(env.USER_MANAGEMENT_URL, userId, token)
 
