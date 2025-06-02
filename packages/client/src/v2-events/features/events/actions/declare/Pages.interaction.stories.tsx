@@ -139,6 +139,36 @@ export const SaveAndExit: Story = {
                 getUser: generator.user.localRegistrar()
               }
             })
+          }),
+          tRPCMsw.user.list.query(([id]) => {
+            return [
+              {
+                id,
+                name: [
+                  {
+                    use: 'en',
+                    given: ['Kennedy'],
+                    family: 'Mweene'
+                  }
+                ],
+                role: 'LOCAL_REGISTRAR',
+                signatureFilename: 'signature.png'
+              }
+            ]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return {
+              id,
+              name: [
+                {
+                  use: 'en',
+                  given: ['Kennedy'],
+                  family: 'Mweene'
+                }
+              ],
+              role: 'LOCAL_REGISTRAR',
+              signatureFilename: 'signature.png'
+            }
           })
         ]
       }
