@@ -143,5 +143,22 @@ describe('event.actions.notify', () => {
         expect.objectContaining({ type: ActionType.READ })
       ])
     })
+
+    test('system user should not be able to perform action on assigned event', async () => {
+      const { user, generator } = await setupTestCase()
+
+      let client = createTestClient(user)
+      const event = await client.event.create(generator.event.create())
+
+      client = createSystemTestClient('test-system-2', [
+        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+      ])
+
+      await expect(
+        client.event.actions.notify.request(
+          generator.event.actions.notify(event.id)
+        )
+      ).rejects.toMatchSnapshot()
+    })
   })
 })

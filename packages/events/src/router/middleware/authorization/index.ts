@@ -206,17 +206,24 @@ export const requireAssignment: MiddlewareFunction<
 
   const { user } = ctx
 
-  // System users don't require assignment
-  if (user.type === TokenUserType.SYSTEM) {
-    return next()
-  }
-
   const assignedTo = getAssignedUserFromActions(
     event.actions.filter(
       (action): action is ActionDocument =>
         action.type === ActionType.ASSIGN || action.type === ActionType.UNASSIGN
     )
   )
+
+  // System users don't require assignment
+  if (user.type === TokenUserType.SYSTEM) {
+    if (assignedTo) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        cause: 'System user can not perform action on assigned event'
+      })
+    }
+
+    return next()
+  }
 
   if (user.id !== assignedTo) {
     throw new TRPCError({
