@@ -15,36 +15,13 @@ import { NoResultText } from '@opencrvs/components/lib/Workqueue'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import {
   LoadingIndicator,
-  withOnlineStatus,
-  IOnlineStatusProps
+  OnlineStatusProps,
+  withOnlineStatus
 } from '@client/v2-events/components/LoadingIndicator'
 
 /**
  * Based on packages/client/src/views/OfficeHome/WQContentWrapper.tsx
  */
-
-interface BodyProps {
-  isShowPagination?: boolean
-  paginationId?: number
-  totalPages?: number
-  onPageChange?: (newPageNumber: number) => void
-  noResultText?: string
-  noContent?: boolean
-  loading?: boolean
-  error?: boolean
-  children: React.ReactNode | React.ReactNode[]
-}
-
-interface IContentWrapper extends BodyProps {
-  isMobileSize: boolean
-  title: string
-  tabBarContent?: React.ReactNode
-
-  topActionButtons?: React.ReactElement[]
-  showTitleOnMobile?: boolean
-}
-
-type IProps = IContentWrapper & IOnlineStatusProps
 
 const TabBarContainer = styled.div`
   background-color: ${({ theme }) => theme.colors.white};
@@ -60,6 +37,26 @@ const PaginationLoaderContainer = styled.div<{ isShowPagination?: boolean }>`
   height: auto;
 `
 
+interface BodyProps extends OnlineStatusProps {
+  isShowPagination?: boolean
+  paginationId?: number
+  totalPages?: number
+  onPageChange?: (newPageNumber: number) => void
+  noResultText?: string
+  noContent?: boolean
+  loading?: boolean
+  error?: boolean
+  children: React.ReactNode | React.ReactNode[]
+}
+
+interface ContentWrapperProps extends BodyProps {
+  title: string
+  tabBarContent?: React.ReactNode
+  topActionButtons?: React.ReactElement[]
+  showTitleOnMobile?: boolean
+  isMobileSize: boolean
+}
+
 function Body({
   isShowPagination,
   paginationId,
@@ -71,7 +68,7 @@ function Body({
   noContent,
   noResultText,
   children
-}: IProps) {
+}: BodyProps) {
   return (
     <>
       {children}
@@ -116,7 +113,7 @@ function WQContentWrapperComp({
   totalPages,
   noResultText,
   children
-}: IProps) {
+}: ContentWrapperProps) {
   return (
     <>
       {isMobileSize ? (
@@ -125,14 +122,12 @@ function WQContentWrapperComp({
           <MobileChildrenContainer>
             <Body
               error={error}
-              isMobileSize={isMobileSize}
               isOnline={isOnline}
               isShowPagination={isShowPagination}
               loading={loading}
               noContent={noContent}
               noResultText={noResultText}
               paginationId={paginationId}
-              title={title}
               totalPages={totalPages}
               onPageChange={onPageChange}
             >
@@ -150,14 +145,12 @@ function WQContentWrapperComp({
         >
           <Body
             error={error}
-            isMobileSize={isMobileSize}
             isOnline={isOnline}
             isShowPagination={isShowPagination}
             loading={loading}
             noContent={noContent}
             noResultText={noResultText}
             paginationId={paginationId}
-            title={title}
             totalPages={totalPages}
             onPageChange={onPageChange}
           >

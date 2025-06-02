@@ -101,6 +101,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         ]
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $inProgressSkip
     ) {
       totalItems
@@ -119,6 +120,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         ]
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $healthSystemSkip
     ) {
       totalItems
@@ -132,6 +134,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         registrationStatuses: $reviewStatuses
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $reviewSkip
     ) {
       totalItems
@@ -167,6 +170,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         ]
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $sentForReviewSkip
     ) {
       totalItems
@@ -180,6 +184,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         registrationStatuses: ["VALIDATED", "CORRECTION_REQUESTED"]
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $approvalSkip
     ) {
       totalItems
@@ -193,6 +198,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         registrationStatuses: ["WAITING_VALIDATION"]
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $externalValidationSkip
     ) {
       totalItems
@@ -206,6 +212,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         registrationStatuses: ["REGISTERED"]
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $printSkip
     ) {
       totalItems
@@ -219,6 +226,7 @@ export const REGISTRATION_HOME_QUERY = gql`
         registrationStatuses: ["CERTIFIED"]
       }
       count: $pageSize
+      sortColumn: "dateOfDeclaration"
       skip: $issueSkip
     ) {
       totalItems

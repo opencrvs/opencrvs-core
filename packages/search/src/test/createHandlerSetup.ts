@@ -46,7 +46,7 @@ export const createHandlerSetup = () => {
     // eslint-disable-next-line no-console
     console.log('Building elastic container...')
 
-    return new ElasticsearchContainer('elasticsearch:8.14.3')
+    return new ElasticsearchContainer('elasticsearch:8.16.4')
       .withExposedPorts(ELASTIC_SEARCH_HTTP_PORT)
       .withStartupTimeout(120_000)
       .withEnvironment({

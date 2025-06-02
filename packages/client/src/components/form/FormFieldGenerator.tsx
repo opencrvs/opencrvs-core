@@ -92,10 +92,11 @@ import {
   DependencyInfo,
   Ii18nButtonFormField,
   LINK_BUTTON,
-  IDocumentUploaderWithOptionsFormField,
   ID_READER,
   ID_VERIFICATION_BANNER,
-  ILocationSearchInputFormField
+  IDocumentUploaderWithOptionsFormField,
+  ILocationSearchInputFormField,
+  LOADER
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
 import { InputField } from '@client/components/form/InputField'
@@ -148,7 +149,8 @@ import { ButtonField } from '@client/components/form/Button'
 import { getListOfLocations } from '@client/utils/validate'
 import { LinkButtonField } from '@client/components/form/LinkButton'
 import { ReaderGenerator } from './ReaderGenerator'
-import { IDVerificationBanner } from './IDVerificationBanner'
+import { IDVerificationBanner } from './IDVerification/Banner'
+import { FormLoader } from './FormLoader'
 
 const SignatureField = styled(Stack)`
   margin-top: 8px;
@@ -186,7 +188,9 @@ type GeneratedInputFieldProps = {
   values: IFormSectionData
   setFieldValue: (name: string, value: IFormFieldValue) => void
   onClick?: () => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onChange: (e: React.ChangeEvent<any>) => void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onBlur: (e: React.FocusEvent<any>) => void
   resetDependentSelectValues: (name: string) => void
   resetNestedInputValues?: (field: Ii18nFormField) => void
@@ -280,29 +284,44 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
     if (fieldDefinition.type === ID_READER) {
       return (
-        <IDReader
-          dividerLabel={fieldDefinition.dividerLabel}
-          manualInputInstructionLabel={
-            fieldDefinition.manualInputInstructionLabel
-          }
-        >
-          <ReaderGenerator
-            readers={fieldDefinition.readers}
-            form={values}
-            field={fieldDefinition}
-            draft={draftData}
-            fields={fields}
-            setFieldValue={setFieldValue}
-          />
-        </IDReader>
+        <InputField {...inputFieldProps}>
+          <IDReader
+            dividerLabel={fieldDefinition.dividerLabel}
+            manualInputInstructionLabel={
+              fieldDefinition.manualInputInstructionLabel
+            }
+          >
+            <ReaderGenerator
+              readers={fieldDefinition.readers}
+              form={values}
+              field={fieldDefinition}
+              draft={draftData}
+              fields={fields}
+              setFieldValue={setFieldValue}
+            />
+          </IDReader>
+        </InputField>
       )
     }
+
+    if (fieldDefinition.type === LOADER) {
+      return (
+        <InputField {...inputFieldProps}>
+          <FormLoader
+            id={fieldDefinition.name}
+            loadingText={fieldDefinition.loadingText}
+          />
+        </InputField>
+      )
+    }
+
     if (fieldDefinition.type === ID_VERIFICATION_BANNER) {
       return (
         <IDVerificationBanner
           type={fieldDefinition.bannerType}
           idFieldName={fieldDefinition.idFieldName}
           setFieldValue={setFieldValue}
+          form={values}
         />
       )
     }
@@ -475,6 +494,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <InputField {...inputFieldProps}>
           <TimeField
             {...inputProps}
+            use12HourFormat={fieldDefinition.use12HourFormat}
             ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
             onChange={onChangeGroupInput}
             value={value as string}
@@ -544,6 +564,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
 
       const message = intl.formatMessage(label, {
         ...values,
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         [fieldDefinition.name]: value as any
       })
 
@@ -840,6 +861,7 @@ type Props = IFormSectionProps &
   IntlShapeProps
 
 interface IQueryData {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any
 }
 
@@ -850,7 +872,7 @@ export interface ITouchedNestedFields {
   }
 }
 
-class FormSectionComponent extends React.Component<Props> {
+export class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id
@@ -925,30 +947,57 @@ class FormSectionComponent extends React.Component<Props> {
     this.props.setTouched(touched)
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   handleBlur = (e: React.FocusEvent<any>) => {
     this.props.setFieldTouched(e.target.name)
+  }
+
+  static getUpdatedValuesAfterDependentFieldEvaluation = (
+    existingValues: IFormSectionData,
+    fields: IFormField[],
+    fieldName: string,
+    value: IFormFieldValue,
+    evalParams: {
+      config: IOfflineData
+      draft: IFormData
+      user: UserDetails | null
+    }
+  ): IFormSectionData => {
+    const updatedValues = cloneDeep(existingValues)
+    set(updatedValues, fieldName, value)
+    const updateDependentFields = (fieldName: string) => {
+      const dependentFields = getDependentFields(fields, fieldName)
+      for (const field of dependentFields) {
+        updatedValues[field.name] = evalExpressionInFieldDefinition(
+          (field.initialValue as DependencyInfo).expression,
+          updatedValues,
+          evalParams.config,
+          evalParams.draft,
+          evalParams.user
+        )
+        updateDependentFields(field.name)
+      }
+    }
+    updateDependentFields(fieldName)
+    return updatedValues
   }
 
   setFieldValuesWithDependency = (
     fieldName: string,
     value: IFormFieldValue
   ) => {
-    const updatedValues = cloneDeep(this.props.values)
-    set(updatedValues, fieldName, value)
-    const updateDependentFields = (fieldName: string) => {
-      const dependentFields = getDependentFields(this.props.fields, fieldName)
-      for (const field of dependentFields) {
-        updatedValues[field.name] = evalExpressionInFieldDefinition(
-          (field.initialValue as DependencyInfo).expression,
-          updatedValues,
-          this.props.offlineCountryConfig,
-          this.props.draftData,
-          this.props.userDetails
-        )
-        updateDependentFields(field.name)
-      }
-    }
-    updateDependentFields(fieldName)
+    const updatedValues =
+      FormSectionComponent.getUpdatedValuesAfterDependentFieldEvaluation(
+        this.props.values,
+        this.props.fields,
+        fieldName,
+        value,
+        {
+          config: this.props.offlineCountryConfig,
+          draft: this.props.draftData,
+          user: this.props.userDetails
+        }
+      )
 
     this.props.setValues(updatedValues)
   }
@@ -1145,7 +1194,29 @@ class FormSectionComponent extends React.Component<Props> {
                             setValues(updatedValues)
                           }
                         } as ILoaderButton)
-                      : field
+                      : field.type === LOCATION_SEARCH_INPUT
+                        ? {
+                            ...field,
+                            locationList: generateLocations(
+                              field.searchableResource.reduce(
+                                (locations, resource) => {
+                                  return {
+                                    ...locations,
+                                    ...getListOfLocations(
+                                      offlineCountryConfig,
+                                      resource
+                                    )
+                                  }
+                                },
+                                {}
+                              ),
+                              intl,
+                              (location) =>
+                                field.searchableType.includes(location.type),
+                              field.userOfficeId
+                            )
+                          }
+                        : field
 
           if (
             field.type === FETCH_BUTTON ||
@@ -1159,6 +1230,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1221,6 +1293,7 @@ class FormSectionComponent extends React.Component<Props> {
                       ignoreBottomMargin={field.ignoreBottomMargin}
                     >
                       <FastField name={nestedFieldName}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
                             fieldDefinition={internationaliseFieldObject(intl, {
@@ -1258,6 +1331,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={`${field.name}.value`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1290,6 +1364,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <MemoizedLocationList field={field}>
@@ -1330,6 +1405,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <GeneratedInputField

@@ -16,6 +16,7 @@ export const getEventIndexName = vi.fn()
 /** @knipignore */
 export const getEventAliasName = vi.fn()
 
+/** @knipignore */
 export function getOrCreateClient() {
   return new elasticsearch.Client({
     node: `http://${inject('ELASTICSEARCH_URI')}`

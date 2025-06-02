@@ -10,11 +10,6 @@
  */
 import { MessageDescriptor } from 'react-intl'
 import { validationMessages as messages } from '@client/i18n/messages'
-// import {
-//   IFormFieldValue,
-//   IFormData,
-//   IFormSectionData
-// } from '@opencrvs/client/src/forms'
 import {
   REGEXP_BLOCK_ALPHA_NUMERIC_DOT,
   REGEXP_DECIMAL_POINT_NUMBER,
@@ -39,8 +34,11 @@ export function getListOfLocations(
 // @TODO: Importing from forms breaks the tests. Basically the references are not resolved correctly
 // and @opencrvs/client/src/forms causes recursion in this branch.
 // https://github.com/vitest-dev/vitest/issues/546
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type IFormFieldValue = any
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type IFormData = any
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 type IFormSectionData = any
 /**
  * NOTE! When amending validators in this file, remember to also update country configuration typings to reflect the changes
@@ -48,6 +46,7 @@ type IFormSectionData = any
 
 export interface IValidationResult {
   message: MessageDescriptor
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   props?: { [key: string]: any }
 }
 
@@ -67,6 +66,7 @@ export type Validation = (
   form?: IFormSectionData
 ) => IValidationResult | undefined
 
+/*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
 export type ValidationInitializer = (...value: any[]) => Validation
 
 export const isAValidPhoneNumberFormat = (value: string): boolean => {
@@ -239,10 +239,6 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(Date.now())
 }
 
-export const isDateNotPastLimit = (date: string, limit: Date) => {
-  return new Date(date) >= limit
-}
-
 export const isDateNotBeforeBirth = (date: string, drafts: IFormData) => {
   const birthDate = drafts?.deceased?.birthDate as string
   return birthDate ? new Date(date) >= new Date(birthDate) : true
@@ -307,30 +303,29 @@ export const isValidBirthDate: Validation = (
   return !cast
     ? { message: messages.required }
     : cast &&
-      isDateNotInFuture(cast) &&
-      isAValidDateFormat(cast) &&
-      isDateNotAfterBirthEvent(cast, drafts as IFormData)
-    ? isDateNotAfterDeath(cast, drafts as IFormData)
-      ? undefined
+        isDateNotInFuture(cast) &&
+        isAValidDateFormat(cast) &&
+        isDateNotAfterBirthEvent(cast, drafts as IFormData)
+      ? isDateNotAfterDeath(cast, drafts as IFormData)
+        ? undefined
+        : {
+            message: messages.isDateNotAfterDeath
+          }
       : {
-          message: messages.isDateNotAfterDeath
+          message: messages.isValidBirthDate
         }
-    : {
-        message: messages.isValidBirthDate
-      }
 }
 
 export const isValidChildBirthDate: Validation = (value: IFormFieldValue) => {
   const childBirthDate = value as string
-  const pastDateLimit = new Date(1900, 0, 1)
+
   return !childBirthDate
     ? { message: messages.required }
     : childBirthDate &&
-      isAValidDateFormat(childBirthDate) &&
-      isDateNotInFuture(childBirthDate) &&
-      isDateNotPastLimit(childBirthDate, pastDateLimit)
-    ? undefined
-    : { message: messages.isValidBirthDate }
+        isAValidDateFormat(childBirthDate) &&
+        isDateNotInFuture(childBirthDate)
+      ? undefined
+      : { message: messages.isValidBirthDate }
 }
 
 export const isValidParentsBirthDate =
@@ -519,17 +514,6 @@ export const dateNotInFuture = (): Validation => (value: IFormFieldValue) => {
   }
 }
 
-export const dateNotPastLimit =
-  (limit: string): Validation =>
-  (value: IFormFieldValue) => {
-    const cast = value as string
-    if (isDateNotPastLimit(cast, new Date(limit))) {
-      return undefined
-    } else {
-      return { message: messages.dateFormat }
-    }
-  }
-
 export const dateNotToday = (date: string): boolean => {
   const today = new Date().setHours(0, 0, 0, 0)
   const day = new Date(date).setHours(0, 0, 0, 0)
@@ -671,6 +655,7 @@ export const isAValidNIDNumberFormat = (value: string): boolean => {
 
 export const validIDNumber =
   (typeOfID: string): Validation =>
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   (value: any) => {
     value = (value && value.toString()) || ''
 
@@ -765,8 +750,8 @@ export const greaterThanZero: Validation = (value: IFormFieldValue) => {
   return !value && value !== 0
     ? { message: messages.required }
     : value && Number(value) > 0
-    ? undefined
-    : { message: messages.greaterThanZero }
+      ? undefined
+      : { message: messages.greaterThanZero }
 }
 
 export const notGreaterThan =

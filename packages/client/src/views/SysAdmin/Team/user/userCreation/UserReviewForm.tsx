@@ -93,6 +93,7 @@ interface IStateProps {
   userDetails: UserDetails | null
 }
 interface IDispatchProps {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   submitForm: (variables: Record<string, any>) => void
   modify: (values: IFormSectionData) => void
 }
@@ -262,8 +263,8 @@ const getValue = ({
       ? field.name === 'systemRole'
         ? intl.formatMessage(userMessages[formData.systemRole as string])
         : field.name === 'role' && role
-        ? intl.formatMessage(role.label)
-        : String(formData[field.name])
+          ? intl.formatMessage(role.label)
+          : String(formData[field.name])
       : (formData[field.name] as IDynamicValues).label
     : ''
 }
@@ -322,7 +323,8 @@ const UserReviewFormComponent = ({
       { user: formData },
       '',
       userDetails,
-      offlineCountryConfiguration
+      offlineCountryConfiguration,
+      undefined
     )
     if (variables.user._fhirID) {
       variables.user.id = variables.user._fhirID
@@ -444,6 +446,7 @@ const mapDispatchToProps = (dispatch: Dispatch, props: IFullProps) => {
 
   return {
     modify: (values: IFormSectionData) => dispatch(modifyUserFormData(values)),
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     submitForm: (variables: Record<string, any>) => {
       dispatch(
         submitUserFormData(

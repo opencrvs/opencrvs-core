@@ -16,6 +16,7 @@ import {
 import { ApolloClient, NormalizedCacheObject } from '@apollo/client'
 
 export function ApolloProvider(
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   props: Omit<ApolloProviderProps<any>, 'client'> & {
     client: ApolloClient<NormalizedCacheObject> | null
   }

@@ -19,7 +19,6 @@ import { NetworkFirst, CacheFirst } from 'workbox-strategies'
 import { clientsClaim } from 'workbox-core'
 import { MINIO_REGEX } from '@opencrvs/commons/client'
 
-// eslint-disable-next-line @typescript-eslint/no-use-before-define
 self.__WB_DISABLE_DEV_LOGS = true
 
 declare let self: ServiceWorkerGlobalScope
@@ -54,7 +53,6 @@ self.addEventListener('message', async (event) => {
   }
 })
 
-/* eslint-disable-next-line no-restricted-globals */
 precacheAndRoute(self.__WB_MANIFEST as PrecacheEntry[])
 
 cleanupOutdatedCaches()

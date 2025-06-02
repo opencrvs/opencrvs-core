@@ -17,6 +17,7 @@ DIR=$(pwd)
 # It's fine if these fail as it might be that the databases do not exist at this point
 docker run --rm --network=opencrvs_default mongo:4.4 mongo --host mongo1 --eval "\
 db.getSiblingDB('hearth-dev').dropDatabase();\
+db.getSiblingDB('events').dropDatabase();\
 db.getSiblingDB('openhim-dev').dropDatabase();\
 db.getSiblingDB('user-mgnt').dropDatabase();\
 db.getSiblingDB('application-config').dropDatabase();\
@@ -25,7 +26,12 @@ db.getSiblingDB('config').dropDatabase();\
 db.getSiblingDB('performance').dropDatabase();\
 db.getSiblingDB('webhooks').dropDatabase();"
 
-docker run --rm --network=opencrvs_default appropriate/curl curl -XDELETE 'http://elasticsearch:9200/*' -v
+curl -s "http://localhost:9200/_cat/indices?h=index" | while read -r index; do
+  echo "Deleting index: $index"
+  docker run --rm --network=opencrvs_default appropriate/curl \
+    curl -XDELETE "http://elasticsearch:9200/$index" -v
+done
+
 docker run --rm --network=opencrvs_default appropriate/curl curl -X POST 'http://influxdb:8086/query?db=ocrvs' --data-urlencode "q=DROP SERIES FROM /.*/" -v
 PATH_TO_MINIO_DIR="$DIR/data/minio/ocrvs"
 # Clear Minio Data

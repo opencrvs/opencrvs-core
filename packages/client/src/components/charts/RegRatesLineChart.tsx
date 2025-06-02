@@ -273,17 +273,17 @@ const RegRatesLineChartComponent = (props: IProps) => {
               {completenessRateTime === CompletenessRateTime.Within5Years
                 ? intl.formatMessage(messages.performanceWithin5YearsLabel)
                 : completenessRateTime === CompletenessRateTime.Within1Year
-                ? intl.formatMessage(messages.performanceWithin1YearLabel)
-                : intl.formatMessage(
-                    messages.performanceWithinTargetDaysLabel,
-                    {
-                      target:
-                        eventType === EventType.Birth
-                          ? window.config.BIRTH.REGISTRATION_TARGET
-                          : window.config.DEATH.REGISTRATION_TARGET,
-                      withPrefix: false
-                    }
-                  )}
+                  ? intl.formatMessage(messages.performanceWithin1YearLabel)
+                  : intl.formatMessage(
+                      messages.performanceWithinTargetDaysLabel,
+                      {
+                        target:
+                          eventType === EventType.Birth
+                            ? window.config.BIRTH.REGISTRATION_TARGET
+                            : window.config.DEATH.REGISTRATION_TARGET,
+                        withPrefix: false
+                      }
+                    )}
             </LegendDataLabel>
             <br />
             <LegendDataValue>

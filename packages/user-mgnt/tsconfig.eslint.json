@@ -1,15 +1,11 @@
 {
   "extends": "./tsconfig.json",
-  "include": [
-    "src/**/*.ts",
-    "typings",
-    "src/**/*.test.ts"
-  ],
+  "include": ["src/**/*.ts", "typings", "src/**/*.test.ts"],
   "exclude": [
     "node_modules",
     "build",
     "scripts",
     "acceptance-tests",
-    "src/setupTests.ts",
+    "src/setupTests.ts"
   ]
 }

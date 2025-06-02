@@ -363,6 +363,7 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
             data
             type
           }
+          fullHonorificName
         }
         signature {
           data
@@ -644,6 +645,7 @@ export const GET_DEATH_REGISTRATION_FOR_CERTIFICATION = gql`
             data
             type
           }
+          fullHonorificName
         }
         signature {
           data

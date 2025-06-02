@@ -155,10 +155,10 @@ export const transformAdvancedSearchLocalStateToStoreData = (
       localState.registrationStatuses === RegStatus.Registered
         ? [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued]
         : localState.registrationStatuses === 'IN_REVIEW'
-        ? [RegStatus.WaitingValidation, RegStatus.Declared]
-        : localState.registrationStatuses === 'ALL'
-        ? Object.values(RegStatus)
-        : [localState.registrationStatuses]
+          ? [RegStatus.WaitingValidation, RegStatus.Declared]
+          : localState.registrationStatuses === 'ALL'
+            ? Object.values(RegStatus)
+            : [localState.registrationStatuses]
   } else {
     transformedStoreState.registrationStatuses = undefined
   }
@@ -300,16 +300,20 @@ export const transformStoreDataToAdvancedSearchLocalState = (
       reduxState.registrationStatuses.length === 1
         ? reduxState.registrationStatuses[0]
         : isEqual(
-            [...reduxState.registrationStatuses].sort(),
-            [RegStatus.WaitingValidation, RegStatus.Declared].sort()
-          )
-        ? 'IN_REVIEW'
-        : isEqual(
-            [...reduxState.registrationStatuses].sort(),
-            [RegStatus.Registered, RegStatus.Certified, RegStatus.Issued].sort()
-          )
-        ? 'REGISTERED'
-        : 'ALL'
+              [...reduxState.registrationStatuses].sort(),
+              [RegStatus.WaitingValidation, RegStatus.Declared].sort()
+            )
+          ? 'IN_REVIEW'
+          : isEqual(
+                [...reduxState.registrationStatuses].sort(),
+                [
+                  RegStatus.Registered,
+                  RegStatus.Certified,
+                  RegStatus.Issued
+                ].sort()
+              )
+            ? 'REGISTERED'
+            : 'ALL'
   } else {
     localState.registrationStatuses = ''
   }

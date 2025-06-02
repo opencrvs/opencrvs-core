@@ -17,6 +17,7 @@ import {
   RegisteredRecord,
   ValidRecord,
   addTaskToRecord,
+  getComposition,
   getPractitioner,
   getPractitionerContactDetails,
   getRecordWithoutTasks,
@@ -38,6 +39,8 @@ import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, sendNotification } from './utils'
 import { SCOPES } from '@opencrvs/commons/authentication'
 import { getValidRecordById } from '@workflow/records'
+import { notifyForAction } from '@workflow/utils/country-config-api'
+import { getRecordSpecificToken } from '@workflow/records/token-exchange'
 
 export const approveCorrectionRoute = createRoute({
   method: 'POST',
@@ -155,6 +158,21 @@ export const approveCorrectionRoute = createRoute({
         userFullName: requestingPractitioner.name
       }
     )
+
+    const recordSpecificToken = await getRecordSpecificToken(
+      token,
+      request.headers,
+      getComposition(updatedRecord).id
+    )
+    await notifyForAction({
+      event: getEventType(updatedRecord),
+      action: 'approve-correction',
+      record,
+      headers: {
+        ...request.headers,
+        authorization: `Bearer ${recordSpecificToken.access_token}`
+      }
+    })
 
     return recordWithUpdatedValues
   }
