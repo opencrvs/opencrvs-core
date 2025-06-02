@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -41,10 +41,7 @@ import { approveCorrection } from '@events/service/events/actions/approve-correc
 import { assignRecord } from '@events/service/events/actions/assign'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import { unassignRecord } from '@events/service/events/actions/unassign'
-import {
-  createDraft,
-  getDraftsByUserId
-} from '@events/storage/postgres/events/drafts'
+import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
   createEvent,

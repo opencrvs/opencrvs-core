@@ -36,6 +36,7 @@ import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import { UserDetails } from '@events/user'
 
 function getValidFileValue(
   fieldKey: string,
@@ -114,9 +115,7 @@ export async function createEvent({
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
-  createdBy: string
-  createdByRole: string
-  createdAtLocation: UUID
+  user: UserDetails
   transactionId: string
 }): Promise<EventDocument> {
   const event = await eventsRepo.getOrCreateEvent({
@@ -124,9 +123,9 @@ export async function createEvent({
     fieldId: eventInput.dateOfEvent?.fieldId,
     transactionId: transactionId,
     trackingId: generateTrackingId(),
-    createdBy,
-    createdByRole,
-    createdAtLocation
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
   })
 
   await indexEvent(event)
@@ -185,12 +184,7 @@ export async function addAction(
     status
   }: {
     eventId: UUID
-    createdBy: string
-    createdByRole: string
-    /**
-     * The location where the action was created. This is used for auditing purposes.
-     */
-    createdAtLocation: UUID
+    user: UserDetails
     token: string
     status: ActionStatus
   }
@@ -214,12 +208,6 @@ export async function addAction(
     }
   }
 
-  const createdByDetails = {
-    createdBy: user.id,
-    createdByRole: user.role,
-    createdAtLocation: user.primaryOfficeId
-  }
-
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
@@ -228,9 +216,9 @@ export async function addAction(
       declaration: input.declaration,
       annotation: input.annotation,
       status,
-      createdBy,
-      createdByRole,
-      createdAtLocation,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId
     })
   }
@@ -245,9 +233,9 @@ export async function addAction(
     declaration: input.declaration,
     annotation: input.annotation,
     status,
-    createdBy,
-    createdByRole,
-    createdAtLocation,
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId,
     originalActionId: input.originalActionId,
     // @TODO: ^ Split this function
     assignedTo: input.type === ActionType.ASSIGN ? input.assignedTo : undefined
@@ -259,15 +247,15 @@ export async function addAction(
       transactionId: input.transactionId,
       type: ActionType.UNASSIGN,
       status,
-      createdBy,
-      createdByRole,
-      createdAtLocation
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdAtLocation: user.primaryOfficeId
     })
   }
 
   const drafts = await draftsRepo.getDraftsForAction(
     eventId,
-    createdBy,
+    user.id,
     input.type
   )
 
@@ -294,7 +282,12 @@ export async function addAction(
 type AsyncRejectActionInput = Omit<
   z.infer<typeof AsyncRejectActionDocument>,
   'createdAt' | 'id' | 'status'
-> & { transactionId: string; eventId: UUID; originalActionId: UUID }
+> & {
+  transactionId: string
+  eventId: UUID
+  originalActionId: UUID
+  createdAtLocation: UUID
+}
 
 export async function addAsyncRejectAction({
   transactionId,

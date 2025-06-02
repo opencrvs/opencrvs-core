@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Draft, DraftInput } from '@opencrvs/commons/events'
+import { SerializableValue } from 'slonik'
+import { ActionType, Draft } from '@opencrvs/commons/events'
 import { UUID } from '@opencrvs/commons'
 import {
   formatTimestamp,
@@ -17,23 +18,25 @@ import {
   sql
 } from '@events/storage/postgres/events/db'
 
-export async function createDraft(
-  input: DraftInput,
-  {
-    eventId,
-    createdBy,
-    createdByRole,
-    createdAtLocation,
-    transactionId
-  }: {
-    eventId: UUID
-    createdBy: string
-    createdByRole: string
-    createdAtLocation: UUID
-    token: string
-    transactionId: string
-  }
-) {
+export async function createDraft({
+  eventId,
+  transactionId,
+  actionType,
+  declaration,
+  annotation,
+  createdBy,
+  createdByRole,
+  createdAtLocation
+}: {
+  eventId: UUID
+  transactionId: string
+  actionType: ActionType
+  declaration: NonNullable<SerializableValue>
+  annotation: SerializableValue
+  createdBy: string
+  createdByRole: string
+  createdAtLocation: UUID | null
+}) {
   const db = await getClient()
 
   const draft = await db.one(sql.type(Draft)`
@@ -52,12 +55,12 @@ export async function createDraft(
       (
         ${eventId},
         ${transactionId},
-        ${input.type},
-        ${sql.jsonb(input.declaration)},
-        ${sql.jsonb(input.annotation)},
+        ${actionType},
+        ${sql.jsonb(declaration)},
+        ${sql.jsonb(annotation)},
         ${createdBy},
         ${createdByRole},
-        ${createdAtLocation}
+        ${createdAtLocation as UUID}
       )
     ON CONFLICT (transaction_id) DO UPDATE
     SET
