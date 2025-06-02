@@ -1065,7 +1065,32 @@ describe('User root resolvers', () => {
   describe('createOrUpdateUser mutation', () => {
     const authHeaderSysAdmin = {
       Authorization: `Bearer ${jwt.sign(
-        { scope: [SCOPES.USER_CREATE] },
+        { scope: [SCOPES.USER_CREATE, 'user.create[role=LOCAL_REGISTRAR]'] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )}`
+    }
+
+    const authHeaderDataSeeder = {
+      Authorization: `Bearer ${jwt.sign(
+        { scope: [SCOPES.USER_DATA_SEEDING] },
+        readFileSync('./test/cert.key'),
+        {
+          subject: 'ba7022f0ff4822',
+          algorithm: 'RS256',
+          issuer: 'opencrvs:auth-service',
+          audience: 'opencrvs:gateway-user'
+        }
+      )}`
+    }
+    const authHeaderSysAdminWithoutSuppliedRole = {
+      Authorization: `Bearer ${jwt.sign(
+        { scope: [SCOPES.USER_CREATE, 'user.create[role=REGISTRATION_AGENT]'] },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1077,7 +1102,12 @@ describe('User root resolvers', () => {
     }
     const authHeaderLocalSysAdmin = {
       Authorization: `Bearer ${jwt.sign(
-        { scope: [SCOPES.USER_CREATE_MY_JURISDICTION] },
+        {
+          scope: [
+            SCOPES.USER_CREATE_MY_JURISDICTION,
+            'user.create[role=LOCAL_REGISTRAR]'
+          ]
+        },
         readFileSync('./test/cert.key'),
         {
           subject: 'ba7022f0ff4822',
@@ -1135,6 +1165,50 @@ describe('User root resolvers', () => {
       expect(response).toEqual({
         username: 'someUser123'
       })
+    })
+
+    it('allows creating user for data seeder', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'someUser123'
+        }),
+        { status: 201 }
+      )
+
+      const response = await resolvers.Mutation!.createOrUpdateUser(
+        {},
+        { user },
+        { headers: authHeaderDataSeeder }
+      )
+
+      expect(response).toEqual({
+        username: 'someUser123'
+      })
+    })
+
+    it('fails to create user for sysadmin if the role is not creatable by the user', async () => {
+      fetchJSONMock.mockReturnValueOnce(
+        Promise.resolve(DEFAULT_ROLES_DEFINITION)
+      )
+      fetch.mockResponseOnce(
+        JSON.stringify({
+          username: 'someUser123'
+        }),
+        { status: 201 }
+      )
+
+      expect(
+        resolvers.Mutation!.createOrUpdateUser(
+          {},
+          { user },
+          { headers: authHeaderSysAdminWithoutSuppliedRole }
+        )
+      ).rejects.toThrowError(
+        'A user with role "LOCAL_REGISTRAR" can not be created or updated by this user'
+      )
     })
 
     it('allows creating users in offices under the jurisdiction of the local sysadmin', async () => {

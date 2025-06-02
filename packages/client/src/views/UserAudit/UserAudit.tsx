@@ -38,7 +38,6 @@ import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
 import {
   GetUserQuery,
   GetUserQueryVariables,
-  HumanName
 } from '@client/utils/gateway'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'

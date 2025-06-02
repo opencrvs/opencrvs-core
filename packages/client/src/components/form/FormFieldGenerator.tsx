@@ -92,9 +92,9 @@ import {
   DependencyInfo,
   Ii18nButtonFormField,
   LINK_BUTTON,
-  IDocumentUploaderWithOptionsFormField,
   ID_READER,
   ID_VERIFICATION_BANNER,
+  IDocumentUploaderWithOptionsFormField,
   ILocationSearchInputFormField
 } from '@client/forms'
 import { getValidationErrorsForForm, Errors } from '@client/forms/validation'
@@ -475,6 +475,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
         <InputField {...inputFieldProps}>
           <TimeField
             {...inputProps}
+            use12HourFormat={fieldDefinition.use12HourFormat}
             ignorePlaceHolder={fieldDefinition.ignorePlaceHolder}
             onChange={onChangeGroupInput}
             value={value as string}
@@ -1073,79 +1074,76 @@ class FormSectionComponent extends React.Component<Props> {
                   )
                 } satisfies ISelectFormFieldWithOptions)
               : field.type === DOCUMENT_UPLOADER_WITH_OPTION
-                ? ({
-                    ...field,
-                    options: getFieldOptions(
-                      sectionName,
-                      field,
-                      values,
-                      offlineCountryConfig,
-                      draftData
+              ? ({
+                  ...field,
+                  options: getFieldOptions(
+                    sectionName,
+                    field,
+                    values,
+                    offlineCountryConfig,
+                    draftData
+                  )
+                } satisfies IDocumentUploaderWithOptionsFormField)
+              : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
+              ? ({
+                  ...field,
+                  type: getFieldType(field as IDynamicFormField, values),
+                  label: getFieldLabel(field as IDynamicFormField, values),
+                  helperText: getFieldHelperText(
+                    field as IDynamicFormField,
+                    values
+                  ),
+                  tooltip: getFieldLabelToolTip(
+                    field as IDynamicFormField,
+                    values
+                  )
+                } as ITextFormField)
+              : field.type === DYNAMIC_LIST
+              ? ({
+                  ...field,
+                  type: BULLET_LIST,
+                  items: getFieldOptionsByValueMapper(
+                    field as IDynamicListFormField,
+                    draftData as IFormData,
+                    field.dynamicItems.valueMapper
+                  )
+                } as IListFormField)
+              : field.type === FETCH_BUTTON
+              ? ({
+                  ...field,
+                  queryData: getQueryData(field as ILoaderButton, values),
+                  draftData: draftData as IFormData,
+                  onFetch: (response) => {
+                    const section = {
+                      id: this.props.id,
+                      groups: [
+                        {
+                          id: `${this.props.id}-view-group`,
+                          fields
+                        }
+                      ]
+                    } as IFormSection
+
+                    const form = {
+                      sections: [section]
+                    } as IForm
+
+                    const queryData: IQueryData = {}
+                    queryData[this.props.id] = response
+
+                    const transformedData = gqlToDraftTransformer(
+                      form,
+                      queryData
                     )
-                  } satisfies IDocumentUploaderWithOptionsFormField)
-                : field.type === FIELD_WITH_DYNAMIC_DEFINITIONS
-                  ? ({
-                      ...field,
-                      type: getFieldType(field as IDynamicFormField, values),
-                      label: getFieldLabel(field as IDynamicFormField, values),
-                      helperText: getFieldHelperText(
-                        field as IDynamicFormField,
-                        values
-                      ),
-                      tooltip: getFieldLabelToolTip(
-                        field as IDynamicFormField,
-                        values
-                      )
-                    } as ITextFormField)
-                  : field.type === DYNAMIC_LIST
-                    ? ({
-                        ...field,
-                        type: BULLET_LIST,
-                        items: getFieldOptionsByValueMapper(
-                          field as IDynamicListFormField,
-                          draftData as IFormData,
-                          field.dynamicItems.valueMapper
-                        )
-                      } as IListFormField)
-                    : field.type === FETCH_BUTTON
-                      ? ({
-                          ...field,
-                          queryData: getQueryData(
-                            field as ILoaderButton,
-                            values
-                          ),
-                          draftData: draftData as IFormData,
-                          onFetch: (response) => {
-                            const section = {
-                              id: this.props.id,
-                              groups: [
-                                {
-                                  id: `${this.props.id}-view-group`,
-                                  fields
-                                }
-                              ]
-                            } as IFormSection
-
-                            const form = {
-                              sections: [section]
-                            } as IForm
-
-                            const queryData: IQueryData = {}
-                            queryData[this.props.id] = response
-
-                            const transformedData = gqlToDraftTransformer(
-                              form,
-                              queryData
-                            )
-                            const updatedValues = Object.assign(
-                              {},
-                              values,
-                              transformedData[this.props.id]
-                            )
-                            setValues(updatedValues)
-                          }
-                        } as ILoaderButton)
-                      : field
+                    const updatedValues = Object.assign(
+                      {},
+                      values,
+                      transformedData[this.props.id]
+                    )
+                    setValues(updatedValues)
+                  }
+                } as ILoaderButton)
+              : field
 
           if (
             field.type === FETCH_BUTTON ||
@@ -1159,6 +1157,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1221,6 +1220,7 @@ class FormSectionComponent extends React.Component<Props> {
                       ignoreBottomMargin={field.ignoreBottomMargin}
                     >
                       <FastField name={nestedFieldName}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
                             fieldDefinition={internationaliseFieldObject(intl, {
@@ -1258,6 +1258,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={`${field.name}.value`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1290,6 +1291,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <MemoizedLocationList field={field}>
@@ -1330,6 +1332,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <GeneratedInputField

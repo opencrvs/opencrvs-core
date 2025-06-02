@@ -507,7 +507,6 @@ export const typeResolvers: GQLResolver = {
       if (!relatedPerson.patient) {
         return
       }
-
       const person = getResourceFromBundleById<Patient>(
         context.dataSources.recordsAPI.getRecord(),
         resourceIdentifierToUUID(relatedPerson.patient.reference)
@@ -1370,18 +1369,10 @@ export const typeResolvers: GQLResolver = {
         await context.dataSources.fhirAPI.getPractionerRoleHistory(
           practitionerRoleId
         )
-      const result = practitionerRoleHistory.find(
-        (it) =>
-          it?.meta?.lastUpdated &&
-          task.lastModified &&
-          it?.meta?.lastUpdated <= task.lastModified!
+      const roleId = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
       )
-
-      const targetCode = result?.code?.find((element) => {
-        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
-      })
-
-      const roleId = targetCode?.coding?.[0].code
       const userResponse =
         await context.dataSources.usersAPI.getUserByPractitionerId(
           practitionerId

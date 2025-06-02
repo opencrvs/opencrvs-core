@@ -15,7 +15,6 @@ import {
 } from '@client/declarations'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { EventType, History, RegStatus } from '@client/utils/gateway'
-
 import type {
   GQLBirthEventSearchSet,
   GQLDeathEventSearchSet,

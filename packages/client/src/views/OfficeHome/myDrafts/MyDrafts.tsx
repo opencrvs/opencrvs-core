@@ -91,7 +91,6 @@ export const MyDrafts: React.FC<{
   }
 
   const transformDraftContent = () => {
-    const { locale } = intl
     if (drafts.length <= 0) {
       return []
     }

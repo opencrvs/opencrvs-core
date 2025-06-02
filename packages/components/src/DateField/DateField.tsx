@@ -94,11 +94,7 @@ export const DateField = ({
           }
           break
         case 'yyyy':
-          if (
-            val.length > 4 ||
-            Number(val) > MAX_YEAR_NUMBER ||
-            (val.length === 2 && Number(val) < 19)
-          ) {
+          if (val.length > 4 || Number(val) > MAX_YEAR_NUMBER) {
             return
           }
           break
@@ -170,7 +166,6 @@ export const DateField = ({
           type="number"
           placeholder={ignorePlaceHolder ? '' : 'yyyy'}
           maxLength={4}
-          min={1900}
           value={yyyy}
           onChange={change}
           onWheel={(event: React.WheelEvent<HTMLInputElement>) => {
