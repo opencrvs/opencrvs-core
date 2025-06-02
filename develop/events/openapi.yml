@@ -70,7 +70,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: b6e1cbf2-c518-47e5-b591-58e4233b97ea
+                transactionId: 51c19332-0c29-4a29-909a-9d75f32ae005
                 type: v2.birth
       responses:
         "200":
@@ -433,7 +433,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ad8fd977-cb93-4226-9c81-5d6ebf7699ef
+                transactionId: d4056517-c3ee-4844-a37e-3831b2ca47f2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4809,6 +4809,18 @@ components:
           type: string
           enum:
             - REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4818,6 +4830,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     MarkAsDuplicateAction:
       type: object
       properties:
@@ -5471,6 +5484,18 @@ components:
           type: string
           enum:
             - ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -5480,6 +5505,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     NotifiedAction:
       type: object
       properties:

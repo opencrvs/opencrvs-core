@@ -4086,6 +4086,18 @@ components:
         type:
           type: string
           const: REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4095,6 +4107,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     MarkAsDuplicateAction:
       type: object
       properties:
@@ -4768,6 +4781,18 @@ components:
         type:
           type: string
           const: ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4777,6 +4802,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     NotifiedAction:
       type: object
       properties:
@@ -9532,7 +9558,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: dfa5c74d-f8f8-4d37-aa62-12c864312f1b
+        transactionId: 63b388da-3ecb-49fb-9016-9bc3802c4a91
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10183,9 +10209,22 @@ components:
           type: string
           const: REJECT
           default: REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
+        - reason
     MarkedAsDuplicateActionInput:
       type: object
       properties:
@@ -10833,9 +10872,22 @@ components:
           type: string
           const: ARCHIVE
           default: ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
+        - reason
     AssignActionInput:
       type: object
       properties:
