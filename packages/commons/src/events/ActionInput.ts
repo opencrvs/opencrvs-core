@@ -29,14 +29,14 @@ export const BaseActionInput = z.object({
 const CreateActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.CREATE).default(ActionType.CREATE),
-    createdAtLocation: CreatedAtLocation // @TODO: should not be part of the input
+    createdAtLocation: CreatedAtLocation
   })
 )
 
 export const RegisterActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
-    registrationNumber: z.string().optional() // @TODO: Should only be allowed by the system user?
+    registrationNumber: z.string().optional()
   })
 )
 
@@ -113,7 +113,7 @@ export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
 export const AssignActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN).default(ActionType.ASSIGN),
-    assignedTo: z.string() // @TODO: Could this be set to UUID?
+    assignedTo: z.string()
   })
 )
 
