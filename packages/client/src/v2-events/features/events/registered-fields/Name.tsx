@@ -42,7 +42,7 @@ function NameInput(props: Props) {
       required: true,
       label: {
         defaultMessage: 'First name(s)',
-        description: 'This is the label for the field',
+        description: 'This is the label for the firstname field',
         id: 'v2.field.name.firstname.label'
       },
       validation: getValidatorsForField('firstname', validators)
@@ -56,7 +56,7 @@ function NameInput(props: Props) {
       },
       label: {
         defaultMessage: 'Last name',
-        description: 'This is the label for the field',
+        description: 'This is the label for the surname field',
         id: 'v2.field.name.surname.label'
       },
       validation: getValidatorsForField('surname', validators)
