@@ -239,7 +239,7 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(Date.now())
 }
 
-export const isDateNotPastLimit = (date: string, limit: Date) => {
+const isDateNotPastLimit = (date: string, limit: Date) => {
   return new Date(date) >= limit
 }
 
@@ -519,7 +519,7 @@ export const dateNotInFuture = (): Validation => (value: IFormFieldValue) => {
   }
 }
 
-export const dateNotPastLimit =
+const dateNotPastLimit =
   (limit: string): Validation =>
   (value: IFormFieldValue) => {
     const cast = value as string

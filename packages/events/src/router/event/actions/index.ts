@@ -315,7 +315,7 @@ export function getDefaultActionProcedures(
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,
-          eventType: event.type ?? undefined
+          eventType: event.type
         })
       })
   }

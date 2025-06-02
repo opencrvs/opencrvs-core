@@ -259,7 +259,7 @@ describe('getCurrentEventState()', () => {
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
-      dateOfEvent: '2025-05-29',
+      dateOfEvent: new Date().toISOString().slice(0, 10),
       createdAtLocation: createAction.createdAtLocation,
       updatedAt: registerRequestAction.createdAt,
       updatedBy: registerRequestAction.createdBy,
@@ -365,7 +365,7 @@ describe('getCurrentEventState()', () => {
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
-      dateOfEvent: '2025-05-29',
+      dateOfEvent: new Date().toISOString().slice(0, 10),
       createdAtLocation: createAction.createdAtLocation,
       updatedAt: registerAcceptAction.createdAt,
       updatedBy: registerAcceptAction.createdBy,
