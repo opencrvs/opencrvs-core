@@ -34,11 +34,12 @@ function ReadonlyView() {
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
-  const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, drafts),
-    [drafts, event]
-  )
   const { eventConfiguration: config } = useEventConfiguration(event.type)
+  const eventStateWithDrafts = useMemo(
+    () =>
+      getCurrentEventStateWithDrafts({ event, drafts, configuration: config }),
+    [drafts, event, config]
+  )
 
   const { title, fields } = getActionReview(config, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
