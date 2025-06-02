@@ -22,6 +22,7 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { VALIDATED_BIRTH_RECORD } from '@test/mocks/records/validated'
 
 describe('Validate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -46,12 +47,18 @@ describe('Validate record endpoint', () => {
       }
     )
 
+    let calledOnce = false
+
     // Gets record by id via getRecordById endpoint
     mswServer.use(
       rest.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+          if (!calledOnce) {
+            calledOnce = true
+            return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+          }
+          return res(ctx.json(VALIDATED_BIRTH_RECORD))
         }
       )
     )
