@@ -239,7 +239,7 @@ export const isDateNotInFuture = (date: string) => {
   return new Date(date) <= new Date(Date.now())
 }
 
-export const isDateNotPastLimit = (date: string, limit: Date) => {
+const isDateNotPastLimit = (date: string, limit: Date) => {
   return new Date(date) >= limit
 }
 
@@ -518,17 +518,6 @@ export const dateNotInFuture = (): Validation => (value: IFormFieldValue) => {
     return { message: messages.dateFormat }
   }
 }
-
-export const dateNotPastLimit =
-  (limit: string): Validation =>
-  (value: IFormFieldValue) => {
-    const cast = value as string
-    if (isDateNotPastLimit(cast, new Date(limit))) {
-      return undefined
-    } else {
-      return { message: messages.dateFormat }
-    }
-  }
 
 export const dateNotToday = (date: string): boolean => {
   const today = new Date().setHours(0, 0, 0, 0)
