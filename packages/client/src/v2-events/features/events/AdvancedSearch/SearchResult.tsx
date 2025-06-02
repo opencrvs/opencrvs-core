@@ -11,7 +11,7 @@
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
-import { Link, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { orderBy } from 'lodash'
 import styled from 'styled-components'
 import {
@@ -30,8 +30,6 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { Link as TextButton } from '@opencrvs/components'
-import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
-import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -41,14 +39,6 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 import { useEventTitle } from '../useEvents/useEventTitle'
 
-const FabContainer = styled.div`
-  position: fixed;
-  right: 40px;
-  bottom: 55px;
-  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
-    display: none;
-  }
-`
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
 })``
@@ -190,10 +180,8 @@ export const SearchResultComponent = ({
   limit = 10,
   offset = 0,
   title: contentTitle,
-  tabBarContent,
-  showPlusButton // In mobile view of v1, plus button is visible for workqueue and not for searchResult
+  tabBarContent
 }: {
-  showPlusButton?: boolean
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
   queryData: EventIndex[]
@@ -379,16 +367,6 @@ export const SearchResultComponent = ({
           hideLastBorder={!isShowPagination}
           sortOrder={sortOrder}
         />
-        {showPlusButton && (
-          <FabContainer>
-            <Link to={ROUTES.V2.EVENTS.CREATE.path}>
-              <FloatingActionButton
-                icon={() => <PlusTransparentWhite />}
-                id="new_event_declaration"
-              />
-            </Link>
-          </FabContainer>
-        )}
       </WQContentWrapper>
     </WithTestId>
   )

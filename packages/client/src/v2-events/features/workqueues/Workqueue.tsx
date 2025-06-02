@@ -16,12 +16,25 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
+import { Link } from 'react-router-dom'
+import styled from 'styled-components'
+import { FloatingActionButton } from '@opencrvs/components/lib/buttons'
+import { PlusTransparentWhite } from '@opencrvs/components/lib/icons'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { SearchResultComponent } from '../events/AdvancedSearch/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
+
+const FabContainer = styled.div`
+  position: fixed;
+  right: 40px;
+  bottom: 55px;
+  @media (min-width: ${({ theme }) => theme.grid.breakpoints.lg}px) {
+    display: none;
+  }
+`
 
 export function WorkqueueContainer() {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
@@ -40,13 +53,22 @@ export function WorkqueueContainer() {
   }
 
   return (
-    <SearchResultComponent
-      columns={workqueueConfig.columns}
-      eventConfigs={eventConfigs}
-      queryData={events}
-      title={intl.formatMessage(workqueueConfig.name)}
-      {...searchParams}
-      showPlusButton
-    />
+    <>
+      <SearchResultComponent
+        columns={workqueueConfig.columns}
+        eventConfigs={eventConfigs}
+        queryData={events}
+        title={intl.formatMessage(workqueueConfig.name)}
+        {...searchParams}
+      />
+      <FabContainer>
+        <Link to={ROUTES.V2.EVENTS.CREATE.path}>
+          <FloatingActionButton
+            icon={() => <PlusTransparentWhite />}
+            id="new_event_declaration"
+          />
+        </Link>
+      </FabContainer>
+    </>
   )
 }
