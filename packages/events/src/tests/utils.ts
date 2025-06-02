@@ -25,7 +25,7 @@ import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
-import { UserContext } from '@events/context'
+import { SystemContext } from '@events/context'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 /**
@@ -122,7 +122,7 @@ export function createSystemTestClient(
   const token = createTestToken(systemId, scopes, TokenUserType.enum.system)
 
   const caller = createCaller({
-    user: UserContext.parse({
+    user: SystemContext.parse({
       id: systemId,
       role: SystemRole.enum.HEALTH,
       primaryOfficeId: undefined,

@@ -25,7 +25,7 @@ import {
 } from '@opencrvs/commons'
 import { env } from './environment'
 
-export const UserContext = z.object({
+const UserContext = z.object({
   id: z.string(),
   primaryOfficeId: z.string(),
   role: z.string(),
@@ -37,7 +37,7 @@ export const UserContext = z.object({
 })
 type UserContext = z.infer<typeof UserContext>
 
-const SystemContext = z.object({
+export const SystemContext = z.object({
   id: z.string(),
   role: SystemRole,
   type: TokenUserType.extract(['system']),
