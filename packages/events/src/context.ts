@@ -46,13 +46,28 @@ export const SystemContext = z.object({
 })
 type SystemContext = z.infer<typeof SystemContext>
 
-export type TrpcUserContext = SystemContext | UserContext
-
 export const TrpcContext = z.object({
   token: TokenWithBearer,
   user: z.union([SystemContext, UserContext])
 })
+
 export type TrpcContext = z.infer<typeof TrpcContext>
+
+/**
+ * Internal user, used to bootstrap the system and then deactivate.
+ */
+const SEEDER_SUPER_ADMIN = 'o.admin'
+
+/**
+ * Super admin does not have a primary office. It is the one setting locations.
+ * It should be used only once to bootstrap the system. Usage should be limited. Seeing it as 'system' is one way of doing that. (And it also plays well with types)
+ */
+const SuperAdminContext = SystemContext.extend({
+  role: z.literal('SUPER_ADMIN')
+})
+type SuperAdminContext = z.infer<typeof SuperAdminContext>
+
+export type TrpcUserContext = SystemContext | UserContext | SuperAdminContext
 
 type HeadersLike =
   // gateway is not aware of Headers. We use this as a proxy.
@@ -77,11 +92,6 @@ function normalizeHeaders(
 
   return headers
 }
-
-/**
- * Internal user, used to bootstrap the system and then deactivate.
- */
-const SEEDER_SUPER_ADMIN = 'o.admin'
 
 export async function resolveUserDetails(
   token: TokenWithBearer
@@ -121,11 +131,9 @@ export async function resolveUserDetails(
         `User ${username} is used for seeding. Treating it as a ${TokenUserType.Enum.system} user type.`
       )
 
-      return SystemContext.parse({
+      return SuperAdminContext.parse({
         type: TokenUserType.Enum.system,
         id: userId,
-        // Super user does not have a primary office. It is the one setting locations.
-        // It should be used only once to bootstrap the system. We should limit its usage. Seeing it as 'system' is one way of doing that. (And it also plays well with types)
         primaryOfficeId: undefined,
         role
       })
