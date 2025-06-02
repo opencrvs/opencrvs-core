@@ -129,7 +129,7 @@ describe('event.create', () => {
     test('event created by system user should not have assignment action', async () => {
       const { generator } = await setupTestCase()
       let client = createSystemTestClient('test-system', [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
       const event = await client.event.create(generator.event.create())
 

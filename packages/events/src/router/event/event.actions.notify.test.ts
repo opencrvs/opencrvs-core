@@ -124,13 +124,13 @@ describe('event.actions.notify', () => {
       const { generator } = await setupTestCase()
 
       let client = createSystemTestClient('test-system', [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       await client.event.actions.notify.request(
@@ -156,7 +156,7 @@ describe('event.actions.notify', () => {
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       await expect(
