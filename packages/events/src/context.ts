@@ -54,15 +54,18 @@ export const TrpcContext = z.object({
 })
 export type TrpcContext = z.infer<typeof TrpcContext>
 
+type HeadersLike =
+  // gateway is not aware of Headers. We use this as a proxy.
+  | {
+      entries: () => IterableIterator<[string, string]>
+    }
+  | Headers
+
 // This avoids TS2693 ("'Headers' only refers to a type, but is being used as a value here.") which is thrown by gateway in CI
 function isHeadersLike(
-  headers: Headers | Record<string, string | string[] | undefined>
-): headers is Headers {
-  return (
-    typeof headers === 'object' &&
-    typeof headers.entries === 'function' &&
-    typeof headers.get === 'function'
-  )
+  headers: HeadersLike | Record<string, string | string[] | undefined>
+): headers is HeadersLike {
+  return typeof headers === 'object' && typeof headers.entries === 'function'
 }
 
 function normalizeHeaders(
