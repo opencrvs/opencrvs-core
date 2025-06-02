@@ -17,7 +17,6 @@ import {
   EventType,
   System,
   SystemStatus,
-  SystemType,
   WebhookPermission
 } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
@@ -50,6 +49,7 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
+import { SystemType } from '@opencrvs/commons/client'
 
 interface ToggleModal {
   modalVisible: boolean

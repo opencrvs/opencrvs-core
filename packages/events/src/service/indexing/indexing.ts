@@ -219,7 +219,7 @@ export async function createIndex(
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
-                  acceptedAt: { type: 'date' }
+                  acceptedAt: { type: 'date' },
                 } satisfies Record<
                   keyof ActionCreationMetadata,
                   estypes.MappingProperty
@@ -233,7 +233,7 @@ export async function createIndex(
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
-                  registrationNumber: { type: 'keyword' }
+                  registrationNumber: { type: 'keyword' },
                 } satisfies Record<
                   keyof RegistrationCreationMetadata,
                   estypes.MappingProperty

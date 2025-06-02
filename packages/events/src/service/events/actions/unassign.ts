@@ -19,23 +19,18 @@ import {
 import { inScope, SCOPES } from '@opencrvs/commons'
 import { addAction, getEventById } from '@events/service/events/events'
 import { setBearerForToken } from '@events/router/middleware'
+import { UserDetails } from '@events/user'
 
 export async function unassignRecord(
   input: UnassignActionInput,
   {
     eventId,
-    createdBy,
-    createdByRole,
-    token,
-    createdAtLocation,
-    transactionId
+    user,
+    token
   }: {
     eventId: string
-    createdBy: string
-    createdByRole: string
-    createdAtLocation: string
+    user: UserDetails
     token: string
-    transactionId: string
   }
 ) {
   const storedEvent = await getEventById(eventId)
@@ -43,7 +38,7 @@ export async function unassignRecord(
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
     if (
-      lastAssignmentAction.assignedTo !== createdBy &&
+      lastAssignmentAction.assignedTo !== user.id &&
       !inScope({ Authorization: setBearerForToken(token) }, [
         SCOPES.RECORD_UNASSIGN_OTHERS
       ])
@@ -52,13 +47,11 @@ export async function unassignRecord(
         code: 'FORBIDDEN'
       })
     }
+
     return addAction(input, {
       eventId,
-      createdBy,
-      createdByRole,
+      user,
       token,
-      createdAtLocation,
-      transactionId,
       status: ActionStatus.Accepted
     })
   }
