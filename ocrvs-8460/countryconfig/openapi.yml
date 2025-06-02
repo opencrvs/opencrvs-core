@@ -3172,7 +3172,9 @@ components:
                   createdByRole:
                     type: string
                   createdAtLocation:
-                    type: string
+                    type:
+                      - string
+                      - "null"
                   status:
                     type: string
                     const: Rejected
@@ -3194,7 +3196,6 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -3255,6 +3256,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -3415,6 +3420,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -3580,11 +3587,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum:
@@ -3604,7 +3611,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -3621,6 +3627,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -3781,6 +3791,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -3946,11 +3958,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -3966,7 +3978,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -3983,6 +3994,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4143,6 +4158,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -4308,11 +4325,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4328,7 +4345,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     MarkAsDuplicateAction:
@@ -4345,6 +4361,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4505,6 +4525,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -4670,11 +4692,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4690,7 +4712,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -4707,6 +4728,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4867,6 +4892,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -5032,11 +5059,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5052,7 +5079,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     NotifiedAction:
@@ -5069,6 +5095,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5229,6 +5259,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -5394,11 +5426,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5414,7 +5446,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -5431,6 +5462,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5591,6 +5626,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -5756,11 +5793,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5778,7 +5815,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -5795,6 +5831,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5955,6 +5995,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -6120,11 +6162,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6140,7 +6182,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -6157,6 +6198,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6317,6 +6362,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -6482,11 +6529,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6504,7 +6551,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -6522,6 +6568,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6682,6 +6732,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -6847,11 +6899,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6867,7 +6919,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -6884,6 +6935,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7044,6 +7099,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -7209,11 +7266,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7231,7 +7288,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7249,6 +7305,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7409,6 +7469,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -7574,11 +7636,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7596,7 +7658,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7614,6 +7675,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7774,6 +7839,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -7939,11 +8006,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7961,7 +8028,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -7979,6 +8045,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -8139,6 +8209,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -8304,11 +8376,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -8324,7 +8396,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -8341,6 +8412,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -8501,6 +8576,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -8666,11 +8743,11 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -8686,7 +8763,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ActionInput:
@@ -8874,6 +8950,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -9040,6 +9118,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -9052,11 +9132,12 @@ components:
           const: CREATE
           default: CREATE
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
       required:
         - eventId
         - transactionId
-        - createdAtLocation
     ValidateActionInput:
       type: object
       properties:
@@ -9225,6 +9306,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -9389,6 +9472,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -9577,6 +9662,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -9741,6 +9828,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -9926,6 +10015,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -10091,6 +10182,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -10107,7 +10200,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: b323032a-e5bf-4fe3-a153-badb6e44bbae
+        transactionId: 8cf94ae1-3779-455a-985b-07d11e054c22
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10279,6 +10372,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -10443,6 +10538,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -10626,6 +10723,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -10790,6 +10889,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -10973,6 +11074,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -11137,6 +11240,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -11320,6 +11425,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -11484,6 +11591,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -11667,6 +11776,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -11831,6 +11942,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -12017,6 +12130,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -12181,6 +12296,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -12367,6 +12484,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -12531,6 +12650,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -12714,6 +12835,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -12878,6 +13001,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -13061,6 +13186,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -13225,6 +13352,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -13411,6 +13540,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -13575,6 +13706,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
@@ -13761,6 +13894,8 @@ components:
                     type: string
                   surname:
                     type: string
+                  middlename:
+                    type: string
                 required:
                   - firstname
                   - surname
@@ -13925,6 +14060,8 @@ components:
                   firstname:
                     type: string
                   surname:
+                    type: string
+                  middlename:
                     type: string
                 required:
                   - firstname
