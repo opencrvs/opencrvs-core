@@ -129,7 +129,6 @@ export async function resolveUserDetails(
 
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
-
   const token = TokenWithBearer.parse(normalizedHeaders.authorization)
 
   const user = await resolveUserDetails(token)
