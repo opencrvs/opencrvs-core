@@ -164,9 +164,7 @@ const getUserRole = (history: History): MessageDescriptor => {
 }
 
 const getUserFullHonorificName = (history: History): string => {
-  return (
-    history?.user?.fullHonorificName || ''
-  )
+  return history?.user?.fullHonorificName || ''
 }
 
 const getUserSignature = (history: History): string => {
