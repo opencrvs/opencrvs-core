@@ -12,7 +12,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fn, userEvent, waitFor, within } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
-import { graphql, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
@@ -24,7 +23,6 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
 
@@ -55,7 +53,6 @@ const undeclaredDraftEvent = {
   )
 }
 const spy = fn()
-const generator = testDataGenerator()
 
 function createDraftHandlers() {
   const draftList = fn<() => Draft[]>(() => [])
@@ -130,45 +127,6 @@ export const SaveAndExit: Story = {
                 tennisClubMembershipEvent
               )
             ]
-          })
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.localRegistrar()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [
-              {
-                id,
-                name: [
-                  {
-                    use: 'en',
-                    given: ['Kennedy'],
-                    family: 'Mweene'
-                  }
-                ],
-                role: 'LOCAL_REGISTRAR',
-                signatureFilename: 'signature.png'
-              }
-            ]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return {
-              id,
-              name: [
-                {
-                  use: 'en',
-                  given: ['Kennedy'],
-                  family: 'Mweene'
-                }
-              ],
-              role: 'LOCAL_REGISTRAR',
-              signatureFilename: 'signature.png'
-            }
           })
         ]
       }

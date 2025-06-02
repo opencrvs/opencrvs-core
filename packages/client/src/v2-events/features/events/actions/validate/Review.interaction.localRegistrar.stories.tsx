@@ -118,6 +118,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(() => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -187,6 +190,9 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           }),
           tRPCMsw.user.list.query(() => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -306,6 +312,9 @@ export const ReviewForLocalRegistrarRejectInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }

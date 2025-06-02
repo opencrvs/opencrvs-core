@@ -1101,6 +1101,20 @@ export const handlers = {
           signatureFilename: undefined
         }
       ]
+    }),
+    tRPCMsw.user.get.query((id) => {
+      return {
+        id,
+        name: [
+          {
+            use: 'en',
+            given: ['Kennedy'],
+            family: 'Mweene'
+          }
+        ],
+        role: 'LOCAL_REGISTRAR',
+        signatureFilename: 'signature.png'
+      }
     })
   ],
   event: [
