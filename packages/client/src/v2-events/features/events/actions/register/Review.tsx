@@ -10,7 +10,6 @@
  */
 
 import React from 'react'
-import { defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
@@ -164,7 +163,8 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message }
+          annotation: {},
+          reason: { message }
         })
       }
 
@@ -173,7 +173,8 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message, isDuplicate }
+          annotation: {},
+          reason: { message, isDuplicate }
         })
       }
 
