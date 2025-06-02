@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/fixtures'
+import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('event config can be fetched', async () => {

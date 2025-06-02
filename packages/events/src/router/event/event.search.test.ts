@@ -11,7 +11,7 @@
  */
 
 import { AddressType } from '@opencrvs/commons'
-import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/fixtures'
+import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Throws error without proper scope', async () => {

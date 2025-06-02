@@ -17,7 +17,7 @@ import * as jwt from 'jsonwebtoken'
 import * as mockingoose from 'mockingoose'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { SCOPES } from '@opencrvs/commons/authentication'
-import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/fixtures'
+import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
 
 const fetch = fetchMock as fetchMock.FetchMock
 

@@ -9,11 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent
-} from '@opencrvs/commons/fixtures'
-import { QueryType } from '@opencrvs/commons/events'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { QueryType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import {
   getEventIndexName,
