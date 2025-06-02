@@ -193,6 +193,8 @@ export const requireAssignment: MiddlewareFunction<
   ActionInputWithType | DeleteActionInput
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
+
+  // First check if the action is a duplicate
   if (
     'transactionId' in input &&
     event.actions.some((action) => action.transactionId === input.transactionId)
@@ -203,6 +205,8 @@ export const requireAssignment: MiddlewareFunction<
     })
   }
 
+  const { user } = ctx
+
   const assignedTo = getAssignedUserFromActions(
     event.actions.filter(
       (action): action is ActionDocument =>
@@ -210,16 +214,25 @@ export const requireAssignment: MiddlewareFunction<
     )
   )
 
-  if (ctx.user.type === TokenUserType.SYSTEM) {
+  // System users don't require assignment
+  if (user.type === TokenUserType.SYSTEM) {
+    if (assignedTo) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        cause: 'System user can not perform action on assigned event'
+      })
+    }
+
     return next()
   }
 
-  if (ctx.user.id !== assignedTo) {
+  if (user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       message: JSON.stringify('You are not assigned to this event')
     })
   }
+
   return next()
 }
 

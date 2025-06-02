@@ -12,7 +12,11 @@
 import { TRPCError } from '@trpc/server'
 import { SCOPES } from '@opencrvs/commons'
 import { ActionType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createSystemTestClient,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 describe('event.create', () => {
   describe('authorization', () => {
@@ -66,6 +70,7 @@ describe('event.create', () => {
 
     const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
     expect(fetchedEventWithoutReadAction).toEqual(event.actions)
+    expect(fetchedEvent.actions.length).toEqual(3)
 
     expect(fetchedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
@@ -110,5 +115,35 @@ describe('event.create', () => {
         })
       )
     ).rejects.toThrowErrorMatchingSnapshot()
+  })
+
+  describe('system user', () => {
+    test('should not allow system user to create event if required scopes are not present', async () => {
+      const { generator } = await setupTestCase()
+      const client = createSystemTestClient('test-system', [])
+      await expect(
+        client.event.create(generator.event.create())
+      ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+    })
+
+    test('event created by system user should not have assignment action', async () => {
+      const { generator } = await setupTestCase()
+      let client = createSystemTestClient('test-system', [
+        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+      ])
+      const event = await client.event.create(generator.event.create())
+
+      const { user } = await setupTestCase()
+      client = createTestClient(user)
+      const fetchedEvent = await client.event.get(event.id)
+
+      const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
+      expect(fetchedEventWithoutReadAction).toEqual(event.actions)
+      expect(fetchedEvent.actions.length).toEqual(2)
+      expect(fetchedEvent.actions).toEqual([
+        expect.objectContaining({ type: ActionType.CREATE }),
+        expect.objectContaining({ type: ActionType.READ })
+      ])
+    })
   })
 })
