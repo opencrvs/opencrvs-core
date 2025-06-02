@@ -26,7 +26,9 @@ export async function checkServiceHealth(url: string) {
     method: 'GET'
   })
   return {
-    status: res.status
+    status: res.status,
+    ok: res.ok,
+    responseText: await res.text()
   }
 }
 
@@ -61,17 +63,25 @@ export default async function healthCheckHandler(
     error?: string
   }>
   let stackAllOk = true
-  
   for (const [key, value] of Object.entries(SERVICES)) {
     try {
       const res = await checkServiceHealth(value)
-      responses.push({
-        name: key,
-        status: res.status
-      })
+      if (res.ok) {
+        responses.push({
+          name: key,
+          status: res.status
+        })
+      } else {
+        responses.push({
+          name: key,
+          status: res.status,
+          error: res.responseText
+        })
+        stackAllOk = false
+      }
     } catch (err) {
       stackAllOk = false
-      responses.push({ name: key, status: 500, error: err.message })
+      responses.push({ name: key, status: 502, error: err.message })
     }
   }
   if (stackAllOk) {
