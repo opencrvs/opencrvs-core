@@ -13,6 +13,7 @@ import * as Joi from 'joi'
 import { unauthorized } from '@hapi/boom'
 import User from '@user-mgnt/model/user'
 import { getPractitionerSignature } from './service'
+import { logger } from '@opencrvs/commons'
 
 interface IVerifyPayload {
   userId: string
@@ -49,7 +50,15 @@ export default async function getUser(
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
-  const signature = await getPractitionerSignature(token, user.practitionerId)
+
+  let signature
+  try {
+    signature = await getPractitionerSignature(token, user.practitionerId)
+  } catch {
+    logger.error(
+      'Error fetching practitioner signature. Sending user without it.'
+    )
+  }
 
   return { ...user.toObject(), signature }
 }
