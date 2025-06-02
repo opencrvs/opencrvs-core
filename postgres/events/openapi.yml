@@ -70,7 +70,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 9a293837-9ef1-4ace-93d6-083c965e7a91
+                transactionId: a6b97b45-f824-4419-b9cd-4c4c5445f6cf
                 type: v2.birth
       responses:
         "200":
@@ -435,7 +435,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 628b5b5b-42a4-406c-b73d-2c658ccbf839
+                transactionId: a6abf677-baf1-4862-9bde-5aae34edde26
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -523,6 +523,7 @@ paths:
                             type: string
                           createdAtLocation:
                             type: string
+                            nullable: true
                             format: uuid
                           status:
                             type: string
@@ -548,7 +549,6 @@ paths:
                           - createdAt
                           - createdBy
                           - createdByRole
-                          - createdAtLocation
                           - status
                           - type
                 trackingId:
@@ -3682,6 +3682,7 @@ components:
                     type: string
                   createdAtLocation:
                     type: string
+                    nullable: true
                     format: uuid
                   status:
                     type: string
@@ -3700,7 +3701,6 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -3761,6 +3761,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4058,9 +4062,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: &a10
@@ -4082,7 +4083,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -4099,6 +4099,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4396,9 +4400,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -4417,7 +4418,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -4434,6 +4434,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4731,9 +4735,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -4752,7 +4753,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     MarkAsDuplicateAction:
@@ -4769,6 +4769,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5066,9 +5070,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -5087,7 +5088,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -5104,6 +5104,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5401,9 +5405,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -5422,7 +5423,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     NotifiedAction:
@@ -5439,6 +5439,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5736,9 +5740,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -5757,7 +5758,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -5774,6 +5774,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6071,9 +6075,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -6094,7 +6095,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -6111,6 +6111,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6408,9 +6412,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -6429,7 +6430,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -6446,6 +6446,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6743,9 +6747,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -6766,7 +6767,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -6784,6 +6784,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7081,9 +7085,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -7102,7 +7103,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -7119,6 +7119,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7416,9 +7420,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -7439,7 +7440,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7457,6 +7457,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7754,9 +7758,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -7777,7 +7778,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7795,6 +7795,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8092,9 +8096,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -8115,7 +8116,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -8133,6 +8133,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8430,9 +8434,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -8451,7 +8452,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -8468,6 +8468,10 @@ components:
           type: string
         createdByRole:
           type: string
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8765,9 +8769,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
-          format: uuid
         status:
           type: string
           enum: *a10
@@ -8786,7 +8787,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     error.BAD_REQUEST:
