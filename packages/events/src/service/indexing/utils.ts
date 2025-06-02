@@ -8,7 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventIndex } from '@opencrvs/commons/events'
+import { uniqBy } from 'lodash'
+import {
+  EventConfig,
+  EventIndex,
+  getDeclarationFields
+} from '@opencrvs/commons/events'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -19,6 +24,10 @@ export function encodeFieldId(fieldId: string) {
 
 function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
+}
+
+export function getAllUniqueFields(eventConfig: EventConfig) {
+  return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
 export const DEFAULT_SIZE = 10

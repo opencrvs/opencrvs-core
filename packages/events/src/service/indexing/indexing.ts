@@ -38,7 +38,8 @@ import {
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId
+  encodeFieldId,
+  getAllUniqueFields
 } from './utils'
 import { buildElasticQueryFromSearchPayload } from './query'
 
@@ -46,7 +47,20 @@ function eventToEventIndex(
   event: EventDocument,
   config: EventConfig
 ): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event, config))
+  const eventIndex = getCurrentEventState(event, config)
+  const allFields = getAllUniqueFields(config)
+  const nameFields = allFields
+    .filter((field) => field.type === 'NAME')
+    .map((f) => f.id)
+  for (const [key, value] of Object.entries(eventIndex.declaration)) {
+    if (nameFields.includes(key) && value) {
+      // Compute and attach a __fullname field for internal search purposes only
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      ;(value as any).__fullname = Object.values(value).join(' ')
+    }
+  }
+
+  return encodeEventIndex(eventIndex)
 }
 
 /*
@@ -136,9 +150,9 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          firstname: { type: 'keyword' },
-          surname: { type: 'keyword' },
-          fullname: { type: 'keyword' }
+          firstname: { type: 'text' },
+          surname: { type: 'text' },
+          __fullname: { type: 'text' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -371,7 +385,10 @@ export async function getIndexedEvents(userId: string) {
     .map(decodeEventIndex)
 }
 
-export async function getIndex(eventParams: QueryType) {
+export async function getIndex(
+  eventParams: QueryType,
+  eventConfigs: EventConfig[]
+) {
   if (
     Object.values(eventParams).length === 0 ||
     eventParams.clauses.length === 0
@@ -380,12 +397,18 @@ export async function getIndex(eventParams: QueryType) {
   }
 
   const esClient = getOrCreateClient()
-  const query = buildElasticQueryFromSearchPayload(eventParams)
+  const query = buildElasticQueryFromSearchPayload(eventParams, eventConfigs)
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     size: DEFAULT_SIZE,
     request_cache: false,
-    query
+    query,
+    sort: {
+      _score: {
+        order: 'desc'
+      }
+    }
   })
 
   const events = z.array(EventIndex).parse(

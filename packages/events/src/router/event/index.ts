@@ -287,7 +287,10 @@ export const eventRouter = router({
   search: publicProcedure
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
-    .query(async ({ input }) => getIndex(input)),
+    .query(async ({ input, ctx }) => {
+      const eventConfigs = await getEventConfigurations(ctx.token)
+      return getIndex(input, eventConfigs)
+    }),
   import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({
