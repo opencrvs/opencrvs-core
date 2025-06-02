@@ -21,7 +21,7 @@ import { getFromFhir } from '../createUser/service'
  *
  * @returns storage key in /:bucketName/:objectName format.  e.g. /ocrvs/123123123123.png
  */
-export function findSignatureStorageKey(extensions: Extension[] | undefined) {
+function findSignatureStorageKey(extensions: Extension[] | undefined) {
   const signature = findExtension(
     `${OPENCRVS_SPECIFICATION_URL}extension/employee-signature`,
     extensions || []
