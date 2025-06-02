@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { SCOPES } from '@opencrvs/commons'
-import { ActionType } from '@opencrvs/commons/events'
+import { ActionType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 describe('event.create', () => {
@@ -48,7 +48,7 @@ describe('event.create', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       await expect(
