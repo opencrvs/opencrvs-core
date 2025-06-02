@@ -277,9 +277,13 @@ export const eventPayloadGenerator = {
       transactionId: input.transactionId ?? getUUID(),
       declaration: {},
       // @TODO: Check whether generator is needed?
-      annotation: { isDuplicate: isDuplicate ?? false },
+      annotation: {},
       duplicates: [],
-      eventId
+      eventId,
+      reason: {
+        message: `${ActionType.ARCHIVE}`,
+        isDuplicate: isDuplicate ?? false
+      }
     }),
     reject: (
       eventId: string,
@@ -297,7 +301,8 @@ export const eventPayloadGenerator = {
           ActionType.REJECT
         ),
       duplicates: [],
-      eventId
+      eventId,
+      reason: { message: `${ActionType.REJECT}` }
     }),
     register: (
       eventId: string,
@@ -447,9 +452,9 @@ export function generateActionDocument({
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, reason: { message: 'Archive' } }
     case ActionType.REJECT:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, reason: { message: 'Reject' } }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
@@ -461,7 +466,11 @@ export function generateActionDocument({
     case ActionType.APPROVE_CORRECTION:
       return { ...actionBase, requestId: getUUID(), type: action }
     case ActionType.REJECT_CORRECTION:
-      return { ...actionBase, requestId: getUUID(), type: action }
+      return {
+        ...actionBase,
+        requestId: getUUID(),
+        type: action
+      }
     case ActionType.REGISTER:
       return {
         ...actionBase,

@@ -306,8 +306,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     const annotation = actionConfiguration
       ? omitHiddenAnnotationFields(
           actionConfiguration,
-          params.annotation,
-          originalDeclaration
+          originalDeclaration,
+          params.annotation
         )
       : {}
 

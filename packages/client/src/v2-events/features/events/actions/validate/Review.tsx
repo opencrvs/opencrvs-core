@@ -159,7 +159,8 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message }
+          annotation: {},
+          reason: { message }
         })
       }
 
@@ -168,7 +169,8 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message, isDuplicate }
+          annotation: {},
+          reason: { message, isDuplicate }
         })
       }
 

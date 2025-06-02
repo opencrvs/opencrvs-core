@@ -97,11 +97,13 @@ export const mockActions: Record<
   },
   [ActionType.ARCHIVE]: {
     ...actionProps,
-    type: ActionType.ARCHIVE
+    type: ActionType.ARCHIVE,
+    reason: { message: 'Archived' }
   },
   [ActionType.REJECT]: {
     ...actionProps,
-    type: ActionType.REJECT
+    type: ActionType.REJECT,
+    reason: { message: 'Rejected' }
   },
   [ActionType.ASSIGN]: {
     ...actionProps,
