@@ -104,6 +104,10 @@ describe('registerSystem handler', () => {
   it('creates and saves system client using mongoose', async () => {
     mockingoose(User).toReturn(mockUser, 'findOne')
     fetch.mockResponses(
+      [
+        JSON.stringify([{ id: 'v2.birth' }, { id: 'tennis-club-membership' }]),
+        { status: 200 }
+      ],
       ['', { status: 201, headers: { Location: 'Practitioner/123' } }],
       ['', { status: 201, headers: { Location: 'PractitionerRole/123' } }]
     )

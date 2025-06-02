@@ -18,12 +18,11 @@ import {
   ActionType,
   ActionUpdate
 } from '@opencrvs/commons/client'
-import { ResolvedUser } from '@opencrvs/commons/client'
-import { getUsersFullName, joinValues } from '@client/v2-events/utils'
+import { joinValues } from '@client/v2-events/utils'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
+    '{status, select, CREATE {Draft} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -62,16 +61,14 @@ function prepareComments(action: ActionType, annotation: ActionUpdate) {
  */
 export function EventHistoryModal({
   history,
-  user,
+  userName,
   close
 }: {
   history: ActionDocument
-  user: ResolvedUser
+  userName: string
   close: () => void
 }) {
   const intl = useIntl()
-
-  const userName = getUsersFullName(user.name, intl.locale)
   const title = intl.formatMessage(eventHistoryStatusMessage, {
     status: history.type
   })
@@ -91,6 +88,7 @@ export function EventHistoryModal({
       autoHeight
       actions={[]}
       handleClose={close}
+      id="event-history-modal"
       responsive={true}
       show={true}
       title={title}

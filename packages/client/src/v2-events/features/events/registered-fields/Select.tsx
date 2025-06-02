@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldProps,
+  SelectField,
   SelectOption,
   TranslationConfig
 } from '@opencrvs/commons/client'
@@ -60,7 +61,22 @@ function SelectOutput({
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
 
+function stringify(intl: IntlShape, value: string, fieldConfig: SelectField) {
+  const option = fieldConfig.options.find((opt) => opt.value === value)
+
+  if (!option) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Could not find option with value ${value} for field ${fieldConfig.id}`
+    )
+    return value
+  }
+
+  return intl.formatMessage(option.label)
+}
+
 export const Select = {
   Input: SelectInput,
-  Output: SelectOutput
+  Output: SelectOutput,
+  stringify
 }

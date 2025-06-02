@@ -11,32 +11,37 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { getUUID } from '@opencrvs/commons'
+import { extendZodWithOpenApi } from 'zod-openapi'
+import { getUUID, SCOPES } from '@opencrvs/commons'
 import {
-  ActionType,
-  Draft,
-  DraftInput,
-  EventIndex,
-  EventInput,
-  ActionStatus,
-  ApproveCorrectionActionInput,
-  EventConfig,
-  RejectCorrectionActionInput,
-  RequestCorrectionActionInput,
-  AssignActionInput,
-  UnassignActionInput,
   ACTION_ALLOWED_SCOPES,
+  ActionStatus,
+  ActionType,
+  ApproveCorrectionActionInput,
+  AssignActionInput,
   CONFIG_GET_ALLOWED_SCOPES,
   CONFIG_SEARCH_ALLOWED_SCOPES,
-  QueryType,
-  DeleteActionInput
+  DeleteActionInput,
+  Draft,
+  DraftInput,
+  EventConfig,
+  EventDocument,
+  EventIndex,
+  EventInput,
+  RejectCorrectionActionInput,
+  RequestCorrectionActionInput,
+  UnassignActionInput,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  QueryType
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
-import { publicProcedure, router } from '@events/router/trpc'
+import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import { getEventConfigurations } from '@events/service/config/config'
 import { approveCorrection } from '@events/service/events/actions/approve-correction'
+import { assignRecord } from '@events/service/events/actions/assign'
 import { rejectCorrection } from '@events/service/events/actions/reject-correction'
+import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
@@ -44,10 +49,11 @@ import {
   deleteEvent,
   getEventById
 } from '@events/service/events/events'
+import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
-import { assignRecord } from '@events/service/events/actions/assign'
-import { unassignRecord } from '@events/service/events/actions/unassign'
 import { getDefaultActionProcedures } from './actions'
+
+extendZodWithOpenApi(z)
 
 function validateEventType({
   eventTypes,
@@ -73,8 +79,9 @@ export const eventRouter = router({
         openapi: {
           summary: 'List event configurations',
           method: 'GET',
-          path: '/events/config',
-          tags: ['Events']
+          path: '/config',
+          tags: ['events'],
+          protect: true
         }
       })
       .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
@@ -84,24 +91,38 @@ export const eventRouter = router({
         return getEventConfigurations(options.ctx.token)
       })
   }),
-  create: publicProcedure
-    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.CREATE]))
+  create: systemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create event',
+        method: 'POST',
+        path: '/events',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .use(
+      requiresAnyOfScopes(
+        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
+        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
+      )
+    )
     .input(EventInput)
-    .mutation(async (options) => {
-      const config = await getEventConfigurations(options.ctx.token)
+    .use(middleware.eventTypeAuthorization)
+    .output(EventDocument)
+    .mutation(async ({ input, ctx }) => {
+      const config = await getEventConfigurations(ctx.token)
       const eventIds = config.map((c) => c.id)
 
       validateEventType({
         eventTypes: eventIds,
-        eventInputType: options.input.type
+        eventInputType: input.type
       })
 
       return createEvent({
-        eventInput: options.input,
-        createdBy: options.ctx.user.id,
-        createdByRole: options.ctx.user.role,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        transactionId: options.input.transactionId
+        transactionId: input.transactionId,
+        eventInput: input,
+        user: ctx.user
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
@@ -119,11 +140,8 @@ export const eventRouter = router({
         },
         {
           eventId: event.id,
-          createdBy: ctx.user.id,
-          createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId,
+          user: ctx.user,
           token: ctx.token,
-          transactionId: getUUID(),
           status: ActionStatus.Accepted
         }
       )
@@ -141,19 +159,18 @@ export const eventRouter = router({
     list: publicProcedure.output(z.array(Draft)).query(async (options) => {
       return getDraftsByUserId(options.ctx.user.id)
     }),
-    create: publicProcedure.input(DraftInput).mutation(async (options) => {
-      const eventId = options.input.eventId
-      await getEventById(eventId)
+    create: publicProcedure
+      .input(DraftInput)
+      .mutation(async ({ input, ctx }) => {
+        const { eventId } = input
+        await getEventById(eventId)
 
-      return createDraft(options.input, {
-        eventId,
-        createdBy: options.ctx.user.id,
-        createdByRole: options.ctx.user.role,
-        createdAtLocation: options.ctx.user.primaryOfficeId,
-        token: options.ctx.token,
-        transactionId: options.input.transactionId
+        return createDraft(input, {
+          eventId,
+          user: ctx.user,
+          transactionId: input.transactionId
+        })
       })
-    })
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
@@ -172,9 +189,7 @@ export const eventRouter = router({
         .mutation(async (options) => {
           return assignRecord({
             input: options.input,
-            createdBy: options.ctx.user.id,
-            createdByRole: options.ctx.user.role,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
+            user: options.ctx.user,
             token: options.ctx.token
           })
         }),
@@ -184,11 +199,8 @@ export const eventRouter = router({
         .mutation(async (options) => {
           return unassignRecord(options.input, {
             eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdByRole: options.ctx.user.role,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token,
-            transactionId: options.input.transactionId
+            user: options.ctx.user,
+            token: options.ctx.token
           })
         })
     }),
@@ -209,11 +221,8 @@ export const eventRouter = router({
 
           return addAction(input, {
             eventId: input.eventId,
-            createdBy: ctx.user.id,
-            createdByRole: ctx.user.role,
-            createdAtLocation: ctx.user.primaryOfficeId,
+            user: ctx.user,
             token: ctx.token,
-            transactionId: input.transactionId,
             status: ActionStatus.Accepted
           })
         }),
@@ -232,11 +241,8 @@ export const eventRouter = router({
           }
           return approveCorrection(input, {
             eventId: input.eventId,
-            createdBy: ctx.user.id,
-            createdByRole: ctx.user.role,
-            createdAtLocation: ctx.user.primaryOfficeId,
-            token: ctx.token,
-            transactionId: input.transactionId
+            user: ctx.user,
+            token: ctx.token
           })
         }),
       reject: publicProcedure
@@ -255,16 +261,13 @@ export const eventRouter = router({
 
           return rejectCorrection(input, {
             eventId: input.eventId,
-            createdBy: ctx.user.id,
-            createdByRole: ctx.user.role,
-            createdAtLocation: ctx.user.primaryOfficeId,
-            token: ctx.token,
-            transactionId: input.transactionId
+            user: ctx.user,
+            token: ctx.token
           })
         })
     })
   }),
-  list: publicProcedure
+  list: systemProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
@@ -272,7 +275,29 @@ export const eventRouter = router({
       return getIndexedEvents(userId)
     }),
   search: publicProcedure
+    .meta({
+      openapi: {
+        summary: 'Search for events',
+        method: 'GET',
+        tags: ['Search'],
+        path: '/events/search'
+      }
+    })
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
-    .query(async ({ input }) => getIndex(input))
+    .output(z.array(EventIndex))
+    .query(async ({ input }) => getIndex(input)),
+  import: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .meta({
+      openapi: {
+        summary: 'Import full event record',
+        method: 'POST',
+        path: '/events/import',
+        tags: ['events']
+      }
+    })
+    .input(EventDocument)
+    .output(EventDocument)
+    .mutation(async ({ input }) => importEvent(input))
 })

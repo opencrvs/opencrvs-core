@@ -31,11 +31,12 @@ import {
   EventStatus,
   isWriteAction
 } from '@opencrvs/commons/events'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
+import { UserDetails } from '@events/user'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {
@@ -157,15 +158,11 @@ type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
 
 export async function createEvent({
   eventInput,
-  createdAtLocation,
-  createdBy,
-  createdByRole,
+  user,
   transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
-  createdBy: string
-  createdByRole: string
-  createdAtLocation: string
+  user: UserDetails
   transactionId: string
 }): Promise<EventDocument> {
   const existingEvent = await getEventByTransactionId(transactionId)
@@ -181,6 +178,12 @@ export async function createEvent({
   const id = getUUID()
   const trackingId = generateTrackingId()
 
+  const createdByDetails = {
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
+  }
+
   await collection.insertOne({
     ...eventInput,
     id,
@@ -190,11 +193,9 @@ export async function createEvent({
     trackingId,
     actions: [
       {
+        ...createdByDetails,
         type: ActionType.CREATE,
         createdAt: now,
-        createdBy,
-        createdByRole,
-        createdAtLocation,
         id: getUUID(),
         declaration: {},
         status: ActionStatus.Accepted,
@@ -203,22 +204,26 @@ export async function createEvent({
     ]
   })
 
-  const action: ActionDocument = {
-    type: ActionType.ASSIGN,
-    assignedTo: createdBy,
-    declaration: {},
-    createdBy,
-    createdByRole,
-    createdAt: now,
-    createdAtLocation,
-    id,
-    status: ActionStatus.Accepted,
-    transactionId: getUUID()
-  }
+  // System users don't use assignment
+  if (user.type !== TokenUserType.SYSTEM) {
+    const action: ActionDocument = {
+      ...createdByDetails,
+      type: ActionType.ASSIGN,
+      assignedTo: createdByDetails.createdBy,
+      declaration: {},
+      createdAt: now,
+      id,
+      status: ActionStatus.Accepted,
+      transactionId: getUUID()
+    }
 
-  await db
-    .collection<EventDocument>('events')
-    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
+    await db
+      .collection<EventDocument>('events')
+      .updateOne(
+        { id },
+        { $push: { actions: action }, $set: { updatedAt: now } }
+      )
+  }
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -272,21 +277,13 @@ export async function addAction(
   input: ActionInputWithType,
   {
     eventId,
-    createdBy,
-    createdByRole,
+    user,
     token,
-    createdAtLocation,
     status
   }: {
     eventId: string
-    createdBy: string
-    createdByRole: string
-    /**
-     * The location where the action was created. This is used for auditing purposes.
-     */
-    createdAtLocation: string
+    user: UserDetails
     token: string
-    transactionId: string
     status: ActionStatus
   },
   actionId = getUUID()
@@ -312,6 +309,12 @@ export async function addAction(
     }
   }
 
+  const createdByDetails = {
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId
+  }
+
   if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
     await db.collection<EventDocument>('events').updateOne(
       {
@@ -324,12 +327,10 @@ export async function addAction(
         $push: {
           actions: {
             ...input,
+            ...createdByDetails,
             transactionId: getUUID(),
             type: ActionType.MARKED_AS_DUPLICATE,
-            createdBy,
-            createdByRole,
             createdAt: now,
-            createdAtLocation,
             id: getUUID(),
             status
           }
@@ -343,10 +344,8 @@ export async function addAction(
 
   const action: ActionDocument = {
     ...input,
-    createdBy,
-    createdByRole,
+    ...createdByDetails,
     createdAt: now,
-    createdAtLocation,
     id: actionId,
     status: status
   }
@@ -358,21 +357,28 @@ export async function addAction(
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
 
-  if (isWriteAction(input.type) && !input.keepAssignment) {
+  // We want to unassign only if:
+  // - Action is a write action, since we dont want to unassign from e.g. READ action
+  // - Keep assignment is false
+  // - User is not a system user, since system users dont partake in assignment
+  const shouldUnassign =
+    isWriteAction(input.type) &&
+    !input.keepAssignment &&
+    user.type !== TokenUserType.SYSTEM
+
+  if (shouldUnassign) {
     await db.collection<EventDocument>('events').updateOne(
       { id: eventId },
       {
         $push: {
           actions: {
             ...input,
+            ...createdByDetails,
             transactionId: getUUID(),
             type: ActionType.UNASSIGN,
             declaration: {},
             assignedTo: null,
-            createdBy,
-            createdByRole,
             createdAt: now,
-            createdAtLocation,
             id: actionId,
             status
           }
@@ -382,7 +388,11 @@ export async function addAction(
     )
   }
 
-  const drafts = await getDraftsForAction(eventId, createdBy, input.type)
+  const drafts = await getDraftsForAction(
+    eventId,
+    createdByDetails.createdBy,
+    input.type
+  )
 
   await cleanUnreferencedAttachmentsFromPreviousDrafts(
     token,

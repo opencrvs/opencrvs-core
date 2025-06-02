@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionStatus, ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionStatus, ActionType, getUUID, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
@@ -107,7 +107,7 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
         filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
-    transactionId: 'transactionId',
+    transactionId: getUUID(),
     eventId: originalEvent.id,
     status: ActionStatus.Requested
   }
@@ -146,7 +146,7 @@ test(`${ActionType.UNASSIGN} is idempotent`, async () => {
         filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
-    transactionId: 'transactionId',
+    transactionId: getUUID(),
     eventId: originalEvent.id,
     status: ActionStatus.Requested
   }

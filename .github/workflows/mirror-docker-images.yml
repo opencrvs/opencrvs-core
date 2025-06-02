@@ -22,11 +22,26 @@ jobs:
     runs-on: ubuntu-24.04
     env:
       RETRIES: 100
-
+    strategy:
+      matrix:
+        images:
+          - source: ghcr.io/aquasecurity/trivy-db:2
+            target: ghcr.io/${{ github.repository_owner }}/trivy-db:2
+          - source: ghcr.io/aquasecurity/trivy-java-db:1
+            target: ghcr.io/${{ github.repository_owner }}/trivy-java-db:1
+          - source: ghcr.io/aquasecurity/trivy-checks:1
+            target: ghcr.io/${{ github.repository_owner }}/trivy-checks:1
+          - source: docker.elastic.co/apm/apm-server:7.17.22
+            target: ghcr.io/${{ github.repository_owner }}/apm-server:7.17.22
+          - source: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/elasticsearch:8.16.4
+          - source: docker.elastic.co/kibana/kibana:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/kibana:8.16.4
+          - source: docker.elastic.co/beats/filebeat:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/filebeat:8.16.4
+          - source: docker.elastic.co/beats/metricbeat:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/metricbeat:8.16.4
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -45,8 +60,8 @@ jobs:
             exit 1
           fi
 
-          SOURCE_IMAGE=$1
-          DESTINATION_IMAGE=$2
+          SOURCE_IMAGE="docker://${1}"
+          DESTINATION_IMAGE="docker://${2}"
           RETRIES=$3
           COUNT=0
 
@@ -67,11 +82,7 @@ jobs:
       - name: Make mirror-image.sh executable
         run: chmod +x mirror-image.sh
 
-      - name: Mirror trivy-db to GHCR
-        run: ./mirror-image.sh docker://ghcr.io/aquasecurity/trivy-db:2 docker://ghcr.io/${{ github.repository_owner }}/trivy-db:2 ${{ env.RETRIES }}
 
-      - name: Mirror trivy-java-db to GHCR
-        run: ./mirror-image.sh docker://ghcr.io/aquasecurity/trivy-java-db:1 docker://ghcr.io/${{ github.repository_owner }}/trivy-java-db:1 ${{ env.RETRIES }}
-
-      - name: Mirror trivy-checks to GHCR
-        run: ./mirror-image.sh docker://ghcr.io/aquasecurity/trivy-checks:1 docker://ghcr.io/${{ github.repository_owner }}/trivy-checks:1 ${{ env.RETRIES }}
+      - name: Mirror ${{ matrix.images.source }} to ${{ matrix.images.target }}
+        run: |
+          ./mirror-image.sh "${{ matrix.images.source }}" "${{ matrix.images.target }}" "${{ env.RETRIES }}"

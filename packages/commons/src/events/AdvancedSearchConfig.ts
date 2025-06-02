@@ -11,6 +11,8 @@
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { SelectOption } from './FieldConfig'
+import { FieldConditional } from './Conditional'
+import { FieldValue } from './FieldValue'
 
 const MatchType = z.enum(['fuzzy', 'exact', 'range'])
 
@@ -18,15 +20,72 @@ const BaseField = z.object({
   config: z.object({
     type: MatchType.describe('Determines the type of field')
   }),
-  options: z.array(SelectOption).optional()
+  options: z.array(SelectOption).optional(),
+  searchCriteriaLabelPrefix: TranslationConfig.optional().describe(
+    `
+    This property determines whether to add a prefix (such as "Child" or "Applicant") before the field label 
+    when rendering search parameter labels — for example, in the search results page to indicate which fields were used in the search.
+
+    For example, a field config like { id: "child.firstname", label: { defaultMessage: "First Name(s)" } } would render as "First Name(s)" by default.
+
+    A field config like { id: "mother.firstname", label: { defaultMessage: "First Name(s)" } } would also render as "First Name(s)" by default.
+
+    So, if both child.firstname and mother.firstname are used in a search, the resulting search criteria labels would be "First Name(s)", "First Name(s)", 
+    which is ambiguous.
+
+    Now, if we treat the field ID prefix as a label (e.g., "applicant.firstname" → "Applicant"), and the field label is already 
+    descriptive — like { id: "applicant.firstname", label: { defaultMessage: "Applicant's First Name" } } — then the resulting 
+    label would be "Applicant Applicant's First Name", which is redundant and awkward.
+
+    By setting searchCriteriaLabelPrefix to a translation config object, we can explicitly define the desired prefix 
+    in the country-config > event.advancedSearch configuration. For example: field("child.dob", { searchCriteriaLabelPrefix: TranslationConfig }).
+    `
+  ),
+  conditionals: z
+    .array(FieldConditional)
+    .default([])
+    .optional()
+    .describe(
+      `
+       In advanced search, we sometimes need to override the default field visibility conditionals.
+       
+       For example, Informant fields in the declaration form may have conditional logic 
+       that hides them based on other field values. Since the advanced search form reuses 
+       the declaration form config, those same conditionals would apply by default.
+       
+       However, in advanced search we often want to make all Informant fields searchable,
+       regardless of their original visibility logic. To do this, we explicitly set their 
+       'conditionals' to an empty array ('[]') in the search config. This ensures they 
+       are always rendered in the advanced search form.
+      `
+    )
 })
+
+export const SearchQueryParams = z
+  .object({
+    eventType: z
+      .string()
+      .optional()
+      .describe(
+        'Defines type of event so that when redirecting to Advanced Search page, appropriate tab can be selected'
+      )
+  })
+  .catchall(FieldValue)
+export type SearchQueryParams = z.infer<typeof SearchQueryParams>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),
   fieldType: z.literal('field')
 })
 
-export const EventFieldId = z.enum(['trackingId', 'status'])
+export const EventFieldId = z.enum([
+  'trackingId',
+  'status',
+  'legalStatus.REGISTERED.createdAt',
+  'legalStatus.REGISTERED.createdAtLocation',
+  'updatedAt'
+])
+
 export type EventFieldId = z.infer<typeof EventFieldId>
 
 export const EventFieldConfigSchema = BaseField.extend({

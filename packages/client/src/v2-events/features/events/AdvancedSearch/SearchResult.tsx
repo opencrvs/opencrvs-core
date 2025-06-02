@@ -17,7 +17,8 @@ import {
   defaultColumns,
   EventIndex,
   EventConfig,
-  workqueues
+  workqueues,
+  EventState
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -31,7 +32,7 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { SearchModifierComponent } from './SearchModifier'
+import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 
 const SORT_ORDER = {
   ASCENDING: 'asc',
@@ -159,7 +160,7 @@ const messages = defineMessages(messagesToDefine)
 interface Props {
   workqueueConfig: (typeof workqueues)['all']
   eventConfig: EventConfig
-  searchParams: Record<string, string>
+  searchParams: EventState
   queryData: EventIndex[]
 }
 
@@ -302,8 +303,8 @@ export const SearchResult = ({
       noContent={total < 1}
       noResultText={noResultText}
       tabBarContent={
-        <SearchModifierComponent
-          eventType={eventConfig.id}
+        <SearchCriteriaPanel
+          eventConfig={eventConfig}
           searchParams={searchParams}
         />
       }
