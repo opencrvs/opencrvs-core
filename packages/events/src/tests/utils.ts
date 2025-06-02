@@ -116,8 +116,7 @@ export function createTestToken(
 
 export function createSystemTestClient(
   systemId: string,
-  scopes: string[] = TEST_USER_DEFAULT_SCOPES,
-  seed?: number
+  scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
   const token = createTestToken(systemId, scopes, TokenUserType.enum.system)
