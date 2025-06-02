@@ -78,6 +78,11 @@ function normalizeHeaders(
   return headers
 }
 
+/**
+ * Internal user, used to bootstrap the system and then deactivate.
+ */
+const SEEDER_SUPER_ADMIN = 'o.admin'
+
 export async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
@@ -105,11 +110,26 @@ export async function resolveUserDetails(
       })
     }
 
-    const { primaryOfficeId, role, signature } = await getUser(
+    const { primaryOfficeId, role, signature, username } = await getUser(
       env.USER_MANAGEMENT_URL,
       userId,
       token
     )
+
+    if (username === SEEDER_SUPER_ADMIN) {
+      logger.warn(
+        `User ${username} is used for seeding. Treating it as a ${TokenUserType.Enum.system} user type.`
+      )
+
+      return SystemContext.parse({
+        type: TokenUserType.Enum.system,
+        id: userId,
+        // Super user does not have a primary office. It is the one setting locations.
+        // It should be used only once to bootstrap the system. We should limit its usage. Seeing it as 'system' is one way of doing that. (And it also plays well with types)
+        primaryOfficeId: undefined,
+        role
+      })
+    }
 
     return UserContext.parse({
       type: userType,
