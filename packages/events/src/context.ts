@@ -54,12 +54,21 @@ export const TrpcContext = z.object({
 })
 export type TrpcContext = z.infer<typeof TrpcContext>
 
+// This avoids TS2693 ("'Headers' only refers to a type, but is being used as a value here.") which is thrown by gateway in CI
+function isHeaders(
+  headers: Headers | Record<string, string | string[] | undefined>
+): headers is Headers {
+  return typeof Headers !== 'undefined' && headers instanceof Headers
+}
+
 function normalizeHeaders(
   headers: Headers | Record<string, string | string[] | undefined>
 ): Record<string, string | string[] | undefined> {
-  return headers instanceof Headers
-    ? Object.fromEntries(headers.entries())
-    : headers
+  if (isHeaders(headers)) {
+    return Object.fromEntries(headers.entries())
+  }
+
+  return headers
 }
 
 export async function resolveUserDetails(

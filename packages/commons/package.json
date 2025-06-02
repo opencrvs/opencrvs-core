@@ -55,6 +55,7 @@
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",
