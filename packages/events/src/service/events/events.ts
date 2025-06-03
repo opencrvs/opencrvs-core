@@ -31,7 +31,7 @@ import {
   EventStatus,
   isWriteAction
 } from '@opencrvs/commons/events'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
@@ -204,20 +204,26 @@ export async function createEvent({
     ]
   })
 
-  const action: ActionDocument = {
-    ...createdByDetails,
-    type: ActionType.ASSIGN,
-    assignedTo: createdByDetails.createdBy,
-    declaration: {},
-    createdAt: now,
-    id,
-    status: ActionStatus.Accepted,
-    transactionId: getUUID()
-  }
+  // System users don't use assignment
+  if (user.type !== TokenUserType.SYSTEM) {
+    const action: ActionDocument = {
+      ...createdByDetails,
+      type: ActionType.ASSIGN,
+      assignedTo: createdByDetails.createdBy,
+      declaration: {},
+      createdAt: now,
+      id,
+      status: ActionStatus.Accepted,
+      transactionId: getUUID()
+    }
 
-  await db
-    .collection<EventDocument>('events')
-    .updateOne({ id }, { $push: { actions: action }, $set: { updatedAt: now } })
+    await db
+      .collection<EventDocument>('events')
+      .updateOne(
+        { id },
+        { $push: { actions: action }, $set: { updatedAt: now } }
+      )
+  }
 
   const event = await getEventById(id)
   await indexEvent(event)
@@ -309,7 +315,7 @@ export async function addAction(
     createdAtLocation: user.primaryOfficeId
   }
 
-  if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
+  if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await db.collection<EventDocument>('events').updateOne(
       {
         id: eventId,
@@ -351,7 +357,16 @@ export async function addAction(
       { $push: { actions: action }, $set: { updatedAt: now } }
     )
 
-  if (isWriteAction(input.type) && !input.keepAssignment) {
+  // We want to unassign only if:
+  // - Action is a write action, since we dont want to unassign from e.g. READ action
+  // - Keep assignment is false
+  // - User is not a system user, since system users dont partake in assignment
+  const shouldUnassign =
+    isWriteAction(input.type) &&
+    !input.keepAssignment &&
+    user.type !== TokenUserType.SYSTEM
+
+  if (shouldUnassign) {
     await db.collection<EventDocument>('events').updateOne(
       { id: eventId },
       {
