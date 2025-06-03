@@ -21,7 +21,7 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW,
   timePeriodOptions
-} from './tennis-club-membership-event'
+} from './forms'
 
 export const footballClubMembershipEvent = defineConfig({
   id: 'FOOTBALL_CLUB_MEMBERSHIP',
