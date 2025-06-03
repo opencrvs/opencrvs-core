@@ -24,7 +24,7 @@ import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
 import { EventStatus } from '../events/EventMetadata'
 
 /** @knipignore */
-const PRINT_CERTIFICATE_FORM = defineActionForm({
+export const PRINT_CERTIFICATE_FORM = defineActionForm({
   label: {
     id: 'v2.event.tennis-club-membership.action.certificate.form.label',
     defaultMessage: 'Tennis club membership certificate collector',
@@ -687,7 +687,7 @@ const PRINT_CERTIFICATE_FORM = defineActionForm({
   ]
 })
 
-const TENNIS_CLUB_DECLARATION_REVIEW = {
+export const TENNIS_CLUB_DECLARATION_REVIEW = {
   title: {
     id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
     defaultMessage:
@@ -944,7 +944,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
   ]
 })
 
-const statusOptions = [
+export const statusOptions = [
   {
     value: 'ALL',
     label: {
@@ -1019,7 +1019,7 @@ const statusOptions = [
   }
 ]
 
-const timePeriodOptions = [
+export const timePeriodOptions = [
   {
     label: {
       defaultMessage: 'Last 7 days',
@@ -1059,7 +1059,7 @@ export const tennisClubMembershipEvent = defineConfig({
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
-    id: 'event.tennis-club-membership.label'
+    id: 'v2.event.tennis-club-membership.label'
   },
   title: {
     defaultMessage: '{applicant.firstname} {applicant.surname}',

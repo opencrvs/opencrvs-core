@@ -11,6 +11,7 @@
 import React, { useCallback, useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { parse } from 'query-string'
+import { useLocation } from 'react-router-dom'
 import {
   Content,
   ContentSize,
@@ -45,8 +46,9 @@ const messages = defineMessages(messagesToDefine)
 export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
+  const location = useLocation()
 
-  const searchParams = SearchQueryParams.parse(parse(window.location.search))
+  const searchParams = SearchQueryParams.parse(parse(location.search))
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
