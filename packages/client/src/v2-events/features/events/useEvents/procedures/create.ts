@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { v4 as uuid } from 'uuid'
 import { useMutation } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
@@ -26,6 +25,7 @@ import {
 } from '@opencrvs/commons/client'
 
 import {
+  findLocalEventConfig,
   invalidateEventsList,
   setEventData,
   setEventListData
@@ -88,7 +88,12 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
 
     setEventData(newEvent.transactionId, optimisticEvent)
     setEventListData((eventIndices) =>
-      eventIndices?.concat(getCurrentEventState(optimisticEvent))
+      eventIndices?.concat(
+        getCurrentEventState(
+          optimisticEvent,
+          findLocalEventConfig(optimisticEvent.type) ?? {}
+        )
+      )
     )
     return optimisticEvent
   },

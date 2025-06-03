@@ -28,7 +28,6 @@ async function getEventByIdInTransaction(
     SELECT
       id,
       event_type AS type,
-      date_of_event_field_id AS "dateOfEventFieldId",
       ${formatTimestamp('created_at')} AS "createdAt",
       ${formatTimestamp('updated_at')} AS "updatedAt",
       tracking_id AS "trackingId"
@@ -89,30 +88,22 @@ export const createEvent = async (
   {
     type,
     transactionId,
-    trackingId,
-    fieldId
+    trackingId
   }: {
     type: string
     transactionId: string
     trackingId: string
-    fieldId?: string
   },
   trx: CommonQueryMethods
 ) => {
   return trx.one(sql.type(z.object({ id: UUID }))`
     INSERT INTO
-      events (
-        event_type,
-        transaction_id,
-        tracking_id,
-        date_of_event_field_id
-      )
+      events (event_type, transaction_id, tracking_id)
     VALUES
       (
         ${type},
         ${transactionId},
-        ${trackingId},
-        ${fieldId ?? null}
+        ${trackingId}
       )
     RETURNING
       id
@@ -206,7 +197,6 @@ export const getOrCreateEvent = async ({
   type,
   transactionId,
   trackingId,
-  fieldId,
   createdBy,
   createdByRole,
   createdAtLocation
@@ -214,7 +204,6 @@ export const getOrCreateEvent = async ({
   type: string
   transactionId: string
   trackingId: string
-  fieldId?: string
   createdBy: string
   createdByRole: string
   createdAtLocation?: UUID
@@ -224,18 +213,12 @@ export const getOrCreateEvent = async ({
   return db.transaction(async (trx) => {
     const eventId = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
       INSERT INTO
-        events (
-          event_type,
-          transaction_id,
-          tracking_id,
-          date_of_event_field_id
-        )
+        events (event_type, transaction_id, tracking_id)
       VALUES
         (
           ${type},
           ${transactionId},
-          ${trackingId},
-          ${fieldId ?? null}
+          ${trackingId}
         )
       ON CONFLICT (transaction_id) DO UPDATE
       SET

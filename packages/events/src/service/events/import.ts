@@ -11,10 +11,13 @@
 import { EventDocument } from '@opencrvs/commons'
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function importEvent(_event: EventDocument) {
+export async function importEvent(_event: EventDocument, _token: string) {
   return new Promise<EventDocument>((_, reject) =>
     reject('TODO: Importing is not supported in Postgres yet')
   )
-
+  // const config = await getEventConfigurationById({
+  //   token,
+  //   eventType: event.type
+  // })
   // await indexEvent(event)
 }

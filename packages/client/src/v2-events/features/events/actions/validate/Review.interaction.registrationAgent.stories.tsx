@@ -92,7 +92,10 @@ const mockUser = {
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
+      formValues: getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
     })
   },
   parameters: {
@@ -117,6 +120,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -145,7 +151,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -185,6 +193,9 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -263,11 +274,9 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
       const archiveButton = modal.getByRole('button', { name: 'Archive' })
       await userEvent.click(archiveButton)
 
-      await waitFor(async () =>
-        expect(
-          within(canvasElement).getByText('All events')
-        ).toBeInTheDocument()
-      )
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -306,6 +315,9 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -397,7 +409,9 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
       await expect(sendForUpdateButton).not.toBeDisabled()
 
       await userEvent.click(sendForUpdateButton)
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({

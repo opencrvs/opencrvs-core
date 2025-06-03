@@ -11,7 +11,6 @@
 
 import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -24,7 +23,8 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType
+  QueryType,
+  WorkqueueCountInput
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -42,8 +42,11 @@ import {
 } from './utils'
 import { buildElasticQueryFromSearchPayload } from './query'
 
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
+function eventToEventIndex(
+  event: EventDocument,
+  config: EventConfig
+): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event, config))
 }
 
 /*
@@ -191,7 +194,7 @@ export async function createIndex(
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
-                  acceptedAt: { type: 'date' },
+                  acceptedAt: { type: 'date' }
                 } satisfies Record<
                   keyof ActionCreationMetadata,
                   estypes.MappingProperty
@@ -205,7 +208,7 @@ export async function createIndex(
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
-                  registrationNumber: { type: 'keyword' },
+                  registrationNumber: { type: 'keyword' }
                 } satisfies Record<
                   keyof RegistrationCreationMetadata,
                   estypes.MappingProperty
@@ -262,7 +265,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     readableObjectMode: true,
     writableObjectMode: true,
     transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record))
+      callback(null, eventToEventIndex(record, eventConfiguration))
     }
   })
 
@@ -271,7 +274,6 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
       SELECT
         e.id,
         e.event_type AS type,
-        e.date_of_event_field_id AS "dateOfEventFieldId",
         e.created_at AS "createdAt",
         e.updated_at AS "updatedAt",
         e.tracking_id AS "trackingId",
@@ -313,7 +315,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
       GROUP BY
         e.id
     `,
-    // @TODO: Look into thi
+    // @TODO: Look into this
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     async (stream) => {
       await esClient.helpers.bulk({
@@ -332,7 +334,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   )
 }
 
-export async function indexEvent(event: EventDocument) {
+export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
@@ -340,7 +342,7 @@ export async function indexEvent(event: EventDocument) {
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event),
+    document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
 }
@@ -397,7 +399,7 @@ export async function getIndexedEvents(userId: string) {
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: 10000,
+    size: DEFAULT_SIZE,
     request_cache: false
   })
 
@@ -430,14 +432,27 @@ export async function getIndex(eventParams: QueryType) {
     query
   })
 
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
-  )
+  const events = response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map((event) => decodeEventIndex(event))
 
   return events
+}
 
-  return []
+export async function getEventCount(queries: WorkqueueCountInput) {
+  return (
+    //  @ToDo: write a query that does everything in one go.
+    (
+      await Promise.all(
+        queries.map(async ({ slug, query }) => {
+          const count = (await getIndex(query)).length
+          return { slug, count }
+        })
+      )
+    ).reduce((acc: Record<string, number>, { slug, count }) => {
+      acc[slug] = count
+      return acc
+    }, {})
+  )
 }

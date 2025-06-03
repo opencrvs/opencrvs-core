@@ -26,9 +26,10 @@ import {
   getAcceptedActions,
   AsyncRejectActionDocument,
   ActionType,
-  getCurrentEventState,
   EventStatus,
-  isWriteAction
+  isWriteAction,
+  getStatusFromActions,
+  EventConfig
 } from '@opencrvs/commons/events'
 import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -76,10 +77,10 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
 export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
   const event = await eventsRepo.getEventById(eventId)
-  const eventState = getCurrentEventState(event)
+  const eventStatus = getStatusFromActions(event.actions)
 
   // Once an event is declared or notified, it can not be deleted anymore
-  if (eventState.status !== EventStatus.CREATED) {
+  if (eventStatus !== EventStatus.CREATED) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'A declared or notified event can not be deleted'
@@ -112,15 +113,16 @@ function generateTrackingId(): string {
 export async function createEvent({
   eventInput,
   user,
-  transactionId
+  transactionId,
+  config
 }: {
   eventInput: z.infer<typeof EventInput>
   user: UserDetails
   transactionId: string
+  config: EventConfig
 }): Promise<EventDocument> {
   const event = await eventsRepo.getOrCreateEvent({
     type: eventInput.type,
-    fieldId: eventInput.dateOfEvent?.fieldId,
     transactionId: transactionId,
     trackingId: generateTrackingId(),
     createdBy: user.id,
@@ -128,7 +130,7 @@ export async function createEvent({
     createdAtLocation: user.primaryOfficeId
   })
 
-  await indexEvent(event)
+  await indexEvent(event, config)
 
   return event
 }
@@ -292,7 +294,7 @@ export async function addAction(
   const updatedEvent = await eventsRepo.getEventById(eventId)
 
   if (input.type !== ActionType.READ) {
-    await indexEvent(updatedEvent)
+    await indexEvent(updatedEvent, configuration)
 
     if (input.type !== ActionType.ASSIGN) {
       await draftsRepo.deleteDraftsByEventId(eventId)
@@ -309,7 +311,9 @@ type AsyncRejectActionInput = Omit<
   transactionId: string
   eventId: UUID
   originalActionId: UUID
-  createdAtLocation: UUID
+  createdAtLocation?: UUID
+  token: string
+  eventType: string
 }
 
 export async function addAsyncRejectAction({
@@ -319,8 +323,15 @@ export async function addAsyncRejectAction({
   originalActionId,
   createdBy,
   createdByRole,
-  createdAtLocation
+  createdAtLocation,
+  token,
+  eventType
 }: AsyncRejectActionInput) {
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType
+  })
+
   await eventsRepo.createAction({
     eventId,
     transactionId,
@@ -333,7 +344,7 @@ export async function addAsyncRejectAction({
   })
 
   const updatedEvent = await eventsRepo.getEventById(eventId)
-  await indexEvent(updatedEvent)
+  await indexEvent(updatedEvent, configuration)
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent

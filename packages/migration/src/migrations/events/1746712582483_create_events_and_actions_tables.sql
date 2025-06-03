@@ -11,7 +11,6 @@ CREATE TABLE events (
   event_type text NOT NULL,
   transaction_id text NOT NULL UNIQUE,
   tracking_id text NOT NULL UNIQUE,
-  date_of_event_field_id text,
   created_at timestamp with time zone DEFAULT now() NOT NULL,
   updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
