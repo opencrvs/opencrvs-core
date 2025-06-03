@@ -10,35 +10,103 @@
  */
 import { z } from 'zod'
 import { ActionConfig } from './ActionConfig'
-import { TranslationConfig } from './TranslationConfig'
-import { SummaryConfig } from './SummaryConfig'
-import { WorkqueueConfig } from './WorkqueueConfig'
-import { FormConfig, FormConfigInput, FormPage } from './FormConfig'
 import { DeduplicationConfig } from './DeduplicationConfig'
+import { SummaryConfig } from './SummaryConfig'
+import { TranslationConfig } from './TranslationConfig'
+import { AdvancedSearchConfig, EventFieldId } from './AdvancedSearchConfig'
+import { findAllFields, getDeclarationFields } from './utils'
+import { DeclarationFormConfig } from './FormConfig'
+import { extendZodWithOpenApi } from 'zod-openapi'
+import { FieldType } from './FieldType'
+extendZodWithOpenApi(z)
 
 /**
  * Description of event features defined by the country. Includes configuration for process steps and forms involved.
  *
  * `Event.parse(config)` will throw an error if the configuration is invalid.
  */
-export const EventConfig = z.object({
-  id: z
-    .string()
-    .describe(
-      'A machine-readable identifier for the event, e.g. "birth" or "death"'
+export const EventConfig = z
+  .object({
+    id: z
+      .string()
+      .describe(
+        'A machine-readable identifier for the event, e.g. "birth" or "death"'
+      ),
+    dateOfEvent: z.object({ fieldId: z.string() }).optional(),
+    title: TranslationConfig,
+    fallbackTitle: TranslationConfig.optional().describe(
+      'This is a fallback title if actual title resolves to empty string'
     ),
-  summary: SummaryConfig,
-  label: TranslationConfig,
-  actions: z.array(ActionConfig),
-  workqueues: z.array(WorkqueueConfig),
-  deduplication: z.array(DeduplicationConfig).optional().default([])
-})
+    summary: SummaryConfig,
+    label: TranslationConfig,
+    actions: z.array(ActionConfig),
+    declaration: DeclarationFormConfig,
+    deduplication: z.array(DeduplicationConfig).optional().default([]),
+    advancedSearch: z.array(AdvancedSearchConfig).optional().default([])
+  })
+  .superRefine((event, ctx) => {
+    const allFields = findAllFields(event)
+    const fieldIds = allFields.map((field) => field.id)
+
+    const advancedSearchFields = event.advancedSearch.flatMap((section) =>
+      section.fields.flatMap((field) => field.fieldId)
+    )
+
+    const advancedSearchFieldsSet = new Set(advancedSearchFields)
+
+    if (advancedSearchFieldsSet.size !== advancedSearchFields.length) {
+      ctx.addIssue({
+        code: 'custom',
+        message: 'Advanced search field ids must be unique',
+        path: ['advancedSearch']
+      })
+    }
+
+    const invalidFields = event.advancedSearch.flatMap((section) =>
+      // Check if the fieldId is not in the fieldIds array
+      // and also not in the metadataFields array
+      section.fields.filter(
+        (field) =>
+          !(
+            fieldIds.includes(field.fieldId) ||
+            (EventFieldId.options as string[]).includes(field.fieldId)
+          )
+      )
+    )
+
+    if (invalidFields.length > 0) {
+      ctx.addIssue({
+        code: 'custom',
+        message: `Advanced search id must match a field id of form fields or pre-defined metadata fields.
+    Invalid AdvancedSearch field IDs for event ${event.id}: ${invalidFields
+      .map((f) => f.fieldId)
+      .join(', ')}`,
+        path: ['advancedSearch']
+      })
+    }
+
+    if (event.dateOfEvent) {
+      const eventDateFieldId = getDeclarationFields(event).find(
+        ({ id }) => id === event.dateOfEvent?.fieldId
+      )
+      if (!eventDateFieldId) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Date of event field id must match a field id in fields array.
+          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.fieldId}`,
+          path: ['dateOfEvent']
+        })
+      } else if (eventDateFieldId.type !== FieldType.DATE) {
+        ctx.addIssue({
+          code: 'custom',
+          message: `Field specified for date of event is of type: ${eventDateFieldId.type}, but it needs to be of type: ${FieldType.DATE}`,
+          path: ['dateOfEvent.fieldType']
+        })
+      }
+    }
+  })
+  .openapi({
+    ref: 'EventConfig'
+  })
 
 export type EventConfig = z.infer<typeof EventConfig>
-export type EventConfigInput = z.input<typeof EventConfig>
-
-export const defineForm = (form: FormConfigInput): FormConfig =>
-  FormConfig.parse(form)
-
-export const defineFormPage = (formPage: FormPage): FormPage =>
-  FormPage.parse(formPage)

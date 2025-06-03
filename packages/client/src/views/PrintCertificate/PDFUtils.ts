@@ -89,6 +89,7 @@ const cache = createIntlCache()
 
 export function compileSvg(
   templateString: string,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   data: Record<string, any> = {},
   state: IStoreState
 ): string {
@@ -116,6 +117,7 @@ export function compileSvg(
 
   Handlebars.registerHelper(
     'intl',
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     function (this: any, ...args: [...string[], Handlebars.HelperOptions]) {
       // If even one of the parts is undefined, then return empty string
       const idParts = args.slice(0, -1)
@@ -129,12 +131,14 @@ export function compileSvg(
         id,
         defaultMessage: 'Missing translation for ' + id
       })
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
 
   Handlebars.registerHelper(
     'ifCond',
     function (
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       this: any,
       v1: string,
       operator: string,
@@ -166,6 +170,7 @@ export function compileSvg(
 
   Handlebars.registerHelper(
     'formatDate',
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     function (this: any, dateString: string, formatString: string) {
       if (isValidPlainDate(dateString)) {
         return formatPlainDate(dateString, formatString)
@@ -177,6 +182,7 @@ export function compileSvg(
 
   Handlebars.registerHelper(
     'location',
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     function (this: any, locationId: string | undefined, key: keyof ILocation) {
       const offlineData = getOfflineData(state)
 

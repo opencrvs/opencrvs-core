@@ -111,7 +111,7 @@ describe('My drafts tab', () => {
 
     expect(data.length).toBe(drafts.length)
     expect(data[0].id).toBe('e302f7c5-ad87-4117-91c1-35eaf2ea7be8')
-    expect(data[0].name).toBe('hoque anik')
+    expect(data[0].name).toBe('anik hoque')
     expect(data[0].lastUpdated).toBe(EXPECTED_LAST_UPDATE)
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()

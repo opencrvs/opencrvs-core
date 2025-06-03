@@ -12,7 +12,6 @@
 import {
   isBase64FileString,
   uploadBase64ToMinio
-  // eslint-disable-next-line import/no-relative-parent-imports
 } from '../../utils/minio-helper.js'
 import { Db, MongoClient } from 'mongodb'
 
@@ -30,7 +29,7 @@ export const up = async (db: Db, client: MongoClient) => {
       while (totalCompositionCount > processedDocCount) {
         const documentCursor = await getDocumentReferenceCursor(db, limit, skip)
         const count = await documentCursor.count()
-        // eslint-disable-next-line no-console
+
         console.log(
           `Migration - Minio :: Processing ${processedDocCount + 1} - ${
             processedDocCount + count
@@ -57,7 +56,7 @@ export const up = async (db: Db, client: MongoClient) => {
           (processedDocCount / totalCompositionCount) *
           100
         ).toFixed(2)
-        // eslint-disable-next-line no-console
+
         console.log(`Migration - Minio :: Processing done ${percentage}%`)
       }
     })

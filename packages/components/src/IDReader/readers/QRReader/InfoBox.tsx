@@ -22,6 +22,7 @@ interface InfoBoxProps {
 
 const Container = styled(Box)`
   background-color: ${({ theme }) => theme.colors.background};
+  border: 0;
   flex: 1;
 `
 const IconContainer = styled.div`

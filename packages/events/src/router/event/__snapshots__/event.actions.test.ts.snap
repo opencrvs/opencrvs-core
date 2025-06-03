@@ -1,0 +1,29 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`partial declaration update accounts for conditional field values not in payload 1`] = `
+{
+  "applicant.address": {
+    "addressType": "DOMESTIC",
+    "country": "FAR",
+    "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+    "number": "55",
+    "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
+    "residentialArea": "Example Residential Area",
+    "street": "Example Street",
+    "town": "Example Town",
+    "urbanOrRural": "URBAN",
+    "zipCode": "123456",
+  },
+  "applicant.age": 25,
+  "applicant.dobUnknown": true,
+  "applicant.email": "test@opencrvs.org",
+  "applicant.firstname": "applicant.firstname-TEXT-0",
+  "applicant.image": {
+    "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+    "originalFilename": "abcd.png",
+    "type": "image/png",
+  },
+  "applicant.surname": "applicant.surname-TEXT-1",
+  "recommender.none": true,
+}
+`;

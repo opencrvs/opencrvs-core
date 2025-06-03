@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { env } from '@events/environment'
 import { MongoClient } from 'mongodb'
+import { env } from '@events/environment'
 
 const url = env.USER_MGNT_MONGO_URL
 const client = new MongoClient(url)

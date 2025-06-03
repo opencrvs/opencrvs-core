@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { env } from '@events/environment'
 import fetch from 'node-fetch'
+import { env } from '@events/environment'
 
 export async function getAnonymousToken() {
   const res = await fetch(new URL('/anonymous-token', env.AUTH_URL).toString())
