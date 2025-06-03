@@ -10,7 +10,12 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, getAcceptedActions, SCOPES } from '@opencrvs/commons'
+import {
+  ActionType,
+  getAcceptedActions,
+  SCOPES,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons'
 import {
   createSystemTestClient,
   createTestClient,
@@ -42,7 +47,7 @@ describe('event.actions.notify', () => {
     test('disallows access with API scope with incorrect event type', async () => {
       const { user, generator } = await setupTestCase()
       const eventCreateClient = createTestClient(user, [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       const event = await eventCreateClient.event.create(
@@ -61,7 +66,7 @@ describe('event.actions.notify', () => {
     test('allows access with API scope with correct event type', async () => {
       const { user } = await setupTestCase()
       const client = createTestClient(user, [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       await expect(
@@ -119,13 +124,13 @@ describe('event.actions.notify', () => {
       const { generator } = await setupTestCase()
 
       let client = createSystemTestClient('test-system', [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       await client.event.actions.notify.request(
@@ -151,7 +156,7 @@ describe('event.actions.notify', () => {
       const event = await client.event.create(generator.event.create())
 
       client = createSystemTestClient('test-system-2', [
-        'record.notify[event=TENNIS_CLUB_MEMBERSHIP]'
+        `record.notify[event=${TENNIS_CLUB_MEMBERSHIP}]`
       ])
 
       await expect(

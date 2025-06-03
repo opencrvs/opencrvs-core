@@ -13,6 +13,7 @@ import { z, ZodType } from 'zod'
 import { EventMetadata, EventStatusEnum } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
@@ -35,13 +36,17 @@ export const EventSearchIndex = z
 export type EventSearchIndex = z.infer<typeof EventSearchIndex>
 export type EventIndex = z.infer<typeof EventIndex>
 
-const Fuzzy = z.object({ type: z.literal('fuzzy'), term: z.string() }).openapi({
-  ref: 'Fuzzy'
-})
-const Exact = z.object({ type: z.literal('exact'), term: z.string() }).openapi({
-  ref: 'Exact'
-})
-const AnyOf = z
+export const Fuzzy = z
+  .object({ type: z.literal('fuzzy'), term: z.string() })
+  .openapi({
+    ref: 'Fuzzy'
+  })
+export const Exact = z
+  .object({ type: z.literal('exact'), term: z.string() })
+  .openapi({
+    ref: 'Exact'
+  })
+export const AnyOf = z
   .object({
     type: z.literal('anyOf'),
     terms: z.array(z.string())
@@ -50,7 +55,7 @@ const AnyOf = z
     ref: 'AnyOf'
   })
 
-const ExactStatus = z
+export const ExactStatus = z
   .object({
     type: z.literal('exact'),
     term: EventStatusEnum
@@ -59,7 +64,7 @@ const ExactStatus = z
     ref: 'ExactStatus'
   })
 
-const AnyOfStatus = z
+export const AnyOfStatus = z
   .object({
     type: z.literal('anyOf'),
     terms: z.array(EventStatusEnum)
@@ -68,7 +73,7 @@ const AnyOfStatus = z
     ref: 'AnyOfStatus'
   })
 
-const Range = z
+export const Range = z
   .object({
     type: z.literal('range'),
     gte: z.string(),
@@ -77,17 +82,19 @@ const Range = z
   .openapi({
     ref: 'Range'
   })
-const Not = z.object({ type: z.literal('not'), term: z.string() }).openapi({
-  ref: 'Not'
-})
+export const Not = z
+  .object({ type: z.literal('not'), term: z.string() })
+  .openapi({
+    ref: 'Not'
+  })
 
-const Within = z
+export const Within = z
   .object({ type: z.literal('within'), location: z.string() })
   .openapi({
     ref: 'Within'
   })
 
-const DateCondition = z.union([Exact, Range]).openapi({
+export const DateCondition = z.union([Exact, Range]).openapi({
   ref: 'DateCondition'
 })
 
@@ -129,8 +136,9 @@ export const QueryExpression = z
     'legalStatus.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
-    createAtLocation: z.optional(z.union([Within, Exact])),
+    createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
+    assignedTo: z.optional(Exact),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
@@ -168,7 +176,7 @@ export const QueryType = z
       z.array(QueryExpression).openapi({
         default: [
           {
-            eventType: 'tennis-club-membership',
+            eventType: TENNIS_CLUB_MEMBERSHIP,
             status: {
               type: 'anyOf',
               terms: [

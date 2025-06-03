@@ -14,6 +14,7 @@ import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
 import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
+import { userSerializer } from '../events/serializers/user/serializer'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -129,7 +130,7 @@ export function never(): JSONSchema {
  *
  * Generate conditional rules for user.
  */
-export const user = {
+export const user = Object.assign(userSerializer, {
   hasScope: (scope: Scope) =>
     defineConditional({
       type: 'object',
@@ -150,7 +151,7 @@ export const user = {
       },
       required: ['$user']
     })
-}
+})
 
 /**
  *

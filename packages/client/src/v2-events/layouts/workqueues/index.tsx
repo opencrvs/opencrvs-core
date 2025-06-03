@@ -11,45 +11,30 @@
 
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useIntl, defineMessages } from 'react-intl'
-import {
-  AppBar,
-  Button,
-  Frame,
-  Icon,
-  INavigationType,
-  Stack
-} from '@opencrvs/components'
+import { useIntl } from 'react-intl'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
-import { workqueues } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
-import { Hamburger } from '@client/components/Header/Hamburger'
 import * as routes from '@client/navigation/routes'
+import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
+import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchTool } from '@client/v2-events/features/events/components/SearchTool'
+import { Hamburger } from '../sidebar/Hamburger'
+import { Sidebar } from '../sidebar/Sidebar'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
 
-const messagesToDefine = {
-  header: {
-    id: 'home.header.advancedSearch',
-    defaultMessage: 'Advanced Search',
-    description: 'Search menu advanced search type'
-  }
-}
-const messages = defineMessages(messagesToDefine)
-
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
   const intl = useIntl()
-  const allEvents = useEventConfigurations()
+  const workqueues = useWorkqueueConfigurations()
 
-  const advancedSearchEvents = allEvents.filter(
-    (event) => event.advancedSearch.length > 0
-  )
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
   return (
     <Frame
@@ -77,13 +62,12 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               <Icon color="primary" name="MagnifyingGlass" size="medium" />
             </Button>
           }
-          /**
-           * We need to revisit on how the workqueue is picked
-           * during 'workqueue' feature.
-           */
-          mobileTitle={intl.formatMessage(workqueues.all.title)}
+          mobileTitle={intl.formatMessage(
+            workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
+          )}
         />
       }
+      navigation={<Sidebar />}
       skipToContentText="skip"
     >
       {children}

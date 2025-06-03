@@ -11,6 +11,7 @@
 import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
+  dateOfEventColumn,
   eventQueryDataGenerator,
   EventStatus,
   tennisClubMembershipEvent
@@ -61,10 +62,10 @@ export const DefaultSearchResult: Story = {
         status: EventStatus.REGISTERED
       })
     ],
-    searchParams: mockSearchParams
+    searchParams: mockSearchParams,
+    columns: dateOfEventColumn
   }
 }
-
 export const SearchResultWithMultipleItems: Story = {
   name: 'Search Results With Multiple Items',
   parameters: {
@@ -72,8 +73,9 @@ export const SearchResultWithMultipleItems: Story = {
   },
   args: {
     eventConfig: tennisClubMembershipEvent,
-    queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
-    searchParams: { status: EventStatus.REGISTERED }
+    queryData: queryData.map((e) => ({ ...e, status: EventStatus.REGISTERED })),
+    searchParams: { status: EventStatus.REGISTERED },
+    columns: dateOfEventColumn
   }
 }
 export const NoSearchResult: Story = {
@@ -81,6 +83,7 @@ export const NoSearchResult: Story = {
   args: {
     eventConfig: tennisClubMembershipEvent,
     queryData: [],
-    searchParams: mockSearchParams
+    searchParams: mockSearchParams,
+    columns: dateOfEventColumn
   }
 }

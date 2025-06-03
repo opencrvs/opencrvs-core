@@ -32,7 +32,7 @@ type AugmentedNameFieldValue = BaseNameFieldValue & {
   __fullname?: string
 }
 
-export const DEFAULT_SIZE = 10
+export const DEFAULT_SIZE = 10000
 
 function augmentIndexedField(
   eventConfig: EventConfig,

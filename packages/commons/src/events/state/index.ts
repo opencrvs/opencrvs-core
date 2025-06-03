@@ -130,11 +130,11 @@ function aggregateActionDeclarations(
     ActionType.PRINT_CERTIFICATE
   ]
 
-  return actions.reduce((status, action) => {
+  return actions.reduce((declaration, action) => {
     if (
       excludedActions.some((excludedAction) => excludedAction === action.type)
     ) {
-      return status
+      return declaration
     }
 
     /*
@@ -146,12 +146,12 @@ function aggregateActionDeclarations(
     if (action.type === ActionType.APPROVE_CORRECTION) {
       const requestAction = actions.find(({ id }) => id === action.requestId)
       if (!requestAction) {
-        return status
+        return declaration
       }
-      return deepMerge(status, requestAction.declaration)
+      return deepMerge(declaration, requestAction.declaration)
     }
 
-    return deepMerge(status, action.declaration)
+    return deepMerge(declaration, action.declaration)
   }, {})
 }
 
@@ -207,7 +207,7 @@ export const DEFAULT_DATE_OF_EVENT_PROPERTY =
  */
 export function getCurrentEventState(
   event: EventDocument,
-  config?: EventConfig
+  config: Partial<EventConfig>
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -227,7 +227,7 @@ export function getCurrentEventState(
 
   let dateOfEvent
 
-  if (config && config.dateOfEvent) {
+  if (config.dateOfEvent) {
     const parsedDate = ZodDate.safeParse(
       declaration[config.dateOfEvent.fieldId]
     )

@@ -11,6 +11,7 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useLocation } from 'react-router-dom'
+import { dateOfEventColumn } from '@opencrvs/commons/client'
 import { SearchResult } from '@client/v2-events/features/events/Search/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
@@ -28,5 +29,5 @@ export const QuickSearchIndex = () => {
   const query = buildQuickSearchQuery(searchParams, eventConfigurations)
   const queryData = searchEvent.useSuspenseQuery(query)
 
-  return <SearchResult queryData={queryData} />
+  return <SearchResult columns={dateOfEventColumn} queryData={queryData} />
 }

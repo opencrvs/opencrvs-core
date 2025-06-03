@@ -10,60 +10,58 @@
  */
 import React, { useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import styled, { useTheme } from 'styled-components'
-import { Link } from 'react-router-dom'
-import { mapKeys } from 'lodash'
+import { useTheme } from 'styled-components'
+import { useNavigate } from 'react-router-dom'
+import { orderBy } from 'lodash'
+import styled from 'styled-components'
 import {
-  defaultColumns,
   EventIndex,
   EventConfig,
-  workqueues,
-  EventState,
-  WorkQueueTypes
+  defaultWorkqueueColumns,
+  WorkqueueColumn,
+  deepDropNulls,
+  applyDraftsToEventIndex,
+  EventState
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
-  Workqueue,
-  ColumnContentAlignment
+  ColumnContentAlignment,
+  SORT_ORDER,
+  Workqueue
 } from '@opencrvs/components/lib/Workqueue'
+import { Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { useEventTitle } from '../useEvents/useEventTitle'
 
-const SORT_ORDER = {
-  ASCENDING: 'asc',
-  DESCENDING: 'desc'
-} as const
+const WithTestId = styled.div.attrs({
+  'data-testid': 'search-result'
+})``
 
 const COLUMNS = {
   ICON_WITH_NAME: 'iconWithName',
   ICON_WITH_NAME_EVENT: 'iconWithNameEvent',
-  EVENT: 'event',
+  EVENT: 'type',
   DATE_OF_EVENT: 'dateOfEvent',
   SENT_FOR_REVIEW: 'sentForReview',
   SENT_FOR_UPDATES: 'sentForUpdates',
   SENT_FOR_APPROVAL: 'sentForApproval',
   SENT_FOR_VALIDATION: 'sentForValidation',
   REGISTERED: 'registered',
-  LAST_UPDATED: 'lastUpdated',
+  LAST_UPDATED: 'updatedAt',
   ACTIONS: 'actions',
   NOTIFICATION_SENT: 'notificationSent',
-  NAME: 'name',
+  NAME: 'title',
   TRACKING_ID: 'trackingId',
   REGISTRATION_NO: 'registrationNumber',
   NONE: 'none'
 } as const
-
-const NondecoratedLink = styled(Link)`
-  text-decoration: none;
-  color: 'primary';
-`
 
 interface Column {
   label?: string
@@ -143,7 +141,7 @@ function changeSortedColumn(
   }
 }
 
-const messagesToDefine = {
+const searchResultMessages = {
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
@@ -154,29 +152,51 @@ const messagesToDefine = {
     description:
       'The label for search result header in advancedSearchResult page',
     id: 'v2.advancedSearchResult.table.searchResult'
+  },
+  eventStatus: {
+    id: `v2.events.status`,
+    defaultMessage:
+      '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
   }
 }
 
-const messages = defineMessages(messagesToDefine)
+const messages = defineMessages(searchResultMessages)
 
 interface Props {
+  columns: WorkqueueColumn[]
   eventConfig?: EventConfig
   searchParams?: EventState
   queryData: EventIndex[]
 }
 
-export const SearchResult = ({
-  eventConfig,
-  searchParams,
-  queryData
-}: Props) => {
+const ExtendedEventStatuses = {
+  OUTBOX: 'OUTBOX',
+  DRAFT: 'DRAFT'
+} as const
+
+export const SearchResultComponent = ({
+  columns,
+  queryData,
+  eventConfigs,
+  limit = 10,
+  offset = 0,
+  title: contentTitle,
+  tabBarContent
+}: {
+  columns: WorkqueueColumn[]
+  eventConfigs?: EventConfig[]
+  queryData: EventIndex[]
+  limit?: number
+  offset?: number
+  title: string
+  tabBarContent?: React.ReactNode
+}) => {
   const intl = useIntl()
-  const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+  const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
-  const total = queryData.length
-  const noResultText = intl.formatMessage(messages.noResult)
-  const eventConfigurations = useEventConfigurations()
+  const { getEventTitle } = useEventTitle()
+  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const { getOutbox } = useEvents()
   const { getRemoteDrafts } = useDrafts()
@@ -185,10 +205,10 @@ export const SearchResult = ({
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
-  >(COLUMNS.NONE)
+  >(COLUMNS.LAST_UPDATED)
   const [sortOrder, setSortOrder] = useState<
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
-  >(SORT_ORDER.ASCENDING)
+  >(SORT_ORDER.DESCENDING)
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
@@ -200,89 +220,104 @@ export const SearchResult = ({
     setSortOrder(newSortOrder)
   }
 
-  const workqueueId = 'all' satisfies WorkQueueTypes
-  const workqueueConfig = workqueues[workqueueId as WorkQueueTypes]
   const getEventConfig = (id: string) =>
-    eventConfigurations.find(
-      (eventConfiguration) => eventConfiguration.id === id
-    )
+    eventConfigs &&
+    eventConfigs.find((eventConfiguration) => eventConfiguration.id === id)
 
   const transformData = (eventData: EventIndex[]) => {
-    return eventData
-      .map((event) => {
-        const { declaration, ...rest } = event
-        return { ...rest, ...mapKeys(declaration, (_, key) => `${key}`) }
-      })
-      .map((doc) => {
-        // Event document should always have a type that matches an event configuration
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const eventConfigOfDocument = eventConfig ?? getEventConfig(doc.type)!
-        const isInOutbox = outbox.some(
-          (outboxEvent) => outboxEvent.id === doc.id
-        )
-        const isInDrafts = drafts.some((draft) => draft.id === doc.id)
-
-        const getEventStatus = () => {
-          if (isInOutbox) {
-            return 'OUTBOX'
-          }
-          if (isInDrafts) {
-            return 'DRAFT'
-          }
-          return doc.status
-        }
-
-        const titleColumnId = workqueueConfig.columns[0].id
-        const status = doc.status
-
-        const title = flattenedIntl.formatMessage(
-          eventConfigOfDocument.title,
-          doc
-        )
-
-        return {
-          ...doc,
-          event: intl.formatMessage(eventConfigOfDocument.label),
-          createdAt: formattedDuration(new Date(doc.createdAt)),
-          modifiedAt: formattedDuration(new Date(doc.updatedAt)),
-          status: intl.formatMessage(
-            {
-              id: `v2.events.status`,
-              defaultMessage:
-                '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
-            },
-            {
-              status: getEventStatus()
-            }
-          ),
-          [titleColumnId]: isInOutbox ? (
-            <IconWithName name={title} status={status} />
-          ) : (
-            <NondecoratedLink
-              to={ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                eventId: doc.id
-              })}
-            >
-              <IconWithName name={title} status={status} />
-            </NondecoratedLink>
+    return (
+      eventData
+        /*
+         * Apply pending drafts to the event index.
+         * This is necessary to show the most up to date information in the workqueue.
+         */
+        .map((event) =>
+          deepDropNulls(
+            applyDraftsToEventIndex(
+              event,
+              drafts.filter((d) => d.eventId === event.id)
+            )
           )
-        }
-      })
+        )
+        .map((event) => {
+          const eventConfig =
+            eventConfigs && eventConfigs.find(({ id }) => id === event.type)
+          if (!eventConfig) {
+            throw new Error(
+              'Event configuration not found for event:' + event.type
+            )
+          }
+          const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
+          const { declaration, ...rest } = event
+
+          return {
+            useFallbackTitle,
+            title,
+            label: eventConfig.label,
+            ...rest,
+            ...declaration
+          }
+        })
+        .map((doc) => {
+          const isInOutbox = outbox.some(
+            (outboxEvent) => outboxEvent.id === doc.id
+          )
+          const eventConfig =
+            eventConfigs && eventConfigs.find(({ id }) => id === doc.type)
+          // Event document should always have a type that matches an event configuration
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const eventConfigOfDocument = eventConfig ?? getEventConfig(doc.type)!
+          const isInDrafts = drafts.some((draft) => draft.id === doc.id)
+
+          const getEventStatus = () => {
+            if (isInOutbox) {
+              return ExtendedEventStatuses.OUTBOX
+            }
+            if (isInDrafts) {
+              return ExtendedEventStatuses.DRAFT
+            }
+            return doc.status
+          }
+
+          const status = getEventStatus()
+          return {
+            ...doc,
+            type: intl.formatMessage(doc.label),
+            event: intl.formatMessage(eventConfigOfDocument.label),
+            createdAt: formattedDuration(new Date(doc.createdAt)),
+            updatedAt: formattedDuration(new Date(doc.updatedAt)),
+            status: intl.formatMessage(messages.eventStatus, {
+              status
+            }),
+            title: isInOutbox ? (
+              <IconWithName name={doc.title} status={status} />
+            ) : (
+              <TextButton
+                color={doc.useFallbackTitle ? 'red' : 'primary'}
+                onClick={() => {
+                  return navigate(
+                    ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                      eventId: doc.id
+                    })
+                  )
+                }}
+              >
+                <IconWithName name={doc.title} status={status} />
+              </TextButton>
+            )
+          }
+        })
+    )
   }
 
   function getDefaultColumns(): Array<Column> {
-    return workqueueConfig.defaultColumns.map(
-      (column): Column => ({
-        label:
-          column in defaultColumns
-            ? intl.formatMessage(
-                defaultColumns[column as keyof typeof defaultColumns].label
-              )
-            : '',
+    return defaultWorkqueueColumns.map(
+      ({ label, value }): Column => ({
+        label: intl.formatMessage(label),
         width: 25,
-        key: column,
+        key: value.$event,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === column
+        isSorted: sortedCol === value.$event
       })
     )
   }
@@ -291,31 +326,78 @@ export const SearchResult = ({
   // @TODO: separate types for action button vs other columns
   function getColumns(): Array<Column> {
     if (windowWidth > theme.grid.breakpoints.lg) {
-      return workqueueConfig.columns.map((column) => ({
-        label: intl.formatMessage(column.label),
+      return columns.map(({ label, value }) => ({
+        label: intl.formatMessage(label),
         width: 35,
-        key: column.id,
+        key: value.$event,
         sortFunction: onColumnClick,
-        isSorted: sortedCol === column.id
+        isSorted: sortedCol === value.$event
       }))
     } else {
-      return workqueueConfig.columns
-        .map((column) => ({
-          label: intl.formatMessage(column.label),
+      return columns
+        .map(({ label, value }) => ({
+          label: intl.formatMessage(label),
           width: 35,
-          key: column.id,
+          key: value.$event,
           sortFunction: onColumnClick,
-          isSorted: sortedCol === column.id
+          isSorted: sortedCol === value.$event
         }))
         .slice(0, 2)
     }
   }
 
+  const sortedResult = orderBy(queryData, sortedCol, sortOrder)
+
+  const allResults = transformData(sortedResult)
+
+  const totalPages = allResults.length
+    ? Math.ceil(allResults.length / limit)
+    : 0
+
+  const isShowPagination = totalPages > 1
+
   return (
-    <WQContentWrapper
-      isMobileSize={false}
-      noContent={total < 1}
-      noResultText={noResultText}
+    <WithTestId>
+      <WQContentWrapper
+        error={false}
+        isMobileSize={windowWidth < theme.grid.breakpoints.lg}
+        isShowPagination={isShowPagination}
+        noContent={allResults.length === 0}
+        noResultText={intl.formatMessage(messages.noResult)}
+        paginationId={currentPageNumber}
+        tabBarContent={tabBarContent}
+        title={contentTitle}
+        totalPages={totalPages}
+        onPageChange={(page) => setCurrentPageNumber(page)}
+      >
+        <Workqueue
+          columns={[...getDefaultColumns(), ...getColumns()]}
+          content={allResults.slice(
+            limit * (currentPageNumber - 1),
+            limit * currentPageNumber
+          )}
+          hideLastBorder={!isShowPagination}
+          sortOrder={sortOrder}
+        />
+      </WQContentWrapper>
+    </WithTestId>
+  )
+}
+
+export const SearchResult = ({
+  columns,
+  eventConfig,
+  searchParams,
+  queryData
+}: Props) => {
+  const intl = useIntl()
+  const total = queryData.length
+
+  return (
+    <SearchResultComponent
+      columns={columns}
+      eventConfigs={eventConfig ? [eventConfig] : []}
+      queryData={queryData}
       tabBarContent={
         eventConfig &&
         searchParams && (
@@ -328,12 +410,6 @@ export const SearchResult = ({
       title={`${intl.formatMessage(messages.searchResult)} ${
         ' (' + total + ')'
       }`}
-    >
-      <Workqueue
-        columns={getColumns().concat(getDefaultColumns())}
-        content={transformData(queryData)}
-        hideLastBorder={true}
-      />
-    </WQContentWrapper>
+    />
   )
 }

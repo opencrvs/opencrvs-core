@@ -16,12 +16,12 @@ import {
   QueryInputType,
   SearchField,
   EventFieldId,
+  QueryType,
   SearchQueryParams,
   Inferred,
   EventState,
   FieldType,
-  QueryExpression,
-  QueryType
+  QueryExpression
 } from '@opencrvs/commons/client'
 import {
   Errors,

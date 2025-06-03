@@ -18,6 +18,7 @@ import { AddressType } from '../CompositeFieldValue'
 import { EventStatus } from '../EventMetadata'
 import { generateActionDocument, generateEventDocument } from '../test.utils'
 import { EventIndex } from '../EventIndex'
+import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
 
 /* eslint-disable max-lines */
 
@@ -259,7 +260,6 @@ describe('getCurrentEventState()', () => {
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
-      dateOfEvent: new Date().toISOString().slice(0, 10),
       createdAtLocation: createAction.createdAtLocation,
       updatedAt: registerRequestAction.createdAt,
       updatedBy: registerRequestAction.createdBy,
@@ -270,6 +270,7 @@ describe('getCurrentEventState()', () => {
       updatedByUserRole: registerRequestAction.createdByRole,
       updatedAtLocation: registerRequestAction.createdAtLocation,
       declaration: deepDropNulls(declareRequestAction.declaration),
+      dateOfEvent: event.createdAt.split('T')[0],
       flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
@@ -361,11 +362,9 @@ describe('getCurrentEventState()', () => {
     }
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
-
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
-      dateOfEvent: new Date().toISOString().slice(0, 10),
       createdAtLocation: createAction.createdAtLocation,
       updatedAt: registerAcceptAction.createdAt,
       updatedBy: registerAcceptAction.createdBy,
@@ -376,6 +375,7 @@ describe('getCurrentEventState()', () => {
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration),
+      dateOfEvent: event.createdAt.split('T')[0],
       flags: [],
       legalStatuses: {
         [EventStatus.DECLARED]: {
@@ -403,7 +403,7 @@ describe('correction requests', () => {
   test('proposed correction data is not applied before the correction request is approved', () => {
     const state = getCurrentEventState(
       {
-        type: 'TENNIS_CLUB_MEMBERSHIP',
+        type: TENNIS_CLUB_MEMBERSHIP,
         id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf',
         trackingId: 'TEST12',
         createdAt: '2025-01-23T02:21:38.343Z',
@@ -463,7 +463,7 @@ describe('correction requests', () => {
   test('proposed correction data is applied after the correction request is approved', () => {
     const state = getCurrentEventState(
       {
-        type: 'TENNIS_CLUB_MEMBERSHIP',
+        type: TENNIS_CLUB_MEMBERSHIP,
         id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf',
         trackingId: 'TEST12',
         createdAt: '2025-01-23T02:21:38.343Z',

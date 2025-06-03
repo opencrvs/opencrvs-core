@@ -11,7 +11,6 @@
 
 import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -24,7 +23,8 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType
+  QueryType,
+  WorkqueueCountInput
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -46,8 +46,7 @@ function eventToEventIndex(
   event: EventDocument,
   config: EventConfig
 ): EventIndex {
-  const eventIndex = getCurrentEventState(event, config)
-  return encodeEventIndex(eventIndex, config)
+  return encodeEventIndex(getCurrentEventState(event, config), config)
 }
 
 /*
@@ -365,7 +364,7 @@ export async function getIndexedEvents(
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: 10000,
+    size: DEFAULT_SIZE,
     request_cache: false
   })
 
@@ -401,12 +400,30 @@ export async function getIndex(
     }
   })
 
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(eventConfigs, event))
-  )
+  const events = response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map((event) => decodeEventIndex(eventConfigs, event))
 
   return events
+}
+
+export async function getEventCount(
+  queries: WorkqueueCountInput,
+  eventConfigs: EventConfig[]
+) {
+  return (
+    //  @ToDo: write a query that does everything in one go.
+    (
+      await Promise.all(
+        queries.map(async ({ slug, query }) => {
+          const count = (await getIndex(query, eventConfigs)).length
+          return { slug, count }
+        })
+      )
+    ).reduce((acc: Record<string, number>, { slug, count }) => {
+      acc[slug] = count
+      return acc
+    }, {})
+  )
 }
