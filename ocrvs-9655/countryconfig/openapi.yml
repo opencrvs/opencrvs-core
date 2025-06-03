@@ -1,3 +1,122 @@
+{
+  id: 'tennis-club-membership',
+  label: {
+    defaultMessage: 'Tennis club membership application',
+    description: 'This is what this event is referred as in the system',
+    id: 'v2.event.tennis-club-membership.label'
+  },
+  title: {
+    defaultMessage: '{applicant.firstname} {applicant.surname}',
+    description: 'This is the title of the summary',
+    id: 'v2.event.tennis-club-membership.title'
+  },
+  summary: { fields: [ [Object], [Object], [Object] ] },
+  actions: [
+    { type: 'READ', label: [Object], review: [Object] },
+    { type: 'DECLARE', label: [Object], review: [Object] },
+    { type: 'VALIDATE', label: [Object], review: [Object] },
+    { type: 'REGISTER', label: [Object], review: [Object] },
+    {
+      type: 'REQUEST_CORRECTION',
+      label: [Object],
+      onboardingForm: [Array],
+      additionalDetailsForm: [Array]
+    },
+    { type: 'APPROVE_CORRECTION', label: [Object] },
+    {
+      type: 'PRINT_CERTIFICATE',
+      label: [Object],
+      printForm: [Object],
+      conditionals: [Array]
+    },
+    { type: 'ARCHIVE', label: [Object] },
+    { type: 'REJECT', label: [Object] }
+  ],
+  advancedSearch: [
+    { title: [Object], fields: [Array] },
+    { title: [Object], fields: [Array] },
+    { title: [Object], fields: [Array] }
+  ],
+  declaration: {
+    label: {
+      id: 'v2.event.tennis-club-membership.action.declare.form.label',
+      defaultMessage: 'Tennis club membership application',
+      description: 'This is what this form is referred as in the system'
+    },
+    pages: [ [Object], [Object], [Object] ]
+  }
+}
+{
+  id: 'FOOTBALL_CLUB_MEMBERSHIP',
+  label: {
+    defaultMessage: 'Football club membership application',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.football-club-membership.label'
+  },
+  title: {
+    defaultMessage: '{applicant.firstname} {applicant.surname}',
+    description: 'This is the title of the summary',
+    id: 'v2.event.football-club-membership.title'
+  },
+  summary: { fields: [ [Object], [Object], [Object] ] },
+  actions: [
+    { type: 'READ', label: [Object], review: [Object] },
+    { type: 'DECLARE', label: [Object], review: [Object] },
+    { type: 'VALIDATE', label: [Object], review: [Object] },
+    { type: 'REGISTER', label: [Object], review: [Object] },
+    {
+      type: 'REQUEST_CORRECTION',
+      label: [Object],
+      onboardingForm: [Array],
+      additionalDetailsForm: [Array]
+    },
+    { type: 'APPROVE_CORRECTION', label: [Object] },
+    {
+      type: 'PRINT_CERTIFICATE',
+      label: [Object],
+      printForm: [Object],
+      conditionals: [Array]
+    },
+    { type: 'ARCHIVE', label: [Object] },
+    { type: 'REJECT', label: [Object] }
+  ],
+  advancedSearch: [
+    { title: [Object], fields: [Array] },
+    { title: [Object], fields: [Array] },
+    { title: [Object], fields: [Array] }
+  ],
+  declaration: {
+    label: {
+      id: 'v2.event.tennis-club-membership.action.declare.form.label',
+      defaultMessage: 'Tennis club membership application',
+      description: 'This is what this form is referred as in the system'
+    },
+    pages: [ [Object], [Object], [Object] ]
+  }
+}
+{
+  id: 'library-membership',
+  label: {
+    defaultMessage: 'Library membership application',
+    description: 'This is what this event is referred as in the system',
+    id: 'event.library-membership.label'
+  },
+  title: {
+    defaultMessage: '{member.firstname} {member.surname}',
+    description: 'This is the title of the summary',
+    id: 'v2.event.library-membership.title'
+  },
+  summary: { fields: [] },
+  actions: [],
+  declaration: {
+    label: {
+      id: 'v2.event.library-membership.action.declare.form.label',
+      defaultMessage: 'Library membership application',
+      description: 'This is what this form is referred as in the system'
+    },
+    pages: [ [Object] ]
+  }
+}
 openapi: 3.1.0
 info:
   title: Countryconfig implementation requirements
@@ -9612,7 +9731,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 6e77275c-d5cd-4f58-bd8e-0c7fabb7ec37
+        transactionId: 87f99594-52af-46d1-b3e6-1af4e855e313
         declaration: {}
         annotation: {}
         type: NOTIFY
