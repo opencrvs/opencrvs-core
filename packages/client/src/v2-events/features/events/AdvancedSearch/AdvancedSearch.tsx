@@ -27,7 +27,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import { TabSearch } from './TabSearch'
 import { parseFieldSearchParams } from './utils'
 
-const messagesToDefine = {
+export const advancedSearchMessages = {
   advancedSearch: {
     id: 'v2.config.advanced.search',
     defaultMessage: 'Advanced Search',
@@ -41,7 +41,7 @@ const messagesToDefine = {
   }
 }
 
-const messages = defineMessages(messagesToDefine)
+const messages = defineMessages(advancedSearchMessages)
 
 export function AdvancedSearch() {
   const intl = useIntl()

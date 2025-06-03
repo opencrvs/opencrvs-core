@@ -137,12 +137,20 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
           tRPCMsw.user.list.query(() => {
             return [
               {
-                id: '6780dbf7a263c6515c7b97d2',
+                id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
                 signatureFilename: undefined
               }
             ]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return {
+              id: generator.user.id.localRegistrar,
+              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+              role: 'LOCAL_REGISTRAR',
+              signatureFilename: undefined
+            }
           })
         ]
       }
@@ -199,6 +207,14 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                 signatureFilename: undefined
               }
             ]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return {
+              id: generator.user.id.localRegistrar,
+              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+              role: 'LOCAL_REGISTRAR',
+              signatureFilename: undefined
+            }
           })
         ]
       }

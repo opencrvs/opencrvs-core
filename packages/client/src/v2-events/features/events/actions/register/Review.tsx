@@ -79,7 +79,7 @@ export function Review() {
   const reviewConfig = getActionReview(config, ActionType.REGISTER)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const currentEventState = getCurrentEventState(event)
+  const currentEventState = getCurrentEventState(event, config)
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 

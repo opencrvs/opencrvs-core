@@ -11,10 +11,10 @@
 import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
+  dateOfEventColumn,
   eventQueryDataGenerator,
   EventStatus,
-  tennisClubMembershipEvent,
-  workqueues
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { SearchResult } from './SearchResult'
@@ -63,10 +63,9 @@ export const DefaultSearchResult: Story = {
       })
     ],
     searchParams: mockSearchParams,
-    workqueueConfig: workqueues['all']
+    columns: dateOfEventColumn
   }
 }
-
 export const SearchResultWithMultipleItems: Story = {
   name: 'Search Results With Multiple Items',
   parameters: {
@@ -74,9 +73,9 @@ export const SearchResultWithMultipleItems: Story = {
   },
   args: {
     eventConfig: tennisClubMembershipEvent,
-    queryData: queryData.filter((e) => e.status === EventStatus.REGISTERED),
+    queryData: queryData.map((e) => ({ ...e, status: EventStatus.REGISTERED })),
     searchParams: { status: EventStatus.REGISTERED },
-    workqueueConfig: workqueues['all']
+    columns: dateOfEventColumn
   }
 }
 export const NoSearchResult: Story = {
@@ -85,6 +84,6 @@ export const NoSearchResult: Story = {
     eventConfig: tennisClubMembershipEvent,
     queryData: [],
     searchParams: mockSearchParams,
-    workqueueConfig: workqueues['all']
+    columns: dateOfEventColumn
   }
 }

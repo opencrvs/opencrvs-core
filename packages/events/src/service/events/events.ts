@@ -27,9 +27,10 @@ import {
   getAcceptedActions,
   AsyncRejectActionDocument,
   ActionType,
-  getCurrentEventState,
   EventStatus,
-  isWriteAction
+  isWriteAction,
+  getStatusFromActions,
+  EventConfig
 } from '@opencrvs/commons/events'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -121,10 +122,10 @@ export async function deleteEvent(
     throw new EventNotFoundError(eventId)
   }
 
-  const eventState = getCurrentEventState(event)
+  const eventStatus = getStatusFromActions(event.actions)
 
   // Once an event is declared or notified, it can not be deleted anymore
-  if (eventState.status !== EventStatus.CREATED) {
+  if (eventStatus !== EventStatus.CREATED) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'A declared or notified event can not be deleted'
@@ -159,11 +160,13 @@ type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
 export async function createEvent({
   eventInput,
   user,
-  transactionId
+  transactionId,
+  config
 }: {
   eventInput: z.infer<typeof EventInput>
   user: UserDetails
   transactionId: string
+  config: EventConfig
 }): Promise<EventDocument> {
   const existingEvent = await getEventByTransactionId(transactionId)
 
@@ -226,7 +229,7 @@ export async function createEvent({
   }
 
   const event = await getEventById(id)
-  await indexEvent(event)
+  await indexEvent(event, config)
 
   return event
 }
@@ -404,7 +407,7 @@ export async function addAction(
   const updatedEvent = await getEventById(eventId)
 
   if (action.type !== ActionType.READ) {
-    await indexEvent(updatedEvent)
+    await indexEvent(updatedEvent, configuration)
 
     if (action.type !== ActionType.ASSIGN) {
       await deleteDraftsByEventId(eventId)
@@ -417,12 +420,21 @@ export async function addAction(
 type AsyncRejectActionInput = Omit<
   z.infer<typeof AsyncRejectActionDocument>,
   'createdAt' | 'id' | 'status'
-> & { transactionId: string; eventId: string }
+> & { transactionId: string; eventId: string; token: string; eventType: string }
 
-export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
+export async function addAsyncRejectAction({
+  token,
+  eventType,
+  ...input
+}: AsyncRejectActionInput) {
   const db = await events.getClient()
   const now = new Date().toISOString()
   const { transactionId, eventId } = input
+
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType
+  })
 
   const action = {
     ...input,
@@ -439,7 +451,7 @@ export async function addAsyncRejectAction(input: AsyncRejectActionInput) {
     )
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent)
+  await indexEvent(updatedEvent, configuration)
   await deleteDraftsByEventId(eventId)
 
   return updatedEvent
