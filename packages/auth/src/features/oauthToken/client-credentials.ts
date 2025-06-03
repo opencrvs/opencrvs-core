@@ -20,7 +20,7 @@ import {
   NOTIFICATION_API_USER_AUDIENCE
 } from '@auth/constants'
 import * as oauthResponse from './responses'
-import { SCOPES } from '@opencrvs/commons/authentication'
+import { SCOPES, TokenUserType } from '@opencrvs/commons/authentication'
 
 export async function clientCredentialsHandler(
   request: Hapi.Request,
@@ -53,7 +53,8 @@ export async function clientCredentialsHandler(
       ? WEB_USER_JWT_AUDIENCES.concat([NOTIFICATION_API_USER_AUDIENCE])
       : WEB_USER_JWT_AUDIENCES,
     JWT_ISSUER,
-    true
+    true,
+    TokenUserType.SYSTEM
   )
 
   return oauthResponse.success(h, token)

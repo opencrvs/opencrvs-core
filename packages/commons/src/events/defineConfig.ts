@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventConfig, EventConfigInput } from './EventConfig'
-import { findInputPageFields, resolveFieldLabels } from './utils'
+import { EventConfig } from './EventConfig'
+import { EventConfigInput } from './EventConfigInput'
 
 /**
  * Builds a validated configuration for an event
@@ -19,15 +19,5 @@ import { findInputPageFields, resolveFieldLabels } from './utils'
 export const defineConfig = (config: EventConfigInput) => {
   const input = EventConfig.parse(config)
 
-  const pageFields = findInputPageFields(input)
-
-  return EventConfig.parse({
-    ...input,
-    workqueues: input.workqueues.map((workqueue) =>
-      resolveFieldLabels({
-        config: workqueue,
-        pageFields
-      })
-    )
-  })
+  return input
 }

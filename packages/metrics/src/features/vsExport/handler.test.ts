@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable @typescript-eslint/no-var-requires */
 import { createServer } from '@metrics/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'

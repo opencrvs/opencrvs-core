@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-relative-parent-imports
 import { AugmentedRequest } from '@apollo/datasource-rest'
 import { FHIR_URL } from '@gateway/constants'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'

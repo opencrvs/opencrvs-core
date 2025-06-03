@@ -9,147 +9,277 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { getEventWithOnlyUserSpecificDrafts } from '@events/drafts'
-import { getEventConfigurations } from '@events/service/config/config'
+import { extendZodWithOpenApi } from 'zod-openapi'
+import { getUUID, SCOPES } from '@opencrvs/commons'
+import {
+  ACTION_ALLOWED_SCOPES,
+  ActionStatus,
+  ActionType,
+  ApproveCorrectionActionInput,
+  AssignActionInput,
+  CONFIG_GET_ALLOWED_SCOPES,
+  CONFIG_SEARCH_ALLOWED_SCOPES,
+  DeleteActionInput,
+  Draft,
+  DraftInput,
+  EventConfig,
+  EventDocument,
+  EventIndex,
+  EventInput,
+  RejectCorrectionActionInput,
+  RequestCorrectionActionInput,
+  UnassignActionInput,
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  QueryType
+} from '@opencrvs/commons/events'
+import * as middleware from '@events/router/middleware'
+import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
+import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
+import {
+  getEventConfigurationById,
+  getEventConfigurations
+} from '@events/service/config/config'
+import { approveCorrection } from '@events/service/events/actions/approve-correction'
+import { assignRecord } from '@events/service/events/actions/assign'
+import { rejectCorrection } from '@events/service/events/actions/reject-correction'
+import { unassignRecord } from '@events/service/events/actions/unassign'
+import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
   createEvent,
   deleteEvent,
-  EventInputWithId,
-  getEventById,
-  patchEvent
+  getEventById
 } from '@events/service/events/events'
-import { presignFilesInEvent } from '@events/service/files'
-import { getIndexedEvents } from '@events/service/indexing/indexing'
-import { EventConfig, getUUID } from '@opencrvs/commons'
-import {
-  DeclareActionInput,
-  EventIndex,
-  EventInput,
-  NotifyActionInput,
-  RegisterActionInput,
-  ValidateActionInput
-} from '@opencrvs/commons/events'
-import { router, publicProcedure } from '@events/router/trpc'
+import { importEvent } from '@events/service/events/import'
+import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { getDefaultActionProcedures } from './actions'
 
-function validateEventType({
-  eventTypes,
-  eventInputType
-}: {
-  eventTypes: string[]
-  eventInputType: string
-}) {
-  if (!eventTypes.includes(eventInputType)) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: `Invalid event type ${eventInputType}. Valid event types are: ${eventTypes.join(
-        ', '
-      )}`
-    })
-  }
-}
+extendZodWithOpenApi(z)
 
 export const eventRouter = router({
   config: router({
-    get: publicProcedure.output(z.array(EventConfig)).query(async (options) => {
-      return getEventConfigurations(options.ctx.token)
-    })
+    get: publicProcedure
+      .meta({
+        openapi: {
+          summary: 'List event configurations',
+          method: 'GET',
+          path: '/config',
+          tags: ['events'],
+          protect: true
+        }
+      })
+      .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+      .input(z.void())
+      .output(z.array(EventConfig))
+      .query(async (options) => {
+        return getEventConfigurations(options.ctx.token)
+      })
   }),
-  create: publicProcedure.input(EventInput).mutation(async (options) => {
-    const config = await getEventConfigurations(options.ctx.token)
-    const eventIds = config.map((c) => c.id)
-
-    validateEventType({
-      eventTypes: eventIds,
-      eventInputType: options.input.type
+  create: systemProcedure
+    .meta({
+      openapi: {
+        summary: 'Create event',
+        method: 'POST',
+        path: '/events',
+        tags: ['events'],
+        protect: true
+      }
     })
-
-    return createEvent({
-      eventInput: options.input,
-      createdBy: options.ctx.user.id,
-      createdAtLocation: options.ctx.user.primaryOfficeId,
-      transactionId: options.input.transactionId
-    })
-  }),
-  patch: publicProcedure.input(EventInputWithId).mutation(async (options) => {
-    const config = await getEventConfigurations(options.ctx.token)
-    const eventIds = config.map((c) => c.id)
-
-    validateEventType({
-      eventTypes: eventIds,
-      eventInputType: options.input.type
-    })
-
-    return patchEvent(options.input)
-  }),
-  get: publicProcedure.input(z.string()).query(async ({ input, ctx }) => {
-    const event = await getEventById(input)
-
-    const eventWithSignedFiles = await presignFilesInEvent(event, ctx.token)
-    const eventWithUserSpecificDrafts = getEventWithOnlyUserSpecificDrafts(
-      eventWithSignedFiles,
-      ctx.user.id
+    .use(
+      requiresAnyOfScopes(
+        ACTION_ALLOWED_SCOPES[ActionType.CREATE],
+        ACTION_ALLOWED_CONFIGURABLE_SCOPES[ActionType.CREATE]
+      )
     )
+    .input(EventInput)
+    .use(middleware.eventTypeAuthorization)
+    .output(EventDocument)
+    .mutation(async ({ input, ctx }) => {
+      const config = await getEventConfigurationById({
+        token: ctx.token,
+        eventType: input.type
+      })
+      return createEvent({
+        transactionId: input.transactionId,
+        config,
+        eventInput: input,
+        user: ctx.user
+      })
+    }),
+  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
+  get: publicProcedure
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
+    .input(z.string())
+    .query(async ({ input, ctx }) => {
+      const event = await getEventById(input)
+      const updatedEvent = await addAction(
+        {
+          type: ActionType.READ,
+          eventId: event.id,
+          transactionId: getUUID(),
+          declaration: {}
+        },
+        {
+          eventId: event.id,
+          user: ctx.user,
+          token: ctx.token,
+          status: ActionStatus.Accepted
+        }
+      )
 
-    return eventWithUserSpecificDrafts
-  }),
+      return updatedEvent
+    }),
   delete: publicProcedure
-    .input(z.object({ eventId: z.string() }))
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.DELETE]))
+    .input(DeleteActionInput)
+    .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
-  actions: router({
-    notify: publicProcedure
-      .input(NotifyActionInput)
-      .mutation(async (options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
+  draft: router({
+    list: publicProcedure.output(z.array(Draft)).query(async (options) => {
+      return getDraftsByUserId(options.ctx.user.id)
+    }),
+    create: publicProcedure
+      .input(DraftInput)
+      .mutation(async ({ input, ctx }) => {
+        const { eventId } = input
+        await getEventById(eventId)
+
+        return createDraft(input, {
+          eventId,
+          user: ctx.user,
+          transactionId: input.transactionId
         })
-      }),
-    declare: publicProcedure
-      .input(DeclareActionInput)
-      .mutation(async (options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
-        })
-      }),
-    validate: publicProcedure
-      .input(ValidateActionInput)
-      .mutation(async (options) => {
-        return addAction(options.input, {
-          eventId: options.input.eventId,
-          createdBy: options.ctx.user.id,
-          createdAtLocation: options.ctx.user.primaryOfficeId,
-          token: options.ctx.token
-        })
-      }),
-    register: publicProcedure
-      .input(RegisterActionInput.omit({ identifiers: true }))
-      .mutation(async (options) => {
-        return addAction(
-          {
-            ...options.input,
-            identifiers: {
-              trackingId: getUUID(),
-              registrationNumber: getUUID()
-            }
-          },
-          {
-            eventId: options.input.eventId,
-            createdBy: options.ctx.user.id,
-            createdAtLocation: options.ctx.user.primaryOfficeId,
-            token: options.ctx.token
-          }
-        )
       })
   }),
-  list: publicProcedure.output(z.array(EventIndex)).query(getIndexedEvents)
+  actions: router({
+    notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
+    declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
+    validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
+    reject: router(getDefaultActionProcedures(ActionType.REJECT)),
+    archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
+    register: router(getDefaultActionProcedures(ActionType.REGISTER)),
+    printCertificate: router(
+      getDefaultActionProcedures(ActionType.PRINT_CERTIFICATE)
+    ),
+    assignment: router({
+      assign: publicProcedure
+        .input(AssignActionInput)
+        .use(middleware.validateAction(ActionType.ASSIGN))
+        .mutation(async (options) => {
+          return assignRecord({
+            input: options.input,
+            user: options.ctx.user,
+            token: options.ctx.token
+          })
+        }),
+      unassign: publicProcedure
+        .input(UnassignActionInput)
+        .use(middleware.validateAction(ActionType.UNASSIGN))
+        .mutation(async (options) => {
+          return unassignRecord(options.input, {
+            eventId: options.input.eventId,
+            user: options.ctx.user,
+            token: options.ctx.token
+          })
+        })
+    }),
+    correction: router({
+      request: publicProcedure
+        .use(
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.REQUEST_CORRECTION]
+          )
+        )
+        .input(RequestCorrectionActionInput)
+        .use(middleware.requireAssignment)
+        .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+
+          return addAction(input, {
+            eventId: input.eventId,
+            user: ctx.user,
+            token: ctx.token,
+            status: ActionStatus.Accepted
+          })
+        }),
+      approve: publicProcedure
+        .use(
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.APPROVE_CORRECTION]
+          )
+        )
+        .input(ApproveCorrectionActionInput)
+        .use(middleware.requireAssignment)
+        .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+          return approveCorrection(input, {
+            eventId: input.eventId,
+            user: ctx.user,
+            token: ctx.token
+          })
+        }),
+      reject: publicProcedure
+        .use(
+          requiresAnyOfScopes(
+            ACTION_ALLOWED_SCOPES[ActionType.REJECT_CORRECTION]
+          )
+        )
+        .input(RejectCorrectionActionInput)
+        .use(middleware.requireAssignment)
+        .use(middleware.validateAction(ActionType.REJECT_CORRECTION))
+        .mutation(async ({ input, ctx }) => {
+          if (ctx.isDuplicateAction) {
+            return ctx.event
+          }
+
+          return rejectCorrection(input, {
+            eventId: input.eventId,
+            user: ctx.user,
+            token: ctx.token
+          })
+        })
+    })
+  }),
+  list: systemProcedure
+    .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
+    .output(z.array(EventIndex))
+    .query(async ({ ctx }) => {
+      const userId = ctx.user.id
+      return getIndexedEvents(userId)
+    }),
+  search: publicProcedure
+    .meta({
+      openapi: {
+        summary: 'Search for events',
+        method: 'GET',
+        tags: ['Search'],
+        path: '/events/search'
+      }
+    })
+    .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
+    .input(QueryType)
+    .output(z.array(EventIndex))
+    .query(async ({ input }) => getIndex(input)),
+  import: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .meta({
+      openapi: {
+        summary: 'Import full event record',
+        method: 'POST',
+        path: '/events/import',
+        tags: ['events']
+      }
+    })
+    .input(EventDocument)
+    .output(EventDocument)
+    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token))
 })

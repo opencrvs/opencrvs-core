@@ -51,6 +51,7 @@ type CSVRow = { id: string; description: string } & Record<string, string>
 
 const write = process.argv.includes('--write')
 const outdated = process.argv.includes('--outdated')
+const ci = process.argv.includes('--ci')
 
 const COUNTRY_CONFIG_PATH = process.argv[2]
 
@@ -155,7 +156,11 @@ async function extractMessages() {
   console.log()
 
   const files = await promisify(glob)('src/**/*.@(tsx|ts)', {
-    ignore: ['**/*.test.@(tsx|ts)', 'src/tests/**/*.*']
+    ignore: [
+      '**/*.test.@(tsx|ts)',
+      'src/tests/**/*.*',
+      '**/*.stories.@(tsx|ts)'
+    ]
   })
 
   const messagesParsedFromApp: MessageDescriptor[] = files
@@ -187,12 +192,37 @@ async function extractMessages() {
   }
 
   if (missingKeys.length > 0) {
-    // eslint-disable-line no-console
-    console.log(chalk.red.bold('Missing translations'))
-    console.log(`You are missing the following content keys from your country configuration package:\n
-${chalk.white(missingKeys.join('\n'))}\n
-Translate the keys and add them to this file:
+    console.log(chalk.red.bold('Missing translations '))
+    if (ci) {
+      const emptyLanguages = Object.fromEntries(
+        knownLanguages.filter((lang) => lang != 'en').map((lang) => [lang, ''])
+      )
+      const defaultsToBeAdded = missingKeys.map(
+        (key): CSVRow => ({
+          id: key,
+          description: reactIntlDescriptions[key],
+          en:
+            messagesParsedFromApp
+              .find(({ id }) => id === key)
+              ?.defaultMessage?.toString() || '',
+          ...emptyLanguages
+        })
+      )
+      const message = defaultsToBeAdded
+        .map((row) => Object.values(row).join(','))
+        .join('\n')
+      console.log(`You are missing the following content keys from your country configuration package:\n
+${chalk.white(message)}\n
+ Add them to this file and run again:
 ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
+    }
+
+    if (!ci) {
+      console.log(`You are missing the following content keys from your country configuration package:\n
+  ${chalk.white(missingKeys.join('\n'))}\n
+  Translate the keys and add them to this file:
+  ${chalk.white(`${COUNTRY_CONFIG_PATH}/src/translations/client.csv`)}`)
+    }
 
     if (write) {
       console.log(

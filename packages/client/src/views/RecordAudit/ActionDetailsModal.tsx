@@ -414,11 +414,11 @@ const ActionDetailsModalListTable = ({
           window.config.LANGUAGES
         )
       : certificate.certifier?.name
-      ? getIndividualNameObj(
-          certificate.certifier.name,
-          window.config.LANGUAGES
-        )
-      : {}
+        ? getIndividualNameObj(
+            certificate.certifier.name,
+            window.config.LANGUAGES
+          )
+        : {}
     const collectorLabel = () => {
       const relation = CollectorRelationLabelArray.find(
         (labelItem) => labelItem.value === certificate.collector?.relationship

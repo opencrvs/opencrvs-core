@@ -22,7 +22,6 @@ import { showSessionExpireConfirmation } from '@client/notification/actions'
 
 import { IStoreState } from '@client/store'
 import { AnyAction, Store } from 'redux'
-// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import TimeoutLink from '@client/utils/timeoutLink'
 import * as React from 'react'
@@ -55,7 +54,7 @@ export const createClient = (
       }
     }
   })
-
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const errorLink = onError((error: any) => {
     if (
       (error.networkError &&

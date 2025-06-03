@@ -162,7 +162,6 @@ describe('when user is in the register form for death event', () => {
       // TODO: need to check if causeOfDeathNotice is needed or not
       // clonedForm.sections[2].notice = messages.causeOfDeathNotice
       clonedForm.sections[2].groups[0].ignoreSingleFieldView = true
-      // const mock: any = vi.fn()
       const { component: testComponent } = await createTestComponent(
         <RegisterForm
           registerForm={clonedForm}

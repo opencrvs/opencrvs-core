@@ -10,9 +10,11 @@
  */
 import * as elasticsearch from '@elastic/elasticsearch'
 import { env } from '@events/environment'
+import { FIELD_ID_SEPARATOR } from '@events/service/indexing/utils'
 
 let client: elasticsearch.Client | undefined
 
+/** @knipignore */
 export const getOrCreateClient = () => {
   if (!client) {
     client = new elasticsearch.Client({
@@ -26,9 +28,11 @@ export const getOrCreateClient = () => {
 }
 
 export function getEventAliasName() {
-  return `events`
+  return env.ES_INDEX_PREFIX
 }
 
 export function getEventIndexName(eventType: string) {
-  return `events_${eventType}`.toLowerCase()
+  return `${env.ES_INDEX_PREFIX}_${eventType}`
+    .toLowerCase()
+    .replaceAll('.', FIELD_ID_SEPARATOR)
 }
