@@ -3027,13 +3027,6 @@ components:
           type: string
         type:
           type: string
-        dateOfEvent:
-          type: object
-          properties:
-            fieldId:
-              type: string
-          required:
-            - fieldId
         createdAt:
           type: string
           format: date-time
@@ -9619,7 +9612,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 8e81bb19-6ddc-4373-aedf-d8a3959f4d8c
+        transactionId: 790c4f1c-1ce1-4dcb-9a97-5cfe666dc13a
         declaration: {}
         annotation: {}
         type: NOTIFY
