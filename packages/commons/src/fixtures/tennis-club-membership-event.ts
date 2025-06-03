@@ -19,9 +19,11 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
+import { defineWorkqueues } from '../events'
 import { event } from '../events/event'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
 import { EventStatus } from '../events/EventMetadata'
+import { TENNIS_CLUB_MEMBERSHIP } from '../events/Constants'
 
 /** @knipignore */
 const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -1026,7 +1028,10 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 7 days',
       id: 'form.section.label.timePeriodLast7Days'
     },
-    value: `${format(subDays(new Date(), 7), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subDays(new Date(), 7), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   },
   {
     label: {
@@ -1034,7 +1039,10 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 30 days',
       id: 'form.section.label.timePeriodLast30Days'
     },
-    value: `${format(subMonths(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subMonths(new Date(), 1), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   },
   {
     label: {
@@ -1042,7 +1050,10 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last 90 days',
       id: 'form.section.label.timePeriodLast90Days'
     },
-    value: `${format(subQuarters(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subQuarters(new Date(), 1), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   },
   {
     label: {
@@ -1050,12 +1061,15 @@ const timePeriodOptions = [
       description: 'Label for option of time period select: last year',
       id: 'form.section.label.timePeriodLastYear'
     },
-    value: `${format(subYears(new Date(), 1), 'yyyy-MM-dd')},${format(new Date(), 'yyyy-MM-dd')}`
+    value: `${format(subYears(new Date(), 1), 'yyyy-MM-dd')},${format(
+      new Date(),
+      'yyyy-MM-dd'
+    )}`
   }
 ]
 
 export const tennisClubMembershipEvent = defineConfig({
-  id: 'TENNIS_CLUB_MEMBERSHIP',
+  id: TENNIS_CLUB_MEMBERSHIP,
   label: {
     defaultMessage: 'Tennis club membership application',
     description: 'This is what this event is referred as in the system',
@@ -1466,3 +1480,21 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
+
+export const WorkqueueFixture = defineWorkqueues([
+  {
+    columns: [],
+    slug: 'in-progress',
+    name: {
+      id: 'workqueues.inProgress.title',
+      defaultMessage: 'In progress',
+      description: 'Title of in progress workqueue'
+    },
+    query: {
+      type: 'and',
+      clauses: [{ eventType: tennisClubMembershipEvent.id }]
+    },
+    actions: [],
+    icon: 'Draft'
+  }
+])
