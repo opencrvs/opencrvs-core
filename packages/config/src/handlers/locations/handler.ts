@@ -94,10 +94,10 @@ type UpdateLocation = {
 
 const locationStatisticSchema = Joi.object({
   year: Joi.number().required(),
-  male_population: Joi.number().required(),
-  female_population: Joi.number().required(),
-  population: Joi.number().required(),
-  crude_birth_rate: Joi.number().required()
+  male_population: Joi.number().min(0).default(0),
+  female_population: Joi.number().min(0).default(0),
+  population: Joi.number().min(0).default(0),
+  crude_birth_rate: Joi.number().min(0).default(0)
 }).label('YearStatistics')
 
 function instanceOfJurisdiction(object: any): object is Location {
@@ -126,6 +126,7 @@ const locationRequestSchema = Joi.object({
   statistics: Joi.array()
     .items(locationStatisticSchema)
     .optional()
+    .default([])
     .label('Statistics')
 }).label('LocationPayload')
 
