@@ -139,13 +139,15 @@ export const WithRejectedAction: Story = {
               actions: tennisClubMembershipEventDocument.actions.concat([
                 {
                   type: ActionType.ARCHIVE,
-                  status: ActionStatus.Rejected,
+                  status: ActionStatus.Accepted,
                   id: getUUID(),
                   transactionId: getUUID(),
                   createdAt: new Date().toISOString(),
                   createdBy: '123',
                   createdAtLocation: '123',
-                  createdByRole: 'LOCAL_REGISTRAR'
+                  createdByRole: 'LOCAL_REGISTRAR',
+                  declaration: {},
+                  reason: { message: 'Archived', isDuplicate: true }
                 }
               ])
             }

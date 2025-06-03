@@ -318,7 +318,7 @@ export async function addAction(
     createdAtLocation: user.primaryOfficeId
   }
 
-  if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
+  if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await db.collection<EventDocument>('events').updateOne(
       {
         id: eventId,
