@@ -12,11 +12,12 @@ import { estypes } from '@elastic/elasticsearch'
 import {
   EventConfig,
   FieldType,
+  getAllUniqueFields,
   Inferred,
   QueryExpression,
   QueryType
 } from '@opencrvs/commons/events'
-import { encodeFieldId, getAllUniqueFields } from './utils'
+import { encodeFieldId } from './utils'
 
 /**
  * Generates an Elasticsearch query to search within `document.declaration`

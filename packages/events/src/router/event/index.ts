@@ -283,7 +283,8 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
-      return getIndexedEvents(userId)
+      const eventConfigs = await getEventConfigurations(ctx.token)
+      return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure
     .meta({

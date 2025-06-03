@@ -38,8 +38,7 @@ import {
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId,
-  getAllUniqueFields
+  encodeFieldId
 } from './utils'
 import { buildElasticQueryFromSearchPayload } from './query'
 
@@ -48,19 +47,7 @@ function eventToEventIndex(
   config: EventConfig
 ): EventIndex {
   const eventIndex = getCurrentEventState(event, config)
-  const allFields = getAllUniqueFields(config)
-  const nameFields = allFields
-    .filter((field) => field.type === 'NAME')
-    .map((f) => f.id)
-  for (const [key, value] of Object.entries(eventIndex.declaration)) {
-    if (nameFields.includes(key) && value) {
-      // Compute and attach a __fullname field for internal search purposes only
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(value as any).__fullname = Object.values(value).join(' ')
-    }
-  }
-
-  return encodeEventIndex(eventIndex)
+  return encodeEventIndex(eventIndex, config)
 }
 
 /*
@@ -219,7 +206,7 @@ export async function createIndex(
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
-                  acceptedAt: { type: 'date' },
+                  acceptedAt: { type: 'date' }
                 } satisfies Record<
                   keyof ActionCreationMetadata,
                   estypes.MappingProperty
@@ -233,7 +220,7 @@ export async function createIndex(
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
-                  registrationNumber: { type: 'keyword' },
+                  registrationNumber: { type: 'keyword' }
                 } satisfies Record<
                   keyof RegistrationCreationMetadata,
                   estypes.MappingProperty
@@ -335,7 +322,10 @@ export async function deleteEventIndex(event: EventDocument) {
   return response
 }
 
-export async function getIndexedEvents(userId: string) {
+export async function getIndexedEvents(
+  userId: string,
+  eventConfigs: EventConfig[]
+) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -382,7 +372,7 @@ export async function getIndexedEvents(userId: string) {
   return response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map(decodeEventIndex)
+    .map((event) => decodeEventIndex(eventConfigs, event))
 }
 
 export async function getIndex(
@@ -415,7 +405,7 @@ export async function getIndex(
     response.hits.hits
       .map((hit) => hit._source)
       .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
+      .map((event) => decodeEventIndex(eventConfigs, event))
   )
 
   return events
