@@ -546,6 +546,7 @@ components:
       description: JSON schema conditional configuration
     ActionConfig:
       oneOf:
+        - $ref: "#/components/schemas/ReadActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RejectDeclarationActionConfig"
@@ -560,6 +561,7 @@ components:
       discriminator:
         propertyName: type
         mapping:
+          READ: "#/components/schemas/ReadActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REJECT: "#/components/schemas/RejectDeclarationActionConfig"
@@ -571,7 +573,7 @@ components:
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
           REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
           APPROVE_CORRECTION: "#/components/schemas/ApproveCorrectionActionConfig"
-    DeclareActionConfig:
+    ReadActionConfig:
       type: object
       properties:
         label:
@@ -610,7 +612,7 @@ components:
           type: boolean
         type:
           type: string
-          const: DECLARE
+          const: READ
         review:
           type: object
           properties:
@@ -2236,6 +2238,65 @@ components:
             within declaration forms, as they are the only ones with review
             pages.
       description: Field conditional configuration
+    DeclareActionConfig:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          type: array
+          items:
+            oneOf:
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+          default: *a8
+        draft:
+          type: boolean
+        type:
+          type: string
+          const: DECLARE
+        review:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/TranslationConfig"
+              description: Title of the review page
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+              description: Fields to be rendered on the review page for annotations.
+          required:
+            - title
+            - fields
+          description: Configuration for **declaration** review page.
+      required:
+        - label
+        - conditionals
+        - type
+        - review
     ValidateActionConfig:
       type: object
       properties:
@@ -4086,6 +4147,18 @@ components:
         type:
           type: string
           const: REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4095,6 +4168,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     MarkAsDuplicateAction:
       type: object
       properties:
@@ -4768,6 +4842,18 @@ components:
         type:
           type: string
           const: ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4777,6 +4863,7 @@ components:
         - declaration
         - status
         - type
+        - reason
     NotifiedAction:
       type: object
       properties:
@@ -9532,7 +9619,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: a5a1c16d-78ad-47fe-8261-08b1d05f0240
+        transactionId: 9d47c5da-3519-4f4b-b759-8579e4489aeb
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10183,9 +10270,22 @@ components:
           type: string
           const: REJECT
           default: REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
+        - reason
     MarkedAsDuplicateActionInput:
       type: object
       properties:
@@ -10833,9 +10933,22 @@ components:
           type: string
           const: ARCHIVE
           default: ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
+        - reason
     AssignActionInput:
       type: object
       properties:
