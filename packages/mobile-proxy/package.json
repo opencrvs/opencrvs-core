@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/mobile-proxy",
-  "version": "1.0.0-alpha.1.2",
+  "version": "0.2.0",
   "description": "OpenCRVS proxy for local mobile development",
   "license": "MPL-2.0",
   "private": true,
