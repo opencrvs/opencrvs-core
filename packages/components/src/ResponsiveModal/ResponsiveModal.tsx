@@ -217,6 +217,7 @@ export const ResponsiveModal = ({
           e.stopPropagation()
         }
       }}
+      data-testid={id}
     >
       <ScreenBlocker />
       <ModalContent width={width} responsive={responsive} role="dialog">

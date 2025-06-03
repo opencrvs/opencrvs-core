@@ -45,15 +45,7 @@ export const EventOverviewProvider = ({
 }) => {
   const getUser = (id: string) => {
     const user = users.find((u) => u.id === id)
-
-    if (!user) {
-      // eslint-disable-next-line no-console
-      console.error(`User with id ${id} not found.`)
-
-      return MISSING_USER
-    }
-
-    return user
+    return user ?? MISSING_USER
   }
 
   const getLocation = (id: string) => {

@@ -29,11 +29,8 @@ import {
   ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
-import {
-  MiddlewareOptions,
-  requiresAnyOfScopes
-} from '@events/router/middleware'
-import { publicProcedure } from '@events/router/trpc'
+import { requiresAnyOfScopes } from '@events/router/middleware'
+import { systemProcedure } from '@events/router/trpc'
 
 import {
   getEventById,
@@ -151,24 +148,24 @@ export function getDefaultActionProcedures(
     ACTION_ALLOWED_CONFIGURABLE_SCOPES[actionType]
   )
 
-  const validatePayloadMiddleware = validatePayload
-    ? middleware.validateAction(actionType)
-    : async ({ next }: MiddlewareOptions) => next()
-
   const meta = 'meta' in actionConfig ? actionConfig.meta : {}
 
   return {
-    request: publicProcedure
+    request: systemProcedure
       .meta(meta)
       .use(requireScopesMiddleware)
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
-      .use(validatePayloadMiddleware)
+      .use(
+        validatePayload
+          ? middleware.validateAction(actionType)
+          : async ({ next }) => next()
+      )
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
-        const { eventId, transactionId } = input
+        const { eventId } = input
         const actionId = getUUID()
 
         if (ctx.isDuplicateAction) {
@@ -221,24 +218,25 @@ export function getDefaultActionProcedures(
           { ...input, ...parsedBody },
           {
             eventId,
-            createdBy: user.id,
-            createdByRole: user.role,
-            createdAtLocation: user.primaryOfficeId,
+            user,
             token,
-            transactionId,
             status
           },
           actionId
         )
       }),
 
-    accept: publicProcedure
+    accept: systemProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(validatePayloadMiddleware)
+      .use(
+        validatePayload
+          ? middleware.validateAction(actionType)
+          : async ({ next }) => next()
+      )
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
-        const { eventId, actionId, transactionId } = input
+        const { eventId, actionId } = input
         const event = await getEventById(eventId)
         const originalAction = event.actions.find((a) => a.id === actionId)
         const confirmationAction = event.actions.find(
@@ -270,17 +268,14 @@ export function getDefaultActionProcedures(
           { ...input, originalActionId: actionId },
           {
             eventId,
-            createdBy: user.id,
-            createdByRole: user.role,
-            createdAtLocation: user.primaryOfficeId,
+            user,
             token,
-            transactionId,
             status: ActionStatus.Accepted
           }
         )
       }),
 
-    reject: publicProcedure
+    reject: systemProcedure
       .use(requireScopesMiddleware)
       .input(
         z.object({
@@ -318,7 +313,7 @@ export function getDefaultActionProcedures(
           type: actionType,
           createdBy: ctx.user.id,
           createdByRole: ctx.user.role,
-          createdAtLocation: ctx.user.primaryOfficeId
+          createdAtLocation: ctx.user.primaryOfficeId ?? undefined
         })
       })
   }
