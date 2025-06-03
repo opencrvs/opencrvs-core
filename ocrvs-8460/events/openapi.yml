@@ -59,18 +59,11 @@ paths:
                   type: string
                 type:
                   type: string
-                dateOfEvent:
-                  type: object
-                  properties:
-                    fieldId:
-                      type: string
-                  required:
-                    - fieldId
               required:
                 - transactionId
                 - type
               default:
-                transactionId: 5d1716eb-e1c3-49e5-9693-cf8871aa0dfb
+                transactionId: 44e8511c-a7c4-4d0d-8369-767f2883966b
                 type: v2.birth
       responses:
         "200":
@@ -457,7 +450,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a6e90758-c4de-4f60-8711-8183f2e9b7e2
+                transactionId: d9b06ada-ff5f-48aa-b860-ffe5471fc8f6
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9499,7 +9492,7 @@ components:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
-        createAtLocation:
+        createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
@@ -9507,6 +9500,8 @@ components:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
+        assignedTo:
+          $ref: "#/components/schemas/Exact"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
