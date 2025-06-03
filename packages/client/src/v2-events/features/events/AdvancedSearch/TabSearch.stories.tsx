@@ -41,6 +41,7 @@ export const DefaultSearchResult: Story = {
       'applicant.firstname': 'Danny',
       'applicant.dob': '1999-11-11'
     },
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
     onChange: (updateForm: EventState) => {}
   }
 }
