@@ -76,6 +76,7 @@ import { UserList } from './views/SysAdmin/Team/user/UserList'
 import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { config } from './config'
+import { useAdvancedFrontendCustomizations } from './hooks/useAdvancedFrontendCustomizations'
 
 // Injecting global styles for the body tag - used only once
 const GlobalStyle = createGlobalStyle`
@@ -98,6 +99,11 @@ function createRedirect(from: string, to: string) {
       return redirect(to)
     }
   }
+}
+
+const AdvancedCustomizationsComponent = () => {
+  useAdvancedFrontendCustomizations()
+  return null;
 }
 
 export const routesConfig = config.FEATURES.V2_EVENTS
@@ -546,6 +552,7 @@ export function App({ client, store, router }: IAppProps) {
         <Provider store={store}>
           <I18nContainer>
             <ThemeProvider theme={getTheme()}>
+              <AdvancedCustomizationsComponent />
               <StyledErrorBoundary>
                 <RouterProvider
                   router={router}

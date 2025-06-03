@@ -111,3 +111,7 @@ export function selectApplicationName(store: IStoreState) {
 export const getOfflineLoadingError = (
   store: IStoreState
 ): IOfflineDataState['loadingError'] => getKey(store, 'loadingError')
+
+export function selectAdvancedFrontendCustomizations(store: IStoreState) {
+  return getKey(store, 'offlineData').config?.ADVANCED_FRONTEND_CUSTOMIZATIONS || getKey(store, 'offlineData').anonymousConfig?.ADVANCED_FRONTEND_CUSTOMIZATIONS
+}
