@@ -59,18 +59,11 @@ paths:
                   type: string
                 type:
                   type: string
-                dateOfEvent:
-                  type: object
-                  properties:
-                    fieldId:
-                      type: string
-                  required:
-                    - fieldId
               required:
                 - transactionId
                 - type
               default:
-                transactionId: 5470202e-4167-4acb-b21d-12c7654072ab
+                transactionId: 0f0fca58-37e0-45e5-bfd6-2016652673da
                 type: v2.birth
       responses:
         "200":
@@ -435,7 +428,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: b4a494fd-e2ba-4c19-aee6-591b589847fa
+                transactionId: 2ea15038-548e-4a0c-917d-de3c6d6b7bd4
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -575,13 +568,6 @@ paths:
                   format: uuid
                 type:
                   type: string
-                dateOfEvent:
-                  type: object
-                  properties:
-                    fieldId:
-                      type: string
-                  required:
-                    - fieldId
                 createdAt:
                   type: string
                   format: date-time
@@ -3799,13 +3785,6 @@ components:
           format: uuid
         type:
           type: string
-        dateOfEvent:
-          type: object
-          properties:
-            fieldId:
-              type: string
-          required:
-            - fieldId
         createdAt:
           type: string
           format: date-time
@@ -9015,7 +8994,7 @@ components:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
-        createAtLocation:
+        createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
@@ -9023,6 +9002,8 @@ components:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
+        assignedTo:
+          $ref: "#/components/schemas/Exact"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
