@@ -71,7 +71,11 @@ export async function validate(
 
   const resultsFromAllRules = await Promise.all(
     config.deduplication.map(async (deduplication) => {
-      const matches = await searchForDuplicates(futureEventState, deduplication)
+      const matches = await searchForDuplicates(
+        futureEventState,
+        deduplication,
+        config
+      )
       return matches
     })
   )
