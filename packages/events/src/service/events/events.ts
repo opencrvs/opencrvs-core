@@ -208,7 +208,7 @@ export async function addAction(
     }
   }
 
-  if (input.type === ActionType.ARCHIVE && input.annotation?.isDuplicate) {
+  if (input.type === ActionType.ARCHIVE && input.reason?.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
