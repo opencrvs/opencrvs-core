@@ -19,6 +19,7 @@ import {
   BearerTokenByUserType,
   getTokenPayload,
   getUUID,
+  TENNIS_CLUB_MEMBERSHIP,
   UserRole
 } from '@opencrvs/commons'
 import { AppRouter } from './router'
@@ -71,7 +72,7 @@ async function createEvent(token: string) {
   const res = await customClient.event.create.mutate(
     {
       transactionId: getUUID(),
-      type: 'TENNIS_CLUB_MEMBERSHIP'
+      type: TENNIS_CLUB_MEMBERSHIP
     },
     {
       context: {
@@ -106,7 +107,7 @@ test('Server starts up and returns an event based on context dependency values',
   const response = await customClient.event.create.mutate(
     {
       transactionId: getUUID(),
-      type: 'TENNIS_CLUB_MEMBERSHIP'
+      type: TENNIS_CLUB_MEMBERSHIP
     },
     {
       context: {

@@ -209,7 +209,7 @@ export async function createEvent({
   })
 
   // System users don't use assignment
-  if (user.type !== TokenUserType.SYSTEM) {
+  if (user.type !== TokenUserType.enum.system) {
     const action: ActionDocument = {
       ...createdByDetails,
       type: ActionType.ASSIGN,
@@ -369,7 +369,7 @@ export async function addAction(
   const shouldUnassign =
     isWriteAction(input.type) &&
     !input.keepAssignment &&
-    user.type !== TokenUserType.SYSTEM
+    user.type !== TokenUserType.enum.system
 
   if (shouldUnassign) {
     await db.collection<EventDocument>('events').updateOne(
