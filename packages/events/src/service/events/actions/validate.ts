@@ -20,7 +20,7 @@ import { getUUID, UUID } from '@opencrvs/commons'
 import { getEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 
 export async function validate(
   input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
@@ -30,7 +30,7 @@ export async function validate(
     token
   }: {
     eventId: UUID
-    user: UserDetails
+    user: TrpcUserContext
     token: string
   }
 ) {
@@ -49,6 +49,7 @@ export async function validate(
   const createdBy = user.id
   const createdByRole = user.role
   const createdAtLocation = user.primaryOfficeId
+  const createdBySignature = user.signature
 
   const futureEventState = getCurrentEventState(
     {
@@ -60,6 +61,7 @@ export async function validate(
           createdAt: new Date().toISOString(),
           createdBy,
           createdByRole,
+          createdBySignature,
           id: getUUID(),
           createdAtLocation,
           status: ActionStatus.Accepted

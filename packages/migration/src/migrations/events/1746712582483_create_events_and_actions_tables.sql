@@ -52,6 +52,7 @@ CREATE TABLE event_actions (
   original_action_id uuid REFERENCES event_actions(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
+  created_by_signature text,
   created_at_location uuid REFERENCES locations(id),
   created_at timestamp with time zone DEFAULT now() NOT NULL,
   UNIQUE (transaction_id, action_type),
@@ -87,6 +88,7 @@ CREATE TABLE event_action_drafts (
   annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
+  created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );

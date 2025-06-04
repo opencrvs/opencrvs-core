@@ -11,7 +11,7 @@
 
 import { DraftInput, UUID } from '@opencrvs/commons'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 
 export const createDraft = async (
   input: DraftInput,
@@ -21,7 +21,7 @@ export const createDraft = async (
     transactionId
   }: {
     eventId: UUID
-    user: UserDetails
+    user: TrpcUserContext
     transactionId: string
   }
 ) => {
@@ -33,7 +33,9 @@ export const createDraft = async (
     annotation: input.annotation,
     createdBy: user.id,
     createdByRole: user.role,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: user.primaryOfficeId,
+    // @TODO: Why can this be null | undefined, does either have a different meaning?
+    createdBySignature: user.signature ?? undefined
   })
 }
 

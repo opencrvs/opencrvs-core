@@ -26,6 +26,7 @@ export async function createDraft({
   annotation,
   createdBy,
   createdByRole,
+  createdBySignature,
   createdAtLocation
 }: {
   eventId: UUID
@@ -35,6 +36,7 @@ export async function createDraft({
   annotation: SerializableValue
   createdBy: string
   createdByRole: string
+  createdBySignature?: string
   createdAtLocation?: UUID
 }) {
   // @TODO: Some typing error here
@@ -52,6 +54,7 @@ export async function createDraft({
         annotation,
         created_by,
         created_by_role,
+        created_by_signature,
         created_at_location
       )
     VALUES
@@ -63,6 +66,7 @@ export async function createDraft({
         ${sql.jsonb(annotation)},
         ${createdBy},
         ${createdByRole},
+        ${createdBySignature ?? null},
         ${createdAtLocationx ?? null}::uuid
       )
     ON CONFLICT (transaction_id) DO UPDATE

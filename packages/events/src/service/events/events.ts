@@ -37,7 +37,7 @@ import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 
 function getValidFileValue(
   fieldKey: string,
@@ -117,7 +117,7 @@ export async function createEvent({
   config
 }: {
   eventInput: z.infer<typeof EventInput>
-  user: UserDetails
+  user: TrpcUserContext
   transactionId: string
   config: EventConfig
 }): Promise<EventDocument> {
@@ -127,6 +127,8 @@ export async function createEvent({
     trackingId: generateTrackingId(),
     createdBy: user.id,
     createdByRole: user.role,
+    // @TODO: Why can this be null | undefined, does either have a different meaning?
+    createdBySignature: user.signature ?? undefined,
     createdAtLocation: user.primaryOfficeId
   })
 
@@ -186,7 +188,7 @@ export async function addAction(
     status
   }: {
     eventId: UUID
-    user: UserDetails
+    user: TrpcUserContext
     token: string
     status: ActionStatus
   }
@@ -220,6 +222,8 @@ export async function addAction(
       status,
       createdBy: user.id,
       createdByRole: user.role,
+      // @TODO: Why can this be null | undefined, does either have a different meaning?
+      createdBySignature: user.signature ?? undefined,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId
     })
@@ -264,7 +268,7 @@ export async function addAction(
   const shouldUnassign =
     isWriteAction(input.type) &&
     !input.keepAssignment &&
-    user.type !== TokenUserType.SYSTEM
+    user.type !== TokenUserType.enum.system
 
   if (shouldUnassign) {
     await eventsRepo.createAction({

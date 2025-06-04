@@ -136,6 +136,10 @@ export const EventMetadata = z.object({
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the event.'
   ),
+  createdBySignature: z
+    .string()
+    .nullish()
+    .describe('Signature of the user who created the event.'),
   updatedAtLocation: UUID.nullish().describe(
     'Location of the user who last updated the declaration.'
   ),

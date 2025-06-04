@@ -119,6 +119,7 @@ async function createActionInTransaction(
     status,
     createdBy,
     createdByRole,
+    createdBySignature,
     createdAtLocation,
     declaration,
     annotation,
@@ -132,6 +133,7 @@ async function createActionInTransaction(
     status: ActionStatus
     createdBy: string
     createdByRole: string
+    createdBySignature?: string
     createdAtLocation?: UUID
     declaration?: Record<string, SerializableValue>
     annotation?: Record<string, SerializableValue>
@@ -158,6 +160,7 @@ async function createActionInTransaction(
         annotation,
         created_by,
         created_by_role,
+        created_by_signature,
         created_at_location,
         original_action_id
       )
@@ -173,6 +176,7 @@ async function createActionInTransaction(
         ${sql.jsonb(annotation ?? {})},
         ${createdBy},
         ${createdByRole},
+        ${createdBySignature ?? null},
         ${createdAtLocationx ?? null}::uuid,
         ${originalActionIdx ?? null}::uuid
       )
@@ -199,6 +203,7 @@ export const getOrCreateEvent = async ({
   trackingId,
   createdBy,
   createdByRole,
+  createdBySignature,
   createdAtLocation
 }: {
   type: string
@@ -206,6 +211,7 @@ export const getOrCreateEvent = async ({
   trackingId: string
   createdBy: string
   createdByRole: string
+  createdBySignature?: string
   createdAtLocation?: UUID
 }) => {
   const db = await getClient()
@@ -235,6 +241,7 @@ export const getOrCreateEvent = async ({
         status: ActionStatus.Accepted,
         createdBy,
         createdByRole,
+        createdBySignature,
         createdAtLocation
       },
       trx
@@ -248,6 +255,7 @@ export const getOrCreateEvent = async ({
         status: ActionStatus.Accepted,
         createdBy,
         createdByRole,
+        createdBySignature,
         createdAtLocation,
         assignedTo: createdBy
       },

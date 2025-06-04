@@ -464,7 +464,7 @@ describe('"user" conditionals', () => {
       scope: ['record.register', 'record.registration-correct'],
       exp: '1739881718',
       algorithm: 'RS256',
-      userType: TokenUserType.USER,
+      userType: TokenUserType.enum.user,
       sub: '677b33fea7efb08730f3abfa33'
     },
     $now: formatISO(new Date(), { representation: 'date' })

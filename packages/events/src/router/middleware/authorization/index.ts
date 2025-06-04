@@ -30,8 +30,8 @@ import {
   UUID,
   EventDocument
 } from '@opencrvs/commons'
-import { Context } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
+import { TrpcContext } from '@events/context'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -90,7 +90,7 @@ function inConfigurableScopes(
   return getAuthorizedEntitiesFromScopes(foundScopes)
 }
 
-type CtxWithAuthorizedEntities = Context & {
+type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
 }
 
@@ -106,9 +106,9 @@ export function requiresAnyOfScopes(
   configurableScopes?: ConfigurableScopeType[]
 ) {
   const fn: MiddlewareFunction<
-    Context,
+    TrpcContext,
     OpenApiMeta,
-    Context,
+    TrpcContext,
     CtxWithAuthorizedEntities,
     unknown
   > = async (opts) => {
@@ -121,7 +121,7 @@ export function requiresAnyOfScopes(
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue
-    // and add the authorized entities to the context which are checked in later middleware
+    // and add the authorized entities to the TrpcContext which are checked in later middleware
     if (configurableScopes) {
       const authorizedEntities = inConfigurableScopes(
         authHeader,
@@ -149,13 +149,13 @@ export function requiresAnyOfScopes(
  * The function accepts either an eventId or event type directly in the input.
  * If an eventId is provided, it fetches the event to determine its type.
  *
- * Authorization is checked against authorized entities in the context:
+ * Authorization is checked against authorized entities in the TrpcContext:
  * - If no authorized entities or events are present, access is allowed
  * - Otherwise, verifies the event type is included in authorized events
  *
  * @param input - Object containing either eventId or type
  * @param next - Next middleware function to be called
- * @param ctx - Context object containing authorizedEntities
+ * @param ctx - TrpcContext object containing authorizedEntities
  * @returns Next middleware result
  * @throws {TRPCError} With code 'FORBIDDEN' if event type is not authorized
  */
@@ -187,10 +187,10 @@ export const eventTypeAuthorization: MiddlewareFunction<
 }
 
 export const requireAssignment: MiddlewareFunction<
-  Context,
+  TrpcContext,
   OpenApiMeta,
-  Context,
-  Context & { isDuplicateAction?: boolean; event: EventDocument },
+  TrpcContext,
+  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
   ActionInputWithType | DeleteActionInput
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
@@ -215,8 +215,8 @@ export const requireAssignment: MiddlewareFunction<
     )
   )
 
-  // System users don't require assignment
-  if (user.type === TokenUserType.SYSTEM) {
+  if (ctx.user.type === TokenUserType.Enum.system) {
+    // System users don't require assignment
     if (assignedTo) {
       throw new TRPCError({
         code: 'CONFLICT',
@@ -238,10 +238,10 @@ export const requireAssignment: MiddlewareFunction<
 }
 
 export const requireScopeForWorkqueues: MiddlewareFunction<
-  Context,
+  TrpcContext,
   OpenApiMeta,
-  Context,
-  Context,
+  TrpcContext,
+  TrpcContext,
   WorkqueueCountInput
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
