@@ -219,7 +219,7 @@ export const SearchResultComponent = ({
     setSortOrder(newSortOrder)
   }
 
-  const transformData = (
+  const mapEventsToWorkqueueRows = (
     eventData: (EventIndex & {
       title: string | null
       useFallbackTitle: boolean
@@ -350,7 +350,7 @@ export const SearchResultComponent = ({
 
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
-  const allResults = transformData(sortedResult)
+  const allResults = mapEventsToWorkqueueRows(sortedResult)
 
   const totalPages = queryData.length ? Math.ceil(queryData.length / limit) : 0
 
