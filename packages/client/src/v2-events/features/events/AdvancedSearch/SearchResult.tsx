@@ -42,6 +42,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
+  ActionConfig,
   useAction,
   useActionMenuItems
 } from '../../workqueues/EventOverview/components/useActionMenuItems'
@@ -188,10 +189,13 @@ function ActionComponent({
   actionType: WorkqueueActionsWithDefault
 }) {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+
+  // @ToDo: Investigate hook count mismatch
   const { config: configs } = useAction(event)
+
   const intl = useIntl()
 
-  let config
+  let config: ActionConfig | undefined
   if (actionType === 'DEFAULT') {
     const actionMenuItems = useActionMenuItems(event)
     config = actionMenuItems.find(
@@ -210,8 +214,13 @@ function ActionComponent({
   if (!config) {
     return null
   }
+
   return (
-    <Button type="primary" onClick={async () => config.onClick(slug)}>
+    <Button
+      disabled={Boolean(config.disabled)}
+      type="primary"
+      onClick={async () => config.onClick(slug)}
+    >
       {intl.formatMessage(config.label)}
     </Button>
   )

@@ -101,7 +101,7 @@ function getUserActionsByStatus(
   }
 }
 
-interface ActionConfig {
+export interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
