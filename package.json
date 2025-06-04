@@ -37,8 +37,13 @@
     "debug": "bash debug-service-in-chrome.sh"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@types/dotenv": "^6.1.0",
+    "@typescript-eslint/parser": "^8.33.1",
     "concurrently": "^8.0.0",
+    "eslint": "^9.28.0",
+    "eslint-plugin-import": "^2.31.0",
+    "globals": "^16.2.0",
     "husky": "^9.1.6",
     "lerna": "^8.0.0",
     "lint-staged": "^15.2.10",
@@ -53,8 +58,32 @@
   },
   "resolutions": {
     "@types/react": "18.3.1",
-    "fast-xml-parser": "4.4.1",
-    "@types/node@*": "20.8.7",
-    "@types/hapi__shot@*": "4.1.4"
+    "fast-xml-parser": "4.4.1"
+  },
+  "pnpm": {
+    "overrides": {
+      "enzyme@^3.4.4>cheerio@1.0.0": "1.0.0-rc.12"
+    },
+    "onlyBuiltDependencies": [
+      "@apollo/protobufjs",
+      "@swc/core",
+      "core-js",
+      "core-js-pure",
+      "cpu-features",
+      "dtrace-provider",
+      "ejs",
+      "es5-ext",
+      "esbuild",
+      "iframe-resizer",
+      "mongodb-memory-server",
+      "msgpackr-extract",
+      "msw",
+      "ngrok",
+      "nx",
+      "postinstall-postinstall",
+      "protobufjs",
+      "ssh2",
+      "unrs-resolver"
+    ]
   }
 }
