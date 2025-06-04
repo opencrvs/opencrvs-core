@@ -10,7 +10,8 @@
  */
 import * as React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { noop } from 'lodash'
+import { EventState, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { TabSearch } from './TabSearch'
 
@@ -40,6 +41,7 @@ export const DefaultSearchResult: Story = {
     fieldValues: {
       'applicant.firstname': 'Danny',
       'applicant.dob': '1999-11-11'
-    }
+    },
+    onChange: (updateForm: EventState) => noop(updateForm)
   }
 }
