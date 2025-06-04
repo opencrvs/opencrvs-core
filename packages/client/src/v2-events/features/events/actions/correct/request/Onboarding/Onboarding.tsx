@@ -59,7 +59,7 @@ export function Onboarding() {
     )
   }
 
-  const formPages = actionConfiguration.onboardingForm
+  const formPages = actionConfiguration.correctionForm.pages
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id

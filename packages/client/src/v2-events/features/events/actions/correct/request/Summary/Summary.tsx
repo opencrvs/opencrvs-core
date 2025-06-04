@@ -135,8 +135,7 @@ export function Summary() {
 
   const allFields = [
     ...fields,
-    ...actionConfig.onboardingForm.flatMap((page) => page.fields),
-    ...actionConfig.additionalDetailsForm.flatMap((page) => page.fields)
+    ...actionConfig.correctionForm.pages.flatMap((page) => page.fields)
   ]
 
   const stringifiedForm = stringifyFormData(allFields, form)
@@ -151,15 +150,10 @@ export function Summary() {
 
   const stringiedRequestData = stringifyFormData(allFields, annotationForm)
 
-  const onboardingFormPages =
+  const correctionFormPages =
     eventConfiguration.actions.find(
       (action) => action.type === ActionType.REQUEST_CORRECTION
-    )?.onboardingForm || []
-
-  const additionalDetailsFormPages =
-    eventConfiguration.actions.find(
-      (action) => action.type === ActionType.REQUEST_CORRECTION
-    )?.additionalDetailsForm || []
+    )?.correctionForm.pages || []
 
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.entries(form).reduce<typeof form>(
@@ -241,7 +235,7 @@ export function Summary() {
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
           topActionButtons={[backToReviewButton]}
         >
-          {onboardingFormPages.map((page) => {
+          {correctionFormPages.map((page) => {
             return (
               <Table
                 key={page.id}
@@ -330,40 +324,6 @@ export function Summary() {
                 content={content}
                 hideTableBottomBorder={true}
                 id="diff"
-                isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              ></Table>
-            )
-          })}
-
-          {additionalDetailsFormPages.map((page) => {
-            return (
-              <Table
-                key={page.id}
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    width: 34,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'fieldLabel'
-                  },
-                  {
-                    label: '',
-                    width: 64,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'collectedValue'
-                  }
-                ]}
-                content={page.fields
-                  .filter(shouldBeShownAsAValue)
-                  .map((field) => {
-                    return {
-                      fieldLabel: intl.formatMessage(field.label),
-                      collectedValue: stringiedRequestData[field.id] || ''
-                    }
-                  })}
-                hideTableBottomBorder={true}
-                id="additional-details"
                 isLoading={false}
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               ></Table>
