@@ -14,7 +14,6 @@ import FormVersions, {
   Status
 } from '@config/models/formVersions'
 import * as Hapi from '@hapi/hapi'
-import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 import { badData } from '@hapi/boom'
 import { registrationForms } from './validation'
@@ -47,7 +46,7 @@ export default async function getForm(
     return h.response().code(500)
   }
 
-  const forms: IFormsPayload = await response.json()
+  const forms = (await response.json()) as IFormsPayload
 
   if (process.env.NODE_ENV === 'development') {
     const result = registrationForms.safeParse(forms)
