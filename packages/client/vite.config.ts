@@ -74,7 +74,6 @@ export default defineConfig(({ mode }) => {
      * included in components bundle
      */
     define: {
-      global: {},
       'process.env': {},
       APP_VERSION: JSON.stringify(process.env.npm_package_version)
     },
