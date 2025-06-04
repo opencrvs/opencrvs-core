@@ -453,7 +453,7 @@ function buildQueryFromQuickSearchFields(
   return {
     type: QUICK_SEARCH_KEY,
     clauses
-  }
+  } as QueryType
 }
 
 export function buildQuickSearchQuery(
