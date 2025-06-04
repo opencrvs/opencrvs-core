@@ -148,6 +148,11 @@ export const actionLabels = {
     defaultMessage: 'Delete',
     description: 'Label for delete button in dropdown menu',
     id: 'v2.event.birth.action.delete.label'
+  },
+  [ActionType.REQUEST_CORRECTION]: {
+    defaultMessage: 'Request correction',
+    description: 'Label for request correction button in dropdown menu',
+    id: 'v2.event.birth.action.request-correction.label'
   }
 } as const
 
@@ -237,6 +242,14 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
         })
         navigate(ROUTES.V2.buildPath({}))
       }
+    },
+    [ActionType.REQUEST_CORRECTION]: {
+      label: actionLabels[ActionType.REQUEST_CORRECTION],
+      onClick: (eventId: string) =>
+        navigate(
+          ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+        ),
+      disabled: !eventIsAssignedToSelf
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 
