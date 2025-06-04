@@ -19,7 +19,7 @@ import { Option } from '@client/v2-events/utils'
 
 /* Based on components/Select.tsx */
 
-export interface StyledSelectProps extends Props<Option> {
+interface StyledSelectProps extends Props<Option> {
   id: string
   error?: boolean
   touched?: boolean

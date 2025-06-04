@@ -17,14 +17,14 @@ import {
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 
 export async function assignRecord({
   user,
   token,
   input
 }: {
-  user: UserDetails
+  user: TrpcUserContext
   token: string
   input: AssignActionInput
 }) {

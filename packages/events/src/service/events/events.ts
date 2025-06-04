@@ -37,7 +37,7 @@ import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
 import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as events from '@events/storage/mongodb/events'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 import { deleteDraftsByEventId, getDraftsForAction } from './drafts'
 
 async function getEventByTransactionId(transactionId: string) {
@@ -164,7 +164,7 @@ export async function createEvent({
   config
 }: {
   eventInput: z.infer<typeof EventInput>
-  user: UserDetails
+  user: TrpcUserContext
   transactionId: string
   config: EventConfig
 }): Promise<EventDocument> {
@@ -184,7 +184,8 @@ export async function createEvent({
   const createdByDetails = {
     createdBy: user.id,
     createdByRole: user.role,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: user.primaryOfficeId,
+    createdBySignature: user.signature
   }
 
   await collection.insertOne({
@@ -208,7 +209,7 @@ export async function createEvent({
   })
 
   // System users don't use assignment
-  if (user.type !== TokenUserType.SYSTEM) {
+  if (user.type !== TokenUserType.enum.system) {
     const action: ActionDocument = {
       ...createdByDetails,
       type: ActionType.ASSIGN,
@@ -285,7 +286,7 @@ export async function addAction(
     status
   }: {
     eventId: string
-    user: UserDetails
+    user: TrpcUserContext
     token: string
     status: ActionStatus
   },
@@ -315,7 +316,8 @@ export async function addAction(
   const createdByDetails = {
     createdBy: user.id,
     createdByRole: user.role,
-    createdAtLocation: user.primaryOfficeId
+    createdAtLocation: user.primaryOfficeId,
+    createdBySignature: user.signature
   }
 
   if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
@@ -367,7 +369,7 @@ export async function addAction(
   const shouldUnassign =
     isWriteAction(input.type) &&
     !input.keepAssignment &&
-    user.type !== TokenUserType.SYSTEM
+    user.type !== TokenUserType.enum.system
 
   if (shouldUnassign) {
     await db.collection<EventDocument>('events').updateOne(
