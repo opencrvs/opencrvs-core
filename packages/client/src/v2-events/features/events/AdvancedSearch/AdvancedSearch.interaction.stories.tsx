@@ -13,6 +13,7 @@ import { Meta, StoryObj } from '@storybook/react'
 import { userEvent, within, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
@@ -139,7 +140,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}?applicant.firstname=Nina&applicant.surname=Roy&event.legalStatus.REGISTERED.createdAt=2024-06-01&event.legalStatus.REGISTERED.createdAt=2025-06-30&event.legalStatus.REGISTERED.createdAtLocation=028d2c85-ca31-426d-b5d1-2cef545a4902&event.status=ALL&event.updatedAt=2025-05-03%2C2025-06-03&eventType=TENNIS_CLUB_MEMBERSHIP&recommender.firstname=Annina`
+      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}?applicant.firstname=Nina&applicant.surname=Roy&event.legalStatus.REGISTERED.createdAt=2024-06-01&event.legalStatus.REGISTERED.createdAt=2025-06-30&event.legalStatus.REGISTERED.createdAtLocation=028d2c85-ca31-426d-b5d1-2cef545a4902&event.status=ALL&event.updatedAt=2025-05-03%2C2025-06-03&eventType=${TENNIS_CLUB_MEMBERSHIP}&recommender.firstname=Annina`
     },
     chromatic: { disableSnapshot: true },
     msw: {
