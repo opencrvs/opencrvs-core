@@ -261,6 +261,7 @@ export interface GQLUser {
   mobile?: string
   role: GQLUserRole
   email?: string
+  fullHonorificName?: string
   status: GQLStatus
   underInvestigation?: boolean
   primaryOffice: GQLLocation
