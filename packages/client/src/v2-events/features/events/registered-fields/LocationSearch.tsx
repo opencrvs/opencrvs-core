@@ -53,6 +53,7 @@ function LocationSearchInput({
   onChange: (val: string | undefined) => void
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string
+  onBlur?: (e: React.FocusEvent<HTMLElement>) => void
 }) {
   const locationList = useAdministrativeAreas(searchableResource)
   const selectedLocation = locationList.find(
