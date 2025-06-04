@@ -18,6 +18,7 @@ import {
   getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createTestClient,
   sanitizeForSnapshot,
@@ -170,7 +171,10 @@ test('Action data accepts partial changes', async () => {
 
   const updatedEvent = await client.event.get(originalEvent.id)
 
-  const eventStateBeforeVillageRemoval = getCurrentEventState(updatedEvent)
+  const eventStateBeforeVillageRemoval = getCurrentEventState(
+    updatedEvent,
+    tennisClubMembershipEvent
+  )
   expect(eventStateBeforeVillageRemoval.declaration).toEqual(initialForm)
 
   await client.event.actions.assignment.assign({
@@ -193,7 +197,8 @@ test('Action data accepts partial changes', async () => {
   await client.event.actions.declare.request(declarationWithVillageNull)
   const eventAfterVillageRemoval = await client.event.get(originalEvent.id)
   const stateAfterVillageRemoval = getCurrentEventState(
-    eventAfterVillageRemoval
+    eventAfterVillageRemoval,
+    tennisClubMembershipEvent
   )
 
   expect(stateAfterVillageRemoval.declaration).toEqual({
@@ -320,7 +325,7 @@ test('partial declaration update accounts for conditional field values not in pa
 
   const event = await client.event.get(originalEvent.id)
 
-  const eventState = getCurrentEventState(event)
+  const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
 
   expect(eventState.declaration).toMatchSnapshot()
 })

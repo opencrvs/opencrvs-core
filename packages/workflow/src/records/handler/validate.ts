@@ -20,6 +20,7 @@ import { getRecordSpecificToken } from '@workflow/records/token-exchange'
 import { getComposition } from '@opencrvs/commons/types'
 import { notifyForAction } from '@workflow/utils/country-config-api'
 import { getEventType } from '@workflow/features/registration/utils'
+import { getRecordById } from '@workflow/records'
 
 export const validateRoute = createRoute({
   method: 'POST',
@@ -38,11 +39,12 @@ export const validateRoute = createRoute({
       request.payload
     )
 
-    const validatedRecord = await toValidated(
-      record,
-      token,
-      payload.comments,
-      payload.timeLoggedMS
+    await toValidated(record, token, payload.comments, payload.timeLoggedMS)
+    const validatedRecord = await getRecordById(
+      request.params.recordId,
+      request.headers.authorization,
+      ['VALIDATED'],
+      true
     )
 
     await indexBundle(validatedRecord, token)

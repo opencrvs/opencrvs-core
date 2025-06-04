@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+export * from './Constants'
 export * from './ActionConfig'
 export * from './offline'
 export * from './EventConfig'
@@ -17,6 +18,8 @@ export * from './FieldConfig'
 export * from './PageConfig'
 export * from './SummaryConfig'
 export * from './WorkqueueConfig'
+export * from './WorkqueueColumnConfig'
+export * from './workqueueDefaultColumns'
 export * from './Draft'
 export * from './EventMetadata'
 export * from './EventInput'
@@ -42,6 +45,7 @@ export * from './AdvancedSearchConfig'
 export * from './test.utils'
 export * from './TemplateConfig'
 export * from './scopes'
+export * from './serializer'
 // In order to infer types, we need to export the following types along with events
 export * from '../conditionals/conditionals'
 export * from '../conditionals/validate'

@@ -9,16 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { allWorkqueue } from './all'
-import { inReviewWorkqueue } from './readyForReview'
-import { registeredWorkqueue } from './readyToPrint'
-/** @knipignore */
-export { RootWorkqueueConfig, WorkQueueColumnConfig } from './WorkqueueConfig'
-/** @knipignore */
-export { defaultColumns } from './defaultColumns'
-
-export const workqueues = {
-  all: allWorkqueue,
-  registered: registeredWorkqueue,
-  'in-review': inReviewWorkqueue
-}
+export const TENNIS_CLUB_MEMBERSHIP = 'tennis-club-membership'

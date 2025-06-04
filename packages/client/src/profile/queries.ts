@@ -27,6 +27,7 @@ const FETCH_USER = gql`
       practitionerId
       mobile
       email
+      fullHonorificName
       role {
         label {
           id

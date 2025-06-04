@@ -22,6 +22,7 @@ import {
   EventDocument,
   getUUID,
   IndexMap,
+  TENNIS_CLUB_MEMBERSHIP,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -96,11 +97,13 @@ export const mockActions: Record<
   },
   [ActionType.ARCHIVE]: {
     ...actionProps,
-    type: ActionType.ARCHIVE
+    type: ActionType.ARCHIVE,
+    reason: { message: 'Archived' }
   },
   [ActionType.REJECT]: {
     ...actionProps,
-    type: ActionType.REJECT
+    type: ActionType.REJECT,
+    reason: { message: 'Rejected' }
   },
   [ActionType.ASSIGN]: {
     ...actionProps,
@@ -131,7 +134,7 @@ function getMockEvent(
         ? generator.user.id.fieldAgent
         : generator.user.id.registrationAgent
   return {
-    type: 'tennis-club-membership',
+    type: TENNIS_CLUB_MEMBERSHIP,
     id: 'b4c52c54-f6eb-45ee-be70-142838f8c8d4',
     createdAt: '2025-04-18T08:34:20.711Z',
     updatedAt: '2025-04-18T10:40:59.442Z',

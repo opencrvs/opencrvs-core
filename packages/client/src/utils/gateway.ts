@@ -2201,6 +2201,7 @@ export type User = {
   identifier?: Maybe<Identifier>
   localRegistrar?: Maybe<LocalRegistrar>
   mobile?: Maybe<Scalars['String']>
+  fullHonorificName?: Maybe<Scalars['String']>
   name: Array<HumanName>
   practitionerId: Scalars['String']
   primaryOffice: Location
@@ -2254,6 +2255,7 @@ export type UserInput = {
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile?: InputMaybe<Scalars['String']>
+  fullHonorificName?: InputMaybe<Scalars['String']>
   name: Array<HumanNameInput>
   password?: InputMaybe<Scalars['String']>
   primaryOffice?: InputMaybe<Scalars['String']>
@@ -2685,6 +2687,7 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile?: string | null
     email?: string | null
+    fullHonorificName?: string | null
     status: Status
     role: {
       __typename?: 'UserRole'
@@ -2974,6 +2977,7 @@ export type SearchUsersQuery = {
       id: string
       mobile?: string | null
       email?: string | null
+      fullHonorificName?: string | null
       status: Status
       underInvestigation?: boolean | null
       name: Array<{
@@ -3050,6 +3054,7 @@ export type GetUserQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
+    fullHonorificName?: string | null
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
