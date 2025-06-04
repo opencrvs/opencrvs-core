@@ -390,13 +390,12 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <SignatureField
             {...field.config}
+            defaultValue={undefined}
             maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
             value={field.value}
-            onChange={(val: string) =>
-              onFieldValueChange(fieldDefinition.id, val)
-            }
+            onChange={(val) => handleFileChange(val)}
           />
         </InputField>
       )

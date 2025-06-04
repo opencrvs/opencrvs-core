@@ -74,7 +74,6 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
@@ -118,6 +117,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         type: 'object',
         properties: addressProperties
       }
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         type: 'object',

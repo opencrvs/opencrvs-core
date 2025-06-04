@@ -50,6 +50,7 @@ export const useEventFormData = create<EventFormData>()((set, get) => ({
     get().formValues || initialValues || {},
   setFormValues: (form: EventState) => {
     const formValues = removeUndefinedKeys(form)
+    console.log({ formValues })
     return set(() => ({ formValues }))
   },
   setAllTouchedFields: (fields) => set(() => ({ touchedFields: fields })),

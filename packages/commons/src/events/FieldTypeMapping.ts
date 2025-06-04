@@ -100,7 +100,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.SIGNATURE:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -109,6 +108,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.CHECKBOX:
       schema = CheckboxFieldValue
       break
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       schema = FileFieldValue
       break
@@ -153,7 +153,6 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
     case FieldType.SELECT:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -182,6 +181,7 @@ export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
       return ['2021-01-01', '2021-01-02']
     case FieldType.CHECKBOX:
       return true
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
@@ -209,7 +209,6 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.SELECT:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
@@ -234,6 +233,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
         number: null,
         zipCode: null
       }
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         filename: '',
@@ -296,8 +296,8 @@ export const isTextAreaFieldType = (field: {
 
 export const isSignatureFieldType = (field: {
   config: FieldConfig
-  value: FieldValue
-}): field is { value: string; config: SignatureField } => {
+  value: FileFieldValue | undefined
+}): field is { value: FileFieldValue | undefined; config: SignatureField } => {
   return field.config.type === FieldType.SIGNATURE
 }
 

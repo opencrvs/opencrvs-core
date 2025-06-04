@@ -127,6 +127,7 @@ export function Review() {
     }
   }
 
+  console.log('Rendered DECLARE/REVIEW')
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}

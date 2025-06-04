@@ -39,6 +39,10 @@ export function extractFilenameFromUrl(url: string) {
   throw new Error('Could not extract filename from URL: ' + url)
 }
 
+/**
+ * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
+ * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
+ */
 export function getUnsignedFileUrl(filename: string) {
   const minioURL = window.config.MINIO_URL
   if (minioURL && typeof minioURL === 'string') {

@@ -17,11 +17,15 @@ import { ImageUploader, InputError } from '@opencrvs/components'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
-import { MimeType } from '@opencrvs/commons/client'
+import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
 import { validationMessages } from '@client/i18n/messages'
-import { dataUrlToFile, getBase64String } from '@client/utils/imageUtils'
+import { dataUrlToFile } from '@client/utils/imageUtils'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import {
+  cacheFile,
+  getUnsignedFileUrl
+} from '@client/utils/persistence/fileCache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -37,8 +41,11 @@ export type SignatureFieldProps = Omit<
   'onChange' | 'value' | 'type'
 > & {
   name: string
-  value?: string
-  onChange: (fileSrc: string) => void
+  /**
+   * Value is a file name, which is stored in the cache.
+   */
+  value?: FileFieldValue
+  onChange: (value: FileFieldValue | undefined) => void
   required?: boolean
   maxFileSize: number
   acceptedFileTypes?: MimeType[]
@@ -63,27 +70,33 @@ export function SignatureField({
    * When page is refreshed, value is read in from props. At this point, we know that cache has been updated with the file URL if we uploaded anything.
    * @see onComplete
    */
-  const [dataUrl, setDataUrl] = useState<string | undefined>(value)
+  const [signature, setSignature] = useState<FileFieldValue | undefined>(value)
 
   const requiredError =
     props.required &&
     !Boolean(value) &&
     intl.formatMessage(validationMessages.required)
 
-  const { uploadFile, getFullUrl } = useFileUpload(name, {
-    onSuccess: ({ filename }) => {
-      onChange(getFullUrl(filename))
+  const { uploadFile } = useFileUpload(name, {
+    onSuccess: ({ filename, originalFilename, type }) => {
+      setSignature({
+        filename,
+        originalFilename,
+        type
+      })
+
+      onChange({
+        filename,
+        originalFilename,
+        type
+      })
     }
   })
 
-  const onComplete = async (newFile: File | null) => {
+  const onComplete = (newFile: File | null) => {
     if (!newFile) {
       return
     }
-
-    const newFileSrc = (await getBase64String(newFile)).toString()
-    // To keep the file visible in read mode, we convert it to base64 and use the local state reference.
-    setDataUrl(newFileSrc)
 
     uploadFile(newFile)
   }
@@ -115,14 +128,19 @@ export function SignatureField({
           </Stack>
         </>
       )}
-      {value && <SignaturePreview alt={modalTitle} src={dataUrl} />}
+      {signature && (
+        <SignaturePreview
+          alt={modalTitle}
+          src={getUnsignedFileUrl(signature.filename)}
+        />
+      )}
       {value && !props.disabled && (
         <Button
           size="medium"
           type="tertiary"
           onClick={() => {
-            onChange('') // @TODO
-            setDataUrl(undefined)
+            onChange(undefined) // @TODO
+            setSignature(undefined)
           }}
         >
           {intl.formatMessage(messages.signatureDelete)}
@@ -137,13 +155,25 @@ export function SignatureField({
           id={name}
           title={modalTitle}
           onClose={() => setIsModalOpen(false)}
-          onSubmit={async (signature: string) => {
+          onSubmit={async (signatureBase64: string) => {
             const signatureFile = await dataUrlToFile(
-              signature,
+              signatureBase64,
               `signature-${name}-${Date.now()}.png`
             )
 
-            setDataUrl(dataUrl)
+            // When we are in offline mode, the actual upload might not happen immediately.
+            // Cache the "temporary" file to allow using same functionality for all files.
+            await cacheFile({
+              filename: signatureFile.name,
+              file: signatureFile
+            })
+
+            setSignature({
+              filename: signatureFile.name,
+              originalFilename: signatureFile.name,
+              type: signatureFile.type
+            })
+
             handleFileChange(signatureFile)
 
             setIsModalOpen(false)

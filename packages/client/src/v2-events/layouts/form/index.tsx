@@ -34,11 +34,16 @@ export function FormLayout({
   appbarIcon?: React.ReactNode
 }) {
   const { eventId } = useTypedParams(route)
+  console.log('eventId', eventId)
   const events = useEvents()
+  console.log('useEvents')
   const event = events.getEventState.useSuspenseQuery(eventId)
+  console.log('getEventState,', event)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+
+  console.log('eventConfiguration', configuration)
 
   return (
     <Frame
