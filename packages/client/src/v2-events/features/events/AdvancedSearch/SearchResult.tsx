@@ -14,6 +14,7 @@ import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { orderBy } from 'lodash'
 import styled from 'styled-components'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventIndex,
   EventConfig,
@@ -186,6 +187,7 @@ function ActionComponent({
   event: EventIndex
   actionType: WorkqueueActionsWithDefault
 }) {
+  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const { config: configs } = useAction(event)
   const intl = useIntl()
 
@@ -209,7 +211,7 @@ function ActionComponent({
     return null
   }
   return (
-    <Button type="primary" onClick={config.onClick}>
+    <Button type="primary" onClick={async () => config.onClick(slug)}>
       {intl.formatMessage(config.label)}
     </Button>
   )

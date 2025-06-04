@@ -183,12 +183,12 @@ export function useAction(event: EventIndex) {
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
-        onClick: () =>
+        onClick: (workqueue?: string) =>
           navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
       },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
-        onClick: async () => {
+        onClick: async (workqueue?: string) => {
           await events.actions.assignment.assign.mutate({
             eventId: event.id,
             assignedTo: authentication.sub,
@@ -198,7 +198,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
-        onClick: async () => {
+        onClick: async (workqueue?: string) => {
           await events.actions.assignment.unassign.mutateAsync({
             eventId: event.id,
             transactionId: getUUID(),
@@ -208,43 +208,57 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
-        onClick: () =>
+        onClick: (workqueue?: string) =>
           navigate(
-            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId: event.id })
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
           ),
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
-        onClick: () =>
+        onClick: (workqueue?: string) =>
           navigate(
-            ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId: event.id })
+            ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
           ),
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
-        onClick: () =>
+        onClick: (workqueue?: string) =>
           navigate(
-            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId: event.id })
+            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
           ),
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        onClick: () =>
+        onClick: (workqueue?: string) =>
           navigate(
-            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId: event.id })
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
           ),
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
-        onClick: () => {
+        onClick: (workqueue?: string) => {
           deleteEvent({
             eventId: event.id
           })
-          navigate(ROUTES.V2.buildPath({}))
+          if (!workqueue) {
+            navigate(ROUTES.V2.buildPath({}))
+          }
         }
       }
     } satisfies Record<WorkqueueActionType, ActionConfig>,
