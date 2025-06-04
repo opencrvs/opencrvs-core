@@ -10,6 +10,7 @@
  */
 import * as React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
+import { noop } from 'lodash'
 import { EventState, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { TabSearch } from './TabSearch'
@@ -41,7 +42,6 @@ export const DefaultSearchResult: Story = {
       'applicant.firstname': 'Danny',
       'applicant.dob': '1999-11-11'
     },
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
-    onChange: (updateForm: EventState) => {}
+    onChange: (updateForm: EventState) => noop(updateForm)
   }
 }
