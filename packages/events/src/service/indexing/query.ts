@@ -9,7 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { estypes } from '@elastic/elasticsearch'
-import { QueryExpression, QueryType } from '@opencrvs/commons/events'
+import {
+  EventConfig,
+  FieldType,
+  getAllUniqueFields,
+  Inferred,
+  QueryExpression,
+  QueryType
+} from '@opencrvs/commons/events'
 import { encodeFieldId } from './utils'
 
 /**
@@ -22,8 +29,20 @@ function generateQuery(
     | { type: 'exact' | 'fuzzy'; term: string }
     | { type: 'anyOf'; terms: string[] }
     | { type: 'range'; gte: string; lte: string }
-  >
+  >,
+  eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
+  const allFieldsOfConfig = eventConfigs.reduce<Inferred[]>(
+    (acc, eventConfig) => {
+      const fields = getAllUniqueFields(eventConfig)
+      return acc.concat(fields)
+    },
+    []
+  )
+  const nameFieldIds = allFieldsOfConfig
+    .filter((field) => field.type === FieldType.NAME)
+    .map((f) => f.id)
+
   const must = Object.entries(event).map(([key, value]) => {
     const field = `declaration.${encodeFieldId(key)}`
 
@@ -36,10 +55,27 @@ function generateQuery(
     }
 
     if (value.type === 'fuzzy') {
+      /**
+       * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
+       * return a match query on the `${field}.__fullname` subfield. This allows Elasticsearch to perform
+       * a fuzzy search on the full name, improving matching for name-related fields (e.g., handling typos or variations).
+       */
+      if (nameFieldIds.includes(key)) {
+        return {
+          match: {
+            [`${field}.__fullname`]: {
+              query: value.term,
+              fuzziness: 'AUTO'
+            }
+          }
+        }
+      }
+
       return {
-        fuzzy: {
+        match: {
           [field]: {
-            value: value.term
+            query: value.term,
+            fuzziness: 'AUTO'
           }
         }
       }
@@ -71,7 +107,7 @@ function generateQuery(
   return { bool: { must } } as estypes.QueryDslQueryContainer
 }
 
-function buildClause(clause: QueryExpression) {
+function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
   if (clause.eventType) {
@@ -142,6 +178,15 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
+  if (clause.registrationNumber) {
+    must.push({
+      term: {
+        'legalStatuses.REGISTERED.registrationNumber':
+          clause.registrationNumber.term
+      }
+    })
+  }
+
   if (clause.createdAt) {
     if (clause.createdAt.type === 'exact') {
       must.push({ term: { createdAt: clause.createdAt.term } })
@@ -201,7 +246,7 @@ function buildClause(clause: QueryExpression) {
   }
 
   if (clause.data) {
-    const dataQuery = generateQuery(clause.data)
+    const dataQuery = generateQuery(clause.data, eventConfigs)
     const innerMust = dataQuery.bool?.must
 
     if (Array.isArray(innerMust)) {
@@ -215,9 +260,12 @@ function buildClause(clause: QueryExpression) {
 }
 
 export function buildElasticQueryFromSearchPayload(
-  input: QueryType
+  input: QueryType,
+  eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
-  const must = input.clauses.flatMap((clause) => buildClause(clause))
+  const must = input.clauses.flatMap((clause) =>
+    buildClause(clause, eventConfigs)
+  )
   switch (input.type) {
     case 'and': {
       return {
@@ -232,14 +280,15 @@ export function buildElasticQueryFromSearchPayload(
     case 'or': {
       const should = input.clauses.flatMap((clause) => ({
         bool: {
-          must: buildClause(clause)
+          must: buildClause(clause, eventConfigs),
+          should: undefined
         }
       }))
       return {
         bool: {
           should
         }
-      } as estypes.QueryDslQueryContainer
+      }
     }
     // default fallback (shouldn't happen if input is validated correctly)
     default:

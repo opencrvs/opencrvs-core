@@ -17,7 +17,8 @@ import {
   isObject,
   get,
   has,
-  isNil
+  isNil,
+  uniqBy
 } from 'lodash'
 import {
   ActionType,
@@ -26,7 +27,7 @@ import {
   writeActions
 } from './ActionType'
 import { EventConfig } from './EventConfig'
-import { FieldConfig } from './FieldConfig'
+import { FieldConfig, Inferred } from './FieldConfig'
 import {
   Action,
   ActionStatus,
@@ -83,6 +84,21 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
   return flattenDeep(config.actions.map(getActionAnnotationFields))
+}
+
+export function getAllUniqueFields(eventConfig: EventConfig) {
+  return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
+}
+
+export function getDeclarationFieldById(
+  config: EventConfig,
+  fieldId: string
+): Inferred {
+  const field = getAllUniqueFields(config).find((f) => f.id === fieldId)
+  if (!field) {
+    throw new Error(`Field with id ${fieldId} not found in event config`)
+  }
+  return field
 }
 
 /**

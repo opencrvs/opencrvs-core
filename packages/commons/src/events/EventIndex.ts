@@ -142,6 +142,7 @@ export const QueryExpression = z
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
+    registrationNumber: z.optional(Exact),
     flags: z.optional(z.array(z.union([AnyOf, Not]))),
     data: QueryInput
   })
@@ -172,32 +173,35 @@ export const QueryType = z
 
         // This preprocessing ensures consistent handling of `clauses` regardless of how the client submits the data.
       },
-      z.array(QueryExpression).openapi({
-        default: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            status: {
-              type: 'anyOf',
-              terms: [
-                'CREATED',
-                'NOTIFIED',
-                'DECLARED',
-                'VALIDATED',
-                'REGISTERED',
-                'CERTIFIED',
-                'REJECTED',
-                'ARCHIVED'
-              ]
-            },
-            updatedAt: {
-              type: 'range',
-              gte: '2025-05-22',
-              lte: '2025-05-29'
-            },
-            data: {}
-          }
-        ]
-      })
+      z
+        .array(QueryExpression)
+        .nonempty('At least one clause is required.')
+        .openapi({
+          default: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              status: {
+                type: 'anyOf',
+                terms: [
+                  'CREATED',
+                  'NOTIFIED',
+                  'DECLARED',
+                  'VALIDATED',
+                  'REGISTERED',
+                  'CERTIFIED',
+                  'REJECTED',
+                  'ARCHIVED'
+                ]
+              },
+              updatedAt: {
+                type: 'range',
+                gte: '2025-05-22',
+                lte: '2025-05-29'
+              },
+              data: {}
+            }
+          ]
+        })
     )
   })
   .openapi({

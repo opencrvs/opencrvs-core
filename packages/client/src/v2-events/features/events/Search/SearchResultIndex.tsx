@@ -18,9 +18,8 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchResult } from './SearchResult'
 import {
-  ADVANCED_SEARCH_KEY,
   buildDataCondition,
-  toQueryType,
+  toAdvancedSearchQueryType,
   parseFieldSearchParams
 } from './utils'
 
@@ -39,7 +38,7 @@ export const SearchResultIndex = () => {
   )
 
   const queryData = searchEvent.useSuspenseQuery(
-    toQueryType(eventType, formattedSearchParams, ADVANCED_SEARCH_KEY)
+    toAdvancedSearchQueryType(formattedSearchParams, eventType)
   )
 
   return (

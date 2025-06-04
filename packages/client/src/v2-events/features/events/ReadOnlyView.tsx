@@ -34,17 +34,19 @@ function ReadonlyView() {
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const eventStateWithDrafts = useMemo(
-    () =>
-      getCurrentEventStateWithDrafts({ event, drafts, configuration: config }),
-    [drafts, event, config]
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
   )
 
-  const { title, fields } = getActionReview(config, ActionType.READ)
+  const eventStateWithDrafts = useMemo(
+    () => getCurrentEventStateWithDrafts({ event, drafts, configuration }),
+    [drafts, event, configuration]
+  )
+
+  const { title, fields } = getActionReview(configuration, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
-  const formConfig = getDeclaration(config)
+  const formConfig = getDeclaration(configuration)
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>

@@ -36,7 +36,8 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
+import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventTitle } from '../useEvents/useEventTitle'
 
 const WithTestId = styled.div.attrs({
@@ -163,8 +164,8 @@ const messages = defineMessages(searchResultMessages)
 
 interface Props {
   columns: WorkqueueColumn[]
-  eventConfig: EventConfig
-  searchParams: EventState
+  eventConfig?: EventConfig
+  searchParams?: EventState
   queryData: EventIndex[]
 }
 
@@ -183,7 +184,7 @@ export const SearchResultComponent = ({
   tabBarContent
 }: {
   columns: WorkqueueColumn[]
-  eventConfigs: EventConfig[]
+  eventConfigs?: EventConfig[]
   queryData: EventIndex[]
   limit?: number
   offset?: number
@@ -219,6 +220,10 @@ export const SearchResultComponent = ({
     setSortOrder(newSortOrder)
   }
 
+  const getEventConfig = (id: string) =>
+    eventConfigs &&
+    eventConfigs.find((eventConfiguration) => eventConfiguration.id === id)
+
   const transformData = (eventData: EventIndex[]) => {
     return (
       eventData
@@ -235,7 +240,8 @@ export const SearchResultComponent = ({
           )
         )
         .map((event) => {
-          const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+          const eventConfig =
+            eventConfigs && eventConfigs.find(({ id }) => id === event.type)
           if (!eventConfig) {
             throw new Error(
               'Event configuration not found for event:' + event.type
@@ -256,6 +262,11 @@ export const SearchResultComponent = ({
           const isInOutbox = outbox.some(
             (outboxEvent) => outboxEvent.id === doc.id
           )
+          const eventConfig =
+            eventConfigs && eventConfigs.find(({ id }) => id === doc.type)
+          // Event document should always have a type that matches an event configuration
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          const eventConfigOfDocument = eventConfig ?? getEventConfig(doc.type)!
           const isInDrafts = drafts.some((draft) => draft.id === doc.id)
 
           const getEventStatus = () => {
@@ -272,6 +283,7 @@ export const SearchResultComponent = ({
           return {
             ...doc,
             type: intl.formatMessage(doc.label),
+            event: intl.formatMessage(eventConfigOfDocument.label),
             createdAt: formattedDuration(new Date(doc.createdAt)),
             updatedAt: formattedDuration(new Date(doc.updatedAt)),
             status: intl.formatMessage(messages.eventStatus, {
@@ -384,13 +396,16 @@ export const SearchResult = ({
   return (
     <SearchResultComponent
       columns={columns}
-      eventConfigs={[eventConfig]}
+      eventConfigs={eventConfig ? [eventConfig] : []}
       queryData={queryData}
       tabBarContent={
-        <SearchCriteriaPanel
-          eventConfig={eventConfig}
-          searchParams={searchParams}
-        />
+        eventConfig &&
+        searchParams && (
+          <SearchCriteriaPanel
+            eventConfig={eventConfig}
+            searchParams={searchParams}
+          />
+        )
       }
       title={`${intl.formatMessage(messages.searchResult)} ${
         ' (' + total + ')'
