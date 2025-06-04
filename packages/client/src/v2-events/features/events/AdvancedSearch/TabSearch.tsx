@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { useIntl, defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
+import { useEffect, useRef, useState } from 'react'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -175,26 +176,30 @@ function buildSearchSections({
 
 export function TabSearch({
   currentEvent,
-  fieldValues
+  fieldValues,
+  onChange
 }: {
   currentEvent: EventConfig
-  fieldValues?: EventState
+  fieldValues: EventState
+  onChange: (updatedForm: EventState) => void
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
 
-  const [formValues, setFormValues] = React.useState<EventState>(
-    fieldValues ?? {}
-  )
+  const [formValues, setFormValues] = useState<EventState>(fieldValues)
 
-  const prevEventId = React.useRef(currentEvent.id)
+  const prevEventId = useRef(currentEvent.id)
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (prevEventId.current !== currentEvent.id) {
-      setFormValues({})
+      setFormValues(fieldValues)
       prevEventId.current = currentEvent.id
     }
-  }, [currentEvent])
+  }, [currentEvent, fieldValues])
+
+  useEffect(() => {
+    onChange(formValues)
+  }, [formValues, onChange])
 
   const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(currentEvent)
 

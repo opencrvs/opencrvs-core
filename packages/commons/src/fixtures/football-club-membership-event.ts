@@ -14,9 +14,7 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
-import { defineWorkqueues } from '../events'
 import { event } from '../events/event'
-import { TENNIS_CLUB_MEMBERSHIP } from '../events/Constants'
 import {
   PRINT_CERTIFICATE_FORM,
   statusOptions,
@@ -25,17 +23,17 @@ import {
   timePeriodOptions
 } from './forms'
 
-export const tennisClubMembershipEvent = defineConfig({
-  id: TENNIS_CLUB_MEMBERSHIP,
+export const footballClubMembershipEvent = defineConfig({
+  id: 'FOOTBALL_CLUB_MEMBERSHIP',
   label: {
-    defaultMessage: 'Tennis club membership application',
+    defaultMessage: 'Football club membership application',
     description: 'This is what this event is referred as in the system',
-    id: 'v2.event.tennis-club-membership.label'
+    id: 'event.football-club-membership.label'
   },
   title: {
     defaultMessage: '{applicant.firstname} {applicant.surname}',
     description: 'This is the title of the summary',
-    id: 'v2.event.tennis-club-membership.title'
+    id: 'v2.event.football-club-membership.title'
   },
   summary: {
     fields: [
@@ -44,17 +42,17 @@ export const tennisClubMembershipEvent = defineConfig({
         label: {
           defaultMessage: "Applicant's first name",
           description: 'This is the label for the field',
-          id: 'event.tennis-club-membership.summary.field.firstname.label'
+          id: 'event.football-club-membership.summary.field.firstname.label'
         },
         value: {
           defaultMessage: '{applicant.firstname}',
           description: 'This is the value to show in the summary',
-          id: 'event.tennis-club-membership.summary.field.firstname'
+          id: 'event.football-club-membership.summary.field.firstname'
         },
         emptyValueMessage: {
           defaultMessage: 'First name is not provided',
           description: 'This is the message to show when the field is empty',
-          id: 'event.tennis-club-membership.summary.field.firstname.empty'
+          id: 'event.football-club-membership.summary.field.firstname.empty'
         }
       },
       {
@@ -62,7 +60,7 @@ export const tennisClubMembershipEvent = defineConfig({
         label: {
           defaultMessage: "Applicant's last name",
           description: 'Label for surname',
-          id: 'v2.event.tennis-club-membership.summary.field.surname.label'
+          id: 'v2.event.football-club-membership.summary.field.surname.label'
         }
       },
       {
@@ -74,7 +72,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.READ,
       label: {
-        id: 'v2.event.tennis-club-membership.action.read.label',
+        id: 'v2.event.football-club-membership.action.read.label',
         defaultMessage: 'Read',
         description: 'Title of the read only page'
       },
@@ -86,7 +84,7 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Send an application',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.declare.label'
+        id: 'event.football-club-membership.action.declare.label'
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
@@ -96,7 +94,7 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Validate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.validate.label'
+        id: 'event.football-club-membership.action.validate.label'
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
@@ -106,7 +104,7 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Register',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.register.label'
+        id: 'event.football-club-membership.action.register.label'
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
@@ -116,14 +114,14 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Request correction',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.correction.request.label'
+        id: 'event.football-club-membership.action.correction.request.label'
       },
       onboardingForm: [
         {
           id: 'correction-requester',
           type: PageTypes.enum.FORM,
           title: {
-            id: 'event.tennis-club-membership.action.requestCorrection.form.section.corrector',
+            id: 'event.football-club-membership.action.requestCorrection.form.section.corrector',
             defaultMessage: 'Correction requester',
             description: 'This is the title of the section'
           },
@@ -192,7 +190,7 @@ export const tennisClubMembershipEvent = defineConfig({
           id: 'identity-check',
           type: PageTypes.enum.FORM,
           title: {
-            id: 'event.tennis-club-membership.action.requestCorrection.form.section.verify',
+            id: 'event.football-club-membership.action.requestCorrection.form.section.verify',
             defaultMessage: 'Verify their identity',
             description: 'This is the title of the section'
           },
@@ -237,7 +235,7 @@ export const tennisClubMembershipEvent = defineConfig({
           id: 'correction-request.supporting-documents',
           type: PageTypes.enum.FORM,
           title: {
-            id: 'event.tennis-club-membership.action.requestCorrection.form.section.verify',
+            id: 'event.football-club-membership.action.requestCorrection.form.section.verify',
             defaultMessage: 'Upload supporting documents',
             description: 'This is the title of the section'
           },
@@ -301,7 +299,7 @@ export const tennisClubMembershipEvent = defineConfig({
           id: 'correction-request.additional-details',
           type: PageTypes.enum.FORM,
           title: {
-            id: 'event.tennis-club-membership.action.requestCorrection.form.section.corrector',
+            id: 'event.football-club-membership.action.requestCorrection.form.section.corrector',
             defaultMessage: 'Reason for correction',
             description: 'This is the title of the section'
           },
@@ -325,13 +323,13 @@ export const tennisClubMembershipEvent = defineConfig({
         defaultMessage: 'Approve correction',
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
-        id: 'event.tennis-club-membership.action.correction.approve.label'
+        id: 'event.football-club-membership.action.correction.approve.label'
       }
     },
     {
       type: ActionType.PRINT_CERTIFICATE,
       label: {
-        id: 'v2.event.tennis-club-membership.action.collect-certificate.label',
+        id: 'v2.event.football-club-membership.action.collect-certificate.label',
         defaultMessage: 'Print certificate',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -380,7 +378,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.ARCHIVE,
       label: {
-        id: 'v2.event.tennis-club-membership.action.archive.label',
+        id: 'v2.event.football-club-membership.action.archive.label',
         defaultMessage: 'Archive',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -389,7 +387,7 @@ export const tennisClubMembershipEvent = defineConfig({
     {
       type: ActionType.REJECT,
       label: {
-        id: 'v2.event.tennis-club-membership.action.reject.label',
+        id: 'v2.event.football-club-membership.action.reject.label',
         defaultMessage: 'Reject',
         description:
           'This is shown as the action name anywhere the user can trigger the action from'
@@ -414,7 +412,7 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Applicant's details",
         description: 'Applicant details search field section title',
-        id: 'v2.event.tennis-club-membership.search.applicants'
+        id: 'v2.event.football-club-membership.search.applicants'
       },
       fields: [
         field('applicant.firstname').fuzzy(),
@@ -427,7 +425,7 @@ export const tennisClubMembershipEvent = defineConfig({
       title: {
         defaultMessage: "Recommender's details",
         description: 'Recommender details search field section title',
-        id: 'v2.event.tennis-club-membership.search.recommender'
+        id: 'v2.event.football-club-membership.search.recommender'
       },
       fields: [
         field('recommender.firstname').fuzzy(),
@@ -437,21 +435,3 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
-
-export const WorkqueueFixture = defineWorkqueues([
-  {
-    columns: [],
-    slug: 'in-progress',
-    name: {
-      id: 'workqueues.inProgress.title',
-      defaultMessage: 'In progress',
-      description: 'Title of in progress workqueue'
-    },
-    query: {
-      type: 'and',
-      clauses: [{ eventType: tennisClubMembershipEvent.id }]
-    },
-    actions: [],
-    icon: 'Draft'
-  }
-])

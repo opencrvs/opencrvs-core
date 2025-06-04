@@ -13,7 +13,8 @@ import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
-  generateEventDraftDocument
+  generateEventDraftDocument,
+  footballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -116,7 +117,7 @@ export const createDeclarationTrpcMsw = (
       {
         name: 'event.config.get',
         procedure: trpcMsw.event.config.get.query,
-        handler: () => [tennisClubMembershipEvent]
+        handler: () => [tennisClubMembershipEvent, footballClubMembershipEvent]
       },
       {
         name: 'event.get',
