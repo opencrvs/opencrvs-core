@@ -592,6 +592,7 @@ export interface GQLUserInput {
   status?: GQLStatus
   role?: string
   email?: string
+  fullHonorificName?: string
   primaryOffice?: string
   device?: string
   signature?: GQLSignatureInput
@@ -4291,6 +4292,7 @@ export interface GQLUserTypeResolver<TParent = any> {
   mobile?: UserToMobileResolver<TParent>
   role?: UserToRoleResolver<TParent>
   email?: UserToEmailResolver<TParent>
+  fullHonorificName?: UserToFullHonorificNameResolver<TParent>
   status?: UserToStatusResolver<TParent>
   underInvestigation?: UserToUnderInvestigationResolver<TParent>
   primaryOffice?: UserToPrimaryOfficeResolver<TParent>
@@ -4367,6 +4369,15 @@ export interface UserToRoleResolver<TParent = any, TResult = any> {
 }
 
 export interface UserToEmailResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface UserToFullHonorificNameResolver<TParent = any, TResult = any> {
   (
     parent: TParent,
     args: {},
