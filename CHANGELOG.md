@@ -5,6 +5,7 @@
 ### New features
 
 - **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
+- Use conditionals set on `country-config` to filter certificates. [#9684](https://github.com/opencrvs/opencrvs-core/issues/9684)
 
 ### Improvements
 
