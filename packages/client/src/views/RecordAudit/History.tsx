@@ -45,7 +45,7 @@ import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
-import { SystemType } from '@opencrvs/commons/client'
+import { SystemRole } from '@opencrvs/commons/client'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -125,7 +125,7 @@ const GetNameWithAvatar = ({
 }
 
 function getSystemType(type: string | undefined) {
-  if (type === SystemType.RecordSearch) {
+  if (type === SystemRole.enum.RECORD_SEARCH) {
     return integrationMessages.recordSearch
   }
   return integrationMessages.healthSystem

@@ -1,0 +1,36 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Token parser helpers  getUserId With bad token 1`] = `"getTokenPayload: Error occurred during token decode : InvalidTokenError: Invalid token specified: Cannot read properties of undefined (reading 'replace')"`;
+
+exports[`Token parser helpers  getUserId With invalid payload 1`] = `
+"[
+  {
+    "code": "invalid_type",
+    "expected": "string",
+    "received": "number",
+    "path": [],
+    "message": "Expected string, received number"
+  }
+]"
+`;
+
+exports[`Token parser helpers  getUserId Without Bearer 1`] = `"getTokenPayload: Error occurred during token decode : InvalidTokenError: Invalid token specified"`;
+
+exports[`Token parser helpers  getUserType With bad token 1`] = `"getTokenPayload: Error occurred during token decode : InvalidTokenError: Invalid token specified: Cannot read properties of undefined (reading 'replace')"`;
+
+exports[`Token parser helpers  getUserType With invalid payload 1`] = `
+"[
+  {
+    "received": "invalidType",
+    "code": "invalid_enum_value",
+    "options": [
+      "user",
+      "system"
+    ],
+    "path": [],
+    "message": "Invalid enum value. Expected 'user' | 'system', received 'invalidType'"
+  }
+]"
+`;
+
+exports[`Token parser helpers  getUserType Without Bearer 1`] = `"getTokenPayload: Error occurred during token decode : InvalidTokenError: Invalid token specified"`;

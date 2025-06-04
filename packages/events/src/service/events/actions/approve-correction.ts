@@ -14,7 +14,7 @@ import {
   ApproveCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
-import { UserDetails } from '@events/user'
+import { TrpcUserContext } from '@events/context'
 import { RequestNotFoundError } from './correction'
 
 export async function approveCorrection(
@@ -25,7 +25,7 @@ export async function approveCorrection(
     token
   }: {
     eventId: string
-    user: UserDetails
+    user: TrpcUserContext
     token: string
   }
 ) {

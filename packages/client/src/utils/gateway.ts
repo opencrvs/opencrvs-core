@@ -15,7 +15,7 @@
 
 /* eslint-disable */
 import { PlainDate } from '@client/utils/date-formatting'
-import { SystemType } from '@opencrvs/commons/client'
+import { SystemRole } from '@opencrvs/commons/client'
 
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
@@ -2104,14 +2104,14 @@ export type System = {
   settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
   status: SystemStatus
-  type: SystemType
+  type: SystemRole
 }
 
 export type SystemInput = {
   integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
-  type: SystemType
+  type: SystemRole
 }
 
 export type SystemSecret = {
@@ -7076,7 +7076,7 @@ export type RegisterSystemMutation = {
       name: string
       shaSecret: string
       status: SystemStatus
-      type: SystemType
+      type: SystemRole
       integratingSystemType?: IntegratingSystemType | null
       settings?: {
         __typename?: 'SystemSettings'
@@ -7103,7 +7103,7 @@ export type DeactivateSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7128,7 +7128,7 @@ export type ReactivateSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7156,7 +7156,7 @@ export type RefreshSystemSecretMutation = {
       name: string
       shaSecret: string
       status: SystemStatus
-      type: SystemType
+      type: SystemRole
     }
   } | null
 }
@@ -7174,7 +7174,7 @@ export type UpdatePermissionsMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7199,7 +7199,7 @@ export type DeleteSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
   } | null
 }
 
