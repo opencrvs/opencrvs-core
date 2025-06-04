@@ -3051,6 +3051,11 @@ components:
                     type: string
                   createdByRole:
                     type: string
+                  createdBySignature:
+                    type:
+                      - string
+                      - "null"
+                    description: URL to Signature file of the user who created the action
                   createdAtLocation:
                     type:
                       - string
@@ -3136,6 +3141,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -3481,6 +3491,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -3822,6 +3837,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4176,6 +4196,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4517,6 +4542,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4871,6 +4901,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5212,6 +5247,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5555,6 +5595,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5896,6 +5941,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6240,6 +6290,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6581,6 +6636,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6925,6 +6985,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7269,6 +7334,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7613,6 +7683,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7954,6 +8029,11 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: URL to Signature file of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -9612,7 +9692,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 76066c1c-1815-4129-bc21-6daabaa1d6ce
+        transactionId: d7125b75-cc8a-45e1-a3a5-7c387dfbedf0
         declaration: {}
         annotation: {}
         type: NOTIFY
