@@ -114,7 +114,10 @@ function validateDeclarationUpdateAction({
    */
 
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
-  const previousDeclaration = getCurrentEventState(event).declaration
+  const previousDeclaration = getCurrentEventState(
+    event,
+    eventConfig
+  ).declaration
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
@@ -196,12 +199,12 @@ function validateActionAnnotation({
 export function validateAction(actionType: ActionType) {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
     const event = await getEventById(input.eventId)
-    const declaration = getCurrentEventState(event).declaration
-
     const eventConfig = await getEventConfigurationById({
       token: ctx.token,
       eventType: event.type
     })
+
+    const declaration = getCurrentEventState(event, eventConfig).declaration
 
     const declarationUpdateAction =
       DeclarationUpdateActions.safeParse(actionType)

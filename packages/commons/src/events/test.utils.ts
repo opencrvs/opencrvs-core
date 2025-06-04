@@ -50,6 +50,8 @@ import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
 import { eventStatuses } from './EventMetadata'
+import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
+import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 
 function fieldConfigsToActionPayload(fields: FieldConfig[]) {
   return fields.reduce(
@@ -122,11 +124,11 @@ export function generateActionAnnotationInput(
 export const eventPayloadGenerator = {
   create: (input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP'
+    type: input.type ?? TENNIS_CLUB_MEMBERSHIP
   }),
   patch: (id: string, input: Partial<EventInput> = {}) => ({
     transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+    type: input.type ?? TENNIS_CLUB_MEMBERSHIP,
     id
   }),
   draft: (
@@ -275,9 +277,13 @@ export const eventPayloadGenerator = {
       transactionId: input.transactionId ?? getUUID(),
       declaration: {},
       // @TODO: Check whether generator is needed?
-      annotation: { isDuplicate: isDuplicate ?? false },
+      annotation: {},
       duplicates: [],
-      eventId
+      eventId,
+      reason: {
+        message: `${ActionType.ARCHIVE}`,
+        isDuplicate: isDuplicate ?? false
+      }
     }),
     reject: (
       eventId: string,
@@ -295,7 +301,8 @@ export const eventPayloadGenerator = {
           ActionType.REJECT
         ),
       duplicates: [],
-      eventId
+      eventId,
+      reason: { message: `${ActionType.REJECT}` }
     }),
     register: (
       eventId: string,
@@ -445,9 +452,9 @@ export function generateActionDocument({
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, reason: { message: 'Archive' } }
     case ActionType.REJECT:
-      return { ...actionBase, type: action }
+      return { ...actionBase, type: action, reason: { message: 'Reject' } }
     case ActionType.CREATE:
       return { ...actionBase, type: action }
     case ActionType.NOTIFY:
@@ -459,7 +466,11 @@ export function generateActionDocument({
     case ActionType.APPROVE_CORRECTION:
       return { ...actionBase, requestId: getUUID(), type: action }
     case ActionType.REJECT_CORRECTION:
-      return { ...actionBase, requestId: getUUID(), type: action }
+      return {
+        ...actionBase,
+        requestId: getUUID(),
+        type: action
+      }
     case ActionType.REGISTER:
       return {
         ...actionBase,
@@ -492,8 +503,7 @@ export function generateEventDocument({
     id: getUUID(),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
-    updatedAt: new Date(Date.now() - 1000).toISOString(),
-    dateOfEvent: configuration.dateOfEvent
+    updatedAt: new Date(Date.now() - 1000).toISOString()
   }
 }
 
@@ -630,7 +640,7 @@ export const eventQueryDataGenerator = (
 
   return {
     id: overrides.id ?? generateUuid(rng),
-    type: overrides.type ?? 'TENNIS_CLUB_MEMBERSHIP',
+    type: overrides.type ?? TENNIS_CLUB_MEMBERSHIP,
     status: overrides.status ?? pickRandom(rng, eventStatuses),
     createdAt: overrides.createdAt ?? createdAt,
     createdBy: overrides.createdBy ?? generateUuid(rng),
@@ -649,7 +659,6 @@ export const eventQueryDataGenerator = (
     trackingId: overrides.trackingId ?? generateTrackingId(rng)
   }
 }
-
 export const generateTranslationConfig = (
   message: string
 ): TranslationConfig => ({
@@ -666,3 +675,24 @@ export const BearerTokenByUserType = {
   localRegistrar:
     'eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzY29wZSI6WyJyZWNvcmQucmVhZCIsInJlY29yZC5kZWNsYXJlLWJpcnRoIiwicmVjb3JkLmRlY2xhcmUtZGVhdGgiLCJyZWNvcmQuZGVjbGFyZS1tYXJyaWFnZSIsInJlY29yZC5kZWNsYXJhdGlvbi1lZGl0IiwicmVjb3JkLmRlY2xhcmF0aW9uLXN1Ym1pdC1mb3ItdXBkYXRlcyIsInJlY29yZC5yZXZpZXctZHVwbGljYXRlcyIsInJlY29yZC5kZWNsYXJhdGlvbi1hcmNoaXZlIiwicmVjb3JkLmRlY2xhcmF0aW9uLXJlaW5zdGF0ZSIsInJlY29yZC5yZWdpc3RlciIsInJlY29yZC5yZWdpc3RyYXRpb24tY29ycmVjdCIsInJlY29yZC5kZWNsYXJhdGlvbi1wcmludC1zdXBwb3J0aW5nLWRvY3VtZW50cyIsInJlY29yZC5leHBvcnQtcmVjb3JkcyIsInJlY29yZC51bmFzc2lnbi1vdGhlcnMiLCJyZWNvcmQucmVnaXN0cmF0aW9uLXByaW50Jmlzc3VlLWNlcnRpZmllZC1jb3BpZXMiLCJyZWNvcmQuY29uZmlybS1yZWdpc3RyYXRpb24iLCJyZWNvcmQucmVqZWN0LXJlZ2lzdHJhdGlvbiIsInBlcmZvcm1hbmNlLnJlYWQiLCJwZXJmb3JtYW5jZS5yZWFkLWRhc2hib2FyZHMiLCJwcm9maWxlLmVsZWN0cm9uaWMtc2lnbmF0dXJlIiwib3JnYW5pc2F0aW9uLnJlYWQtbG9jYXRpb25zOm15LW9mZmljZSIsInNlYXJjaC5iaXJ0aCIsInNlYXJjaC5kZWF0aCIsInNlYXJjaC5tYXJyaWFnZSIsImRlbW8iXSwidXNlclR5cGUiOiJ1c2VyIiwiaWF0IjoxNzQ4NTI2NDIwLCJleHAiOjE3NDkxMzEyMjAsImF1ZCI6WyJvcGVuY3J2czphdXRoLXVzZXIiLCJvcGVuY3J2czp1c2VyLW1nbnQtdXNlciIsIm9wZW5jcnZzOmhlYXJ0aC11c2VyIiwib3BlbmNydnM6Z2F0ZXdheS11c2VyIiwib3BlbmNydnM6bm90aWZpY2F0aW9uLXVzZXIiLCJvcGVuY3J2czp3b3JrZmxvdy11c2VyIiwib3BlbmNydnM6c2VhcmNoLXVzZXIiLCJvcGVuY3J2czptZXRyaWNzLXVzZXIiLCJvcGVuY3J2czpjb3VudHJ5Y29uZmlnLXVzZXIiLCJvcGVuY3J2czp3ZWJob29rcy11c2VyIiwib3BlbmNydnM6Y29uZmlnLXVzZXIiLCJvcGVuY3J2czpkb2N1bWVudHMtdXNlciJdLCJpc3MiOiJvcGVuY3J2czphdXRoLXNlcnZpY2UiLCJzdWIiOiI2NzdmYjA4NjMwZjNhYmZhMzMwNzI3MjEifQ.Exwojy_1lsoPmp-kQ79SMWI0eQy8Qt7yO_ynGvb_oIVdqSwTxFkkNr9x4UxhBA-o0P6LkMZ2ELKOlSzBr3PRJ8IQnfMQ7Db8oG8HAPsY8sKqra_L6ryV088NW2e2LqAjoOX0dXRIqYMolUhF_OOuZpHW5K8nvog5SLlnJ1gKysQ1EuWBg2dcKbjkkB16v-9NGz4XHye3vcoZlalyha5OOujzbPhkmr9UGiksSIXFNbanBhkQdt-EJlLX9SXvQ4ACJWPKFb_f4gv8p84jdLiryzQux46zHPpTicZHzg0nZtoKKIH1AyFtqWfBFm4y8qWC3ht9TAk93NAXTfkS0wzxKA'
 }
+export const generateWorkqueues = (
+  slug: string = 'all-events'
+): WorkqueueConfig[] =>
+  defineWorkqueues([
+    {
+      slug,
+      name: {
+        id: 'workqueues.inProgress.title',
+        defaultMessage:
+          slug.charAt(0).toUpperCase() + slug.slice(1).split('-').join(' '),
+        description: 'Title of in progress workqueue'
+      },
+      query: {
+        type: 'and',
+        clauses: [{ eventType: tennisClubMembershipEvent.id }]
+      },
+      actions: [],
+      icon: 'Draft',
+      columns: []
+    }
+  ])

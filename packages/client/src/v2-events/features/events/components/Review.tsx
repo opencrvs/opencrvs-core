@@ -822,6 +822,7 @@ function RejectActionModal({
       ]}
       contentHeight={270}
       handleClose={() => close(null)}
+      id="reject-modal"
       show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
       width={918}
@@ -831,6 +832,7 @@ function RejectActionModal({
           {intl.formatMessage(reviewMessages.rejectModalDescription)}
         </Text>
         <TextArea
+          data-testid="reject-reason"
           required={true}
           value={state.message}
           onChange={(e) =>

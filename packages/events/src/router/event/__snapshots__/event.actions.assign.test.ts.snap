@@ -61,7 +61,7 @@ exports[`Should add an ASSIGN action when last action is not ASSIGN 1`] = `
   "id": "[sanitized]",
   "trackingId": "[sanitized]",
   "transactionId": "[sanitized]",
-  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "type": "tennis-club-membership",
   "updatedAt": "[sanitized]",
 }
 `;

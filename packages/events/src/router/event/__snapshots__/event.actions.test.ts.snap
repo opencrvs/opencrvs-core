@@ -255,7 +255,7 @@ exports[`Event document contains all created actions 1`] = `
   "id": "[sanitized]",
   "trackingId": "[sanitized]",
   "transactionId": "[sanitized]",
-  "type": "TENNIS_CLUB_MEMBERSHIP",
+  "type": "tennis-club-membership",
   "updatedAt": "[sanitized]",
 }
 `;

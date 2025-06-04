@@ -47,6 +47,13 @@ export const ActionConfigBase = z.object({
   draft: z.boolean().optional()
 })
 
+const ReadActionConfig = ActionConfigBase.merge(
+  z.object({
+    type: z.literal(ActionType.READ),
+    review: DeclarationReviewConfig
+  })
+)
+
 const DeclareConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.DECLARE),
@@ -127,6 +134,7 @@ const ApproveCorrectionConfig = ActionConfigBase.merge(
  */
 /** @knipignore */
 export type AllActionConfigFields =
+  | typeof ReadActionConfig
   | typeof DeclareConfig
   | typeof ValidateConfig
   | typeof RejectDeclarationConfig
@@ -141,6 +149,7 @@ export type AllActionConfigFields =
 
 /** @knipignore */
 export type InferredActionConfig =
+  | z.infer<typeof ReadActionConfig>
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
   | z.infer<typeof RejectDeclarationConfig>
@@ -159,6 +168,7 @@ export const ActionConfig = z
      * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
      * and treat them as "models" instead of duplicating the data structure in each endpoint.
      */
+    ReadActionConfig.openapi({ ref: 'ReadActionConfig' }),
     DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
     ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
     RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
