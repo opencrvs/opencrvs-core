@@ -50,7 +50,8 @@ export function Pages() {
   )
   const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
-    event.type
+    event.type,
+    event.declaration
   )
 
   const formPages = getPrintCertificatePages(configuration)
