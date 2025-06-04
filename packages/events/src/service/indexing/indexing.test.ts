@@ -296,7 +296,14 @@ describe('test buildElasticQueryFromSearchPayload', () => {
       {
         // @ts-expect-error testing invalid input
         type: 'invalid',
-        clauses: []
+        clauses: [
+          {
+            status: {
+              type: 'exact',
+              term: 'ARCHIVED'
+            }
+          }
+        ]
       },
       tennisClubMembershipEvent
     )

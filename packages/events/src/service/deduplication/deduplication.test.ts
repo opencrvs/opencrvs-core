@@ -10,7 +10,7 @@
  */
 
 import { DeduplicationConfig, EventIndex, getUUID } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
@@ -161,9 +161,10 @@ async function findDuplicates(
         {
           id: getUUID(),
           transactionId: getUUID(),
+          type: 'v2-birth',
           declaration: existingComposition
         } as unknown as EventIndex,
-        tennisClubMembershipEvent
+        v2BirthEvent
       ),
       doc_as_upsert: true
     },
@@ -190,7 +191,7 @@ async function findDuplicates(
       flags: []
     },
     DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-    tennisClubMembershipEvent
+    v2BirthEvent
   )
 
   return results
@@ -272,7 +273,7 @@ describe('deduplication tests', () => {
         flags: []
       },
       DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
-      tennisClubMembershipEvent
+      v2BirthEvent
     )
     expect(results).toHaveLength(0)
   })
