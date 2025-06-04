@@ -15,6 +15,7 @@ import { userEvent, within, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 
+import { waitFor } from '@testing-library/dom'
 import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -262,5 +263,75 @@ export const AdvancedSearchTabsBehaviour: Story = {
       await userEvent.click(footballTab)
       await checkRegisterLocation()
     })
+  }
+}
+
+export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}?applicant.firstname=Nina&applicant.surname=Roy&event.legalStatus.REGISTERED.createdAt=2024-06-01&event.legalStatus.REGISTERED.createdAt=2025-06-30&event.legalStatus.REGISTERED.createdAtLocation=028d2c85-ca31-426d-b5d1-2cef545a4902&event.status=ALL&event.updatedAt=2025-05-03%2C2025-06-03&eventType=${TENNIS_CLUB_MEMBERSHIP}&recommender.firstname=Annina`
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        events: declarationTrpcMsw.events.handlers,
+        search: declarationTrpcMsw.search.handlers
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Remove pre populated Place of Registration and Date of Registration, then click search',
+      async () => {
+        await waitFor(
+          async () => {
+            const placeOfRegistration = await canvas.findByTestId(
+              'event____legalStatus____REGISTERED____createdAtLocation'
+            )
+            await expect(placeOfRegistration).toHaveValue(
+              'Ibombo District Office'
+            )
+            await userEvent.clear(placeOfRegistration)
+            placeOfRegistration.blur()
+
+            const checkBox = (await canvas.findAllByRole('checkbox')).find(
+              (x) =>
+                x.id ===
+                'event____legalStatus____REGISTERED____createdAtdate_range_toggle'
+            )
+            if (checkBox) {
+              await expect(checkBox).toBeChecked()
+              await userEvent.click(checkBox)
+            }
+            const searchButton = (
+              await canvas.findAllByRole('button', { name: 'Search' })
+            ).find((btn) => btn.id === 'search')
+
+            if (searchButton) {
+              await userEvent.click(searchButton)
+            }
+          },
+          { timeout: 5000 }
+        )
+      }
+    )
+
+    await step(
+      'Check in Search result page whether removed fields exist as search cirteria',
+      async () => {
+        await waitFor(async () => {
+          await expect(
+            canvas.queryByText('Place of registration')
+          ).not.toBeInTheDocument()
+
+          await expect(
+            canvas.queryByText('Date of registration:')
+          ).not.toBeInTheDocument()
+        })
+      }
+    )
   }
 }
