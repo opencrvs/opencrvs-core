@@ -12,7 +12,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import {
   getCurrentEventState,
   ActionType,
@@ -53,11 +56,14 @@ function getTranslations(hasErrors: boolean) {
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
+  const { goToHome, goToWorkqueue } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
@@ -112,7 +118,8 @@ export function Review() {
         ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
           fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
@@ -146,8 +153,7 @@ export function Review() {
         transactionId: uuid(),
         annotation
       })
-
-      goToHome()
+      slug ? goToWorkqueue(slug) : goToHome()
     }
   }
 
@@ -178,7 +184,7 @@ export function Review() {
         })
       }
 
-      goToHome()
+      slug ? goToWorkqueue(slug) : goToHome()
     }
   }
 
@@ -188,7 +194,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          slug ? goToWorkqueue(slug) : goToHome()
         })
       }
     >
