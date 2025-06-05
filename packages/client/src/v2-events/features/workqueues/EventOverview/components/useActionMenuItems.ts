@@ -255,6 +255,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
           throw new Error('No page ID found for request correction')
         }
 
+        // If no pages are configured, skip directly to review page
         if (correctionPages.length === 0) {
           // TODO CIHAN: is this correct?
           navigate(
@@ -265,6 +266,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
           return
         }
 
+        // If pages are configured, navigate to first page
         navigate(
           ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
             eventId,
