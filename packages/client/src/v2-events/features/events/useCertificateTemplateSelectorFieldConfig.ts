@@ -37,12 +37,9 @@ export const useCertificateTemplateSelectorFieldConfig = (
     )?.id,
     options: certificateTemplates
       .filter((x) => x.event === eventType)
-      .filter((x) => {
-        if (x.conditionals) {
-          return areConditionsMet(x.conditionals, declation)
-        }
-        return true
-      })
+      .filter(
+        (x) => !x.conditionals || areConditionsMet(x.conditionals, declation)
+      )
       .map((x) => ({ label: x.label, value: x.id }))
   }
 }
