@@ -46,6 +46,7 @@ function FileInput({
         originalFilename: originalFilename,
         type: type
       })
+
       onChange({
         filename,
         originalFilename: originalFilename,
@@ -72,6 +73,7 @@ function FileInput({
             originalFilename: newFile.name,
             type: newFile.type
           })
+
           uploadFile(newFile)
         }
         if (!newFile && file) {

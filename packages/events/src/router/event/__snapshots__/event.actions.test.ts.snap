@@ -31,7 +31,11 @@ exports[`Event document contains all created actions 1`] = `
     {
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": "review.signature-SIGNATURE-1",
+        "review.signature": {
+          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "originalFilename": "abcd.png",
+          "type": "image/png",
+        },
       },
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
@@ -72,7 +76,11 @@ exports[`Event document contains all created actions 1`] = `
     {
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": "review.signature-SIGNATURE-1",
+        "review.signature": {
+          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "originalFilename": "abcd.png",
+          "type": "image/png",
+        },
       },
       "assignedTo": "[sanitized]",
       "createdAt": "[sanitized]",
@@ -104,7 +112,11 @@ exports[`Event document contains all created actions 1`] = `
     {
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": "review.signature-SIGNATURE-1",
+        "review.signature": {
+          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "originalFilename": "abcd.png",
+          "type": "image/png",
+        },
       },
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
@@ -146,7 +158,11 @@ exports[`Event document contains all created actions 1`] = `
     {
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": "review.signature-SIGNATURE-1",
+        "review.signature": {
+          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "originalFilename": "abcd.png",
+          "type": "image/png",
+        },
       },
       "assignedTo": "[sanitized]",
       "createdAt": "[sanitized]",
@@ -179,7 +195,11 @@ exports[`Event document contains all created actions 1`] = `
     {
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": "review.signature-SIGNATURE-1",
+        "review.signature": {
+          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "originalFilename": "abcd.png",
+          "type": "image/png",
+        },
       },
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
@@ -221,7 +241,11 @@ exports[`Event document contains all created actions 1`] = `
     {
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": "review.signature-SIGNATURE-1",
+        "review.signature": {
+          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "originalFilename": "abcd.png",
+          "type": "image/png",
+        },
       },
       "assignedTo": "[sanitized]",
       "createdAt": "[sanitized]",

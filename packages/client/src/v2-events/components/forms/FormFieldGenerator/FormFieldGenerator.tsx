@@ -22,7 +22,6 @@ import {
   isNonInteractiveFieldType,
   SystemVariables
 } from '@opencrvs/commons/client'
-
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 import { handleDefaultValue } from '@client/v2-events/components/forms/utils'

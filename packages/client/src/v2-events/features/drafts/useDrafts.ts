@@ -26,7 +26,7 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
-import { getFileNames } from '../files/cache'
+import { getFilenamesFromActionDocument } from '../files/cache'
 import { precacheFile } from '../files/useFileUpload'
 
 /*
@@ -46,7 +46,9 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const response = await queryOptions.queryFn(...params)
     const drafts = response.map((draft) => Draft.parse(draft))
 
-    const filenames = drafts.flatMap((draft) => getFileNames([draft.action]))
+    const filenames = drafts.flatMap((draft) =>
+      getFilenamesFromActionDocument([draft.action])
+    )
     await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
 
     return drafts

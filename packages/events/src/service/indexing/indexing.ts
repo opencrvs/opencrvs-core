@@ -77,7 +77,6 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
@@ -121,6 +120,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         type: 'object',
         properties: addressProperties
       }
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         type: 'object',
@@ -194,6 +194,7 @@ export async function createIndex(
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' }
                 } satisfies Record<
                   keyof ActionCreationMetadata,
@@ -207,6 +208,7 @@ export async function createIndex(
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
                   registrationNumber: { type: 'keyword' }
                 } satisfies Record<

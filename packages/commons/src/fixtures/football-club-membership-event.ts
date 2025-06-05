@@ -23,6 +23,9 @@ import {
   timePeriodOptions
 } from './forms'
 
+/**
+ * @knipignore
+ */
 export const footballClubMembershipEvent = defineConfig({
   id: 'FOOTBALL_CLUB_MEMBERSHIP',
   label: {

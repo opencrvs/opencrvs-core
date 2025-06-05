@@ -145,16 +145,18 @@ export const AdvancedSearchTabsBehaviour: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
-    const checkRegistrationDetails = async () => {
-      await canvas.findByText('Tennis club membership application')
+    const checkRegistrationDetails = async (
+      canvasRef: ReturnType<typeof within>
+    ) => {
+      await canvasRef.findByText('Tennis club membership application')
 
-      const accordion = await canvas.findByTestId(
+      const accordion = await canvasRef.findByTestId(
         'accordion-v2.advancedSearch.form.registrationDetails'
       )
 
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
-        await canvas.findByTestId(
+        await canvasRef.findByTestId(
           'event____legalStatus____REGISTERED____createdAtLocation'
         )
       ).toHaveValue('Ibombo District Office')
@@ -166,7 +168,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
     await step(
       'Prepopulate Registration details from URL and toggle accordion',
       async () => {
-        await checkRegistrationDetails()
+        await checkRegistrationDetails(canvas)
 
         const accordion = await canvas.findByTestId(
           'accordion-v2.advancedSearch.form.registrationDetails'
@@ -178,7 +180,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
         await userEvent.click(
           await within(accordion).findByRole('button', { name: 'Show' })
         )
-        await checkRegistrationDetails()
+        await checkRegistrationDetails(canvas)
       }
     )
 
@@ -255,7 +257,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
       await fillRegisterLocation()
       await userEvent.click(tennisTab)
 
-      await checkRegistrationDetails()
+      await checkRegistrationDetails(canvas)
       await checkApplicantDetails()
       await checkRecommenderDetails()
 
