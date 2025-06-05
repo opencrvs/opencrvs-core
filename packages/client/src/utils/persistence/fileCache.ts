@@ -16,27 +16,12 @@
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
 
-export const FILE_STORAGE_BUCKET = 'ocrvs'
-
 function withPostfix(str: string, postfix: string) {
   if (str.endsWith(postfix)) {
     return str
   }
 
   return str + postfix
-}
-
-export function extractFilenameFromUrl(url: string) {
-  const pathname = new URL(url).pathname
-
-  const regex = new RegExp(`^/${FILE_STORAGE_BUCKET}/([^/?#]+)`)
-  const match = pathname.match(regex)
-
-  if (match && match[1]) {
-    return match[1]
-  }
-
-  throw new Error('Could not extract filename from URL: ' + url)
 }
 
 /**
