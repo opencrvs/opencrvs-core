@@ -25,13 +25,15 @@ import { AddressFieldValue } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
 
-const FieldId = z.string()
+const FieldId = z.string().describe('Unique identifier for the field')
 
-const ParentReference = z
+export const FieldReference = z
   .object({
-    _fieldId: FieldId.optional()
+    $$field: FieldId
   })
-  .optional()
+  .describe('Reference to a field by its ID')
+
+const ParentReference = FieldReference.optional()
 
 const BaseField = z.object({
   id: FieldId,
