@@ -82,6 +82,7 @@ export function SignatureCanvasModal({
         {intl.formatMessage(messages.signatureInputDescription)}
       </SignatureDescription>
       <SignatureCanvas
+        id={id}
         onChange={(base64Src?: string) => {
           setSignature(base64Src)
         }}

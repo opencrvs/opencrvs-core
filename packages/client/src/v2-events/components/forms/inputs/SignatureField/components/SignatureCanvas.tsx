@@ -37,8 +37,10 @@ const SignatureInputContainer = styled.div`
  * @param onChange - Callback function to handle the signature data URL when the "pen is lifted" (onEnd).
  */
 export function SignatureCanvas({
+  id,
   onChange
 }: {
+  id?: string
   onChange: (dataUrl?: string) => void
 }) {
   const [canvasWidth, setCanvasWidth] = useState(300)
@@ -76,12 +78,13 @@ export function SignatureCanvas({
 
   return (
     <SignatureInputContainer>
-      <SignatureContainer ref={canvasContainerRef}>
+      <SignatureContainer ref={canvasContainerRef} id={id}>
         <SignatureCanvasComponent
           ref={canvasRef}
           canvasProps={{
             width: canvasWidth,
-            height: 200
+            height: 200,
+            id: `${id}_canvas_element`
           }}
           penColor="black"
           onEnd={onEnd}
