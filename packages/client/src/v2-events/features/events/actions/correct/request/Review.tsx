@@ -104,13 +104,7 @@ export function Review() {
           disabled={!valuesHaveChanged}
           id="continue_button"
           onClick={() => {
-            navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath(
-                {
-                  eventId
-                }
-              )
-            )
+            console.log('CIHAN TODO ')
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
