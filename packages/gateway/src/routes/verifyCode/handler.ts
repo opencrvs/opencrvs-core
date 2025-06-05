@@ -17,7 +17,7 @@ import {
   PRODUCTION,
   QA_ENV
 } from '@gateway/constants'
-import { del, get, set } from '@gateway/utils/redis'
+import { redis } from '@gateway/utils/redis'
 import * as crypto from 'crypto'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -66,7 +66,7 @@ export async function storeVerificationCode(nonce: string, code: string) {
     code,
     createdAt: Date.now()
   }
-  await set(`verification_${nonce}`, JSON.stringify(codeDetails))
+  await redis.set(`verification_${nonce}`, JSON.stringify(codeDetails))
 }
 
 export async function generateAndStoreVerificationCode(
@@ -81,11 +81,7 @@ export async function checkVerificationCode(
   nonce: string,
   code: string
 ): Promise<void> {
-  const codeDetails: ICodeDetails = await getVerificationCodeDetails(nonce)
-
-  if (!codeDetails) {
-    throw new Error('sms code not found')
-  }
+  const codeDetails = await getVerificationCodeDetails(nonce)
 
   const codeExpired =
     (Date.now() - codeDetails.createdAt) / 1000 >=
@@ -103,14 +99,19 @@ export async function checkVerificationCode(
 export async function getVerificationCodeDetails(
   nonce: string
 ): Promise<ICodeDetails> {
-  const codeDetails = await get(`verification_${nonce}`)
+  const codeDetails = await redis.get(`verification_${nonce}`)
+
+  if (!codeDetails) {
+    throw new Error('sms code not found')
+  }
+
   return JSON.parse(codeDetails) as ICodeDetails
 }
 
 export async function deleteUsedVerificationCode(
   nonce: string
 ): Promise<boolean> {
-  const count = await del(`verification_${nonce}`)
+  const count = await redis.del(`verification_${nonce}`)
   return Boolean(count)
 }
 

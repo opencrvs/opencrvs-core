@@ -170,6 +170,7 @@ async function getOfficeIdFromIdentifier(identifier: string) {
     }
   )
   if (!response.ok) {
+    // eslint-disable-next-line no-console
     console.error(
       `Error fetching location with identifier ${identifier}`,
       response.statusText
@@ -210,6 +211,7 @@ export async function seedUsers(token: string) {
     } = userMetadata
 
     if (await userAlreadyExists(token, username)) {
+      // eslint-disable-next-line no-console
       console.log(
         `User with the username "${username}" already exists. Skipping user "${username}"`
       )
@@ -218,6 +220,7 @@ export async function seedUsers(token: string) {
 
     const primaryOffice = await getOfficeIdFromIdentifier(officeIdentifier)
     if (!primaryOffice) {
+      // eslint-disable-next-line no-console
       console.log(
         `No office found with id ${officeIdentifier}. Skipping user "${username}"`
       )
@@ -245,6 +248,7 @@ export async function seedUsers(token: string) {
       ++tryNumber
       if (tryNumber > 1) {
         await delay(RETRY_DELAY_IN_MILLISECONDS)
+        // eslint-disable-next-line no-console
         console.log('Trying again for time: ', tryNumber)
       }
       res = await callCreateUserMutation(token, userPayload)

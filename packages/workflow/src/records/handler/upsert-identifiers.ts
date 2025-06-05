@@ -10,7 +10,7 @@
  */
 import { getToken } from '@workflow/utils/auth-utils'
 import * as Hapi from '@hapi/hapi'
-import { getRecordById } from '@workflow/records/index'
+import { getValidRecordById } from '@workflow/records/index'
 import { indexBundle } from '@workflow/records/search'
 import { toIdentifierUpserted } from '@workflow/records/state-transitions'
 import { SupportedPatientIdentifierCode } from '@opencrvs/commons/types'
@@ -33,27 +33,18 @@ export async function upsertRegistrationHandler(
   const compositionId = request.params.id
   const { identifiers } = request.payload as EventRegistrationPayload
 
-  const savedRecord = await getRecordById(
+  const savedRecord = await getValidRecordById(
     compositionId,
     request.headers.authorization,
-    [
-      'ARCHIVED',
-      'CERTIFIED',
-      'CORRECTION_REQUESTED',
-      'IN_PROGRESS',
-      'READY_FOR_REVIEW',
-      'ISSUED',
-      'REGISTERED',
-      'REJECTED',
-      'VALIDATED',
-      'WAITING_VALIDATION'
-    ],
     true
   )
 
-  const upsertedRecord = toIdentifierUpserted(savedRecord, identifiers)
+  const [upsertedRecord, changedResources] = toIdentifierUpserted(
+    savedRecord,
+    identifiers
+  )
 
-  await sendBundleToHearth(upsertedRecord)
+  await sendBundleToHearth(changedResources)
   await indexBundle(upsertedRecord, token)
 
   return h.response(upsertedRecord).code(200)

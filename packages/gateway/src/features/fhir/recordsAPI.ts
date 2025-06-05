@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-relative-parent-imports
 import { Bundle, Saved } from '@opencrvs/commons/types'
 
 export default class RecordsAPI {

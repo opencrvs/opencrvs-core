@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -48,9 +47,11 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
     if (navigatedFromInsideApp) {
       navigate(-1)
     } else {
-      navigate(generatePerformanceHomeUrl({
-        locationId: userDetails?.primaryOffice.id
-      }))
+      navigate(
+        generatePerformanceHomeUrl({
+          locationId: userDetails?.primaryOffice.id
+        })
+      )
     }
   }
 
@@ -97,8 +98,11 @@ export const DashboardEmbedView = ({ title, url, icon }: IdashboardView) => {
           <div id={`${title.toLowerCase()}_noContent`}>
             <Content title={title} size={ContentSize.LARGE}>
               {intl.formatMessage(messages.noContent, {
+                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                 strong: (chunks: any) => <strong>{chunks}</strong>,
+                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                 ul: (chunks: any) => <ul>{chunks}</ul>,
+                /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
                 li: (chunks: any) => <li>{chunks}</li>
               })}
             </Content>

@@ -9,9 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { env } from '@config/environment'
 import { logger } from '@opencrvs/commons'
 import { MongoClient } from 'mongodb'
-import { env } from '@config/environment'
 
 const client = new MongoClient(env.HEARTH_MONGO_URL)
 

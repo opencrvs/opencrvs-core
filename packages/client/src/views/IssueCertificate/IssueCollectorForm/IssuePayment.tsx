@@ -54,6 +54,7 @@ export const IssuePayment = () => {
   const intl = useIntl()
   const dispatch = useDispatch()
   const navigate = useNavigate()
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const offlineCountryConfig = useSelector<IStoreState, any>((state) =>
     getOfflineData(state)
   )

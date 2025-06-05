@@ -261,6 +261,7 @@ export async function seedLocations(token: string) {
   const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
   response.entry?.forEach((res, index) => {
     if (res.response?.status !== '201') {
+      // eslint-disable-next-line no-console
       console.log(
         `Failed to create location resource for: "${locations[index].name}"`
       )
@@ -323,9 +324,11 @@ export async function seedLocationsForV2Events(token: string) {
   })
 
   if (!res.ok) {
+    // eslint-disable-next-line no-console
     console.error(
       'Unable to seed locations for v2 events. Ensure events service is running.'
     )
+    // eslint-disable-next-line no-console
     console.error(JSON.stringify(await res.json()))
   }
 }
