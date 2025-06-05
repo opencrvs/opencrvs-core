@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 809251aa-6521-4fa9-83c5-d56779df61fa
+                transactionId: 065790b0-aebb-4ced-9a0b-30f6872975af
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 78a336fa-37a1-4e7f-8b58-cf8b6d2359ac
+                transactionId: c2277856-5cff-43bc-8f48-50a8dd55e8f3
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -675,10 +675,12 @@ components:
         dateOfEvent:
           type: object
           properties:
-            fieldId:
+            $$field:
               type: string
+              description: Unique identifier for the field
           required:
-            - fieldId
+            - $$field
+          description: Reference to a field by its ID
         title:
           $ref: "#/components/schemas/TranslationConfig"
         fallbackTitle:
@@ -1216,6 +1218,50 @@ components:
           properties:
             id:
               type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: &a4 []
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: &a5 []
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            type:
+              type: string
+              enum:
+                - ADDRESS
             defaultValue:
               anyOf:
                 - oneOf:
@@ -1302,45 +1348,6 @@ components:
                     - addressType
                     - state
                     - district2
-            parent:
-              type: object
-              properties:
-                _fieldId:
-                  type: string
-            conditionals:
-              type: array
-              items:
-                $ref: "#/components/schemas/FieldConditional"
-              default: &a4 []
-            required:
-              type: boolean
-              default: false
-            placeholder:
-              $ref: "#/components/schemas/TranslationConfig"
-            validation:
-              type: array
-              items:
-                type: object
-                properties:
-                  validator:
-                    $ref: "#/components/schemas/Conditional"
-                  message:
-                    $ref: "#/components/schemas/TranslationConfig"
-                required:
-                  - validator
-                  - message
-              default: &a5 []
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            helperText:
-              $ref: "#/components/schemas/TranslationConfig"
-            hideLabel:
-              type: boolean
-              default: false
-            type:
-              type: string
-              enum:
-                - ADDRESS
           required:
             - id
             - label
@@ -1350,14 +1357,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1392,6 +1401,9 @@ components:
               type: string
               enum:
                 - TEXT
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1418,13 +1430,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: number
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1459,6 +1474,8 @@ components:
               type: string
               enum:
                 - NUMBER
+            defaultValue:
+              type: number
             configuration:
               type: object
               properties:
@@ -1481,14 +1498,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1523,6 +1542,9 @@ components:
               type: string
               enum:
                 - TEXTAREA
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1550,15 +1572,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              format: date
-              description: Date in the format YYYY-MM-DD
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1593,6 +1616,10 @@ components:
               type: string
               enum:
                 - DATE
+            defaultValue:
+              type: string
+              format: date
+              description: Date in the format YYYY-MM-DD
             configuration:
               type: object
               properties:
@@ -1609,27 +1636,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: array
-                  maxItems: 2
-                  minItems: 2
-                  items:
-                    oneOf:
-                      - type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
-                      - type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1664,6 +1680,22 @@ components:
               type: string
               enum:
                 - DATE_RANGE
+            defaultValue:
+              anyOf:
+                - type: string
+                  format: date
+                  description: Date in the format YYYY-MM-DD
+                - type: array
+                  maxItems: 2
+                  minItems: 2
+                  items:
+                    oneOf:
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
             configuration:
               type: object
               properties:
@@ -1681,14 +1713,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1723,6 +1757,9 @@ components:
               type: string
               enum:
                 - PARAGRAPH
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1751,13 +1788,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1792,6 +1832,8 @@ components:
               type: string
               enum:
                 - RADIO_GROUP
+            defaultValue:
+              type: string
             options:
               type: array
               items:
@@ -1829,13 +1871,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1870,6 +1915,8 @@ components:
               type: string
               enum:
                 - BULLET_LIST
+            defaultValue:
+              type: string
             items:
               type: array
               items:
@@ -1896,14 +1943,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1938,6 +1987,9 @@ components:
               type: string
               enum:
                 - PAGE_HEADER
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1947,13 +1999,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1988,6 +2043,8 @@ components:
               type: string
               enum:
                 - SELECT
+            defaultValue:
+              type: string
             options:
               type: array
               items:
@@ -2014,13 +2071,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2055,6 +2115,8 @@ components:
               type: string
               enum:
                 - CHECKBOX
+            defaultValue:
+              type: boolean
           required:
             - id
             - label
@@ -2064,21 +2126,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2113,6 +2170,19 @@ components:
               type: string
               enum:
                 - FILE
+            defaultValue:
+              type: object
+              properties:
+                filename:
+                  type: string
+                originalFilename:
+                  type: string
+                type:
+                  type: string
+              required:
+                - filename
+                - originalFilename
+                - type
             configuration:
               type: object
               properties:
@@ -2156,14 +2226,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2198,6 +2270,9 @@ components:
               type: string
               enum:
                 - COUNTRY
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -2207,14 +2282,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2249,6 +2326,9 @@ components:
               type: string
               enum:
                 - ADMINISTRATIVE_AREA
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -2279,21 +2359,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2336,14 +2411,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2378,6 +2455,9 @@ components:
               type: string
               enum:
                 - LOCATION
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -2387,14 +2467,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2429,6 +2511,9 @@ components:
               type: string
               enum:
                 - FACILITY
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -2438,14 +2523,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2480,6 +2567,9 @@ components:
               type: string
               enum:
                 - OFFICE
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -2489,21 +2579,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2542,6 +2627,8 @@ components:
               description: Title of the signature modal
               allOf:
                 - $ref: "#/components/schemas/TranslationConfig"
+            defaultValue:
+              type: string
             configuration:
               type: object
               properties:
@@ -2570,14 +2657,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2620,6 +2709,9 @@ components:
                   description: Maximum length of the text
               default:
                 maxLength: 10
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -2628,21 +2720,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2693,6 +2780,24 @@ components:
                   - value
                   - label
               description: A list of options
+            defaultValue:
+              type: array
+              items:
+                type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                  option:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+                  - option
             configuration:
               type: object
               properties:
@@ -2720,21 +2825,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
