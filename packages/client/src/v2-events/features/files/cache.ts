@@ -51,13 +51,9 @@ export function getFilenamesFromActionDocument(
     // Signatures follow v1 pattern where storage key includes the bucket name. e.g. /ocrvs/signature.png
     // We need to extract the filename from the storage key.
     const metadataSignatureFilenames = Object.values(metadata)
-      .map((val) => {
-        if (typeof val === 'string') {
-          return extractFilenameFromStorageKey(val)
-        }
-
-        return undefined
-      })
+      .map((val) =>
+        typeof val === 'string' ? extractFilenameFromStorageKey(val) : undefined
+      )
       .filter((val): val is string => typeof val === 'string')
 
     const actionFileNames = [...declarationValues, ...annotationValues].flatMap(

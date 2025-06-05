@@ -64,12 +64,6 @@ export function SignatureField({
   const intl = useIntl()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  /**
-   * source can be a base64 string or external url.
-   * When page is refreshed, value is read in from props. At this point, we know that cache has been updated with the file URL if we uploaded anything.
-   * @see onComplete
-   */
   const [signature, setSignature] = useState<FileFieldValue | undefined>(value)
 
   const requiredError =

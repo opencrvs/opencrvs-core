@@ -464,8 +464,6 @@ function ReviewComponent({
   const hasReviewFieldsToUpdate =
     annotation && onAnnotationChange && reviewFields && reviewFields.length > 0
 
-  console.log('Renders ReviewComponent')
-
   return (
     <Row>
       <LeftColumn>
