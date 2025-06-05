@@ -155,7 +155,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </g>
     <path d="M53 514H537V513H53V514Z" fill="#ECECEC" />
   </g>
-  <image id="image0_5_2"  x="362.248" y="400.656" width="100" height="100" xlink:href="{{ $lookup $metadata 'updatedBy.signature'}}" />
+  <image id="image0_5_2"  x="362.248" y="400.656" width="100" height="100" xlink:href="{{ $lookup $metadata 'legalStatuses.REGISTERED.createdBySignature'}}" />
   <defs>
     <pattern id="pattern0_5_2" patternContentUnits="objectBoundingBox" width="1" height="1">
       <use xlink:href="#image0_5_2" />
