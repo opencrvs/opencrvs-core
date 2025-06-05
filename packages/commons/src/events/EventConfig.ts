@@ -18,6 +18,7 @@ import { findAllFields, getDeclarationFields } from './utils'
 import { DeclarationFormConfig } from './FormConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { FieldType } from './FieldType'
+import { FieldReference } from './FieldConfig'
 extendZodWithOpenApi(z)
 
 /**
@@ -32,7 +33,7 @@ export const EventConfig = z
       .describe(
         'A machine-readable identifier for the event, e.g. "birth" or "death"'
       ),
-    dateOfEvent: z.object({ fieldId: z.string() }).optional(),
+    dateOfEvent: FieldReference.optional(),
     title: TranslationConfig,
     fallbackTitle: TranslationConfig.optional().describe(
       'This is a fallback title if actual title resolves to empty string'
@@ -87,13 +88,13 @@ export const EventConfig = z
 
     if (event.dateOfEvent) {
       const eventDateFieldId = getDeclarationFields(event).find(
-        ({ id }) => id === event.dateOfEvent?.fieldId
+        ({ id }) => id === event.dateOfEvent?.$$field
       )
       if (!eventDateFieldId) {
         ctx.addIssue({
           code: 'custom',
           message: `Date of event field id must match a field id in fields array.
-          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.fieldId}`,
+          Invalid date of event field ID for event ${event.id}: ${event.dateOfEvent.$$field}`,
           path: ['dateOfEvent']
         })
       } else if (eventDateFieldId.type !== FieldType.DATE) {
