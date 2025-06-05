@@ -410,3 +410,24 @@ export const isDataFieldType = (field: {
 }): field is { value: undefined; config: DataField } => {
   return field.config.type === FieldType.DATA
 }
+
+export type NonInteractiveFieldType =
+  | Divider
+  | PageHeader
+  | Paragraph
+  | BulletList
+  | DataField
+
+export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
+
+export const isNonInteractiveFieldType = (
+  field: FieldConfig
+): field is NonInteractiveFieldType => {
+  return (
+    field.type === FieldType.DIVIDER ||
+    field.type === FieldType.PAGE_HEADER ||
+    field.type === FieldType.PARAGRAPH ||
+    field.type === FieldType.BULLET_LIST ||
+    field.type === FieldType.DATA
+  )
+}

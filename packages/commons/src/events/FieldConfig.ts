@@ -19,9 +19,14 @@ import {
   NumberFieldValue,
   NonEmptyTextValue,
   TextValue,
-  DateRangeFieldValue
+  DateRangeFieldValue,
+  SignatureFieldValue
 } from './FieldValue'
-import { AddressFieldValue } from './CompositeFieldValue'
+import {
+  AddressFieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue
+} from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
 
@@ -37,15 +42,6 @@ const ParentReference = FieldReference.optional()
 
 const BaseField = z.object({
   id: FieldId,
-  defaultValue: z
-    .union([
-      TextValue,
-      NonEmptyTextValue,
-      DateValue,
-      NumberFieldValue,
-      CheckboxFieldValue
-    ])
-    .optional(),
   parent: ParentReference,
   conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
@@ -134,6 +130,7 @@ const SignatureField = BaseField.extend({
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
+  defaultValue: SignatureFieldValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -232,6 +229,7 @@ export type PageHeader = z.infer<typeof PageHeader>
 
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE),
+  defaultValue: FileFieldValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -355,6 +353,7 @@ export type Location = z.infer<typeof Location>
 const FileUploadWithOptions = BaseField.extend({
   type: z.literal(FieldType.FILE_WITH_OPTIONS),
   options: z.array(SelectOption).describe('A list of options'),
+  defaultValue: FileFieldWithOptionValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
