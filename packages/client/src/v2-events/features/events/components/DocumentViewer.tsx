@@ -21,7 +21,7 @@ import {
   isFileFieldWithOptionType,
   FieldType
 } from '@opencrvs/commons/client'
-import { getUnsignedFileUrl } from '@client/utils/persistence/fileCache'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import {
   DocumentViewer as DocumentViewerComponent,
   DocumentViewerOptionValue

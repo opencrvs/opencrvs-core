@@ -18,7 +18,7 @@ import {
   FileFieldWithOptionValue,
   getAcceptedActions
 } from '@opencrvs/commons/client'
-import { removeCached } from '@client/utils/persistence/fileCache'
+import { removeCached } from '@client/v2-events/cache'
 import { precacheFile } from './useFileUpload'
 
 const FILE_STORAGE_BUCKET = 'ocrvs'

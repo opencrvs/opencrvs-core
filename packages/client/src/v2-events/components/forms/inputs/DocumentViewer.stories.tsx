@@ -12,7 +12,7 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { getUnsignedFileUrl } from '@client/utils/persistence/fileCache'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { DocumentViewer } from './DocumentViewer'
 
 const meta: Meta<typeof DocumentViewer> = {
