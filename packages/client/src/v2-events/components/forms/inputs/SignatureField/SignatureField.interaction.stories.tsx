@@ -113,6 +113,7 @@ const createdEvent = generateEventDocument({
 export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
   parameters: {
     layout: 'centered',
+    chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
         event: [
@@ -224,6 +225,7 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
   {
     parameters: {
       layout: 'centered',
+      chromatic: { disableSnapshot: true },
       msw: {
         handlers: {
           event: [

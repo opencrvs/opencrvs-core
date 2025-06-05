@@ -29,7 +29,7 @@ const FILE_STORAGE_BUCKET = 'ocrvs'
  * @returns filename extracted from the storage key.
  *
  */
-export function extractFilenameFromStorageKey(storageKey: string) {
+function extractFilenameFromStorageKey(storageKey: string) {
   const regex = new RegExp(`^/${FILE_STORAGE_BUCKET}/([^/?#]+)`)
   const match = storageKey.match(regex)
 
