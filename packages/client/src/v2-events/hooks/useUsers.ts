@@ -11,7 +11,7 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-import { getUnsignedFileUrl } from '@client/utils/persistence/fileCache'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 

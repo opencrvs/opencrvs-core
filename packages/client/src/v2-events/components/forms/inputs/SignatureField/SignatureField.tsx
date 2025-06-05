@@ -22,10 +22,7 @@ import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { dataUrlToFile } from '@client/utils/imageUtils'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import {
-  cacheFile,
-  getUnsignedFileUrl
-} from '@client/utils/persistence/fileCache'
+import { cacheFile, getUnsignedFileUrl } from '@client/v2-events/cache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -36,10 +33,7 @@ const SignaturePreview = styled.img`
   display: block;
 `
 
-export type SignatureFieldProps = Omit<
-  React.ButtonHTMLAttributes<HTMLButtonElement>,
-  'onChange' | 'value' | 'type' | 'defaultValue'
-> & {
+export interface SignatureFieldProps {
   name: string
   /**
    * File should be stored in the cache where it is then retrieved by the component.
@@ -50,26 +44,24 @@ export type SignatureFieldProps = Omit<
   maxFileSize: number
   acceptedFileTypes?: MimeType[]
   modalTitle: string
+  disabled?: boolean
 }
 
 export function SignatureField({
   value,
   onChange,
+  required,
   name,
   modalTitle,
   maxFileSize,
   acceptedFileTypes = ['image/png'],
-  ...props
+  disabled
 }: SignatureFieldProps) {
   const intl = useIntl()
 
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [signature, setSignature] = useState<FileFieldValue | undefined>(value)
-
-  const requiredError =
-    props.required &&
-    !Boolean(value) &&
-    intl.formatMessage(validationMessages.required)
+  const [touched, setTouched] = useState(false)
 
   const { uploadFile } = useFileUpload(name, {
     onSuccess: ({ filename, originalFilename, type }) => {
@@ -95,27 +87,45 @@ export function SignatureField({
     uploadFile(newFile)
   }
 
-  const { error, handleFileChange } = useOnFileChange({
+  const { error: onUploadError, handleFileChange } = useOnFileChange({
     acceptedFileTypes,
     onComplete,
     maxFileSize
   })
 
+  const errorMessage = React.useMemo(() => {
+    if (onUploadError) {
+      return onUploadError
+    }
+
+    if (!signature) {
+      return touched && required
+        ? intl.formatMessage(validationMessages.required)
+        : undefined
+    }
+
+    return undefined
+  }, [signature, touched, required, onUploadError, intl])
+
   return (
     <>
-      {!value && (
+      {!signature && (
         <>
           <Stack gap={8}>
             <Button
-              disabled={props.disabled}
+              disabled={disabled}
               size="medium"
               type="secondary"
-              onClick={() => setIsModalOpen(true)}
+              onClick={() => {
+                setIsModalOpen(true)
+
+                setTouched(true)
+              }}
             >
               <Icon name="Pen" />
               {intl.formatMessage(messages.signatureOpenSignatureInput)}
             </Button>
-            <ImageUploader {...props} onChange={handleFileChange}>
+            <ImageUploader disabled={disabled} onChange={handleFileChange}>
               {intl.formatMessage(buttonMessages.upload)}
             </ImageUploader>
           </Stack>
@@ -127,21 +137,22 @@ export function SignatureField({
           src={getUnsignedFileUrl(signature.filename)}
         />
       )}
-      {value && !props.disabled && (
+      {signature && !disabled && (
         <Button
           size="medium"
           type="tertiary"
           onClick={() => {
-            onChange(undefined) // @TODO
+            onChange(undefined)
             setSignature(undefined)
+            setTouched(true)
           }}
         >
           {intl.formatMessage(messages.signatureDelete)}
         </Button>
       )}
-      {/* @todo */}
-      {(requiredError || error) && (
-        <InputError id={`${name}_error`}>{requiredError ?? error}</InputError>
+
+      {errorMessage && (
+        <InputError id={`${name}_error`}>{errorMessage}</InputError>
       )}
       {isModalOpen && (
         <SignatureCanvasModal
@@ -168,7 +179,6 @@ export function SignatureField({
             })
 
             handleFileChange(signatureFile)
-
             setIsModalOpen(false)
           }}
         />
