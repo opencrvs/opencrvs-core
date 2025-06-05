@@ -104,7 +104,8 @@ export function Review() {
           disabled={!valuesHaveChanged}
           id="continue_button"
           onClick={() => {
-            console.log('CIHAN TODO ')
+            // eslint-disable-next-line no-console
+            console.log('CIHAN TODO navigate to summary?')
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}
