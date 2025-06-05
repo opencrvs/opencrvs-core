@@ -19,7 +19,7 @@ import { Button } from '@opencrvs/components/lib/Button'
 import { Icon } from '@opencrvs/components/lib/Icon'
 import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
-import { validationMessages } from '@client/i18n/messages'
+import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { dataUrlToFile } from '@client/utils/imageUtils'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import {
@@ -42,7 +42,7 @@ export type SignatureFieldProps = Omit<
 > & {
   name: string
   /**
-   * Value is a file name, which is stored in the cache.
+   * File should be stored in the cache where it is then retrieved by the component.
    */
   value?: FileFieldValue
   onChange: (value: FileFieldValue | undefined) => void
@@ -115,10 +115,9 @@ export function SignatureField({
               <Icon name="Pen" />
               {intl.formatMessage(messages.signatureOpenSignatureInput)}
             </Button>
-            <ImageUploader
-              {...props}
-              onChange={handleFileChange}
-            ></ImageUploader>
+            <ImageUploader {...props} onChange={handleFileChange}>
+              {intl.formatMessage(buttonMessages.upload)}
+            </ImageUploader>
           </Stack>
         </>
       )}
