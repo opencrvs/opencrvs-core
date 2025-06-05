@@ -38,7 +38,7 @@ const SignaturePreview = styled.img`
 
 export type SignatureFieldProps = Omit<
   React.ButtonHTMLAttributes<HTMLButtonElement>,
-  'onChange' | 'value' | 'type'
+  'onChange' | 'value' | 'type' | 'defaultValue'
 > & {
   name: string
   /**

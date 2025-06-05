@@ -384,8 +384,6 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isSignatureFieldType(field)) {
-      console.log('Signature field', field)
-
       return (
         <InputField {...inputFieldProps}>
           <SignatureField

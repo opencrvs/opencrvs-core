@@ -296,7 +296,7 @@ export const isTextAreaFieldType = (field: {
 
 export const isSignatureFieldType = (field: {
   config: FieldConfig
-  value: FileFieldValue | undefined
+  value: FieldValue | undefined
 }): field is { value: FileFieldValue | undefined; config: SignatureField } => {
   return field.config.type === FieldType.SIGNATURE
 }
