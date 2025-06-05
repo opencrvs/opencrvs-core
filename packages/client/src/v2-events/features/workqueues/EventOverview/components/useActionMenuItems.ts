@@ -26,6 +26,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 function getAssignmentActions(
   assignmentStatus: keyof typeof AssignmentStatus,
@@ -168,8 +169,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
   const { refetch: refetchEvent } = events.getEvent.useQuery(event.id, false)
-
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
@@ -245,10 +246,32 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
     },
     [ActionType.REQUEST_CORRECTION]: {
       label: actionLabels[ActionType.REQUEST_CORRECTION],
-      onClick: (eventId: string) =>
+      onClick: (eventId: string) => {
+        const correctionPages = eventConfiguration.actions.find(
+          (action) => action.type === ActionType.REQUEST_CORRECTION
+        )?.correctionForm.pages
+
+        if (!correctionPages) {
+          throw new Error('No page ID found for request correction')
+        }
+
+        if (correctionPages.length === 0) {
+          // TODO CIHAN: is this correct?
+          navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+              eventId
+            })
+          )
+          return
+        }
+
         navigate(
-          ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
-        ),
+          ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+            eventId,
+            pageId: correctionPages[0].id
+          })
+        )
+      },
       disabled: !eventIsAssignedToSelf
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>

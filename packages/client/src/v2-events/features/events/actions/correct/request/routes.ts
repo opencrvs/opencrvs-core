@@ -29,14 +29,6 @@ export const routes = route(
       hash: hashValues()
     }),
     REVIEW: route('review'),
-    ADDITIONAL_DETAILS_INDEX: route('details', {
-      params: { pageId: string() },
-      hash: hashValues()
-    }),
-    ADDITIONAL_DETAILS: route('details/:pageId', {
-      params: { pageId: string() },
-      hash: hashValues()
-    }),
     SUMMARY: route('summary', {
       hash: hashValues()
     })
