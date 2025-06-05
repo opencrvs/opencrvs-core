@@ -14,7 +14,6 @@ import { ActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
-import { defineWorkqueues } from '../events'
 import { event } from '../events/event'
 import { TENNIS_CLUB_MEMBERSHIP } from '../events/Constants'
 import {
