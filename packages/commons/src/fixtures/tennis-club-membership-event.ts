@@ -437,21 +437,3 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
-
-export const WorkqueueFixture = defineWorkqueues([
-  {
-    columns: [],
-    slug: 'in-progress',
-    name: {
-      id: 'workqueues.inProgress.title',
-      defaultMessage: 'In progress',
-      description: 'Title of in progress workqueue'
-    },
-    query: {
-      type: 'and',
-      clauses: [{ eventType: tennisClubMembershipEvent.id }]
-    },
-    actions: [],
-    icon: 'Draft'
-  }
-])
