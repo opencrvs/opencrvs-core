@@ -70,6 +70,11 @@ module.exports = defineConfig([
         {
           name: '@opencrvs/commons/client',
           message: 'Please use @opencrvs/commons or @opencrvs/commons/events'
+        },
+        {
+          name: 'slonik',
+          importNames: ['sql'],
+          message: 'Please import `sql` from `storage/postgres/events/db.ts`'
         }
       ]
     }

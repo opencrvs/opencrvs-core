@@ -9,17 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { UUID } from '../uuid'
 import { Action } from './ActionDocument'
 import { ActionType } from './ActionType'
 import { findLastAssignmentAction, getMixedPath } from './utils'
 
 const commonAction = {
   status: 'Requested' as const,
-  id: 'action-id-1',
+  id: 'action-id-1' as UUID,
   declaration: {},
   createdBy: 'user-id-1',
   createdByRole: 'user-role-1',
-  createdAtLocation: 'location-id-1',
+  createdAtLocation: 'location-id-1' as UUID,
   transactionId: 'transaction-id-1'
 }
 

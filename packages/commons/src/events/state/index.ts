@@ -252,6 +252,9 @@ export function getCurrentEventState(
   } else {
     dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
   }
+
+  // @TODO: Typing issue here with branded values (UUID)
+  // @ts-ignore
   return deepDropNulls({
     id: event.id,
     type: event.type,

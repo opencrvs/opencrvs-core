@@ -13,16 +13,16 @@ import { z } from 'zod'
 import { ActionType } from './ActionType'
 import { ActionUpdate, RejectionReason } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { v4 as uuidv4 } from 'uuid'
+import { UUID, getUUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
 extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
-  eventId: z.string(),
+  eventId: UUID,
   transactionId: z.string(),
   declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
-  originalActionId: z.string().optional(),
+  originalActionId: UUID.optional(),
   keepAssignment: z.boolean().optional()
 })
 
@@ -58,7 +58,7 @@ export const NotifyActionInput = BaseActionInput.merge(
 ).openapi({
   default: {
     eventId: '<event-id-here>',
-    transactionId: uuidv4(),
+    transactionId: getUUID(),
     declaration: {},
     annotation: {},
     type: ActionType.NOTIFY
@@ -175,7 +175,7 @@ export const ReadActionInput = BaseActionInput.merge(
 
 export type ReadActionInput = z.infer<typeof ReadActionInput>
 
-export const DeleteActionInput = z.object({ eventId: z.string() })
+export const DeleteActionInput = z.object({ eventId: UUID })
 export type DeleteActionInput = z.infer<typeof DeleteActionInput>
 
 /**

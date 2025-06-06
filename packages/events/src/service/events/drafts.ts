@@ -9,83 +9,34 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput, Draft } from '@opencrvs/commons/events'
-
-import { getUUID } from '@opencrvs/commons'
-import * as events from '@events/storage/mongodb/events'
+import { DraftInput, UUID } from '@opencrvs/commons'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { TrpcUserContext } from '@events/context'
 
-export async function createDraft(
+export const createDraft = async (
   input: DraftInput,
   {
     eventId,
     user,
     transactionId
   }: {
-    eventId: string
+    eventId: UUID
     user: TrpcUserContext
     transactionId: string
   }
-) {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
-
-  const draft: Draft = {
-    id: getUUID(),
-    eventId: eventId,
-    createdAt: now,
+) => {
+  return draftsRepo.createDraft({
+    eventId,
     transactionId,
-    action: {
-      ...input,
-      type: input.type,
-      createdBy: user.id,
-      createdByRole: user.role,
-      createdAt: now,
-      createdAtLocation: user.primaryOfficeId,
-      createdBySignature: user.signature
-    }
-  }
-
-  await db.collection<Draft>('drafts').updateOne(
-    // Match by transactionId
-    { transactionId },
-    // Update document
-    { $set: draft },
-    // Insert if not found
-    { upsert: true }
-  )
-
-  return draft
+    actionType: input.type,
+    declaration: input.declaration,
+    annotation: input.annotation,
+    createdBy: user.id,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId,
+    // @TODO: Why can this be null | undefined, does either have a different meaning?
+    createdBySignature: user.signature ?? undefined
+  })
 }
 
-export async function getDraftsByUserId(createdBy: string) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-
-  const drafts = await collection
-    .find({ 'action.createdBy': createdBy })
-    .toArray()
-
-  return drafts
-}
-
-export async function getDraftsForAction(
-  eventId: string,
-  createdBy: string,
-  actionType: string
-) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-
-  const drafts = await collection
-    .find({ eventId, 'action.createdBy': createdBy, 'action.type': actionType })
-    .toArray()
-
-  return drafts
-}
-
-export async function deleteDraftsByEventId(eventId: string) {
-  const db = await events.getClient()
-  const collection = db.collection<Draft>('drafts')
-  await collection.deleteMany({ eventId: eventId })
-}
+export const getDraftsByUserId = draftsRepo.getDraftsByUserId

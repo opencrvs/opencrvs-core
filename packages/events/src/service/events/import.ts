@@ -9,18 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { EventDocument } from '@opencrvs/commons'
-import * as events from '@events/storage/mongodb/events'
-import { indexEvent } from '@events/service/indexing/indexing'
-import { getEventConfigurationById } from '../config/config'
 
-export async function importEvent(event: EventDocument, token: string) {
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
-  await collection.replaceOne({ id: event.id }, event, { upsert: true })
-  const config = await getEventConfigurationById({
-    token,
-    eventType: event.type
-  })
-  await indexEvent(event, config)
-  return event
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+export async function importEvent(_event: EventDocument, _token: string) {
+  return new Promise<EventDocument>((_, reject) =>
+    reject('TODO: Importing is not supported in Postgres yet')
+  )
+  // const config = await getEventConfigurationById({
+  //   token,
+  //   eventType: event.type
+  // })
+  // await indexEvent(event)
 }
