@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: bac7163e-eac2-4db1-950e-8d4f1a55cc31
+                transactionId: 42fe6820-fd19-4e7c-b8e7-880f80cd4b57
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: aa49929e-8d69-49c7-9fe3-5b5d48350517
+                transactionId: 12049b67-57c2-4143-83ef-8e3e6bbdc92e
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1777,6 +1777,10 @@ components:
                         - h3
                         - h2
                         - h1
+                      description: Font variant to use for the paragraph text
+                    hint:
+                      type: boolean
+                      description: When true, paragraph is styled as a hint with grey color
               default: {}
           required:
             - id

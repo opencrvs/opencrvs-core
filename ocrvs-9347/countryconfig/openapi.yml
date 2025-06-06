@@ -1188,6 +1188,10 @@ components:
                         - h3
                         - h2
                         - h1
+                      description: Font variant to use for the paragraph text
+                    hint:
+                      type: boolean
+                      description: When true, paragraph is styled as a hint with grey color
               default: {}
           required:
             - id
@@ -9776,7 +9780,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: dc1f4411-e638-475d-96a8-5b96578e8f66
+        transactionId: 5f426988-31cd-4d03-b386-c43b17e28fbd
         declaration: {}
         annotation: {}
         type: NOTIFY
