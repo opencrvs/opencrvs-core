@@ -18,6 +18,8 @@ import {
   EventState,
   FieldConfig,
   FieldValue,
+  InteractiveFieldType,
+  isNonInteractiveFieldType,
   SystemVariables
 } from '@opencrvs/commons/client'
 
@@ -35,14 +37,19 @@ function mapFieldsToValues(
   fields: FieldConfig[],
   systemVariables: SystemVariables
 ) {
-  return fields.reduce((memo, field) => {
-    const fieldInitialValue = handleDefaultValue({
-      field,
-      systemVariables
-    })
+  return fields
+    .filter(
+      (field): field is InteractiveFieldType =>
+        !isNonInteractiveFieldType(field)
+    )
+    .reduce((memo, field) => {
+      const fieldInitialValue = handleDefaultValue({
+        field,
+        systemVariables
+      })
 
-    return { ...memo, [field.id]: fieldInitialValue }
-  }, {})
+      return { ...memo, [field.id]: fieldInitialValue }
+    }, {})
 }
 
 interface FormFieldGeneratorProps {
