@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { logger } from '@opencrvs/commons'
-import '@opencrvs/commons/monitoring'
 import { createServer, IncomingMessage } from 'http'
 import { createHTTPHandler } from '@trpc/server/adapters/standalone'
 import {
   createOpenApiHttpHandler,
   generateOpenApiDocument
 } from 'trpc-to-openapi'
+import { logger } from '@opencrvs/commons'
+import '@opencrvs/commons/monitoring'
 import { createContext } from './context'
 import { appRouter } from './router/router'
 
