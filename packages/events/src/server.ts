@@ -9,13 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createServer, IncomingMessage } from 'http'
-import { createOpenApiHttpHandler } from 'trpc-to-openapi'
-import { createHTTPHandler } from '@trpc/server/adapters/standalone'
-import '@opencrvs/commons/monitoring'
 import { logger } from '@opencrvs/commons'
-import { appRouter } from './router/router'
+import '@opencrvs/commons/monitoring'
+import { createServer, IncomingMessage } from 'http'
+import { createHTTPHandler } from '@trpc/server/adapters/standalone'
+import {
+  createOpenApiHttpHandler,
+  generateOpenApiDocument
+} from 'trpc-to-openapi'
 import { createContext } from './context'
+import { appRouter } from './router/router'
 
 function stringifyRequest(req: IncomingMessage) {
   const url = new URL(req.url || '', `http://${req.headers.host}`)
@@ -64,6 +67,18 @@ export function server() {
     if (isTrpcRequest(req)) {
       trpcServer(req, res)
     } else {
+      if (req.url === '/api') {
+        const response = generateOpenApiDocument(appRouter, {
+          title: 'OpenCRVS API',
+          version: '1.8.0',
+          baseUrl: 'http://localhost:3000/api/events'
+        })
+
+        res.setHeader('Content-Type', 'application/json')
+        res.writeHead(200)
+        res.end(JSON.stringify(response))
+        return
+      }
       // If it's a REST request, handle it with the REST server
       void restServer(req, res)
     }
