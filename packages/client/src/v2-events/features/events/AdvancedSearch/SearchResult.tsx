@@ -14,6 +14,7 @@ import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { orderBy } from 'lodash'
 import styled from 'styled-components'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventIndex,
   EventConfig,
@@ -21,7 +22,9 @@ import {
   WorkqueueColumn,
   deepDropNulls,
   applyDraftsToEventIndex,
-  EventState
+  EventState,
+  WorkqueueActionsWithDefault,
+  ActionType
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -29,7 +32,7 @@ import {
   SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Link as TextButton } from '@opencrvs/components'
+import { Button, Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -38,6 +41,11 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 import { useEventTitle } from '../useEvents/useEventTitle'
+import {
+  ActionConfig,
+  useAction,
+  useActionMenuItems
+} from '../../workqueues/EventOverview/components/useActionMenuItems'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -173,6 +181,51 @@ const ExtendedEventStatuses = {
   DRAFT: 'DRAFT'
 } as const
 
+function ActionComponent({
+  event,
+  actionType
+}: {
+  event: EventIndex
+  actionType: WorkqueueActionsWithDefault
+}) {
+  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+
+  // @ToDo: Investigate hook count mismatch
+  const { config: configs } = useAction(event)
+
+  const intl = useIntl()
+
+  let config: ActionConfig | undefined
+  if (actionType === 'DEFAULT') {
+    const actionMenuItems = useActionMenuItems(event)
+    config = actionMenuItems.find(
+      ({ type }) =>
+        !(
+          [
+            ActionType.ASSIGN,
+            ActionType.UNASSIGN,
+            ActionType.READ
+          ] as readonly string[]
+        ).includes(type)
+    )
+  } else {
+    config = configs[actionType]
+  }
+  if (!config) {
+    return null
+  }
+
+  return (
+    <Button
+      disabled={Boolean(config.disabled)}
+      type="primary"
+      onClick={async () => config.onClick(slug)}
+    >
+      {intl.formatMessage(config.label)}
+    </Button>
+  )
+}
+
 export const SearchResultComponent = ({
   columns,
   queryData,
@@ -180,7 +233,8 @@ export const SearchResultComponent = ({
   limit = 10,
   offset = 0,
   title: contentTitle,
-  tabBarContent
+  tabBarContent,
+  actions = []
 }: {
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -189,6 +243,7 @@ export const SearchResultComponent = ({
   offset?: number
   title: string
   tabBarContent?: React.ReactNode
+  actions?: WorkqueueActionsWithDefault[]
 }) => {
   const intl = useIntl()
   const navigate = useNavigate()
@@ -235,6 +290,14 @@ export const SearchResultComponent = ({
           )
         )
         .map((event) => {
+          const actionConfigs = actions.map((actionType) => {
+            return {
+              actionComponent: (
+                <ActionComponent actionType={actionType} event={event} />
+              )
+            }
+          })
+
           const eventConfig = eventConfigs.find(({ id }) => id === event.type)
           if (!eventConfig) {
             throw new Error(
@@ -248,6 +311,7 @@ export const SearchResultComponent = ({
             useFallbackTitle,
             title,
             label: eventConfig.label,
+            actions: actionConfigs,
             ...rest,
             ...declaration
           }
@@ -302,7 +366,7 @@ export const SearchResultComponent = ({
     return defaultWorkqueueColumns.map(
       ({ label, value }): Column => ({
         label: intl.formatMessage(label),
-        width: 25,
+        width: value.$event === 'title' ? 35 : 15,
         key: value.$event,
         sortFunction: onColumnClick,
         isSorted: sortedCol === value.$event
@@ -316,7 +380,7 @@ export const SearchResultComponent = ({
     if (windowWidth > theme.grid.breakpoints.lg) {
       return columns.map(({ label, value }) => ({
         label: intl.formatMessage(label),
-        width: 35,
+        width: 15,
         key: value.$event,
         sortFunction: onColumnClick,
         isSorted: sortedCol === value.$event
@@ -325,7 +389,7 @@ export const SearchResultComponent = ({
       return columns
         .map(({ label, value }) => ({
           label: intl.formatMessage(label),
-          width: 35,
+          width: 15,
           key: value.$event,
           sortFunction: onColumnClick,
           isSorted: sortedCol === value.$event
@@ -359,7 +423,16 @@ export const SearchResultComponent = ({
         onPageChange={(page) => setCurrentPageNumber(page)}
       >
         <Workqueue
-          columns={[...getDefaultColumns(), ...getColumns()]}
+          columns={[
+            ...getDefaultColumns(),
+            ...getColumns(),
+            {
+              width: 20,
+              key: COLUMNS.ACTIONS,
+              isActionColumn: true,
+              alignment: ColumnContentAlignment.RIGHT
+            }
+          ]}
           content={allResults.slice(
             limit * (currentPageNumber - 1),
             limit * currentPageNumber
@@ -383,6 +456,7 @@ export const SearchResult = ({
 
   return (
     <SearchResultComponent
+      actions={[WorkqueueActionsWithDefault.Values.DEFAULT]}
       columns={columns}
       eventConfigs={[eventConfig]}
       queryData={queryData}

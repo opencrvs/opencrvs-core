@@ -52,9 +52,11 @@ export function WorkqueueContainer() {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
 
+  const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
     <>
       <SearchResultComponent
+        actions={actions}
         columns={workqueueConfig.columns}
         eventConfigs={eventConfigs}
         queryData={events}

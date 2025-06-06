@@ -12,7 +12,10 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   getCurrentEventState,
@@ -48,11 +51,14 @@ import { useReviewActionConfig } from './useReviewActionConfig'
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
+  const { goToHome, goToWorkqueue } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -109,7 +115,8 @@ export function Review() {
         ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
           fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
@@ -143,7 +150,7 @@ export function Review() {
     if (confirmedValidation) {
       reviewActionConfiguration.onConfirm(eventId)
 
-      goToHome()
+      slug ? goToWorkqueue(slug) : goToHome()
     }
   }
 
@@ -173,8 +180,7 @@ export function Review() {
           reason: { message, isDuplicate }
         })
       }
-
-      goToHome()
+      slug ? goToWorkqueue(slug) : goToHome()
     }
   }
 
@@ -184,7 +190,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          slug ? goToWorkqueue(slug) : goToHome()
         })
       }
     >
