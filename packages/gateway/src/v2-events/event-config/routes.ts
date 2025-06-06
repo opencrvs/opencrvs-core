@@ -26,6 +26,7 @@ export const trpcProxy = [
       })
     },
     options: {
+      auth: false,
       payload: {
         output: 'data',
         parse: false
