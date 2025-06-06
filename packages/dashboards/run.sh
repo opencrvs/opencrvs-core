@@ -1,3 +1,4 @@
+#!/bin/bash
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -39,17 +40,16 @@ if [ -z "${OPENCRVS_METABASE_DB_HOST}" ]; then
   exit 1
 fi
 
-if [ -z "${OPENCRVS_METABASE_DB_USER}" ]; then
+if [ -z "${OPENCRVS_METABASE_DB_USER}" ] && [ -z "${OPENCRVS_METABASE_DB_PASS}" ] && [ -z "${OPENCRVS_METABASE_DB_AUTH_DB}" ]; then
+  echo "Warning: OPENCRVS_METABASE_DB_USER, OPENCRVS_METABASE_DB_PASS and OPENCRVS_METABASE_DB_AUTH_DB environment variables are not defined"
+  echo "Using H2 (Metabase) connection without authentication"
+elif [ -z "${OPENCRVS_METABASE_DB_USER}" ]; then
   echo "Error: OPENCRVS_METABASE_DB_USER environment variable is not defined"
   exit 1
-fi
-
-if [ -z "${OPENCRVS_METABASE_DB_PASS}" ]; then
+elif [ -z "${OPENCRVS_METABASE_DB_PASS}" ]; then
   echo "Error: OPENCRVS_METABASE_DB_PASS environment variable is not defined"
   exit 1
-fi
-
-if [ -z "${OPENCRVS_METABASE_DB_AUTH_DB}" ]; then
+elif [ -z "${OPENCRVS_METABASE_DB_AUTH_DB}" ]; then
   echo "Error: OPENCRVS_METABASE_DB_AUTH_DB environment variable is not defined"
   exit 1
 fi

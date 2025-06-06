@@ -10,7 +10,6 @@
  */
 import { getToken } from '@client/utils/authUtils'
 import axios, { AxiosError, AxiosRequestConfig, AxiosResponse } from 'axios'
-// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 
 export enum NotificationEvent {

@@ -8,8 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ParagraphFieldValue } from '@opencrvs/commons/client'
+import React from 'react'
 
-export const INITIAL_PARAGRAPH_VALUE = ''
+import { Text as TextComponent } from '@opencrvs/components'
+import { HtmlFontVariant } from '@opencrvs/commons/client'
 
-export const paragraphToString = (text: ParagraphFieldValue) => text || ''
+function ParagraphInput({
+  fontVariant,
+  message
+}: {
+  message: string
+  fontVariant?: HtmlFontVariant
+}) {
+  return (
+    <TextComponent element="p" variant={fontVariant ?? 'reg16'}>
+      <span dangerouslySetInnerHTML={{ __html: message }} />
+    </TextComponent>
+  )
+}
+
+export const Paragraph = {
+  Input: ParagraphInput,
+  Output: null
+}

@@ -470,28 +470,31 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
               (data[section.id][field.name] as IFormSectionData).value as string
             ]) ||
           []
-        ).reduce((groupedValues, nestedField) => {
-          // Value of the parentField resembles with IFormData as a nested form
-          const nestedValue =
-            (data[section.id] &&
-              data[section.id][field.name] &&
-              renderValue(
-                data[section.id][field.name] as IFormData,
-                'nestedFields',
-                nestedField,
-                intl,
-                offlineResources,
-                language
-              )) ||
-            ''
-          return (
-            <>
-              {groupedValues}
-              {nestedValue && <div></div>}
-              {nestedValue}
-            </>
-          )
-        }, <>{value}</>)
+        ).reduce(
+          (groupedValues, nestedField) => {
+            // Value of the parentField resembles with IFormData as a nested form
+            const nestedValue =
+              (data[section.id] &&
+                data[section.id][field.name] &&
+                renderValue(
+                  data[section.id][field.name] as IFormData,
+                  'nestedFields',
+                  nestedField,
+                  intl,
+                  offlineResources,
+                  language
+                )) ||
+              ''
+            return (
+              <>
+                {groupedValues}
+                {nestedValue && <div></div>}
+                {nestedValue}
+              </>
+            )
+          },
+          <>{value}</>
+        )
       : value
   }
 
@@ -730,7 +733,9 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
     group: IFormSectionGroup,
     overriddenField: IFormField,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     items: any[],
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     item: any,
     deathForm: IForm
   ) => {
@@ -782,8 +787,10 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
       offlineResources,
       userDetails
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let tempItem: any
 
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let items: any[] = []
     formSections.forEach((section) => {
       const visitedTags: string[] = []
@@ -818,8 +825,8 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
                     declaration.originalData[section.id]
                 )
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? this.getNestedPreviewField(section, group, field)
-              : this.getSinglePreviewField(section, group, field)
+                ? this.getNestedPreviewField(section, group, field)
+                : this.getSinglePreviewField(section, group, field)
 
             overriddenFields.forEach((overriddenField) => {
               items = this.getOverRiddenPreviewField(
@@ -1004,6 +1011,7 @@ class CorrectionSummaryComponent extends React.Component<IFullProps, IState> {
             return (
               <SupportingDocument key={`proof-${i}`}>
                 <PaperClip />
+                {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                 <span>{doc[1] as any}</span>
               </SupportingDocument>
             )

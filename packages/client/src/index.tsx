@@ -15,7 +15,6 @@ import { storage } from '@client/storage'
 import { createStore } from '@client/store'
 import * as React from 'react'
 import { createRoot } from 'react-dom/client'
-// eslint-disable-next-line no-restricted-imports
 import { SubmissionController } from '@client/SubmissionController'
 import * as Sentry from '@sentry/react'
 import { BrowserTracing } from '@sentry/tracing'
@@ -63,7 +62,15 @@ window.addEventListener('online', userReconnectedToast)
 const container = document.getElementById('root')
 const root = createRoot(container!)
 
-const router = createBrowserRouter(routesConfig)
+const router = createBrowserRouter(routesConfig, {
+  future: {
+    v7_relativeSplatPath: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_skipActionErrorRevalidation: true
+  }
+})
 
 root.render(<App router={router} store={store} />)
 

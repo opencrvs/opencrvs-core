@@ -18,7 +18,7 @@ src/
 
 ```
 # tsconfig.json references commons. when `tsc --build` is run, both are built.
-> yarn build
+> yarn build:all
 # If you miss this part you might face issues with types.
 > cd dist
 > yarn link

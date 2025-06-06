@@ -161,6 +161,7 @@ describe('AdvancedSearchResult Bookmark', () => {
       store,
       initialEntries: [ADVANCED_SEARCH_RESULT],
       path: ADVANCED_SEARCH_RESULT,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       graphqlMocks: graphqlMock as any
     }))
 

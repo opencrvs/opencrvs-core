@@ -23,12 +23,14 @@ import { extractPersistDirectivePaths } from '@client/utils/persistence/transfor
  * @param {Array} path The data result object path. i.e.: ["a", 0, "b"]
  * @return {String} the query selection path. i.e.: "a.b"
  */
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const toQueryPath = (path: any[]) =>
   path.filter((key) => isNaN(Number(key))).join('.')
 
 /**
  * Given a data result object, attach __persist values.
  */
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const attachPersists = (paths: any[], object: any) => {
   const queryPaths = paths.map(toQueryPath)
 
@@ -62,6 +64,7 @@ class PersistLink extends ApolloLink {
   /**
    * Link query requester.
    */
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   request = (operation: any, forward: any) => {
     const { query, paths } = extractPersistDirectivePaths(
       operation.query,
@@ -72,13 +75,14 @@ class PersistLink extends ApolloLink {
 
     // Remove requesting __persist fields.
     operation.query = visit(operation.query, {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       Field: ({ name: { value: name } }: any): any => {
         if (name === '__persist') {
           return null
         }
       }
     })
-
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     return forward(operation).map((result: any) => {
       if (result.data) {
         result.data = attachPersists(paths, result.data)

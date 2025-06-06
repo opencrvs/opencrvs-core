@@ -23,6 +23,7 @@ import {
   QueryComponentOptions
 } from '@apollo/client/react/components'
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function Query<T = any>(props: QueryComponentOptions<T>) {
   return <ApolloQuery<T> {...props} />
 }

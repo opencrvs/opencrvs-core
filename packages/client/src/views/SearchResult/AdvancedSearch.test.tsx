@@ -64,6 +64,7 @@ describe('when search button is clicked with insufficient parameters', () => {
         event: 'birth'
       })
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
     store.dispatch(setUserDetails(mockUserResponse as any))
     ;({ component: testComponent } = await createTestComponent(
       <AdvancedSearchConfig></AdvancedSearchConfig>,
@@ -96,6 +97,7 @@ describe('when search button is clicked with insufficient parameters', () => {
         event: 'death'
       })
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any*/
     store.dispatch(setUserDetails(mockUserResponse as any))
     ;({ component: testComponent } = await createTestComponent(
       <AdvancedSearchConfig></AdvancedSearchConfig>,
@@ -130,6 +132,7 @@ describe('when advancedSearchPage renders with 2 or more active params in store'
         registrationStatuses: ['IN_PROGRESS']
       })
     )
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     store.dispatch(setUserDetails(mockUserResponse as any))
     ;({ component: testComponent, router } = await createTestComponent(
       <AdvancedSearchConfig></AdvancedSearchConfig>,

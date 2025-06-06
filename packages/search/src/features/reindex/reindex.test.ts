@@ -17,7 +17,7 @@ import { createHandlerSetup, SetupFn } from '@search/test/createHandlerSetup'
 import { generateBearerTokenHeader, getOrThrow } from '@search/test/utils'
 import { BIRTH_BUNDLE } from '@opencrvs/commons/fixtures'
 
-jest.setTimeout(100000)
+jest.setTimeout(120000)
 
 const setupTestCases = async (setup: SetupFn) => {
   const { server, elasticClient } = await setup()

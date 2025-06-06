@@ -9,28 +9,56 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-unassigned-import
-import '@opencrvs/commons/monitoring'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('app-module-path').addPath(require('path').join(__dirname, '../'))
-
-import { appRouter } from './router/router'
-import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
+import { createServer, IncomingMessage } from 'http'
+import { createOpenApiHttpHandler } from 'trpc-to-openapi'
 import { TRPCError } from '@trpc/server'
-import { getUser, logger } from '@opencrvs/commons'
+import { createHTTPHandler } from '@trpc/server/adapters/standalone'
+import { logger } from '@opencrvs/commons'
+import { TokenWithBearer } from '@opencrvs/commons/authentication'
+import '@opencrvs/commons/monitoring'
 import { env } from './environment'
+import { appRouter } from './router/router'
+import { getAnonymousToken } from './service/auth'
 import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
-import { getAnonymousToken } from './service/auth'
+import { resolveUserDetails } from './user'
 
-const server = createHTTPServer({
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const path = require('path')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const appModulePath = require('app-module-path')
+
+appModulePath.addPath(path.join(__dirname, '../'))
+
+// When making requests via different clients, the headers are not always in the same format.
+// This function normalizes the headers to a consistent format.
+function normalizeHeaders(
+  headers: Headers | Record<string, string | string[] | undefined>
+): Record<string, string | string[] | undefined> {
+  return headers instanceof Headers
+    ? Object.fromEntries(headers.entries())
+    : headers
+}
+
+function stringifyRequest(req: IncomingMessage) {
+  const url = new URL(req.url || '', `http://${req.headers.host}`)
+  return `'${req.method} ${url.pathname}'`
+}
+
+const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
   router: appRouter,
-  createContext: async function createContext(opts) {
-    const parseResult = TokenWithBearer.safeParse(
-      opts.req.headers.authorization
+  middleware: (req, _, next) => {
+    logger.info(`Request: ${stringifyRequest(req)}`)
+    return next()
+  },
+  onError: ({ req, error }) => {
+    logger.warn(
+      `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`
     )
+  },
+  createContext: async function createContext(opts) {
+    const { authorization } = normalizeHeaders(opts.req.headers)
+    const parseResult = TokenWithBearer.safeParse(authorization)
 
     if (!parseResult.success) {
       throw new TRPCError({
@@ -39,28 +67,43 @@ const server = createHTTPServer({
     }
 
     const token = parseResult.data
+    return { token, user: await resolveUserDetails(token) }
+  }
+}
 
-    const userId = getUserId(token)
+// Check if the request is a tRPC request
+function isTrpcRequest(req: IncomingMessage) {
+  if (!req.url) {
+    throw new Error('No URL provided')
+  }
 
-    if (!userId) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED'
-      })
-    }
+  const url = new URL(req.url, `http://${req.headers.host}`)
+  const pathName = url.pathname.replace(/^\//, '') // Remove leading slash
+  const trpcProcedurePaths = Object.keys(appRouter._def.procedures)
 
-    const { primaryOfficeId } = await getUser(
-      env.USER_MANAGEMENT_URL,
-      userId,
-      token
-    )
+  return (
+    url.search.startsWith('?input') || trpcProcedurePaths.includes(pathName)
+  )
+}
 
-    return {
-      user: {
-        id: userId,
-        primaryOfficeId
-      },
-      token: token
-    }
+const restServer = createOpenApiHttpHandler(trpcConfig)
+const trpcServer = createHTTPHandler(trpcConfig)
+
+// Server which handles both tRPC and REST requests
+const server = createServer((req, res) => {
+  if (!req.url) {
+    res.writeHead(500)
+    res.end('No URL provided')
+    return
+  }
+
+  // If it's a tRPC request, handle it with the tRPC server
+  if (isTrpcRequest(req)) {
+    trpcServer(req, res)
+  } else {
+    // If it's a REST request, handle it with the REST server
+    // eslint-disable-next-line @typescript-eslint/no-floating-promises
+    restServer(req, res)
   }
 })
 
@@ -79,12 +122,11 @@ export async function main() {
       process.exit(1)
     }
     /*
-     * SIGUSR2 tells nodemon to restart the process with waiting for new file changes
+     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
      */
     setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
     return
   }
-
   server.listen(5555)
 }
 

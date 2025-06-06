@@ -25,7 +25,7 @@ on:
 jobs:
   clear:
     environment: ${{ github.event.inputs.environment }}
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     env:
       ENV: ${{ github.event.inputs.environment }}
       REPLICAS: ${{ github.event.inputs.replicas }}

@@ -74,7 +74,7 @@ export function CopyButton({
       ) : (
         <>
           <Icon name="Copy" />
-          <Text variant="bold14" color="blue" element="span">
+          <Text variant="bold14" color="primary" element="span">
             {copyLabel}
           </Text>
         </>

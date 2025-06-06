@@ -12,6 +12,8 @@ import { cleanEnv, str, port, url, bool, num } from 'envalid'
 
 export const env = cleanEnv(process.env, {
   REDIS_HOST: str({ devDefault: 'localhost' }),
+  REDIS_USERNAME: str({ default: undefined }),
+  REDIS_PASSWORD: str({ default: undefined }),
   HOST: str({ devDefault: '0.0.0.0' }),
   PORT: port({ default: 7070 }),
   DOMAIN: str({ devDefault: '*' }),
@@ -35,6 +37,7 @@ export const env = cleanEnv(process.env, {
   COUNTRY_CONFIG_URL: url({ devDefault: 'http://localhost:3040' }),
   DOCUMENTS_URL: url({ devDefault: 'http://localhost:9050' }),
   DISABLE_RATE_LIMIT: bool({
+    devDefault: true,
     default: false,
     desc: 'Disables the Redis-based rate limiting globally'
   }),

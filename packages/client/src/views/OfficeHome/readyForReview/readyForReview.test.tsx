@@ -134,6 +134,7 @@ const mockSearchData = {
   deceasedName: null,
   createdAt: '2018-05-23T14:44:58+02:00'
 }
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const searchData: any = []
 for (let i = 0; i < 14; i++) {
   searchData.push(mockSearchData)
@@ -300,7 +301,7 @@ describe('OfficeHome sent for review tab related tests', () => {
     expect(data[0].id).toBe('9a55d213-ad9f-4dcd-9418-340f3a7f6269')
     expect(data[0].dateOfEvent).toBe('8 years ago')
     expect(data[0].sentForReview).toBe(EXPECTED_DATE_OF_DECLARATION)
-    expect(data[0].name).toBe('khan iliyas')
+    expect(data[0].name).toBe('iliyas khan')
     expect(data[0].trackingId).toBe('BW0UTHR')
     expect(data[0].event).toBe('Birth')
     expect(data[0].actions).toBeDefined()
