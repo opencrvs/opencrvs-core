@@ -104,13 +104,8 @@ export function Review() {
           disabled={!valuesHaveChanged}
           id="continue_button"
           onClick={() => {
-            navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath(
-                {
-                  eventId
-                }
-              )
-            )
+            // eslint-disable-next-line no-console
+            console.log('CIHAN TODO navigate to summary?')
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}

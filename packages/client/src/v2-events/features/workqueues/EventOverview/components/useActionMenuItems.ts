@@ -26,6 +26,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 function getAssignmentActions(
   assignmentStatus: keyof typeof AssignmentStatus,
@@ -148,6 +149,11 @@ export const actionLabels = {
     defaultMessage: 'Delete',
     description: 'Label for delete button in dropdown menu',
     id: 'v2.event.birth.action.delete.label'
+  },
+  [ActionType.REQUEST_CORRECTION]: {
+    defaultMessage: 'Request correction',
+    description: 'Label for request correction button in dropdown menu',
+    id: 'v2.event.birth.action.request-correction.label'
   }
 } as const
 
@@ -163,8 +169,8 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
   const { refetch: refetchEvent } = events.getEvent.useQuery(event.id, false)
-
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
@@ -237,6 +243,37 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
         })
         navigate(ROUTES.V2.buildPath({}))
       }
+    },
+    [ActionType.REQUEST_CORRECTION]: {
+      label: actionLabels[ActionType.REQUEST_CORRECTION],
+      onClick: (eventId: string) => {
+        const correctionPages = eventConfiguration.actions.find(
+          (action) => action.type === ActionType.REQUEST_CORRECTION
+        )?.correctionForm.pages
+
+        if (!correctionPages) {
+          throw new Error('No page ID found for request correction')
+        }
+
+        // If no pages are configured, skip directly to review page
+        if (correctionPages.length === 0) {
+          navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+              eventId
+            })
+          )
+          return
+        }
+
+        // If pages are configured, navigate to first page
+        navigate(
+          ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+            eventId,
+            pageId: correctionPages[0].id
+          })
+        )
+      },
+      disabled: !eventIsAssignedToSelf
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 

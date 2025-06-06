@@ -76,26 +76,6 @@ export const ReviewWithChanges: Story = {
   }
 }
 
-export const AdditionalDetails: Story = {
-  parameters: {
-    reactRouter: {
-      router: router,
-      initialPath:
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath({
-          eventId: tennisClubMembershipEventDocument.id
-        })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
 export const Summary: Story = {
   parameters: {
     reactRouter: {

@@ -11,17 +11,24 @@
 import React from 'react'
 
 import { Text as TextComponent } from '@opencrvs/components'
-import { HtmlFontVariant } from '@opencrvs/commons/client'
+import { ParagraphConfiguration } from '@opencrvs/commons/client'
 
 function ParagraphInput({
-  fontVariant,
+  configuration,
   message
 }: {
   message: string
-  fontVariant?: HtmlFontVariant
+  configuration: ParagraphConfiguration
 }) {
+  const fontVariant = configuration.styles?.fontVariant
+  const hint = configuration.styles?.hint
+
   return (
-    <TextComponent element="p" variant={fontVariant ?? 'reg16'}>
+    <TextComponent
+      color={hint ? 'grey500' : 'copy'}
+      element="p"
+      variant={fontVariant ?? 'reg16'}
+    >
       <span dangerouslySetInnerHTML={{ __html: message }} />
     </TextComponent>
   )
