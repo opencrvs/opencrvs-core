@@ -257,7 +257,6 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
 
         // If no pages are configured, skip directly to review page
         if (correctionPages.length === 0) {
-          // TODO CIHAN: is this correct?
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
               eventId

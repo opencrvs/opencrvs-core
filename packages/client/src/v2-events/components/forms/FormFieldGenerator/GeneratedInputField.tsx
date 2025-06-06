@@ -203,7 +203,7 @@ export const GeneratedInputField = React.memo(
 
       return (
         <Paragraph.Input
-          fontVariant={field.config.configuration.styles?.fontVariant}
+          configuration={field.config.configuration}
           message={message}
         />
       )
