@@ -22,7 +22,7 @@ import {
   deepDropNulls,
   applyDraftsToEventIndex,
   EventState,
-  getOrThrow
+  getEventConfigById
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -173,13 +173,6 @@ const ExtendedEventStatuses = {
   DRAFT: 'DRAFT'
 } as const
 
-function getEventConfig(eventConfigs: EventConfig[], id: string) {
-  const eventConfig = eventConfigs.find(
-    (eventConfiguration) => eventConfiguration.id === id
-  )
-  return getOrThrow(eventConfig, `Event config for ${id} not found`)
-}
-
 export const SearchResult = ({
   columns,
   queryData,
@@ -242,7 +235,7 @@ export const SearchResult = ({
           )
         )
         .map((event) => {
-          const eventConfig = getEventConfig(eventConfigs, event.type)
+          const eventConfig = getEventConfigById(eventConfigs, event.type)
           const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
           const { declaration, ...rest } = event
 
@@ -259,7 +252,10 @@ export const SearchResult = ({
             (outboxEvent) => outboxEvent.id === doc.id
           )
 
-          const eventConfigOfDocument = getEventConfig(eventConfigs, doc.type)
+          const eventConfigOfDocument = getEventConfigById(
+            eventConfigs,
+            doc.type
+          )
           const isInDrafts = drafts.some((draft) => draft.id === doc.id)
 
           const getEventStatus = () => {

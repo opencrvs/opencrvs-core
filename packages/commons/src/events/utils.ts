@@ -375,3 +375,10 @@ export function getMixedPath<T = unknown>(
   const result = resolve(obj, parts)
   return isNil(result) ? defaultValue : result
 }
+
+export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
+  const eventConfig = eventConfigs.find(
+    (eventConfiguration) => eventConfiguration.id === id
+  )
+  return getOrThrow(eventConfig, `Event config for ${id} not found`)
+}

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import _ from 'lodash'
 import {
   EventConfig,
   EventIndex,
@@ -28,14 +29,15 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
-type BaseNameFieldValue = Exclude<NameFieldValue, undefined>
-type AugmentedNameFieldValue = BaseNameFieldValue & {
+type IndexedNameFieldValue = BaseNameFieldValue & {
   __fullname?: string
 }
 
+type BaseNameFieldValue = Exclude<NameFieldValue, undefined>
+
 export const DEFAULT_SIZE = 10000
 
-function augmentIndexedField(
+function addIndexFieldsToValue(
   eventConfig: EventConfig,
   fieldId: string,
   value: FieldValue
@@ -46,7 +48,7 @@ function augmentIndexedField(
     return {
       ...field.value,
       __fullname: Object.values(field.value).join(' ')
-    }
+    } satisfies IndexedNameFieldValue
   }
 
   return value
@@ -61,42 +63,48 @@ export function encodeEventIndex(
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [encodeFieldId(key)]: augmentIndexedField(eventConfig, key, value)
+        [encodeFieldId(key)]: addIndexFieldsToValue(eventConfig, key, value)
       }),
       {}
     )
   }
 }
-function normaliseIndexedField(
+
+function isIndexedNameFieldValue(
+  value: FieldValue
+): value is IndexedNameFieldValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '__fullname' in value &&
+    typeof (value as IndexedNameFieldValue).__fullname === 'string'
+  )
+}
+
+function stripIndexFieldsFromValue(
   eventConfig: EventConfig,
   fieldId: string,
   value: FieldValue
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
-  if (isNameFieldType(field)) {
-    if (!field.value) {
-      return field.value
-    }
-    delete (field.value as AugmentedNameFieldValue).__fullname
-    return field.value
+
+  if (isIndexedNameFieldValue(field.value)) {
+    return _.omit(field.value, ['__fullname'])
   }
+
   return value
 }
 
 export function decodeEventIndex(
-  eventConfigs: EventConfig[],
+  eventConfig: EventConfig,
   event: EncodedEventIndex
 ): EventIndex {
-  const eventConfig = eventConfigs.find((e) => e.id === event.type)
-  if (!eventConfig) {
-    throw new Error(`Missing event config for record with ID: ${event.id}`)
-  }
   return {
     ...event,
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [decodeFieldId(key)]: normaliseIndexedField(
+        [decodeFieldId(key)]: stripIndexFieldsFromValue(
           eventConfig,
           decodeFieldId(key),
           value

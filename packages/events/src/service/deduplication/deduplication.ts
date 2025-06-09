@@ -177,6 +177,6 @@ export async function searchForDuplicates(
     .filter((hit) => hit._source)
     .map((hit) => ({
       score: hit._score || 0,
-      event: hit._source && decodeEventIndex([eventConfig], hit._source)
+      event: hit._source && decodeEventIndex(eventConfig, hit._source)
     }))
 }

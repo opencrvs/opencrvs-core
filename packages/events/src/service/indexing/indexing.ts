@@ -24,7 +24,8 @@ import {
   getCurrentEventState,
   getDeclarationFields,
   QueryType,
-  WorkqueueCountInput
+  WorkqueueCountInput,
+  getEventConfigById
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -373,7 +374,9 @@ export async function getIndexedEvents(
   return response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((event) => decodeEventIndex(eventConfigs, event))
+    .map((event) =>
+      decodeEventIndex(getEventConfigById(eventConfigs, event.type), event)
+    )
 }
 
 export async function getIndex(
@@ -405,7 +408,9 @@ export async function getIndex(
   const events = response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((event) => decodeEventIndex(eventConfigs, event))
+    .map((event) =>
+      decodeEventIndex(getEventConfigById(eventConfigs, event.type), event)
+    )
 
   return events
 }
