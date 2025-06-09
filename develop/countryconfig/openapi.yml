@@ -3155,7 +3155,7 @@ components:
                     type:
                       - string
                       - "null"
-                    description: URL to Signature file of the user who created the action
+                    description: Reference to signature of the user who created the action
                   createdAtLocation:
                     type:
                       - string
@@ -3245,7 +3245,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -3595,7 +3595,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -3941,7 +3941,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4300,7 +4300,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4646,7 +4646,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5005,7 +5005,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5351,7 +5351,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5699,7 +5699,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6045,7 +6045,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6394,7 +6394,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6740,7 +6740,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7089,7 +7089,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7438,7 +7438,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7787,7 +7787,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -8133,7 +8133,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -9792,7 +9792,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 91ceb451-4e5f-4d4d-9c55-2bca0d9e7f2d
+        transactionId: 1dfe43f6-a87f-471d-8737-74dbfed77171
         declaration: {}
         annotation: {}
         type: NOTIFY
