@@ -105,6 +105,8 @@ function generateQuery(
   return { bool: { must } } as estypes.QueryDslQueryContainer
 }
 
+const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
+
 function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
@@ -176,11 +178,11 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     }
   }
 
-  if (clause.registrationNumber) {
+  if (clause['legalStatus.REGISTERED.registrationNumber']) {
     must.push({
       term: {
         'legalStatuses.REGISTERED.registrationNumber':
-          clause.registrationNumber.term
+          clause['legalStatus.REGISTERED.registrationNumber'].term
       }
     })
   }
@@ -221,7 +223,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     } else {
       must.push({
         geo_distance: {
-          distance: '10km',
+          distance: EXACT_SEARCH_LOCATION_DISTANCE,
           location: clause.createdAtLocation.location
         }
       })
@@ -236,7 +238,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     } else {
       must.push({
         geo_distance: {
-          distance: '10km',
+          distance: EXACT_SEARCH_LOCATION_DISTANCE,
           location: clause.updatedAtLocation.location
         }
       })
