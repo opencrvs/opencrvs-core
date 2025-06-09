@@ -32,7 +32,7 @@ const SignaturePreview = styled.img`
   display: block;
 `
 
-export interface SignatureFieldProps {
+interface SignatureFieldProps {
   name: string
   /**
    * File should be stored in the cache where it is then retrieved by the component.
