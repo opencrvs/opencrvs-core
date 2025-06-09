@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
-import { userEvent, within, expect } from '@storybook/test'
+import { userEvent, within, expect, waitFor } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 
@@ -148,7 +148,9 @@ export const AdvancedSearchTabsBehaviour: Story = {
     const checkRegistrationDetails = async (
       canvasRef: ReturnType<typeof within>
     ) => {
-      await canvasRef.findByText('Tennis club membership application')
+      await waitFor(async () => {
+        await canvasRef.findByText('Tennis club membership application')
+      })
 
       const accordion = await canvasRef.findByTestId(
         'accordion-v2.advancedSearch.form.registrationDetails'
