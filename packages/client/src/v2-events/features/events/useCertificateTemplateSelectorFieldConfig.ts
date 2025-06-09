@@ -11,6 +11,7 @@
 
 import {
   areConditionsMet,
+  DeclarationActionConfig,
   EventState,
   FieldConfig,
   FieldType
@@ -20,9 +21,10 @@ import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
   eventType: string,
-  declation: EventState
+  declaration: EventState
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
+
   return {
     id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
@@ -38,7 +40,7 @@ export const useCertificateTemplateSelectorFieldConfig = (
     options: certificateTemplates
       .filter((x) => x.event === eventType)
       .filter(
-        (x) => !x.conditionals || areConditionsMet(x.conditionals, declation)
+        (x) => !x.conditionals || areConditionsMet(x.conditionals, declaration)
       )
       .map((x) => ({ label: x.label, value: x.id }))
   }

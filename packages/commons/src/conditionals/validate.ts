@@ -59,9 +59,23 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, unknown>
 ) {
-  return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values)
-  )
+  return conditions.every((condition) => {
+    const res = isConditionMet(condition.conditional, values)
+    console.log('**************************************')
+    console.log('**************************************')
+    console.log('**************************************')
+    console.log(
+      'Condition met for',
+      // condition.conditional.properties.$form.required[0],
+      // condition.conditional.properties.$form.properties['child.dob']
+      // .formatMaximum,
+      condition.type,
+      values['child.dob'],
+      ':',
+      res
+    )
+    return res
+  })
 }
 
 function isFieldConditionMet(

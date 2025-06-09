@@ -53,6 +53,7 @@ export function Pages() {
   const annotation = getAnnotation()
   const events = useEvents()
   const event = events.getEventState.useSuspenseQuery(eventId)
+  debugger
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
