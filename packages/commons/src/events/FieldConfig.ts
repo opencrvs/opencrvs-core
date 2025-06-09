@@ -305,6 +305,7 @@ const Select = BaseField.extend({
 
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
+  defaultValue: NonEmptyTextValue.optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -315,10 +316,12 @@ const NameField = BaseField.extend({
 }).describe('Name input field')
 
 const PhoneField = BaseField.extend({
+  defaultValue: NonEmptyTextValue.optional(),
   type: z.literal(FieldType.PHONE)
 }).describe('Phone input field')
 
 const IdField = BaseField.extend({
+  defaultValue: NonEmptyTextValue.optional(),
   type: z.literal(FieldType.ID)
 }).describe('ID input field')
 

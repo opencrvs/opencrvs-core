@@ -24,7 +24,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
-import { SearchResultComponent } from '../events/Search/SearchResult'
+import { SearchResult } from '../events/Search/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 
 const FabContainer = styled.div`
@@ -54,7 +54,7 @@ export function WorkqueueContainer() {
 
   return (
     <>
-      <SearchResultComponent
+      <SearchResult
         columns={workqueueConfig.columns}
         eventConfigs={eventConfigs}
         queryData={events}

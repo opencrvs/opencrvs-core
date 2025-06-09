@@ -19,7 +19,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
-import { SearchResultComponent } from './SearchResult'
+import { SearchResult } from './SearchResult'
 import {
   buildDataCondition,
   toAdvancedSearchQueryType,
@@ -47,7 +47,7 @@ export const SearchResultIndex = () => {
   )
 
   return (
-    <SearchResultComponent
+    <SearchResult
       columns={mandatoryColumns}
       eventConfigs={[eventConfig]}
       queryData={queryData}
@@ -59,7 +59,7 @@ export const SearchResultIndex = () => {
       }
       // @todo add search result message with total count of results
       title={intl.formatMessage({
-        id: '',
+        id: 'kdkdkd',
         description: '',
         defaultMessage: ''
       })}

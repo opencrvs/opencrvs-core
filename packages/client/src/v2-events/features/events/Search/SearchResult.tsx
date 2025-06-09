@@ -37,7 +37,6 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
 import { useEventTitle } from '../useEvents/useEventTitle'
 
 const WithTestId = styled.div.attrs({
@@ -181,7 +180,7 @@ function getEventConfig(eventConfigs: EventConfig[], id: string) {
   return getOrThrow(eventConfig, `Event config for ${id} not found`)
 }
 
-export const SearchResultComponent = ({
+export const SearchResult = ({
   columns,
   queryData,
   eventConfigs,

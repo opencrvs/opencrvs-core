@@ -414,8 +414,10 @@ export async function getEventCount(
   queries: WorkqueueCountInput,
   eventConfigs: EventConfig[]
 ) {
+  console.log(JSON.stringify(queries))
   return (
-    //  @ToDo: write a query that does everything in one go.
+    //  @TODO: write a query that does everything in one go.
+
     (
       await Promise.all(
         queries.map(async ({ slug, query }) => {

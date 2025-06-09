@@ -104,7 +104,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
-    case FieldType.SIGNATURE:
     case FieldType.PHONE:
     case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
