@@ -20,7 +20,6 @@ import { Icon } from '@opencrvs/components/lib/Icon'
 import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
-import { dataUrlToFile } from '@client/utils/imageUtils'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { cacheFile, getUnsignedFileUrl } from '@client/v2-events/cache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
@@ -45,6 +44,20 @@ export interface SignatureFieldProps {
   acceptedFileTypes?: MimeType[]
   modalTitle: string
   disabled?: boolean
+}
+
+/**
+ * given a base64 string, convert it to a File object
+ * Function intentionally uses atob rather than fetch to allow strict CSP.
+ */
+function base64ToFile(fileString: string, filename: string) {
+  const [header, base64] = fileString.split(',')
+  const mime = header.match(/:(.*?);/)?.[1] || MimeType.enum['image/png']
+
+  const binary = atob(base64)
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0))
+
+  return new File([bytes], filename, { type: mime })
 }
 
 export function SignatureField({
@@ -160,7 +173,7 @@ export function SignatureField({
           title={modalTitle}
           onClose={() => setIsModalOpen(false)}
           onSubmit={async (signatureBase64: string) => {
-            const signatureFile = await dataUrlToFile(
+            const signatureFile = base64ToFile(
               signatureBase64,
               `signature-${name}-${Date.now()}.png`
             )

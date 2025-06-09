@@ -15,7 +15,7 @@ import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
 import { joinValues } from '@client/v2-events/utils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
-import { dataUrlToFile } from '@client/utils/imageUtils'
+import { fetchFileFromUrl } from '@client/utils/imageUtils'
 
 async function uploadFile({
   file,
@@ -79,7 +79,7 @@ async function getPresignedUrl(fileUri: string) {
 export async function precacheFile(filename: string) {
   const presignedUrl = (await getPresignedUrl(filename)).presignedURL
 
-  const file = await dataUrlToFile(presignedUrl, filename)
+  const file = await fetchFileFromUrl(presignedUrl, filename)
   await cacheFile({ filename, file })
 }
 

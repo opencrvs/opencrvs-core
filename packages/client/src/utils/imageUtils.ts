@@ -137,11 +137,11 @@ export async function fetchImageAsBase64(url: string): Promise<string> {
 export const bytesToMB = (bytes: number) =>
   Number(Number(bytes / (1024 * 1024)).toFixed(2))
 
-export async function dataUrlToFile(
-  dataUrl: string,
+export async function fetchFileFromUrl(
+  externalUrl: string,
   filename: string
 ): Promise<File> {
-  const res = await fetch(dataUrl)
+  const res = await fetch(externalUrl)
   const blob = await res.blob()
 
   return new File([blob], filename, { type: blob.type })
