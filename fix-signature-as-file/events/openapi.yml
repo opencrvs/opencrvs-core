@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 15c57f0b-e592-4907-b65d-f0eba5e8a2dd
+                transactionId: da2af9a6-317d-4c61-bd8c-9eb8a9ad8cad
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 864ca364-f7b5-4f95-bf2c-c46cc4c99708
+                transactionId: ddb80b31-680e-4b5a-ae73-8927d818fb43
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -592,7 +592,7 @@ paths:
                           createdBySignature:
                             type: string
                             nullable: true
-                            description: URL to Signature file of the user who created the action
+                            description: Reference to signature of the user who created the action
                           createdAtLocation:
                             type: string
                             nullable: true
@@ -3909,7 +3909,7 @@ components:
                   createdBySignature:
                     type: string
                     nullable: true
-                    description: URL to Signature file of the user who created the action
+                    description: Reference to signature of the user who created the action
                   createdAtLocation:
                     type: string
                     nullable: true
@@ -3991,7 +3991,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -4329,7 +4329,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -4664,7 +4664,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -5012,7 +5012,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -5347,7 +5347,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -5695,7 +5695,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -6030,7 +6030,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -6367,7 +6367,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -6702,7 +6702,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -7040,7 +7040,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -7375,7 +7375,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -7713,7 +7713,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -8051,7 +8051,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -8389,7 +8389,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
@@ -8724,7 +8724,7 @@ components:
         createdBySignature:
           type: string
           nullable: true
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type: string
           nullable: true
