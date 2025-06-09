@@ -54,6 +54,9 @@ const libraryMembershipForm = defineDeclarationForm({
   ]
 })
 
+/**
+ * @knipignore
+ */
 export const libraryMembershipEvent = defineConfig({
   id: 'library-membership',
   label: {

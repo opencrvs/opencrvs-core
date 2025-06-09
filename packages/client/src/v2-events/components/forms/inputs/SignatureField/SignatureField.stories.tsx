@@ -12,12 +12,11 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { getUnsignedFileUrl } from '@client/v2-events/cache'
-import { DocumentViewer } from './DocumentViewer'
+import { SignatureField } from './SignatureField'
 
-const meta: Meta<typeof DocumentViewer> = {
-  title: 'Inputs/DocumentViewer',
-  component: DocumentViewer,
+const meta: Meta<typeof SignatureField> = {
+  title: 'Inputs/SignatureField',
+  component: SignatureField,
   args: {},
   decorators: [
     (Story) => (
@@ -30,25 +29,6 @@ const meta: Meta<typeof DocumentViewer> = {
 
 export default meta
 
-export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
-  name: 'Empty Document Viewer',
-  args: {
-    options: []
-  }
-}
-
-export const DocumentViewerSingleOption: StoryObj<typeof DocumentViewer> = {
-  name: 'Document Viewer, Single Option',
-  args: {
-    options: [
-      {
-        value: {
-          filename: 'fish.svg',
-          url: getUnsignedFileUrl('fish.svg'),
-          id: '1'
-        },
-        label: 'Option 1'
-      }
-    ]
-  }
+export const EmptySignatureField: StoryObj<typeof SignatureField> = {
+  args: {}
 }
