@@ -27,7 +27,7 @@ import {
   writeActions
 } from './ActionType'
 import { EventConfig } from './EventConfig'
-import { FieldConfig, Inferred } from './FieldConfig'
+import { FieldConfig } from './FieldConfig'
 import {
   Action,
   ActionStatus,
@@ -93,12 +93,10 @@ export function getAllUniqueFields(eventConfig: EventConfig) {
 export function getDeclarationFieldById(
   config: EventConfig,
   fieldId: string
-): Inferred {
+): FieldConfig {
   const field = getAllUniqueFields(config).find((f) => f.id === fieldId)
-  if (!field) {
-    throw new Error(`Field with id ${fieldId} not found in event config`)
-  }
-  return field
+
+  return getOrThrow(field, `Field with id ${fieldId} not found in event config`)
 }
 
 /**
