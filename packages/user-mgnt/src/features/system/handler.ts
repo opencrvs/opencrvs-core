@@ -18,7 +18,7 @@ import {
   createFhirPractitionerRole,
   postFhir
 } from '@user-mgnt/features/createUser/service'
-import { logger, SystemType } from '@opencrvs/commons'
+import { logger, SystemRole } from '@opencrvs/commons'
 import System, { WebhookPermissions } from '@user-mgnt/model/system'
 import User from '@user-mgnt/model/user'
 import { generateHash, generateSaltedHash } from '@user-mgnt/utils/hash'
@@ -45,7 +45,7 @@ interface IRegisterSystemPayload {
     dailyQuota: number
     webhook: WebHookPayload[]
   }
-  type: SystemType
+  type: SystemRole
   integratingSystemType: string
 }
 

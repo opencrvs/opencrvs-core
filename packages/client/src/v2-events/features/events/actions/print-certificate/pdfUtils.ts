@@ -129,7 +129,9 @@ export const stringifyEventMetadata = ({
               intl,
               metadata.legalStatuses.DECLARED.acceptedAt
             ),
-            createdByRole: metadata.legalStatuses.DECLARED.createdByRole
+            createdByRole: metadata.legalStatuses.DECLARED.createdByRole,
+            createdBySignature:
+              metadata.legalStatuses.DECLARED.createdBySignature
           }
         : null,
       [EventStatus.REGISTERED]: metadata.legalStatuses.REGISTERED
@@ -153,7 +155,14 @@ export const stringifyEventMetadata = ({
             ),
             createdByRole: metadata.legalStatuses.REGISTERED.createdByRole,
             registrationNumber:
-              metadata.legalStatuses.REGISTERED.registrationNumber
+              metadata.legalStatuses.REGISTERED.registrationNumber,
+            createdBySignature: metadata.legalStatuses.REGISTERED
+              .createdBySignature
+              ? new URL(
+                  metadata.legalStatuses.REGISTERED.createdBySignature,
+                  window.config.MINIO_BASE_URL
+                ).href
+              : undefined
           }
         : null
     }

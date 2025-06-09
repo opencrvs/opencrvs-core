@@ -8,10 +8,5 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export enum SystemType {
-  Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
-  RecordSearch = 'RECORD_SEARCH',
-  Import = 'IMPORT',
-  Webhook = 'WEBHOOK'
-}
+
+export { SignatureField } from './SignatureField'

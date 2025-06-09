@@ -118,6 +118,21 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
+export function getAssignedUserSignatureFromActions(
+  actions: Array<ActionDocument>
+) {
+  return actions.reduce<null | string>((signature, action) => {
+    if (action.type === ActionType.ASSIGN) {
+      return action.createdBySignature || null
+    }
+    if (action.type === ActionType.UNASSIGN) {
+      return null
+    }
+
+    return signature
+  }, null)
+}
+
 function aggregateActionDeclarations(
   actions: Array<ActionDocument>
 ): ActionUpdate {
@@ -229,7 +244,7 @@ export function getCurrentEventState(
 
   if (config.dateOfEvent) {
     const parsedDate = ZodDate.safeParse(
-      declaration[config.dateOfEvent.fieldId]
+      declaration[config.dateOfEvent.$$field]
     )
     if (parsedDate.success) {
       dateOfEvent = parsedDate.data
@@ -245,13 +260,14 @@ export function getCurrentEventState(
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
+    createdBySignature: creationAction.createdBySignature,
     updatedAt: declarationUpdateMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
+    assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: declarationUpdateMetadata.createdBy,
     updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
-    // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
     updatedByUserRole: declarationUpdateMetadata.createdByRole,
     dateOfEvent,
     flags: getFlagsFromActions(event.actions)

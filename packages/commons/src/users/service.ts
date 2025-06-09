@@ -32,6 +32,7 @@ type User = {
   scope: string[]
   status: string
   creationDate: number
+  signature?: string
 }
 type System = {
   name: string

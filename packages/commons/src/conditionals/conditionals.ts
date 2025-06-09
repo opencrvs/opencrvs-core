@@ -236,9 +236,9 @@ function getDateRangeToFieldReference(
   }
 }
 
-type FieldReference = { _fieldId: string; [key: string]: unknown }
+type FieldReference = { $$field: string }
 function isFieldReference(value: unknown): value is FieldReference {
-  return typeof value === 'object' && value !== null && '_fieldId' in value
+  return typeof value === 'object' && value !== null && '$$field' in value
 }
 
 /**
@@ -267,6 +267,10 @@ export function createFieldConditionals(fieldId: string) {
   })
 
   return {
+    /**
+     * @private Internal property used for field reference tracking.
+     */
+    $$field: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () =>
@@ -280,7 +284,7 @@ export function createFieldConditionals(fieldId: string) {
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
-          const comparedFieldId = date._fieldId
+          const comparedFieldId = date.$$field
           return defineFormConditional(
             getDateRangeToFieldReference(
               fieldId,
@@ -308,7 +312,7 @@ export function createFieldConditionals(fieldId: string) {
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
-          const comparedFieldId = date._fieldId
+          const comparedFieldId = date.$$field
           return defineFormConditional(
             getDateRangeToFieldReference(
               fieldId,
@@ -326,7 +330,7 @@ export function createFieldConditionals(fieldId: string) {
     isEqualTo: (value: string | boolean | FieldReference) => {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {
-        const comparedFieldId = value._fieldId
+        const comparedFieldId = value.$$field
 
         return defineFormConditional({
           type: 'object',

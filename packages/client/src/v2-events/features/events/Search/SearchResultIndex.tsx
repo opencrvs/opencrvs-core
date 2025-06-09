@@ -13,6 +13,7 @@ import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
+import { useLocation } from 'react-router-dom'
 import { SearchQueryParams, mandatoryColumns } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
@@ -29,9 +30,10 @@ export const SearchResultIndex = () => {
   const intl = useIntl()
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
+  const location = useLocation()
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = SearchQueryParams.parse(parse(window.location.search))
+  const searchParams = SearchQueryParams.parse(parse(location.search))
 
   const filteredSearchParams = parseFieldSearchParams(eventConfig, searchParams)
 

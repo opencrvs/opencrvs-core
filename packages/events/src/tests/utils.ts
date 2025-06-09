@@ -13,9 +13,11 @@ import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
+  createPseudoRandomNumberGenerator,
+  generateRandomSignature,
   Scope,
   SCOPES,
-  SystemType,
+  SystemRole,
   TokenUserType,
   TokenWithBearer
 } from '@opencrvs/commons'
@@ -23,7 +25,60 @@ import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
 import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
+import { SystemContext } from '@events/context'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
+
+/**
+ * Known unstable fields in events that should be sanitized for snapshot testing.
+ * We should aim to have stable ids based on the actual users and events in the system.
+ */
+export const UNSTABLE_EVENT_FIELDS = [
+  'createdAt',
+  'updatedAt',
+  'transactionId',
+  'id',
+  'trackingId',
+  'eventId',
+  'createdBy',
+  'createdAtLocation',
+  'assignedTo'
+]
+/**u
+ * Cleans up unstable fields in data for snapshot testing.
+ *
+ * @param data - The data to sanitize
+ * @param options - fields to sanitize and replacement value for them
+ *
+ * @example sanitizeForSnapshot({
+ *   name: 'John Doe',
+ *   createdAt: '2023-10-01T12:00:00Z'
+ * }, { fields: ['createdAt'] })
+ * // → { name: 'John Doe', createdAt: '[sanitized]' }
+ */
+export function sanitizeForSnapshot(data: unknown, fields: string[]) {
+  const replacement = '[sanitized]'
+  const keyMatches = (key: string) => fields.includes(key)
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sanitize = (value: unknown): any => {
+    if (Array.isArray(value)) {
+      return value.map(sanitize)
+    }
+
+    if (value && typeof value === 'object') {
+      return Object.fromEntries(
+        Object.entries(value).map(([key, val]) => [
+          key,
+          keyMatches(key) ? replacement : sanitize(val)
+        ])
+      )
+    }
+
+    return value
+  }
+
+  return sanitize(data)
+}
 
 const { createCallerFactory } = t
 
@@ -45,7 +100,7 @@ export const TEST_USER_DEFAULT_SCOPES = [
 export function createTestToken(
   userId: string,
   scopes: Scope[],
-  userType: TokenUserType = TokenUserType.USER
+  userType: TokenUserType = TokenUserType.enum.user
 ): TokenWithBearer {
   const token = jwt.sign(
     { scope: scopes, sub: userId, userType },
@@ -65,19 +120,21 @@ export function createSystemTestClient(
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
 ) {
   const createCaller = createCallerFactory(appRouter)
-  const token = createTestToken(systemId, scopes, TokenUserType.SYSTEM)
+  const token = createTestToken(systemId, scopes, TokenUserType.enum.system)
 
   const caller = createCaller({
-    user: {
+    user: SystemContext.parse({
       id: systemId,
-      role: SystemType.Health,
+      role: SystemRole.enum.HEALTH,
       primaryOfficeId: undefined,
-      type: TokenUserType.SYSTEM
-    },
+      type: TokenUserType.enum.system
+    }),
     token
   })
+
   return caller
 }
+
 export function createTestClient(
   user: CreatedUser,
   scopes: string[] = TEST_USER_DEFAULT_SCOPES
@@ -88,7 +145,7 @@ export function createTestClient(
   const caller = createCaller({
     user: {
       ...user,
-      type: TokenUserType.USER
+      type: TokenUserType.enum.user
     },
     token
   })
@@ -103,6 +160,8 @@ export const setupTestCase = async () => {
   const eventsDb = await events.getClient()
   const userMgntDb = await userMgnt.getClient()
 
+  const rng = createPseudoRandomNumberGenerator(101)
+
   const seed = seeder()
   const locations = generator.locations.set(5)
   await seed.locations(eventsDb, locations)
@@ -116,7 +175,10 @@ export const setupTestCase = async () => {
 
   return {
     locations,
-    user,
+    user: {
+      ...user,
+      signature: generateRandomSignature(rng)
+    },
     eventsDb,
     userMgntDb,
     seed,

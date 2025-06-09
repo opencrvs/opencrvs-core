@@ -48,10 +48,7 @@ import {
   getValidatorsForField
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { NameFieldValue } from '@opencrvs/commons/client'
-import { SignatureUploader } from '@client/components/form/SignatureField/SignatureUploader'
 import { InputField } from '@client/components/form/InputField'
-
 import {
   BulletList,
   Checkbox,
@@ -75,6 +72,7 @@ import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileIn
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
+import { SignatureField } from '../inputs/SignatureField'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
 interface GeneratedInputFieldProps<T extends FieldConfig> {
@@ -437,15 +435,15 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isSignatureFieldType(field)) {
-      return readonlyMode ? null : (
+      return (
         <InputField {...inputFieldProps}>
-          <SignatureUploader
+          <SignatureField
+            {...field.config}
+            maxFileSize={field.config.configuration.maxFileSize}
             modalTitle={intl.formatMessage(field.config.signaturePromptLabel)}
             name={fieldDefinition.id}
             value={field.value}
-            onChange={(val: string) =>
-              onFieldValueChange(fieldDefinition.id, val)
-            }
+            onChange={(val) => handleFileChange(val)}
           />
         </InputField>
       )

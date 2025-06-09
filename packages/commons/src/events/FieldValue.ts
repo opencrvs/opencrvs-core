@@ -58,6 +58,9 @@ export type NumberFieldValue = z.infer<typeof NumberFieldValue>
 export const DataFieldValue = z.undefined()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
+export const SignatureFieldValue = z.string()
+export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
+
 export const FieldValue = z.union([
   TextValue,
   DateValue,
