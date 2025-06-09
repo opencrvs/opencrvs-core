@@ -86,10 +86,12 @@ components:
         dateOfEvent:
           type: object
           properties:
-            fieldId:
+            $$field:
               type: string
+              description: Unique identifier for the field
           required:
-            - fieldId
+            - $$field
+          description: Reference to a field by its ID
         title:
           $ref: "#/components/schemas/TranslationConfig"
         fallbackTitle:
@@ -639,6 +641,51 @@ components:
           properties:
             id:
               type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default:
+                &a4 []
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default:
+                &a5 []
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            type:
+              type: string
+              const: ADDRESS
             defaultValue:
               anyOf:
                 - oneOf:
@@ -720,46 +767,6 @@ components:
                     - addressType
                     - state
                     - district2
-            parent:
-              type: object
-              properties:
-                _fieldId:
-                  type: string
-            conditionals:
-              type: array
-              items:
-                $ref: "#/components/schemas/FieldConditional"
-              default:
-                &a4 []
-            required:
-              type: boolean
-              default: false
-            placeholder:
-              $ref: "#/components/schemas/TranslationConfig"
-            validation:
-              type: array
-              items:
-                type: object
-                properties:
-                  validator:
-                    $ref: "#/components/schemas/Conditional"
-                  message:
-                    $ref: "#/components/schemas/TranslationConfig"
-                required:
-                  - validator
-                  - message
-              default:
-                &a5 []
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            helperText:
-              $ref: "#/components/schemas/TranslationConfig"
-            hideLabel:
-              type: boolean
-              default: false
-            type:
-              type: string
-              const: ADDRESS
           required:
             - id
             - label
@@ -769,14 +776,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -810,6 +819,9 @@ components:
             type:
               type: string
               const: TEXT
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -836,13 +848,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: number
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -876,6 +891,8 @@ components:
             type:
               type: string
               const: NUMBER
+            defaultValue:
+              type: number
             configuration:
               type: object
               properties:
@@ -898,14 +915,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -939,6 +958,9 @@ components:
             type:
               type: string
               const: TEXTAREA
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -966,15 +988,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              format: date
-              description: Date in the format YYYY-MM-DD
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1008,6 +1031,10 @@ components:
             type:
               type: string
               const: DATE
+            defaultValue:
+              type: string
+              format: date
+              description: Date in the format YYYY-MM-DD
             configuration:
               type: object
               properties:
@@ -1023,26 +1050,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: array
-                  maxItems: 2
-                  minItems: 2
-                  prefixItems:
-                    - type: string
-                      format: date
-                      description: Date in the format YYYY-MM-DD
-                    - type: string
-                      format: date
-                      description: Date in the format YYYY-MM-DD
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1076,6 +1093,21 @@ components:
             type:
               type: string
               const: DATE_RANGE
+            defaultValue:
+              anyOf:
+                - type: string
+                  format: date
+                  description: Date in the format YYYY-MM-DD
+                - type: array
+                  maxItems: 2
+                  minItems: 2
+                  prefixItems:
+                    - type: string
+                      format: date
+                      description: Date in the format YYYY-MM-DD
+                    - type: string
+                      format: date
+                      description: Date in the format YYYY-MM-DD
             configuration:
               type: object
               properties:
@@ -1092,14 +1124,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1133,6 +1167,9 @@ components:
             type:
               type: string
               const: PARAGRAPH
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1162,13 +1199,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1202,6 +1242,8 @@ components:
             type:
               type: string
               const: RADIO_GROUP
+            defaultValue:
+              type: string
             options:
               type: array
               items:
@@ -1238,13 +1280,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1278,6 +1323,8 @@ components:
             type:
               type: string
               const: BULLET_LIST
+            defaultValue:
+              type: string
             items:
               type: array
               items:
@@ -1304,14 +1351,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1345,6 +1394,9 @@ components:
             type:
               type: string
               const: PAGE_HEADER
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1354,13 +1406,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1394,6 +1449,8 @@ components:
             type:
               type: string
               const: SELECT
+            defaultValue:
+              type: string
             options:
               type: array
               items:
@@ -1419,13 +1476,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1459,6 +1519,8 @@ components:
             type:
               type: string
               const: CHECKBOX
+            defaultValue:
+              type: boolean
           required:
             - id
             - label
@@ -1468,21 +1530,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1516,6 +1573,19 @@ components:
             type:
               type: string
               const: FILE
+            defaultValue:
+              type: object
+              properties:
+                filename:
+                  type: string
+                originalFilename:
+                  type: string
+                type:
+                  type: string
+              required:
+                - filename
+                - originalFilename
+                - type
             configuration:
               type: object
               properties:
@@ -1560,14 +1630,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1601,6 +1673,9 @@ components:
             type:
               type: string
               const: COUNTRY
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1610,14 +1685,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1651,6 +1728,9 @@ components:
             type:
               type: string
               const: ADMINISTRATIVE_AREA
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1681,21 +1761,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1737,14 +1812,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1778,6 +1855,9 @@ components:
             type:
               type: string
               const: LOCATION
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1787,14 +1867,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1828,6 +1910,9 @@ components:
             type:
               type: string
               const: FACILITY
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1837,14 +1922,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1878,6 +1965,9 @@ components:
             type:
               type: string
               const: OFFICE
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1887,21 +1977,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1938,6 +2023,8 @@ components:
             signaturePromptLabel:
               $ref: "#/components/schemas/TranslationConfig"
               description: Title of the signature modal
+            defaultValue:
+              type: string
             configuration:
               type: object
               properties:
@@ -1966,14 +2053,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2015,6 +2104,9 @@ components:
                   description: Maximum length of the text
               default:
                 maxLength: 10
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -2023,21 +2115,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2086,6 +2173,24 @@ components:
                   - value
                   - label
               description: A list of options
+            defaultValue:
+              type: array
+              items:
+                type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                  option:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+                  - option
             configuration:
               type: object
               properties:
@@ -2113,21 +2218,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -3055,7 +3155,7 @@ components:
                     type:
                       - string
                       - "null"
-                    description: URL to Signature file of the user who created the action
+                    description: Reference to signature of the user who created the action
                   createdAtLocation:
                     type:
                       - string
@@ -3145,7 +3245,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -3495,7 +3595,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -3841,7 +3941,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4200,7 +4300,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4546,7 +4646,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -4905,7 +5005,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5251,7 +5351,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5599,7 +5699,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -5945,7 +6045,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6294,7 +6394,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6640,7 +6740,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -6989,7 +7089,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7338,7 +7438,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -7687,7 +7787,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -8033,7 +8133,7 @@ components:
           type:
             - string
             - "null"
-          description: URL to Signature file of the user who created the action
+          description: Reference to signature of the user who created the action
         createdAtLocation:
           type:
             - string
@@ -9692,7 +9792,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: bd68885f-b9b0-4b2b-8f1d-acf76073e144
+        transactionId: d2329046-9aea-4597-b373-6a3e6b909721
         declaration: {}
         annotation: {}
         type: NOTIFY
