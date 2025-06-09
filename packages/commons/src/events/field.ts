@@ -27,10 +27,6 @@ export function field(
   } = {}
 ) {
   return {
-    /**
-     * @private Internal property used for field reference tracking.
-     */
-    _fieldId: fieldId,
     ...createFieldConditionals(fieldId),
     ...createFieldConfig(fieldId, options)
   }

@@ -244,7 +244,7 @@ export function getCurrentEventState(
 
   if (config.dateOfEvent) {
     const parsedDate = ZodDate.safeParse(
-      declaration[config.dateOfEvent.fieldId]
+      declaration[config.dateOfEvent.$$field]
     )
     if (parsedDate.success) {
       dateOfEvent = parsedDate.data

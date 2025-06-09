@@ -47,7 +47,7 @@ export const ActionBase = z.object({
   createdBySignature: z
     .string()
     .nullish() // @TODO: Check where the null comes from
-    .describe('URL to Signature file of the user who created the action'),
+    .describe('Reference to signature of the user who created the action'),
   createdAtLocation: CreatedAtLocation,
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional().nullable(),
