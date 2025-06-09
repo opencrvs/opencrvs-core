@@ -448,6 +448,7 @@ function buildQueryFromQuickSearchFields(
       clauses.push(queryClause)
     }
   }
+
   addMetadataFieldsInQuickSearchQuery(clauses, terms)
 
   return {

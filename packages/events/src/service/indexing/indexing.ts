@@ -199,7 +199,7 @@ export async function createIndex(
           legalStatuses: {
             type: 'object',
             properties: {
-              [EventStatus.DECLARED]: {
+              [EventStatus.enum.DECLARED]: {
                 type: 'object',
                 properties: {
                   createdAt: { type: 'date' },
@@ -213,7 +213,7 @@ export async function createIndex(
                   estypes.MappingProperty
                 >
               },
-              [EventStatus.REGISTERED]: {
+              [EventStatus.enum.REGISTERED]: {
                 type: 'object',
                 properties: {
                   createdAt: { type: 'date' },
@@ -348,13 +348,13 @@ export async function getIndexedEvents(
       should: [
         {
           bool: {
-            must_not: [{ term: { status: EventStatus.CREATED } }]
+            must_not: [{ term: { status: EventStatus.enum.CREATED } }]
           }
         },
         {
           bool: {
             must: [
-              { term: { status: EventStatus.CREATED } },
+              { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
             ]
           }

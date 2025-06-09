@@ -209,7 +209,7 @@ export function Review() {
           primaryButtonType="positive"
           onConfirm={handleRegistration}
           onReject={
-            currentEventState.status === EventStatus.REJECTED
+            currentEventState.status === EventStatus.enum.REJECTED
               ? undefined
               : handleRejection
           }

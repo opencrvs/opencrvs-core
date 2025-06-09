@@ -54,7 +54,7 @@ export const DefaultSearchResult: Story = {
           'applicant.surname': 'Doe',
           'applicant.dob': '1999-11-11'
         },
-        status: EventStatus.REGISTERED
+        status: EventStatus.enum.REGISTERED
       })
     ],
     columns: mandatoryColumns
@@ -67,7 +67,10 @@ export const SearchResultWithMultipleItems: Story = {
   },
   args: {
     eventConfigs: [tennisClubMembershipEvent],
-    queryData: queryData.map((e) => ({ ...e, status: EventStatus.REGISTERED })),
+    queryData: queryData.map((e) => ({
+      ...e,
+      status: EventStatus.enum.REGISTERED
+    })),
     columns: mandatoryColumns
   }
 }

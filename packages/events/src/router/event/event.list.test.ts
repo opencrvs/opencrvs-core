@@ -81,7 +81,7 @@ test('Returns aggregated event with updated status and values', async () => {
   const initialEvents = await client.event.list()
 
   expect(initialEvents).toHaveLength(1)
-  expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
+  expect(initialEvents[0].status).toBe(EventStatus.enum.DECLARED)
   expect(initialEvents[0].declaration).toEqual(initialDeclaration)
 
   const updatedDeclaration = {
@@ -109,7 +109,7 @@ test('Returns aggregated event with updated status and values', async () => {
 
   expect(updatedEvents).toHaveLength(1)
 
-  expect(updatedEvents[0].status).toBe(EventStatus.DECLARED)
+  expect(updatedEvents[0].status).toBe(EventStatus.enum.DECLARED)
   expect(updatedEvents[0].declaration).toEqual(updatedDeclaration)
 })
 

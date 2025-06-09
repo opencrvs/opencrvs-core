@@ -125,7 +125,7 @@ export async function deleteEvent(
   const eventStatus = getStatusFromActions(event.actions)
 
   // Once an event is declared or notified, it can not be deleted anymore
-  if (eventStatus !== EventStatus.CREATED) {
+  if (eventStatus !== EventStatus.enum.CREATED) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'A declared or notified event can not be deleted'

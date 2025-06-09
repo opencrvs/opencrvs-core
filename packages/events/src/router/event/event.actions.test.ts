@@ -211,7 +211,7 @@ test('Action data accepts partial changes', async () => {
     {
       ...stateAfterVillageRemoval,
       legalStatuses: {
-        [EventStatus.DECLARED]: {
+        [EventStatus.enum.DECLARED]: {
           acceptedAt: stateAfterVillageRemoval.updatedAt as string,
           createdAt: stateAfterVillageRemoval.updatedAt as string,
           createdByRole: user.role,

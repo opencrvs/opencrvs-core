@@ -49,7 +49,7 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { eventStatuses } from './EventMetadata'
+import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 
@@ -641,7 +641,7 @@ export const eventQueryDataGenerator = (
   return {
     id: overrides.id ?? generateUuid(rng),
     type: overrides.type ?? TENNIS_CLUB_MEMBERSHIP,
-    status: overrides.status ?? pickRandom(rng, eventStatuses),
+    status: overrides.status ?? pickRandom(rng, EventStatus.options),
     createdAt: overrides.createdAt ?? createdAt,
     createdBy: overrides.createdBy ?? generateUuid(rng),
     createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),

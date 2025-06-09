@@ -101,7 +101,7 @@ export const stringifyEventMetadata = ({
     id: metadata.id,
     type: metadata.type,
     trackingId: metadata.trackingId,
-    status: EventStatus.REGISTERED,
+    status: EventStatus.enum.REGISTERED,
     updatedByUserRole: metadata.updatedByUserRole,
     updatedAtLocation: LocationSearch.stringify(
       intl,
@@ -110,7 +110,7 @@ export const stringifyEventMetadata = ({
     ),
     flags: [],
     legalStatuses: {
-      [EventStatus.DECLARED]: metadata.legalStatuses.DECLARED
+      [EventStatus.enum.DECLARED]: metadata.legalStatuses.DECLARED
         ? {
             createdAt: DateField.stringify(
               intl,
@@ -134,7 +134,7 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.DECLARED.createdBySignature
           }
         : null,
-      [EventStatus.REGISTERED]: metadata.legalStatuses.REGISTERED
+      [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
         ? {
             createdAt: DateField.stringify(
               intl,

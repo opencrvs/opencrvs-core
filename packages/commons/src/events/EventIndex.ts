@@ -10,7 +10,7 @@
  */
 
 import { z, ZodType } from 'zod'
-import { EventMetadata, EventStatusEnum } from './EventMetadata'
+import { EventMetadata, EventStatus } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -58,7 +58,7 @@ export const AnyOf = z
 export const ExactStatus = z
   .object({
     type: z.literal('exact'),
-    term: EventStatusEnum
+    term: EventStatus
   })
   .openapi({
     ref: 'ExactStatus'
@@ -67,7 +67,7 @@ export const ExactStatus = z
 export const AnyOfStatus = z
   .object({
     type: z.literal('anyOf'),
-    terms: z.array(EventStatusEnum)
+    terms: z.array(EventStatus)
   })
   .openapi({
     ref: 'AnyOfStatus'
@@ -182,16 +182,7 @@ export const QueryType = z
               eventType: TENNIS_CLUB_MEMBERSHIP,
               status: {
                 type: 'anyOf',
-                terms: [
-                  'CREATED',
-                  'NOTIFIED',
-                  'DECLARED',
-                  'VALIDATED',
-                  'REGISTERED',
-                  'CERTIFIED',
-                  'REJECTED',
-                  'ARCHIVED'
-                ]
+                terms: EventStatus.options
               },
               updatedAt: {
                 type: 'range',
