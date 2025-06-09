@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 95185f82-4ee4-4c43-b3d0-555d7467321a
+                transactionId: 8cd90c3e-f7eb-48bd-b855-e6b93e85cef6
                 type: v2.birth
       responses:
         "200":
@@ -450,7 +450,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 660bdc9d-d80b-478d-a6e1-6d1a49e1d735
+                transactionId: 59c363af-fbc7-433b-86e7-d87354f19cc5
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -517,7 +517,7 @@ paths:
               - eventType: tennis-club-membership
                 status:
                   type: anyOf
-                  terms:
+                  terms: &a11
                     - CREATED
                     - NOTIFIED
                     - DECLARED
@@ -9686,15 +9686,7 @@ components:
           type: array
           items:
             type: string
-            enum: &a11
-              - CREATED
-              - NOTIFIED
-              - DECLARED
-              - VALIDATED
-              - REGISTERED
-              - CERTIFIED
-              - REJECTED
-              - ARCHIVED
+            enum: *a11
       required:
         - type
         - terms
@@ -9823,15 +9815,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum:
-            - CREATED
-            - NOTIFIED
-            - DECLARED
-            - VALIDATED
-            - REGISTERED
-            - CERTIFIED
-            - REJECTED
-            - ARCHIVED
+          enum: *a11
         legalStatuses:
           type: object
           properties:
