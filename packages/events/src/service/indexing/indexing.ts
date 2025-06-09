@@ -414,7 +414,6 @@ export async function getEventCount(
   queries: WorkqueueCountInput,
   eventConfigs: EventConfig[]
 ) {
-  console.log(JSON.stringify(queries))
   return (
     //  @TODO: write a query that does everything in one go.
 
