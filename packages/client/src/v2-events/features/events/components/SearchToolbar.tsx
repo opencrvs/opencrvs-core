@@ -10,7 +10,7 @@
  */
 import React, { useState } from 'react'
 import styled from 'styled-components'
-import { defineMessages, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
 import { ClearText } from '@opencrvs/components/src/icons'
@@ -96,13 +96,7 @@ const ClearTextIcon = styled((props) => <ClearText {...props} />)`
   margin: 0 12px;
 `
 
-interface INavigationType {
-  label: string
-  id: string
-  onClick: () => void
-}
-
-const messagesToDefine = {
+const messages = {
   header: {
     id: 'home.header.advancedSearch',
     defaultMessage: 'Advanced Search',
@@ -110,55 +104,56 @@ const messagesToDefine = {
   },
   placeHolderText: {
     id: 'v2.home.header.searchTool.placeholder',
-    defaultMessage:
-      'Search for a tracking ID, name, registration number, national ID, phone number or email',
+    defaultMessage: 'Search by name, ID, or by using contact details.',
     description: 'Search tool placeholder'
   }
 }
-const messages = defineMessages(messagesToDefine)
 
-export const SearchTool = () => {
+/**
+ *
+ * @returns
+ */
+export const SearchToolbar = () => {
   const intl = useIntl()
-  const [searchParam, setSearchParam] = useState('')
+  const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)
   const navigate = useNavigate()
+
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchParam(event.target.value)
-  }
-  const onClearTextHandler = () => {
-    setSearchParam('')
+    setSearchTerm(event.target.value)
   }
 
-  const advancedSearchNavigationList: INavigationType = {
-    label: intl.formatMessage(messages.header),
-    id: 'advanced-search',
-    onClick: () => {
-      navigate(ROUTES.V2.ADVANCED_SEARCH.path)
-    }
+  const clearSearchTerm = () => {
+    setSearchTerm(undefined)
   }
 
-  const search = (e: React.FormEvent) => {
+  const onSearch = (e: React.FormEvent) => {
     e.preventDefault()
+    const searchUrl = ROUTES.V2.SEARCH.buildPath({})
+
+    if (!searchTerm) {
+      return
+    }
+
     const stringifiedSearchParams = stringify(
-      { keys: searchParam },
+      { keys: searchTerm },
       {
         arrayFormat: 'comma',
         skipEmptyString: true
       }
     )
-    const navigateTo = ROUTES.V2.SEARCH.buildPath({})
-    stringifiedSearchParams &&
-      navigate(`${navigateTo}?${stringifiedSearchParams.toString()}`)
+
+    navigate(`${searchUrl}?${stringifiedSearchParams.toString()}`)
   }
 
   return (
     <SearchBox className={'search-tool'}>
-      <Wrapper onSubmit={search}>
+      <Wrapper onSubmit={onSearch}>
         <Button
           aria-label="Search"
           id="searchIconButton"
           size="medium"
           type="icon"
-          onClick={search}
+          onClick={onSearch}
         >
           <Icon color="currentColor" name="MagnifyingGlass" size="large" />
         </Button>
@@ -168,19 +163,19 @@ export const SearchTool = () => {
           maxLength={200}
           placeholder={intl.formatMessage(messages.placeHolderText)}
           type={'text'}
-          value={searchParam}
+          value={searchTerm}
           onChange={onChangeHandler}
         />
-        {searchParam && <ClearTextIcon onClick={onClearTextHandler} />}
+        {searchTerm && <ClearTextIcon onClick={clearSearchTerm} />}
         <AdvancedSearchWrapper
           id="searchType"
           onClick={() => {
-            advancedSearchNavigationList.onClick()
-            setSearchParam('')
+            clearSearchTerm()
+            navigate(ROUTES.V2.ADVANCED_SEARCH.path)
           }}
         >
           <span className="selected-label">
-            {advancedSearchNavigationList.label}
+            {intl.formatMessage(messages.header)}
           </span>
         </AdvancedSearchWrapper>
       </Wrapper>

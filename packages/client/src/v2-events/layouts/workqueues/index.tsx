@@ -20,7 +20,7 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import * as routes from '@client/navigation/routes'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
-import { SearchTool } from '@client/v2-events/features/events/components/SearchTool'
+import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -52,7 +52,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
                 <Plus />
               </Button>
 
-              <SearchTool />
+              <SearchToolbar />
             </Stack>
           }
           desktopRight={<ProfileMenu key="profileMenu" />}

@@ -11,6 +11,7 @@
 import {
   EventConfig,
   EventIndex,
+  FieldValue,
   getDeclarationFieldById,
   isNameFieldType,
   NameFieldValue
@@ -37,7 +38,7 @@ export const DEFAULT_SIZE = 10000
 function augmentIndexedField(
   eventConfig: EventConfig,
   fieldId: string,
-  value: EventIndex['declaration'][string]
+  value: FieldValue
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
 
@@ -47,6 +48,7 @@ function augmentIndexedField(
       __fullname: Object.values(field.value).join(' ')
     }
   }
+
   return value
 }
 
@@ -68,7 +70,7 @@ export function encodeEventIndex(
 function normaliseIndexedField(
   eventConfig: EventConfig,
   fieldId: string,
-  value: EventIndex['declaration'][string]
+  value: FieldValue
 ) {
   const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
   if (isNameFieldType(field)) {

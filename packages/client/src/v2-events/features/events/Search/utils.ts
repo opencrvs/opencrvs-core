@@ -175,21 +175,21 @@ export function toAdvancedSearchQueryType(
   eventType?: string,
   type = ADVANCED_SEARCH_KEY
 ): QueryType {
-  const topLevelFields: Record<string, unknown> = {}
-  const dataFields: Record<string, unknown> = {}
+  const metadata: Record<string, unknown> = {}
+  const declaration: Record<string, unknown> = {}
 
   Object.entries(searchParams).forEach(([_, value]) => {
     const key = _.replace(/^event____/, '').replaceAll(FIELD_SEPARATOR, '.')
     if (_.startsWith('event____')) {
-      topLevelFields[key] = value
+      metadata[key] = value
     } else {
-      dataFields[key] = value
+      declaration[key] = value
     }
   })
 
   return {
     type,
-    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+    clauses: [{ ...metadata, eventType, data: declaration }]
   }
 }
 

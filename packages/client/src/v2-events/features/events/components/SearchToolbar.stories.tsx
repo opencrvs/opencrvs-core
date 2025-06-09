@@ -13,22 +13,22 @@ import React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
 import { ThemeProvider } from 'styled-components'
 import { getTheme } from '@opencrvs/components'
-import { SearchTool } from './SearchTool'
+import { SearchToolbar } from './SearchToolbar'
 
 export default {
-  title: 'Components/SearchTool',
-  component: SearchTool,
+  title: 'Components/SearchToolbar',
+  component: SearchToolbar,
   parameters: {
     layout: 'centered'
   }
-} as Meta<typeof SearchTool>
+} as Meta<typeof SearchToolbar>
 
-type Story = StoryObj<typeof SearchTool>
+type Story = StoryObj<typeof SearchToolbar>
 
 export const Default: Story = {
   render: () => (
     <ThemeProvider theme={getTheme}>
-      <SearchTool />
+      <SearchToolbar />
     </ThemeProvider>
   )
 }
