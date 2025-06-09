@@ -6,6 +6,8 @@ CREATE TABLE locations (
   parent_id uuid REFERENCES locations(id)
 );
 
+GRANT SELECT, INSERT, UPDATE, DELETE ON locations TO events_app;
+
 CREATE TABLE events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   event_type text NOT NULL,
@@ -14,6 +16,8 @@ CREATE TABLE events (
   created_at timestamp with time zone DEFAULT now() NOT NULL,
   updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON events TO events_app;
 
 COMMENT ON TABLE events IS 'Stores life events associated with individuals, identified by tracking_id. Each event includes a type, structured data payload, and a client-supplied transaction_id to ensure idempotency.';
 
@@ -75,7 +79,9 @@ CREATE TABLE event_actions (
   )
 );
 
-COMMENT ON TABLE event_actions IS 'Stores actions performed on life events, including client-supplied transaction_id for idempotency. The same transaction id can only create action of one type. Each action is linked to a specific event.';
+GRANT SELECT, INSERT ON event_actions TO events_app;
+
+COMMENT ON TABLE event_actions IS 'Stores actions performed on life events, including client-supplied transaction_id for idempotency. Event actions cannot be updated or deleted by the application database user. The same transaction id can only create action of one type. Each action is linked to a specific event.';
 
 COMMENT ON COLUMN event_actions.original_action_id IS 'References the original action if this is an asynchronous confirmation of it.';
 
@@ -92,6 +98,8 @@ CREATE TABLE event_action_drafts (
   created_at_location uuid NOT NULL REFERENCES locations(id),
   created_at timestamp with time zone DEFAULT now() NOT NULL
 );
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON event_action_drafts TO events_app;
 
 COMMENT ON TABLE event_action_drafts IS 'Stores user-specific drafts of event-related actions. Drafts use client-supplied transaction_id for idempotency. Declaration fields may be incomplete. Each draft is owned exclusively by created_by.';
 
