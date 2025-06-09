@@ -32,39 +32,37 @@ function generateQuery(
   >,
   eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
-  const allFieldsOfConfig = eventConfigs.reduce<Inferred[]>(
-    (acc, eventConfig) => {
-      const fields = getAllUniqueFields(eventConfig)
-      return acc.concat(fields)
-    },
-    []
-  )
-  const nameFieldIds = allFieldsOfConfig
+  const allEventFields = eventConfigs.reduce<Inferred[]>((acc, eventConfig) => {
+    const fields = getAllUniqueFields(eventConfig)
+    return acc.concat(fields)
+  }, [])
+
+  const nameFieldIds = allEventFields
     .filter((field) => field.type === FieldType.NAME)
     .map((f) => f.id)
 
-  const must = Object.entries(event).map(([key, value]) => {
-    const field = `declaration.${encodeFieldId(key)}`
+  const must = Object.entries(event).map(([fieldId, search]) => {
+    const field = `declaration.${encodeFieldId(fieldId)}`
 
-    if (value.type === 'exact') {
+    if (search.type === 'exact') {
       return {
         match: {
-          [field]: value.term
+          [field]: search.term
         }
       }
     }
 
-    if (value.type === 'fuzzy') {
+    if (search.type === 'fuzzy') {
       /**
        * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
        * return a match query on the `${field}.__fullname` subfield. This allows Elasticsearch to perform
        * a fuzzy search on the full name, improving matching for name-related fields (e.g., handling typos or variations).
        */
-      if (nameFieldIds.includes(key)) {
+      if (nameFieldIds.includes(fieldId)) {
         return {
           match: {
             [`${field}.__fullname`]: {
-              query: value.term,
+              query: search.term,
               fuzziness: 'AUTO'
             }
           }
@@ -74,34 +72,34 @@ function generateQuery(
       return {
         match: {
           [field]: {
-            query: value.term,
+            query: search.term,
             fuzziness: 'AUTO'
           }
         }
       }
     }
 
-    if (value.type === 'anyOf') {
+    if (search.type === 'anyOf') {
       return {
         terms: {
-          [field]: value.terms
+          [field]: search.terms
         }
       }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (value.type === 'range') {
+    if (search.type === 'range') {
       return {
         range: {
           [field]: {
-            gte: value.gte,
-            lte: value.lte
+            gte: search.gte,
+            lte: search.lte
           }
         }
       }
     }
 
-    throw new Error(`Unsupported query type: ${value.type}`)
+    throw new Error(`Unsupported query type: ${search.type}`)
   }) satisfies estypes.QueryDslQueryContainer[]
 
   return { bool: { must } } as estypes.QueryDslQueryContainer
