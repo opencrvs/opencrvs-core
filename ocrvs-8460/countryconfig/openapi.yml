@@ -263,7 +263,7 @@ components:
 
                             \    This property
                             determines whether to add a prefix (such as
-                            \"Child\" or \"Applicant\") before the field label\ 
+                            \"Child\" or \"Applicant\") before the field label
 
                             \    when rendering
                             search parameter labels — for example, in the search
@@ -272,9 +272,9 @@ components:
 
 
                             \    For example, a
-                            field config like { id: \"child.firstname\", label:
-                            { defaultMessage: \"First Name(s)\" } } would render
-                            as \"First Name(s)\" by default.
+                            field config like { id: \"child.name.firstname\",
+                            label: { defaultMessage: \"First Name(s)\" } } would
+                            render as \"First Name(s)\" by default.
 
 
                             \    A field config like
@@ -284,9 +284,9 @@ components:
 
 
                             \    So, if both
-                            child.firstname and mother.firstname are used in a
-                            search, the resulting search criteria labels would
-                            be \"First Name(s)\", \"First Name(s)\",\ 
+                            child.name.firstname and mother.firstname are used
+                            in a search, the resulting search criteria labels
+                            would be \"First Name(s)\", \"First Name(s)\",
 
                             \    which is ambiguous.
 
@@ -294,12 +294,12 @@ components:
                             \    Now, if we treat
                             the field ID prefix as a label (e.g.,
                             \"applicant.firstname\" → \"Applicant\"), and the
-                            field label is already\ 
+                            field label is already
 
                             \    descriptive — like
                             { id: \"applicant.firstname\", label: {
                             defaultMessage: \"Applicant's First Name\" } } —
-                            then the resulting\ 
+                            then the resulting
 
                             \    label would be
                             \"Applicant Applicant's First Name\", which is
@@ -308,8 +308,7 @@ components:
 
                             \    By setting
                             searchCriteriaLabelPrefix to a translation config
-                            object, we can explicitly define the desired
-                            prefix\ 
+                            object, we can explicitly define the desired prefix
 
                             \    in the
                             country-config > event.advancedSearch configuration.
@@ -329,21 +328,19 @@ components:
                             search, we sometimes need to override the default
                             field visibility conditionals.
 
-                            \      \ 
 
                             \       For example,
                             Informant fields in the declaration form may have
-                            conditional logic\ 
+                            conditional logic
 
                             \       that hides them
                             based on other field values. Since the advanced
-                            search form reuses\ 
+                            search form reuses
 
                             \       the declaration
                             form config, those same conditionals would apply by
                             default.
 
-                            \      \ 
 
                             \       However, in
                             advanced search we often want to make all Informant
@@ -351,11 +348,11 @@ components:
 
                             \       regardless of
                             their original visibility logic. To do this, we
-                            explicitly set their\ 
+                            explicitly set their
 
                             \       'conditionals'
                             to an empty array ('[]') in the search config. This
-                            ensures they\ 
+                            ensures they
 
                             \       are always
                             rendered in the advanced search form.
@@ -401,7 +398,7 @@ components:
 
                             \    This property
                             determines whether to add a prefix (such as
-                            \"Child\" or \"Applicant\") before the field label\ 
+                            \"Child\" or \"Applicant\") before the field label
 
                             \    when rendering
                             search parameter labels — for example, in the search
@@ -410,9 +407,9 @@ components:
 
 
                             \    For example, a
-                            field config like { id: \"child.firstname\", label:
-                            { defaultMessage: \"First Name(s)\" } } would render
-                            as \"First Name(s)\" by default.
+                            field config like { id: \"child.name.firstname\",
+                            label: { defaultMessage: \"First Name(s)\" } } would
+                            render as \"First Name(s)\" by default.
 
 
                             \    A field config like
@@ -422,9 +419,9 @@ components:
 
 
                             \    So, if both
-                            child.firstname and mother.firstname are used in a
-                            search, the resulting search criteria labels would
-                            be \"First Name(s)\", \"First Name(s)\",\ 
+                            child.name.firstname and mother.firstname are used
+                            in a search, the resulting search criteria labels
+                            would be \"First Name(s)\", \"First Name(s)\",
 
                             \    which is ambiguous.
 
@@ -432,12 +429,12 @@ components:
                             \    Now, if we treat
                             the field ID prefix as a label (e.g.,
                             \"applicant.firstname\" → \"Applicant\"), and the
-                            field label is already\ 
+                            field label is already
 
                             \    descriptive — like
                             { id: \"applicant.firstname\", label: {
                             defaultMessage: \"Applicant's First Name\" } } —
-                            then the resulting\ 
+                            then the resulting
 
                             \    label would be
                             \"Applicant Applicant's First Name\", which is
@@ -446,8 +443,7 @@ components:
 
                             \    By setting
                             searchCriteriaLabelPrefix to a translation config
-                            object, we can explicitly define the desired
-                            prefix\ 
+                            object, we can explicitly define the desired prefix
 
                             \    in the
                             country-config > event.advancedSearch configuration.
@@ -466,21 +462,19 @@ components:
                             search, we sometimes need to override the default
                             field visibility conditionals.
 
-                            \      \ 
 
                             \       For example,
                             Informant fields in the declaration form may have
-                            conditional logic\ 
+                            conditional logic
 
                             \       that hides them
                             based on other field values. Since the advanced
-                            search form reuses\ 
+                            search form reuses
 
                             \       the declaration
                             form config, those same conditionals would apply by
                             default.
 
-                            \      \ 
 
                             \       However, in
                             advanced search we often want to make all Informant
@@ -488,11 +482,11 @@ components:
 
                             \       regardless of
                             their original visibility logic. To do this, we
-                            explicitly set their\ 
+                            explicitly set their
 
                             \       'conditionals'
                             to an empty array ('[]') in the search config. This
-                            ensures they\ 
+                            ensures they
 
                             \       are always
                             rendered in the advanced search form.
@@ -1519,6 +1513,9 @@ components:
             type:
               type: string
               const: NAME
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1578,6 +1575,9 @@ components:
             hideLabel:
               type: boolean
               default: false
+            defaultValue:
+              type: string
+              minLength: 1
             type:
               type: string
               const: PHONE
@@ -1630,6 +1630,9 @@ components:
             hideLabel:
               type: boolean
               default: false
+            defaultValue:
+              type: string
+              minLength: 1
             type:
               type: string
               const: ID
@@ -10452,7 +10455,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 451b92fa-ac4d-43bf-a357-95a784868a45
+        transactionId: bd6efaef-ee11-4c28-9dd6-6b70855b86b9
         declaration: {}
         annotation: {}
         type: NOTIFY
