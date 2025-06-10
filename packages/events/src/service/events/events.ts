@@ -142,7 +142,13 @@ export async function createEvent({
   transactionId: string
   config: EventConfig
 }): Promise<EventDocument> {
-  const event = await eventsRepo.getOrCreateEvent({
+  const isSystem = user.type === TokenUserType.enum.system
+
+  const getOrCreateEvent = isSystem
+    ? eventsRepo.getOrCreateEvent // System users create events without assignment
+    : eventsRepo.getOrCreateEventAndAssign
+
+  const event = await getOrCreateEvent({
     type: eventInput.type,
     transactionId: transactionId,
     trackingId: generateTrackingId(),

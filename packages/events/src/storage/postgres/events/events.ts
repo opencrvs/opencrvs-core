@@ -219,7 +219,69 @@ export const createAction = async (
   return db.transaction(async (trx) => createActionInTransaction(params, trx))
 }
 
-export const getOrCreateEvent = async ({
+export const getOrCreateEventInTransaction = async (
+  {
+    type,
+    transactionId,
+    trackingId,
+    createdBy,
+    createdByRole,
+    createdBySignature,
+    createdAtLocation
+  }: {
+    type: string
+    transactionId: string
+    trackingId: string
+    createdBy: string
+    createdByRole: string
+    createdBySignature?: string
+    createdAtLocation?: UUID
+  },
+  trx: CommonQueryMethods
+) => {
+  const eventId = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
+    INSERT INTO
+      events (event_type, transaction_id, tracking_id)
+    VALUES
+      (
+        ${type},
+        ${transactionId},
+        ${trackingId}
+      )
+    ON CONFLICT (transaction_id) DO UPDATE
+    SET
+      updated_at = NOW()
+    RETURNING
+      id
+  `)
+
+  await createActionInTransaction(
+    {
+      eventId,
+      transactionId,
+      type: ActionType.CREATE,
+      status: ActionStatus.Accepted,
+      createdBy,
+      createdByRole,
+      createdBySignature,
+      createdAtLocation
+    },
+    trx
+  )
+
+  return getEventByIdInTransaction(eventId, trx)
+}
+
+export const getOrCreateEvent = async (
+  params: Parameters<typeof getOrCreateEventInTransaction>[0]
+): Promise<EventDocument> => {
+  const db = await getClient()
+  return db.transaction(async (trx) =>
+    getOrCreateEventInTransaction(params, trx)
+  )
+}
+
+export const getOrCreateEventAndAssign = async ({
   type,
   transactionId,
   trackingId,
@@ -239,28 +301,11 @@ export const getOrCreateEvent = async ({
   const db = await getClient()
 
   return db.transaction(async (trx) => {
-    const eventId = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
-      INSERT INTO
-        events (event_type, transaction_id, tracking_id)
-      VALUES
-        (
-          ${type},
-          ${transactionId},
-          ${trackingId}
-        )
-      ON CONFLICT (transaction_id) DO UPDATE
-      SET
-        updated_at = NOW()
-      RETURNING
-        id
-    `)
-
-    await createActionInTransaction(
+    const { id: eventId } = await getOrCreateEventInTransaction(
       {
-        eventId,
+        type,
         transactionId,
-        type: ActionType.CREATE,
-        status: ActionStatus.Accepted,
+        trackingId,
         createdBy,
         createdByRole,
         createdBySignature,
