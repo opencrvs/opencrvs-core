@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { NotFoundError as SlonikNotFoundError } from 'slonik'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -38,6 +39,27 @@ import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { TrpcUserContext } from '@events/context'
+
+class EventNotFoundError extends TRPCError {
+  constructor(id: string) {
+    super({
+      code: 'NOT_FOUND',
+      message: `Event not found with ID: ${id}`
+    })
+  }
+}
+
+/** Get event by ID. Throws tRPC HTTP 404 if event is not found */
+export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
+  try {
+    return await eventsRepo.getEventById(eventId)
+  } catch (error) {
+    if (error instanceof SlonikNotFoundError) {
+      throw new EventNotFoundError(eventId)
+    }
+    throw error
+  }
+}
 
 function getValidFileValue(
   fieldKey: string,
@@ -74,9 +96,8 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
     }
   }
 }
-
 export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
-  const event = await eventsRepo.getEventById(eventId)
+  const event = await getEventById(eventId)
   const eventStatus = getStatusFromActions(event.actions)
 
   // Once an event is declared or notified, it can not be deleted anymore
@@ -193,7 +214,7 @@ export async function addAction(
     status: ActionStatus
   }
 ): Promise<EventDocument> {
-  const event = await eventsRepo.getEventById(eventId)
+  const event = await getEventById(eventId)
   const configuration = await getEventConfigurationById({
     token,
     eventType: event.type
@@ -298,7 +319,7 @@ export async function addAction(
     drafts
   )
 
-  const updatedEvent = await eventsRepo.getEventById(eventId)
+  const updatedEvent = await getEventById(eventId)
 
   if (input.type !== ActionType.READ) {
     await indexEvent(updatedEvent, configuration)
@@ -350,11 +371,9 @@ export async function addAsyncRejectAction({
     createdAtLocation
   })
 
-  const updatedEvent = await eventsRepo.getEventById(eventId)
+  const updatedEvent = await getEventById(eventId)
   await indexEvent(updatedEvent, configuration)
   await draftsRepo.deleteDraftsByEventId(eventId)
 
   return updatedEvent
 }
-
-export const getEventById = eventsRepo.getEventById
