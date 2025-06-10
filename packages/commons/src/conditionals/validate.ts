@@ -14,12 +14,12 @@ import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
 import { formatISO, isAfter, isBefore } from 'date-fns'
-import { EventState, ActionUpdate } from '../events/ActionDocument'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType, FieldConditional } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true,
@@ -121,21 +121,7 @@ export function areConditionsMet(
   values: Record<string, unknown>
 ) {
   return conditions.every((condition) => {
-    const res = isConditionMet(condition.conditional, values)
-    console.log('**************************************')
-    console.log('**************************************')
-    console.log('**************************************')
-    console.log(
-      'Condition met for',
-      // condition.conditional.properties.$form.required[0],
-      // condition.conditional.properties.$form.properties['child.dob']
-      // .formatMaximum,
-      condition.type,
-      values['child.dob'],
-      ':',
-      res
-    )
-    return res
+    return isConditionMet(condition.conditional, values)
   })
 }
 
