@@ -67,6 +67,10 @@ export function selectApplicationName(store: IStoreState) {
   return getKey(store, 'config').APPLICATION_NAME
 }
 
+export function selectAdvancedFrontendCustomizations(store: IStoreState) {
+  return getKey(store, 'config').ADVANCED_FRONTEND_CUSTOMIZATIONS
+}
+
 export const getStepOneDetails = (
   store: IStoreState
 ): LoginState['authenticationDetails'] => getKey(store, 'authenticationDetails')
