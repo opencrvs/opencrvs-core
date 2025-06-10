@@ -212,7 +212,8 @@ export async function addAction(
     }
   }
 
-  if (input.type === ActionType.ARCHIVE && input.reason?.isDuplicate) {
+  // @TODO: @naftis: Split up the `addAction` function into smaller functions.
+  if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
@@ -241,25 +242,27 @@ export async function addAction(
       createdByRole: user.role,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
-      assignedTo: input.assignedTo
+      assignedTo: user.id
+    })
+  } else {
+    await eventsRepo.createAction({
+      eventId,
+      registrationNumber:
+        // @TODO: Can this be something else than register? `addAction` likely eventually gets quite bloated if not split up.
+        input.type === ActionType.REGISTER
+          ? input.registrationNumber
+          : undefined,
+      transactionId: input.transactionId,
+      type: input.type,
+      declaration: input.declaration,
+      annotation: input.annotation,
+      status,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdAtLocation: user.primaryOfficeId,
+      originalActionId: input.originalActionId
     })
   }
-
-  await eventsRepo.createAction({
-    eventId,
-    registrationNumber:
-      // @TODO: Can this be something else than register? `addAction` likely eventually gets quite bloated if not split up.
-      input.type === ActionType.REGISTER ? input.registrationNumber : undefined,
-    transactionId: input.transactionId,
-    type: input.type,
-    declaration: input.declaration,
-    annotation: input.annotation,
-    status,
-    createdBy: user.id,
-    createdByRole: user.role,
-    createdAtLocation: user.primaryOfficeId,
-    originalActionId: input.originalActionId
-  })
 
   // We want to unassign only if:
   // - Action is a write action, since we dont want to unassign from e.g. READ action
