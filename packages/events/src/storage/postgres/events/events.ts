@@ -239,21 +239,28 @@ export const getOrCreateEventInTransaction = async (
   },
   trx: CommonQueryMethods
 ) => {
-  const eventId = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
-    INSERT INTO
-      events (event_type, transaction_id, tracking_id)
-    VALUES
-      (
-        ${type},
-        ${transactionId},
-        ${trackingId}
-      )
-    ON CONFLICT (transaction_id) DO UPDATE
-    SET
-      updated_at = NOW()
-    RETURNING
-      id
-  `)
+  const eventId =
+    (await trx.maybeOneFirst(sql.type(z.object({ id: UUID }))`
+      INSERT INTO
+        events (event_type, transaction_id, tracking_id)
+      VALUES
+        (
+          ${type},
+          ${transactionId},
+          ${trackingId}
+        )
+      ON CONFLICT (transaction_id) DO NOTHING
+      RETURNING
+        id
+    `)) ??
+    (await trx.oneFirst(sql.type(z.object({ id: UUID }))`
+      SELECT
+        id
+      FROM
+        events
+      WHERE
+        transaction_id = ${transactionId}
+    `))
 
   await createActionInTransaction(
     {
