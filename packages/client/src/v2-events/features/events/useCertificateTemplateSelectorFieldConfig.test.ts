@@ -10,6 +10,7 @@
  */
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { date } from 'react-router-typesafe-routes'
 import {
   CertificateTemplateConfig,
   EventState,
@@ -110,39 +111,43 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
     expect(result.options[0].value).toBe('birth-certificate')
   })
 
-  it('does not include birth-certified-certificate if age is less than a year old', async () => {
-    mockTemplates = [birthCertificateTemplateWithMinimumAge(1)]
+  describe('when a certificate has a conditional which should only show one year after birth', () => {
+    it('should not return the certificate if child is within one year', async () => {
+      mockTemplates = [birthCertificateTemplateWithMinimumAge(1)]
 
-    const { useCertificateTemplateSelectorFieldConfig } = await import(
-      './useCertificateTemplateSelectorFieldConfig'
-    )
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
 
-    const birthResult = useCertificateTemplateSelectorFieldConfig(
-      'birth',
-      declaration
-    ) as SelectField
+      const birthResult = useCertificateTemplateSelectorFieldConfig('birth', {
+        ...declaration,
+        'child.dob': dateToday.toISOString()
+      }) as SelectField
 
-    expect(birthResult.options).toHaveLength(0)
+      expect(birthResult.options).toHaveLength(0)
+    })
   })
 
-  it('returns the defaultValue if a template is marked as isDefault', async () => {
-    mockTemplates = [
-      { ...birthCertificateTemplateWithNoConditional, isDefault: false },
-      {
-        ...birthCertificateTemplateWithNoConditional,
-        id: 'default-birth-certificate',
-        isDefault: true
-      }
-    ]
+  describe('When two without conditionals are available with one marked as a', () => {
+    it("should set the field's default value to the id of the default certificate", async () => {
+      mockTemplates = [
+        { ...birthCertificateTemplateWithNoConditional, isDefault: false },
+        {
+          ...birthCertificateTemplateWithNoConditional,
+          id: 'default-birth-certificate',
+          isDefault: true
+        }
+      ]
 
-    const { useCertificateTemplateSelectorFieldConfig } = await import(
-      './useCertificateTemplateSelectorFieldConfig'
-    )
-    const result = useCertificateTemplateSelectorFieldConfig(
-      'birth',
-      declaration
-    ) as SelectField
-    expect(result.defaultValue).toBe('default-birth-certificate')
-    expect(result.options).toHaveLength(2)
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
+      const result = useCertificateTemplateSelectorFieldConfig(
+        'birth',
+        declaration
+      ) as SelectField
+      expect(result.defaultValue).toBe('default-birth-certificate')
+      expect(result.options).toHaveLength(2)
+    })
   })
 })
