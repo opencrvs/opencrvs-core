@@ -79,7 +79,7 @@ CREATE TABLE event_actions (
   )
 );
 
-GRANT SELECT, INSERT ON event_actions TO events_app;
+GRANT SELECT, DELETE, INSERT ON event_actions TO events_app;
 
 COMMENT ON TABLE event_actions IS 'Stores actions performed on life events, including client-supplied transaction_id for idempotency. Event actions cannot be updated or deleted by the application database user. The same transaction id can only create action of one type. Each action is linked to a specific event.';
 

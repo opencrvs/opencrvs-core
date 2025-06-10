@@ -77,11 +77,19 @@ export async function getEventById(id: UUID): Promise<EventDocument> {
 export async function deleteEventById(eventId: UUID): Promise<void> {
   const db = await getClient()
 
-  await db.query(sql.type(z.void())`
-    DELETE FROM events
-    WHERE
-      id = ${eventId}
-  `)
+  await db.transaction(async (trx) => {
+    await trx.query(sql.type(z.void())`
+      DELETE FROM event_actions
+      WHERE
+        event_id = ${eventId}
+    `)
+
+    await trx.query(sql.type(z.void())`
+      DELETE FROM events
+      WHERE
+        id = ${eventId}
+    `)
+  })
 }
 
 export const createEvent = async (
