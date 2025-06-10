@@ -11,7 +11,6 @@
 
 import {
   areConditionsMet,
-  DeclarationActionConfig,
   EventState,
   FieldConfig,
   FieldType
