@@ -110,6 +110,10 @@ export const createEvent = async (
   `)
 }
 
+/**
+ * Idempotently inserts an action into the event_actions table
+ * @returns the id of the action
+ */
 async function createActionInTransaction(
   {
     eventId,
@@ -147,7 +151,7 @@ async function createActionInTransaction(
   // @TODO: Some typing error here
   const createdAtLocationx = createdAtLocation as string | undefined
 
-  const id = await trx.oneFirst(sql.type(z.object({ id: UUID }))`
+  const result = await trx.maybeOneFirst(sql.type(z.object({ id: UUID }))`
     INSERT INTO
       event_actions (
         event_id,
@@ -180,12 +184,22 @@ async function createActionInTransaction(
         ${createdAtLocationx ?? null}::uuid,
         ${originalActionIdx ?? null}::uuid
       )
-    ON CONFLICT (action_type, transaction_id) DO UPDATE -- no-op, DO NOTHING would not return the id
-    SET
-      action_type = event_actions.action_type
+    ON CONFLICT (action_type, transaction_id) DO NOTHING
     RETURNING
       id
   `)
+
+  const id =
+    result ??
+    (await trx.oneFirst(sql.type(z.object({ id: UUID }))`
+      SELECT
+        id
+      FROM
+        event_actions
+      WHERE
+        transaction_id = ${transactionId}
+        AND action_type = ${type}::action_type
+    `))
 
   return id
 }
