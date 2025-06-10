@@ -688,7 +688,7 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
   title: {
     id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
     defaultMessage:
-      '{applicant.firstname, select, __EMPTY__ {Member declaration} other {{applicant.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.firstname} {applicant.surname}}}}}',
+      '{applicant.name.firstname, select, __EMPTY__ {Member declaration} other {{applicant.name.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.name.firstname} {applicant.name.surname}}}}}',
     description: 'Title of the review page'
   },
   fields: [
@@ -735,25 +735,14 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
       },
       fields: [
         {
-          id: 'applicant.firstname',
-          type: FieldType.TEXT,
+          id: 'applicant.name',
+          type: FieldType.NAME,
           required: true,
           conditionals: [],
           label: {
             defaultMessage: "Applicant's first name",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
-          }
-        },
-        {
-          id: 'applicant.surname',
-          type: FieldType.TEXT,
-          required: true,
-          conditionals: [],
-          label: {
-            defaultMessage: "Applicant's surname",
-            description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.surname.label'
           }
         },
         {
@@ -888,9 +877,10 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.none.label'
           }
         },
+
         {
-          id: 'recommender.firstname',
-          type: FieldType.TEXT,
+          id: 'recommender.name',
+          type: FieldType.NAME,
           required: true,
           conditionals: [
             {
@@ -902,22 +892,6 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: "Recommender's first name",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
-          }
-        },
-        {
-          id: 'recommender.surname',
-          type: FieldType.TEXT,
-          required: true,
-          conditionals: [
-            {
-              type: ConditionalType.SHOW,
-              conditional: field('recommender.none').isFalsy()
-            }
-          ],
-          label: {
-            defaultMessage: "Recommender's surname",
-            description: 'This is the label for the field',
-            id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.surname.label'
           }
         },
         {

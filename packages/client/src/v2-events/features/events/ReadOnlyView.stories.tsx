@@ -16,6 +16,7 @@ import { within } from '@testing-library/dom'
 import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
+  createPrng,
   generateEventDocument,
   generateEventDraftDocument,
   tennisClubMembershipEvent
@@ -47,6 +48,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const rng = createPrng(122)
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
@@ -54,11 +56,16 @@ const eventDocument = generateEventDocument({
     ActionType.DECLARE,
     ActionType.VALIDATE,
     ActionType.REGISTER
-  ]
+  ],
+  rng
 })
 
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument(eventId)
+const draft = generateEventDraftDocument({
+  eventId,
+  actionType: ActionType.DECLARE,
+  rng
+})
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
   loaders: [
@@ -115,14 +122,15 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
                   'applicant.firstname': 'Riku',
                   'applicant.surname': 'This value is from a draft'
-                }
-              )
+                },
+                rng
+              })
             ]
           })
         ],

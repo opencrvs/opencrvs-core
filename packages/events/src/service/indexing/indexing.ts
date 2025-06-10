@@ -421,7 +421,6 @@ export async function getEventCount(
 ) {
   return (
     //  @TODO: write a query that does everything in one go.
-
     (
       await Promise.all(
         queries.map(async ({ slug, query }) => {

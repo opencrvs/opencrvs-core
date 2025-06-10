@@ -416,8 +416,7 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'v2.event.tennis-club-membership.search.applicants'
       },
       fields: [
-        field('applicant.firstname').fuzzy(),
-        field('applicant.surname').fuzzy(),
+        field('applicant.name').fuzzy(),
         field('applicant.dob').range(),
         field('applicant.email').exact()
       ]
@@ -428,10 +427,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'Recommender details search field section title',
         id: 'v2.event.tennis-club-membership.search.recommender'
       },
-      fields: [
-        field('recommender.firstname').fuzzy(),
-        field('recommender.surname').fuzzy()
-      ]
+      fields: [field('recommender.name').fuzzy()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM

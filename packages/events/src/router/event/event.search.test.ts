@@ -10,9 +10,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { AddressType } from '@opencrvs/commons'
-import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  ActionType,
+  AddressType,
+  EventStatus,
+  TENNIS_CLUB_MEMBERSHIP
+} from '@opencrvs/commons'
+import {
+  createEvent,
+  createTestClient,
+  getGrowingCombinations,
+  sanitizeForSnapshot,
+  setupTestCase,
+  UNSTABLE_EVENT_FIELDS
+} from '@events/tests/utils'
 
 test('Throws error without proper scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -22,8 +33,10 @@ test('Throws error without proper scope', async () => {
   const data = generator.event.actions.declare(event.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Unique',
-      'applicant.surname': 'Doe',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Doe'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -45,7 +58,7 @@ test('Throws error without proper scope', async () => {
         {
           eventType: TENNIS_CLUB_MEMBERSHIP,
           data: {
-            'applicant.firstname': 'Unique'
+            'applicant.name.firstname': 'Unique'
           }
         }
       ]
@@ -62,8 +75,10 @@ test('Returns empty list when no events match search criteria', async () => {
   ])
 
   const initialData = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
@@ -90,7 +105,7 @@ test('Returns empty list when no events match search criteria', async () => {
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____firstname: { type: 'exact', term: 'Johnson' }
+          'applicant.name': { type: 'exact', term: 'Johnson' }
         }
       }
     ]
@@ -108,8 +123,10 @@ test('Returns events that match the text field criteria of applicant', async () 
   ])
 
   const record1 = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
@@ -123,8 +140,10 @@ test('Returns events that match the text field criteria of applicant', async () 
   }
 
   const record2 = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
@@ -138,8 +157,10 @@ test('Returns events that match the text field criteria of applicant', async () 
   }
 
   const record3 = {
-    'applicant.firstname': 'Johnson', // different first name than previous records
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'Johnson', // different first name than previous records
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
@@ -178,7 +199,7 @@ test('Returns events that match the text field criteria of applicant', async () 
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____firstname: { type: 'exact', term: 'John' },
+          'applicant.name.firstname': { type: 'exact', term: 'John' },
           applicant____dob: { type: 'exact', term: '2000-01-01' }
         }
       }
@@ -197,8 +218,10 @@ test('Returns events that match date of birth of applicant', async () => {
   ])
 
   const record1 = {
-    'applicant.firstname': 'Johnson',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'Johnson',
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
@@ -212,8 +235,10 @@ test('Returns events that match date of birth of applicant', async () => {
   }
 
   const record2 = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-12', // different dob
     'recommender.none': true,
     'applicant.address': {
@@ -251,7 +276,9 @@ test('Returns events that match date of birth of applicant', async () => {
       }
     ]
   })
-  expect(fetchedEvents[0].declaration['applicant.firstname']).toBe('Johnson') // fetches first document as result
+  expect(fetchedEvents[0].declaration['applicant.name.firstname']).toBe(
+    'Johnson'
+  ) // fetches first document as result
   expect(fetchedEvents).toHaveLength(1)
 })
 
@@ -264,8 +291,10 @@ test('Does not return events when searching with a similar but different date of
   ])
 
   const record1 = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'Johnson',
+      surname: 'Doe'
+    },
     'applicant.dob': '2024-11-11',
     'recommender.none': true,
     'applicant.address': {
@@ -279,8 +308,10 @@ test('Does not return events when searching with a similar but different date of
   }
 
   const record2 = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'Johnson',
+      surname: 'Doe'
+    },
     'applicant.dob': '2024-12-12',
     'recommender.none': true,
     'applicant.address': {
@@ -333,8 +364,10 @@ test('Returns single document after creation', async () => {
   const data = generator.event.actions.declare(event.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Unique',
-      'applicant.surname': 'Doe',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Doe'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -379,8 +412,10 @@ test('Returns multiple documents after creation', async () => {
   const data1 = generator.event.actions.declare(event1.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Unique',
-      'applicant.surname': 'Lastname',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -399,8 +434,10 @@ test('Returns multiple documents after creation', async () => {
   const data2 = generator.event.actions.declare(event2.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Unique',
-      'applicant.surname': 'Lastname',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -418,8 +455,11 @@ test('Returns multiple documents after creation', async () => {
   const data3 = generator.event.actions.declare(event3.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Different',
-      'applicant.surname': 'Lastname',
+      'applicant.name': {
+        firstname: 'Different',
+        surname: 'Lastname'
+      },
+
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -469,8 +509,10 @@ test('Returns no documents when search params are not matched', async () => {
   const data1 = generator.event.actions.declare(event1.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Unique',
-      'applicant.surname': 'Lastname',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -489,8 +531,10 @@ test('Returns no documents when search params are not matched', async () => {
   const data2 = generator.event.actions.declare(event2.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Unique',
-      'applicant.surname': 'Lastname',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -508,8 +552,10 @@ test('Returns no documents when search params are not matched', async () => {
   const data3 = generator.event.actions.declare(event3.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Different',
-      'applicant.surname': 'Lastname',
+      'applicant.name': {
+        firstname: 'Different',
+        surname: 'Lastname'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -558,8 +604,10 @@ test('Throws error when search params are not matching proper schema', async () 
   const data = generator.event.actions.declare(event.id, {
     declaration: {
       'applicant.dob': '2000-11-11',
-      'applicant.firstname': 'Unique',
-      'applicant.surname': 'Lastname',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -607,24 +655,30 @@ test('Returns events assigned to a specific user', async () => {
   }
 
   const record1 = {
-    'applicant.firstname': 'Ace',
-    'applicant.surname': 'Portgues D',
+    'applicant.name': {
+      firstname: 'Ace',
+      surname: 'Portgues D'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': WindmillVillage
   }
 
   const record2 = {
-    'applicant.firstname': 'Luffy',
-    'applicant.surname': 'Monkey D',
+    'applicant.name': {
+      firstname: 'Luffy',
+      surname: 'Monkey D'
+    },
     'applicant.dob': '2002-02-03',
     'recommender.none': true,
     'applicant.address': WindmillVillage
   }
 
   const record3 = {
-    'applicant.firstname': 'Sabo',
-    'applicant.surname': 'Archipelago D',
+    'applicant.name': {
+      firstname: 'Sabo',
+      surname: 'Archipelago D'
+    },
     'applicant.dob': '2001-06-07',
     'recommender.none': true,
     'applicant.address': WindmillVillage
@@ -672,5 +726,120 @@ test('Returns events assigned to a specific user', async () => {
   expect(fetchedEvents).toHaveLength(2)
   expect(fetchedEvents.every(({ assignedTo }) => assignedTo === user.id)).toBe(
     true
+  )
+})
+
+test('Returns relevant events in right order', async () => {
+  const { user, generator } = await setupTestCase(4432)
+
+  const client = createTestClient(user)
+
+  // Until we have a way to reindex from mongodb, we create events through API.
+  // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
+  const actions = [
+    ActionType.CREATE,
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REJECT,
+    ActionType.ARCHIVE,
+    ActionType.REGISTER,
+    ActionType.PRINT_CERTIFICATE
+  ]
+
+  const actionCombinations = getGrowingCombinations(actions)
+
+  // 1. Create events with all combinations of actions
+  for (const actionCombination of actionCombinations) {
+    await createEvent(client, generator, actionCombination)
+  }
+
+  // 2. Ensure we return only events that match the action type (1 each)
+  const declaredEvents = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        eventType: TENNIS_CLUB_MEMBERSHIP,
+        status: { type: 'exact', term: EventStatus.enum.DECLARED }
+      }
+    ]
+  })
+
+  expect(declaredEvents).toHaveLength(1)
+  expect(
+    sanitizeForSnapshot(declaredEvents[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+
+  const registeredEvents = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        eventType: TENNIS_CLUB_MEMBERSHIP,
+        status: { type: 'exact', term: EventStatus.enum.REGISTERED }
+      }
+    ]
+  })
+
+  expect(registeredEvents).toHaveLength(1)
+  expect(
+    sanitizeForSnapshot(registeredEvents[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+
+  // 3. Search by past timestamp, which should not match to any event.
+  const eventsCreatedBeforeTests = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        createdAt: {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          type: 'range',
+          gte: '2020-01-01',
+          lte: '2022-01-01'
+        }
+      }
+    ]
+  })
+
+  expect(eventsCreatedBeforeTests).toHaveLength(0)
+
+  // 4. Search by future timestamp, which should match to all events.
+  const eventsCreatedToday = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        createdAt: {
+          eventType: TENNIS_CLUB_MEMBERSHIP,
+          type: 'exact',
+          term: new Date().toISOString().split('T')[0] // today's date. Let's have something more sophisticated later.
+        }
+      }
+    ]
+  })
+
+  expect(eventsCreatedToday).toHaveLength(actionCombinations.length)
+
+  const eventStatuses = eventsCreatedToday.map((event) => event.status)
+
+  // 5. Order of statuses should stay constant. Whatever that is.
+  expect(eventStatuses).toMatchSnapshot()
+
+  // 6. Search by partial name
+  const partialName = 'Sara'
+  const eventsByName = await client.event.search({
+    type: 'or',
+    clauses: [
+      { data: { 'applicant.name': { type: 'fuzzy', term: partialName } } },
+      { data: { 'recommender.name': { type: 'fuzzy', term: partialName } } }
+    ]
+  })
+
+  expect(eventsByName).toHaveLength(2)
+  const names = eventsByName.map((event) => event.declaration['applicant.name'])
+
+  expect(names).toEqual(
+    expect.arrayContaining([
+      // These names are expected to be in the events created above based on the prng. The result of the search does not seem fuzzy.
+      { firstname: 'Sara', surname: 'Garcia' },
+      { firstname: 'Zara', surname: 'Sarajanen' }
+    ])
   )
 })

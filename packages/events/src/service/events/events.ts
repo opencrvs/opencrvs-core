@@ -144,7 +144,7 @@ export async function deleteEvent(
 const TRACKING_ID_LENGTH = 6
 const TRACKING_ID_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-function generateTrackingId(): string {
+export function generateTrackingId(): string {
   let result = ''
   for (let i = 0; i < TRACKING_ID_LENGTH; i++) {
     const randomIndex = Math.floor(
@@ -155,7 +155,7 @@ function generateTrackingId(): string {
   return result
 }
 
-type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
+type EventDocumentWithTransactionId = EventDocument & { transactionId: string }
 
 export async function createEvent({
   eventInput,
@@ -175,7 +175,7 @@ export async function createEvent({
   }
 
   const db = await events.getClient()
-  const collection = db.collection<EventDocumentWithTransActionId>('events')
+  const collection = db.collection<EventDocumentWithTransactionId>('events')
 
   const now = new Date().toISOString()
   const id = getUUID()

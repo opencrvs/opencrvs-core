@@ -149,65 +149,6 @@ export function createValidationSchema(config: FieldConfig[]) {
 }
 
 /**
- * Quick-and-dirty mock data generator for event actions.
- */
-export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
-  switch (field.type) {
-    case FieldType.DIVIDER:
-    case FieldType.TEXT:
-    case FieldType.TEXTAREA:
-    case FieldType.BULLET_LIST:
-    case FieldType.PAGE_HEADER:
-    case FieldType.LOCATION:
-    case FieldType.SELECT:
-    case FieldType.COUNTRY:
-    case FieldType.RADIO_GROUP:
-    case FieldType.PARAGRAPH:
-    case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.NAME:
-    case FieldType.PHONE:
-    case FieldType.ID:
-    case FieldType.OFFICE:
-      return `${field.id}-${field.type}-${i}`
-    case FieldType.NUMBER:
-      return 19
-    case FieldType.EMAIL:
-      return 'test@opencrvs.org'
-    case FieldType.ADDRESS:
-      return {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'URBAN',
-        town: 'Example Town',
-        residentialArea: 'Example Residential Area',
-        street: 'Example Street',
-        number: '55',
-        zipCode: '123456'
-      }
-    case FieldType.DATE:
-      return '2021-01-01'
-    case FieldType.DATE_RANGE:
-      return ['2021-01-01', '2021-01-02']
-    case FieldType.CHECKBOX:
-      return true
-    case FieldType.SIGNATURE:
-    case FieldType.FILE:
-      return {
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
-        originalFilename: 'abcd.png',
-        type: 'image/png'
-      } satisfies FileFieldValue
-    case FieldType.FILE_WITH_OPTIONS:
-      return null
-    case FieldType.DATA:
-      return {}
-  }
-}
-
-/**
  * Maps complex or nested field types, such as Address fields, to their corresponding empty values.
  */
 export function mapFieldTypeToEmptyValue(field: FieldConfig) {
