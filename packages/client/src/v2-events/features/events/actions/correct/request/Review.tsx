@@ -104,8 +104,9 @@ export function Review() {
           disabled={!valuesHaveChanged}
           id="continue_button"
           onClick={() => {
-            // eslint-disable-next-line no-console
-            console.log('CIHAN TODO navigate to summary?')
+            navigate(
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({ eventId })
+            )
           }}
         >
           {intl.formatMessage(buttonMessages.continueButton)}

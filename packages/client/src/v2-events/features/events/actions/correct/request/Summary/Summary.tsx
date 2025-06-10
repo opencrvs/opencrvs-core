@@ -22,7 +22,8 @@ import {
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getDeclaration
+  getDeclaration,
+  getActionAnnotationFields
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -132,10 +133,22 @@ export function Summary() {
     )
   }
   const fields = getDeclarationFields(eventConfiguration)
+  const declareActionConfig = eventConfiguration.actions.find(
+    (action) => action.type === ActionType.DECLARE
+  )
+
+  if (!declareActionConfig) {
+    throw new Error(
+      `No action configuration found for ${ActionType.DECLARE} found. This should never happen`
+    )
+  }
+
+  const annotationFields = getActionAnnotationFields(declareActionConfig)
 
   const allFields = [
     ...fields,
-    ...actionConfig.correctionForm.pages.flatMap((page) => page.fields)
+    ...actionConfig.correctionForm.pages.flatMap((page) => page.fields),
+    ...annotationFields
   ]
 
   const stringifiedForm = stringifyFormData(allFields, form)
@@ -145,10 +158,8 @@ export function Summary() {
   )
 
   const annotation = useActionAnnotation()
-
   const annotationForm = annotation.getAnnotation()
-
-  const stringiedRequestData = stringifyFormData(allFields, annotationForm)
+  const stringifiedRequestData = stringifyFormData(allFields, annotationForm)
 
   const correctionFormPages =
     eventConfiguration.actions.find(
@@ -258,7 +269,7 @@ export function Summary() {
                   .map((field) => {
                     return {
                       fieldLabel: intl.formatMessage(field.label),
-                      collectedValue: stringiedRequestData[field.id] || ''
+                      collectedValue: stringifiedRequestData[field.id] || ''
                     }
                   })}
                 hideTableBottomBorder={true}
