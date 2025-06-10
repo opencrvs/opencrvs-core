@@ -27,25 +27,26 @@ countryconfig_image_tag="develop"
 opencrvs_namespace = 'opencrvs-dev'
 dependencies_namespace = 'opencrvs-deps-dev'
 
-
+# Security enabled:
+# Configure security for dependencies and OpenCRVS services:
+# - Setup MinIO admin user and password
+# - Configure Redis users
+# - Sync passwords between dependencies and OpenCRVS services
+security_enabled = True
 
 # Checkout infrastructure directory if not exists
 if not os.path.exists('../infrastructure'):
     local("git clone git@github.com:opencrvs/infrastructure.git ../infrastructure")
 
-local_resource('README.md', cmd='awk "/For OpenCRVS Core Developers/{flag=1; next} /For OpenCRVS Country Config Developers/{flag=0} flag" ../infrastructure/README.md', labels=['0.Readme'])
-
-############################################################
-# What common Tiltfile does?
-# - Group resources by label on UI: http://localhost:10350/
-include('../infrastructure/tilt/Tiltfile.common')
-
 # Load extensions for namespace and helm operations
-load('ext://namespace', 'namespace_create', 'namespace_inject')
 load('ext://helm_resource', 'helm_resource', 'helm_repo')
+load('ext://namespace', 'namespace_create', 'namespace_inject')
+load("../infrastructure/tilt/lib.tilt", "copy_secrets", "reset_environment", "seed_data")
+
+include('../infrastructure/tilt/common.tilt')
 
 # If your machine is powerful feel free to change parallel updates from default 3
-# update_settings(max_parallel_updates=3)
+update_settings(max_parallel_updates=1)
 
 ############################################################
 # Build images:
@@ -60,7 +61,13 @@ docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
 # Build services
 docker_build("ghcr.io/opencrvs/ocrvs-client:local", ".",
               dockerfile="packages/client/Dockerfile", 
-              only=["infrastructure", "packages/components","packages/client","packages/events","packages/gateway"],
+              only=[
+                "infrastructure",
+                "packages/components",
+                "packages/client",
+                "packages/events",
+                "packages/gateway"
+              ],
               network="host")
 docker_build("ghcr.io/opencrvs/ocrvs-login:local", ".",
               dockerfile="packages/login/Dockerfile", 
@@ -102,33 +109,30 @@ build_services()
 ############################################################
 
 # Create namespaces:
-# - traefik, ingress controller (https://opencrvs.localhost)
 # - opencrvs-deps-dev, dependencies namespace
 # - opencrvs-dev, main namespace
-namespace_create('traefik')
 namespace_create(dependencies_namespace)
 namespace_create(opencrvs_namespace)
-
-
-# Install Traefik GW
-helm_repo('traefik-repo', 'https://traefik.github.io/charts', labels=['Dependencies'])
-helm_resource(
-  'traefik', 'traefik-repo/traefik', namespace='traefik', resource_deps=['traefik-repo'],
-  flags=['--values=../infrastructure/infrastructure/localhost/traefik/values.yaml'])
 
 ######################################################
 # OpenCRVS Dependencies Deployment
 # NOTE: This helm chart can be deployed as helm release
+if security_enabled:
+    deps_configuration_file = '../infrastructure/examples/localhost/dependencies/values-dev-secure.yaml'
+    opencrvs_configuration_file = '../infrastructure/examples/localhost/opencrvs-services/values-dev-secure.yaml'
+else:
+    deps_configuration_file = '../infrastructure/examples/localhost/dependencies/values-dev.yaml'
+    opencrvs_configuration_file = '../infrastructure/examples/localhost/opencrvs-services/values-dev.yaml'
 k8s_yaml(helm('../infrastructure/charts/dependencies',
   namespace=dependencies_namespace,
-  values=['../infrastructure/infrastructure/localhost/dependencies/values-dev.yaml']))
+  values=[deps_configuration_file]))
 
 ######################################################
 # OpenCRVS Deployment
 k8s_yaml(
   helm('../infrastructure/charts/opencrvs-services',
        namespace=opencrvs_namespace,
-       values=['../infrastructure/infrastructure/localhost/opencrvs-services/values-dev.yaml'],
+       values=[opencrvs_configuration_file],
        set=[
         "image.tag={}".format(core_images_tag),
         "countryconfig.image.name={}".format(countryconfig_image_name),
@@ -137,18 +141,13 @@ k8s_yaml(
       )
 )
 
-######################################################
-# Data management tasks:
-# - Reset database: This task is not part of helm deployment to avoid accidental data loss
-# - Seed data: is part of helm install post-deploy hook, but it is a manual task as well
-# - Run migration job, is part of helm install/upgrade post-deploy hook
-cleanup_command = "../infrastructure/infrastructure/clear-all-data.k8s.sh --dependencies-namespace {1} -o {0}".format(
-  opencrvs_namespace, dependencies_namespace
-)
-local_resource(
-    'Reset database',
-    labels=['2.Data-tasks'],
-    auto_init=False,
-    cmd=cleanup_command,
-    trigger_mode=TRIGGER_MODE_MANUAL,
-)
+#######################################################
+# Add Data Tasks to Tilt Dashboard
+reset_environment(opencrvs_namespace, opencrvs_configuration_file)
+
+seed_data(opencrvs_namespace, opencrvs_configuration_file)
+
+if security_enabled:
+    copy_secrets(dependencies_namespace, opencrvs_namespace)
+
+print("✅ Tiltfile configuration loaded successfully.")
