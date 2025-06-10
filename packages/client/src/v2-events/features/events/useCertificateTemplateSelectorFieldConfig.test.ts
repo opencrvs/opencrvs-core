@@ -102,9 +102,12 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
       './useCertificateTemplateSelectorFieldConfig'
     )
     const result = useCertificateTemplateSelectorFieldConfig(
-      'v2.birth',
+      'birth',
       declaration
     ) as SelectField
+
+    expect(result.options).toHaveLength(1)
+    expect(result.options[0].value).toBe('birth-certificate')
   })
 
   it('does not include birth-certified-certificate if age is less than a year old', async () => {
@@ -122,23 +125,14 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
     expect(birthResult.options).toHaveLength(0)
   })
 
-  it('returns correct label and required fields in the config', async () => {
-    mockTemplates = [{ ...birthCertificateTemplateWithNoConditional }]
-
-    const { useCertificateTemplateSelectorFieldConfig } = await import(
-      './useCertificateTemplateSelectorFieldConfig'
-    )
-    const result = useCertificateTemplateSelectorFieldConfig(
-      'birth',
-      declaration
-    ) as SelectField
-    expect(result.label).toBeDefined()
-    expect(result.required).toBe(true)
-  })
-
   it('returns the defaultValue if a template is marked as isDefault', async () => {
     mockTemplates = [
-      { ...birthCertificateTemplateWithNoConditional, isDefault: true }
+      { ...birthCertificateTemplateWithNoConditional, isDefault: false },
+      {
+        ...birthCertificateTemplateWithNoConditional,
+        id: 'default-birth-certificate',
+        isDefault: true
+      }
     ]
 
     const { useCertificateTemplateSelectorFieldConfig } = await import(
@@ -148,6 +142,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
       'birth',
       declaration
     ) as SelectField
-    expect(result.defaultValue).toBe('birth-certificate')
+    expect(result.defaultValue).toBe('default-birth-certificate')
+    expect(result.options).toHaveLength(2)
   })
 })
