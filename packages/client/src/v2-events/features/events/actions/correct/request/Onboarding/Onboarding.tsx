@@ -93,7 +93,6 @@ export function Onboarding() {
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
-        // @TODO: Use subscription if needed
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         declaration={event.declaration}
         eventConfig={configuration}
@@ -102,6 +101,7 @@ export function Onboarding() {
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={false}
+        validateBeforeNextPage={true}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({

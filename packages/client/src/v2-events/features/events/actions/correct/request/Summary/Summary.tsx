@@ -304,6 +304,7 @@ export function Summary() {
             if (content.length === 0) {
               return null
             }
+
             return (
               <Table
                 key={page.id}
@@ -340,8 +341,6 @@ export function Summary() {
               ></Table>
             )
           })}
-
-          {/* @todo fees select */}
         </Content>
       </ActionPageLight>
       <Dialog
