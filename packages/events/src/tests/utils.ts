@@ -45,7 +45,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'assignedTo',
   'updatedAtLocation', // @todo check?
   'updatedBy',
-  'acceptedAt'
+  'acceptedAt',
+  'dateOfEvent'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.

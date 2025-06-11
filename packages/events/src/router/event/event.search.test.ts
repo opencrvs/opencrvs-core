@@ -199,7 +199,8 @@ test('Returns events that match the text field criteria of applicant', async () 
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          'applicant.name.firstname': { type: 'exact', term: 'John' },
+          // @TODO: Should you be able to search by only first name?
+          'applicant.name': { type: 'exact', term: 'John' },
           applicant____dob: { type: 'exact', term: '2000-01-01' }
         }
       }

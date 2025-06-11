@@ -227,7 +227,8 @@ describe('Request and confirmation flow', () => {
     await client.event.actions.assignment.assign(assignmentInput)
 
     const data = generator.event.actions.register(eventId, {
-      declaration
+      declaration,
+      keepAssignment: true
     })
 
     await client.event.actions.register.request(data)
