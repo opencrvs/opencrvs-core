@@ -11,8 +11,9 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
-import { getFullUrl, precacheFile } from '../features/files/useFileUpload'
+import { precacheFile } from '../features/files/useFileUpload'
 
 setQueryDefaults(trpcOptionsProxy.user.get, {
   queryFn: async (...params) => {
@@ -32,7 +33,7 @@ setQueryDefaults(trpcOptionsProxy.user.get, {
       await precacheFile(user.signatureFilename)
       return {
         ...user,
-        signatureFilename: getFullUrl(user.signatureFilename)
+        signatureFilename: getUnsignedFileUrl(user.signatureFilename)
       }
     }
 
@@ -66,7 +67,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
     return users.map((user) => ({
       ...user,
       signatureFilename: user.signatureFilename
-        ? getFullUrl(user.signatureFilename)
+        ? getUnsignedFileUrl(user.signatureFilename)
         : undefined
     }))
   }
