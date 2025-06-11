@@ -319,10 +319,12 @@ export const SearchResultComponent = ({
         .slice(0, 2)
     }
   }
-  const paginatedData = queryData.slice(
-    limit * (currentPageNumber - 1),
-    limit * currentPageNumber
-  )
+
+  const paginatedData = orderBy(
+    queryData,
+    COLUMNS.LAST_UPDATED,
+    SORT_ORDER.DESCENDING
+  ).slice(limit * (currentPageNumber - 1), limit * currentPageNumber)
 
   const dataWithDraft = paginatedData
     /*
