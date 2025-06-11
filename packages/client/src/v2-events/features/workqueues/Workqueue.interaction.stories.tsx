@@ -24,6 +24,7 @@ import {
   tennisClubMembershipEventIndex,
   tennisClubMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { WorkqueueIndex } from './index'
 
 const meta: Meta<typeof WorkqueueIndex> = {
@@ -88,12 +89,28 @@ export const SortWorkqueue: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     const TitleHeader = await canvas.findByText('Title')
+    const LastUpdatedHeader = await canvas.findByText('Last updated')
+
     await userEvent.click(TitleHeader)
     const names = queryData.map(
       ({ declaration }) =>
         `${declaration['applicant.firstname']} ${declaration['applicant.surname']}`
     )
     const sortedNames = [...names].sort((a, b) => a.localeCompare(b))
+    const reverseSortedNames = [...sortedNames].reverse()
+
+    const lastUpdatedAt = queryData.map(({ updatedAt }) => updatedAt)
+    const sortedUpdatedAt = lastUpdatedAt.sort(
+      (a, b) => new Date(a).getTime() - new Date(b).getTime()
+    )
+
+    const formattedUpdatedAt = sortedUpdatedAt.map((date) =>
+      formattedDuration(new Date(date))
+    )
+
+    const reverseFormattedUpdatedAt = sortedUpdatedAt
+      .reverse()
+      .map((date) => formattedDuration(new Date(date)))
 
     await step('Sort by name - page 1', async () => {
       const namesInFirstPage = sortedNames.slice(0, 10)
@@ -104,18 +121,85 @@ export const SortWorkqueue: Story = {
       await expect(nameCells).toStrictEqual(namesInFirstPage)
     })
 
-    await step('Sort by name - page 2', async () => {
-      const nextPageButton = await canvas.findByRole('button', {
-        name: 'Next page'
-      })
-
-      const nameInSecondPage = sortedNames.slice(10)
-      await userEvent.click(nextPageButton)
+    await step('Sort by name - page 1 - reverse', async () => {
+      await userEvent.click(TitleHeader)
+      const namesInFirstPage = reverseSortedNames.slice(0, 10)
       const rows = canvasElement.querySelectorAll('div[id^="row_"]')
       const nameCells = Array.from(rows).map(
         (row: Element) => row.firstElementChild?.textContent
       )
-      await expect(nameCells).toStrictEqual(nameInSecondPage)
+      await expect(nameCells).toStrictEqual(namesInFirstPage)
+    })
+
+    await step('Sort by last updated - page 1', async () => {
+      await userEvent.click(LastUpdatedHeader)
+
+      const updatedAtInFirstPage = formattedUpdatedAt.slice(0, 10)
+      const cells = canvasElement.querySelectorAll('div[id^="row_"]')
+      const updatedAtCell = Array.from(cells).map(
+        (cell: Element) => cell.lastElementChild?.textContent
+      )
+      await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
+    })
+
+    await step('Sort by last updated - page 1 - reverse', async () => {
+      await userEvent.click(LastUpdatedHeader)
+
+      const updatedAtInFirstPage = reverseFormattedUpdatedAt.slice(0, 10)
+      const cells = canvasElement.querySelectorAll('div[id^="row_"]')
+      const updatedAtCell = Array.from(cells).map(
+        (cell: Element) => cell.lastElementChild?.textContent
+      )
+      await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
+    })
+
+    await step('Sort by name - page 2', async () => {
+      const nextPageButton = await canvas.findByRole('button', {
+        name: 'Next page'
+      })
+      await userEvent.click(nextPageButton)
+
+      await userEvent.click(TitleHeader)
+
+      const namesInSecondPage = sortedNames.slice(10)
+      const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+      const nameCells = Array.from(rows).map(
+        (row: Element) => row.firstElementChild?.textContent
+      )
+      await expect(nameCells).toStrictEqual(namesInSecondPage)
+    })
+
+    await step('Sort by name - page 2 - reverse', async () => {
+      await userEvent.click(TitleHeader)
+
+      const namesInSecondPage = reverseSortedNames.slice(10)
+      const rows = canvasElement.querySelectorAll('div[id^="row_"]')
+      const nameCells = Array.from(rows).map(
+        (row: Element) => row.firstElementChild?.textContent
+      )
+      await expect(nameCells).toStrictEqual(namesInSecondPage)
+    })
+
+    await step('Sort by last updated - page 2', async () => {
+      await userEvent.click(LastUpdatedHeader)
+
+      const updatedAtInFirstPage = formattedUpdatedAt.slice(10)
+      const cells = canvasElement.querySelectorAll('div[id^="row_"]')
+      const updatedAtCell = Array.from(cells).map(
+        (cell: Element) => cell.lastElementChild?.textContent
+      )
+      await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
+    })
+
+    await step('Sort by last updated - page 2 - reverse', async () => {
+      await userEvent.click(LastUpdatedHeader)
+
+      const updatedAtInFirstPage = reverseFormattedUpdatedAt.slice(10)
+      const cells = canvasElement.querySelectorAll('div[id^="row_"]')
+      const updatedAtCell = Array.from(cells).map(
+        (cell: Element) => cell.lastElementChild?.textContent
+      )
+      await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
     })
   }
 }
