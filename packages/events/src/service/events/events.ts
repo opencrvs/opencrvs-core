@@ -239,7 +239,6 @@ export async function addAction(
     }
   }
 
-  // @TODO: @naftis: Split up the `addAction` function into smaller functions.
   if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
@@ -250,14 +249,11 @@ export async function addAction(
       status,
       createdBy: user.id,
       createdByRole: user.role,
-      // @TODO: Why can this be null | undefined, does either have a different meaning?
       createdBySignature: user.signature ?? undefined,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId
     })
-  }
-
-  if (input.type === ActionType.ASSIGN) {
+  } else if (input.type === ActionType.ASSIGN) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
@@ -275,7 +271,6 @@ export async function addAction(
     await eventsRepo.createAction({
       eventId,
       registrationNumber:
-        // @TODO: Can this be something else than register? `addAction` likely eventually gets quite bloated if not split up.
         input.type === ActionType.REGISTER
           ? input.registrationNumber
           : undefined,
@@ -287,7 +282,11 @@ export async function addAction(
       createdBy: user.id,
       createdByRole: user.role,
       createdAtLocation: user.primaryOfficeId,
-      originalActionId: input.originalActionId
+      originalActionId: input.originalActionId,
+      reasonMessage:
+        input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+          ? input.reason.message
+          : undefined
     })
   }
 

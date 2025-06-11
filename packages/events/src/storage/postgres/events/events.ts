@@ -39,19 +39,28 @@ async function getEventByIdInTransaction(
 
   const actions = await trx.any(sql.type(ActionDocument)`
     SELECT
-      id,
-      transaction_id AS "transactionId",
       action_type AS "type",
-      registration_number AS "registrationNumber",
-      status,
-      declaration,
       annotation,
       assigned_to AS "assignedTo",
+      created_at_location AS "createdAtLocation",
+      ${formatTimestamp('created_at')} AS "createdAt",
       created_by AS "createdBy",
       created_by_role AS "createdByRole",
+      declaration,
+      id,
       original_action_id AS "originalActionId",
-      created_at_location AS "createdAtLocation",
-      ${formatTimestamp('created_at')} AS "createdAt"
+      registration_number AS "registrationNumber",
+      CASE
+        WHEN reason_message IS NULL THEN NULL
+        ELSE jsonb_build_object(
+          'is_duplicate',
+          reason_is_duplicate,
+          'message',
+          reason_message
+        )
+      END AS reason,
+      status,
+      transaction_id AS "transactionId"
     FROM
       event_actions
     WHERE
@@ -124,73 +133,76 @@ export const createEvent = async (
  */
 async function createActionInTransaction(
   {
-    eventId,
-    transactionId,
-    registrationNumber,
-    type,
-    status,
+    annotation,
+    assignedTo,
+    createdAtLocation,
     createdBy,
     createdByRole,
     createdBySignature,
-    createdAtLocation,
     declaration,
-    annotation,
+    eventId,
     originalActionId,
-    assignedTo
+    reasonIsDuplicate,
+    reasonMessage,
+    registrationNumber,
+    status,
+    transactionId,
+    type
   }: {
-    eventId: UUID
-    transactionId: string
-    registrationNumber?: string
-    type: ActionType
-    status: ActionStatus
+    annotation?: Record<string, SerializableValue>
+    assignedTo?: string
+    createdAtLocation?: UUID
     createdBy: string
     createdByRole: string
     createdBySignature?: string
-    createdAtLocation?: UUID
     declaration?: Record<string, SerializableValue>
-    annotation?: Record<string, SerializableValue>
+    eventId: UUID
     originalActionId?: UUID
-    assignedTo?: string
+    reasonIsDuplicate?: boolean
+    reasonMessage?: string
+    registrationNumber?: string
+    status: ActionStatus
+    transactionId: string
+    type: ActionType
   },
   trx: CommonQueryMethods
 ) {
-  // @TODO: Some typing error here
-  const originalActionIdx = originalActionId as string | undefined
-  // @TODO: Some typing error here
-  const createdAtLocationx = createdAtLocation as string | undefined
-
   const result = await trx.maybeOneFirst(sql.type(z.object({ id: UUID }))`
     INSERT INTO
       event_actions (
-        event_id,
-        transaction_id,
-        registration_number,
         action_type,
-        assigned_to,
-        status,
-        declaration,
         annotation,
-        created_by,
+        assigned_to,
+        created_at_location,
         created_by_role,
         created_by_signature,
-        created_at_location,
-        original_action_id
+        created_by,
+        declaration,
+        event_id,
+        original_action_id,
+        reason_is_duplicate,
+        reason_message,
+        registration_number,
+        status,
+        transaction_id
       )
     VALUES
       (
-        ${eventId},
-        ${transactionId},
-        ${registrationNumber ?? null},
         ${type}::action_type,
-        ${assignedTo ?? null},
-        ${status}::action_status,
-        ${sql.jsonb(declaration ?? {})},
         ${sql.jsonb(annotation ?? {})},
-        ${createdBy},
+        ${assignedTo ?? null},
+        ${createdAtLocation ?? null}::uuid,
         ${createdByRole},
         ${createdBySignature ?? null},
-        ${createdAtLocationx ?? null}::uuid,
-        ${originalActionIdx ?? null}::uuid
+        ${createdBy},
+        ${sql.jsonb(declaration ?? {})},
+        ${eventId},
+        ${originalActionId ?? null}::uuid,
+        ${reasonIsDuplicate ?? null},
+        ${reasonMessage ?? null},
+        ${registrationNumber ?? null},
+        ${status}::action_status,
+        ${transactionId}
       )
     ON CONFLICT (action_type, transaction_id) DO NOTHING
     RETURNING

@@ -45,20 +45,22 @@ CREATE TYPE action_type AS ENUM (
 
 CREATE TABLE event_actions (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  transaction_id text NOT NULL,
-  registration_number text UNIQUE,
-  event_id uuid NOT NULL REFERENCES events(id),
   action_type action_type NOT NULL,
-  assigned_to text,
-  declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
   annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
-  status action_status NOT NULL,
-  original_action_id uuid REFERENCES event_actions(id),
+  assigned_to text,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at_location uuid REFERENCES locations(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_by_signature text,
-  created_at_location uuid REFERENCES locations(id),
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
+  event_id uuid NOT NULL REFERENCES events(id),
+  original_action_id uuid REFERENCES event_actions(id),
+  reason_is_duplicate boolean,
+  reason_message text,
+  registration_number text UNIQUE,
+  status action_status NOT NULL,
+  transaction_id text NOT NULL,
   UNIQUE (transaction_id, action_type),
   CHECK (
     (
@@ -72,6 +74,12 @@ CREATE TABLE event_actions (
     OR (
       action_type = 'REGISTER'
       AND registration_number IS NOT NULL
+    )
+    OR (
+      action_type = 'REJECT'
+      AND reason_message IS NOT NULL
+      AND reason_message <> ''
+      AND reason_is_duplicate IS NOT NULL
     )
     OR (
       action_type NOT IN ('ASSIGN', 'UNASSIGN', 'REGISTER')
