@@ -128,7 +128,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
     })
   })
 
-  describe('When two without conditionals are available with one marked as a', () => {
+  describe('When two certificates without conditionals are available with one marked as default', () => {
     it("should set the field's default value to the id of the default certificate", async () => {
       mockTemplates = [
         { ...birthCertificateTemplateWithNoConditional, isDefault: false },
