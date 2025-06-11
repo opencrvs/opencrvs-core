@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   AddressType,
+  createPrng,
   EventDocument,
   generateActionDeclarationInput,
   getAcceptedActions,
@@ -304,6 +305,8 @@ describe('when a correction request exists', () => {
   let withCorrectionRequest: EventDocument
   let client: ReturnType<typeof createTestClient>
 
+  const rng = createPrng(94842)
+
   beforeEach(async () => {
     const { user, generator } = await setupTestCase()
     client = createTestClient(user)
@@ -337,7 +340,8 @@ describe('when a correction request exists', () => {
         declaration: {
           ...generateActionDeclarationInput(
             tennisClubMembershipEvent,
-            ActionType.DECLARE
+            ActionType.DECLARE,
+            rng
           ),
           'applicant.firstname': 'Johnny'
         }

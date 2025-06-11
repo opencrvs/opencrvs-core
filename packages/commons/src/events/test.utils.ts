@@ -562,12 +562,12 @@ export function eventPayloadGenerator(rng: () => number) {
 export function generateActionDocument({
   configuration,
   action,
-  rng,
+  rng = () => 1,
   defaults = {}
 }: {
   configuration: EventConfig
   action: ActionType
-  rng: () => number
+  rng?: () => number
   defaults?: Partial<ActionDocument>
 }): ActionDocument {
   const actionBase = {
@@ -634,11 +634,11 @@ export function generateActionDocument({
 export function generateEventDocument({
   configuration,
   actions,
-  rng
+  rng = () => 1
 }: {
   configuration: EventConfig
   actions: ActionType[]
-  rng: () => number
+  rng?: () => number
 }): EventDocument {
   return {
     trackingId: getUUID(),
@@ -659,12 +659,12 @@ export function generateEventDocument({
 export function generateEventDraftDocument({
   eventId,
   actionType,
-  rng,
+  rng = () => 1,
   declaration = {}
 }: {
   eventId: string
   actionType: ActionType
-  rng: () => number
+  rng?: () => number
   declaration?: EventState
 }): Draft {
   const action = generateActionDocument({
