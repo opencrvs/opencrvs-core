@@ -320,13 +320,7 @@ export const SearchResultComponent = ({
     }
   }
 
-  const paginatedData = orderBy(
-    queryData,
-    COLUMNS.LAST_UPDATED,
-    SORT_ORDER.DESCENDING
-  ).slice(limit * (currentPageNumber - 1), limit * currentPageNumber)
-
-  const dataWithDraft = paginatedData
+  const dataWithDraft = queryData
     /*
      * Apply pending drafts to the event index.
      * This is necessary to show the most up to date information in the workqueue.
@@ -354,6 +348,11 @@ export const SearchResultComponent = ({
 
   const allResults = mapEventsToWorkqueueRows(sortedResult)
 
+  const paginatedData = allResults.slice(
+    limit * (currentPageNumber - 1),
+    limit * currentPageNumber
+  )
+
   const totalPages = queryData.length ? Math.ceil(queryData.length / limit) : 0
 
   const isShowPagination = totalPages > 1
@@ -374,7 +373,7 @@ export const SearchResultComponent = ({
       >
         <Workqueue
           columns={[...getDefaultColumns(), ...getColumns()]}
-          content={allResults}
+          content={paginatedData}
           hideLastBorder={!isShowPagination}
           sortOrder={sortOrder}
         />

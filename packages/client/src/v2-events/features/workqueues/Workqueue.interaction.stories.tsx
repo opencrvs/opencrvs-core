@@ -93,17 +93,15 @@ export const SortWorkqueue: Story = {
       ({ declaration }) =>
         `${declaration['applicant.firstname']} ${declaration['applicant.surname']}`
     )
+    const sortedNames = [...names].sort((a, b) => a.localeCompare(b))
 
     await step('Sort by name - page 1', async () => {
-      const namesInFirstPage = names.slice(0, 10)
-      const sortedNames = [...namesInFirstPage].sort((a, b) =>
-        a.localeCompare(b)
-      )
+      const namesInFirstPage = sortedNames.slice(0, 10)
       const rows = canvasElement.querySelectorAll('div[id^="row_"]')
       const nameCells = Array.from(rows).map(
         (row: Element) => row.firstElementChild?.textContent
       )
-      await expect(nameCells).toStrictEqual(sortedNames)
+      await expect(nameCells).toStrictEqual(namesInFirstPage)
     })
 
     await step('Sort by name - page 2', async () => {
@@ -111,16 +109,13 @@ export const SortWorkqueue: Story = {
         name: 'Next page'
       })
 
-      const nameInSecondPage = names.slice(10)
+      const nameInSecondPage = sortedNames.slice(10)
       await userEvent.click(nextPageButton)
-      const sortedNames = [...nameInSecondPage].sort((a, b) =>
-        a.localeCompare(b)
-      )
       const rows = canvasElement.querySelectorAll('div[id^="row_"]')
       const nameCells = Array.from(rows).map(
         (row: Element) => row.firstElementChild?.textContent
       )
-      await expect(nameCells).toStrictEqual(sortedNames)
+      await expect(nameCells).toStrictEqual(nameInSecondPage)
     })
   }
 }
