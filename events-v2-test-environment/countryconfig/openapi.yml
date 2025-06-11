@@ -86,10 +86,12 @@ components:
         dateOfEvent:
           type: object
           properties:
-            fieldId:
+            $$field:
               type: string
+              description: Unique identifier for the field
           required:
-            - fieldId
+            - $$field
+          description: Reference to a field by its ID
         title:
           $ref: "#/components/schemas/TranslationConfig"
         fallbackTitle:
@@ -546,6 +548,7 @@ components:
       description: JSON schema conditional configuration
     ActionConfig:
       oneOf:
+        - $ref: "#/components/schemas/ReadActionConfig"
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RejectDeclarationActionConfig"
@@ -560,6 +563,7 @@ components:
       discriminator:
         propertyName: type
         mapping:
+          READ: "#/components/schemas/ReadActionConfig"
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REJECT: "#/components/schemas/RejectDeclarationActionConfig"
@@ -571,7 +575,7 @@ components:
           REQUEST_CORRECTION: "#/components/schemas/RequestCorrectionActionConfig"
           REJECT_CORRECTION: "#/components/schemas/RejectCorrectionActionConfig"
           APPROVE_CORRECTION: "#/components/schemas/ApproveCorrectionActionConfig"
-    DeclareActionConfig:
+    ReadActionConfig:
       type: object
       properties:
         label:
@@ -610,7 +614,7 @@ components:
           type: boolean
         type:
           type: string
-          const: DECLARE
+          const: READ
         review:
           type: object
           properties:
@@ -637,6 +641,51 @@ components:
           properties:
             id:
               type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default:
+                &a4 []
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default:
+                &a5 []
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            type:
+              type: string
+              const: ADDRESS
             defaultValue:
               anyOf:
                 - oneOf:
@@ -718,46 +767,6 @@ components:
                     - addressType
                     - state
                     - district2
-            parent:
-              type: object
-              properties:
-                _fieldId:
-                  type: string
-            conditionals:
-              type: array
-              items:
-                $ref: "#/components/schemas/FieldConditional"
-              default:
-                &a4 []
-            required:
-              type: boolean
-              default: false
-            placeholder:
-              $ref: "#/components/schemas/TranslationConfig"
-            validation:
-              type: array
-              items:
-                type: object
-                properties:
-                  validator:
-                    $ref: "#/components/schemas/Conditional"
-                  message:
-                    $ref: "#/components/schemas/TranslationConfig"
-                required:
-                  - validator
-                  - message
-              default:
-                &a5 []
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            helperText:
-              $ref: "#/components/schemas/TranslationConfig"
-            hideLabel:
-              type: boolean
-              default: false
-            type:
-              type: string
-              const: ADDRESS
           required:
             - id
             - label
@@ -767,14 +776,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -808,6 +819,9 @@ components:
             type:
               type: string
               const: TEXT
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -834,13 +848,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: number
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -874,6 +891,8 @@ components:
             type:
               type: string
               const: NUMBER
+            defaultValue:
+              type: number
             configuration:
               type: object
               properties:
@@ -896,14 +915,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -937,6 +958,9 @@ components:
             type:
               type: string
               const: TEXTAREA
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -964,15 +988,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              format: date
-              description: Date in the format YYYY-MM-DD
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1006,6 +1031,10 @@ components:
             type:
               type: string
               const: DATE
+            defaultValue:
+              type: string
+              format: date
+              description: Date in the format YYYY-MM-DD
             configuration:
               type: object
               properties:
@@ -1021,26 +1050,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: array
-                  maxItems: 2
-                  minItems: 2
-                  prefixItems:
-                    - type: string
-                      format: date
-                      description: Date in the format YYYY-MM-DD
-                    - type: string
-                      format: date
-                      description: Date in the format YYYY-MM-DD
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1074,6 +1093,21 @@ components:
             type:
               type: string
               const: DATE_RANGE
+            defaultValue:
+              anyOf:
+                - type: string
+                  format: date
+                  description: Date in the format YYYY-MM-DD
+                - type: array
+                  maxItems: 2
+                  minItems: 2
+                  prefixItems:
+                    - type: string
+                      format: date
+                      description: Date in the format YYYY-MM-DD
+                    - type: string
+                      format: date
+                      description: Date in the format YYYY-MM-DD
             configuration:
               type: object
               properties:
@@ -1090,14 +1124,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1131,6 +1167,9 @@ components:
             type:
               type: string
               const: PARAGRAPH
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1160,13 +1199,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1200,6 +1242,8 @@ components:
             type:
               type: string
               const: RADIO_GROUP
+            defaultValue:
+              type: string
             options:
               type: array
               items:
@@ -1236,13 +1280,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1276,6 +1323,8 @@ components:
             type:
               type: string
               const: BULLET_LIST
+            defaultValue:
+              type: string
             items:
               type: array
               items:
@@ -1302,14 +1351,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1343,6 +1394,9 @@ components:
             type:
               type: string
               const: PAGE_HEADER
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1352,13 +1406,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1392,6 +1449,8 @@ components:
             type:
               type: string
               const: SELECT
+            defaultValue:
+              type: string
             options:
               type: array
               items:
@@ -1417,13 +1476,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1457,6 +1519,8 @@ components:
             type:
               type: string
               const: CHECKBOX
+            defaultValue:
+              type: boolean
           required:
             - id
             - label
@@ -1466,21 +1530,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1514,6 +1573,19 @@ components:
             type:
               type: string
               const: FILE
+            defaultValue:
+              type: object
+              properties:
+                filename:
+                  type: string
+                originalFilename:
+                  type: string
+                type:
+                  type: string
+              required:
+                - filename
+                - originalFilename
+                - type
             configuration:
               type: object
               properties:
@@ -1558,14 +1630,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1599,6 +1673,9 @@ components:
             type:
               type: string
               const: COUNTRY
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1608,14 +1685,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1649,6 +1728,9 @@ components:
             type:
               type: string
               const: ADMINISTRATIVE_AREA
+            defaultValue:
+              type: string
+              minLength: 1
             configuration:
               type: object
               properties:
@@ -1679,21 +1761,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1735,14 +1812,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1776,6 +1855,9 @@ components:
             type:
               type: string
               const: LOCATION
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1785,14 +1867,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1826,6 +1910,9 @@ components:
             type:
               type: string
               const: FACILITY
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1835,14 +1922,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1876,6 +1965,9 @@ components:
             type:
               type: string
               const: OFFICE
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -1885,21 +1977,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -1936,6 +2023,8 @@ components:
             signaturePromptLabel:
               $ref: "#/components/schemas/TranslationConfig"
               description: Title of the signature modal
+            defaultValue:
+              type: string
             configuration:
               type: object
               properties:
@@ -1964,14 +2053,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              type: string
-              minLength: 1
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2013,6 +2104,9 @@ components:
                   description: Maximum length of the text
               default:
                 maxLength: 10
+            defaultValue:
+              type: string
+              minLength: 1
           required:
             - id
             - label
@@ -2021,21 +2115,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2084,6 +2173,24 @@ components:
                   - value
                   - label
               description: A list of options
+            defaultValue:
+              type: array
+              items:
+                type: object
+                properties:
+                  filename:
+                    type: string
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                  option:
+                    type: string
+                required:
+                  - filename
+                  - originalFilename
+                  - type
+                  - option
             configuration:
               type: object
               properties:
@@ -2111,21 +2218,16 @@ components:
           properties:
             id:
               type: string
-            defaultValue:
-              anyOf:
-                - type: string
-                - type: string
-                  minLength: 1
-                - type: string
-                  format: date
-                  description: Date in the format YYYY-MM-DD
-                - type: number
-                - type: boolean
+              description: Unique identifier for the field
             parent:
               type: object
               properties:
-                _fieldId:
+                $$field:
                   type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
             conditionals:
               type: array
               items:
@@ -2236,6 +2338,65 @@ components:
             within declaration forms, as they are the only ones with review
             pages.
       description: Field conditional configuration
+    DeclareActionConfig:
+      type: object
+      properties:
+        label:
+          $ref: "#/components/schemas/TranslationConfig"
+        conditionals:
+          type: array
+          items:
+            oneOf:
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    const: SHOW
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                description: If 'SHOW' conditional is defined, the component is shown to the
+                  user only if the condition is met
+              - type: object
+                properties:
+                  type:
+                    type: string
+                    const: ENABLE
+                  conditional:
+                    $ref: "#/components/schemas/Conditional"
+                required:
+                  - type
+                  - conditional
+                description: If 'ENABLE' conditional is defined, the component is enabled only
+                  if the condition is met
+          default: *a8
+        draft:
+          type: boolean
+        type:
+          type: string
+          const: DECLARE
+        review:
+          type: object
+          properties:
+            title:
+              $ref: "#/components/schemas/TranslationConfig"
+              description: Title of the review page
+            fields:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConfig"
+              description: Fields to be rendered on the review page for annotations.
+          required:
+            - title
+            - fields
+          description: Configuration for **declaration** review page.
+      required:
+        - label
+        - conditionals
+        - type
+        - review
     ValidateActionConfig:
       type: object
       properties:
@@ -2966,13 +3127,6 @@ components:
           type: string
         type:
           type: string
-        dateOfEvent:
-          type: object
-          properties:
-            fieldId:
-              type: string
-          required:
-            - fieldId
         createdAt:
           type: string
           format: date-time
@@ -2997,8 +3151,15 @@ components:
                     type: string
                   createdByRole:
                     type: string
+                  createdBySignature:
+                    type:
+                      - string
+                      - "null"
+                    description: Reference to signature of the user who created the action
                   createdAtLocation:
-                    type: string
+                    type:
+                      - string
+                      - "null"
                   status:
                     type: string
                     const: Rejected
@@ -3020,7 +3181,6 @@ components:
                   - createdAt
                   - createdBy
                   - createdByRole
-                  - createdAtLocation
                   - status
                   - type
         trackingId:
@@ -3081,6 +3241,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -3387,8 +3556,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum:
@@ -3408,7 +3575,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ValidateAction:
@@ -3425,6 +3591,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -3731,8 +3906,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -3748,7 +3921,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RejectAction:
@@ -3765,6 +3937,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4071,8 +4252,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4081,6 +4260,18 @@ components:
         type:
           type: string
           const: REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4088,9 +4279,9 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
+        - reason
     MarkAsDuplicateAction:
       type: object
       properties:
@@ -4105,6 +4296,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4411,8 +4611,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4428,7 +4626,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ArchiveAction:
@@ -4445,6 +4642,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -4751,8 +4957,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -4761,6 +4965,18 @@ components:
         type:
           type: string
           const: ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -4768,9 +4984,9 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
+        - reason
     NotifiedAction:
       type: object
       properties:
@@ -4785,6 +5001,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5091,8 +5316,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5108,7 +5331,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     RegisterAction:
@@ -5125,6 +5347,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5431,8 +5662,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5450,7 +5679,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     DeclareAction:
@@ -5467,6 +5695,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -5773,8 +6010,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -5790,7 +6025,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     AssignedAction:
@@ -5807,6 +6041,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6113,8 +6356,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6132,7 +6373,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -6150,6 +6390,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6456,8 +6705,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6473,7 +6720,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ApprovedCorrectionAction:
@@ -6490,6 +6736,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -6796,8 +7051,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -6815,7 +7068,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -6833,6 +7085,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7139,8 +7400,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7158,7 +7417,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - requestId
@@ -7176,6 +7434,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7482,8 +7749,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7501,7 +7766,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
         - assignedTo
@@ -7519,6 +7783,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -7825,8 +8098,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -7842,7 +8113,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ReadAction:
@@ -7859,6 +8129,15 @@ components:
           type: string
         createdByRole:
           type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
         declaration:
           type: object
           additionalProperties:
@@ -8165,8 +8444,6 @@ components:
                   - addressType
                   - state
                   - district2
-        createdAtLocation:
-          type: string
         status:
           type: string
           enum: *a9
@@ -8182,7 +8459,6 @@ components:
         - createdBy
         - createdByRole
         - declaration
-        - createdAtLocation
         - status
         - type
     ActionInput:
@@ -8526,11 +8802,12 @@ components:
           const: CREATE
           default: CREATE
         createdAtLocation:
-          type: string
+          type:
+            - string
+            - "null"
       required:
         - eventId
         - transactionId
-        - createdAtLocation
     ValidateActionInput:
       type: object
       properties:
@@ -9515,7 +9792,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 07075924-e043-4f2e-b1e3-fe9c3323bb8d
+        transactionId: 25531b7b-b954-44b2-9aa6-1fb07b4e90d9
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10166,9 +10443,22 @@ components:
           type: string
           const: REJECT
           default: REJECT
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
+        - reason
     MarkedAsDuplicateActionInput:
       type: object
       properties:
@@ -10816,9 +11106,22 @@ components:
           type: string
           const: ARCHIVE
           default: ARCHIVE
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
+        - reason
     AssignActionInput:
       type: object
       properties:
