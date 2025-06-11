@@ -156,7 +156,6 @@ export function mapFieldTypeToMockValue(
         type: 'image/png'
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
-      return null
     case FieldType.DATA:
       return undefined
   }
@@ -183,7 +182,6 @@ export function generateActionDeclarationInput(
 
     const declarationConfig = getDeclaration(configuration)
 
-    console.log('declarationConfig', declarationConfig)
     const declaration = fieldConfigsToActionPayload(fields, rng)
 
     // Strip away hidden or disabled fields from mock action declaration
@@ -564,7 +562,7 @@ export function eventPayloadGenerator(rng: () => number) {
 export function generateActionDocument({
   configuration,
   action,
-  rng = () => 1,
+  rng = () => 0.1,
   defaults = {}
 }: {
   configuration: EventConfig
@@ -636,7 +634,7 @@ export function generateActionDocument({
 export function generateEventDocument({
   configuration,
   actions,
-  rng = () => 1
+  rng = () => 0.1
 }: {
   configuration: EventConfig
   actions: ActionType[]
@@ -661,7 +659,7 @@ export function generateEventDocument({
 export function generateEventDraftDocument({
   eventId,
   actionType,
-  rng = () => 1,
+  rng = () => 0.1,
   declaration = {}
 }: {
   eventId: string
@@ -724,7 +722,7 @@ function generateRandomApplicant(rng: () => number): EventState {
  * Useful for testing when we need deterministic outcome.
  * @param seed - Seed value for the pseudo-random number generator
  *
- * @returns A function that generates pseudo-random numbers between 0 and 1
+ * @returns A function that generates pseudo-random numbers between 0 and 1 [0, 1)
  */
 export function createPrng(seed: number) {
   // Parameters are not arbirary. Reference: https://en.wikipedia.org/wiki/Linear_congruential_generator

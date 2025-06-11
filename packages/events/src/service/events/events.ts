@@ -377,15 +377,14 @@ export async function addAction(
       {
         $push: {
           actions: {
-            ...input,
             ...createdByDetails,
             transactionId: getUUID(),
             type: ActionType.UNASSIGN,
             declaration: {},
             assignedTo: null,
             createdAt: now,
-            id: actionId,
-            status
+            id: getUUID(), // use a new UUID for unassign action
+            status: ActionStatus.Accepted // @TODO: check if there is any gotcha with this
           }
         },
         $set: { updatedAt: now }

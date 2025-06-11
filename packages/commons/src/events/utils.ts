@@ -18,7 +18,8 @@ import {
   get,
   has,
   isNil,
-  uniqBy
+  uniqBy,
+  cloneDeep
 } from 'lodash'
 import {
   ActionType,
@@ -285,8 +286,12 @@ export function deepMerge<
   T extends Record<string, unknown>,
   K extends Record<string, unknown>
 >(currentDocument: T, actionDocument: K): T & K {
+  /**
+   * Cloning is essential since mergeWith mutates the first argument.
+   */
+  const currentDocumentClone = cloneDeep(currentDocument)
   return mergeWith(
-    currentDocument,
+    cloneDeep(currentDocumentClone),
     actionDocument,
     (previousValue, incomingValue) => {
       if (incomingValue === undefined) {

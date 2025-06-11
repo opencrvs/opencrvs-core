@@ -123,5 +123,6 @@ export type FieldUpdateValueSchema =
   | typeof NumberFieldValue
   | typeof DataFieldValue
   | typeof NameFieldValue
+  | typeof NameFieldUpdateValue
   | z.ZodString
   | z.ZodBoolean

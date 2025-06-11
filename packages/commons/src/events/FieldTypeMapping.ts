@@ -57,7 +57,8 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue,
   AddressType,
-  NameFieldValue
+  NameFieldValue,
+  NameFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -128,7 +129,7 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       schema = DataFieldValue
       break
     case FieldType.NAME:
-      schema = NameFieldValue
+      schema = required ? NameFieldValue : NameFieldUpdateValue
       break
   }
 
