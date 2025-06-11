@@ -156,7 +156,7 @@ export function FormSectionComponent({
   // Create a reference map of parent fields and their their children for quick access.
   // This is used to reset the values of child fields when a parent field changes.
   const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
-    () => groupBy(fieldsWithDotSeparator, (field) => field.parent?._fieldId),
+    () => groupBy(fieldsWithDotSeparator, (field) => field.parent?.$$field),
     [fieldsWithDotSeparator]
   )
 

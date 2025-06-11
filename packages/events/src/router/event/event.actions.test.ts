@@ -18,7 +18,13 @@ import {
   getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  createTestClient,
+  sanitizeForSnapshot,
+  setupTestCase,
+  UNSTABLE_EVENT_FIELDS
+} from '@events/tests/utils'
 
 test('actions can be added to created events', async () => {
   const { user, generator } = await setupTestCase()
@@ -38,7 +44,7 @@ test('actions can be added to created events', async () => {
   ])
 })
 
-test('Action data can be retrieved', async () => {
+test('Event document contains all created actions', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -85,6 +91,27 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.READ })
   ])
+
+  updatedEvent.actions.forEach((action) => {
+    expect(action.createdAtLocation).toBe(user.primaryOfficeId)
+    expect(action.createdByRole).toBe(user.role)
+    expect(action.createdBySignature).toBe(user.signature)
+
+    const actionsWithoutAnnotatation = [
+      ActionType.CREATE,
+      ActionType.READ,
+      ActionType.ASSIGN,
+      ActionType.UNASSIGN
+    ]
+
+    if (actionsWithoutAnnotatation.every((ac) => ac !== action.type)) {
+      expect(action).toHaveProperty('annotation')
+    }
+  })
+
+  expect(
+    sanitizeForSnapshot(updatedEvent, UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
 })
 
 test('Action data accepts partial changes', async () => {
@@ -144,7 +171,10 @@ test('Action data accepts partial changes', async () => {
 
   const updatedEvent = await client.event.get(originalEvent.id)
 
-  const eventStateBeforeVillageRemoval = getCurrentEventState(updatedEvent)
+  const eventStateBeforeVillageRemoval = getCurrentEventState(
+    updatedEvent,
+    tennisClubMembershipEvent
+  )
   expect(eventStateBeforeVillageRemoval.declaration).toEqual(initialForm)
 
   await client.event.actions.assignment.assign({
@@ -167,7 +197,8 @@ test('Action data accepts partial changes', async () => {
   await client.event.actions.declare.request(declarationWithVillageNull)
   const eventAfterVillageRemoval = await client.event.get(originalEvent.id)
   const stateAfterVillageRemoval = getCurrentEventState(
-    eventAfterVillageRemoval
+    eventAfterVillageRemoval,
+    tennisClubMembershipEvent
   )
 
   expect(stateAfterVillageRemoval.declaration).toEqual({
@@ -294,7 +325,7 @@ test('partial declaration update accounts for conditional field values not in pa
 
   const event = await client.event.get(originalEvent.id)
 
-  const eventState = getCurrentEventState(event)
+  const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
 
   expect(eventState.declaration).toMatchSnapshot()
 })

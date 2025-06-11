@@ -15,6 +15,7 @@
 
 /* eslint-disable */
 import { PlainDate } from '@client/utils/date-formatting'
+import { SystemRole } from '@opencrvs/commons/client'
 
 export type Maybe<T> = T | null
 export type InputMaybe<T> = Maybe<T>
@@ -2103,14 +2104,14 @@ export type System = {
   settings?: Maybe<SystemSettings>
   shaSecret: Scalars['ID']
   status: SystemStatus
-  type: SystemType
+  type: SystemRole
 }
 
 export type SystemInput = {
   integratingSystemType?: InputMaybe<IntegratingSystemType>
   name: Scalars['String']
   settings?: InputMaybe<SystemSettingsInput>
-  type: SystemType
+  type: SystemRole
 }
 
 export type SystemSecret = {
@@ -2136,14 +2137,6 @@ export type SystemSettingsInput = {
 export enum SystemStatus {
   Active = 'active',
   Deactivated = 'deactivated'
-}
-
-export enum SystemType {
-  Health = 'HEALTH',
-  NationalId = 'NATIONAL_ID',
-  RecordSearch = 'RECORD_SEARCH',
-  Import = 'IMPORT',
-  Webhook = 'WEBHOOK'
 }
 
 export enum TelecomSystem {
@@ -2208,6 +2201,7 @@ export type User = {
   identifier?: Maybe<Identifier>
   localRegistrar?: Maybe<LocalRegistrar>
   mobile?: Maybe<Scalars['String']>
+  fullHonorificName?: Maybe<Scalars['String']>
   name: Array<HumanName>
   practitionerId: Scalars['String']
   primaryOffice: Location
@@ -2261,6 +2255,7 @@ export type UserInput = {
   id?: InputMaybe<Scalars['ID']>
   identifier?: InputMaybe<Array<InputMaybe<UserIdentifierInput>>>
   mobile?: InputMaybe<Scalars['String']>
+  fullHonorificName?: InputMaybe<Scalars['String']>
   name: Array<HumanNameInput>
   password?: InputMaybe<Scalars['String']>
   primaryOffice?: InputMaybe<Scalars['String']>
@@ -2692,6 +2687,7 @@ export type FetchUserQuery = {
     practitionerId: string
     mobile?: string | null
     email?: string | null
+    fullHonorificName?: string | null
     status: Status
     role: {
       __typename?: 'UserRole'
@@ -2981,6 +2977,7 @@ export type SearchUsersQuery = {
       id: string
       mobile?: string | null
       email?: string | null
+      fullHonorificName?: string | null
       status: Status
       underInvestigation?: boolean | null
       name: Array<{
@@ -3057,6 +3054,7 @@ export type GetUserQuery = {
     username?: string | null
     mobile?: string | null
     email?: string | null
+    fullHonorificName?: string | null
     status: Status
     underInvestigation?: boolean | null
     practitionerId: string
@@ -7078,7 +7076,7 @@ export type RegisterSystemMutation = {
       name: string
       shaSecret: string
       status: SystemStatus
-      type: SystemType
+      type: SystemRole
       integratingSystemType?: IntegratingSystemType | null
       settings?: {
         __typename?: 'SystemSettings'
@@ -7105,7 +7103,7 @@ export type DeactivateSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7130,7 +7128,7 @@ export type ReactivateSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7158,7 +7156,7 @@ export type RefreshSystemSecretMutation = {
       name: string
       shaSecret: string
       status: SystemStatus
-      type: SystemType
+      type: SystemRole
     }
   } | null
 }
@@ -7176,7 +7174,7 @@ export type UpdatePermissionsMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
     settings?: {
       __typename?: 'SystemSettings'
       webhook?: Array<{
@@ -7201,7 +7199,7 @@ export type DeleteSystemMutation = {
     name: string
     shaSecret: string
     status: SystemStatus
-    type: SystemType
+    type: SystemRole
   } | null
 }
 

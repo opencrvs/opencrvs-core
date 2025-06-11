@@ -16,6 +16,7 @@ import {
   QueryInputType,
   SearchField,
   EventFieldId,
+  QueryType,
   SearchQueryParams,
   Inferred,
   EventState
@@ -357,4 +358,29 @@ export function parseFieldSearchParams(
     )
   )
   return filteredSearchParams
+}
+
+export function toQueryType(
+  eventType: string,
+  searchParams: QueryInputType,
+  type: 'and' | 'or'
+): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  const regex = new RegExp(`^event${FIELD_SEPARATOR}`)
+  Object.entries(searchParams).forEach(([encodedKey, value]) => {
+    const key = encodedKey.replace(regex, '').replaceAll(FIELD_SEPARATOR, '.')
+
+    if (encodedKey.startsWith(`event${FIELD_SEPARATOR}`)) {
+      topLevelFields[key] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+  }
 }

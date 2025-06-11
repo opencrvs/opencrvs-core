@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { experimental_standaloneMiddleware, TRPCError } from '@trpc/server'
+import { TRPCError } from '@trpc/server'
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import {
@@ -17,18 +17,20 @@ import {
   ActionInputWithType,
   ActionType,
   DeleteActionInput,
+  findScope,
   getAssignedUserFromActions,
   getScopes,
   inScope,
   Scope,
   TokenUserType,
-  findScope,
+  WorkqueueCountInput,
   ConfigurableScopeType,
   ConfigurableScopes,
-  IAuthHeader
+  IAuthHeader,
+  EventDocument
 } from '@opencrvs/commons'
-import { Context } from '@events/router/middleware/utils'
 import { getEventById } from '@events/service/events/events'
+import { TrpcContext } from '@events/context'
 
 /**
  * Depending on how the API is called, there might or might not be Bearer keyword in the header.
@@ -87,7 +89,7 @@ function inConfigurableScopes(
   return getAuthorizedEntitiesFromScopes(foundScopes)
 }
 
-type CtxWithAuthorizedEntities = Context & {
+type CtxWithAuthorizedEntities = TrpcContext & {
   authorizedEntities?: { events?: string[] }
 }
 
@@ -103,9 +105,9 @@ export function requiresAnyOfScopes(
   configurableScopes?: ConfigurableScopeType[]
 ) {
   const fn: MiddlewareFunction<
-    Context,
+    TrpcContext,
     OpenApiMeta,
-    Context,
+    TrpcContext,
     CtxWithAuthorizedEntities,
     unknown
   > = async (opts) => {
@@ -118,7 +120,7 @@ export function requiresAnyOfScopes(
     }
 
     // If the user has any of the allowed configurable scopes, allow the user to continue
-    // and add the authorized entities to the context which are checked in later middleware
+    // and add the authorized entities to the TrpcContext which are checked in later middleware
     if (configurableScopes) {
       const authorizedEntities = inConfigurableScopes(
         authHeader,
@@ -146,13 +148,13 @@ export function requiresAnyOfScopes(
  * The function accepts either an eventId or event type directly in the input.
  * If an eventId is provided, it fetches the event to determine its type.
  *
- * Authorization is checked against authorized entities in the context:
+ * Authorization is checked against authorized entities in the TrpcContext:
  * - If no authorized entities or events are present, access is allowed
  * - Otherwise, verifies the event type is included in authorized events
  *
  * @param input - Object containing either eventId or type
  * @param next - Next middleware function to be called
- * @param ctx - Context object containing authorizedEntities
+ * @param ctx - TrpcContext object containing authorizedEntities
  * @returns Next middleware result
  * @throws {TRPCError} With code 'FORBIDDEN' if event type is not authorized
  */
@@ -183,12 +185,16 @@ export const eventTypeAuthorization: MiddlewareFunction<
   return next()
 }
 
-/**@todo Investigate: `experimental_standaloneMiddleware has been deprecated in favor of .concat()` */
-export const requireAssignment = experimental_standaloneMiddleware<{
-  input: ActionInputWithType | DeleteActionInput
-  ctx: Context
-}>().create(async ({ next, ctx, input }) => {
+export const requireAssignment: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  ActionInputWithType | DeleteActionInput
+> = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
+
+  // First check if the action is a duplicate
   if (
     'transactionId' in input &&
     event.actions.some((action) => action.transactionId === input.transactionId)
@@ -199,6 +205,8 @@ export const requireAssignment = experimental_standaloneMiddleware<{
     })
   }
 
+  const { user } = ctx
+
   const assignedTo = getAssignedUserFromActions(
     event.actions.filter(
       (action): action is ActionDocument =>
@@ -206,15 +214,41 @@ export const requireAssignment = experimental_standaloneMiddleware<{
     )
   )
 
-  if (ctx.userType === TokenUserType.SYSTEM) {
+  if (ctx.user.type === TokenUserType.Enum.system) {
+    // System users don't require assignment
+    if (assignedTo) {
+      throw new TRPCError({
+        code: 'CONFLICT',
+        cause: 'System user can not perform action on assigned event'
+      })
+    }
+
     return next()
   }
 
-  if (ctx.user.id !== assignedTo) {
+  if (user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
       message: JSON.stringify('You are not assigned to this event')
     })
   }
+
   return next()
-})
+}
+
+export const requireScopeForWorkqueues: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  WorkqueueCountInput
+> = async ({ next, ctx, input }) => {
+  const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
+
+  const availableWorkqueues = findScope(scopes, 'workqueue')?.options.id ?? []
+
+  if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+  return next()
+}

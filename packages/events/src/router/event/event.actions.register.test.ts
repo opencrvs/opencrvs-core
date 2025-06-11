@@ -179,7 +179,7 @@ test('Prevents adding birth date in future', async () => {
   ).rejects.matchSnapshot()
 })
 
-export const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
+const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 
 describe('Request and confirmation flow', () => {
   let actionId: string
@@ -187,7 +187,7 @@ describe('Request and confirmation flow', () => {
   function mockNotifyApi(status: number) {
     return mswServer.use(
       http.post<never, { actionId: string }>(
-        `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
+        `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
         async ({ request }) => {
           const body = await request.json()
           actionId = body.actionId
@@ -270,7 +270,7 @@ describe('Request and confirmation flow', () => {
 
       mswServer.use(
         http.post(
-          `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/REGISTER`,
+          `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
           () => {
             return HttpResponse.json(
               { registrationNumber: 1234567890 }, // Registration number is not a string as it should be
