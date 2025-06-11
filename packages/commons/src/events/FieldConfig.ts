@@ -305,7 +305,6 @@ const Select = BaseField.extend({
 
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
-  defaultValue: NonEmptyTextValue.optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),

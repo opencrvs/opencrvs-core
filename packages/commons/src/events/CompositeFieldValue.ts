@@ -74,7 +74,7 @@ export const NameFieldUpdateValue = z
   .object({
     firstname: z.string(),
     surname: z.string(),
-    middlename: z.string().optional()
+    middlename: z.string().nullish()
   })
   .nullish()
 

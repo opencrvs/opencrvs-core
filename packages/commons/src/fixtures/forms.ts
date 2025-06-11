@@ -740,7 +740,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           required: true,
           conditionals: [],
           label: {
-            defaultMessage: "Applicant's first name",
+            defaultMessage: "Applicant's name",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
           }
@@ -889,7 +889,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             }
           ],
           label: {
-            defaultMessage: "Recommender's first name",
+            defaultMessage: "Recommender's name",
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
           }

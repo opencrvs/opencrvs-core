@@ -123,7 +123,6 @@ export function mapFieldTypeToMockValue(
     case FieldType.ID:
     case FieldType.OFFICE:
       return `${field.id}-${field.type}-${i}`
-
     case FieldType.NAME:
       return generateRandomName(rng)
     case FieldType.NUMBER:
@@ -184,6 +183,7 @@ export function generateActionDeclarationInput(
 
     const declarationConfig = getDeclaration(configuration)
 
+    console.log('declarationConfig', declarationConfig)
     const declaration = fieldConfigsToActionPayload(fields, rng)
 
     // Strip away hidden or disabled fields from mock action declaration

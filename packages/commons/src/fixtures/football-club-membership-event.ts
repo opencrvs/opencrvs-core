@@ -59,7 +59,7 @@ export const footballClubMembershipEvent = defineConfig({
         }
       },
       {
-        fieldId: 'applicant.surname',
+        fieldId: 'applicant.name.surname',
         label: {
           defaultMessage: "Applicant's last name",
           description: 'Label for surname',
