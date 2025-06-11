@@ -167,6 +167,9 @@ function DateRangeInput({
   const handleDateRangeActiveChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (!event.target.checked) {
+      onChange('')
+    }
     setDateValue((d) => ({
       ...d,
       isDateRangeActive: event.target.checked
