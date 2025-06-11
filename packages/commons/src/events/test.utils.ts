@@ -259,8 +259,10 @@ export function eventPayloadGenerator(rng: () => number) {
             type: actionType,
             status: ActionStatus.Accepted,
             declaration: {
-              'applicant.firstname': 'Max',
-              'applicant.surname': 'McLaren',
+              'applicant.name': {
+                firstname: 'Max',
+                surname: 'McLaren'
+              },
               'applicant.dob': '2020-01-02',
               'recommender.none': true
             },
@@ -704,16 +706,16 @@ export function getRandomDate(rng: () => number, start: string, end: string) {
   return datetime.split('T')[0] // Return only the date part in YYYY-MM-DD format
 }
 
-function generateRandomApplicant(
-  rng: () => number
-): Record<string, string | boolean> {
+function generateRandomApplicant(rng: () => number): EventState {
   const { firstname, surname } = generateRandomName(rng)
   const randomDob = getRandomDate(rng, '1990-01-01', '2010-12-31')
 
   return {
     'recommender.none': true,
-    'applicant.firstname': firstname,
-    'applicant.surname': surname,
+    'applicant.name': {
+      firstname,
+      surname
+    },
     'applicant.dob': randomDob
   }
 }

@@ -176,8 +176,10 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
     declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.dobUnknown': false,
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
+      'applicant.name': {
+        firstname: 'John',
+        surname: 'Doe'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -204,8 +206,10 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   const form = {
     'applicant.dob': '2024-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -239,8 +243,10 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   const form = {
     'applicant.dob': '2040-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -343,7 +349,10 @@ describe('when a correction request exists', () => {
             ActionType.DECLARE,
             rng
           ),
-          'applicant.firstname': 'Johnny'
+          'applicant.name': {
+            firstname: 'Johnny',
+            surname: 'Doe'
+          }
         }
       })
     )

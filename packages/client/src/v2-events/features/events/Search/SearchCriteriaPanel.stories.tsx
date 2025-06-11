@@ -34,7 +34,7 @@ export default meta
 type Story = StoryObj<typeof SearchCriteriaPanel>
 
 const mockSearchParams = {
-  'applicant.firstname': 'Danny',
+  'applicant.name.firstname': 'Danny',
   'applicant.dob': '1999-11-11'
 }
 

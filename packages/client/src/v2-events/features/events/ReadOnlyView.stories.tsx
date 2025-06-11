@@ -126,8 +126,10 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 eventId: tennisClubMembershipEventDocument.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 },
                 rng
               })

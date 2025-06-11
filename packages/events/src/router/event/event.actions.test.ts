@@ -135,8 +135,10 @@ test('Action data accepts partial changes', async () => {
 
   const initialForm = {
     'applicant.dob': '2000-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': { ...initialAddress }
   }

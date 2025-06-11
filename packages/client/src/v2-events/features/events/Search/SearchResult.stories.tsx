@@ -50,8 +50,10 @@ export const DefaultSearchResult: Story = {
       eventQueryDataGenerator({
         declaration: {
           'recommender.none': true,
-          'applicant.firstname': 'Danny',
-          'applicant.surname': 'Doe',
+          'applicant.name': {
+            firstname: 'Danny',
+            surname: 'Doe'
+          },
           'applicant.dob': '1999-11-11'
         },
         status: EventStatus.enum.REGISTERED

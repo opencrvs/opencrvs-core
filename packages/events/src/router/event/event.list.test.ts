@@ -56,8 +56,10 @@ test('Returns aggregated event with updated status and values', async () => {
   const client = createTestClient(user)
 
   const initialDeclaration = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
@@ -86,7 +88,10 @@ test('Returns aggregated event with updated status and values', async () => {
 
   const updatedDeclaration = {
     ...initialDeclaration,
-    'applicant.firstname': 'Jane'
+    'applicant.name': {
+      firstname: 'Jane',
+      surname: 'Doe'
+    }
   }
 
   const createAction = event.actions.filter(

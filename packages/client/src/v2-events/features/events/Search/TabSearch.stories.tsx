@@ -39,7 +39,7 @@ export const DefaultSearchResult: Story = {
   args: {
     currentEvent: tennisClubMembershipEvent,
     fieldValues: {
-      'applicant.firstname': 'Danny',
+      'applicant.name.firstname': 'Danny',
       'applicant.dob': '1999-11-11'
     },
     onChange: (updateForm: EventState) => noop(updateForm)

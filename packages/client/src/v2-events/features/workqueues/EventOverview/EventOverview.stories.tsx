@@ -78,8 +78,10 @@ export const Overview: Story = {
                 eventId: tennisClubMembershipEventDocument.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
               })
             ]
@@ -112,8 +114,10 @@ export const WithAcceptedRegisterEvent: Story = {
                 eventId: tennisClubMembershipEventDocument.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
               })
             ]
@@ -162,8 +166,10 @@ export const WithRejectedAction: Story = {
                 eventId: tennisClubMembershipEventDocument.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
               })
             ]
@@ -280,8 +286,10 @@ export const WithSystemUserActions: Story = {
                 eventId: tennisClubMembershipEventDocument.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
               })
             ]

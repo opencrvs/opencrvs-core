@@ -71,8 +71,10 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
     declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.dobUnknown': false,
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
+      'applicant.name': {
+        firstname: 'John',
+        surname: 'Doe'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -99,8 +101,10 @@ test('Skips required field validation when they are conditionally hidden', async
   const form = {
     'applicant.dob': '2024-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -134,8 +138,10 @@ test('gives validation error when a conditional page, which is visible, has a re
   const form = {
     // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
     'applicant.dob': '1944-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -166,8 +172,10 @@ test('successfully validates a fields on a conditional page, which is visible', 
     // When the applicant.dob is before 1950-01-01, the senior-pass.id field on senior-pass page is required
     'applicant.dob': '1944-02-01',
     'senior-pass.id': '1234567890',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -201,8 +209,10 @@ test('Prevents adding birth date in future', async () => {
   const form = {
     'applicant.dob': '2040-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',

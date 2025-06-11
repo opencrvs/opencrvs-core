@@ -34,21 +34,21 @@ export const footballClubMembershipEvent = defineConfig({
     id: 'event.football-club-membership.label'
   },
   title: {
-    defaultMessage: '{applicant.firstname} {applicant.surname}',
+    defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
     description: 'This is the title of the summary',
     id: 'v2.event.football-club-membership.title'
   },
   summary: {
     fields: [
       {
-        id: 'applicant.firstname',
+        id: 'applicant.name.firstname',
         label: {
           defaultMessage: "Applicant's first name",
           description: 'This is the label for the field',
           id: 'event.football-club-membership.summary.field.firstname.label'
         },
         value: {
-          defaultMessage: '{applicant.firstname}',
+          defaultMessage: '{applicant.name.firstname}',
           description: 'This is the value to show in the summary',
           id: 'event.football-club-membership.summary.field.firstname'
         },
