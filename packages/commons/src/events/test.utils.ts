@@ -159,7 +159,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.FILE_WITH_OPTIONS:
       return null
     case FieldType.DATA:
-      return {} as any
+      return undefined
   }
 }
 
