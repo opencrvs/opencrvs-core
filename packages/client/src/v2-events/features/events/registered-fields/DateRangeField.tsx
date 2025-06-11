@@ -267,7 +267,7 @@ function DateRangeOutput({ value }: { value?: string | [string, string] }) {
     }
   }
 
-  return value ?? ''
+  return String(value ?? '')
 }
 
 export const DateRangeField = {
