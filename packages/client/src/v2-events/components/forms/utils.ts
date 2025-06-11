@@ -13,7 +13,10 @@ import {
   FieldType,
   EventState,
   SystemVariables,
-  isFieldConfigDefaultValue
+  isFieldConfigDefaultValue,
+  isFileFieldType,
+  isDividerFieldType,
+  InteractiveFieldType
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'
 
@@ -37,7 +40,7 @@ export function handleDefaultValue({
   field,
   systemVariables
 }: {
-  field: FieldConfig
+  field: InteractiveFieldType
   systemVariables: SystemVariables
 }) {
   const defaultValue = field.defaultValue
