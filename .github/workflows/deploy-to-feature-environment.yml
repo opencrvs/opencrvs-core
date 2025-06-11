@@ -168,7 +168,6 @@ jobs:
         run: |
           FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
           BASE_BRANCH="${{ github.base_ref || 'develop' }}"
-
           if git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
             COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
             echo "Branch ${{ env.BRANCH_NAME }} exists in opencrvs-farajaland repo: $COMMIT_HASH"
