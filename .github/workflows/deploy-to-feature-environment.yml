@@ -168,10 +168,11 @@ jobs:
         run: |
           FARAJALAND_REPO=https://github.com/opencrvs/opencrvs-farajaland
           BASE_BRANCH="${{ github.base_ref || 'develop' }}"
+
           if git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | grep -q "${{ env.BRANCH_NAME }}"; then
             COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/${{ env.BRANCH_NAME }} | cut -c1-7)
             echo "Branch ${{ env.BRANCH_NAME }} exists in opencrvs-farajaland repo: $COMMIT_HASH"
-          else if git ls-remote $FARAJALAND_REPO refs/heads/$BASE_BRANCH | grep -q "$BASE_BRANCH"; then
+          elif git ls-remote $FARAJALAND_REPO refs/heads/$BASE_BRANCH | grep -q "$BASE_BRANCH"; then
             COMMIT_HASH=$(git ls-remote $FARAJALAND_REPO refs/heads/$BASE_BRANCH | cut -c1-7)
             echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-farajaland repo. Will use commit hash: '$COMMIT_HASH' from base branch: '$BASE_BRANCH'"
           else
