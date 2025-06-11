@@ -110,7 +110,9 @@ describe('event.actions.notify', () => {
 
     const event = await client.event.create(generator.event.create())
 
-    const notifyPayload = generator.event.actions.notify(event.id)
+    const notifyPayload = generator.event.actions.notify(event.id, {
+      keepAssignment: true
+    })
 
     const firstResponse =
       await client.event.actions.notify.request(notifyPayload)

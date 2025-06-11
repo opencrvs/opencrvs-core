@@ -313,6 +313,7 @@ export function eventPayloadGenerator(rng: () => number) {
         input: {
           transactionId?: string
           declaration?: Partial<ActionUpdate>
+          keepAssignment?: boolean
         } = {}
       ) => {
         let declaration = input.declaration
@@ -335,7 +336,8 @@ export function eventPayloadGenerator(rng: () => number) {
           type: ActionType.NOTIFY,
           transactionId: input.transactionId ?? getUUID(),
           declaration,
-          eventId
+          eventId,
+          keepAssignment: input.keepAssignment
         }
       },
       validate: (
@@ -492,7 +494,7 @@ export function eventPayloadGenerator(rng: () => number) {
           input: Partial<
             Pick<
               RequestCorrectionActionInput,
-              'transactionId' | 'declaration' | 'annotation'
+              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
             >
           > = {}
         ) => ({
@@ -512,13 +514,17 @@ export function eventPayloadGenerator(rng: () => number) {
               ActionType.REQUEST_CORRECTION,
               rng
             ),
-          eventId
+          eventId,
+          keepAssignment: input.keepAssignment
         }),
         approve: (
           eventId: string,
           requestId: string,
           input: Partial<
-            Pick<RequestCorrectionActionInput, 'transactionId' | 'annotation'>
+            Pick<
+              RequestCorrectionActionInput,
+              'transactionId' | 'annotation' | 'keepAssignment'
+            >
           > = {}
         ) => ({
           type: ActionType.APPROVE_CORRECTION,
@@ -532,13 +538,17 @@ export function eventPayloadGenerator(rng: () => number) {
               rng
             ),
           eventId,
-          requestId
+          requestId,
+          keepAssignment: input.keepAssignment
         }),
         reject: (
           eventId: string,
           requestId: string,
           input: Partial<
-            Pick<RequestCorrectionActionInput, 'transactionId' | 'annotation'>
+            Pick<
+              RequestCorrectionActionInput,
+              'transactionId' | 'annotation' | 'keepAssignment'
+            >
           > = {}
         ) => ({
           type: ActionType.REJECT_CORRECTION,
@@ -552,7 +562,8 @@ export function eventPayloadGenerator(rng: () => number) {
               rng
             ),
           eventId,
-          requestId
+          requestId,
+          keepAssignment: input.keepAssignment
         })
       }
     }

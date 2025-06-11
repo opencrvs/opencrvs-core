@@ -428,7 +428,10 @@ test(`${ActionType.REQUEST_CORRECTION} is idempotent`, async () => {
     transactionId: getUUID()
   })
   const correctionRequestPayload = generator.event.actions.correction.request(
-    registeredEvent.id
+    registeredEvent.id,
+    {
+      keepAssignment: true
+    }
   )
   const firstResponse = await client.event.actions.correction.request(
     correctionRequestPayload
@@ -471,7 +474,7 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
   })
 
   const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(registeredEvent.id)
+    generator.event.actions.correction.request(registeredEvent.id, {})
   )
 
   await client.event.actions.assignment.assign({
@@ -481,7 +484,8 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
 
   const approveCorrectionPayload = generator.event.actions.correction.approve(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id
+    withCorrectionRequest.actions.at(-1).id,
+    { keepAssignment: true }
   )
 
   const firstResponse = await client.event.actions.correction.approve(
@@ -534,7 +538,8 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
 
   const rejectCorrectionPayload = generator.event.actions.correction.reject(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id
+    withCorrectionRequest.actions.at(-1).id,
+    { keepAssignment: true }
   )
 
   const firstResponse = await client.event.actions.correction.reject(

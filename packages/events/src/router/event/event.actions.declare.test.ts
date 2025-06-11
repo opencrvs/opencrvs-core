@@ -285,7 +285,9 @@ test(`${ActionType.DECLARE} is idempotent`, async () => {
 
   const event = await client.event.create(generator.event.create())
 
-  const data = generator.event.actions.declare(event.id)
+  const data = generator.event.actions.declare(event.id, {
+    keepAssignment: true
+  })
 
   const firstResponse = await client.event.actions.declare.request(data)
   const secondResponse = await client.event.actions.declare.request(data)
