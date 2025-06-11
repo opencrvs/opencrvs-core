@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 52cdeeb1-f247-4e95-b597-683b6f50c02d
+                transactionId: e3722711-448a-4bcb-b3cd-32c96a94b6eb
                 type: v2.birth
       responses:
         "200":
@@ -263,19 +263,21 @@ paths:
                           - addressType
                           - state
                           - district2
-                      - type: object
-                        nullable: true
-                        properties:
-                          firstname:
-                            type: string
-                          surname:
-                            type: string
-                          middlename:
-                            type: string
-                            nullable: true
-                        required:
-                          - firstname
-                          - surname
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
                   default: {}
                 annotation:
                   type: object
@@ -425,19 +427,21 @@ paths:
                           - addressType
                           - state
                           - district2
-                      - type: object
-                        nullable: true
-                        properties:
-                          firstname:
-                            type: string
-                          surname:
-                            type: string
-                          middlename:
-                            type: string
-                            nullable: true
-                        required:
-                          - firstname
-                          - surname
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
                 originalActionId:
                   type: string
                 keepAssignment:
@@ -452,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: bf759257-856f-4b0f-a5c5-cacd5ab2e2fe
+                transactionId: aae2908e-cfe9-4d96-b91f-f1c64af19271
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4339,19 +4343,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -4500,19 +4506,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: &a10
@@ -4703,19 +4711,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -4864,19 +4874,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -5064,19 +5076,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -5225,19 +5239,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -5438,19 +5454,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -5599,19 +5617,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -5799,19 +5819,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -5960,19 +5982,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -6173,19 +6197,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -6334,19 +6360,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -6534,19 +6562,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -6695,19 +6725,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -6897,19 +6929,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -7058,19 +7092,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -7258,19 +7294,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -7419,19 +7457,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -7622,19 +7662,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -7783,19 +7825,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -7983,19 +8027,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -8144,19 +8190,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -8347,19 +8395,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -8508,19 +8558,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -8711,19 +8763,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -8872,19 +8926,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -9075,19 +9131,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -9236,19 +9294,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -9436,19 +9496,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -9597,19 +9659,21 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                nullable: true
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                    nullable: true
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -10105,20 +10169,7 @@ components:
                   - addressType
                   - state
                   - district2
-              - anyOf:
-                  - type: object
-                    properties:
-                      firstname:
-                        type: string
-                      surname:
-                        type: string
-                      middlename:
-                        type: string
-                    required:
-                      - firstname
-                      - surname
               - type: object
-                nullable: true
                 properties:
                   firstname:
                     type: string
@@ -10126,10 +10177,24 @@ components:
                     type: string
                   middlename:
                     type: string
-                    nullable: true
                 required:
                   - firstname
                   - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
       required:
         - id
         - type
