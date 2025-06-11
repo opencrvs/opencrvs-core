@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 8a925744-3eb4-4bd5-bce3-88f12b120af4
+                transactionId: 52cdeeb1-f247-4e95-b597-683b6f50c02d
                 type: v2.birth
       responses:
         "200":
@@ -272,6 +272,7 @@ paths:
                             type: string
                           middlename:
                             type: string
+                            nullable: true
                         required:
                           - firstname
                           - surname
@@ -433,6 +434,7 @@ paths:
                             type: string
                           middlename:
                             type: string
+                            nullable: true
                         required:
                           - firstname
                           - surname
@@ -450,7 +452,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ff9cad9e-d986-4e64-bf96-85bc4d19da78
+                transactionId: bf759257-856f-4b0f-a5c5-cacd5ab2e2fe
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2134,9 +2136,6 @@ components:
               type: string
               enum:
                 - NAME
-            defaultValue:
-              type: string
-              minLength: 1
             configuration:
               type: object
               properties:
@@ -4349,6 +4348,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -4509,6 +4509,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -4711,6 +4712,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -4871,6 +4873,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -5070,6 +5073,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -5230,6 +5234,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -5442,6 +5447,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -5602,6 +5608,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -5801,6 +5808,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -5961,6 +5969,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -6173,6 +6182,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -6333,6 +6343,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -6532,6 +6543,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -6692,6 +6704,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -6893,6 +6906,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -7053,6 +7067,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -7252,6 +7267,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -7412,6 +7428,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -7614,6 +7631,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -7774,6 +7792,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -7973,6 +7992,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -8133,6 +8153,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -8335,6 +8356,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -8495,6 +8517,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -8697,6 +8720,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -8857,6 +8881,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -9059,6 +9084,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -9219,6 +9245,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -9418,6 +9445,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -9578,6 +9606,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
@@ -10097,6 +10126,7 @@ components:
                     type: string
                   middlename:
                     type: string
+                    nullable: true
                 required:
                   - firstname
                   - surname
