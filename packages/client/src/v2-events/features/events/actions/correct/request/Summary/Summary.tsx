@@ -285,6 +285,32 @@ export function Summary() {
             }))}
           ></Table>
 
+          <Table
+            key="correction-details"
+            columns={[
+              {
+                label: intl.formatMessage(correctionMessages.correctionDetails),
+                width: 34,
+                key: 'label'
+              },
+              { label: '', width: 64, key: 'value' }
+            ]}
+            content={[
+              {
+                label: intl.formatMessage(correctionMessages.submittedBy),
+                value: 'CIHAN TODO'
+              },
+              {
+                label: intl.formatMessage(correctionMessages.office),
+                value: 'CIHAN TODO'
+              },
+              {
+                label: intl.formatMessage(correctionMessages.requestedOn),
+                value: 'CIHAN TODO'
+              }
+            ]}
+          ></Table>
+
           {correctionFormPages.map((page) => {
             const pageFields = page.fields
               .filter((f) => isFieldVisible(f, { ...form, ...annotationForm }))
