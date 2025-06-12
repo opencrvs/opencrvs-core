@@ -37,7 +37,7 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Check } from '@opencrvs/components/lib/icons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -326,68 +326,6 @@ export function Summary() {
               ></Table>
             )
           })}
-
-          {/* {formConfig.pages.map((page) => {
-            const content = page.fields
-              .filter((field) => {
-                const visibilityChanged =
-                  isFieldVisible(field, previousFormValues) !==
-                  isFieldVisible(field, form)
-
-                return (
-                  stringifiedPreviousForm[field.id] !==
-                    stringifiedForm[field.id] || visibilityChanged
-                )
-              })
-              .map((field) => {
-                const wasHidden = !isFieldVisible(field, form)
-                return {
-                  item: intl.formatMessage(field.label),
-                  original: stringifiedPreviousForm[field.id] || '-',
-                  changed: wasHidden ? '-' : stringifiedForm[field.id]
-                }
-              })
-
-            if (content.length === 0) {
-              return null
-            }
-
-            return (
-              <Table
-                key={page.id}
-                noPagination
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    alignment: ColumnContentAlignment.LEFT,
-                    width: 34,
-                    key: 'item'
-                  },
-                  {
-                    label: intl.formatMessage(
-                      correctionMessages.correctionSummaryOriginal
-                    ),
-                    width: 33,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'original'
-                  },
-                  {
-                    label: intl.formatMessage(
-                      correctionMessages.correctionSummaryCorrection
-                    ),
-                    width: 33,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'changed'
-                  }
-                ]}
-                content={content}
-                hideTableBottomBorder={true}
-                id="diff"
-                isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              ></Table>
-            )
-          })} */}
         </Content>
       </ActionPageLight>
       <Dialog
