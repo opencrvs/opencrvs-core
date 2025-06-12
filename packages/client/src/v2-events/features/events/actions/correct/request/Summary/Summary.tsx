@@ -15,6 +15,7 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { isEqual } from 'lodash'
+import styled from 'styled-components'
 import {
   ActionType,
   FieldConfig,
@@ -90,6 +91,14 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
     }
   }, {})
 }
+
+const SectionTitle = styled(Text)`
+  margin-bottom: 20px;
+`
+
+const CorrectionInformationSectionTitle = styled(SectionTitle)`
+  margin-top: 20px;
+`
 
 export function Summary() {
   const { eventId } = useTypedParams(
@@ -202,22 +211,6 @@ export function Summary() {
     previousFormValues
   ])
 
-  const changedFields = formConfig.pages.flatMap((page) =>
-    page.fields.filter((f) => {
-      const wasVisible = isFieldVisible(f, previousFormValues)
-      const isVisible = isFieldVisible(f, form)
-      const visibilityChanged = wasVisible !== isVisible
-
-      // TODO CIHAN: use the actually stringified values here...?
-      const valueHasChanged = !isEqual(
-        stringifiedPreviousForm[f.id],
-        stringifiedForm[f.id]
-      )
-
-      return isVisible && (valueHasChanged || visibilityChanged)
-    })
-  )
-
   return (
     <>
       <ActionPageLight
@@ -253,37 +246,66 @@ export function Summary() {
             </SecondaryButton>
           ]}
         >
-          <Table
-            key="changed-fields"
-            columns={[
-              {
-                label: intl.formatMessage(
-                  correctionMessages.correctionSummaryItem
-                ),
-                width: 34,
-                key: 'fieldLabel'
-              },
-              {
-                label: intl.formatMessage(
-                  correctionMessages.correctionSummaryOriginal
-                ),
-                width: 33,
-                key: 'original'
-              },
-              {
-                label: intl.formatMessage(
-                  correctionMessages.correctionSummaryCorrection
-                ),
-                width: 33,
-                key: 'correction'
-              }
-            ]}
-            content={changedFields.map((f) => ({
-              fieldLabel: intl.formatMessage(f.label),
-              original: stringifiedPreviousForm[f.id] || '-',
-              correction: stringifiedForm[f.id] || '-'
-            }))}
-          ></Table>
+          <SectionTitle element="h3" variant="h3">
+            {'Corrections'}
+          </SectionTitle>
+          {formConfig.pages.map((page) => {
+            const changedFields = page.fields
+              .filter((f) => {
+                const wasVisible = isFieldVisible(f, previousFormValues)
+                const isVisible = isFieldVisible(f, form)
+                const visibilityChanged = wasVisible !== isVisible
+
+                // TODO CIHAN: use the actually stringified values here...?
+                const valueHasChanged = !isEqual(
+                  stringifiedPreviousForm[f.id],
+                  stringifiedForm[f.id]
+                )
+
+                return isVisible && (valueHasChanged || visibilityChanged)
+              })
+              .map((f) => ({
+                fieldLabel: intl.formatMessage(f.label),
+                original: stringifiedPreviousForm[f.id] || '-',
+                correction: stringifiedForm[f.id] || '-'
+              }))
+
+            if (changedFields.length === 0) {
+              return null
+            }
+
+            return (
+              <Table
+                key={`changed-fields-${page.id}`}
+                columns={[
+                  {
+                    label: intl.formatMessage(page.title),
+                    width: 34,
+                    key: 'fieldLabel'
+                  },
+                  {
+                    label: intl.formatMessage(
+                      correctionMessages.correctionSummaryOriginal
+                    ),
+                    width: 33,
+                    key: 'original'
+                  },
+                  {
+                    label: intl.formatMessage(
+                      correctionMessages.correctionSummaryCorrection
+                    ),
+                    width: 33,
+                    key: 'correction'
+                  }
+                ]}
+                content={changedFields}
+              ></Table>
+            )
+          })}
+
+          <CorrectionInformationSectionTitle element="h3" variant="h3">
+            {'Correction information'}
+          </CorrectionInformationSectionTitle>
 
           <Table
             key="correction-details"
@@ -333,20 +355,29 @@ export function Summary() {
                     label: intl.formatMessage(page.title),
                     width: 34,
                     alignment: ColumnContentAlignment.LEFT,
-                    key: 'fieldLabel'
+                    key: 'firstColumn'
                   },
                   {
                     label: '',
                     width: 64,
                     alignment: ColumnContentAlignment.LEFT,
-                    key: 'collectedValue'
+                    key: 'secondColumn'
                   }
                 ]}
-                content={pageFields.map(({ valueDisplay, label }) => ({
-                  // TODO CIHAN: gotta handle cases where label is not defined
-                  fieldLabel: intl.formatMessage(label),
-                  collectedValue: valueDisplay
-                }))}
+                content={pageFields.map(({ valueDisplay, label }) => {
+                  if (label.defaultMessage) {
+                    return {
+                      // TODO CIHAN: gotta handle cases where label is not defined
+                      firstColumn: label.defaultMessage
+                        ? intl.formatMessage(label)
+                        : valueDisplay,
+                      secondColumn: valueDisplay
+                    }
+                  }
+
+                  // If no label is defined for the field, we just show the value on the first column
+                  return { firstColumn: valueDisplay }
+                })}
                 hideTableBottomBorder={true}
                 id="onboarding"
                 isLoading={false}
