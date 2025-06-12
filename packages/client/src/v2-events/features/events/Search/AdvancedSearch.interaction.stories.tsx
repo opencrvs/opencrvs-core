@@ -59,10 +59,13 @@ export const AdvancedSearchStory: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
+
     await step('Opens up advanced tennis club membership tab', async () => {
-      await waitFor(async () => {
-        await canvas.findByText('Tennis club membership application')
-      })
+      await canvas.findByText(
+        'Tennis club membership application',
+        {},
+        { timeout: 3000 }
+      )
     })
 
     await step(

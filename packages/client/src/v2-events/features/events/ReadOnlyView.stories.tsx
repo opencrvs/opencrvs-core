@@ -85,23 +85,22 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       const actionButton = await canvas.findByRole('button', {
         name: 'Action'
       })
+
       await userEvent.click(actionButton)
     })
 
     await step('User is taken to the view record page', async () => {
-      const ViewRecordMenus = await canvas.findAllByText('View record')
-      if (ViewRecordMenus.length > 0) {
-        await userEvent.click(ViewRecordMenus[0])
+      const list = await canvas.findByRole('list')
+      await userEvent.click(within(list).getByText('View record'))
 
-        await waitFor(async () => {
-          await canvas.findByText('Riku')
-          await canvas.findByText('This value is from a draft')
-          await canvas.findByText(
-            'Member declaration for Riku This value is from a draft'
-          )
-          await canvas.findByText('Tennis club membership application')
-        })
-      }
+      await waitFor(async () => {
+        await canvas.findByText("Applicant's name")
+        await canvas.findByText('Riku This value is from a draft')
+        await canvas.findByText(
+          'Member declaration for Riku This value is from a draft'
+        )
+        await canvas.findByText('Tennis club membership application')
+      })
     })
   },
   parameters: {

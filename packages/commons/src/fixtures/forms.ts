@@ -738,6 +738,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'applicant.name',
           type: FieldType.NAME,
           required: true,
+          hideLabel: true,
           conditionals: [],
           label: {
             defaultMessage: "Applicant's name",
@@ -881,6 +882,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
         {
           id: 'recommender.name',
           type: FieldType.NAME,
+          hideLabel: true,
           required: true,
           conditionals: [
             {
