@@ -247,8 +247,9 @@ export function Summary() {
           ]}
         >
           <SectionTitle element="h3" variant="h3">
-            {'Corrections'}
+            {intl.formatMessage(correctionMessages.correctionSectionTitle)}
           </SectionTitle>
+
           {formConfig.pages.map((page) => {
             const changedFields = page.fields
               .filter((f) => {
@@ -276,7 +277,7 @@ export function Summary() {
 
             return (
               <Table
-                key={`changed-fields-${page.id}`}
+                key={`corrections-table-${page.id}`}
                 columns={[
                   {
                     label: intl.formatMessage(page.title),
@@ -305,11 +306,12 @@ export function Summary() {
           })}
 
           <CorrectionInformationSectionTitle element="h3" variant="h3">
-            {'Correction information'}
+            {intl.formatMessage(
+              correctionMessages.correctionInformationSectionTitle
+            )}
           </CorrectionInformationSectionTitle>
 
           <Table
-            key="correction-details"
             columns={[
               {
                 label: intl.formatMessage(correctionMessages.correctionDetails),
@@ -351,7 +353,7 @@ export function Summary() {
 
             return (
               <Table
-                key={page.id}
+                key={`correction-form-table-${page.id}`}
                 columns={[
                   {
                     label: intl.formatMessage(page.title),
