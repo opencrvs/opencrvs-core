@@ -45,13 +45,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-
-function shouldBeShownAsAValue(field: FieldConfig) {
-  if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
-    return false
-  }
-  return true
-}
+import { Output } from '@client/v2-events/features/events/components/Output'
 
 function ContinueButton({
   onClick,
@@ -74,7 +68,6 @@ function ContinueButton({
       onClick={onClick}
     >
       <Check />
-
       {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
         ? intl.formatMessage(buttonMessages.makeCorrection)
         : intl.formatMessage(buttonMessages.sendForApproval)}
@@ -117,7 +110,6 @@ export function Summary() {
 
   const previousFormValues = event.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
-
   const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()
@@ -208,22 +200,6 @@ export function Summary() {
     previousFormValues
   ])
 
-  const backToReviewButton = (
-    <SecondaryButton
-      key="back-to-review"
-      id="back-to-review"
-      onClick={() =>
-        navigate(
-          ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-            eventId
-          })
-        )
-      }
-    >
-      {intl.formatMessage(registerMessages.backToReviewButton)}
-    </SecondaryButton>
-  )
-
   return (
     <>
       <ActionPageLight
@@ -236,22 +212,49 @@ export function Summary() {
         <Content
           bottomActionButtons={[
             <ContinueButton
-              key={'make-correction'}
-              disabled={false /* @todo */}
+              key="make-correction"
               scopes={scopes}
               onClick={togglePrompt}
             />
           ]}
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
-          topActionButtons={[backToReviewButton]}
+          topActionButtons={[
+            <SecondaryButton
+              key="back-to-review"
+              id="back-to-review"
+              onClick={() =>
+                navigate(
+                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+                    eventId
+                  })
+                )
+              }
+            >
+              {intl.formatMessage(registerMessages.backToReviewButton)}
+            </SecondaryButton>
+          ]}
         >
           {correctionFormPages.map((page) => {
+            const pageFields = page.fields
+              .filter((f) => isFieldVisible(f, { ...form, ...annotationForm }))
+              .map((field) => {
+                const valueDisplay = Output({
+                  field,
+                  value: annotationForm[field.id],
+                  showPreviouslyMissingValuesAsChanged: false
+                })
+
+                return { ...field, valueDisplay }
+              })
+              .filter((f) => f.valueDisplay)
+
             return (
               <Table
                 key={page.id}
                 columns={[
                   {
+                    // @TODO CIHAN: page title, use configured alternative title?
                     label: intl.formatMessage(page.title),
                     width: 34,
                     alignment: ColumnContentAlignment.LEFT,
@@ -264,23 +267,19 @@ export function Summary() {
                     key: 'collectedValue'
                   }
                 ]}
-                content={page.fields
-                  .filter(shouldBeShownAsAValue)
-                  .map((field) => {
-                    return {
-                      fieldLabel: intl.formatMessage(field.label),
-                      collectedValue: stringifiedRequestData[field.id] || ''
-                    }
-                  })}
+                content={pageFields.map(({ valueDisplay, label }) => ({
+                  // TODO CIHAN: add summary label
+                  fieldLabel: intl.formatMessage(label),
+                  collectedValue: valueDisplay
+                }))}
                 hideTableBottomBorder={true}
                 id="onboarding"
                 isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
               ></Table>
             )
           })}
 
-          {formConfig.pages.map((page) => {
+          {/* {formConfig.pages.map((page) => {
             const content = page.fields
               .filter((field) => {
                 const visibilityChanged =
@@ -340,7 +339,7 @@ export function Summary() {
                 noResultText={intl.formatMessage(constantsMessages.noResults)}
               ></Table>
             )
-          })}
+          })} */}
         </Content>
       </ActionPageLight>
       <Dialog
