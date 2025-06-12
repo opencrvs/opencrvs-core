@@ -14,6 +14,7 @@ import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { isEqual } from 'lodash'
 import {
   ActionType,
   FieldConfig,
@@ -200,6 +201,22 @@ export function Summary() {
     previousFormValues
   ])
 
+  const changedFields = formConfig.pages.flatMap((page) =>
+    page.fields.filter((f) => {
+      const wasVisible = isFieldVisible(f, previousFormValues)
+      const isVisible = isFieldVisible(f, form)
+      const visibilityChanged = wasVisible !== isVisible
+
+      // TODO CIHAN: use the actually stringified values here...?
+      const valueHasChanged = !isEqual(
+        stringifiedPreviousForm[f.id],
+        stringifiedForm[f.id]
+      )
+
+      return isVisible && (valueHasChanged || visibilityChanged)
+    })
+  )
+
   return (
     <>
       <ActionPageLight
@@ -235,6 +252,38 @@ export function Summary() {
             </SecondaryButton>
           ]}
         >
+          <Table
+            key="changed-fields"
+            columns={[
+              {
+                label: intl.formatMessage(
+                  correctionMessages.correctionSummaryItem
+                ),
+                width: 34,
+                key: 'fieldLabel'
+              },
+              {
+                label: intl.formatMessage(
+                  correctionMessages.correctionSummaryOriginal
+                ),
+                width: 33,
+                key: 'original'
+              },
+              {
+                label: intl.formatMessage(
+                  correctionMessages.correctionSummaryCorrection
+                ),
+                width: 33,
+                key: 'correction'
+              }
+            ]}
+            content={changedFields.map((f) => ({
+              fieldLabel: intl.formatMessage(f.label),
+              original: stringifiedPreviousForm[f.id] || '-',
+              correction: stringifiedForm[f.id] || '-'
+            }))}
+          ></Table>
+
           {correctionFormPages.map((page) => {
             const pageFields = page.fields
               .filter((f) => isFieldVisible(f, { ...form, ...annotationForm }))
@@ -254,7 +303,6 @@ export function Summary() {
                 key={page.id}
                 columns={[
                   {
-                    // @TODO CIHAN: page title, use configured alternative title?
                     label: intl.formatMessage(page.title),
                     width: 34,
                     alignment: ColumnContentAlignment.LEFT,
@@ -268,7 +316,7 @@ export function Summary() {
                   }
                 ]}
                 content={pageFields.map(({ valueDisplay, label }) => ({
-                  // TODO CIHAN: add summary label
+                  // TODO CIHAN: gotta handle cases where label is not defined
                   fieldLabel: intl.formatMessage(label),
                   collectedValue: valueDisplay
                 }))}
