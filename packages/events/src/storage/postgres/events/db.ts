@@ -9,28 +9,37 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createPool, createSqlTag, DatabasePool } from 'slonik'
-import * as z from 'zod'
-import { Draft } from '@opencrvs/commons'
+import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
+import { Pool } from 'pg'
 import { env } from '@events/environment'
+import { DB } from './types' // this is the Database interface we defined earlier
 
-const url = env.EVENTS_POSTGRES_URL
-let db: DatabasePool | null = null
+const connectionString = env.EVENTS_POSTGRES_URL
+// let db: DatabasePool | null = null
 
-export const getClient = async (): Promise<DatabasePool> => {
-  if (!db) {
-    db = await createPool(url)
-  }
-  return db
-}
+// export const getClient = async (): Promise<DatabasePool> => {
+//   if (!db) {
+//     db = await createPool(url)
+//   }
+//   return db
+// }
 
-export const sql = createSqlTag({
-  typeAliases: {
-    void: z.object({}),
-    draft: Draft
-  }
+// export const sql = createSqlTag({
+//   typeAliases: {
+//     void: z.object({}),
+//     draft: Draft
+//   }
+// })
+
+// export const formatTimestamp = (columnName: string) => {
+//   return sql.fragment`TO_CHAR(${sql.identifier([columnName])}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`
+// }
+
+const dialect = new PostgresDialect({
+  pool: new Pool({ connectionString })
 })
 
-export const formatTimestamp = (columnName: string) => {
-  return sql.fragment`TO_CHAR(${sql.identifier([columnName])}, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`
-}
+export const db = new Kysely<DB>({
+  dialect,
+  plugins: [new CamelCasePlugin()]
+})

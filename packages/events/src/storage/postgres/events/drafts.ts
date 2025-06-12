@@ -12,11 +12,7 @@
 import { SerializableValue } from 'slonik'
 import { ActionType, Draft } from '@opencrvs/commons/events'
 import { UUID } from '@opencrvs/commons'
-import {
-  formatTimestamp,
-  getClient,
-  sql
-} from '@events/storage/postgres/events/db'
+import { db } from '@events/storage/postgres/events/db'
 
 export async function createDraft({
   eventId,
@@ -85,43 +81,39 @@ export async function createDraft({
   return draft
 }
 
-export async function getDraftsByUserId(createdBy: string) {
-  const db = await getClient()
-  // @TODO: Change the `Draft` type to be flat to avoid `json_build_object` ?
-  const drafts = await db.any(sql.type(Draft)`
-    SELECT
-      id,
-      event_id AS "eventId",
-      transaction_id AS "transactionId",
-      ${formatTimestamp('created_at')} AS "createdAt",
-      json_build_object(
-        'transactionId',
-        transaction_id,
-        'createdAt',
-        ${formatTimestamp('created_at')},
-        'createdBy',
-        created_by,
-        'createdByRole',
-        created_by_role,
-        'createdAtLocation',
-        created_at_location,
-        'declaration',
-        declaration,
-        'annotation',
-        annotation,
-        'type',
-        action_type,
-        'status',
-        'Accepted'::action_status::text
-      ) AS action
-    FROM
-      event_action_drafts
-    WHERE
-      created_by = ${createdBy}
-  `)
+export async function getDraftsByUserId(createdBy: string): Promise<Draft[]> {
+  const drafts = await db.selectFrom('eventActionDrafts').selectAll().execute()
+  const nestedDrafts = drafts.map((draft) => {
+    return {
+      id: draft.id as UUID,
+      transactionId: draft.transactionId,
+      createdAt: draft.createdAt,
+      eventId: draft.eventId,
+      action: {
+        transactionId: draft.transactionId,
+        createdAt: draft.createdAt,
+        createdBy,
+        createdByRole: draft.createdByRole,
+        createdAtLocation: draft.createdAtLocation,
+        declaration: draft.declaration,
+        annotation: draft.annotation,
+        type: draft.actionType
+      }
+    }
+  })
 
-  return [...drafts]
+  return nestedDrafts
 }
+
+// export const Draft = z.object({
+//   id: UUID,
+//   eventId: UUID,
+//   transactionId: z.string(),
+//   createdAt: z.string().datetime(),
+//   action: ActionBase.extend({
+//     type: ActionTypes
+//   }).omit({ id: true })
+// })
 
 export async function getDraftsForAction(
   eventId: UUID,

@@ -28,7 +28,17 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     logger.info(`Request: ${stringifyRequest(req)}`)
     return next()
   },
-  onError: ({ req, error }) => {
+  onError: ({ error, path, type, req, input }) => {
+    if (error.code === 'INTERNAL_SERVER_ERROR') {
+      console.error('tRPC error:', {
+        path,
+        type,
+        input,
+        message: error.message,
+        cause: error.cause
+      })
+    }
+
     logger.warn(
       `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`
     )

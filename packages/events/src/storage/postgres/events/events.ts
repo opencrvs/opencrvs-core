@@ -18,7 +18,7 @@ import {
   EventDocument,
   UUID
 } from '@opencrvs/commons'
-import { formatTimestamp, getClient, sql } from './db'
+import { db, formatTimestamp, getClient, sql } from './db'
 
 async function getEventByIdInTransaction(
   eventId: UUID,
@@ -74,14 +74,41 @@ async function getEventByIdInTransaction(
 }
 
 export async function getEventById(id: UUID): Promise<EventDocument> {
-  const db = await getClient()
+  return db.transaction().execute(async (trx) => {
+    const event = await trx
+      .selectFrom('events')
+      .select([
+        'id',
+        'eventType as type',
+        'createdAt',
+        'updatedAt',
+        'trackingId'
+      ])
+      .where('id', '=', id)
+      .executeTakeFirstOrThrow()
 
-  const result = await db.transaction(async (trx) =>
-    getEventByIdInTransaction(id, trx)
-  )
+    const actions = await trx
+      .selectFrom('eventActions')
+      .selectAll()
+      .where('eventId', '=', event.id)
+      .execute()
 
-  return result
+    return {
+      ...event,
+      actions
+    }
+  })
 }
+
+// export async function getEventById(id: UUID): Promise<EventDocument> {
+//   const db = await getClient()
+
+//   const result = await db.transaction(async (trx) =>
+//     getEventByIdInTransaction(id, trx)
+//   )
+
+//   return result
+// }
 
 export async function deleteEventById(eventId: UUID): Promise<void> {
   const db = await getClient()
