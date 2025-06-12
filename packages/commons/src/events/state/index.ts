@@ -323,7 +323,7 @@ export function getCurrentEventStateWithDrafts({
 export function applyDraftsToEventIndex(
   eventIndex: EventIndex,
   drafts: Draft[]
-): EventIndex {
+) {
   const indexedAt = eventIndex.updatedAt
 
   const activeDrafts = drafts
@@ -340,7 +340,7 @@ export function applyDraftsToEventIndex(
     declaration: {
       ...eventIndex.declaration,
       ...activeDrafts[activeDrafts.length - 1].declaration
-    } as any
+    }
   }
 }
 

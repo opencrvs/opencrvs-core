@@ -18,7 +18,8 @@ import {
   getAcceptedActions,
   getCurrentEventStateWithDrafts,
   EventIndex,
-  applyDraftsToEventIndex
+  applyDraftsToEventIndex,
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -65,7 +66,9 @@ function EventOverview({
   const { trackingId, status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
-  const eventWithDrafts = applyDraftsToEventIndex(eventIndex, drafts)
+  const eventWithDrafts = deepDropNulls(
+    applyDraftsToEventIndex(eventIndex, drafts)
+  )
   const { getUser } = useUsers()
   const intl = useIntl()
 
@@ -127,9 +130,7 @@ function EventOverviewContainer() {
   const getEventQuery = searchEventById.useQuery(params.eventId)
   const eventIndex = getEventQuery.data
 
-  const q = getEvent.useQuery(params.eventId, false)
-  const fullEvent = q.data
-  console.log({ eventIndex })
+  const fullEvent = getEvent.useQuery(params.eventId, false).data
 
   if (!eventIndex) {
     return

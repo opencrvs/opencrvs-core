@@ -17,6 +17,7 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   applyDraftsToEventIndex,
+  deepDropNulls,
   getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import {
@@ -138,7 +139,9 @@ export function EventOverviewLayout({
           mobileRight={<ActionMenu eventId={eventId} />}
           mobileTitle={flattenedIntl.formatMessage(
             eventConfiguration.title,
-            flattenEventIndex(applyDraftsToEventIndex(eventIndex, drafts))
+            flattenEventIndex(
+              deepDropNulls(applyDraftsToEventIndex(eventIndex, drafts))
+            )
           )}
         />
       }
