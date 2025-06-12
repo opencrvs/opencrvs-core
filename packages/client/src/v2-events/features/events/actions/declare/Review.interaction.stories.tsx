@@ -473,7 +473,7 @@ export const ChangeFieldInReview: Story = {
       await userEvent.click(backToReviewButton)
 
       await canvas.findByText("Applicant's name")
-      await canvas.findByText('Nileem-Rowa')
+      await canvas.findByText('John Nileem-Rowa')
     })
   }
 }
