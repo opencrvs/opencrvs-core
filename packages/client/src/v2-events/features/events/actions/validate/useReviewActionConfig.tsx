@@ -50,6 +50,7 @@ export function useReviewActionConfig({
         events.customActions.registerOnValidate.mutate({
           eventId,
           declaration,
+          transactionId: uuid(),
           annotation
         }),
       messages: incomplete
