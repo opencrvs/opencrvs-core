@@ -102,6 +102,7 @@ export function Summary() {
   const togglePrompt = () => setShowPrompt(!showPrompt)
 
   const eventFormNavigation = useEventFormNavigation()
+  const { goToHome } = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
@@ -190,14 +191,14 @@ export function Summary() {
       transactionId: generateTransactionId(),
       annotation: annotationForm
     })
-    eventFormNavigation.goToHome()
+    goToHome()
   }, [
     form,
     fields,
     events.actions.correction.request,
     eventId,
     annotationForm,
-    eventFormNavigation,
+    goToHome,
     previousFormValues
   ])
 
@@ -222,7 +223,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.goToHome()}
+        goHome={goToHome}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
