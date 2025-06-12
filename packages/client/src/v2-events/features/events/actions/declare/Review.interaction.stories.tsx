@@ -430,7 +430,12 @@ export const ChangeFieldInReview: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [generateEventDraftDocument(eventId, ActionType.REGISTER)]
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.REGISTER
+              })
+            ]
           })
         ],
         events: [
