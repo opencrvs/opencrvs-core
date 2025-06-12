@@ -92,7 +92,6 @@ import {
 } from '@opencrvs/commons/types'
 import { findAssignment } from '@opencrvs/commons/assignment'
 import { GQLQuestionnaireQuestion, GQLResolver } from '@gateway/graphql/schema'
-
 import { Context } from '@gateway/graphql/context'
 import validateUUID from 'uuid-validate'
 import { fetchTaskByCompositionIdFromHearth } from '@gateway/features/fhir/service'
@@ -1662,7 +1661,7 @@ export const typeResolvers: GQLResolver = {
 
       return { ...userResponse, role }
     },
-    system: async (task: Task, _: any) => {
+    system: async (task: Task, _: any, { dataSources }) => {
       const systemIdentifier = task.identifier?.find(
         ({ system }) =>
           system === `${OPENCRVS_SPECIFICATION_URL}id/system_identifier`
@@ -1670,7 +1669,18 @@ export const typeResolvers: GQLResolver = {
       if (!systemIdentifier || !systemIdentifier.value) {
         return null
       }
-      return JSON.parse(systemIdentifier.value)
+
+      const systtemTask = JSON.parse(systemIdentifier.value)
+
+      const systemResponse = await dataSources.usersAPI.getSystemByName(
+        systtemTask.name
+      )
+
+      return {
+        id: systemResponse.id,
+        officeId: systemResponse.officeId,
+        ...systtemTask
+      }
     },
     location: async (task: Task, _: any, context) => {
       const record = context.dataSources.recordsAPI.fetchRecord()

@@ -13,11 +13,14 @@ import { USER_MANAGEMENT_URL } from '@gateway/constants'
 import { Context } from '@gateway/graphql/context'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
 import { AuthenticationError } from '@gateway/utils/graphql-errors'
-import { IUserModelData } from './type-resolvers'
+import { IUserModelData, ISystemModelData } from './type-resolvers'
 
 export class UsersAPI extends OpenCRVSRESTDataSource {
   override baseURL = USER_MANAGEMENT_URL
-  private memoizedResults: Map<string, Promise<IUserModelData>>
+  private memoizedResults: Map<
+    string,
+    Promise<IUserModelData | ISystemModelData>
+  >
 
   constructor(options: { contextValue: Context }) {
     super(options)
@@ -27,7 +30,9 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
   async getUserByEmail(email: string): Promise<IUserModelData | null> {
     const cacheKey = `${this.baseURL}/getUser:email:${email}`
 
-    const cachedResponse = this.memoizedResults.get(cacheKey)
+    const cachedResponse = this.memoizedResults.get(
+      cacheKey
+    ) as Promise<IUserModelData>
 
     if (cachedResponse) {
       return cachedResponse
@@ -49,7 +54,9 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
   async getUserByMobile(mobile: string): Promise<IUserModelData | null> {
     const cacheKey = `${this.baseURL}/getUser:mobile:${mobile}`
 
-    const cachedResponse = this.memoizedResults.get(cacheKey)
+    const cachedResponse = this.memoizedResults.get(
+      cacheKey
+    ) as Promise<IUserModelData>
 
     if (cachedResponse) {
       return cachedResponse
@@ -70,7 +77,9 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
   async getUserById(id: string): Promise<IUserModelData> {
     const cacheKey = `${this.baseURL}/getUser:user:${id}`
 
-    const cachedResponse = this.memoizedResults.get(cacheKey)
+    const cachedResponse = this.memoizedResults.get(
+      cacheKey
+    ) as Promise<IUserModelData>
 
     if (cachedResponse) {
       return cachedResponse
@@ -86,13 +95,34 @@ export class UsersAPI extends OpenCRVSRESTDataSource {
   async getUserByPractitionerId(id: string): Promise<IUserModelData> {
     const cacheKey = `${this.baseURL}/getUser:practitioner:${id}`
 
-    const cachedResponse = this.memoizedResults.get(cacheKey)
+    const cachedResponse = this.memoizedResults.get(
+      cacheKey
+    ) as Promise<IUserModelData>
 
     if (cachedResponse) {
       return cachedResponse
     }
     const response = this.post('getUser', {
       body: { practitionerId: id }
+    })
+
+    this.memoizedResults.set(cacheKey, response)
+
+    return response
+  }
+
+  async getSystemByName(name: string): Promise<ISystemModelData> {
+    const cacheKey = `${this.baseURL}/getSystem:name:${name}`
+
+    const cachedResponse = this.memoizedResults.get(
+      cacheKey
+    ) as Promise<ISystemModelData>
+
+    if (cachedResponse) {
+      return cachedResponse
+    }
+    const response = this.post('getSystem', {
+      body: { name }
     })
 
     this.memoizedResults.set(cacheKey, response)

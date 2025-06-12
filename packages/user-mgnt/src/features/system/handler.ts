@@ -314,19 +314,23 @@ export const verifySystemResSchema = Joi.object({
 interface IGetSystemPayload {
   systemId: string
   clientId: string
+  name: string
 }
 
 export async function getSystemHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { systemId, clientId } = request.payload as IGetSystemPayload
+  const { systemId, clientId, name } = request.payload as IGetSystemPayload
   let criteria = {}
   if (systemId) {
     criteria = { ...criteria, _id: systemId }
   }
   if (clientId) {
     criteria = { ...criteria, client_id: clientId }
+  }
+  if (name) {
+    criteria = { ...criteria, name: name }
   }
 
   const system = await System.findOne(criteria)
@@ -336,8 +340,17 @@ export async function getSystemHandler(
     throw unauthorized()
   }
   const systemName = system.name
+  const associatedUser = await User.findOne({
+    _id: system.createdBy
+  })
+
+  if (!associatedUser) {
+    throw unauthorized()
+  }
   return {
     name: systemName || system.createdBy,
+    id: system._id.toString(),
+    officeId: associatedUser.primaryOfficeId,
     createdBy: system.createdBy,
     client_id: system.client_id,
     username: system.username,
@@ -352,7 +365,8 @@ export async function getSystemHandler(
 
 export const getSystemRequestSchema = Joi.object({
   systemId: Joi.string(),
-  clientId: Joi.string()
+  clientId: Joi.string(),
+  name: Joi.string()
 })
 
 const webHookSchema = Joi.array().items(
@@ -371,6 +385,8 @@ const settingsSchema = Joi.object({
 })
 
 export const getSystemResponseSchema = Joi.object({
+  id: Joi.string(),
+  officeId: Joi.string(),
   name: Joi.string(),
   createdBy: Joi.string(),
   username: Joi.string(),

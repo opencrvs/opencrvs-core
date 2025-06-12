@@ -70,6 +70,8 @@ export interface IUserModelData {
 }
 
 export interface ISystemModelData {
+  id: string
+  officeId: string
   scope?: string[]
   name: string
   createdBy: string

@@ -1250,6 +1250,8 @@ export interface GQLStatusReason {
 export interface GQLIntegratedSystem {
   name?: string
   username?: string
+  id?: string
+  officeId?: string
   type?: string
 }
 
@@ -8010,6 +8012,8 @@ export interface StatusReasonToTextResolver<TParent = any, TResult = any> {
 export interface GQLIntegratedSystemTypeResolver<TParent = any> {
   name?: IntegratedSystemToNameResolver<TParent>
   username?: IntegratedSystemToUsernameResolver<TParent>
+  id?: IntegratedSystemToIdResolver<TParent>
+  officeId?: IntegratedSystemToOfficeIdResolver<TParent>
   type?: IntegratedSystemToTypeResolver<TParent>
 }
 
@@ -8023,6 +8027,27 @@ export interface IntegratedSystemToNameResolver<TParent = any, TResult = any> {
 }
 
 export interface IntegratedSystemToUsernameResolver<
+  TParent = any,
+  TResult = any
+> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToIdResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: {},
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface IntegratedSystemToOfficeIdResolver<
   TParent = any,
   TResult = any
 > {
