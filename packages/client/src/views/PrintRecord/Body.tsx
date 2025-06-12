@@ -39,7 +39,8 @@ import {
   IAttachment,
   IDocumentUploaderWithOptionsFormField,
   BULLET_LIST,
-  DIVIDER
+  DIVIDER,
+  HIDDEN
 } from '@client/forms'
 import {
   getConditionalActionsForField,
@@ -658,6 +659,11 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
   }
   function isVisibleField(field: IFormField, section: IFormSection) {
     const { declaration: draft } = props
+
+    if (field.type === HIDDEN) {
+      return false
+    }
+
     const conditionalActions = getConditionalActionsForField(
       field,
       draft.data[section.id] || {},
