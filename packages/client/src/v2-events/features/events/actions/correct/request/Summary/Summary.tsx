@@ -119,29 +119,9 @@ export function Summary() {
 
   const form = getFormValues()
   const formConfig = getDeclaration(eventConfiguration)
-
-  const actionConfig = eventConfiguration.actions.find(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
-  )
-
-  if (!actionConfig) {
-    throw new Error(
-      `No action configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
-    )
-  }
   const fields = getDeclarationFields(eventConfiguration)
-  const declareActionConfig = eventConfiguration.actions.find(
-    (action) => action.type === ActionType.DECLARE
-  )
-
-  if (!declareActionConfig) {
-    throw new Error(
-      `No action configuration found for ${ActionType.DECLARE} found. This should never happen`
-    )
-  }
-
-  const annotation = useActionAnnotation()
-  const annotationForm = annotation.getAnnotation()
+  const { getAnnotation } = useActionAnnotation()
+  const annotationForm = getAnnotation()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
