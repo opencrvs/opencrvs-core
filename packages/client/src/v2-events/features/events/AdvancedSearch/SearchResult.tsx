@@ -219,83 +219,69 @@ export const SearchResultComponent = ({
     setSortOrder(newSortOrder)
   }
 
-  const transformData = (eventData: EventIndex[]) => {
-    return (
-      eventData
-        /*
-         * Apply pending drafts to the event index.
-         * This is necessary to show the most up to date information in the workqueue.
-         */
-        .map((event) =>
-          deepDropNulls(
-            applyDraftsToEventIndex(
-              event,
-              drafts.filter((d) => d.eventId === event.id)
-            )
+  const mapEventsToWorkqueueRows = (
+    eventData: (EventIndex & {
+      title: string | null
+      useFallbackTitle: boolean
+    })[]
+  ) => {
+    return eventData
+      .map((event) => {
+        const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+        if (!eventConfig) {
+          throw new Error(
+            'Event configuration not found for event:' + event.type
           )
+        }
+
+        return {
+          label: eventConfig.label,
+          ...event
+        }
+      })
+      .map((doc) => {
+        const isInOutbox = outbox.some(
+          (outboxEvent) => outboxEvent.id === doc.id
         )
-        .map((event) => {
-          const eventConfig = eventConfigs.find(({ id }) => id === event.type)
-          if (!eventConfig) {
-            throw new Error(
-              'Event configuration not found for event:' + event.type
-            )
-          }
-          const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
-          const { declaration, ...rest } = event
+        const isInDrafts = drafts.some((draft) => draft.id === doc.id)
 
-          return {
-            useFallbackTitle,
-            title,
-            label: eventConfig.label,
-            ...rest,
-            ...declaration
+        const getEventStatus = () => {
+          if (isInOutbox) {
+            return ExtendedEventStatuses.OUTBOX
           }
-        })
-        .map((doc) => {
-          const isInOutbox = outbox.some(
-            (outboxEvent) => outboxEvent.id === doc.id
-          )
-          const isInDrafts = drafts.some((draft) => draft.id === doc.id)
-
-          const getEventStatus = () => {
-            if (isInOutbox) {
-              return ExtendedEventStatuses.OUTBOX
-            }
-            if (isInDrafts) {
-              return ExtendedEventStatuses.DRAFT
-            }
-            return doc.status
+          if (isInDrafts) {
+            return ExtendedEventStatuses.DRAFT
           }
+          return doc.status
+        }
 
-          const status = getEventStatus()
-          return {
-            ...doc,
-            type: intl.formatMessage(doc.label),
-            createdAt: formattedDuration(new Date(doc.createdAt)),
-            updatedAt: formattedDuration(new Date(doc.updatedAt)),
-            status: intl.formatMessage(messages.eventStatus, {
-              status
-            }),
-            title: isInOutbox ? (
+        const status = getEventStatus()
+        return {
+          ...doc,
+          type: intl.formatMessage(doc.label),
+          createdAt: formattedDuration(new Date(doc.createdAt)),
+          updatedAt: formattedDuration(new Date(doc.updatedAt)),
+          status: intl.formatMessage(messages.eventStatus, {
+            status
+          }),
+          title: isInOutbox ? (
+            <IconWithName name={doc.title} status={status} />
+          ) : (
+            <TextButton
+              color={doc.useFallbackTitle ? 'red' : 'primary'}
+              onClick={() => {
+                return navigate(
+                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                    eventId: doc.id
+                  })
+                )
+              }}
+            >
               <IconWithName name={doc.title} status={status} />
-            ) : (
-              <TextButton
-                color={doc.useFallbackTitle ? 'red' : 'primary'}
-                onClick={() => {
-                  return navigate(
-                    ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                      eventId: doc.id
-                    })
-                  )
-                }}
-              >
-                <IconWithName name={doc.title} status={status} />
-              </TextButton>
-            )
-          }
-        })
-    )
+            </TextButton>
+          )
+        }
+      })
   }
 
   function getDefaultColumns(): Array<Column> {
@@ -334,13 +320,40 @@ export const SearchResultComponent = ({
     }
   }
 
-  const sortedResult = orderBy(queryData, sortedCol, sortOrder)
+  const dataWithDraft = queryData
+    /*
+     * Apply pending drafts to the event index.
+     * This is necessary to show the most up to date information in the workqueue.
+     */
+    .map((event) =>
+      deepDropNulls(
+        applyDraftsToEventIndex(
+          event,
+          drafts.filter((d) => d.eventId === event.id)
+        )
+      )
+    )
 
-  const allResults = transformData(sortedResult)
+  const dataWithTitle = dataWithDraft.map((event) => {
+    const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+    if (!eventConfig) {
+      throw new Error('Event configuration not found for event:' + event.type)
+    }
+    const { useFallbackTitle, title } = getEventTitle(eventConfig, event)
 
-  const totalPages = allResults.length
-    ? Math.ceil(allResults.length / limit)
-    : 0
+    return { ...event, title, useFallbackTitle }
+  })
+
+  const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
+
+  const allResults = mapEventsToWorkqueueRows(sortedResult)
+
+  const paginatedData = allResults.slice(
+    limit * (currentPageNumber - 1),
+    limit * currentPageNumber
+  )
+
+  const totalPages = queryData.length ? Math.ceil(queryData.length / limit) : 0
 
   const isShowPagination = totalPages > 1
 
@@ -350,7 +363,7 @@ export const SearchResultComponent = ({
         error={false}
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
-        noContent={allResults.length === 0}
+        noContent={queryData.length === 0}
         noResultText={intl.formatMessage(messages.noResult)}
         paginationId={currentPageNumber}
         tabBarContent={tabBarContent}
@@ -360,10 +373,7 @@ export const SearchResultComponent = ({
       >
         <Workqueue
           columns={[...getDefaultColumns(), ...getColumns()]}
-          content={allResults.slice(
-            limit * (currentPageNumber - 1),
-            limit * currentPageNumber
-          )}
+          content={paginatedData}
           hideLastBorder={!isShowPagination}
           sortOrder={sortOrder}
         />
@@ -371,7 +381,6 @@ export const SearchResultComponent = ({
     </WithTestId>
   )
 }
-
 export const SearchResult = ({
   columns,
   eventConfig,
