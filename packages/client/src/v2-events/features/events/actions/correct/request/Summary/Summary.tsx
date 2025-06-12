@@ -299,6 +299,7 @@ export function Summary() {
                   }
                 ]}
                 content={changedFields}
+                hideTableBottomBorder={true}
               ></Table>
             )
           })}
@@ -331,6 +332,7 @@ export function Summary() {
                 value: 'CIHAN TODO'
               }
             ]}
+            hideTableBottomBorder={true}
           ></Table>
 
           {correctionFormPages.map((page) => {
@@ -367,7 +369,6 @@ export function Summary() {
                 content={pageFields.map(({ valueDisplay, label }) => {
                   if (label.defaultMessage) {
                     return {
-                      // TODO CIHAN: gotta handle cases where label is not defined
                       firstColumn: label.defaultMessage
                         ? intl.formatMessage(label)
                         : valueDisplay,
@@ -379,8 +380,6 @@ export function Summary() {
                   return { firstColumn: valueDisplay }
                 })}
                 hideTableBottomBorder={true}
-                id="onboarding"
-                isLoading={false}
               ></Table>
             )
           })}
