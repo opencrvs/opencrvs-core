@@ -1513,6 +1513,18 @@ components:
             type:
               type: string
               const: NAME
+            defaultValue:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  minLength: 1
+                surname:
+                  type: string
+                  minLength: 1
+              required:
+                - firstname
+                - surname
             configuration:
               type: object
               properties:
@@ -10566,7 +10578,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 4f0cab86-08a8-4f7c-a681-b4f426750afb
+        transactionId: 16840568-394b-40ee-9e28-34dd886f0c8d
         declaration: {}
         annotation: {}
         type: NOTIFY

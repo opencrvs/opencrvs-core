@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: e3722711-448a-4bcb-b3cd-32c96a94b6eb
+                transactionId: bb002690-e170-4ebd-b26f-a674e74970c2
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: aae2908e-cfe9-4d96-b91f-f1c64af19271
+                transactionId: d8b79970-4354-4b73-813a-01126fd8e810
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2140,6 +2140,18 @@ components:
               type: string
               enum:
                 - NAME
+            defaultValue:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  minLength: 1
+                surname:
+                  type: string
+                  minLength: 1
+              required:
+                - firstname
+                - surname
             configuration:
               type: object
               properties:
@@ -10169,17 +10181,18 @@ components:
                   - addressType
                   - state
                   - district2
-              - type: object
-                properties:
-                  firstname:
-                    type: string
-                  surname:
-                    type: string
-                  middlename:
-                    type: string
-                required:
-                  - firstname
-                  - surname
+              - anyOf:
+                  - type: object
+                    properties:
+                      firstname:
+                        type: string
+                      surname:
+                        type: string
+                      middlename:
+                        type: string
+                    required:
+                      - firstname
+                      - surname
               - anyOf:
                   - anyOf:
                       - type: object
