@@ -1670,16 +1670,16 @@ export const typeResolvers: GQLResolver = {
         return null
       }
 
-      const systtemTask = JSON.parse(systemIdentifier.value)
+      const systemTask = JSON.parse(systemIdentifier.value)
 
       const systemResponse = await dataSources.usersAPI.getSystemByName(
-        systtemTask.name
+        systemTask.name
       )
 
       return {
         id: systemResponse.id,
         officeId: systemResponse.officeId,
-        ...systtemTask
+        ...systemTask
       }
     },
     location: async (task: Task, _: any, context) => {
