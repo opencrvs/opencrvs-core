@@ -74,6 +74,12 @@ function generateQuery(
 function buildClause(clause: QueryExpression) {
   const must: estypes.QueryDslQueryContainer[] = []
 
+  if (clause.id) {
+    must.push({
+      term: { id: clause.id }
+    })
+  }
+
   if (clause.eventType) {
     must.push({
       term: { type: clause.eventType }
