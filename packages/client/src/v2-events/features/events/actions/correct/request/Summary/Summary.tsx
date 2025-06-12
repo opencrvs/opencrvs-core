@@ -272,6 +272,7 @@ export function Summary() {
                 ]}
                 content={changedFields}
                 hideTableBottomBorder={true}
+                id={`corrections-table-${page.id}`}
               ></Table>
             )
           })}
@@ -281,32 +282,6 @@ export function Summary() {
               correctionMessages.correctionInformationSectionTitle
             )}
           </CorrectionInformationSectionTitle>
-
-          <Table
-            columns={[
-              {
-                label: intl.formatMessage(correctionMessages.correctionDetails),
-                width: 34,
-                key: 'label'
-              },
-              { label: '', width: 64, key: 'value' }
-            ]}
-            content={[
-              {
-                label: intl.formatMessage(correctionMessages.submittedBy),
-                value: 'TODO'
-              },
-              {
-                label: intl.formatMessage(correctionMessages.office),
-                value: 'TODO'
-              },
-              {
-                label: intl.formatMessage(correctionMessages.requestedOn),
-                value: 'TODO'
-              }
-            ]}
-            hideTableBottomBorder={true}
-          ></Table>
 
           {correctionFormPages.map((page) => {
             const pageFields = page.fields

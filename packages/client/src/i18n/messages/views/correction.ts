@@ -377,26 +377,6 @@ const messagesToDefine = {
     id: 'v2.correction.summary.information.section.title',
     defaultMessage: 'Correction information',
     description: 'Correction information section title'
-  },
-  correctionDetails: {
-    id: 'v2.correction.summary.details',
-    defaultMessage: 'Correction details',
-    description: 'Correction details header'
-  },
-  submittedBy: {
-    id: 'v2.correction.summary.submittedBy',
-    defaultMessage: 'Submitted by',
-    description: 'Submitted by label'
-  },
-  office: {
-    id: 'v2.correction.summary.office',
-    defaultMessage: 'Office',
-    description: 'Office label'
-  },
-  requestedOn: {
-    id: 'v2.correction.summary.requestedOn',
-    defaultMessage: 'Requested on',
-    description: 'Requested on label'
   }
 }
 
