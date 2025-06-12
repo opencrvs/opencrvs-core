@@ -11,8 +11,13 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { QueryInputType, QueryType, getUUID } from '@opencrvs/commons/client'
-import { useTRPC } from '@client/v2-events/trpc'
+import {
+  EventIndex,
+  QueryInputType,
+  QueryType,
+  getUUID
+} from '@opencrvs/commons/client'
+import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { useGetEvent, useGetEventState } from './procedures/get'
 import { useOutbox } from './outbox'
@@ -54,6 +59,51 @@ export function useEvents() {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query)
+        }).data
+      }
+    },
+    searchEventById: {
+      useQuery: (id: string) => {
+        const query = {
+          type: 'and',
+          clauses: [{ id }]
+        } satisfies QueryType
+
+        return useQuery({
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query),
+          initialData: () => {
+            const list = queryClient
+              .getQueriesData<EventIndex>({
+                queryKey: trpc.event.search.queryKey()
+              })
+              .flatMap(([, data]) => data)
+              .filter((event): event is EventIndex => Boolean(event))
+              .filter((e) => e.id === id)
+
+            return list.length === 0 ? undefined : list
+          }
+        })
+      },
+      useSuspenseQuery: (id: string) => {
+        const query = {
+          type: 'and',
+          clauses: [{ id }]
+        } satisfies QueryType
+        return useSuspenseQuery({
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query),
+          initialData: () => {
+            const list = queryClient
+              .getQueriesData<EventIndex>({
+                queryKey: trpc.event.search.queryKey()
+              })
+              .flatMap(([, data]) => data)
+              .filter((event): event is EventIndex => Boolean(event))
+              .filter((e) => e.id === id)
+
+            return list.length === 0 ? undefined : list
+          }
         }).data
       }
     },

@@ -23,6 +23,7 @@ import {
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
 /*
@@ -62,6 +63,9 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
       cacheFiles(eventDocument),
       cacheUsersFromEventDocument(eventDocument)
     ])
+
+    updateLocalEventIndex(eventDocument)
+
     return eventDocument
   }
 })
@@ -76,11 +80,19 @@ export function useGetEvent() {
 
       return useQuery({
         ...options,
-        enabled: enabled || true,
         queryKey: trpc.event.get.queryKey(id),
         meta: {
           eventConfig
-        }
+        },
+        /*
+         * We never want to refetch this query automatically
+         * because it is the user's explicit (audit logged) action to fetch a record
+         */
+        enabled: enabled ?? false,
+        staleTime: Infinity,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false
       })
     },
     useSuspenseQuery: (id: string) => {
@@ -94,7 +106,15 @@ export function useGetEvent() {
           queryKey: trpc.event.get.queryKey(id),
           meta: {
             eventConfig
-          }
+          },
+          /*
+           * We never want to refetch this query automatically
+           * because it is the user's explicit (audit logged) action to fetch a record
+           */
+          staleTime: Infinity,
+          refetchOnMount: false,
+          refetchOnReconnect: false,
+          refetchOnWindowFocus: false
         }).data
       ]
     }

@@ -9,18 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 
-import { getCurrentEventState } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { getScope } from '@client/profile/profileSelectors'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({
@@ -31,17 +29,21 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-  const events = useEvents()
   const scopes = useSelector(getScope)
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const { searchEventById } = useEvents()
 
-  const { eventConfiguration } = useEventConfiguration(event.type)
+  const getEventQuery = searchEventById.useQuery(eventId)
+  const eventResults = getEventQuery.data
 
-  const eventState = useMemo(
-    () => getCurrentEventState(event, eventConfiguration),
-    [event, eventConfiguration]
-  )
+  if (!eventResults) {
+    return
+  }
+  if (eventResults.length === 0) {
+    throw new Error(`Event ${eventId} not found`)
+  }
+  const eventIndex = eventResults[0]
 
+  const eventState = eventIndex
   const actionMenuItems = useActionMenuItems(eventState, scopes ?? [])
 
   return (
@@ -62,7 +64,7 @@ export function ActionMenu({
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
-                  await action.onClick(event.id)
+                  await action.onClick(eventIndex.id)
                   onAction?.()
                 }}
               >
