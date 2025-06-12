@@ -24,8 +24,7 @@ import {
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getDeclaration,
-  getActionAnnotationFields
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -44,7 +43,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -106,11 +104,8 @@ export function Summary() {
   )
 
   const scopes = useSelector(getScope)
-
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
-
-  const eventFormNavigation = useEventFormNavigation()
   const { goToHome } = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
@@ -121,7 +116,6 @@ export function Summary() {
 
   const previousFormValues = event.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const stringifyFormData = useFormDataStringifier()
 
   const form = getFormValues()
   const formConfig = getDeclaration(eventConfiguration)
@@ -146,23 +140,8 @@ export function Summary() {
     )
   }
 
-  const annotationFields = getActionAnnotationFields(declareActionConfig)
-
-  const allFields = [
-    ...fields,
-    ...actionConfig.correctionForm.pages.flatMap((page) => page.fields),
-    ...annotationFields
-  ]
-
-  const stringifiedForm = stringifyFormData(allFields, form)
-  const stringifiedPreviousForm = stringifyFormData(
-    allFields,
-    previousFormValues
-  )
-
   const annotation = useActionAnnotation()
   const annotationForm = annotation.getAnnotation()
-  const stringifiedRequestData = stringifyFormData(allFields, annotationForm)
 
   const correctionFormPages =
     eventConfiguration.actions.find(
@@ -256,20 +235,32 @@ export function Summary() {
                 const wasVisible = isFieldVisible(f, previousFormValues)
                 const isVisible = isFieldVisible(f, form)
                 const visibilityChanged = wasVisible !== isVisible
-
-                // TODO CIHAN: use the actually stringified values here...?
                 const valueHasChanged = !isEqual(
-                  stringifiedPreviousForm[f.id],
-                  stringifiedForm[f.id]
+                  previousFormValues[f.id],
+                  form[f.id]
                 )
 
                 return isVisible && (valueHasChanged || visibilityChanged)
               })
-              .map((f) => ({
-                fieldLabel: intl.formatMessage(f.label),
-                original: stringifiedPreviousForm[f.id] || '-',
-                correction: stringifiedForm[f.id] || '-'
-              }))
+              .map((f) => {
+                const originalOutput = Output({
+                  field: f,
+                  value: previousFormValues[f.id],
+                  showPreviouslyMissingValuesAsChanged: false
+                })
+
+                const correctionOutput = Output({
+                  field: f,
+                  value: form[f.id],
+                  showPreviouslyMissingValuesAsChanged: false
+                })
+
+                return {
+                  fieldLabel: intl.formatMessage(f.label),
+                  original: originalOutput ?? '-',
+                  correction: correctionOutput ?? '-'
+                }
+              })
 
             if (changedFields.length === 0) {
               return null
@@ -323,15 +314,15 @@ export function Summary() {
             content={[
               {
                 label: intl.formatMessage(correctionMessages.submittedBy),
-                value: 'CIHAN TODO'
+                value: 'TODO'
               },
               {
                 label: intl.formatMessage(correctionMessages.office),
-                value: 'CIHAN TODO'
+                value: 'TODO'
               },
               {
                 label: intl.formatMessage(correctionMessages.requestedOn),
-                value: 'CIHAN TODO'
+                value: 'TODO'
               }
             ]}
             hideTableBottomBorder={true}
