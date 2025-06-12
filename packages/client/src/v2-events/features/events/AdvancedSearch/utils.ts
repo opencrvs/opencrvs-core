@@ -142,7 +142,7 @@ export const getDefaultSearchFields = (
   return searchFields
 }
 
-const RegStatus = {
+const StatusesForAdvancedSearch = {
   Created: 'CREATED',
   Notified: 'NOTIFIED',
   Declared: 'DECLARED',
@@ -188,7 +188,7 @@ function buildCondition(
 }
 
 function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values(RegStatus) }
+  return { type: 'anyOf', terms: Object.values(StatusesForAdvancedSearch) }
 }
 
 function formatValue(
