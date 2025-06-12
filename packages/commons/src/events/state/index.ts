@@ -232,7 +232,9 @@ export function getCurrentEventState(
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const acceptedActions = getAcceptedActions(event)
+  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
 
   const declarationUpdateMetadata = getDeclarationActionUpdateMetadata(
     event.actions

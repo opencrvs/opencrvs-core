@@ -378,6 +378,7 @@ export async function getIndex(eventParams: QueryType) {
   }
 
   const query = buildElasticQueryFromSearchPayload(eventParams)
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     size: DEFAULT_SIZE,
