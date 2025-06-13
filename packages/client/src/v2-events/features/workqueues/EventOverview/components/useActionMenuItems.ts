@@ -20,7 +20,8 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  IndexMap
+  IndexMap,
+  CustomFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -273,7 +274,9 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
           })
         )
       },
-      disabled: !eventIsAssignedToSelf
+      disabled:
+        !eventIsAssignedToSelf ||
+        event.flags.includes(CustomFlags.CORRECTION_REQUESTED)
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 
