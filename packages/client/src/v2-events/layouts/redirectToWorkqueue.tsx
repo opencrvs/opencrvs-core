@@ -13,11 +13,13 @@ import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Loader } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
+import { useHomePage } from '@client/hooks/useHomePage'
 import { useWorkqueueConfigurations } from '../features/events/useWorkqueueConfiguration'
 
 export const RedirectToWorkqueue = () => {
   const workqueues = useWorkqueueConfigurations()
   const navigate = useNavigate()
+  const { path } = useHomePage()
 
   useEffect(() => {
     if (workqueues.length) {
@@ -28,10 +30,10 @@ export const RedirectToWorkqueue = () => {
         }
       )
     } else {
-      // redirect to old site. Will only work for system admins
-      navigate('/organisation', { replace: true })
+      // redirect to old site.
+      navigate(path, { replace: true })
     }
-  }, [workqueues, navigate])
+  }, [workqueues, navigate, path])
 
   return <Loader id="redirect_to_workqueue" />
 }
