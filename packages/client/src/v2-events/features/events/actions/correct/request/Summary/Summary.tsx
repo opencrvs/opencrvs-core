@@ -14,6 +14,8 @@ import { useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { isEqual } from 'lodash'
+import styled from 'styled-components'
 import {
   ActionType,
   FieldConfig,
@@ -22,8 +24,7 @@ import {
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getDeclaration,
-  getActionAnnotationFields
+  getDeclaration
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -36,22 +37,15 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Check } from '@opencrvs/components/lib/icons'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
+import { buttonMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-
-function shouldBeShownAsAValue(field: FieldConfig) {
-  if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
-    return false
-  }
-  return true
-}
+import { Output } from '@client/v2-events/features/events/components/Output'
 
 function ContinueButton({
   onClick,
@@ -74,7 +68,6 @@ function ContinueButton({
       onClick={onClick}
     >
       <Check />
-
       {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
         ? intl.formatMessage(buttonMessages.makeCorrection)
         : intl.formatMessage(buttonMessages.sendForApproval)}
@@ -97,17 +90,23 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
   }, {})
 }
 
+const SectionTitle = styled(Text)`
+  margin-bottom: 20px;
+`
+
+const CorrectionInformationSectionTitle = styled(SectionTitle)`
+  margin-top: 20px;
+`
+
 export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
   const scopes = useSelector(getScope)
-
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
-
-  const eventFormNavigation = useEventFormNavigation()
+  const { goToHome } = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
@@ -118,48 +117,11 @@ export function Summary() {
   const previousFormValues = event.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const stringifyFormData = useFormDataStringifier()
-
   const form = getFormValues()
   const formConfig = getDeclaration(eventConfiguration)
-
-  const actionConfig = eventConfiguration.actions.find(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
-  )
-
-  if (!actionConfig) {
-    throw new Error(
-      `No action configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
-    )
-  }
   const fields = getDeclarationFields(eventConfiguration)
-  const declareActionConfig = eventConfiguration.actions.find(
-    (action) => action.type === ActionType.DECLARE
-  )
-
-  if (!declareActionConfig) {
-    throw new Error(
-      `No action configuration found for ${ActionType.DECLARE} found. This should never happen`
-    )
-  }
-
-  const annotationFields = getActionAnnotationFields(declareActionConfig)
-
-  const allFields = [
-    ...fields,
-    ...actionConfig.correctionForm.pages.flatMap((page) => page.fields),
-    ...annotationFields
-  ]
-
-  const stringifiedForm = stringifyFormData(allFields, form)
-  const stringifiedPreviousForm = stringifyFormData(
-    allFields,
-    previousFormValues
-  )
-
-  const annotation = useActionAnnotation()
-  const annotationForm = annotation.getAnnotation()
-  const stringifiedRequestData = stringifyFormData(allFields, annotationForm)
+  const { getAnnotation } = useActionAnnotation()
+  const annotationForm = getAnnotation()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
@@ -197,131 +159,107 @@ export function Summary() {
       transactionId: generateTransactionId(),
       annotation: annotationForm
     })
-    eventFormNavigation.goToHome()
+    goToHome()
   }, [
     form,
     fields,
     events.actions.correction.request,
     eventId,
     annotationForm,
-    eventFormNavigation,
+    goToHome,
     previousFormValues
   ])
-
-  const backToReviewButton = (
-    <SecondaryButton
-      key="back-to-review"
-      id="back-to-review"
-      onClick={() =>
-        navigate(
-          ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-            eventId
-          })
-        )
-      }
-    >
-      {intl.formatMessage(registerMessages.backToReviewButton)}
-    </SecondaryButton>
-  )
 
   return (
     <>
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.goToHome()}
+        goHome={goToHome}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
         <Content
           bottomActionButtons={[
             <ContinueButton
-              key={'make-correction'}
-              disabled={false /* @todo */}
+              key="make-correction"
               scopes={scopes}
               onClick={togglePrompt}
             />
           ]}
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
-          topActionButtons={[backToReviewButton]}
+          topActionButtons={[
+            <SecondaryButton
+              key="back-to-review"
+              id="back-to-review"
+              onClick={() =>
+                navigate(
+                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+                    eventId
+                  })
+                )
+              }
+            >
+              {intl.formatMessage(registerMessages.backToReviewButton)}
+            </SecondaryButton>
+          ]}
         >
-          {correctionFormPages.map((page) => {
-            return (
-              <Table
-                key={page.id}
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    width: 34,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'fieldLabel'
-                  },
-                  {
-                    label: '',
-                    width: 64,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'collectedValue'
-                  }
-                ]}
-                content={page.fields
-                  .filter(shouldBeShownAsAValue)
-                  .map((field) => {
-                    return {
-                      fieldLabel: intl.formatMessage(field.label),
-                      collectedValue: stringifiedRequestData[field.id] || ''
-                    }
-                  })}
-                hideTableBottomBorder={true}
-                id="onboarding"
-                isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              ></Table>
-            )
-          })}
+          <SectionTitle element="h3" variant="h3">
+            {intl.formatMessage(correctionMessages.correctionSectionTitle)}
+          </SectionTitle>
 
           {formConfig.pages.map((page) => {
-            const content = page.fields
-              .filter((field) => {
-                const visibilityChanged =
-                  isFieldVisible(field, previousFormValues) !==
-                  isFieldVisible(field, form)
-
-                return (
-                  stringifiedPreviousForm[field.id] !==
-                    stringifiedForm[field.id] || visibilityChanged
+            const changedFields = page.fields
+              .filter((f) => {
+                const wasVisible = isFieldVisible(f, previousFormValues)
+                const isVisible = isFieldVisible(f, form)
+                const visibilityChanged = wasVisible !== isVisible
+                const valueHasChanged = !isEqual(
+                  previousFormValues[f.id],
+                  form[f.id]
                 )
+
+                return isVisible && (valueHasChanged || visibilityChanged)
               })
-              .map((field) => {
-                const wasHidden = !isFieldVisible(field, form)
+              .map((f) => {
+                const originalOutput = Output({
+                  field: f,
+                  value: previousFormValues[f.id],
+                  showPreviouslyMissingValuesAsChanged: false
+                })
+
+                const correctionOutput = Output({
+                  field: f,
+                  value: form[f.id],
+                  showPreviouslyMissingValuesAsChanged: false
+                })
+
                 return {
-                  item: intl.formatMessage(field.label),
-                  original: stringifiedPreviousForm[field.id] || '-',
-                  changed: wasHidden ? '-' : stringifiedForm[field.id]
+                  fieldLabel: intl.formatMessage(f.label),
+                  original: originalOutput ?? '-',
+                  correction: correctionOutput ?? '-'
                 }
               })
 
-            if (content.length === 0) {
+            if (changedFields.length === 0) {
               return null
             }
 
             return (
               <Table
-                key={page.id}
-                noPagination
+                key={`corrections-table-${page.id}`}
                 columns={[
                   {
                     label: intl.formatMessage(page.title),
-                    alignment: ColumnContentAlignment.LEFT,
                     width: 34,
-                    key: 'item'
+                    key: 'fieldLabel'
                   },
                   {
                     label: intl.formatMessage(
                       correctionMessages.correctionSummaryOriginal
                     ),
                     width: 33,
-                    alignment: ColumnContentAlignment.LEFT,
                     key: 'original'
                   },
                   {
@@ -329,15 +267,67 @@ export function Summary() {
                       correctionMessages.correctionSummaryCorrection
                     ),
                     width: 33,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'changed'
+                    key: 'correction'
                   }
                 ]}
-                content={content}
+                content={changedFields}
                 hideTableBottomBorder={true}
-                id="diff"
-                isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
+                id={`corrections-table-${page.id}`}
+              ></Table>
+            )
+          })}
+
+          <CorrectionInformationSectionTitle element="h3" variant="h3">
+            {intl.formatMessage(
+              correctionMessages.correctionInformationSectionTitle
+            )}
+          </CorrectionInformationSectionTitle>
+
+          {correctionFormPages.map((page) => {
+            const pageFields = page.fields
+              .filter((f) => isFieldVisible(f, { ...form, ...annotationForm }))
+              .map((field) => {
+                const valueDisplay = Output({
+                  field,
+                  value: annotationForm[field.id],
+                  showPreviouslyMissingValuesAsChanged: false
+                })
+
+                return { ...field, valueDisplay }
+              })
+              .filter((f) => f.valueDisplay)
+
+            return (
+              <Table
+                key={`correction-form-table-${page.id}`}
+                columns={[
+                  {
+                    label: intl.formatMessage(page.title),
+                    width: 34,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'firstColumn'
+                  },
+                  {
+                    label: '',
+                    width: 64,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'secondColumn'
+                  }
+                ]}
+                content={pageFields.map(({ valueDisplay, label }) => {
+                  if (label.defaultMessage) {
+                    return {
+                      firstColumn: label.defaultMessage
+                        ? intl.formatMessage(label)
+                        : valueDisplay,
+                      secondColumn: valueDisplay
+                    }
+                  }
+
+                  // If no label is defined for the field, we just show the value on the first column
+                  return { firstColumn: valueDisplay }
+                })}
+                hideTableBottomBorder={true}
               ></Table>
             )
           })}
