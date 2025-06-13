@@ -74,7 +74,7 @@ function NameInput(props: Props) {
   )
 }
 
-function stringify(value: NameFieldValue) {
+function stringify(value?: NameFieldValue) {
   return joinValues([value?.firstname, value?.middlename, value?.surname])
 }
 
