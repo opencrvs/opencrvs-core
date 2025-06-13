@@ -204,18 +204,28 @@ const HtmlFontVariant = z.enum([
 
 export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
+const ParagraphConfiguration = z
+  .object({
+    styles: z
+      .object({
+        fontVariant: HtmlFontVariant.optional().describe(
+          'Font variant to use for the paragraph text'
+        ),
+        hint: z
+          .boolean()
+          .optional()
+          .describe('When true, paragraph is styled as a hint with grey color')
+      })
+      .optional()
+  })
+  .default({})
+
+export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: z
-    .object({
-      styles: z
-        .object({
-          fontVariant: HtmlFontVariant.optional()
-        })
-        .optional()
-    })
-    .default({})
+  configuration: ParagraphConfiguration
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
