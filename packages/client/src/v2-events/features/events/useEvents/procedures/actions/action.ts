@@ -27,7 +27,7 @@ import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   cleanUpOnUnassign,
-  findLocalEventData,
+  findLocalEventDocument,
   onAssign,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
@@ -283,13 +283,16 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
   function getMutationPayload(params: ActionMutationInput) {
     const { eventId } = params
-    const localEvent = findLocalEventData(eventId)
+    const localEvent = findLocalEventDocument(eventId)
+
     const eventConfiguration = eventConfigurations.find(
       (event) => event.id === localEvent?.type
     )
 
     if (!eventConfiguration) {
-      throw new Error('Event configuration not found')
+      throw new Error(
+        `Event configuration not found for event: ${localEvent?.type}`
+      )
     }
 
     // Let's find the action configuration. For NOTIFY action, we can use the DECLARE action configuration.
@@ -335,7 +338,7 @@ export function useEventCustomAction(mutationKey: string[]) {
 
   return {
     mutate: (params: customApi.OnDeclareParams) => {
-      const localEvent = findLocalEventData(params.eventId)
+      const localEvent = findLocalEventDocument(params.eventId)
 
       const eventConfiguration = eventConfigurations.find(
         (event) => event.id === localEvent?.type

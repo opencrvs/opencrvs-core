@@ -32,12 +32,9 @@ export function ActionMenu({
   const scopes = useSelector(getScope)
   const { searchEventById } = useEvents()
 
-  const getEventQuery = searchEventById.useQuery(eventId)
-  const eventResults = getEventQuery.data
+  const getEventQuery = searchEventById.useSuspenseQuery(eventId)
+  const eventResults = getEventQuery
 
-  if (!eventResults) {
-    return
-  }
   if (eventResults.length === 0) {
     throw new Error(`Event ${eventId} not found`)
   }

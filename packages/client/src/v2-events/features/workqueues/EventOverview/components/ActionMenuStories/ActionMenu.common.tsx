@@ -20,9 +20,11 @@ import {
   ActionType,
   ActionTypes,
   EventDocument,
+  getCurrentEventState,
   getUUID,
   IndexMap,
   TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -229,7 +231,12 @@ export function createStoriesFromScenarios(
           msw: {
             handlers: {
               event: [
-                tRPCMsw.event.get.query(() => getMockEvent(actions, role))
+                tRPCMsw.event.search.query(() => [
+                  getCurrentEventState(
+                    getMockEvent(actions, role),
+                    tennisClubMembershipEvent
+                  )
+                ])
               ]
             }
           }

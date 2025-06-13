@@ -50,13 +50,10 @@ export function updateLocalEventIndex(updatedEvent: EventDocument) {
   )
 }
 
-export function findLocalEventData(eventId: string) {
+export function findLocalEventDocument(eventId: string) {
   return queryClient.getQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      type: 'and',
-      clauses: [{ id: eventId }]
-    })
-  )?.[0] as EventDocument | undefined
+    trpcOptionsProxy.event.get.queryKey(eventId)
+  ) as EventDocument | undefined
 }
 
 export function setEventData(id: string, data: EventDocument) {

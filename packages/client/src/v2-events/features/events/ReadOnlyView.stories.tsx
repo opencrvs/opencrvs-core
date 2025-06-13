@@ -18,6 +18,7 @@ import {
   ActionType,
   generateEventDocument,
   generateEventDraftDocument,
+  getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -110,7 +111,13 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
-          })
+          }),
+          tRPCMsw.event.search.query(() => [
+            getCurrentEventState(
+              tennisClubMembershipEventDocument,
+              tennisClubMembershipEvent
+            )
+          ])
         ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {

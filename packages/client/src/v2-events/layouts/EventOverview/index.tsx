@@ -69,11 +69,8 @@ export function EventOverviewLayout({
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
 
-  const eventResults = searchEventById.useQuery(eventId).data
+  const eventResults = searchEventById.useSuspenseQuery(eventId)
 
-  if (!eventResults) {
-    return
-  }
   if (eventResults.length === 0) {
     throw new Error(`Event ${eventId} not found`)
   }
