@@ -27,26 +27,25 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 
 export function Review() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
-  const events = useEvents()
   const intl = useIntl()
   const navigate = useNavigate()
 
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const events = useEvents()
   const event = events.getEventState.useSuspenseQuery(eventId)
-
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const formConfig = getDeclaration(config)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const formConfig = getDeclaration(eventConfiguration)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-
   const form = getFormValues()
   const previousFormValues = event.declaration
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => !isEqual(previousFormValues[key], value)
   )
+
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
-  const actionConfig = config.actions.find(
+  const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
