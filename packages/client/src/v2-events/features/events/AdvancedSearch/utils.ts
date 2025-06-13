@@ -8,7 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import startOfDay from 'date-fns/startOfDay'
+import addMinutes from 'date-fns/addMinutes'
+import endOfDay from 'date-fns/endOfDay'
+import parse from 'date-fns/parse'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -199,17 +202,23 @@ function buildConditionForStatus(): Condition {
  * - Returns a string formatted as "startUTC,endUTC".
  *
  * @param {string} inputDateString - The date range input string.
- * @returns {string} A string representing the UTC date range.
+ * @returns {string} A comma-separated string of ISO-formatted UTC start and end timestamps.
  */
-function getUTCRangeFromInput(inputDateString: string) {
+function getUtcRangeFromInput(inputDateString: string) {
   const offsetMinutes = new Date().getTimezoneOffset()
 
-  const [startDateStr, endDateStr] = inputDateString.split(',')
-  const startLocal = new Date(`${startDateStr}T00:00:00`)
-  const endLocal = new Date(`${endDateStr || startDateStr}T23:59:59.999`)
+  const [startDateStr, endDateStr] = inputDateString
+    .split(',')
+    .map((s) => s.trim())
 
-  const utcStart = new Date(startLocal.getTime() + offsetMinutes * 60 * 1000)
-  const utcEnd = new Date(endLocal.getTime() + offsetMinutes * 60 * 1000)
+  const dateFormat = 'yyyy-MM-dd'
+  const startLocal = startOfDay(parse(startDateStr, dateFormat, new Date()))
+  const endLocal = endOfDay(
+    parse(endDateStr || startDateStr, dateFormat, new Date())
+  )
+
+  const utcStart = addMinutes(startLocal, offsetMinutes)
+  const utcEnd = addMinutes(endLocal, offsetMinutes)
 
   return `${utcStart.toISOString()},${utcEnd.toISOString()}`
 }
@@ -267,7 +276,7 @@ function buildDataConditionFromSearchKeys(
           fieldType === 'event'
         ) {
           searchType = 'range'
-          value = getUTCRangeFromInput(value)
+          value = getUtcRangeFromInput(value)
         }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
