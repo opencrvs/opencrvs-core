@@ -13,6 +13,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { isEqual } from 'lodash'
 import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -41,7 +42,7 @@ export function Review() {
   const form = getFormValues()
   const previousFormValues = event.declaration
   const valuesHaveChanged = Object.entries(form).some(
-    ([key, value]) => previousFormValues[key] !== value
+    ([key, value]) => !isEqual(previousFormValues[key], value)
   )
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
