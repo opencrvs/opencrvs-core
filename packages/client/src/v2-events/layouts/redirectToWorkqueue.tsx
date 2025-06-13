@@ -28,7 +28,8 @@ export const RedirectToWorkqueue = () => {
         }
       )
     } else {
-      throw new Error('No workqueue is configured for this user')
+      // redirect to old site. Will only work for system admins
+      navigate('/organisation', { replace: true })
     }
   }, [workqueues, navigate])
 
