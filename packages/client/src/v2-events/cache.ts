@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { joinValues } from './utils'
+
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
 
@@ -25,12 +27,16 @@ function withPostfix(str: string, postfix: string) {
  * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
  */
 export function getUnsignedFileUrl(filename: string) {
-  const minioURL = window.config.MINIO_URL
-  if (minioURL && typeof minioURL === 'string') {
-    return new URL(filename, withPostfix(minioURL, '/')).toString()
+  try {
+    return new URL(
+      joinValues([window.config.MINIO_BUCKET, filename], '/'),
+      window.config.MINIO_BASE_URL
+    ).toString()
+  } catch (error) {
+    throw new Error(
+      `Failed to build file url from: MINIO_BUCKET: ${window.config.MINIO_BUCKET}, MINIO_BASE_URL: ${window.config.MINIO_BASE_URL}`
+    )
   }
-
-  throw new Error('MINIO_URL is not defined')
 }
 
 /**
