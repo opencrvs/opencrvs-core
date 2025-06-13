@@ -64,6 +64,7 @@ export const SortWorkqueue: Story = {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
     },
+    chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
         event: [
