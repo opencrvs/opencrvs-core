@@ -11,7 +11,7 @@
 
 import { deepDropNulls, getCurrentEventState } from '.'
 import { tennisClubMembershipEvent } from '../../fixtures'
-import { getUUID } from '../../uuid'
+import { getUUID, UUID } from '../../uuid'
 import { ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
@@ -169,7 +169,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-01-01T00:00:00.000Z',
         createdBy: 'user1',
-        createdAtLocation: 'location1',
+        createdAtLocation: 'location1' as UUID,
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
       }
@@ -183,7 +183,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-02-01T00:00:00.000Z',
         createdBy: 'user1',
-        createdAtLocation: 'location1',
+        createdAtLocation: 'location1' as UUID,
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
       }
@@ -197,7 +197,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-03-01T00:00:00.000Z',
         createdBy: 'computer1',
-        createdAtLocation: 'location2',
+        createdAtLocation: 'location2' as UUID,
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: '3RD_PARTY_API'
       }
@@ -210,7 +210,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-04-01T00:00:00.000Z',
         createdBy: 'user2',
-        createdAtLocation: 'location3',
+        createdAtLocation: 'location3' as UUID,
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: 'REGISTRATION_AGENT'
       }
@@ -223,7 +223,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-05-01T00:00:00.000Z',
         createdBy: 'user3',
-        createdAtLocation: 'location4',
+        createdAtLocation: 'location4' as UUID,
         createdByRole: 'LOCAL_REGISTRAR',
         createdBySignature: '/ocrvs/signature-3.png'
       }
@@ -236,7 +236,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-06-01T00:00:00.000Z',
         createdBy: 'computer2',
-        createdAtLocation: 'location5',
+        createdAtLocation: 'location5' as UUID,
         createdBySignature: '/ocrvs/signature-4.png',
         createdByRole: '3RD_PARTY_API',
         registrationNumber: '123456789'
@@ -312,7 +312,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-01-01T00:00:00.000Z',
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
-        createdAtLocation: 'location1',
+        createdAtLocation: 'location1' as UUID,
         createdByRole: 'FIELD_AGENT'
       }
     })
@@ -326,7 +326,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-02-01T00:00:00.000Z',
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
-        createdAtLocation: 'location1',
+        createdAtLocation: 'location1' as UUID,
         createdByRole: 'FIELD_AGENT'
       }
     })
@@ -339,7 +339,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-04-01T00:00:00.000Z',
         createdBySignature: '/ocrvs/signature-2.png',
         createdBy: 'user2',
-        createdAtLocation: 'location3',
+        createdAtLocation: 'location3' as UUID,
         createdByRole: 'REGISTRATION_AGENT'
       }
     })
@@ -352,7 +352,7 @@ describe('getCurrentEventState()', () => {
         createdAt: '2023-05-01T00:00:00.000Z',
         createdBy: 'user3',
         createdBySignature: '/ocrvs/signature-3.png',
-        createdAtLocation: 'location4',
+        createdAtLocation: 'location4' as UUID,
         createdByRole: 'LOCAL_REGISTRAR',
         registrationNumber: '123456789'
       }
@@ -420,7 +420,7 @@ describe('correction requests', () => {
     const state = getCurrentEventState(
       {
         type: TENNIS_CLUB_MEMBERSHIP,
-        id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf',
+        id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf' as UUID,
         trackingId: 'TEST12',
         createdAt: '2025-01-23T02:21:38.343Z',
         updatedAt: '2025-01-23T02:21:42.230Z',
@@ -430,7 +430,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
             declaration: {},
@@ -443,7 +443,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdAt: '2025-01-23T02:21:39.161Z',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8',
             status: ActionStatus.Accepted,
@@ -455,7 +455,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdAt: '2025-01-23T02:21:40.182Z',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2',
             status: ActionStatus.Accepted,
@@ -467,7 +467,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdAt: '2025-01-23T02:21:41.206Z',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
             id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
             status: ActionStatus.Accepted,
@@ -484,7 +484,7 @@ describe('correction requests', () => {
     const state = getCurrentEventState(
       {
         type: TENNIS_CLUB_MEMBERSHIP,
-        id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf',
+        id: 'f743a5d5-19d4-44eb-9b0f-301a2d823bcf' as UUID,
         trackingId: 'TEST12',
         createdAt: '2025-01-23T02:21:38.343Z',
         updatedAt: '2025-01-23T02:21:42.230Z',
@@ -494,9 +494,9 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
-            id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
+            id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
             declaration: {},
             status: ActionStatus.Accepted,
             transactionId: getUUID()
@@ -508,8 +508,8 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
             createdAt: '2025-01-23T02:21:39.161Z',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-            id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
+            id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
           },
@@ -520,8 +520,8 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
             createdAt: '2025-01-23T02:21:40.182Z',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-            id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
+            id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
           },
@@ -532,8 +532,8 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
             createdAt: '2025-01-23T02:21:41.206Z',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-            id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
+            id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
           },
@@ -545,8 +545,8 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
             createdAt: '2025-01-23T02:21:42.230Z',
-            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
-            id: '94d5a963-0125-4d31-85f0-6d77080758f4',
+            createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
+            id: '94d5a963-0125-4d31-85f0-6d77080758f4' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
           }

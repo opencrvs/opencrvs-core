@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { SCOPES } from '@opencrvs/commons'
+import { SCOPES, UUID } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -64,10 +64,10 @@ test('Creates multiple locations', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const parentId = 'parent-id'
+  const parentId = 'parent-id' as UUID
 
   const locationPayload = generator.locations.set([
-    { id: 'parentId' },
+    { id: 'parentId' as UUID },
     { partOf: parentId },
     { partOf: parentId },
     {}

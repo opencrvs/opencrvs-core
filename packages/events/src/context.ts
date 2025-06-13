@@ -21,13 +21,14 @@ import {
   logger,
   SystemRole,
   TokenUserType,
-  TokenWithBearer
+  TokenWithBearer,
+  UUID
 } from '@opencrvs/commons'
 import { env } from './environment'
 
 const UserContext = z.object({
   id: z.string(),
-  primaryOfficeId: z.string(),
+  primaryOfficeId: UUID,
   role: z.string(),
   signature: z
     .string()

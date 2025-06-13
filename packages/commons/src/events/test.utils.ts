@@ -12,7 +12,7 @@
 import { merge, omitBy, isString } from 'lodash'
 import addDays from 'date-fns/addDays'
 import { tennisClubMembershipEvent } from '../fixtures'
-import { getUUID } from '../uuid'
+import { getUUID, UUID } from '../uuid'
 import {
   ActionBase,
   ActionDocument,
@@ -132,7 +132,7 @@ export const eventPayloadGenerator = {
     id
   }),
   draft: (
-    { eventId, actionType }: { eventId: string; actionType: ActionType },
+    { eventId, actionType }: { eventId: UUID; actionType: ActionType },
     input: Partial<Draft> = {}
   ): Draft =>
     merge(
@@ -158,7 +158,7 @@ export const eventPayloadGenerator = {
           createdAt: new Date().toISOString(),
           createdBy: '@todo',
           createdByRole: '@todo',
-          createdAtLocation: '@todo'
+          createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID
         }
       } satisfies Draft,
       input
@@ -430,7 +430,7 @@ export function generateActionDocument({
     createdBy: getUUID(),
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(configuration, action),
     annotation: {},
     status: ActionStatus.Accepted,
@@ -448,7 +448,7 @@ export function generateActionDocument({
     case ActionType.UNASSIGN:
       return { ...actionBase, type: action, assignedTo: null }
     case ActionType.ASSIGN:
-      return { ...actionBase, assignedTo: getUUID(), type: action }
+      return { ...actionBase, assignedTo: getUUID() as string, type: action }
     case ActionType.VALIDATE:
       return { ...actionBase, type: action }
     case ActionType.ARCHIVE:
@@ -508,7 +508,7 @@ export function generateEventDocument({
 }
 
 export function generateEventDraftDocument(
-  eventId: string,
+  eventId: UUID,
   actionType: ActionType = ActionType.DECLARE,
   declaration: EventState = {}
 ): Draft {
@@ -608,12 +608,12 @@ export function createPseudoRandomNumberGenerator(seed: number) {
   }
 }
 
-function generateUuid(rng: () => number): string {
+function generateUuid(rng: () => number) {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.floor(rng() * 16)
     const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
-  })
+  }) as UUID
 }
 
 function generateTrackingId(rng: () => number): string {
