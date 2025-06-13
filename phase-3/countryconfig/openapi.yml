@@ -1188,6 +1188,10 @@ components:
                         - h3
                         - h2
                         - h1
+                      description: Font variant to use for the paragraph text
+                    hint:
+                      type: boolean
+                      description: When true, paragraph is styled as a hint with grey color
               default: {}
           required:
             - id
@@ -2858,60 +2862,44 @@ components:
         type:
           type: string
           const: REQUEST_CORRECTION
-        onboardingForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
-        additionalDetailsForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    const: VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
+        correctionForm:
+          type: object
+          properties:
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+              description: Human readable description of the form
+            pages:
+              type: array
+              items:
+                oneOf:
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        const: FORM
+                        default: FORM
+                    required:
+                      - type
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        const: VERIFICATION
+                      actions:
+                        $ref: "#/components/schemas/VerificationActionConfig"
+                    required:
+                      - type
+                      - actions
+          required:
+            - label
+            - pages
       required:
         - label
         - conditionals
         - type
-        - onboardingForm
-        - additionalDetailsForm
+        - correctionForm
     RejectCorrectionActionConfig:
       type: object
       properties:
@@ -9792,7 +9780,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 103e57c3-ce68-4741-9b53-2d854c0b4bda
+        transactionId: db32a249-2c66-4a0d-912a-ed5cb2122c69
         declaration: {}
         annotation: {}
         type: NOTIFY

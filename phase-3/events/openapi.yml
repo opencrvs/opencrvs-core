@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 9996e54b-ddf3-41eb-a261-2a8c77923a63
+                transactionId: 30948058-7f43-45f9-84e4-9827ccc213d0
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 9729853c-3887-4e6d-9454-c95af5685a54
+                transactionId: 89c00d39-619e-4495-aa93-9f31d82dd48b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1777,6 +1777,10 @@ components:
                         - h3
                         - h2
                         - h1
+                      description: Font variant to use for the paragraph text
+                    hint:
+                      type: boolean
+                      description: When true, paragraph is styled as a hint with grey color
               default: {}
           required:
             - id
@@ -3504,64 +3508,47 @@ components:
           type: string
           enum:
             - REQUEST_CORRECTION
-        onboardingForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
-        additionalDetailsForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
+        correctionForm:
+          type: object
+          properties:
+            label:
+              description: Human readable description of the form
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
+            pages:
+              type: array
+              items:
+                oneOf:
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - FORM
+                        default: FORM
+                    required:
+                      - type
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - VERIFICATION
+                      actions:
+                        $ref: "#/components/schemas/VerificationActionConfig"
+                    required:
+                      - type
+                      - actions
+          required:
+            - label
+            - pages
       required:
         - label
         - conditionals
         - type
-        - onboardingForm
-        - additionalDetailsForm
+        - correctionForm
     RejectCorrectionActionConfig:
       type: object
       properties:
