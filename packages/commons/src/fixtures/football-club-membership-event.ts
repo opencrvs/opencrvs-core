@@ -34,21 +34,21 @@ export const footballClubMembershipEvent = defineConfig({
     id: 'event.football-club-membership.label'
   },
   title: {
-    defaultMessage: '{applicant.firstname} {applicant.surname}',
+    defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
     description: 'This is the title of the summary',
     id: 'v2.event.football-club-membership.title'
   },
   summary: {
     fields: [
       {
-        id: 'applicant.firstname',
+        id: 'applicant.name.firstname',
         label: {
           defaultMessage: "Applicant's first name",
           description: 'This is the label for the field',
           id: 'event.football-club-membership.summary.field.firstname.label'
         },
         value: {
-          defaultMessage: '{applicant.firstname}',
+          defaultMessage: '{applicant.name.firstname}',
           description: 'This is the value to show in the summary',
           id: 'event.football-club-membership.summary.field.firstname'
         },
@@ -59,7 +59,7 @@ export const footballClubMembershipEvent = defineConfig({
         }
       },
       {
-        fieldId: 'applicant.surname',
+        fieldId: 'applicant.name.surname',
         label: {
           defaultMessage: "Applicant's last name",
           description: 'Label for surname',
@@ -418,8 +418,7 @@ export const footballClubMembershipEvent = defineConfig({
         id: 'v2.event.football-club-membership.search.applicants'
       },
       fields: [
-        field('applicant.firstname').fuzzy(),
-        field('applicant.surname').fuzzy(),
+        field('applicant.name').fuzzy(),
         field('applicant.dob').range(),
         field('applicant.email').exact()
       ]
@@ -430,10 +429,7 @@ export const footballClubMembershipEvent = defineConfig({
         description: 'Recommender details search field section title',
         id: 'v2.event.football-club-membership.search.recommender'
       },
-      fields: [
-        field('recommender.firstname').fuzzy(),
-        field('recommender.surname').fuzzy()
-      ]
+      fields: [field('recommender.name').fuzzy()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM

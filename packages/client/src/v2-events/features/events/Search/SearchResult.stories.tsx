@@ -11,9 +11,9 @@
 import { Meta, StoryObj } from '@storybook/react'
 import * as React from 'react'
 import {
-  dateOfEventColumn,
   eventQueryDataGenerator,
   EventStatus,
+  mandatoryColumns,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
@@ -42,28 +42,24 @@ const queryData = Array.from({ length: 12 }, (_, i) =>
   eventQueryDataGenerator(undefined, i)
 )
 
-const mockSearchParams = {
-  'applicant.firstname': 'Danny',
-  'applicant.dob': '1999-11-11'
-}
-
 export const DefaultSearchResult: Story = {
   name: 'Default Search Result',
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: [
       eventQueryDataGenerator({
         declaration: {
           'recommender.none': true,
-          'applicant.firstname': 'Danny',
-          'applicant.surname': 'Doe',
+          'applicant.name': {
+            firstname: 'Danny',
+            surname: 'Doe'
+          },
           'applicant.dob': '1999-11-11'
         },
-        status: EventStatus.REGISTERED
+        status: EventStatus.enum.REGISTERED
       })
     ],
-    searchParams: mockSearchParams,
-    columns: dateOfEventColumn
+    columns: mandatoryColumns
   }
 }
 export const SearchResultWithMultipleItems: Story = {
@@ -72,18 +68,19 @@ export const SearchResultWithMultipleItems: Story = {
     chromatic: { disableSnapshot: true }
   },
   args: {
-    eventConfig: tennisClubMembershipEvent,
-    queryData: queryData.map((e) => ({ ...e, status: EventStatus.REGISTERED })),
-    searchParams: { status: EventStatus.REGISTERED },
-    columns: dateOfEventColumn
+    eventConfigs: [tennisClubMembershipEvent],
+    queryData: queryData.map((e) => ({
+      ...e,
+      status: EventStatus.enum.REGISTERED
+    })),
+    columns: mandatoryColumns
   }
 }
 export const NoSearchResult: Story = {
   name: 'No Search Result',
   args: {
-    eventConfig: tennisClubMembershipEvent,
+    eventConfigs: [tennisClubMembershipEvent],
     queryData: [],
-    searchParams: mockSearchParams,
-    columns: dateOfEventColumn
+    columns: mandatoryColumns
   }
 }

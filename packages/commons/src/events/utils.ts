@@ -17,7 +17,9 @@ import {
   isObject,
   get,
   has,
-  isNil
+  isNil,
+  uniqBy,
+  cloneDeep
 } from 'lodash'
 import {
   ActionType,
@@ -83,6 +85,19 @@ export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
 
 function getAllAnnotationFields(config: EventConfig): FieldConfig[] {
   return flattenDeep(config.actions.map(getActionAnnotationFields))
+}
+
+export function getAllUniqueFields(eventConfig: EventConfig) {
+  return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
+}
+
+export function getDeclarationFieldById(
+  config: EventConfig,
+  fieldId: string
+): FieldConfig {
+  const field = getAllUniqueFields(config).find((f) => f.id === fieldId)
+
+  return getOrThrow(field, `Field with id ${fieldId} not found in event config`)
 }
 
 /**
@@ -271,8 +286,12 @@ export function deepMerge<
   T extends Record<string, unknown>,
   K extends Record<string, unknown>
 >(currentDocument: T, actionDocument: K): T & K {
+  /**
+   * Cloning is essential since mergeWith mutates the first argument.
+   */
+  const currentDocumentClone = cloneDeep(currentDocument)
   return mergeWith(
-    currentDocument,
+    cloneDeep(currentDocumentClone),
     actionDocument,
     (previousValue, incomingValue) => {
       if (incomingValue === undefined) {
@@ -358,4 +377,11 @@ export function getMixedPath<T = unknown>(
 
   const result = resolve(obj, parts)
   return isNil(result) ? defaultValue : result
+}
+
+export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
+  const eventConfig = eventConfigs.find(
+    (eventConfiguration) => eventConfiguration.id === id
+  )
+  return getOrThrow(eventConfig, `Event config for ${id} not found`)
 }

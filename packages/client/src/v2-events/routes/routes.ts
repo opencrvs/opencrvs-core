@@ -104,7 +104,8 @@ export const ROUTES = {
       ADVANCED_SEARCH: route('advanced-search'),
       SEARCH_RESULT: route('search-result/:eventType', {
         params: { eventType: string().defined() }
-      })
+      }),
+      SEARCH: route('search')
     }
   )
 }

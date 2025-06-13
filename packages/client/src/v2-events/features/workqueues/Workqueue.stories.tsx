@@ -197,7 +197,7 @@ export const ReadyToPrintWorkqueue: Story = {
           }),
           tRPCMsw.event.list.query(() => {
             return queryData.filter(
-              (record) => record.status === EventStatus.REGISTERED
+              (record) => record.status === EventStatus.enum.REGISTERED
             )
           }),
           tRPCMsw.workqueue.config.list.query(() => {
@@ -208,14 +208,14 @@ export const ReadyToPrintWorkqueue: Story = {
               return {
                 ...acc,
                 [slug]: queryData.filter(
-                  (record) => record.status === EventStatus.REGISTERED
+                  (record) => record.status === EventStatus.enum.REGISTERED
                 ).length
               }
             }, {})
           }),
           tRPCMsw.event.search.query((input) => {
             return queryData.filter(
-              (record) => record.status === EventStatus.REGISTERED
+              (record) => record.status === EventStatus.enum.REGISTERED
             )
           })
         ]

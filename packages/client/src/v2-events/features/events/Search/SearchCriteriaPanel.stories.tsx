@@ -10,14 +10,13 @@
  */
 import * as React from 'react'
 import { Meta, StoryObj } from '@storybook/react'
-import { noop } from 'lodash'
-import { EventState, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { TabSearch } from './TabSearch'
+import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
 
-const meta: Meta<typeof TabSearch> = {
-  title: 'Components/TabSearch',
-  component: TabSearch,
+const meta: Meta<typeof SearchCriteriaPanel> = {
+  title: 'Components/SearchCriteriaPanel',
+  component: SearchCriteriaPanel,
   parameters: {
     layout: 'centered'
   },
@@ -32,16 +31,20 @@ const meta: Meta<typeof TabSearch> = {
 
 export default meta
 
-type Story = StoryObj<typeof TabSearch>
+type Story = StoryObj<typeof SearchCriteriaPanel>
+
+const mockSearchParams = {
+  'applicant.name': {
+    firstname: 'Danny',
+    surname: 'DeVito'
+  },
+  'applicant.dob': '1999-11-11'
+}
 
 export const DefaultSearchResult: Story = {
-  name: 'TabSearch',
+  name: 'SearchCriteriaPanel',
   args: {
-    currentEvent: tennisClubMembershipEvent,
-    fieldValues: {
-      'applicant.firstname': 'Danny',
-      'applicant.dob': '1999-11-11'
-    },
-    onChange: (updateForm: EventState) => noop(updateForm)
+    eventConfig: tennisClubMembershipEvent,
+    searchParams: mockSearchParams
   }
 }

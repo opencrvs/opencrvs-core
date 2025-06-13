@@ -180,7 +180,8 @@ test(`${ActionType.PRINT_CERTIFICATE} is idempotent`, async () => {
     transactionId: getUUID()
   })
   const printCertificatePayload = generator.event.actions.printCertificate(
-    registeredEvent.id
+    registeredEvent.id,
+    { keepAssignment: true }
   )
   const firstResponse = await client.event.actions.printCertificate.request(
     printCertificatePayload

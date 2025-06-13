@@ -130,7 +130,9 @@ test(`${ActionType.ARCHIVE} action is idempotent`, async () => {
     transactionId: getUUID()
   })
 
-  const archivePayload = generator.event.actions.archive(originalEvent.id)
+  const archivePayload = generator.event.actions.archive(originalEvent.id, {
+    keepAssignment: true
+  })
 
   const firstResponse =
     await client.event.actions.archive.request(archivePayload)

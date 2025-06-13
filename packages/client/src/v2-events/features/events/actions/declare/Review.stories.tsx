@@ -52,7 +52,10 @@ const eventDocument = generateEventDocument({
 })
 
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument(eventId)
+const draft = generateEventDraftDocument({
+  eventId,
+  actionType: ActionType.REGISTER
+})
 
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
@@ -383,7 +386,10 @@ export const ReviewShowsFilesFromDraft: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(createdEvent.id, ActionType.DECLARE)
+              generateEventDraftDocument({
+                eventId: createdEvent.id,
+                actionType: ActionType.DECLARE
+              })
             ]
           })
         ],

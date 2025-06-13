@@ -39,7 +39,7 @@ function getDeSerializedQuery(
 }
 
 export const useWorkqueue = (workqueueSlug: string) => {
-  // @ToDo: remove `legacyUser` once `getUser` provides primaryOfficeId
+  // @TODO: remove `legacyUser` once `getUser` provides primaryOfficeId
   const legacyUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')

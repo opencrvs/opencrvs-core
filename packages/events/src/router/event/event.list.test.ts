@@ -56,8 +56,10 @@ test('Returns aggregated event with updated status and values', async () => {
   const client = createTestClient(user)
 
   const initialDeclaration = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'applicant.dob': '2000-01-01',
     'recommender.none': true,
     'applicant.address': {
@@ -81,12 +83,15 @@ test('Returns aggregated event with updated status and values', async () => {
   const initialEvents = await client.event.list()
 
   expect(initialEvents).toHaveLength(1)
-  expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
+  expect(initialEvents[0].status).toBe(EventStatus.enum.DECLARED)
   expect(initialEvents[0].declaration).toEqual(initialDeclaration)
 
   const updatedDeclaration = {
     ...initialDeclaration,
-    'applicant.firstname': 'Jane'
+    'applicant.name': {
+      firstname: 'Jane',
+      surname: 'Doe'
+    }
   }
 
   const createAction = event.actions.filter(
@@ -109,7 +114,7 @@ test('Returns aggregated event with updated status and values', async () => {
 
   expect(updatedEvents).toHaveLength(1)
 
-  expect(updatedEvents[0].status).toBe(EventStatus.DECLARED)
+  expect(updatedEvents[0].status).toBe(EventStatus.enum.DECLARED)
   expect(updatedEvents[0].declaration).toEqual(updatedDeclaration)
 })
 

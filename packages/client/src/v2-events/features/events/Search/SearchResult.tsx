@@ -21,7 +21,8 @@ import {
   WorkqueueColumn,
   deepDropNulls,
   applyDraftsToEventIndex,
-  EventState
+  EventState,
+  getEventConfigById
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -36,7 +37,6 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 import { useEventTitle } from '../useEvents/useEventTitle'
 
 const WithTestId = styled.div.attrs({
@@ -163,8 +163,8 @@ const messages = defineMessages(searchResultMessages)
 
 interface Props {
   columns: WorkqueueColumn[]
-  eventConfig: EventConfig
-  searchParams: EventState
+  eventConfigs: EventConfig[]
+  searchParams?: EventState
   queryData: EventIndex[]
 }
 
@@ -173,7 +173,7 @@ const ExtendedEventStatuses = {
   DRAFT: 'DRAFT'
 } as const
 
-export const SearchResultComponent = ({
+export const SearchResult = ({
   columns,
   queryData,
   eventConfigs,
@@ -379,31 +379,5 @@ export const SearchResultComponent = ({
         />
       </WQContentWrapper>
     </WithTestId>
-  )
-}
-export const SearchResult = ({
-  columns,
-  eventConfig,
-  searchParams,
-  queryData
-}: Props) => {
-  const intl = useIntl()
-  const total = queryData.length
-
-  return (
-    <SearchResultComponent
-      columns={columns}
-      eventConfigs={[eventConfig]}
-      queryData={queryData}
-      tabBarContent={
-        <SearchCriteriaPanel
-          eventConfig={eventConfig}
-          searchParams={searchParams}
-        />
-      }
-      title={`${intl.formatMessage(messages.searchResult)} ${
-        ' (' + total + ')'
-      }`}
-    />
   )
 }

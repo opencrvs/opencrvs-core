@@ -33,8 +33,10 @@ import { useModal } from '@client/v2-events/hooks/useModal'
 import { RejectionState, Review } from './Review'
 
 const mockDeclaration = {
-  'applicant.firstname': 'John',
-  'applicant.surname': 'Doe',
+  'applicant.name': {
+    firstname: 'John',
+    surname: 'Doe'
+  },
   'applicant.dob': '1990-01-01',
   'applicant.address': {
     country: 'FAR',
@@ -211,9 +213,11 @@ export const ReviewWithValidationErrors: Story = {
   },
   args: {
     form: {
-      'applicant.firstname': 'Mia',
       // @ts-ignore
-      'applicant.surname': undefined,
+      'applicant.name': {
+        firstname: 'Mia',
+        surname: undefined
+      },
       // @ts-ignore
       'applicant.dob': undefined,
       'applicant.email': 'mia@',

@@ -15,7 +15,8 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  SummaryConfig
+  SummaryConfig,
+  getMixedPath
 } from '@opencrvs/commons/client'
 import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -131,7 +132,7 @@ export function EventSummary({
 
     if ('fieldId' in field) {
       const config = declarationFields.find((f) => f.id === field.fieldId)
-      const value = event[field.fieldId] ?? undefined
+      const value = getMixedPath(event, field.fieldId, '')
 
       if (!config) {
         return null

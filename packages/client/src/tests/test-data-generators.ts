@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  createPrng,
   eventPayloadGenerator,
   getUUID,
   SCOPES as Scopes
@@ -28,7 +29,8 @@ const SCOPES = {
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
-export function testDataGenerator() {
+export function testDataGenerator(rngSeed?: number) {
+  const prng = createPrng(rngSeed ?? 1001)
   const user = {
     token: {
       /**
@@ -253,5 +255,5 @@ export function testDataGenerator() {
     }
   }
 
-  return { event: eventPayloadGenerator, user }
+  return { event: eventPayloadGenerator(prng), user }
 }

@@ -193,18 +193,6 @@ export const requireAssignment: MiddlewareFunction<
   ActionInputWithType | DeleteActionInput
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
-
-  // First check if the action is a duplicate
-  if (
-    'transactionId' in input &&
-    event.actions.some((action) => action.transactionId === input.transactionId)
-  ) {
-    return next({
-      ctx: { ...ctx, isDuplicateAction: true, event },
-      input
-    })
-  }
-
   const { user } = ctx
 
   const assignedTo = getAssignedUserFromActions(
@@ -230,6 +218,17 @@ export const requireAssignment: MiddlewareFunction<
     throw new TRPCError({
       code: 'CONFLICT',
       message: JSON.stringify('You are not assigned to this event')
+    })
+  }
+
+  // Check for duplicate only when we know the user is assigned to the event. Otherwise we will effectively leak the event (allow reading it) to users who are not assigned to it.
+  if (
+    'transactionId' in input &&
+    event.actions.some((action) => action.transactionId === input.transactionId)
+  ) {
+    return next({
+      ctx: { ...ctx, isDuplicateAction: true, event },
+      input
     })
   }
 

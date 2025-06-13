@@ -104,7 +104,10 @@ const eventDocument = generateEventDocument({
   actions: [ActionType.CREATE]
 })
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
+const draft = generateEventDraftDocument({
+  eventId,
+  actionType: ActionType.REGISTER
+})
 
 /**
  * Shareable msw configuration for declaration action flows with spies.

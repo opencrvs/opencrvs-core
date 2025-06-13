@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { cloneDeep } from 'lodash'
 import { Action } from './ActionDocument'
 import { ActionType } from './ActionType'
 import { findLastAssignmentAction, getMixedPath } from './utils'
@@ -211,5 +212,123 @@ describe('getMixedPath', () => {
 
   test.each(cases)('$description', ({ obj, path, defaultValue, expected }) => {
     expect(getMixedPath(obj, path, defaultValue)).toEqual(expected)
+  })
+})
+
+describe('deepMerge', () => {
+  const cases = [
+    {
+      description: 'Merging two simple objects',
+      obj1: { a: 1, b: 2 },
+      obj2: { b: 3, c: 4 },
+      expected: { a: 1, b: 3, c: 4 }
+    },
+    {
+      description: 'Merging nested objects',
+      obj1: { a: { x: 1 }, b: 2 },
+      obj2: { a: { y: 2 }, b: 3 },
+      // x is overridden completely
+      expected: { a: { y: 2 }, b: 3 }
+    },
+    {
+      description: 'Merging arrays within objects',
+      obj1: { a: [1, 2], b: 2 },
+      obj2: { a: [3, 4], b: 3 },
+      expected: { a: [3, 4], b: 3 }
+    },
+    {
+      description:
+        'Merging with deep nested structures and arrays in both objects',
+      obj1: {
+        a: {
+          x: [1, 2],
+          y: { z: [3] }
+        }
+      },
+      obj2: {
+        a: {
+          x: [4],
+          y: { z: [5, 6] }
+        }
+      },
+      expected: {
+        a: {
+          x: [4],
+          y: { z: [5, 6] }
+        }
+      }
+    },
+    {
+      description: 'Merging deep action declarations without mutating them',
+      obj1: {
+        actions: [
+          {
+            createdBy: '68497c34f1e1900a891aa81b',
+            createdByRole: 'REGISTRATION_AGENT',
+            createdAtLocation: 'b04a70a5-a158-44a9-a882-1e5714a7c0f5',
+            createdBySignature:
+              '/random-bucket/45450674-6523-441d-90d3-5ad66c7e57d1.png',
+            type: ActionType.DECLARE,
+            createdAt: '2025-06-11T12:53:08.085Z',
+            id: '01a8e3d9-6fce-4b4e-8aba-58f2f67976a0',
+
+            status: 'Accepted',
+            transactionId: '1238cce2-45e1-4c7d-98da-a357ef6bfc92',
+            declaration: {
+              'applicant.name': { firstname: 'Chris', surname: 'Sarajanen' }
+            }
+          }
+        ]
+      },
+      obj2: {
+        actions: [
+          {
+            createdBy: '68497c34f1e1900a891aa81b',
+            createdByRole: 'FIELD_AGENT',
+            createdAtLocation: 'b04a70a5-a158-44a9-a882-1e5714a7c0f5',
+            createdBySignature:
+              '/random-bucket/45450674-6523-441d-90d3-5ad66c7e57d1.png',
+            type: ActionType.DECLARE,
+            createdAt: '2025-06-11T12:53:08.085Z',
+            id: '01a8e3d9-6fce-4b4e-8aba-58f2f67976a0',
+            status: 'Accepted',
+            transactionId: '1238cce2-45e1-4c7d-98da-a357ef6bfc92',
+            declaration: {
+              'applicant.name': { firstname: 'Changed', surname: 'Name' }
+            }
+          }
+        ]
+      },
+      expected: {
+        actions: [
+          {
+            createdAt: '2025-06-11T12:53:08.085Z',
+            createdAtLocation: 'b04a70a5-a158-44a9-a882-1e5714a7c0f5',
+            createdBy: '68497c34f1e1900a891aa81b',
+            createdByRole: 'FIELD_AGENT',
+            createdBySignature:
+              '/random-bucket/45450674-6523-441d-90d3-5ad66c7e57d1.png',
+            declaration: {
+              'applicant.name': { firstname: 'Changed', surname: 'Name' }
+            },
+            id: '01a8e3d9-6fce-4b4e-8aba-58f2f67976a0',
+            status: 'Accepted',
+            transactionId: '1238cce2-45e1-4c7d-98da-a357ef6bfc92',
+            type: ActionType.DECLARE
+          }
+        ]
+      }
+    }
+  ]
+
+  test.each(cases)('$description', ({ obj1, obj2, expected }) => {
+    const cloneObj1 = cloneDeep(obj1)
+    const cloneObj2 = cloneDeep(obj2)
+
+    expect({ ...obj1, ...obj2 }).toEqual(expected)
+
+    // Make sure the method is not mutating the payload.
+    expect(obj1).toEqual(cloneObj1)
+    expect(obj2).toEqual(cloneObj2)
   })
 })

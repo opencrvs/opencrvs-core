@@ -58,13 +58,15 @@ exports[`Event document contains all created actions 1`] = `
         "applicant.age": 19,
         "applicant.dobUnknown": true,
         "applicant.email": "test@opencrvs.org",
-        "applicant.firstname": "applicant.firstname-TEXT-0",
         "applicant.image": {
           "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
-        "applicant.surname": "applicant.surname-TEXT-1",
+        "applicant.name": {
+          "firstname": "Sara",
+          "surname": "Sarajanen",
+        },
         "recommender.none": true,
       },
       "eventId": "[sanitized]",
@@ -74,14 +76,6 @@ exports[`Event document contains all created actions 1`] = `
       "type": "DECLARE",
     },
     {
-      "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": {
-          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-          "originalFilename": "abcd.png",
-          "type": "image/png",
-        },
-      },
       "assignedTo": "[sanitized]",
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
@@ -89,7 +83,6 @@ exports[`Event document contains all created actions 1`] = `
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "declaration": {},
-      "eventId": "[sanitized]",
       "id": "[sanitized]",
       "status": "Accepted",
       "transactionId": "[sanitized]",
@@ -139,13 +132,15 @@ exports[`Event document contains all created actions 1`] = `
         "applicant.age": 19,
         "applicant.dobUnknown": true,
         "applicant.email": "test@opencrvs.org",
-        "applicant.firstname": "applicant.firstname-TEXT-0",
         "applicant.image": {
           "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
-        "applicant.surname": "applicant.surname-TEXT-1",
+        "applicant.name": {
+          "firstname": "Sarachella",
+          "surname": "Smith",
+        },
         "recommender.none": true,
       },
       "duplicates": [],
@@ -156,14 +151,6 @@ exports[`Event document contains all created actions 1`] = `
       "type": "VALIDATE",
     },
     {
-      "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": {
-          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-          "originalFilename": "abcd.png",
-          "type": "image/png",
-        },
-      },
       "assignedTo": "[sanitized]",
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
@@ -171,8 +158,6 @@ exports[`Event document contains all created actions 1`] = `
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "declaration": {},
-      "duplicates": [],
-      "eventId": "[sanitized]",
       "id": "[sanitized]",
       "status": "Accepted",
       "transactionId": "[sanitized]",
@@ -222,13 +207,15 @@ exports[`Event document contains all created actions 1`] = `
         "applicant.age": 19,
         "applicant.dobUnknown": true,
         "applicant.email": "test@opencrvs.org",
-        "applicant.firstname": "applicant.firstname-TEXT-0",
         "applicant.image": {
           "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
-        "applicant.surname": "applicant.surname-TEXT-1",
+        "applicant.name": {
+          "firstname": "Michael",
+          "surname": "Johnson",
+        },
         "recommender.none": true,
       },
       "eventId": "[sanitized]",
@@ -239,14 +226,6 @@ exports[`Event document contains all created actions 1`] = `
       "type": "REGISTER",
     },
     {
-      "annotation": {
-        "review.comment": "review.comment-TEXTAREA-0",
-        "review.signature": {
-          "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-          "originalFilename": "abcd.png",
-          "type": "image/png",
-        },
-      },
       "assignedTo": "[sanitized]",
       "createdAt": "[sanitized]",
       "createdAtLocation": "[sanitized]",
@@ -254,9 +233,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
       "declaration": {},
-      "eventId": "[sanitized]",
       "id": "[sanitized]",
-      "registrationNumber": "1234567890AB",
       "status": "Accepted",
       "transactionId": "[sanitized]",
       "type": "UNASSIGN",
@@ -301,13 +278,15 @@ exports[`partial declaration update accounts for conditional field values not in
   "applicant.age": 25,
   "applicant.dobUnknown": true,
   "applicant.email": "test@opencrvs.org",
-  "applicant.firstname": "applicant.firstname-TEXT-0",
   "applicant.image": {
     "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     "originalFilename": "abcd.png",
     "type": "image/png",
   },
-  "applicant.surname": "applicant.surname-TEXT-1",
+  "applicant.name": {
+    "firstname": "Sara",
+    "surname": "Sarajanen",
+  },
   "recommender.none": true,
 }
 `;

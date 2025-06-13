@@ -17,7 +17,8 @@ import {
   DeduplicationConfig,
   Clause,
   ClauseOutput,
-  FieldValue
+  FieldValue,
+  EventConfig
 } from '@opencrvs/commons/events'
 import {
   getOrCreateClient,
@@ -147,13 +148,14 @@ function generateElasticsearchQuery(
 
 export async function searchForDuplicates(
   eventIndex: EventIndex,
-  configuration: DeduplicationConfig
+  configuration: DeduplicationConfig,
+  eventConfig: EventConfig
 ): Promise<{ score: number; event: EventIndex | undefined }[]> {
   const esClient = getOrCreateClient()
   const query = Clause.parse(configuration.query)
 
   const esQuery = generateElasticsearchQuery(
-    encodeEventIndex(eventIndex),
+    encodeEventIndex(eventIndex, eventConfig),
     query
   )
 
@@ -175,6 +177,6 @@ export async function searchForDuplicates(
     .filter((hit) => hit._source)
     .map((hit) => ({
       score: hit._score || 0,
-      event: hit._source && decodeEventIndex(hit._source)
+      event: hit._source && decodeEventIndex(eventConfig, hit._source)
     }))
 }

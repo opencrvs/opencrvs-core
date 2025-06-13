@@ -22,14 +22,28 @@ test('Throws error if Query includes workqueue that the user does not have scope
       slug: 'first-workqueue',
       query: {
         type: 'and',
-        clauses: []
+        clauses: [
+          {
+            status: {
+              type: 'exact',
+              term: 'ARCHIVED'
+            }
+          }
+        ]
       }
     },
     {
       slug: 'second-workqueue',
       query: {
         type: 'or',
-        clauses: []
+        clauses: [
+          {
+            status: {
+              type: 'exact',
+              term: 'ARCHIVED'
+            }
+          }
+        ]
       }
     }
   ]
@@ -45,14 +59,28 @@ test('Slugs in response matches input', async () => {
       slug: 'recent',
       query: {
         type: 'and',
-        clauses: []
+        clauses: [
+          {
+            status: {
+              type: 'exact',
+              term: 'ARCHIVED'
+            }
+          }
+        ]
       }
     },
     {
       slug: 'assigned-to-you',
       query: {
         type: 'or',
-        clauses: []
+        clauses: [
+          {
+            status: {
+              type: 'exact',
+              term: 'ARCHIVED'
+            }
+          }
+        ]
       }
     }
   ]
