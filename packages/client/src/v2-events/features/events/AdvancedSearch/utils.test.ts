@@ -9,8 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  EventStatus,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
+import { joinValues } from '@client/v2-events/utils'
 import {
   getAdvancedSearchFieldErrors,
   flattenFieldErrors,
@@ -107,18 +111,22 @@ describe('buildDataCondition', () => {
   it('should return anyOf condition for status=ALL', () => {
     const state = { 'event.status': 'ALL' }
     const result = buildDataCondition(state, tennisClubMembershipEvent)
+    const eventStatusField = joinValues(
+      'event.status'.split('.'),
+      FIELD_SEPARATOR
+    )
     //@ts-ignore
-    expect(result[`event${FIELD_SEPARATOR}status`]).toEqual({
+    expect(result[eventStatusField]).toEqual({
       type: 'anyOf',
       terms: [
-        'CREATED',
-        'NOTIFIED',
-        'DECLARED',
-        'VALIDATED',
-        'REGISTERED',
-        'CERTIFIED',
-        'REJECTED',
-        'ARCHIVED'
+        EventStatus.CREATED,
+        EventStatus.NOTIFIED,
+        EventStatus.DECLARED,
+        EventStatus.VALIDATED,
+        EventStatus.REGISTERED,
+        EventStatus.CERTIFIED,
+        EventStatus.REJECTED,
+        EventStatus.ARCHIVED
       ]
     })
   })
@@ -126,11 +134,13 @@ describe('buildDataCondition', () => {
   it('should generate exact match condition for trackingId', () => {
     const state = { 'event.legalStatus.REGISTERED.createdAtLocation': 'ABC123' }
     const result = buildDataCondition(state, tennisClubMembershipEvent)
+    const field = joinValues(
+      'event.legalStatus.REGISTERED.createdAtLocation'.split('.'),
+      FIELD_SEPARATOR
+    )
     expect(
       //@ts-ignore
-      result[
-        `event${FIELD_SEPARATOR}legalStatus${FIELD_SEPARATOR}REGISTERED${FIELD_SEPARATOR}createdAtLocation`
-      ]
+      result[field]
     ).toEqual({
       type: 'exact',
       term: 'ABC123'
