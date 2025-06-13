@@ -415,26 +415,28 @@ function metadataFieldTypeMapping(value: string) {
 function addMetadataFieldsInQuickSearchQuery(
   clauses: QueryExpression[],
   terms: string[]
-) {
+): QueryExpression[] {
+  const updatedClauses = [...clauses]
   for (const term of terms) {
     const mappings = metadataFieldTypeMapping(term)
 
     for (const mapping of mappings) {
       for (const [field, config] of Object.entries(mapping)) {
-        clauses.push({
+        updatedClauses.push({
           [field]: config
         })
       }
     }
   }
+
+  return updatedClauses
 }
 
 function buildQueryFromQuickSearchFields(
   searchableFields: Inferred[],
   terms: string[]
 ): QueryType {
-  const clauses: QueryExpression[] = []
-
+  let clauses: QueryExpression[] = []
   for (const field of searchableFields) {
     const matchType =
       searchFieldTypeMapping[field.type as keyof typeof searchFieldTypeMapping]
@@ -450,7 +452,7 @@ function buildQueryFromQuickSearchFields(
     }
   }
 
-  addMetadataFieldsInQuickSearchQuery(clauses, terms)
+  clauses = addMetadataFieldsInQuickSearchQuery(clauses, terms)
 
   return {
     type: QUICK_SEARCH_KEY,
