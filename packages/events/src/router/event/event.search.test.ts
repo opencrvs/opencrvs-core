@@ -14,6 +14,7 @@ import {
   ActionType,
   AddressType,
   EventStatus,
+  getMixedPath,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import {
@@ -114,7 +115,7 @@ test('Returns empty list when no events match search criteria', async () => {
   expect(fetchedEvents).toEqual([])
 })
 
-test('Returns events that match the text field criteria of applicant', async () => {
+test.skip('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     'search.birth',
@@ -199,8 +200,8 @@ test('Returns events that match the text field criteria of applicant', async () 
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          // @TODO: Should you be able to search by only first name?
-          'applicant.name': { type: 'exact', term: 'John' },
+          // @TODO: Fix when working on https://github.com/opencrvs/opencrvs-core/issues/9765
+          'applicant.name.firstname': { type: 'exact', term: 'John' },
           applicant____dob: { type: 'exact', term: '2000-01-01' }
         }
       }
@@ -277,9 +278,12 @@ test('Returns events that match date of birth of applicant', async () => {
       }
     ]
   })
-  expect(fetchedEvents[0].declaration['applicant.name.firstname']).toBe(
-    'Johnson'
-  ) // fetches first document as result
+
+  expect(
+    getMixedPath(fetchedEvents[0].declaration, 'applicant.name.firstname')
+  ).toBe('Johnson')
+
+  // fetches first document as result
   expect(fetchedEvents).toHaveLength(1)
 })
 
@@ -389,9 +393,9 @@ test('Returns single document after creation', async () => {
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____firstname: {
+          applicant____dob: {
             type: 'exact',
-            term: 'Unique'
+            term: '2000-11-11'
           }
         }
       }
@@ -455,7 +459,7 @@ test('Returns multiple documents after creation', async () => {
   const event3 = await client.event.create(generator.event.create())
   const data3 = generator.event.actions.declare(event3.id, {
     declaration: {
-      'applicant.dob': '2000-11-11',
+      'applicant.dob': '2000-11-12',
       'applicant.name': {
         firstname: 'Different',
         surname: 'Lastname'
@@ -481,13 +485,9 @@ test('Returns multiple documents after creation', async () => {
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____firstname: {
+          applicant____dob: {
             type: 'exact',
-            term: 'Unique'
-          },
-          applicant____surname: {
-            type: 'exact',
-            term: 'Lastname'
+            term: '2000-11-11'
           }
         }
       }

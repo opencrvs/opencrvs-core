@@ -7,7 +7,7 @@ exports[`Returns relevant events in right order 1`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-  "dateOfEvent": "2025-06-11",
+  "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
       "addressType": "DOMESTIC",
@@ -64,7 +64,7 @@ exports[`Returns relevant events in right order 2`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-  "dateOfEvent": "2025-06-11",
+  "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
       "addressType": "DOMESTIC",
