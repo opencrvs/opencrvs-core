@@ -14,14 +14,6 @@ import { joinValues } from './utils'
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
 
-function withPostfix(str: string, postfix: string) {
-  if (str.endsWith(postfix)) {
-    return str
-  }
-
-  return str + postfix
-}
-
 /**
  * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
  * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
