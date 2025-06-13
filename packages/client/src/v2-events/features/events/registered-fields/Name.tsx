@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { IntlShape } from 'react-intl'
 import {
   field,
   FieldConfig,
@@ -73,9 +74,14 @@ function NameInput(props: Props) {
   )
 }
 
+function stringify(value: NameFieldValue) {
+  return joinValues([value?.firstname, value?.middlename, value?.surname])
+}
+
 export const Name = {
   Input: NameInput,
   Output: ({ value }: { value?: NameFieldValue }) => (
-    <>{joinValues([value?.firstname, value?.surname])}</>
-  )
+    <>{joinValues([value?.firstname, value?.middlename, value?.surname])}</>
+  ),
+  stringify
 }
