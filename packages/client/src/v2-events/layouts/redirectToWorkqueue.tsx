@@ -30,7 +30,10 @@ export const RedirectToWorkqueue = () => {
         }
       )
     } else {
-      // redirect to old site.
+      /**
+       * Some users (e.g., National System Admin) might not have access to any workqueue.
+       * In that case, redirect the user to the old site so that other v1 operations can be performed.
+       */
       navigate(path, { replace: true })
     }
   }, [workqueues, navigate, path])
