@@ -64,10 +64,7 @@ export function getDeclaration(configuration: EventConfig) {
 
 export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return [
-      ...actionConfig.onboardingForm.flatMap(({ fields }) => fields),
-      ...actionConfig.additionalDetailsForm.flatMap(({ fields }) => fields)
-    ]
+    return actionConfig.correctionForm.pages.flatMap(({ fields }) => fields)
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
@@ -95,7 +92,7 @@ export const findRecordActionPages = (
   const action = config.actions.find((a) => a.type === actionType)
 
   if (action?.type === ActionType.REQUEST_CORRECTION) {
-    return [...action.onboardingForm, ...action.additionalDetailsForm]
+    return action.correctionForm.pages
   }
 
   if (action?.type === ActionType.PRINT_CERTIFICATE) {
@@ -229,13 +226,10 @@ export function getActionVerificationPageIds(
   annotation: ActionUpdate
 ): string[] {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return [
-      ...getVisibleVerificationPageIds(actionConfig.onboardingForm, annotation),
-      ...getVisibleVerificationPageIds(
-        actionConfig.additionalDetailsForm,
-        annotation
-      )
-    ]
+    return getVisibleVerificationPageIds(
+      actionConfig.correctionForm.pages,
+      annotation
+    )
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
