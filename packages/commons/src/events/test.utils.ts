@@ -16,7 +16,6 @@ import { getUUID } from '../uuid'
 import {
   ActionBase,
   ActionDocument,
-  ActionUpdate,
   ActionStatus,
   EventState
 } from './ActionDocument'
@@ -24,6 +23,7 @@ import {
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
+  NotifyActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
@@ -310,11 +310,12 @@ export function eventPayloadGenerator(rng: () => number) {
        */
       notify: (
         eventId: string,
-        input: {
-          transactionId?: string
-          declaration?: Partial<ActionUpdate>
-          keepAssignment?: boolean
-        } = {}
+        input: Partial<
+          Pick<
+            NotifyActionInput,
+            'transactionId' | 'declaration' | 'keepAssignment'
+          >
+        > = {}
       ) => {
         let declaration = input.declaration
         if (!declaration) {
