@@ -460,19 +460,37 @@ function buildQueryFromQuickSearchFields(
   } as QueryType
 }
 
+/**
+ * Builds a quick search query for Elasticsearch based on the provided search parameters and event configurations.
+ *
+ * Quick search is designed for user-friendly, broad matching. It performs:
+ * - `fuzzy` matches on fields like name.
+ * - `exact` matches on fields like ID, email, phone.
+ * - additional exact matches on metadata fields like `trackingId` and `registrationNumber`.
+ *
+ * The resulting query uses `OR` logic (`type: 'or'`), meaning any matching clause is sufficient.
+ *
+ * @param searchParams - A flat object of field-value pairs submitted from the UI.
+ * @param events - The event configurations to extract searchable fields from.
+ * @returns QueryType - A structured query used to hit Elasticsearch.
+ */
 export function buildQuickSearchQuery(
   searchParams: Record<string, string>,
   events: EventConfig[]
 ): QueryType {
+  // Flatten all searchable fields from the selected events
   const fieldsOfEvents = events.reduce<Inferred[]>((acc, event) => {
     const fields = getAllUniqueFields(event)
     return [...acc, ...fields]
   }, [])
 
+  // Filter fields to only include those that are supported in quick search
   const fieldsToSearch = fieldsOfEvents.filter((field) =>
     searchFields.includes(field.type as keyof typeof searchFieldTypeMapping)
   )
+  // Get all non-empty search terms from user input
   const terms = Object.values(searchParams).filter(Boolean)
 
+  // Delegate to the actual query builder
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
 }
