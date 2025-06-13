@@ -16,7 +16,8 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect } from '@storybook/test'
 import {
   eventQueryDataGenerator,
-  generateWorkqueues
+  generateWorkqueues,
+  NameFieldValue
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -25,6 +26,7 @@ import {
   tennisClubMembershipEventDocument
 } from '@client/v2-events/features/events/fixtures'
 import { formattedDuration } from '@client/utils/date-formatting'
+import { Name } from '../events/registered-fields'
 import { WorkqueueIndex } from './index'
 
 const meta: Meta<typeof WorkqueueIndex> = {
@@ -92,9 +94,10 @@ export const SortWorkqueue: Story = {
     const LastUpdatedHeader = await canvas.findByText('Last updated')
 
     await userEvent.click(TitleHeader)
-    const names = queryData.map(
-      ({ declaration }) =>
-        `${declaration['applicant.firstname']} ${declaration['applicant.surname']}`
+    const names = queryData.map(({ declaration }) =>
+      declaration['applicant.name']
+        ? Name.stringify(declaration['applicant.name'] as NameFieldValue)
+        : ''
     )
     const sortedNames = [...names].sort((a, b) => a.localeCompare(b))
     const reverseSortedNames = [...sortedNames].reverse()
