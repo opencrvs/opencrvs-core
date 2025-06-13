@@ -15,16 +15,11 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
-  findLastAssignmentAction
+  findLastAssignmentAction,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
-
-export function findLocalEventData(eventId: string) {
-  return queryClient.getQueryData(
-    trpcOptionsProxy.event.get.queryKey(eventId)
-  ) as EventDocument | undefined
-}
 
 export function findLocalEventConfig(eventType: string) {
   return queryClient
@@ -39,7 +34,30 @@ export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
   )
 }
 
+export function updateLocalEventIndex(updatedEvent: EventDocument) {
+  const config = findLocalEventConfig(updatedEvent.type)
+  if (!config) {
+    throw new Error(
+      `Event configuration for type ${updatedEvent.type} not found`
+    )
+  }
+  return queryClient.setQueryData(
+    trpcOptionsProxy.event.search.queryKey({
+      type: 'and',
+      clauses: [{ id: updatedEvent.id }]
+    }),
+    () => [getCurrentEventState(updatedEvent, config)]
+  )
+}
+
+export function findLocalEventDocument(eventId: string) {
+  return queryClient.getQueryData(
+    trpcOptionsProxy.event.get.queryKey(eventId)
+  ) as EventDocument | undefined
+}
+
 export function setEventData(id: string, data: EventDocument) {
+  updateLocalEventIndex(data)
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
 }
 
@@ -100,12 +118,5 @@ export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
   deleteEventData(id)
-
   await removeCachedFiles(updatedEvent)
-
-  /**
-   * deleteEventData() is overridden by updateLocalEvent().
-   * We should instead update the query that returns a specific eventIndex when it's implemented.
-   */
-  await updateLocalEvent(updatedEvent)
 }
