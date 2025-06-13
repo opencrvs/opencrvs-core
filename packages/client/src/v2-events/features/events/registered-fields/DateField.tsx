@@ -80,7 +80,7 @@ function DateOutput({ value }: { value?: string }) {
     )
   }
 
-  return value ?? ''
+  return String(value ?? '')
 }
 
 function stringify(intl: IntlShape, value?: string) {
@@ -94,7 +94,7 @@ function stringify(intl: IntlShape, value?: string) {
     )
   }
 
-  return value ?? ''
+  return String(value ?? '')
 }
 
 export const DateField = {
