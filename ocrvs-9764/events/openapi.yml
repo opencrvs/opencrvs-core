@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a2bb9168-b0c6-4f14-8849-2ad7fe9dff99
+                transactionId: 4af7865d-8266-43ac-9d6c-2b8fbf315729
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 883b3ce2-07c9-47a2-a2f1-6d5293d0a8f3
+                transactionId: 9c5e46a9-b6fa-49ac-8682-cbe5fc0ff9e1
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9383,6 +9383,7 @@ components:
               - type: string
                 enum:
                   - certificate-printed
+                  - correction-requested
         declaration:
           type: object
           additionalProperties:
