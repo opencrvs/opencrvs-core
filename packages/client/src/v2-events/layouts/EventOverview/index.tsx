@@ -69,7 +69,7 @@ export function EventOverviewLayout({
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
 
-  const eventResults = searchEventById.useSuspenseQuery(eventId)
+  const eventResults = searchEventById.useQuery(eventId).data
 
   if (!eventResults) {
     return

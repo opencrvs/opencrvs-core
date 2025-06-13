@@ -37,8 +37,9 @@ export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
 export function updateLocalEventIndex(updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
   if (!config) {
-    console.error(`Event configuration for type ${updatedEvent.type} not found`)
-    return
+    throw new Error(
+      `Event configuration for type ${updatedEvent.type} not found`
+    )
   }
   return queryClient.setQueryData(
     trpcOptionsProxy.event.search.queryKey({
