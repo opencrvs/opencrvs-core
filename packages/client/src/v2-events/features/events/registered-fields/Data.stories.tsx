@@ -60,10 +60,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
               },
               data: [
                 {
-                  fieldId: 'applicant.name.firstname'
-                },
-                {
-                  fieldId: 'applicant.name.surname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'applicant.dob'
@@ -129,14 +126,14 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.name.firstname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'recommender.none'
                 },
                 // recommender.name.firstname is not rendered, because recommender.none is true
                 {
-                  fieldId: 'recommender.name.firstname'
+                  fieldId: 'recommender.name'
                 }
               ]
             }
@@ -189,11 +186,11 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.name.firstname'
+                  fieldId: 'applicant.name'
                 },
                 // recommender.name.firstname is rendered, because recommender.none is false
                 {
-                  fieldId: 'recommender.name.firstname'
+                  fieldId: 'recommender.name'
                 }
               ]
             }

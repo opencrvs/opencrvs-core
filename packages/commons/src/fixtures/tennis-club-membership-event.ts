@@ -39,29 +39,16 @@ export const tennisClubMembershipEvent = defineConfig({
   summary: {
     fields: [
       {
-        id: 'applicant.name.firstname',
+        fieldId: 'applicant.name',
         label: {
-          defaultMessage: "Applicant's first name",
+          defaultMessage: "Applicant's name",
           description: 'This is the label for the field',
           id: 'event.tennis-club-membership.summary.field.firstname.label'
-        },
-        value: {
-          defaultMessage: '{applicant.name.firstname}',
-          description: 'This is the value to show in the summary',
-          id: 'event.tennis-club-membership.summary.field.firstname'
         },
         emptyValueMessage: {
           defaultMessage: 'First name is not provided',
           description: 'This is the message to show when the field is empty',
           id: 'event.tennis-club-membership.summary.field.firstname.empty'
-        }
-      },
-      {
-        fieldId: 'applicant.name.surname',
-        label: {
-          defaultMessage: "Applicant's last name",
-          description: 'Label for surname',
-          id: 'v2.event.tennis-club-membership.summary.field.surname.label'
         }
       },
       {
