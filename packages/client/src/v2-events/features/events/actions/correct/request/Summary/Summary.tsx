@@ -121,7 +121,7 @@ export function Summary() {
   const formConfig = getDeclaration(eventConfiguration)
   const fields = getDeclarationFields(eventConfiguration)
   const { getAnnotation } = useActionAnnotation()
-  const annotationForm = getAnnotation()
+  const annotation = getAnnotation()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
@@ -129,20 +129,15 @@ export function Summary() {
     )?.correctionForm.pages || []
 
   const submitCorrection = React.useCallback(() => {
-    const formWithOnlyChangedValues = Object.entries(form).reduce<typeof form>(
-      (acc, [key, value]) => {
-        if (value !== previousFormValues[key]) {
-          acc[key] = value
-        }
-        return acc
-      },
-      {}
+    const formWithOnlyChangedValues = Object.fromEntries(
+      Object.entries(form).filter(
+        ([key, value]) => !isEqual(value, previousFormValues[key])
+      )
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
       const wasVisible = isFieldVisible(field, previousFormValues)
       const isHidden = !isFieldVisible(field, form)
-
       return wasVisible && isHidden
     })
 
@@ -157,7 +152,7 @@ export function Summary() {
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      annotation: annotationForm
+      annotation
     })
     goToHome()
   }, [
@@ -165,7 +160,7 @@ export function Summary() {
     fields,
     events.actions.correction.request,
     eventId,
-    annotationForm,
+    annotation,
     goToHome,
     previousFormValues
   ])
@@ -285,11 +280,11 @@ export function Summary() {
 
           {correctionFormPages.map((page) => {
             const pageFields = page.fields
-              .filter((f) => isFieldVisible(f, { ...form, ...annotationForm }))
+              .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
               .map((field) => {
                 const valueDisplay = Output({
                   field,
-                  value: annotationForm[field.id],
+                  value: annotation[field.id],
                   showPreviouslyMissingValuesAsChanged: false
                 })
 
@@ -317,9 +312,7 @@ export function Summary() {
                 content={pageFields.map(({ valueDisplay, label }) => {
                   if (label.defaultMessage) {
                     return {
-                      firstColumn: label.defaultMessage
-                        ? intl.formatMessage(label)
-                        : valueDisplay,
+                      firstColumn: intl.formatMessage(label),
                       secondColumn: valueDisplay
                     }
                   }
