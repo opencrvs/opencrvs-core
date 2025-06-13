@@ -190,14 +190,13 @@ function ActionComponent({
 }) {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
-  // @ToDo: Investigate hook count mismatch
   const { config: configs } = useAction(event)
+  const actionMenuItems = useActionMenuItems(event)
 
   const intl = useIntl()
 
   let config: ActionConfig | undefined
   if (actionType === 'DEFAULT') {
-    const actionMenuItems = useActionMenuItems(event)
     config = actionMenuItems.find(
       ({ type }) =>
         !(
