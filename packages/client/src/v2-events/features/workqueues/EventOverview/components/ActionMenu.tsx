@@ -11,7 +11,6 @@
 
 import React, { useMemo } from 'react'
 import { useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
 
 import { getCurrentEventState } from '@opencrvs/commons/client'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
@@ -19,7 +18,6 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
-import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionMenuItems } from './useActionMenuItems'
 
@@ -32,7 +30,6 @@ export function ActionMenu({
 }) {
   const intl = useIntl()
   const events = useEvents()
-  const scopes = useSelector(getScope)
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -42,7 +39,7 @@ export function ActionMenu({
     [event, eventConfiguration]
   )
 
-  const actionMenuItems = useActionMenuItems(eventState, scopes ?? [])
+  const actionMenuItems = useActionMenuItems(eventState)
 
   return (
     <>
@@ -62,7 +59,7 @@ export function ActionMenu({
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
-                  await action.onClick(event.id)
+                  await action.onClick()
                   onAction?.()
                 }}
               >

@@ -38,7 +38,7 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const { modal, goToHome } = useEventFormNavigation()
+  const { modal, goToHome, goToWorkqueue } = useEventFormNavigation()
   const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
@@ -71,7 +71,9 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          searchParams.workqueue
+            ? goToWorkqueue(searchParams.workqueue)
+            : goToHome()
         })
       }
     >
@@ -93,7 +95,12 @@ export function Pages() {
           )
         }
         onSubmit={() =>
-          navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
+          navigate(
+            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
+          )
         }
       />
       {saveAndExitModal}
