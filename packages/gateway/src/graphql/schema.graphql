@@ -1343,6 +1343,8 @@ type StatusReason {
 type IntegratedSystem {
   name: String
   username: String
+  id: ID
+  officeId: String
   type: String
 }
 
