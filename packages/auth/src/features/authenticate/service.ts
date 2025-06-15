@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { JWT_ISSUER } from '@auth/constants'
 import { resolve } from 'url'
 import { readFileSync } from 'fs'
@@ -82,7 +81,7 @@ export async function authenticate(
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
+  const body: any = await res.json()
 
   return {
     name: body.name,
@@ -110,7 +109,7 @@ export async function authenticateSystem(
     throw Error(res.statusText)
   }
 
-  const body = await res.json()
+  const body: any = await res.json()
   return {
     systemId: body.id,
     scope: body.scope,
