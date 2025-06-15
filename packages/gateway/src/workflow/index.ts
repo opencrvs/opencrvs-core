@@ -25,7 +25,6 @@ import {
   getComposition
 } from '@opencrvs/commons/types'
 import { WORKFLOW_URL } from '@gateway/constants'
-import fetch from '@gateway/fetch'
 import {
   GQLBirthRegistrationInput,
   GQLCertificateInput,
@@ -58,14 +57,14 @@ const createRequest = async <T = any>(
 
   if (!response.ok) {
     if (response.status === 400) {
-      const data = await response.json()
+      const data = (await response.json()) as { message: string }
       throw new Error(data.message)
     }
 
     throw new Error(response.statusText)
   }
 
-  return response.json()
+  return response.json() as Promise<T>
 }
 
 export function requestRegistrationCorrection(

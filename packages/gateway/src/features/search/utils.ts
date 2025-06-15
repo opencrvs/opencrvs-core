@@ -15,7 +15,6 @@ import {
   GQLEventType
 } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
-import fetch from '@gateway/fetch'
 import { Scope, SCOPES } from '@opencrvs/commons/authentication'
 
 export interface ISearchCriteria {

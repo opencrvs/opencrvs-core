@@ -10,7 +10,6 @@
  */
 import { DOCUMENTS_URL } from '@gateway/constants'
 import { IAuthHeader } from '@opencrvs/commons'
-import fetch from '@gateway/fetch'
 
 export const fetchDocuments = async <T = any>(
   suffix: string,
@@ -27,7 +26,7 @@ export const fetchDocuments = async <T = any>(
     body
   })
   const res = await result.json()
-  return res
+  return res as T
 }
 
 export async function uploadBase64ToMinio(

@@ -158,17 +158,19 @@ export const resolvers: GQLResolver = {
       }
 
       if (isExternalAPI && system) {
-        const getTotalRequest = await getMetrics(
+        const getTotalRequest = (await getMetrics(
           '/advancedSearch',
           {},
           authHeader
-        )
+        )) as { total: number }
         if (getTotalRequest.total >= system.settings.dailyQuota) {
           throw new RateLimitError('Daily search quota exceeded')
         }
 
         const searchResult: ApiResponse<ISearchResponse<any>> =
-          await postAdvancedSearch(authHeader, searchCriteria)
+          (await postAdvancedSearch(authHeader, searchCriteria)) as ApiResponse<
+            ISearchResponse<any>
+          >
 
         if ((searchResult?.statusCode ?? 0) >= 400) {
           const errMsg = searchResult as Options<string>
@@ -208,8 +210,10 @@ export const resolvers: GQLResolver = {
 
         searchCriteria.parameters = { ...transformedSearchParams }
 
-        const searchResult: ApiResponse<ISearchResponse<any>> =
-          await postAdvancedSearch(authHeader, searchCriteria)
+        const searchResult = (await postAdvancedSearch(
+          authHeader,
+          searchCriteria
+        )) as ApiResponse<ISearchResponse<any>>
         return {
           totalItems: searchResult?.body?.hits?.total?.value ?? 0,
           results: searchResult?.body?.hits?.hits ?? []
@@ -249,7 +253,9 @@ export const resolvers: GQLResolver = {
       }
 
       const searchResult: ApiResponse<ISearchResponse<any>> =
-        await postAdvancedSearch(authHeader, searchCriteria)
+        (await postAdvancedSearch(authHeader, searchCriteria)) as ApiResponse<
+          ISearchResponse<any>
+        >
       return {
         totalItems: searchResult?.body?.hits?.total?.value || 0,
         results: searchResult?.body?.hits?.hits || []

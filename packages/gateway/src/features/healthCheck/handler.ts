@@ -19,14 +19,13 @@ import {
   COUNTRY_CONFIG_URL,
   WORKFLOW_URL
 } from '@gateway/constants'
-import fetch from '@gateway/fetch'
 
 export async function checkServiceHealth(url: string) {
   const res = await fetch(url, {
     method: 'GET'
   })
 
-  const body = await res.json()
+  const body = (await res.json()) as { success: boolean }
 
   if (body.success === true) {
     return true

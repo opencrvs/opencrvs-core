@@ -11,7 +11,8 @@
 import { join } from 'path'
 import fetch from 'jest-fetch-mock'
 
-jest.setMock('node-fetch', fetch)
+//@ts-ignore
+globalThis.fetch = fetch
 jest.setMock('@opencrvs/commons/monitoring', {})
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')

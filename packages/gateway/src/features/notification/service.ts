@@ -10,12 +10,15 @@
  */
 import { IAuthHeader } from '@opencrvs/commons'
 import { USER_MANAGEMENT_URL, NOTIFICATION_URL } from '@gateway/constants'
-import fetch from '@gateway/fetch'
 import { IUserModelData } from '@gateway/features/user/type-resolvers'
 import { internal } from '@hapi/boom'
 import { v4 as uuid } from 'uuid'
 
 const DEFAULT_PAGE_SIZE = 500
+
+interface ErrorResponse {
+  message: string
+}
 
 async function fetchAllUsers(authHeader: IAuthHeader) {
   const res = await fetch(`${USER_MANAGEMENT_URL}searchUsers`, {
@@ -37,7 +40,7 @@ async function fetchAllUsers(authHeader: IAuthHeader) {
       results: IUserModelData[]
     }>
   } else {
-    const errorResponse = await res.json()
+    const errorResponse = (await res.json()) as ErrorResponse
     throw internal('Error fetching user-mgnt: ' + errorResponse.message)
   }
 }
@@ -65,7 +68,7 @@ async function requestNotificationServiceToSendEmails(
     }
   })
   if (res.status !== 200) {
-    const errorResponse = await res.json()
+    const errorResponse = (await res.json()) as ErrorResponse
     throw internal('Error fetching notification: ' + errorResponse.message)
   }
 }

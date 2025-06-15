@@ -11,7 +11,6 @@
 import { METRICS_URL } from '@gateway/constants'
 import { IAuthHeader } from '@opencrvs/commons'
 import { IMetricsParam } from './root-resolvers'
-import fetch from '@gateway/fetch'
 
 export interface IEventDurationResponse {
   status: string
@@ -30,7 +29,9 @@ export const getEventDurationsFromMetrics = async (
     }
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<
+        IEventDurationResponse | IEventDurationResponse[]
+      >
     })
     .catch((error) => {
       return Promise.reject(

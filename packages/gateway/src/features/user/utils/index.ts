@@ -15,7 +15,6 @@ import {
   IUserModelData
 } from '@gateway/features/user/type-resolvers'
 import decode from 'jwt-decode'
-import fetch from '@gateway/fetch'
 import { Scope } from '@opencrvs/commons/authentication'
 import { fetchLocation, fetchLocationHierarchy } from '@gateway/location'
 import { resourceIdentifierToUUID } from '@opencrvs/commons/types'
@@ -41,7 +40,7 @@ export async function getUser(
       ...authHeader
     }
   })
-  return await res.json()
+  return (await res.json()) as IUserModelData
 }
 
 export async function getSystem(
@@ -56,7 +55,7 @@ export async function getSystem(
       ...authHeader
     }
   })
-  return await res.json()
+  return (await res.json()) as ISystemModelData
 }
 
 export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
@@ -74,6 +73,7 @@ export async function getUserMobile(userId: string, authHeader: IAuthHeader) {
     return body
   } catch (err) {
     logger.error(`Unable to retrieve mobile for error : ${err}`)
+    return null
   }
 }
 

@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { FHIR_URL } from '@gateway/constants'
-import fetch from '@gateway/fetch'
 import { IAuthHeader } from '@opencrvs/commons'
 import { Bundle, EVENT_TYPE, Task } from '@opencrvs/commons/types'
 
@@ -29,7 +28,7 @@ export const fetchFHIR = <T = any>(
     body
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<T>
     })
     .catch((error) => {
       return Promise.reject(new Error(`FHIR request failed: ${error.message}`))
@@ -50,7 +49,7 @@ export const fetchFromHearth = <T = any>(
     body
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<T>
     })
     .catch((error) => {
       return Promise.reject(

@@ -63,7 +63,6 @@
     "jsonwebtoken": "^9.0.0",
     "jwt-decode": "^3.0.0",
     "lodash": "^4.17.10",
-    "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
     "redis": "^4.7.0",
     "superjson": "1.9.0-0",
@@ -87,8 +86,7 @@
     "@types/jsonwebtoken": "^9.0.0",
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
-    "@types/node": "18.11.18",
-    "@types/node-fetch": "^2.5.12",
+    "@types/node": "22.15.29",
     "@types/uuid": "^3.4.3",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
@@ -117,7 +115,7 @@
     ],
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix"
+      "eslint -c eslint.config.js --fix"
     ]
   },
   "jest": {
