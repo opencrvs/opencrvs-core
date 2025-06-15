@@ -20,7 +20,8 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  IndexMap
+  IndexMap,
+  CustomFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -181,6 +182,10 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
+  const eventIsWaitingForCorrection = event.flags.includes(
+    CustomFlags.CORRECTION_REQUESTED
+  )
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -233,7 +238,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
       label: actionLabels[ActionType.PRINT_CERTIFICATE],
       onClick: (eventId: string) =>
         navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
+      disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
     },
     [ActionType.DELETE]: {
       label: actionLabels[ActionType.DELETE],
@@ -273,7 +278,7 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
           })
         )
       },
-      disabled: !eventIsAssignedToSelf
+      disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
     }
   } satisfies Partial<Record<ActionType, ActionConfig>>
 

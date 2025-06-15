@@ -44,7 +44,8 @@ const eventStatusValues = [
 export const EventStatusEnum = z.enum(eventStatusValues)
 
 export const CustomFlags = {
-  CERTIFICATE_PRINTED: 'certificate-printed'
+  CERTIFICATE_PRINTED: 'certificate-printed',
+  CORRECTION_REQUESTED: 'correction-requested'
 } as const
 export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
 
