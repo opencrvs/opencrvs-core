@@ -12,7 +12,12 @@
 import React, { useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
-import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  getActionReview,
+  getCurrentEventStateWithDrafts,
+  getDeclaration
+} from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -29,24 +34,26 @@ function ReadonlyView() {
 
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts()
+  const { eventConfiguration: config } = useEventConfiguration(event.type)
   const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts(event, drafts),
-    [drafts, event]
+    () =>
+      getCurrentEventStateWithDrafts({ event, drafts, configuration: config }),
+    [drafts, event, config]
   )
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+
+  const { title, fields } = getActionReview(config, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+
+  const formConfig = getDeclaration(config)
+
   return (
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
       <ReviewComponent.Body
         readonlyMode
         form={eventStateWithDrafts.declaration}
-        formConfig={configuration.declaration}
-        title={formatMessage(
-          configuration.title,
-          eventStateWithDrafts.declaration
-        )}
+        formConfig={formConfig}
+        reviewFields={fields}
+        title={formatMessage(title, eventStateWithDrafts.declaration)}
         onEdit={noop}
       >
         <></>

@@ -8,30 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import type { AnyTRPCMiddlewareFunction } from '@trpc/server'
-import {
-  ActionInputWithType,
-  TokenWithBearer,
-  TokenUserType
-} from '@opencrvs/commons'
+import { ActionInputWithType } from '@opencrvs/commons'
+import { TrpcContext } from '@events/context'
 
-export type Context = { token: TokenWithBearer } & (
-  | {
-      userType: TokenUserType.USER
-      user: {
-        id: string
-        primaryOfficeId: string
-        role: string
-      }
-    }
-  | {
-      userType: TokenUserType.SYSTEM
-      system: {
-        id: string
-      }
-    }
-)
 /**
  * TRPC Middleware options with correct context.
  * Actual middleware type definition is only for internal use within TRPC.
@@ -39,7 +19,7 @@ export type Context = { token: TokenWithBearer } & (
 export type MiddlewareOptions = Omit<
   Parameters<AnyTRPCMiddlewareFunction>[0],
   'ctx'
-> & { ctx: Context }
+> & { ctx: TrpcContext }
 
 export type ActionMiddlewareOptions = Omit<MiddlewareOptions, 'input'> & {
   input: ActionInputWithType

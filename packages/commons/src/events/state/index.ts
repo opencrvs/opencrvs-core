@@ -23,8 +23,9 @@ import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import { deepMerge, findActiveDrafts } from '../utils'
 import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
+import { EventConfig } from '../EventConfig'
 
-function getStatusFromActions(actions: Array<Action>) {
+export function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
   const hasRejectedAction = actions.some(
     (a) => a.status === ActionStatus.Rejected
@@ -117,6 +118,21 @@ export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
   }, null)
 }
 
+export function getAssignedUserSignatureFromActions(
+  actions: Array<ActionDocument>
+) {
+  return actions.reduce<null | string>((signature, action) => {
+    if (action.type === ActionType.ASSIGN) {
+      return action.createdBySignature || null
+    }
+    if (action.type === ActionType.UNASSIGN) {
+      return null
+    }
+
+    return signature
+  }, null)
+}
+
 function aggregateActionDeclarations(
   actions: Array<ActionDocument>
 ): ActionUpdate {
@@ -129,11 +145,11 @@ function aggregateActionDeclarations(
     ActionType.PRINT_CERTIFICATE
   ]
 
-  return actions.reduce((status, action) => {
+  return actions.reduce((declaration, action) => {
     if (
       excludedActions.some((excludedAction) => excludedAction === action.type)
     ) {
-      return status
+      return declaration
     }
 
     /*
@@ -145,12 +161,12 @@ function aggregateActionDeclarations(
     if (action.type === ActionType.APPROVE_CORRECTION) {
       const requestAction = actions.find(({ id }) => id === action.requestId)
       if (!requestAction) {
-        return status
+        return declaration
       }
-      return deepMerge(status, requestAction.declaration)
+      return deepMerge(declaration, requestAction.declaration)
     }
 
-    return deepMerge(status, action.declaration)
+    return deepMerge(declaration, action.declaration)
   }, {})
 }
 
@@ -204,7 +220,10 @@ export const DEFAULT_DATE_OF_EVENT_PROPERTY =
  * @returns the current state of the event based on the actions taken.
  * @see EventIndex for the description of the returned object.
  */
-export function getCurrentEventState(event: EventDocument): EventIndex {
+export function getCurrentEventState(
+  event: EventDocument,
+  config: Partial<EventConfig>
+): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
   )
@@ -221,13 +240,18 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  const dateOfEvent =
-    ZodDate.safeParse(
-      event.dateOfEvent?.fieldId
-        ? declaration[event.dateOfEvent.fieldId]
-        : event[DEFAULT_DATE_OF_EVENT_PROPERTY]
-    ).data ?? null
+  let dateOfEvent
 
+  if (config.dateOfEvent) {
+    const parsedDate = ZodDate.safeParse(
+      declaration[config.dateOfEvent.$$field]
+    )
+    if (parsedDate.success) {
+      dateOfEvent = parsedDate.data
+    }
+  } else {
+    dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+  }
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -236,13 +260,14 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
+    createdBySignature: creationAction.createdBySignature,
     updatedAt: declarationUpdateMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
+    assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: declarationUpdateMetadata.createdBy,
     updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
-    // @TODO: unify this with rest of the code. It will trip us if updatedBy has different rules than updatedByUserRole
     updatedByUserRole: declarationUpdateMetadata.createdByRole,
     dateOfEvent,
     flags: getFlagsFromActions(event.actions)
@@ -252,10 +277,15 @@ export function getCurrentEventState(event: EventDocument): EventIndex {
 /**
  * @returns the future state of the event with drafts applied
  */
-export function getCurrentEventStateWithDrafts(
-  event: EventDocument,
+export function getCurrentEventStateWithDrafts({
+  event,
+  drafts,
+  configuration
+}: {
+  event: EventDocument
   drafts: Draft[]
-): EventIndex {
+  configuration: EventConfig
+}): EventIndex {
   const actions = event.actions
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
@@ -285,7 +315,7 @@ export function getCurrentEventStateWithDrafts(
     actions: actionWithDrafts
   }
 
-  return getCurrentEventState(withDrafts)
+  return getCurrentEventState(withDrafts, configuration)
 }
 
 export function applyDraftsToEventIndex(

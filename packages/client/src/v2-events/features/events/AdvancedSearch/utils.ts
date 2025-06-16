@@ -8,7 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import startOfDay from 'date-fns/startOfDay'
+import addMinutes from 'date-fns/addMinutes'
+import endOfDay from 'date-fns/endOfDay'
+import parse from 'date-fns/parse'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -16,6 +19,7 @@ import {
   QueryInputType,
   SearchField,
   EventFieldId,
+  QueryType,
   SearchQueryParams,
   Inferred,
   EventState
@@ -189,23 +193,34 @@ function buildCondition(
 function buildConditionForStatus(): Condition {
   return { type: 'anyOf', terms: Object.values(RegStatus) }
 }
+/**
+ * Converts a date range input string into a UTC-based range string.
+ *
+ * This function:
+ * - Takes a date range input in the format "YYYY-MM-DD,YYYY-MM-DD" or "YYYY-MM-DD".
+ * - Converts the local date(s) to UTC by adjusting for the current timezone offset.
+ * - Returns a string formatted as "startUTC,endUTC".
+ *
+ * @param {string} inputDateString - The date range input string.
+ * @returns {string} A comma-separated string of ISO-formatted UTC start and end timestamps.
+ */
+function getUtcRangeFromInput(inputDateString: string) {
+  const offsetMinutes = new Date().getTimezoneOffset()
 
-function formatValue(
-  rawInput: EventState,
-  fieldId: string,
-  fieldConfig?: FieldConfig
-): string | undefined {
-  const value = rawInput[fieldId]
+  const [startDateStr, endDateStr] = inputDateString
+    .split(',')
+    .map((s) => s.trim())
 
-  if (
-    fieldConfig &&
-    fieldConfig.type === FieldType.DATE_RANGE &&
-    Array.isArray(value) &&
-    value.length === 2
-  ) {
-    return `${value[0]},${value[1]}`
-  }
-  return value ? String(value) : undefined
+  const dateFormat = 'yyyy-MM-dd'
+  const startLocal = startOfDay(parse(startDateStr, dateFormat, new Date()))
+  const endLocal = endOfDay(
+    parse(endDateStr || startDateStr, dateFormat, new Date())
+  )
+
+  const utcStart = addMinutes(startLocal, offsetMinutes)
+  const utcEnd = addMinutes(endLocal, offsetMinutes)
+
+  return `${utcStart.toISOString()},${utcEnd.toISOString()}`
 }
 
 /**
@@ -240,20 +255,36 @@ function buildDataConditionFromSearchKeys(
   rawInput: EventState // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
-    (result: Record<string, Condition>, { fieldId, config, fieldConfig }) => {
-      // Format the raw field value based on its type (e.g., date range value is a string tuple, format it as comma-separated string)
-      const value = formatValue(rawInput, fieldId, fieldConfig)
+    (
+      result: Record<string, Condition>,
+      { fieldId, fieldType, config, fieldConfig }
+    ) => {
+      let value = String(rawInput[fieldId])
       if (fieldId === 'event.status' && value === 'ALL') {
         const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
+        let searchType = config?.type
+        // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
+        // we treat the input as a range, regardless of whether the user entered a single date (e.g., "2023-01-01")
+        // or a date range (e.g., "2023-01-01,2023-12-31").
+        // In both cases, we convert the local date(s) into a UTC-based range to ensure
+        // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
+        if (
+          (fieldConfig?.type === FieldType.DATE_RANGE ||
+            fieldConfig?.type === FieldType.DATE) &&
+          fieldType === 'event'
+        ) {
+          searchType = 'range'
+          value = getUtcRangeFromInput(value)
+        }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
         // but "2023-01-01" should be treated as an exact match
-        const searchType =
-          config?.type === 'range' && value.split(',').length === 1
-            ? 'exact'
-            : config?.type
+        else if (config?.type === 'range' && value.split(',').length === 1) {
+          searchType = 'exact'
+        }
+
         const condition = buildCondition(value, searchType)
         const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = condition
@@ -357,4 +388,29 @@ export function parseFieldSearchParams(
     )
   )
   return filteredSearchParams
+}
+
+export function toQueryType(
+  eventType: string,
+  searchParams: QueryInputType,
+  type: 'and' | 'or'
+): QueryType {
+  const topLevelFields: Record<string, unknown> = {}
+  const dataFields: Record<string, unknown> = {}
+
+  const regex = new RegExp(`^event${FIELD_SEPARATOR}`)
+  Object.entries(searchParams).forEach(([encodedKey, value]) => {
+    const key = encodedKey.replace(regex, '').replaceAll(FIELD_SEPARATOR, '.')
+
+    if (encodedKey.startsWith(`event${FIELD_SEPARATOR}`)) {
+      topLevelFields[key] = value
+    } else {
+      dataFields[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+  }
 }

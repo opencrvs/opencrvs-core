@@ -15,7 +15,7 @@ import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { ILocation } from '@client/offline/reducer'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { Avatar, History, RegStatus, SystemType } from '@client/utils/gateway'
+import { Avatar, History, RegStatus } from '@client/utils/gateway'
 import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { getIndividualNameObj } from '@client/utils/userUtils'
@@ -45,6 +45,7 @@ import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
+import { SystemRole } from '@opencrvs/commons/client'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -124,7 +125,7 @@ const GetNameWithAvatar = ({
 }
 
 function getSystemType(type: string | undefined) {
-  if (type === SystemType.RecordSearch) {
+  if (type === SystemRole.enum.RECORD_SEARCH) {
     return integrationMessages.recordSearch
   }
   return integrationMessages.healthSystem

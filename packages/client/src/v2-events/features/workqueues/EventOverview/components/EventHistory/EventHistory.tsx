@@ -11,24 +11,24 @@
 import React from 'react'
 import format from 'date-fns/format'
 import styled from 'styled-components'
-import { defineMessages, useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
+import { defineMessages, IntlShape, useIntl } from 'react-intl'
+import { NavigateFunction, useNavigate } from 'react-router-dom'
 import { stringify } from 'query-string'
+import { useSelector } from 'react-redux'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import {
-  ActionDocument,
-  ActionType,
-  ResolvedUser
-} from '@opencrvs/commons/client'
+import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
 import * as routes from '@client/navigation/routes'
 import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { getOfflineData } from '@client/offline/selectors'
 import {
   EventHistoryModal,
   eventHistoryStatusMessage
@@ -54,25 +54,94 @@ const messages = defineMessages({
   role: {
     id: 'v2.event.history.role',
     defaultMessage:
-      '{role, select, LOCAL_REGISTRAR{Local Registrar} other{Unknown}}',
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} SOCIAL_WORKER {Field Agent} REGISTRATION_AGENT {Registration Agent} HEALTH {Health integration} IMPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
     description: 'Role of the user in the event history'
+  },
+  systemDefaultName: {
+    id: 'v2.event.history.systemDefaultName',
+    defaultMessage: 'System integration',
+    description: 'Fallback for system integration name in the event history'
   }
 })
+
+const Header = styled(Text)`
+  margin-bottom: 20px;
+`
+
+// At first we tried adding a field such as 'userType' to all actions etc, but that would have caused file changes to like 20 files.
+// So lets Keep It Stupid Simple and just check it there is no location -> machine user.
+function isUserAction(
+  item: ActionDocument
+): item is ActionDocument & { createdAtLocation: string } {
+  return Boolean(item.createdAtLocation)
+}
+
+const SystemName = styled.div`
+  display: flex;
+  align-items: center;
+
+  > div {
+    flex-grow: 0;
+    flex-shrink: 0;
+    border-radius: 100%;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    margin-right: 10px;
+    justify-content: center;
+    background-color: ${({ theme }) => theme.colors.grey200};
+  }
+`
+
+function getUserAvatar(
+  intl: IntlShape,
+  name: string,
+  navigate: NavigateFunction,
+  userId: string
+) {
+  return (
+    <Link
+      font="bold14"
+      id="profile-link"
+      onClick={() => navigate(formatUrl(routes.USER_PROFILE, { userId }))}
+    >
+      <UserAvatar
+        // @TODO: extend v2-events User to include avatar
+        avatar={undefined}
+        locale={intl.locale}
+        names={name}
+      />
+    </Link>
+  )
+}
+
+function getSystemAvatar(name: string) {
+  return (
+    <SystemName>
+      <div>
+        <Box />
+      </div>
+      {name}
+    </SystemName>
+  )
+}
 
 /**
  *  Renders the event history table. Used for audit trail.
  */
 export function EventHistory({ history }: { history: ActionDocument[] }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
+  const { systems } = useSelector(getOfflineData)
 
   const intl = useIntl()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const { getUser, getLocation } = useEventOverviewContext()
 
-  const onHistoryRowClick = (item: ActionDocument, user: ResolvedUser) => {
+  const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
-      <EventHistoryModal close={close} history={item} user={user} />
+      <EventHistoryModal close={close} history={item} userName={userName} />
     ))
   }
 
@@ -85,50 +154,42 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
     )
-    .map((item) => {
-      const user = getUser(item.createdBy)
-      const location = getLocation(item.createdAtLocation)
+    .map((action) => {
+      const userAction = isUserAction(action)
+      const user = getUser(action.createdBy)
+      const system = systems.find((s) => s._id === action.createdBy)
+
+      const location = userAction
+        ? getLocation(action.createdAtLocation)
+        : undefined
+
+      const userName = userAction
+        ? getUsersFullName(user.name, intl.locale)
+        : (system?.name ?? intl.formatMessage(messages.systemDefaultName))
+
+      const userElement = userAction
+        ? getUserAvatar(intl, userName, navigate, action.createdBy)
+        : getSystemAvatar(userName)
 
       return {
-        date: format(
-          new Date(item.createdAt),
-          intl.formatMessage(messages.timeFormat)
-        ),
         action: (
           <Link
             font="bold14"
             onClick={() => {
-              onHistoryRowClick(item, user)
+              onHistoryRowClick(action, userName)
             }}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
-              status: item.type
+              status: action.type
             })}
           </Link>
         ),
-        user: (
-          <Link
-            font="bold14"
-            id="profile-link"
-            onClick={() =>
-              navigate(
-                formatUrl(routes.USER_PROFILE, {
-                  userId: item.createdBy
-                })
-              )
-            }
-          >
-            <UserAvatar
-              // @TODO: extend v2-events User to include avatar
-              avatar={undefined}
-              locale={intl.locale}
-              names={user.name}
-            />
-          </Link>
+        date: format(
+          new Date(action.createdAt),
+          intl.formatMessage(messages.timeFormat)
         ),
-        role: intl.formatMessage(messages.role, {
-          role: user.role
-        }),
+        user: userElement,
+        role: intl.formatMessage(messages.role, { role: action.createdByRole }),
         location: (
           <Link
             font="bold14"
@@ -136,7 +197,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
               navigate({
                 pathname: routes.TEAM_USER_LIST,
                 search: stringify({
-                  locationId: item.createdAtLocation
+                  locationId: action.createdAtLocation
                 })
               })
             }}
@@ -176,12 +237,13 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
       key: 'location'
     }
   ]
+
   return (
     <>
       <Divider />
-      <Text color="copy" element="h3" variant="h3">
+      <Header color="copy" element="h3" variant="h3">
         {intl.formatMessage(constantsMessages.history)}
-      </Text>
+      </Header>
       <TableDiv>
         <Table
           highlightRowOnMouseOver

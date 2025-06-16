@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionDocument'
+import { CreatedAtLocation } from './CreatedAtLocation'
 
 /**
  * Event statuses recognized by the system
@@ -51,7 +52,11 @@ export const Flag = z
   .string()
   .regex(
     new RegExp(
-      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(ActionStatus).join('|').toLowerCase()})$`
+      `^(${Object.values(ActionType).join('|').toLowerCase()}):(${Object.values(
+        ActionStatus
+      )
+        .join('|')
+        .toLowerCase()})$`
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
@@ -72,16 +77,20 @@ export const ActionCreationMetadata = z.object({
   createdBy: z
     .string()
     .describe('ID of the user who created the action request.'),
-  createdAtLocation: z
-    .string()
-    .describe('Location of the user who created the action request.'),
+  createdAtLocation: CreatedAtLocation.describe(
+    'Location of the user who created the action request.'
+  ),
   acceptedAt: z
     .string()
     .datetime()
     .describe('Timestamp when the action request was accepted.'),
   createdByRole: z
     .string()
-    .describe('Role of the user at the time of action request creation.')
+    .describe('Role of the user at the time of action request creation.'),
+  createdBySignature: z
+    .string()
+    .nullish()
+    .describe('Signature of the user who created the action request.')
 })
 
 export type ActionCreationMetadata = z.infer<typeof ActionCreationMetadata>
@@ -127,9 +136,13 @@ export const EventMetadata = z.object({
   updatedByUserRole: z
     .string()
     .describe('Role of the user who last updated the declaration.'),
-  createdAtLocation: z
+  createdAtLocation: CreatedAtLocation.describe(
+    'Location of the user who created the event.'
+  ),
+  createdBySignature: z
     .string()
-    .describe('Location of the user who created the event.'),
+    .nullish()
+    .describe('Signature of the user who created the event.'),
   updatedAtLocation: z
     .string()
     .nullish()
@@ -156,7 +169,7 @@ export const EventMetadata = z.object({
 
 export type EventMetadata = z.infer<typeof EventMetadata>
 
-export const EventMetadataKeys = z.enum([
+export const EventMetadataKeysArray = [
   'id',
   'type',
   'status',
@@ -172,17 +185,10 @@ export const EventMetadataKeys = z.enum([
   'trackingId',
   'legalStatuses',
   'flags'
-])
-export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
+] as const
 
-/**
- * This ensures `event.field()` takes a key from `EventMetadata`
- */
-export const EventMetadataParameter = z.object({
-  // @TODO: Reconcile with the event metadata definition. How could we derive one from the other?
-  $event: EventMetadataKeys
-})
-export type EventMetadataParameter = z.infer<typeof EventMetadataParameter>
+export const EventMetadataKeys = z.enum(EventMetadataKeysArray)
+export type EventMetadataKeys = z.infer<typeof EventMetadataKeys>
 
 /**
  * Mapping of event metadata keys to translation configuration.

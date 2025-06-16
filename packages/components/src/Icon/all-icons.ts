@@ -75,12 +75,14 @@ export {
   Phone,
   Plus,
   Printer,
+  PushPin,
   QrCode,
   SignOut,
   Star,
   Sun,
   Target,
   TextT,
+  Timer,
   Trash,
   UploadSimple,
   User,
@@ -88,7 +90,6 @@ export {
   UserPlus,
   Users,
   WarningCircle,
-  Webcam,
-  X
+  Webcam
 } from 'phosphor-react'
 export * from './custom-icons'

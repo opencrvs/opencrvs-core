@@ -8,21 +8,26 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { parse } from 'query-string'
+import { useLocation } from 'react-router-dom'
 import {
   Content,
   ContentSize,
   FormTabs,
   IFormTabProps
 } from '@opencrvs/components'
-import { SearchQueryParams } from '@opencrvs/commons/client'
+import {
+  EventState,
+  FieldValue,
+  SearchQueryParams
+} from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
 import { parseFieldSearchParams } from './utils'
 
-const messagesToDefine = {
+export const advancedSearchMessages = {
   advancedSearch: {
     id: 'v2.config.advanced.search',
     defaultMessage: 'Advanced Search',
@@ -36,17 +41,36 @@ const messagesToDefine = {
   }
 }
 
-const messages = defineMessages(messagesToDefine)
+const messages = defineMessages(advancedSearchMessages)
 
 export function AdvancedSearch() {
   const intl = useIntl()
   const allEvents = useEventConfigurations()
+  const location = useLocation()
 
-  const searchParams = SearchQueryParams.parse(parse(window.location.search))
+  const searchParams = SearchQueryParams.parse(parse(location.search))
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0
   )
+
+  const [formValuesByTabId, setFormValuesByTabId] = useState<
+    Record<string, EventState>
+  >(() => {
+    const initialState: Record<string, EventState> = {}
+    const currentEvent = advancedSearchEvents.find(
+      (e) => e.id === searchParams.eventType
+    )
+    for (const event of advancedSearchEvents) {
+      if (currentEvent && currentEvent.id === event.id) {
+        const parsedParams = parseFieldSearchParams(event, searchParams)
+        initialState[event.id] = parsedParams
+      } else {
+        initialState[event.id] = {}
+      }
+    }
+    return initialState
+  })
 
   const formTabSections = advancedSearchEvents.map((a) => ({
     id: a.id,
@@ -65,37 +89,44 @@ export function AdvancedSearch() {
   }
 
   const currentTabSections = currentEvent.advancedSearch
-
-  const filteredSearchParams = parseFieldSearchParams(
-    currentEvent,
-    searchParams
-  )
+  const currentFormValues = formValuesByTabId[activeTabId]
 
   const handleTabClick = (tabId: string) => {
     setActiveTabId(tabId)
   }
+
+  const handleFormChange = useCallback(
+    (updatedForm: Record<string, FieldValue>) => {
+      setFormValuesByTabId((prev) => ({
+        ...prev,
+        [activeTabId]: updatedForm
+      }))
+    },
+    [activeTabId]
+  )
+
   return (
-    <>
-      <Content
-        size={ContentSize.SMALL}
-        subtitle={intl.formatMessage(messages.advancedSearchInstruction)}
-        tabBarContent={
-          <FormTabs
-            activeTabId={activeTabId}
-            sections={formTabSections}
-            onTabClick={handleTabClick}
-          />
-        }
-        title={intl.formatMessage(messages.advancedSearch)}
-        titleColor={'copy'}
-      >
-        {currentTabSections.length > 0 && (
-          <TabSearch
-            currentEvent={currentEvent}
-            fieldValues={filteredSearchParams}
-          />
-        )}
-      </Content>
-    </>
+    <Content
+      size={ContentSize.SMALL}
+      subtitle={intl.formatMessage(messages.advancedSearchInstruction)}
+      tabBarContent={
+        <FormTabs
+          activeTabId={activeTabId}
+          sections={formTabSections}
+          onTabClick={handleTabClick}
+        />
+      }
+      title={intl.formatMessage(messages.advancedSearch)}
+      titleColor={'copy'}
+    >
+      {currentTabSections.length > 0 && (
+        <TabSearch
+          key={currentEvent.id}
+          currentEvent={currentEvent}
+          fieldValues={currentFormValues}
+          onChange={handleFormChange}
+        />
+      )}
+    </Content>
   )
 }
