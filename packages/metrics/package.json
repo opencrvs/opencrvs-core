@@ -36,7 +36,6 @@
     "lodash": "^4.17.21",
     "mongodb": "^4.17.1",
     "mongoose": "^6.11.3",
-    "node-fetch": "^2.6.7",
     "pino": "^7.0.0",
     "tsconfig-paths": "^3.13.0",
     "typescript": "5.6.3"
@@ -51,7 +50,6 @@
     "@types/jwt-decode": "^2.2.1",
     "@types/lodash": "^4.14.108",
     "@types/node": "22.15.29",
-    "@types/node-fetch": "^2.5.12",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "cross-env": "^7.0.0",
@@ -70,7 +68,7 @@
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix"
+      "eslint -c eslint.config.js --fix"
     ]
   },
   "jest": {

@@ -214,7 +214,7 @@ export const fetchEstimateByLocation = async (
     }
   }
   if (event === EVENT_TYPE.DEATH) {
-    const crudeDeathRateResponse: ICrudeDeathRate = await fetchFromResource(
+    const crudeDeathRateResponse = await fetchFromResource<ICrudeDeathRate>(
       'crude-death-rate',
       authHeader
     )

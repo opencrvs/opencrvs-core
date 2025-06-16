@@ -21,6 +21,6 @@
     "noUnusedLocals": true,
     "types": ["fhir", "jest"]
   },
-  "include": ["src/**/*.ts", "scripts", "typings"],
+  "include": ["src/**/*.ts", "test/setupJest.ts", "scripts", "typings"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

@@ -31,7 +31,6 @@ import { IAuthHeader } from '@metrics/features/registration'
 import { query } from '@metrics/influxdb/client'
 import { csvToJSON } from '@metrics/utils/csvHelper'
 import { format } from 'date-fns'
-import fetch from 'node-fetch'
 import { fetchLocationChildrenIds } from '@metrics/configApi'
 import { helpers } from '@metrics/utils/queryHelper'
 import {
