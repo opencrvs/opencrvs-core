@@ -30,10 +30,10 @@ describe('getAdvancedSearchFieldErrors', () => {
       mockFormValues
     )
     expect(errors).toEqual({
-      'applicant.firstname': {
+      'applicant.name': {
         errors: []
       },
-      'applicant.surname': {
+      'recommender.name': {
         errors: []
       },
       'applicant.email': {
@@ -56,12 +56,6 @@ describe('getAdvancedSearchFieldErrors', () => {
             }
           }
         ]
-      },
-      'recommender.firstname': {
-        errors: []
-      },
-      'recommender.surname': {
-        errors: []
       }
     })
   })

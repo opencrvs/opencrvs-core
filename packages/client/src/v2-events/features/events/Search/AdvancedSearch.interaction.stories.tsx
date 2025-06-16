@@ -272,34 +272,32 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        await waitFor(
-          async () => {
-            const locationInput = await canvas.findByTestId(
-              'event____legalStatus____REGISTERED____createdAtLocation'
-            )
-            await expect(locationInput).toHaveValue('Ibombo District Office')
-            await userEvent.clear(locationInput)
-            locationInput.blur()
-
-            const dateToggle = (await canvas.findAllByRole('checkbox')).find(
-              (el) =>
-                el.id ===
-                'event____legalStatus____REGISTERED____createdAtdate_range_toggle'
-            )
-            if (dateToggle) {
-              await expect(dateToggle).toBeChecked()
-              await userEvent.click(dateToggle)
-            }
-
-            const searchBtn = (
-              await canvas.findAllByRole('button', { name: 'Search' })
-            ).find((btn) => btn.id === 'search')
-            if (searchBtn) {
-              await userEvent.click(searchBtn)
-            }
-          },
-          { timeout: 5000 }
+        const locationInput = await canvas.findByTestId(
+          'event____legalStatus____REGISTERED____createdAtLocation'
         )
+
+        await expect(locationInput).toHaveValue('Ibombo District Office')
+        await userEvent.clear(locationInput)
+        locationInput.blur()
+
+        const dateToggle = (await canvas.findAllByRole('checkbox')).find(
+          (el) =>
+            el.id ===
+            'event____legalStatus____REGISTERED____createdAt-date_range_toggle'
+        )
+
+        if (dateToggle) {
+          await expect(dateToggle).toBeChecked()
+          await userEvent.click(dateToggle)
+        }
+
+        const searchBtn = (
+          await canvas.findAllByRole('button', { name: 'Search' })
+        ).find((btn) => btn.id === 'search')
+
+        // @TODO: Check for Enabled when https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
+        // Currently, name fields are interpreted as required fields, so clearing them disables the search button.
+        await expect(searchBtn).toBeDisabled()
       }
     )
 
