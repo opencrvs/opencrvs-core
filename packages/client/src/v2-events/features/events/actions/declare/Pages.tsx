@@ -34,7 +34,7 @@ export function Pages() {
   const events = useEvents()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const { modal, goToHome, goToWorkqueue } = useEventFormNavigation()
+  const { modal, redirectToOrigin } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
@@ -93,9 +93,7 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          searchParams.workqueue
-            ? goToWorkqueue(searchParams.workqueue)
-            : goToHome()
+          redirectToOrigin(searchParams.workqueue)
         })
       }
     >

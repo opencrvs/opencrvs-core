@@ -162,5 +162,15 @@ export function useEventFormNavigation() {
     }
   }
 
-  return { exit, modal, goToHome, goToWorkqueue, deleteDeclaration }
+  function redirectToOrigin(slug?: string) {
+    slug ? goToWorkqueue(slug) : goToHome()
+  }
+
+  return {
+    exit,
+    modal,
+    goToHome,
+    deleteDeclaration,
+    redirectToOrigin
+  }
 }

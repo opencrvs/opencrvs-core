@@ -58,7 +58,7 @@ export function Review() {
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome, goToWorkqueue } = useEventFormNavigation()
+  const { redirectToOrigin } = useEventFormNavigation()
 
   const [event] = events.getEvent.useSuspenseQuery(eventId)
 
@@ -149,8 +149,7 @@ export function Review() {
 
     if (confirmedValidation) {
       reviewActionConfiguration.onConfirm(eventId)
-
-      slug ? goToWorkqueue(slug) : goToHome()
+      redirectToOrigin(slug)
     }
   }
 
@@ -180,7 +179,7 @@ export function Review() {
           reason: { message, isDuplicate }
         })
       }
-      slug ? goToWorkqueue(slug) : goToHome()
+      redirectToOrigin(slug)
     }
   }
 
@@ -190,7 +189,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          slug ? goToWorkqueue(slug) : goToHome()
+          redirectToOrigin(slug)
         })
       }
     >
