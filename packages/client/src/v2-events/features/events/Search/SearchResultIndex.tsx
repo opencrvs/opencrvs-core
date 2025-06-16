@@ -57,7 +57,6 @@ export const SearchResultIndex = () => {
           searchParams={searchParams}
         />
       }
-      // @todo add search result message with total count of results
       title={intl.formatMessage(
         {
           id: 'v2.search.v2.search.advancedSearch.result.title',

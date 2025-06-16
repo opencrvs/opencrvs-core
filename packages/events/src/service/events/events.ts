@@ -384,7 +384,7 @@ export async function addAction(
             assignedTo: null,
             createdAt: now,
             id: getUUID(), // use a new UUID for unassign action
-            status: ActionStatus.Accepted // @TODO: check if there is any gotcha with this
+            status: ActionStatus.Accepted
           }
         },
         $set: { updatedAt: now }

@@ -76,7 +76,7 @@ describe('event.actions.notify', () => {
     })
   })
 
-  // @TODO: In order to test this, we need to add another required field to the form. Bit out of scope. Worked on g
+  // @TODO: In order to test this, we need to add another required field to the form. Bit out of scope. Worked on https://github.com/opencrvs/opencrvs-core/issues/9766
   test.skip(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [

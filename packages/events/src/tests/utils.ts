@@ -43,7 +43,7 @@ export const UNSTABLE_EVENT_FIELDS = [
   'createdBy',
   'createdAtLocation',
   'assignedTo',
-  'updatedAtLocation', // @todo check?
+  'updatedAtLocation',
   'updatedBy',
   'acceptedAt',
   'dateOfEvent'
