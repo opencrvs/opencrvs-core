@@ -17,7 +17,10 @@ import Schema from './schema/Database' // this is the Database interface we defi
 const connectionString = env.EVENTS_POSTGRES_URL
 
 // Override timestamptz (OID 1184) to return ISO 8601 strings instead of Date objects
-types.setTypeParser(1184, (str) => str)
+//       `pg`: 2025-06-16 12:55:51.507875+00
+// `ISO 8601`: 2025-06-16T12:55:51.507Z
+//                                 ^^^ (yes, we don't cut the milliseconds, Zod still accepts it)
+types.setTypeParser(1184, (str) => str.replace(' ', 'T').replace('+00', 'Z'))
 
 const pool = new Pool({ connectionString })
 const dialect = new PostgresDialect({
