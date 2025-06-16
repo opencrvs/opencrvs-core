@@ -544,6 +544,15 @@ test('a correction request is not allowed if the event is already waiting for co
     generator.event.actions.correction.request(event.id)
   )
 
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: '123'
+  })
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
   await expect(
     client.event.actions.correction.request(
       generator.event.actions.correction.request(event.id)
