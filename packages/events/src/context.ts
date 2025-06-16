@@ -36,7 +36,7 @@ const UserContext = z.object({
     .describe('Storage key for the user signature. e.g. /ocrvs/signature.png'),
   type: TokenUserType.extract(['user'])
 })
-type UserContext = z.infer<typeof UserContext>
+export type UserContext = z.infer<typeof UserContext>
 
 export const SystemContext = z.object({
   id: z.string(),

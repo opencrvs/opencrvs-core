@@ -11,10 +11,11 @@ GRANT SELECT, INSERT, UPDATE, DELETE ON locations TO events_app;
 CREATE TABLE events (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   event_type text NOT NULL,
-  transaction_id text NOT NULL UNIQUE,
+  transaction_id text NOT NULL,
   tracking_id text NOT NULL UNIQUE,
   created_at timestamp with time zone DEFAULT now() NOT NULL,
-  updated_at timestamp with time zone DEFAULT now() NOT NULL
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  UNIQUE (transaction_id, event_type)
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON events TO events_app;
@@ -24,7 +25,6 @@ COMMENT ON TABLE events IS 'Stores life events associated with individuals, iden
 CREATE TYPE action_status AS ENUM ('Requested', 'Accepted', 'Rejected');
 
 CREATE TYPE action_type AS ENUM (
-  'DELETE',
   'CREATE',
   'NOTIFY',
   'DECLARE',
@@ -95,16 +95,17 @@ COMMENT ON COLUMN event_actions.original_action_id IS 'References the original a
 
 CREATE TABLE event_action_drafts (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  transaction_id text UNIQUE NOT NULL,
+  transaction_id text NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  action_type text NOT NULL,
+  action_type action_type NOT NULL,
   declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
   annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
-  created_at timestamp with time zone DEFAULT now() NOT NULL
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  UNIQUE (transaction_id, action_type)
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON event_action_drafts TO events_app;

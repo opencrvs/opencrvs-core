@@ -9,345 +9,213 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import z from 'zod'
-import { CommonQueryMethods, SerializableValue } from 'slonik'
+import { Kysely } from 'kysely'
 import {
-  ActionDocument,
   ActionStatus,
   ActionType,
   EventDocument,
   UUID
 } from '@opencrvs/commons'
-import { formatTimestamp, getClient, sql } from './db'
+import { db } from './db'
+import { NewEventActions } from './schema/app/EventActions'
+import { NewEvents } from './schema/app/Events'
+import Schema from './schema/Database'
 
-async function getEventByIdInTransaction(
-  eventId: UUID,
-  trx: CommonQueryMethods
-): Promise<EventDocument> {
-  const event = await trx.one(sql.type(EventDocument.omit({ actions: true }))`
-    SELECT
-      id,
-      event_type AS type,
-      ${formatTimestamp('created_at')} AS "createdAt",
-      ${formatTimestamp('updated_at')} AS "updatedAt",
-      tracking_id AS "trackingId"
-    FROM
-      events
-    WHERE
-      id = ${eventId}
-  `)
+async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
+  const event = await trx
+    .selectFrom('events')
+    .select(['id', 'eventType as type', 'createdAt', 'updatedAt', 'trackingId'])
+    .where('id', '=', id)
+    .executeTakeFirstOrThrow()
 
-  const actions = await trx.any(sql.type(ActionDocument)`
-    SELECT
-      action_type AS "type",
-      annotation,
-      assigned_to AS "assignedTo",
-      created_at_location AS "createdAtLocation",
-      ${formatTimestamp('created_at')} AS "createdAt",
-      created_by AS "createdBy",
-      created_by_role AS "createdByRole",
-      declaration,
-      id,
-      original_action_id AS "originalActionId",
-      registration_number AS "registrationNumber",
-      CASE
-        WHEN reason_message IS NULL THEN NULL
-        ELSE jsonb_build_object(
-          'is_duplicate',
-          reason_is_duplicate,
-          'message',
-          reason_message
-        )
-      END AS reason,
-      status,
-      transaction_id AS "transactionId"
-    FROM
-      event_actions
-    WHERE
-      event_id = ${event.id}
-  `)
+  const actions = await trx
+    .selectFrom('eventActions')
+    .selectAll()
+    .where('eventId', '=', event.id)
+    .execute()
 
-  return {
+  const result = {
     ...event,
-    actions: [...actions]
+    actions: actions.map(({ actionType, ...action }) => ({
+      ...action,
+      type: actionType
+    }))
   }
+
+  return EventDocument.parse(result)
 }
 
-export async function getEventById(id: UUID): Promise<EventDocument> {
-  const db = await getClient()
-
-  const result = await db.transaction(async (trx) =>
-    getEventByIdInTransaction(id, trx)
-  )
-
-  return result
-}
-
-export async function deleteEventById(eventId: UUID): Promise<void> {
-  const db = await getClient()
-
-  await db.transaction(async (trx) => {
-    await trx.query(sql.type(z.void())`
-      DELETE FROM event_actions
-      WHERE
-        event_id = ${eventId}
-    `)
-
-    await trx.query(sql.type(z.void())`
-      DELETE FROM events
-      WHERE
-        id = ${eventId}
-    `)
+export const getEventById = async (id: UUID) => {
+  return db.transaction().execute(async (trx) => {
+    return getEventByIdInTrx(id, trx)
   })
 }
 
-export const createEvent = async (
-  {
-    type,
-    transactionId,
-    trackingId
-  }: {
-    type: string
-    transactionId: string
-    trackingId: string
-  },
-  trx: CommonQueryMethods
-) => {
-  return trx.one(sql.type(z.object({ id: UUID }))`
-    INSERT INTO
-      events (event_type, transaction_id, tracking_id)
-    VALUES
-      (
-        ${type},
-        ${transactionId},
-        ${trackingId}
-      )
-    RETURNING
-      id
-  `)
+export async function deleteEventById(eventId: UUID) {
+  return db.transaction().execute(async (trx) => {
+    await trx
+      .deleteFrom('eventActions')
+      .where('eventId', '=', eventId)
+      .execute()
+
+    await trx.deleteFrom('events').where('id', '=', eventId).execute()
+  })
 }
-
-/**
- * Idempotently inserts an action into the event_actions table
- * @returns the id of the action
- */
-async function createActionInTransaction(
-  {
-    annotation,
-    assignedTo,
-    createdAtLocation,
-    createdBy,
-    createdByRole,
-    createdBySignature,
-    declaration,
-    eventId,
-    originalActionId,
-    reasonIsDuplicate,
-    reasonMessage,
-    registrationNumber,
-    status,
-    transactionId,
-    type
-  }: {
-    annotation?: Record<string, SerializableValue>
-    assignedTo?: string
-    createdAtLocation?: UUID
-    createdBy: string
-    createdByRole: string
-    createdBySignature?: string
-    declaration?: Record<string, SerializableValue>
-    eventId: UUID
-    originalActionId?: UUID
-    reasonIsDuplicate?: boolean
-    reasonMessage?: string
-    registrationNumber?: string
-    status: ActionStatus
-    transactionId: string
-    type: ActionType
-  },
-  trx: CommonQueryMethods
-) {
-  const result = await trx.maybeOneFirst(sql.type(z.object({ id: UUID }))`
-    INSERT INTO
-      event_actions (
-        action_type,
-        annotation,
-        assigned_to,
-        created_at_location,
-        created_by_role,
-        created_by_signature,
-        created_by,
-        declaration,
-        event_id,
-        original_action_id,
-        reason_is_duplicate,
-        reason_message,
-        registration_number,
-        status,
-        transaction_id
-      )
-    VALUES
-      (
-        ${type}::action_type,
-        ${sql.jsonb(annotation ?? {})},
-        ${assignedTo ?? null},
-        ${createdAtLocation ?? null}::uuid,
-        ${createdByRole},
-        ${createdBySignature ?? null},
-        ${createdBy},
-        ${sql.jsonb(declaration ?? {})},
-        ${eventId},
-        ${originalActionId ?? null}::uuid,
-        ${reasonIsDuplicate ?? null},
-        ${reasonMessage ?? null},
-        ${registrationNumber ?? null},
-        ${status}::action_status,
-        ${transactionId}
-      )
-    ON CONFLICT (action_type, transaction_id) DO NOTHING
-    RETURNING
-      id
-  `)
-
-  const id =
-    result ??
-    (await trx.oneFirst(sql.type(z.object({ id: UUID }))`
-      SELECT
-        id
-      FROM
-        event_actions
-      WHERE
-        transaction_id = ${transactionId}
-        AND action_type = ${type}::action_type
-    `))
-
-  return id
-}
-
-export const createAction = async (
-  params: Parameters<typeof createActionInTransaction>[0]
-) => {
-  const db = await getClient()
-  return db.transaction(async (trx) => createActionInTransaction(params, trx))
-}
-
-export const getOrCreateEventInTransaction = async (
-  {
-    type,
-    transactionId,
-    trackingId,
-    createdBy,
-    createdByRole,
-    createdBySignature,
-    createdAtLocation
-  }: {
-    type: string
-    transactionId: string
-    trackingId: string
-    createdBy: string
-    createdByRole: string
-    createdBySignature?: string
-    createdAtLocation?: UUID
-  },
-  trx: CommonQueryMethods
-) => {
-  const eventId =
-    (await trx.maybeOneFirst(sql.type(z.object({ id: UUID }))`
-      INSERT INTO
-        events (event_type, transaction_id, tracking_id)
-      VALUES
-        (
-          ${type},
-          ${transactionId},
-          ${trackingId}
-        )
-      ON CONFLICT (transaction_id) DO NOTHING
-      RETURNING
-        id
-    `)) ??
-    (await trx.oneFirst(sql.type(z.object({ id: UUID }))`
-      SELECT
-        id
-      FROM
-        events
-      WHERE
-        transaction_id = ${transactionId}
-    `))
-
-  await createActionInTransaction(
-    {
-      eventId,
-      transactionId,
-      type: ActionType.CREATE,
-      status: ActionStatus.Accepted,
-      createdBy,
-      createdByRole,
-      createdBySignature,
-      createdAtLocation
-    },
-    trx
-  )
-
-  return getEventByIdInTransaction(eventId, trx)
-}
-
-export const getOrCreateEvent = async (
-  params: Parameters<typeof getOrCreateEventInTransaction>[0]
-): Promise<EventDocument> => {
-  const db = await getClient()
-  return db.transaction(async (trx) =>
-    getOrCreateEventInTransaction(params, trx)
-  )
-}
-
-export const getOrCreateEventAndAssign = async ({
+export const createEvent = async ({
   type,
   transactionId,
-  trackingId,
-  createdBy,
-  createdByRole,
-  createdBySignature,
-  createdAtLocation
+  trackingId
 }: {
   type: string
   transactionId: string
   trackingId: string
-  createdBy: string
-  createdByRole: string
-  createdBySignature?: string
-  createdAtLocation?: UUID
 }) => {
-  const db = await getClient()
+  const result = await db
+    .insertInto('events')
+    .values({
+      eventType: type,
+      transactionId,
+      trackingId
+    })
+    .returning('id')
+    .executeTakeFirstOrThrow()
 
-  return db.transaction(async (trx) => {
-    const { id: eventId } = await getOrCreateEventInTransaction(
-      {
-        type,
-        transactionId,
-        trackingId,
-        createdBy,
-        createdByRole,
-        createdBySignature,
-        createdAtLocation
-      },
-      trx
-    )
+  return { id: result.id }
+}
 
-    await createActionInTransaction(
-      {
-        eventId,
-        transactionId,
-        type: ActionType.ASSIGN,
-        status: ActionStatus.Accepted,
-        createdBy,
-        createdByRole,
-        createdBySignature,
-        createdAtLocation,
-        assignedTo: createdBy
-      },
-      trx
-    )
+/**
+ * Creates a new action in the event_actions table
+ * @idempotent with `transactionId, actionType`
+ * @returns action id
+ */
+async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
+  await trx
+    .insertInto('eventActions')
+    .values(action)
+    .onConflict((oc) => oc.columns(['transactionId', 'actionType']).doNothing())
+    .execute()
 
-    return getEventByIdInTransaction(eventId, trx)
+  return trx
+    .selectFrom('eventActions')
+    .select('id')
+    .where('transactionId', '=', action.transactionId)
+    .where('actionType', '=', action.actionType)
+    .executeTakeFirstOrThrow()
+}
+
+export const createAction = async (action: NewEventActions) => {
+  return db.transaction().execute(async (trx) => {
+    return createActionInTrx(action, trx)
+  })
+}
+
+async function getOrCreateEventInTrx(
+  input: NewEvents & Omit<NewEventActions, 'actionType' | 'eventId' | 'status'>,
+  trx: Kysely<Schema>
+) {
+  await trx
+    .insertInto('events')
+    .values({
+      eventType: input.eventType,
+      transactionId: input.transactionId,
+      trackingId: input.trackingId,
+      createdAt: input.createdAt,
+      updatedAt: input.updatedAt
+    })
+    .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
+    .execute()
+
+  const { id: newId } = await trx
+    .selectFrom('events')
+    .select('id')
+    .where('transactionId', '=', input.transactionId)
+    .where('eventType', '=', input.eventType)
+    .executeTakeFirstOrThrow()
+
+  await createActionInTrx(
+    {
+      eventId: newId,
+      transactionId: input.transactionId,
+      actionType: ActionType.CREATE,
+      status: ActionStatus.Accepted,
+      createdBy: input.createdBy,
+      createdByRole: input.createdByRole,
+      createdBySignature: input.createdBySignature,
+      createdAtLocation: input.createdAtLocation
+    },
+    trx
+  )
+
+  return getEventByIdInTrx(newId, trx)
+}
+
+async function getOrCreateEventAndAssignInTrx(
+  input: Parameters<typeof getOrCreateEventInTrx>[0],
+  trx: Kysely<Schema>
+) {
+  await trx
+    .insertInto('events')
+    .values({
+      eventType: input.eventType,
+      transactionId: input.transactionId,
+      trackingId: input.trackingId,
+      createdAt: input.createdAt,
+      updatedAt: input.updatedAt
+    })
+    .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
+    .execute()
+
+  const { id: newId } = await trx
+    .selectFrom('events')
+    .select('id')
+    .where('transactionId', '=', input.transactionId)
+    .where('eventType', '=', input.eventType)
+    .executeTakeFirstOrThrow()
+
+  await createActionInTrx(
+    {
+      eventId: newId,
+      transactionId: input.transactionId,
+      actionType: ActionType.CREATE,
+      status: ActionStatus.Accepted,
+      createdBy: input.createdBy,
+      createdByRole: input.createdByRole,
+      createdBySignature: input.createdBySignature,
+      createdAtLocation: input.createdAtLocation
+    },
+    trx
+  )
+
+  await createActionInTrx(
+    {
+      eventId: newId,
+      transactionId: input.transactionId,
+      actionType: ActionType.ASSIGN,
+      status: ActionStatus.Accepted,
+      createdBy: input.createdBy,
+      createdByRole: input.createdByRole,
+      createdBySignature: input.createdBySignature,
+      createdAtLocation: input.createdAtLocation,
+      assignedTo: input.createdBy
+    },
+    trx
+  )
+
+  return getEventByIdInTrx(newId, trx)
+}
+
+export const getOrCreateEvent = async (
+  input: Parameters<typeof getOrCreateEventInTrx>[0]
+) => {
+  return db.transaction().execute(async (trx) => {
+    return getOrCreateEventInTrx(input, trx)
+  })
+}
+
+export const getOrCreateEventAndAssign = async (
+  input: Parameters<typeof getOrCreateEventAndAssignInTrx>[0]
+) => {
+  return db.transaction().execute(async (trx) => {
+    return getOrCreateEventAndAssignInTrx(input, trx)
   })
 }

@@ -9,150 +9,83 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { SerializableValue } from 'slonik'
-import { ActionType, Draft } from '@opencrvs/commons/events'
-import { UUID } from '@opencrvs/commons'
-import {
-  formatTimestamp,
-  getClient,
-  sql
-} from '@events/storage/postgres/events/db'
+import { Selectable, sql } from 'kysely'
+import z from 'zod'
+import { ActionStatus, Draft, UUID } from '@opencrvs/commons'
+import { db } from '@events/storage/postgres/events/db'
+import EventActionDrafts, {
+  NewEventActionDrafts
+} from './schema/app/EventActionDrafts'
+import ActionType from './schema/app/ActionType'
 
-export async function createDraft({
-  eventId,
-  transactionId,
-  actionType,
-  declaration,
-  annotation,
-  createdBy,
-  createdByRole,
-  createdBySignature,
-  createdAtLocation
-}: {
-  eventId: UUID
-  transactionId: string
-  actionType: ActionType
-  declaration: NonNullable<SerializableValue>
-  annotation: SerializableValue
-  createdBy: string
-  createdByRole: string
-  createdBySignature?: string
-  createdAtLocation?: UUID
-}) {
-  // @TODO: Some typing error here
-  const createdAtLocationx = createdAtLocation as string | undefined
+export async function createDraft(draft: NewEventActionDrafts) {
+  const result = await db
+    .insertInto('eventActionDrafts')
+    .values(draft)
+    .onConflict((oc) =>
+      oc.columns(['transactionId', 'actionType']).doUpdateSet({
+        declaration: sql`EXCLUDED.declaration`,
+        annotation: sql`EXCLUDED.annotation`,
+        createdAt: sql`NOW()`
+      })
+    )
+    .returning(['id', 'eventId', 'transactionId', 'declaration', 'annotation'])
+    .executeTakeFirst()
 
-  const db = await getClient()
+  return result
+}
 
-  const draft = await db.one(sql.type(Draft)`
-    INSERT INTO
-      event_action_drafts (
-        event_id,
-        transaction_id,
-        action_type,
-        declaration,
-        annotation,
-        created_by,
-        created_by_role,
-        created_by_signature,
-        created_at_location
-      )
-    VALUES
-      (
-        ${eventId},
-        ${transactionId},
-        ${actionType},
-        ${sql.jsonb(declaration)},
-        ${sql.jsonb(annotation)},
-        ${createdBy},
-        ${createdByRole},
-        ${createdBySignature ?? null},
-        ${createdAtLocationx ?? null}::uuid
-      )
-    ON CONFLICT (transaction_id) DO UPDATE
-    SET
-      declaration = EXCLUDED.declaration,
-      annotation = EXCLUDED.annotation,
-      created_at = now()
-    RETURNING
-      id,
-      event_id AS "eventId",
-      transaction_id AS "transactionId",
-      declaration,
-      annotation
-  `)
-
-  return draft
+function transformDraft(draft: Selectable<EventActionDrafts>): Draft {
+  return {
+    id: draft.id,
+    transactionId: draft.transactionId,
+    createdAt: draft.createdAt,
+    eventId: draft.eventId,
+    action: {
+      transactionId: draft.transactionId,
+      createdAt: draft.createdAt,
+      createdBy: draft.createdBy,
+      createdByRole: draft.createdByRole,
+      createdAtLocation: draft.createdAtLocation,
+      declaration: draft.declaration,
+      annotation: draft.annotation,
+      type: draft.actionType,
+      status: ActionStatus.Accepted
+    }
+  }
 }
 
 export async function getDraftsByUserId(createdBy: string) {
-  const db = await getClient()
-  // @TODO: Change the `Draft` type to be flat to avoid `json_build_object` ?
-  const drafts = await db.any(sql.type(Draft)`
-    SELECT
-      id,
-      event_id AS "eventId",
-      transaction_id AS "transactionId",
-      ${formatTimestamp('created_at')} AS "createdAt",
-      json_build_object(
-        'transactionId',
-        transaction_id,
-        'createdAt',
-        ${formatTimestamp('created_at')},
-        'createdBy',
-        created_by,
-        'createdByRole',
-        created_by_role,
-        'createdAtLocation',
-        created_at_location,
-        'declaration',
-        declaration,
-        'annotation',
-        annotation,
-        'type',
-        action_type,
-        'status',
-        'Accepted'::action_status::text
-      ) AS action
-    FROM
-      event_action_drafts
-    WHERE
-      created_by = ${createdBy}
-  `)
+  const drafts = await db
+    .selectFrom('eventActionDrafts')
+    .where('createdBy', '=', createdBy)
+    .selectAll()
+    .execute()
+  const draftDocuments = drafts.map(transformDraft)
 
-  return [...drafts]
+  return z.array(Draft).parse(draftDocuments satisfies Draft[])
 }
 
 export async function getDraftsForAction(
   eventId: UUID,
   createdBy: string,
-  actionType: string
+  actionType: ActionType
 ) {
-  const db = await getClient()
-  const drafts = await db.any(sql.type(Draft)`
-    SELECT
-      id,
-      event_id AS "eventId",
-      transaction_id AS "transactionId",
-      declaration,
-      annotation,
-      ${formatTimestamp('created_at')} AS "createdAt"
-    FROM
-      event_action_drafts
-    WHERE
-      event_id = ${eventId}
-      AND created_by = ${createdBy}
-      AND action_type = ${actionType}
-  `)
+  const drafts = await db
+    .selectFrom('eventActionDrafts')
+    .where('eventId', '=', eventId)
+    .where('createdBy', '=', createdBy)
+    .where('actionType', '=', actionType)
+    .selectAll()
+    .execute()
+  const draftDocuments = drafts.map(transformDraft)
 
-  return [...drafts]
+  return z.array(Draft).parse(draftDocuments satisfies Draft[])
 }
 
 export async function deleteDraftsByEventId(eventId: UUID) {
-  const db = await getClient()
-  return db.query(sql.typeAlias('void')`
-    DELETE FROM event_action_drafts
-    WHERE
-      event_id = ${eventId}
-  `)
+  return db
+    .deleteFrom('eventActionDrafts')
+    .where('eventId', '=', eventId)
+    .execute()
 }
