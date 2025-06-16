@@ -533,3 +533,20 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
 
   expect(firstResponse).toEqual(secondResponse)
 })
+
+test('a correction request is not allowed if the event is already waiting for correction', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.correction.request(
+    generator.event.actions.correction.request(event.id)
+  )
+
+  await expect(
+    client.event.actions.correction.request(
+      generator.event.actions.correction.request(event.id)
+    )
+  ).rejects.toThrow(new TRPCError({ code: 'CONFLICT' }))
+})

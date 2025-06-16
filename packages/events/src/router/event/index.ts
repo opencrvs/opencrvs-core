@@ -195,6 +195,7 @@ export const eventRouter = router({
         )
         .input(RequestCorrectionActionInput)
         .use(middleware.requireAssignment)
+        .use(middleware.conflictIfWaitingForCorrection)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async ({ input, ctx }) => {
           if (ctx.isDuplicateAction) {
