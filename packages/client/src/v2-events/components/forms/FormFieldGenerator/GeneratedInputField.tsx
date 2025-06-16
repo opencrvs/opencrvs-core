@@ -230,6 +230,7 @@ export const GeneratedInputField = React.memo(
           <DateRangeField.Input
             {...inputProps}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => {
               //@TODO: We need to come up with a general solution for complex types.
               // @ts-ignore
@@ -474,6 +475,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             searchableResource={['locations']}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
@@ -487,6 +489,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             searchableResource={['offices']}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
@@ -500,6 +503,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             searchableResource={['facilities']}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
