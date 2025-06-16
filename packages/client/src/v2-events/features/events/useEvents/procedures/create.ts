@@ -65,7 +65,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
   mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
-      id: newEvent.transactionId as UUID, // It's not actually an UUID, but as it's not sent to the server, we can manage
+      id: newEvent.transactionId as UUID, // not actually an UUID, but as as it's temporary for the optimistic update, we can satisfy the type this way
       type: newEvent.type,
       trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
