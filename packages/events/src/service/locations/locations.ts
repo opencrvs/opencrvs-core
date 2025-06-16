@@ -27,11 +27,24 @@ export type Location = z.infer<typeof Location>
  * @param incomingLocations - Locations to be set
  */
 
-// @TODO: Check if the previous conditional logic made sense
 export async function setLocations(incomingLocations: Array<Location>) {
-  return locationsRepo.setLocations(incomingLocations)
+  return locationsRepo.createLocations(
+    incomingLocations.map(({ id, externalId, name, partOf }) => ({
+      id,
+      externalId,
+      name,
+      parentId: partOf
+    }))
+  )
 }
 
 export const getLocations = async () => {
-  return locationsRepo.getLocations()
+  const locations = await locationsRepo.getLocations()
+
+  return locations.map(({ id, externalId, name, parentId }) => ({
+    id,
+    externalId,
+    name,
+    partOf: parentId
+  }))
 }

@@ -11,7 +11,7 @@
 
 import { DraftInput, UUID } from '@opencrvs/commons'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
-import { TrpcUserContext } from '@events/context'
+import { UserContext } from '@events/context'
 
 export const createDraft = async (
   input: DraftInput,
@@ -21,21 +21,22 @@ export const createDraft = async (
     transactionId
   }: {
     eventId: UUID
-    user: TrpcUserContext
+    user: UserContext
     transactionId: string
   }
 ) => {
   return draftsRepo.createDraft({
     eventId,
     transactionId,
-    actionType: input.type,
+    // @TODO: Extract DELETE from ActionTypes. It's not an action that's stored!
+    // Type '"DELETE"' is not assignable to type 'ActionType'.
+    actionType: input.type as Exclude<DraftInput['type'], 'DELETE'>,
     declaration: input.declaration,
     annotation: input.annotation,
     createdBy: user.id,
     createdByRole: user.role,
     createdAtLocation: user.primaryOfficeId,
-    // @TODO: Why can this be null | undefined, does either have a different meaning?
-    createdBySignature: user.signature ?? undefined
+    createdBySignature: user.signature
   })
 }
 

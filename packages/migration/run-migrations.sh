@@ -27,6 +27,9 @@ yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
 
 # events migrations
 DATABASE_URL=${EVENTS_POSTGRES_URL} yarn --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
+if [ "$CI" != "true" ]; then
+  yarn workspace @opencrvs/events generate-db-types || true
+fi
 
 #openhim migrations
 yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG

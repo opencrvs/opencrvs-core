@@ -11,7 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
-import { NotFoundError as SlonikNotFoundError } from 'slonik'
+import { NoResultError } from 'kysely'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -54,7 +54,7 @@ export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
   try {
     return await eventsRepo.getEventById(eventId)
   } catch (error) {
-    if (error instanceof SlonikNotFoundError) {
+    if (error instanceof NoResultError) {
       throw new EventNotFoundError(eventId)
     }
     throw error
@@ -149,13 +149,12 @@ export async function createEvent({
     : eventsRepo.getOrCreateEventAndAssign
 
   const event = await getOrCreateEvent({
-    type: eventInput.type,
+    eventType: eventInput.type,
     transactionId: transactionId,
     trackingId: generateTrackingId(),
     createdBy: user.id,
     createdByRole: user.role,
-    // @TODO: Why can this be null | undefined, does either have a different meaning?
-    createdBySignature: user.signature ?? undefined,
+    createdBySignature: user.signature,
     createdAtLocation: user.primaryOfficeId
   })
 
@@ -243,7 +242,7 @@ export async function addAction(
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
-      type: ActionType.MARKED_AS_DUPLICATE,
+      actionType: ActionType.MARKED_AS_DUPLICATE,
       declaration: input.declaration,
       annotation: input.annotation,
       status,
@@ -257,7 +256,7 @@ export async function addAction(
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
-      type: input.type,
+      actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
       status,
@@ -275,7 +274,7 @@ export async function addAction(
           ? input.registrationNumber
           : undefined,
       transactionId: input.transactionId,
-      type: input.type,
+      actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
       status,
@@ -303,7 +302,7 @@ export async function addAction(
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
-      type: ActionType.UNASSIGN,
+      actionType: ActionType.UNASSIGN,
       status,
       createdBy: user.id,
       createdByRole: user.role,
@@ -368,7 +367,7 @@ export async function addAsyncRejectAction({
   await eventsRepo.createAction({
     eventId,
     transactionId,
-    type,
+    actionType: type,
     status: ActionStatus.Rejected,
     originalActionId,
     createdBy,

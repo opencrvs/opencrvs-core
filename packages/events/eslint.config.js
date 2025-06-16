@@ -19,7 +19,14 @@ const compat = new FlatCompat({
 })
 
 module.exports = defineConfig([
-  { ignores: ['build/**/*', 'eslint*', 'vitest.config.ts'] },
+  {
+    ignores: [
+      'build/**/*',
+      'src/storage/postgres/events/schema/**/*',
+      'eslint*',
+      'vitest.config.ts'
+    ]
+  },
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended'
@@ -70,11 +77,6 @@ module.exports = defineConfig([
         {
           name: '@opencrvs/commons/client',
           message: 'Please use @opencrvs/commons or @opencrvs/commons/events'
-        },
-        {
-          name: 'slonik',
-          importNames: ['sql'],
-          message: 'Please import `sql` from `storage/postgres/events/db.ts`'
         }
       ]
     }
