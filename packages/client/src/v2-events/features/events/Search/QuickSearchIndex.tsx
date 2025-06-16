@@ -36,12 +36,17 @@ export const QuickSearchIndex = () => {
       columns={mandatoryColumns}
       eventConfigs={eventConfigurations}
       queryData={queryData}
-      // @todo add quick search title. see https://github.com/opencrvs/opencrvs-core/issues/8460
-      title={intl.formatMessage({
-        id: 'kdkdkd',
-        description: '',
-        defaultMessage: ''
-      })}
+      title={intl.formatMessage(
+        {
+          id: 'v2.search.searchResultFor',
+          description: 'Title for search result page',
+          defaultMessage:
+            'Search result for “{searchTerm}”,résultat de la recherche pour “{searchTerm}“'
+        },
+        {
+          searchTerm: searchParams.keys
+        }
+      )}
     />
   )
 }

@@ -58,11 +58,16 @@ export const SearchResultIndex = () => {
         />
       }
       // @todo add search result message with total count of results
-      title={intl.formatMessage({
-        id: 'kdkdkd',
-        description: '',
-        defaultMessage: ''
-      })}
+      title={intl.formatMessage(
+        {
+          id: 'v2.search.v2.search.advancedSearch.result.title',
+          description: 'Advanced search result title',
+          defaultMessage: 'Search result ({count})'
+        },
+        {
+          count: queryData.length
+        }
+      )}
     />
   )
 }

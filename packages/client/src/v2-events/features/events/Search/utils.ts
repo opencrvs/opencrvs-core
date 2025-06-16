@@ -143,6 +143,7 @@ export const getDefaultSearchFields = (
   return searchFields
 }
 
+// @TODO: Could we just use EventStatus?
 const RegStatus = {
   Created: 'CREATED',
   Notified: 'NOTIFIED',
@@ -167,7 +168,15 @@ type Condition =
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
 
+/**
+ * Represents advanced search behavior where **all conditions must match**.
+ * Used to build ElasticSearch queries with `must` clauses (logical AND).
+ */
 const ADVANCED_SEARCH_KEY = 'and' as const
+/**
+ * Represents quick search behavior where **any condition may match**.
+ * Used to build ElasticSearch queries with `should` clauses (logical OR).
+ */
 const QUICK_SEARCH_KEY = 'or' as const
 
 export function toAdvancedSearchQueryType(
