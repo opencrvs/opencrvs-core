@@ -13,6 +13,8 @@ import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { CreatedAtLocation } from './CreatedAtLocation'
+
 extendZodWithOpenApi(z)
 
 /**
@@ -41,9 +43,13 @@ export const ActionBase = z.object({
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdByRole: z.string(),
+  createdBySignature: z
+    .string()
+    .nullish() // @TODO: Check where the null comes from
+    .describe('Reference to signature of the user who created the action'),
+  createdAtLocation: CreatedAtLocation,
   declaration: ActionUpdate,
   annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string(),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
@@ -90,9 +96,18 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
+export const RejectionReason = z.object({
+  message: z
+    .string()
+    .min(1, { message: 'Message cannot be empty' })
+    .describe('Message describing reason for rejection or archiving'),
+  isDuplicate: z.boolean().optional().describe('If a declaration is duplicated')
+})
+
 const RejectAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT),
+    reason: RejectionReason
   })
 )
 
@@ -104,7 +119,8 @@ const MarkAsDuplicateAction = ActionBase.merge(
 
 const ArchiveAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE),
+    reason: RejectionReason
   })
 )
 

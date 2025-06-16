@@ -17,8 +17,11 @@ import {
   ActionType,
   generateEventDraftDocument,
   ActionStatus,
-  getUUID
+  getUUID,
+  createPseudoRandomNumberGenerator,
+  getRandomDatetime
 } from '@opencrvs/commons/client'
+import { SystemRole } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
@@ -138,15 +141,135 @@ export const WithRejectedAction: Story = {
               actions: tennisClubMembershipEventDocument.actions.concat([
                 {
                   type: ActionType.ARCHIVE,
-                  status: ActionStatus.Rejected,
+                  status: ActionStatus.Accepted,
                   id: getUUID(),
                   transactionId: getUUID(),
                   createdAt: new Date().toISOString(),
                   createdBy: '123',
                   createdAtLocation: '123',
-                  createdByRole: 'LOCAL_REGISTRAR'
+                  createdByRole: 'LOCAL_REGISTRAR',
+                  declaration: {},
+                  reason: { message: 'Archived', isDuplicate: true }
                 }
               ])
+            }
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument(
+                tennisClubMembershipEventDocument.id,
+                ActionType.REGISTER,
+                {
+                  'applicant.firstname': 'Riku',
+                  'applicant.surname': 'This value is from a draft'
+                }
+              )
+            ]
+          })
+        ]
+      }
+    }
+  }
+}
+
+export const WithSystemUserActions: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            const rng = createPseudoRandomNumberGenerator(1234)
+
+            return {
+              ...tennisClubMembershipEventDocument,
+              actions: [
+                {
+                  type: ActionType.CREATE,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-01-01'),
+                    new Date('2024-02-01')
+                  ),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: SystemRole.enum.HEALTH,
+                  assignedTo: '010101',
+                  declaration: {}
+                },
+                {
+                  type: ActionType.ASSIGN,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-02-01'),
+                    new Date('2024-03-01')
+                  ),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: SystemRole.enum.HEALTH,
+                  assignedTo: '010101',
+                  declaration: {}
+                },
+                {
+                  type: ActionType.NOTIFY,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-03-01'),
+                    new Date('2024-04-01')
+                  ),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: SystemRole.enum.HEALTH,
+                  declaration: {}
+                },
+                {
+                  type: ActionType.UNASSIGN,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-04-01'),
+                    new Date('2024-05-01')
+                  ),
+                  createdBy: '010101',
+                  createdAtLocation: undefined,
+                  createdByRole: SystemRole.enum.HEALTH,
+                  assignedTo: null,
+                  declaration: {}
+                },
+                {
+                  type: ActionType.DECLARE,
+                  status: ActionStatus.Accepted,
+                  id: getUUID(),
+                  transactionId: getUUID(),
+                  createdAt: getRandomDatetime(
+                    rng,
+                    new Date('2024-05-01'),
+                    new Date('2024-06-01')
+                  ),
+                  createdBy: '123',
+                  createdAtLocation: '123',
+                  createdByRole: 'LOCAL_REGISTRAR',
+                  declaration: {}
+                }
+              ]
             }
           })
         ],

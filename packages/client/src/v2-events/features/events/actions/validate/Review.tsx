@@ -75,7 +75,7 @@ export function Review() {
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const currentEventState = getCurrentEventState(event)
+  const currentEventState = getCurrentEventState(event, config)
   const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
@@ -159,7 +159,8 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message }
+          annotation: {},
+          reason: { message }
         })
       }
 
@@ -168,7 +169,8 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message, isDuplicate }
+          annotation: {},
+          reason: { message, isDuplicate }
         })
       }
 

@@ -29,10 +29,7 @@ export async function deleteDocument(
       )
     )
 
-  const stat = await minioClient.statObject(
-    MINIO_BUCKET,
-    'event-attachments/' + filename
-  )
+  const stat = await minioClient.statObject(MINIO_BUCKET, filename)
   const createdBy = stat.metaData['created-by']
 
   if (createdBy !== userId)
@@ -41,7 +38,7 @@ export async function deleteDocument(
         `request failed: user with id ${userId} does not have permission to delete this document`
       )
       .code(403)
-  await minioClient.removeObject(MINIO_BUCKET, 'event-attachments/' + filename)
+  await minioClient.removeObject(MINIO_BUCKET, filename)
 
   return h.response().code(204)
 }

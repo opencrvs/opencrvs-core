@@ -1781,12 +1781,25 @@ export function fetchUserMock(officeId: string): FetchUserQuery {
   }
 }
 
-export function setScopes(scope: Scope[], store: AppStore) {
-  const token = jwt.sign({ scope: scope }, readFileSync('./test/cert.key'), {
+export function generateToken(scope: Scope[], subject?: string) {
+  if (subject) {
+    return jwt.sign({ scope }, readFileSync('./test/cert.key'), {
+      subject,
+      algorithm: 'RS256',
+      issuer: 'opencrvs:auth-service',
+      audience: 'opencrvs:gateway-user'
+    })
+  }
+  return jwt.sign({ scope }, readFileSync('./test/cert.key'), {
     algorithm: 'RS256',
     issuer: 'opencrvs:auth-service',
     audience: 'opencrvs:gateway-user'
   })
+}
+
+export function setScopes(scope: Scope[], store: AppStore) {
+  const token = generateToken(scope)
+
   window.history.replaceState({}, '', '?token=' + token)
 
   return store.dispatch({

@@ -74,6 +74,12 @@ function generateQuery(
 function buildClause(clause: QueryExpression) {
   const must: estypes.QueryDslQueryContainer[] = []
 
+  if (clause.eventType) {
+    must.push({
+      term: { type: clause.eventType }
+    })
+  }
+
   if (clause.status) {
     if (clause.status.type === 'anyOf') {
       must.push({ terms: { status: clause.status.terms } })
@@ -86,6 +92,54 @@ function buildClause(clause: QueryExpression) {
     must.push({
       term: { trackingId: clause.trackingId.term }
     })
+  }
+
+  if (clause.assignedTo) {
+    must.push({
+      term: { assignedTo: clause.assignedTo.term }
+    })
+  }
+
+  if (clause.createdBy) {
+    must.push({
+      term: { createdBy: clause.createdBy.term }
+    })
+  }
+
+  if (clause.updatedBy) {
+    must.push({
+      term: { updatedBy: clause.updatedBy.term }
+    })
+  }
+
+  if (clause['legalStatus.REGISTERED.createdAt']) {
+    if (clause['legalStatus.REGISTERED.createdAt'].type === 'exact') {
+      must.push({
+        term: {
+          'legalStatuses.REGISTERED.createdAt':
+            clause['legalStatus.REGISTERED.createdAt'].term
+        }
+      })
+    } else {
+      must.push({
+        range: {
+          'legalStatuses.REGISTERED.createdAt': {
+            gte: clause['legalStatus.REGISTERED.createdAt'].gte,
+            lte: clause['legalStatus.REGISTERED.createdAt'].lte
+          }
+        }
+      })
+    }
+  }
+  if (clause['legalStatus.REGISTERED.createdAtLocation']) {
+    if (clause['legalStatus.REGISTERED.createdAtLocation'].type === 'exact') {
+      must.push({
+        term: {
+          'legalStatuses.REGISTERED.createdAtLocation':
+            clause['legalStatus.REGISTERED.createdAtLocation'].term
+        }
+      })
+    }
   }
 
   if (clause.createdAt) {
@@ -118,14 +172,14 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  if (clause.createAtLocation) {
-    if (clause.createAtLocation.type === 'exact') {
-      must.push({ term: { createdAtLocation: clause.createAtLocation.term } })
+  if (clause.createdAtLocation) {
+    if (clause.createdAtLocation.type === 'exact') {
+      must.push({ term: { createdAtLocation: clause.createdAtLocation.term } })
     } else {
       must.push({
         geo_distance: {
           distance: '10km',
-          location: clause.createAtLocation.location
+          location: clause.createdAtLocation.location
         }
       })
     }
@@ -146,10 +200,6 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  if (clause.eventType) {
-    must.push({ match: { eventType: clause.eventType } })
-  }
-
   if (clause.data) {
     const dataQuery = generateQuery(clause.data)
     const innerMust = dataQuery.bool?.must
@@ -161,26 +211,40 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
-  return { bool: { must } } as estypes.QueryDslQueryContainer
+  return must
 }
 
-export function buildElasticQueryFromSearchPayload(input: QueryType) {
-  if (input.type === 'and') {
-    return buildClause(input)
-  }
-
-  if (input.type === 'or') {
-    const should = input.clauses.map((clause) => buildClause(clause))
-    return {
-      bool: {
-        should,
-        minimum_should_match: 1
+export function buildElasticQueryFromSearchPayload(
+  input: QueryType
+): estypes.QueryDslQueryContainer {
+  const must = input.clauses.flatMap((clause) => buildClause(clause))
+  switch (input.type) {
+    case 'and': {
+      return {
+        bool: {
+          must,
+          // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
+          // when no `should` clauses are provided.
+          should: undefined
+        }
       }
     }
+    case 'or': {
+      const should = input.clauses.flatMap((clause) => ({
+        bool: {
+          must: buildClause(clause)
+        }
+      }))
+      return {
+        bool: {
+          should
+        }
+      } as estypes.QueryDslQueryContainer
+    }
+    // default fallback (shouldn't happen if input is validated correctly)
+    default:
+      return {
+        bool: { must_not: { match_all: {} }, should: undefined }
+      }
   }
-
-  // default fallback (shouldn't happen if input is validated correctly)
-  return {
-    bool: { must_not: { match_all: {} } }
-  } as estypes.QueryDslQueryContainer
 }

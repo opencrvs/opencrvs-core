@@ -17,10 +17,16 @@ import forms from '../src/tests/forms.json'
 import { AppRouter } from '../src/v2-events/trpc'
 import {
   tennisClubMembershipEventIndex,
-  tennisClubMembershipEventDocument
+  tennisClubMembershipEventDocument,
+  TestImage
 } from '../src/v2-events/features/events/fixtures'
 import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMembershipCertifiedCertificateTemplate'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  generateWorkqueues,
+  TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 
 async function ensureCacheExists(cacheName: string) {
   const cacheNames = await caches.keys()
@@ -90,6 +96,96 @@ export const handlers = {
           externalId: 'dbTLdTi7s8F',
           name: 'Chuminga',
           partOf: null
+        },
+        {
+          id: '62a0ccb4-880d-4f30-8882-f256007dfff9',
+          externalId: 'oEBf29y8JP8',
+          name: 'Ibombo',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: '967032fd-3f81-478a-826c-30cb8fe121bd',
+          externalId: 'ntoX1PkiWri',
+          name: 'Isamba',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: '89a33893-b17d-481d-a26d-6461e7ac1651',
+          externalId: 'QTtxiWj8ONP',
+          name: 'Itambo',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250',
+          externalId: 'ydyJb1RAy4U',
+          name: 'Ezhi',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: '423d000f-101b-47c0-8b86-21a908067cee',
+          externalId: 'pXhz0PLiYZX',
+          name: 'Chamakubi Health Post',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '4d3279be-d026-420c-88f7-f0a4ae986973',
+          externalId: 'di3U5u7F8Y3',
+          name: 'Ibombo Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '190902f4-1d77-476a-8947-41145af1db7d',
+          externalId: 'B5LpoYehUfI',
+          name: 'Chikobo Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71',
+          externalId: 'g42i3akwlpj',
+          name: 'Chilochabalenje Health Post',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: 'dbfc178f-7295-4b90-b28d-111c95b03127',
+          externalId: 'FhCAve1Ndla',
+          name: 'Chipeso Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '09862bfe-c7ac-46cd-987b-668681533c80',
+          externalId: 'uhVtTq0ICIF',
+          name: 'Chisamba Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '834ce389-e95b-4fb0-96a0-33e9ab323059',
+          externalId: 'dhcU6eMvhRQ',
+          name: 'Chitanda Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '0431c433-6062-4a4c-aee9-25271aec61ee',
+          externalId: 'xUFGW5vo7No',
+          name: 'Golden Valley Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2',
+          externalId: 'h1YIvEZ6dla',
+          name: 'Ipongo Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '4cf1f53b-b730-41d2-8649-dff7eeed970d',
+          externalId: 'VEhbknBaEOz',
+          name: 'Itumbwe Health Post',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0',
+          externalId: 'sbFApO4who4',
+          name: 'Kabangalala Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
         }
       ]
     })
@@ -372,7 +468,7 @@ export const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/event-attachments/:filename', async (req) => {
+    http.get('/api/presigned-url/:filename', async (req) => {
       return HttpResponse.json({
         presignedURL: `http://localhost:3535/ocrvs/tree.svg`
       })
@@ -380,9 +476,7 @@ export const handlers = {
     http.post('/api/upload', async (req) => {
       const formData = await req.request.formData()
 
-      return HttpResponse.text(
-        `event-attachments/${formData.get('transactionId')}.jpg`
-      )
+      return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
     }),
     http.delete('/api/files/:filename', async (request) => {
       return HttpResponse.text('OK')
@@ -396,55 +490,22 @@ export const handlers = {
         return response
       }
 
-      const defaultFile = `
-        <svg width="800px" height="800px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M3 6C3 4.34315 4.34315 3 6 3H14C15.6569 3 17 4.34315 17 6V14C17 15.6569 15.6569 17 14 17H6C4.34315 17 3 15.6569 3 14V6Z" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M21 7V18C21 19.6569 19.6569 21 18 21H7" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        <path d="M3 12.375L6.66789 8.70711C7.05842 8.31658 7.69158 8.31658 8.08211 8.70711L10.875 11.5M10.875 11.5L13.2304 9.1446C13.6209 8.75408 14.2541 8.75408 14.6446 9.14461L17 11.5M10.875 11.5L12.8438 13.4688" stroke="#000000" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      `
-
-      const tree = `
-        <svg width="150" height="200" xmlns="http://www.w3.org/2000/svg">
-        <rect x="65" y="100" width="20" height="60" fill="#8B4513" />
-        <circle cx="75" cy="80" r="40" fill="green" />
-        <circle cx="55" cy="90" r="30" fill="darkgreen" />
-        <circle cx="95" cy="90" r="30" fill="darkgreen" />
-        <circle cx="75" cy="60" r="30" fill="darkgreen" />
-        </svg>`
-
-      const fish = `
-        <svg width="150" height="100" xmlns="http://www.w3.org/2000/svg">
-        <ellipse cx="75" cy="50" rx="50" ry="30" fill="#1E90FF" />
-        <polygon points="115,50 135,35 135,65" fill="#4682B4" />
-        <circle cx="55" cy="40" r="5" fill="white" />
-        <path d="M55,50 Q65,40 75,50 Q65,60 55,50" fill="lightblue" />
-        </svg>`
-
-      const mountain = `
-          <svg width="200" height="150" xmlns="http://www.w3.org/2000/svg">
-          <rect width="200" height="80" y="70" fill="#98FB98" />
-          <polygon points="50,70 100,20 150,70" fill="#A9A9A9" />
-          <polygon points="70,70 120,30 170,70" fill="#808080" />
-          <circle cx="30" cy="30" r="20" fill="#FFD700" />
-          </svg>`
-
       const url = new URL(request.request.url)
       const basename = url.pathname.split('/').pop()
 
       let file: string
       switch (basename) {
         case 'tree.svg':
-          file = tree
+          file = TestImage.Tree
           break
         case 'fish.svg':
-          file = fish
+          file = TestImage.Fish
           break
         case 'mountain.svg':
-          file = mountain
+          file = TestImage.Mountain
           break
         default:
-          file = defaultFile
+          file = TestImage.Box
       }
 
       return new HttpResponse(file, {
@@ -1124,12 +1185,26 @@ export const handlers = {
     tRPCMsw.user.list.query(() => {
       return [
         {
-          id: '6780dbf7a263c6515c7b97d2',
+          id: testDataGenerator().user.id.localRegistrar,
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
           signatureFilename: undefined
         }
       ]
+    }),
+    tRPCMsw.user.get.query((id) => {
+      return {
+        id,
+        name: [
+          {
+            use: 'en',
+            given: ['Kennedy'],
+            family: 'Mweene'
+          }
+        ],
+        role: 'LOCAL_REGISTRAR',
+        signatureFilename: 'signature.png'
+      }
     })
   ],
   event: [
@@ -1138,6 +1213,17 @@ export const handlers = {
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]
+    }),
+    tRPCMsw.event.search.query((input) => {
+      return [tennisClubMembershipEventIndex]
+    }),
+    tRPCMsw.workqueue.config.list.query(() => {
+      return generateWorkqueues()
+    }),
+    tRPCMsw.workqueue.count.query((input) => {
+      return input.reduce((acc, { slug }) => {
+        return { ...acc, [slug]: 7 }
+      }, {})
     })
   ],
   locations: [
@@ -2046,7 +2132,7 @@ export const handlers = {
         certificates: [
           {
             id: 'tennis-club-membership-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.copy',
               defaultMessage: 'Tennis Club Membership Certificate copy',
@@ -2071,7 +2157,7 @@ export const handlers = {
           },
           {
             id: 'tennis-club-membership-certified-certificate',
-            event: 'TENNIS_CLUB_MEMBERSHIP',
+            event: TENNIS_CLUB_MEMBERSHIP,
             label: {
               id: 'certificates.tennis-club-membership.certificate.certified-copy',
               defaultMessage:

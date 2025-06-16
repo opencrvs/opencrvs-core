@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { graphql, HttpResponse } from 'msw'
+import { graphql, http, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
@@ -21,7 +21,11 @@ import {
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventIndex,
+  TestImage
+} from '@client/v2-events/features/events/fixtures'
+
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -99,6 +103,9 @@ export const ReviewForLocalRegistrarComplete: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -137,6 +144,9 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -191,6 +201,9 @@ export const ReviewForRegistrationAgentComplete: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -240,6 +253,9 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -290,6 +306,9 @@ export const ReviewForFieldAgentComplete: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -336,6 +355,59 @@ export const ReviewForFieldAgentIncomplete: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
+          })
+        ]
+      }
+    }
+  }
+}
+
+const createdEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+export const ReviewShowsFilesFromDraft: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId
+      })
+    },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument(createdEvent.id, ActionType.DECLARE)
+            ]
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return createdEvent
+          }),
+          tRPCMsw.event.list.query(() => {
+            return []
+          })
+        ],
+        files: [
+          http.get('/api/presigned-url/:filename', (req) => {
+            return HttpResponse.json({
+              presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
+            })
+          }),
+          http.get('http://localhost:3535/ocrvs/:id', () => {
+            return new HttpResponse(TestImage.Fish, {
+              headers: {
+                'Content-Type': 'image/svg+xml',
+                'Cache-Control': 'no-cache'
+              }
+            })
           })
         ]
       }

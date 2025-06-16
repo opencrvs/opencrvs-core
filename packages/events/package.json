@@ -12,7 +12,7 @@
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "precommit": "lint-staged",
     "test:compilation": "tsc --noEmit",
-    "build": "tsc && tsc -p tsconfig.router.json",
+    "build": "tsc -p tsconfig.build.json && tsc -p tsconfig.router.json",
     "build:clean": "rm -rf build"
   },
   "dependencies": {
@@ -37,6 +37,7 @@
     "@eslint/compat": "^1.2.7",
     "@eslint/eslintrc": "^3.3.1",
     "@testcontainers/elasticsearch": "^10.15.0",
+    "@trpc/client": "^11.2.0",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/lodash": "^4.14.149",
     "@types/node": "22.15.29",

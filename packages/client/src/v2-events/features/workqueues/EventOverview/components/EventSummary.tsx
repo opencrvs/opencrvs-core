@@ -15,8 +15,7 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  SummaryConfig,
-  EventIndex
+  SummaryConfig
 } from '@opencrvs/commons/client'
 import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -146,7 +145,7 @@ export function EventSummary({
         value: Output({
           field: config,
           showPreviouslyMissingValuesAsChanged: false,
-          value: value
+          value
         })
       }
     }

@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`allows sending partial payload as NOTIFY action 1`] = `
+exports[`event.actions.notify > allows sending partial payload as NOTIFY action 1`] = `
 {
   "applicant.address": {
     "addressType": "DOMESTIC",
@@ -24,3 +24,5 @@ exports[`allows sending partial payload as NOTIFY action 1`] = `
   "recommender.none": true,
 }
 `;
+
+exports[`event.actions.notify > system user > system user should not be able to perform action on assigned event 1`] = `[TRPCError: System user can not perform action on assigned event]`;

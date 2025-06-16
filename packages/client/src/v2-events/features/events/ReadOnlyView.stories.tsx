@@ -82,12 +82,19 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     })
 
     await step('User is taken to the view record page', async () => {
-      await userEvent.click(await canvas.findByText('View record'))
+      const ViewRecordMenus = await canvas.findAllByText('View record')
+      if (ViewRecordMenus.length > 0) {
+        await userEvent.click(ViewRecordMenus[0])
 
-      await waitFor(async () => {
-        await canvas.findByText('Riku This value is from a draft')
-        await canvas.findByText('Tennis club membership application')
-      })
+        await waitFor(async () => {
+          await canvas.findByText('Riku')
+          await canvas.findByText('This value is from a draft')
+          await canvas.findByText(
+            'Member declaration for Riku This value is from a draft'
+          )
+          await canvas.findByText('Tennis club membership application')
+        })
+      }
     })
   },
   parameters: {
@@ -130,12 +137,20 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
           tRPCMsw.user.list.query(() => {
             return [
               {
-                id: '6780dbf7a263c6515c7b97d2',
+                id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
                 signatureFilename: undefined
               }
             ]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return {
+              id: generator.user.id.localRegistrar,
+              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+              role: 'LOCAL_REGISTRAR',
+              signatureFilename: undefined
+            }
           })
         ]
       }
@@ -192,6 +207,14 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                 signatureFilename: undefined
               }
             ]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return {
+              id: generator.user.id.localRegistrar,
+              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+              role: 'LOCAL_REGISTRAR',
+              signatureFilename: undefined
+            }
           })
         ]
       }

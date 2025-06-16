@@ -20,53 +20,59 @@ import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
+import { TrpcUserContext } from '@events/context'
 
 export async function validate(
   input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
   {
     eventId,
-    createdBy,
-    createdByRole,
-    token,
-    transactionId,
-    createdAtLocation
+    user,
+    token
   }: {
     eventId: string
-    createdBy: string
-    createdByRole: string
-    createdAtLocation: string
-    transactionId: string
+    user: TrpcUserContext
     token: string
   }
 ) {
-  const config = await getEventConfigurations(token)
+  const configs = await getEventConfigurations(token)
   const storedEvent = await getEventById(eventId)
-  const form = config.find((c) => c.id === storedEvent.type)
+  const config = configs.find((c) => c.id === storedEvent.type)
 
-  if (!form) {
-    throw new Error(`Form not found with event type: ${storedEvent.type}`)
+  if (!config) {
+    throw new Error(
+      `Event configuration not found with type: ${storedEvent.type}`
+    )
   }
 
   let duplicates: EventIndex[] = []
 
-  const futureEventState = getCurrentEventState({
-    ...storedEvent,
-    actions: [
-      ...storedEvent.actions,
-      {
-        ...input,
-        createdAt: new Date().toISOString(),
-        createdBy,
-        createdByRole,
-        id: getUUID(),
-        createdAtLocation,
-        status: ActionStatus.Accepted
-      }
-    ]
-  })
+  const createdBy = user.id
+  const createdByRole = user.role
+  const createdAtLocation = user.primaryOfficeId
+  const createdBySignature = user.signature
+
+  const futureEventState = getCurrentEventState(
+    {
+      ...storedEvent,
+      actions: [
+        ...storedEvent.actions,
+        {
+          ...input,
+          createdAt: new Date().toISOString(),
+          createdBy,
+          createdByRole,
+          createdBySignature,
+          id: getUUID(),
+          createdAtLocation,
+          status: ActionStatus.Accepted
+        }
+      ]
+    },
+    config
+  )
 
   const resultsFromAllRules = await Promise.all(
-    form.deduplication.map(async (deduplication) => {
+    config.deduplication.map(async (deduplication) => {
       const matches = await searchForDuplicates(futureEventState, deduplication)
       return matches
     })
@@ -92,11 +98,8 @@ export async function validate(
     { ...input, duplicates: duplicates.map((d) => d.id) },
     {
       eventId,
-      createdBy,
-      createdByRole,
-      transactionId,
+      user,
       token,
-      createdAtLocation,
       status: ActionStatus.Accepted
     }
   )

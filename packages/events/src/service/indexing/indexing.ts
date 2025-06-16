@@ -11,7 +11,6 @@
 
 import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -24,7 +23,8 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType
+  QueryType,
+  WorkqueueCountInput
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -42,8 +42,11 @@ import {
 } from './utils'
 import { buildElasticQueryFromSearchPayload } from './query'
 
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
+function eventToEventIndex(
+  event: EventDocument,
+  config: EventConfig
+): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event, config))
 }
 
 /*
@@ -74,7 +77,6 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
@@ -118,6 +120,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         type: 'object',
         properties: addressProperties
       }
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         type: 'object',
@@ -191,6 +194,7 @@ export async function createIndex(
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' }
                 } satisfies Record<
                   keyof ActionCreationMetadata,
@@ -204,6 +208,7 @@ export async function createIndex(
                   createdBy: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
                   acceptedAt: { type: 'date' },
                   registrationNumber: { type: 'keyword' }
                 } satisfies Record<
@@ -233,8 +238,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists`)
-    logger.info(JSON.stringify(hasEventsIndex))
+    logger.info(`Index ${indexName} already exists.\n`)
   }
   return ensureAlias(indexName)
 }
@@ -265,7 +269,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     readableObjectMode: true,
     writableObjectMode: true,
     transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record))
+      callback(null, eventToEventIndex(record, eventConfiguration))
     }
   })
 
@@ -283,7 +287,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   })
 }
 
-export async function indexEvent(event: EventDocument) {
+export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
@@ -291,7 +295,7 @@ export async function indexEvent(event: EventDocument) {
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event),
+    document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
 }
@@ -348,7 +352,7 @@ export async function getIndexedEvents(userId: string) {
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: 10000,
+    size: DEFAULT_SIZE,
     request_cache: false
   })
 
@@ -361,41 +365,47 @@ export async function getIndexedEvents(userId: string) {
 export async function getIndex(eventParams: QueryType) {
   const esClient = getOrCreateClient()
 
-  if ('type' in eventParams && eventParams.type === 'or') {
+  if (eventParams.type === 'or') {
     const { clauses } = eventParams
+    // @todo: implement or query for quick search
     // eslint-disable-next-line no-console
     console.log({ clauses })
     return []
   }
 
-  if ('eventType' in eventParams) {
-    const { eventType, ...queryParams } = eventParams
-    if (Object.values(eventParams).length === 0) {
-      throw new Error('No search params provided')
-    }
-
-    const query = buildElasticQueryFromSearchPayload(queryParams)
-
-    if (!eventType) {
-      throw new Error('No eventType provided')
-    }
-
-    const response = await esClient.search<EncodedEventIndex>({
-      index: getEventIndexName(eventType),
-      size: DEFAULT_SIZE,
-      request_cache: false,
-      query
-    })
-
-    const events = z.array(EventIndex).parse(
-      response.hits.hits
-        .map((hit) => hit._source)
-        .filter((event): event is EncodedEventIndex => event !== undefined)
-        .map((event) => decodeEventIndex(event))
-    )
-
-    return events
+  if (Object.values(eventParams).length === 0) {
+    throw new Error('No search params provided')
   }
 
-  return []
+  const query = buildElasticQueryFromSearchPayload(eventParams)
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventAliasName(),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query
+  })
+
+  const events = response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map((event) => decodeEventIndex(event))
+
+  return events
+}
+
+export async function getEventCount(queries: WorkqueueCountInput) {
+  return (
+    //  @ToDo: write a query that does everything in one go.
+    (
+      await Promise.all(
+        queries.map(async ({ slug, query }) => {
+          const count = (await getIndex(query)).length
+          return { slug, count }
+        })
+      )
+    ).reduce((acc: Record<string, number>, { slug, count }) => {
+      acc[slug] = count
+      return acc
+    }, {})
+  )
 }

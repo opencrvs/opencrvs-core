@@ -9,14 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { initTRPC } from '@trpc/server'
+import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { Context } from './middleware'
+import { logger, TokenUserType } from '@opencrvs/commons'
+import { TrpcContext } from '@events/context'
 
-export const t = initTRPC.context<Context>().meta<OpenApiMeta>().create({
+export const t = initTRPC.context<TrpcContext>().meta<OpenApiMeta>().create({
   transformer: superjson
 })
 
 export const router = t.router
-export const publicProcedure = t.procedure
+
+/**
+ * System procedures are available to both system (API key) users and
+ * human users depending on the scopes they have
+ */
+export const systemProcedure = t.procedure
+
+/**
+ * Public procedures are only available to human users
+ * and will throw an error if a system user tries to access them
+ */
+export const publicProcedure = t.procedure.use(async (opts) => {
+  if (opts.ctx.user.type === TokenUserType.enum.system) {
+    logger.error(
+      `System user tried to access public procedure. User id: '${opts.ctx.user.id}'`
+    )
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  return opts.next({ ctx: opts.ctx })
+})

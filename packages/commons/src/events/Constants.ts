@@ -9,10 +9,4 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-{
-  "compilerOptions": {
-    "paths": {
-      "@events/*": ["./*"]
-    }
-  }
-}
+export const TENNIS_CLUB_MEMBERSHIP = 'tennis-club-membership'

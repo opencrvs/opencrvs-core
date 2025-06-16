@@ -23,7 +23,6 @@ import {
   not,
   GeographicalArea,
   AdministrativeAreas,
-  isFieldVisible,
   alwaysTrue,
   AddressType,
   never,

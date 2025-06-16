@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { SCOPES } from '@opencrvs/commons'
-import { router, publicProcedure } from '@events/router/trpc'
+import { router, publicProcedure, systemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import {
   getLocations,
@@ -20,7 +20,7 @@ import {
 } from '@events/service/locations/locations'
 
 export const locationRouter = router({
-  set: publicProcedure
+  set: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING]))
     .input(z.array(Location).min(1))
     .mutation(async (options) => {

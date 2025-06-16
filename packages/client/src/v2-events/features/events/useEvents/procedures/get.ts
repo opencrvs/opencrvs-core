@@ -16,7 +16,10 @@ import {
   EventIndex,
   getCurrentEventState
 } from '@opencrvs/commons/client'
-import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import {
+  useEventConfiguration,
+  useEventConfigurations
+} from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
@@ -108,8 +111,12 @@ export function useGetEventState() {
   return {
     useQuery: (id: string) => {
       const response = getEvent.useQuery(id)
+
+      const { eventConfiguration } = useEventConfiguration(
+        response.data?.type ?? ''
+      )
       const eventState = response.data
-        ? getCurrentEventState(response.data)
+        ? getCurrentEventState(response.data, eventConfiguration)
         : undefined
 
       return {
@@ -119,8 +126,8 @@ export function useGetEventState() {
     },
     useSuspenseQuery: (id: string): EventIndex => {
       const [eventDocument] = getEvent.useSuspenseQuery(id)
-
-      return getCurrentEventState(eventDocument)
+      const { eventConfiguration } = useEventConfiguration(eventDocument.type)
+      return getCurrentEventState(eventDocument, eventConfiguration)
     }
   }
 }

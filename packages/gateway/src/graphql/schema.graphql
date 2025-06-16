@@ -391,6 +391,7 @@ type User {
   mobile: String
   role: UserRole!
   email: String
+  fullHonorificName: String
   status: Status!
   underInvestigation: Boolean
   primaryOffice: Location!
@@ -708,6 +709,7 @@ input UserInput {
   status: Status
   role: String
   email: String
+  fullHonorificName: String
   primaryOffice: String
   device: String
   signature: SignatureInput
@@ -1073,6 +1075,7 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
+  IMPORT
 }
 
 enum IntegratingSystemType {

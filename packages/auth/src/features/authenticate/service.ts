@@ -24,7 +24,7 @@ import {
 import { logger, UUID } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
 import * as F from 'fp-ts'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -122,9 +122,10 @@ export async function createToken(
   scope: string[],
   audience: string[],
   issuer: string,
-  temporary?: boolean
+  temporary?: boolean,
+  userType: TokenUserType = TokenUserType.enum.user
 ): Promise<string> {
-  return sign({ scope }, cert, {
+  return sign({ scope, userType }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: temporary

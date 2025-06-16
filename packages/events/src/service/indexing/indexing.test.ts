@@ -10,7 +10,7 @@
  */
 
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { QueryType } from '@opencrvs/commons/events'
+import { QueryType, TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/events'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import {
   getEventIndexName,
@@ -32,7 +32,7 @@ test('indexes all records from MongoDB with one function call', async () => {
   }
 
   const body = await esClient.search({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
     body: {
       query: {
         match_all: {}
@@ -51,7 +51,7 @@ test('records are automatically indexed when they are created', async () => {
 
   const esClient = getOrCreateClient()
   const body = await esClient.search({
-    index: getEventIndexName('TENNIS_CLUB_MEMBERSHIP'),
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
     body: {
       query: {
         match_all: {}
@@ -64,44 +64,77 @@ test('records are automatically indexed when they are created', async () => {
 
 const exactStatusPayload: QueryType = {
   type: 'and',
-  eventType: 'tennis-club-membership',
-  status: { type: 'exact', term: 'REGISTERED' }
+  clauses: [
+    {
+      eventType: TENNIS_CLUB_MEMBERSHIP,
+      status: { type: 'exact', term: 'REGISTERED' }
+    }
+  ]
+}
+
+const exactRegisteredAtPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAt': { type: 'exact', term: '2024-01-01' },
+      eventType: TENNIS_CLUB_MEMBERSHIP
+    }
+  ]
+}
+
+const rangeRegisteredAtPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAt': {
+        type: 'range',
+        gte: '2024-01-01',
+        lte: '2024-12-31'
+      },
+      eventType: TENNIS_CLUB_MEMBERSHIP
+    }
+  ]
+}
+
+const exactRegisteredAtLocationPayload: QueryType = {
+  type: 'and',
+  clauses: [
+    {
+      'legalStatus.REGISTERED.createdAtLocation': {
+        type: 'exact',
+        term: 'some-location-id'
+      },
+      eventType: TENNIS_CLUB_MEMBERSHIP
+    }
+  ]
 }
 
 const anyOfStatusPayload: QueryType = {
   type: 'and',
-  status: { type: 'anyOf', terms: ['REGISTERED', 'VALIDATED'] }
+  clauses: [
+    {
+      status: { type: 'anyOf', terms: ['REGISTERED', 'VALIDATED'] }
+    }
+  ]
 }
 
 const fullAndPayload: QueryType = {
   type: 'and',
-  eventType: 'tennis-club-membership',
-  status: { type: 'exact', term: 'ARCHIVED' },
-  trackingId: { type: 'exact', term: 'ABC123' },
-  createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
-  updatedAt: { type: 'exact', term: '2024-06-01' },
-  createAtLocation: { type: 'exact', term: 'some-location-id' },
-  updatedAtLocation: {
-    type: 'within',
-    location: 'some-location-id'
-  },
-  data: {
-    name: { type: 'exact', term: 'John Doe' }
-  }
-}
-
-const orPayload: QueryType = {
-  type: 'or',
   clauses: [
     {
-      eventType: 'foo',
-      status: { type: 'exact', term: 'ISSUED' },
-      type: 'and'
-    },
-    {
-      eventType: 'bar',
-      status: { type: 'exact', term: 'REJECTED' },
-      type: 'and'
+      eventType: TENNIS_CLUB_MEMBERSHIP,
+      status: { type: 'exact', term: 'ARCHIVED' },
+      trackingId: { type: 'exact', term: 'ABC123' },
+      createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
+      updatedAt: { type: 'exact', term: '2024-06-01' },
+      createdAtLocation: { type: 'exact', term: 'some-location-id' },
+      updatedAtLocation: {
+        type: 'within',
+        location: 'some-location-id'
+      },
+      data: {
+        name: { type: 'exact', term: 'John Doe' }
+      }
     }
   ]
 }
@@ -112,8 +145,62 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { status: 'REGISTERED' } },
-          { match: { eventType: 'tennis-club-membership' } }
+          {
+            term: {
+              type: TENNIS_CLUB_MEMBERSHIP
+            }
+          },
+          { term: { status: 'REGISTERED' } }
+        ],
+        should: undefined
+      }
+    })
+  })
+
+  test('builds query with exact legalStatus.REGISTERED.createdAt', () => {
+    const result = buildElasticQueryFromSearchPayload(exactRegisteredAtPayload)
+    expect(result).toEqual({
+      bool: {
+        must: [
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+          { term: { 'legalStatuses.REGISTERED.createdAt': '2024-01-01' } }
+        ]
+      }
+    })
+  })
+
+  test('builds query with range legalStatus.REGISTERED.createdAt', () => {
+    const result = buildElasticQueryFromSearchPayload(rangeRegisteredAtPayload)
+    expect(result).toEqual({
+      bool: {
+        must: [
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+          {
+            range: {
+              'legalStatuses.REGISTERED.createdAt': {
+                gte: '2024-01-01',
+                lte: '2024-12-31'
+              }
+            }
+          }
+        ]
+      }
+    })
+  })
+
+  test('builds query with exact legalStatus.REGISTERED.createdAtLocation', () => {
+    const result = buildElasticQueryFromSearchPayload(
+      exactRegisteredAtLocationPayload
+    )
+    expect(result).toEqual({
+      bool: {
+        must: [
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
+          {
+            term: {
+              'legalStatuses.REGISTERED.createdAtLocation': 'some-location-id'
+            }
+          }
         ]
       }
     })
@@ -144,7 +231,6 @@ describe('test buildElasticQueryFromSearchPayload', () => {
               location: 'some-location-id'
             }
           },
-          { match: { eventType: 'tennis-club-membership' } },
           { match: { 'declaration.name': 'John Doe' } }
         ])
       }
@@ -152,6 +238,19 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   })
 
   test('builds OR query with multiple clauses', () => {
+    const orPayload: QueryType = {
+      type: 'or',
+      clauses: [
+        {
+          eventType: 'foo',
+          status: { type: 'exact', term: 'REGISTERED' }
+        },
+        {
+          eventType: 'bar',
+          status: { type: 'exact', term: 'REJECTED' }
+        }
+      ]
+    }
     const result = buildElasticQueryFromSearchPayload(orPayload)
     expect(result).toEqual({
       bool: {
@@ -159,27 +258,30 @@ describe('test buildElasticQueryFromSearchPayload', () => {
           {
             bool: {
               must: [
-                { term: { status: 'ISSUED' } },
-                { match: { eventType: 'foo' } }
+                { term: { type: 'foo' } },
+                { term: { status: 'REGISTERED' } }
               ]
             }
           },
           {
             bool: {
               must: [
-                { term: { status: 'REJECTED' } },
-                { match: { eventType: 'bar' } }
+                { term: { type: 'bar' } },
+                { term: { status: 'REJECTED' } }
               ]
             }
           }
-        ],
-        minimum_should_match: 1
+        ]
       }
     })
   })
 
   test('returns match_all for invalid input', () => {
-    const result = buildElasticQueryFromSearchPayload({})
+    const result = buildElasticQueryFromSearchPayload({
+      // @ts-expect-error testing invalid input
+      type: 'invalid',
+      clauses: []
+    })
     expect(result).toEqual({
       bool: { must_not: { match_all: {} } }
     })

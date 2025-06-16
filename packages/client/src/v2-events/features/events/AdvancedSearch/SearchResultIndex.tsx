@@ -12,45 +12,44 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { workqueues } from '@opencrvs/commons/client'
+import { useLocation } from 'react-router-dom'
+import { SearchQueryParams, dateOfEventColumn } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchResult } from './SearchResult'
-import { ADVANCED_SEARCH_KEY, buildDataCondition } from './utils'
+import {
+  ADVANCED_SEARCH_KEY,
+  buildDataCondition,
+  toQueryType,
+  parseFieldSearchParams
+} from './utils'
 
 export const SearchResultIndex = () => {
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
+  const location = useLocation()
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = parse(window.location.search, {
-    arrayFormat: 'comma'
-  }) as Record<string, string>
+  const searchParams = SearchQueryParams.parse(parse(location.search))
 
-  const formattedSearchParams = buildDataCondition(searchParams, eventConfig)
+  const filteredSearchParams = parseFieldSearchParams(eventConfig, searchParams)
+
+  const formattedSearchParams = buildDataCondition(
+    filteredSearchParams,
+    eventConfig
+  )
 
   const queryData = searchEvent.useSuspenseQuery(
-    eventType,
-    formattedSearchParams,
-    ADVANCED_SEARCH_KEY
+    toQueryType(eventType, formattedSearchParams, ADVANCED_SEARCH_KEY)
   )
-  const workqueueId = 'all'
-  const workqueueConfig =
-    workqueueId in workqueues
-      ? workqueues[workqueueId as keyof typeof workqueues]
-      : null
-
-  if (!workqueueConfig) {
-    return null
-  }
 
   return (
     <SearchResult
+      columns={dateOfEventColumn}
       eventConfig={eventConfig}
       queryData={queryData}
       searchParams={searchParams}
-      workqueueConfig={workqueueConfig}
     />
   )
 }

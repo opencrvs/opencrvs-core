@@ -48,6 +48,7 @@ interface Window {
     LOGIN_URL: string
     AUTH_URL: string
     MINIO_URL: string
+    MINIO_BASE_URL: string // URL without path/bucket information, used for file uploads, v2
     MINIO_BUCKET: string
     COUNTRY_CONFIG_URL: string
     SHOW_FARAJALAND_IN_COUNTRY_LISTS: boolean

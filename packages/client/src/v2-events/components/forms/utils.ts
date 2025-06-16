@@ -11,9 +11,12 @@
 import {
   FieldConfig,
   FieldType,
-  FieldValue,
+  EventState,
   SystemVariables,
-  isFieldConfigDefaultValue
+  isFieldConfigDefaultValue,
+  isFileFieldType,
+  isDividerFieldType,
+  InteractiveFieldType
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'
 
@@ -22,7 +25,7 @@ import { replacePlaceholders } from '@client/v2-events/utils'
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-const FIELD_SEPARATOR = '____'
+export const FIELD_SEPARATOR = '____'
 const DOT_SEPARATOR = '.'
 
 export function makeFormFieldIdFormikCompatible(fieldId: string) {
@@ -37,7 +40,7 @@ export function handleDefaultValue({
   field,
   systemVariables
 }: {
-  field: FieldConfig
+  field: InteractiveFieldType
   systemVariables: SystemVariables
 }) {
   const defaultValue = field.defaultValue
@@ -71,7 +74,7 @@ export function formatDateFieldValue(value: string) {
  * @returns adds 0 before single digit days and months to make them 2 digit
  * because ajv's `formatMaximum` and `formatMinimum` does not allow single digit day or months
  */
-export function makeDatesFormatted<T extends Record<string, FieldValue>>(
+export function makeDatesFormatted<T extends EventState>(
   fields: FieldConfig[],
   values: T
 ): T {

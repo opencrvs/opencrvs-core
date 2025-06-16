@@ -19,29 +19,29 @@ import {
   NumberFieldValue,
   NonEmptyTextValue,
   TextValue,
-  DateRangeFieldValue
+  DateRangeFieldValue,
+  SignatureFieldValue
 } from './FieldValue'
-import { AddressFieldValue } from './CompositeFieldValue'
+import {
+  AddressFieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue
+} from './CompositeFieldValue'
+import { extendZodWithOpenApi } from 'zod-openapi'
+extendZodWithOpenApi(z)
 
-const FieldId = z.string()
+const FieldId = z.string().describe('Unique identifier for the field')
 
-const ParentReference = z
+export const FieldReference = z
   .object({
-    _fieldId: FieldId.optional()
+    $$field: FieldId
   })
-  .optional()
+  .describe('Reference to a field by its ID')
+
+const ParentReference = FieldReference.optional()
 
 const BaseField = z.object({
   id: FieldId,
-  defaultValue: z
-    .union([
-      TextValue,
-      NonEmptyTextValue,
-      DateValue,
-      NumberFieldValue,
-      CheckboxFieldValue
-    ])
-    .optional(),
   parent: ParentReference,
   conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
@@ -56,6 +56,7 @@ const BaseField = z.object({
     .default([])
     .optional(),
   label: TranslationConfig,
+  helperText: TranslationConfig.optional(),
   hideLabel: z.boolean().default(false).optional()
 })
 
@@ -129,6 +130,7 @@ const SignatureField = BaseField.extend({
   signaturePromptLabel: TranslationConfig.describe(
     'Title of the signature modal'
   ),
+  defaultValue: SignatureFieldValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -227,6 +229,7 @@ export type PageHeader = z.infer<typeof PageHeader>
 
 const File = BaseField.extend({
   type: z.literal(FieldType.FILE),
+  defaultValue: FileFieldValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -350,6 +353,7 @@ export type Location = z.infer<typeof Location>
 const FileUploadWithOptions = BaseField.extend({
   type: z.literal(FieldType.FILE_WITH_OPTIONS),
   options: z.array(SelectOption).describe('A list of options'),
+  defaultValue: FileFieldWithOptionValue.optional(),
   configuration: z
     .object({
       maxFileSize: z
@@ -494,31 +498,36 @@ export type InferredInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
 
-export const FieldConfig = z.discriminatedUnion('type', [
-  Address,
-  TextField,
-  NumberField,
-  TextAreaField,
-  DateField,
-  DateRangeField,
-  Paragraph,
-  RadioGroup,
-  BulletList,
-  PageHeader,
-  Select,
-  Checkbox,
-  File,
-  Country,
-  AdministrativeArea,
-  Divider,
-  Location,
-  Facility,
-  Office,
-  SignatureField,
-  EmailField,
-  FileUploadWithOptions,
-  DataField
-])
+export const FieldConfig = z
+  .discriminatedUnion('type', [
+    Address,
+    TextField,
+    NumberField,
+    TextAreaField,
+    DateField,
+    DateRangeField,
+    Paragraph,
+    RadioGroup,
+    BulletList,
+    PageHeader,
+    Select,
+    Checkbox,
+    File,
+    Country,
+    AdministrativeArea,
+    Divider,
+    Location,
+    Facility,
+    Office,
+    SignatureField,
+    EmailField,
+    FileUploadWithOptions,
+    DataField
+  ])
+  .openapi({
+    description: 'Form field configuration',
+    ref: 'FieldConfig'
+  })
 
 export type SelectField = z.infer<typeof Select>
 export type LocationField = z.infer<typeof Location>
