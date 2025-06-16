@@ -153,16 +153,16 @@ export function generateStatisticalExtensions(
   for (const data of sourceStatistic) {
     // Add statistics without validation
     femalePopulations.push({
-      [data.year]: data.female_population || 0
+      [data.year]: data.female_population
     })
     malePopulations.push({
-      [data.year]: data.male_population || 0
+      [data.year]: data.male_population
     })
     totalPopulations.push({
-      [data.year]: data.population || 0
+      [data.year]: data.population
     })
     birthRates.push({
-      [data.year]: data.crude_birth_rate || 0
+      [data.year]: data.crude_birth_rate
     })
   }
 

@@ -65,6 +65,55 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
       ]
     })
   )
+
+  // Create a map of parent-child relationships
+  const locationNodeMap = new Map(
+    locations.map((loc) => [
+      loc.id,
+      { id: loc.id, children: new Array<string>() }
+    ])
+  )
+  // this is the root location
+  locationNodeMap.set('0', { id: '0', children: [] })
+  locations.forEach((loc) => {
+    const parent = locationNodeMap.get(loc.partOf.split('/')[1])
+    if (!parent) {
+      raise(`Parent location "${loc.partOf}" not found for ${loc.name}`)
+    }
+    parent.children.push(loc.id)
+  })
+
+  // Validate statistics only for top-level locations (states)
+  const statisticsErrors: Error[] = []
+  locationNodeMap.get('0')!.children.forEach((stateId) => {
+    const state = locationsMap.get(stateId)!
+    if (!state.statistics || state.statistics.size === 0) {
+      statisticsErrors.push(
+        new Error(
+          `Top-level location (state) "${state.name}" must have statistics data`
+        )
+      )
+      return
+    }
+
+    // Validate statistics data for the state
+    for (const [year, stats] of state.statistics.entries()) {
+      if (stats.population < stats.male_population + stats.female_population) {
+        statisticsErrors.push(
+          new Error(
+            `Location: ${state.name}, year: ${year} -> Sum of male population and female population ${
+              stats.male_population + stats.female_population
+            } is higher than the total population ${stats.population}`
+          )
+        )
+      }
+    }
+  })
+
+  if (statisticsErrors.length > 0) {
+    raise(statisticsErrors.map((error) => error.message).join('\n'))
+  }
+
   return locationsMap
 }
 

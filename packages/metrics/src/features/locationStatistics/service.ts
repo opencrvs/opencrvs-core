@@ -90,7 +90,7 @@ async function cacheOfficeCount(authHeader: IAuthHeader) {
 }
 
 function isState(location: Location) {
-  return location.identifier?.find((district) => district.value === 'STATE')
+  return location.identifier?.find((id) => id.value === 'STATE')
 }
 
 async function getAdminLocationStatistics(
