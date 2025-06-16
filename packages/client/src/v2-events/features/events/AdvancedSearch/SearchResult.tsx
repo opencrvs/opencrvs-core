@@ -269,72 +269,62 @@ export const SearchResultComponent = ({
       useFallbackTitle: boolean
     })[]
   ) => {
-    return eventData
-      .map((event) => {
-        const actionConfigs = actions.map((actionType) => {
-          return {
-            actionComponent: (
-              <ActionComponent actionType={actionType} event={event} />
-            )
-          }
-        })
-
-        const eventConfig = eventConfigs.find(({ id }) => id === event.type)
-        if (!eventConfig) {
-          throw new Error(
-            'Event configuration not found for event:' + event.type
-          )
-        }
-
-        return {
-          label: eventConfig.label,
-          actions: actionConfigs,
-          ...event
-        }
-      })
-      .map((doc) => {
-        const isInOutbox = outbox.some(
-          (outboxEvent) => outboxEvent.id === doc.id
+    return eventData.map((event) => {
+      const actionConfigs = actions.map((actionType) => ({
+        actionComponent: (
+          <ActionComponent actionType={actionType} event={event} />
         )
-        const isInDrafts = drafts.some((draft) => draft.id === doc.id)
+      }))
 
-        const getEventStatus = () => {
-          if (isInOutbox) {
-            return ExtendedEventStatuses.OUTBOX
-          }
-          if (isInDrafts) {
-            return ExtendedEventStatuses.DRAFT
-          }
-          return doc.status
-        }
+      const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+      if (!eventConfig) {
+        throw new Error('Event configuration not found for event:' + event.type)
+      }
 
-        const status = getEventStatus()
-        return {
-          ...doc,
-          type: intl.formatMessage(doc.label),
-          createdAt: formattedDuration(new Date(doc.createdAt)),
-          updatedAt: formattedDuration(new Date(doc.updatedAt)),
-          status: intl.formatMessage(messages.eventStatus, {
-            status
-          }),
-          title: isInOutbox ? (
-            <IconWithName name={doc.title} status={status} />
-          ) : (
-            <TextButton
-              color={doc.useFallbackTitle ? 'red' : 'primary'}
-              onClick={() => {
-                return navigate(
-                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                    eventId: doc.id
-                  })
-                )
-              }}
-            >
-              <IconWithName name={doc.title} status={status} />
-            </TextButton>
-          )
+      const isInOutbox = outbox.some(
+        (outboxEvent) => outboxEvent.id === event.id
+      )
+      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+
+      const getEventStatus = () => {
+        if (isInOutbox) {
+          return ExtendedEventStatuses.OUTBOX
         }
-      })
+        if (isInDrafts) {
+          return ExtendedEventStatuses.DRAFT
+        }
+        return event.status
+      }
+
+      const status = getEventStatus()
+      return {
+        ...event,
+        actions: actionConfigs,
+        label: eventConfig.label,
+        type: intl.formatMessage(eventConfig.label),
+        createdAt: formattedDuration(new Date(event.createdAt)),
+        updatedAt: formattedDuration(new Date(event.updatedAt)),
+        status: intl.formatMessage(messages.eventStatus, {
+          status
+        }),
+        title: isInOutbox ? (
+          <IconWithName name={event.title} status={status} />
+        ) : (
+          <TextButton
+            color={event.useFallbackTitle ? 'red' : 'primary'}
+            onClick={() => {
+              return navigate(
+                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                  eventId: event.id
+                })
+              )
+            }}
+          >
+            <IconWithName name={event.title} status={status} />
+          </TextButton>
+        )
+      }
+    })
   }
 
   function getDefaultColumns(): Array<Column> {
