@@ -30,7 +30,6 @@ import { badRequest as boomBadRequest } from '@hapi/boom'
 import * as Hapi from '@hapi/hapi'
 import { decode } from 'jsonwebtoken'
 import { USER_MANAGEMENT_URL } from '@notification/constants'
-import fetch from 'node-fetch'
 
 export function getContactPhoneNo(
   record: ReadyForReviewRecord | RegisteredRecord
@@ -157,7 +156,9 @@ export async function getUserDetails(request?: Hapi.Request) {
     }
   })
 
-  const userDetails = await res.json()
+  const userDetails = (await res.json()) as {
+    emailForNotification: string
+  }
 
   return userDetails
 }
