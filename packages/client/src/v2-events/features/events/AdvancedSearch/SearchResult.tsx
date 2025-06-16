@@ -24,7 +24,7 @@ import {
   applyDraftsToEventIndex,
   EventState,
   WorkqueueActionsWithDefault,
-  ActionType
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -195,28 +195,18 @@ function ActionComponent({
 
   const intl = useIntl()
 
-  let config: ActionConfig | undefined
-  if (actionType === 'DEFAULT') {
-    config = actionMenuItems.find(
-      ({ type }) =>
-        !(
-          [
-            ActionType.ASSIGN,
-            ActionType.UNASSIGN,
-            ActionType.READ
-          ] as readonly string[]
-        ).includes(type)
-    )
-  } else {
-    config = configs[actionType]
-  }
+  const config =
+    actionType === 'DEFAULT'
+      ? actionMenuItems.find(({ type }) => !isMetaAction(type))
+      : configs[actionType]
+
   if (!config) {
     return null
   }
 
   return (
     <Button
-      disabled={Boolean(config.disabled)}
+      disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
       onClick={async () => config.onClick(slug)}
     >

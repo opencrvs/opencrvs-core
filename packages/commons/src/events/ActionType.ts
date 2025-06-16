@@ -119,3 +119,13 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.APPROVE_CORRECTION
 ])
 export type WorkqueueActionType = z.infer<typeof workqueueActions>
+
+const META_ACTIONS: ActionType[] = [
+  ActionType.ASSIGN,
+  ActionType.UNASSIGN,
+  ActionType.READ
+]
+
+export function isMetaAction(actionType: ActionType) {
+  return META_ACTIONS.includes(actionType)
+}
