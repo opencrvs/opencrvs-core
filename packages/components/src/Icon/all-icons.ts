@@ -90,6 +90,7 @@ export {
   UserPlus,
   Users,
   WarningCircle,
-  Webcam
+  Webcam,
+  X
 } from 'phosphor-react'
 export * from './custom-icons'
