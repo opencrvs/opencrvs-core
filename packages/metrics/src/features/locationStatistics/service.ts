@@ -17,6 +17,10 @@ import {
 } from '@metrics/api'
 import { getPopulation } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
+import {
+  JURISDICTION_TYPE_IDENTIFIER,
+  OPENCRVS_SPECIFICATION_URL
+} from '../metrics/constants'
 
 interface ILocationStatisticsResponse {
   registrars: number
@@ -90,7 +94,13 @@ async function cacheOfficeCount(authHeader: IAuthHeader) {
 }
 
 function isState(location: Location) {
-  return location.identifier?.find((id) => id.value === 'STATE')
+  return (
+    location.identifier?.find(
+      ({ system }) =>
+        system ===
+        `${OPENCRVS_SPECIFICATION_URL}${JURISDICTION_TYPE_IDENTIFIER}`
+    )?.value === 'STATE'
+  )
 }
 
 async function getAdminLocationStatistics(

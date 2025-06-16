@@ -94,10 +94,10 @@ type UpdateLocation = {
 
 const locationStatisticSchema = Joi.object({
   year: Joi.number().required(),
-  male_population: Joi.number(),
-  female_population: Joi.number(),
-  population: Joi.number(),
-  crude_birth_rate: Joi.number()
+  male_population: Joi.number().required(),
+  female_population: Joi.number().required(),
+  population: Joi.number().required(),
+  crude_birth_rate: Joi.number().required()
 }).label('YearStatistics')
 
 function instanceOfJurisdiction(object: any): object is Location {

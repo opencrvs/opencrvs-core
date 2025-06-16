@@ -261,28 +261,6 @@ const PerformanceHomeComponent = (props: Props) => {
     [offices]
   )
 
-  const isStateOrCountrySelected = useCallback(
-    (selectedLocation?: ISearchLocation) => {
-      if (!selectedLocation) {
-        return false
-      }
-
-      // Check if it's a country (NATIONAL_ADMINISTRATIVE_LEVEL)
-      if (selectedLocation.id === NATIONAL_ADMINISTRATIVE_LEVEL) {
-        return true
-      }
-
-      // Check if it's a state (stateOrCountrySelected: 'STATE')
-      const location = locations[selectedLocation.id]
-      if (location && location.jurisdictionType === 'STATE') {
-        return true
-      }
-
-      return false
-    },
-    [locations]
-  )
-
   const isAccessibleOfficeSelected = useCallback(
     (selectedLocation?: ISearchLocation) => {
       if (
@@ -310,23 +288,19 @@ const PerformanceHomeComponent = (props: Props) => {
   const [officeSelected, setOfficeSelected] = useState(
     isOfficeSelected(selectedLocation)
   )
-  const [stateOrCountrySelected, setStateOrCountrySelected] = useState(
-    isStateOrCountrySelected(selectedLocation)
-  )
   const [isAccessibleOffice, setIsAccessibleOffice] = useState(
     isAccessibleOfficeSelected(selectedLocation)
   )
 
+  const isStateOrCountrySelected = selectedLocation
+    ? selectedLocation.id === NATIONAL_ADMINISTRATIVE_LEVEL ||
+      locations[selectedLocation.id]?.jurisdictionType === 'STATE'
+    : false
+
   useEffect(() => {
     setOfficeSelected(isOfficeSelected(selectedLocation))
     setIsAccessibleOffice(isAccessibleOfficeSelected(selectedLocation))
-    setStateOrCountrySelected(isStateOrCountrySelected(selectedLocation))
-  }, [
-    selectedLocation,
-    isAccessibleOfficeSelected,
-    isOfficeSelected,
-    isStateOrCountrySelected
-  ])
+  }, [selectedLocation, isAccessibleOfficeSelected, isOfficeSelected])
 
   const togglePerformanceStatus = () => {
     setToggleStatus(!toggleStatus)
@@ -487,7 +461,7 @@ const PerformanceHomeComponent = (props: Props) => {
 
                     return (
                       <>
-                        {stateOrCountrySelected && (
+                        {isStateOrCountrySelected && (
                           <CompletenessReport
                             data={data!.getTotalMetrics}
                             selectedEvent={
