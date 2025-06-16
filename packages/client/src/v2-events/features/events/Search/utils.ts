@@ -404,6 +404,7 @@ function metadataFieldTypeMapping(value: string) {
         term: value,
         type: 'exact' as const
       },
+      // @TODO: Registration number should be read from legalStatuses
       registrationNumber: {
         term: value,
         type: 'exact' as const
@@ -416,20 +417,19 @@ function addMetadataFieldsInQuickSearchQuery(
   clauses: QueryExpression[],
   terms: string[]
 ): QueryExpression[] {
-  const updatedClauses = [...clauses]
-  for (const term of terms) {
+  const metadataClauses = terms.reduce<QueryExpression[]>((acc, term) => {
     const mappings = metadataFieldTypeMapping(term)
 
     for (const mapping of mappings) {
       for (const [field, config] of Object.entries(mapping)) {
-        updatedClauses.push({
-          [field]: config
-        })
+        acc.push({ [field]: config })
       }
     }
-  }
 
-  return updatedClauses
+    return acc
+  }, [])
+
+  return [...clauses, ...metadataClauses]
 }
 
 function buildQueryFromQuickSearchFields(
