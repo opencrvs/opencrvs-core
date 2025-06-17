@@ -38,7 +38,7 @@ export const QuickSearchIndex = () => {
       queryData={queryData}
       title={intl.formatMessage(
         {
-          id: 'v2.search.searchResultFor',
+          id: 'v2.search.quickSearch.result.title',
           description: 'Title for search result page',
           defaultMessage:
             'Search result for “{searchTerm}”,résultat de la recherche pour “{searchTerm}“'

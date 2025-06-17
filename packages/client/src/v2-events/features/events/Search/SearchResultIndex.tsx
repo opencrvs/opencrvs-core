@@ -19,7 +19,7 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
-import { SearchResult } from './SearchResult'
+import { SearchResultComponent } from './SearchResult'
 import {
   buildDataCondition,
   toAdvancedSearchQueryType,
@@ -47,7 +47,7 @@ export const SearchResultIndex = () => {
   )
 
   return (
-    <SearchResult
+    <SearchResultComponent
       columns={mandatoryColumns}
       eventConfigs={[eventConfig]}
       queryData={queryData}
@@ -59,7 +59,7 @@ export const SearchResultIndex = () => {
       }
       title={intl.formatMessage(
         {
-          id: 'v2.search.v2.search.advancedSearch.result.title',
+          id: 'v2.search.advancedSearch.result.title',
           description: 'Advanced search result title',
           defaultMessage: 'Search result ({count})'
         },
