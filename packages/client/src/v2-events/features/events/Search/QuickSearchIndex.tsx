@@ -25,7 +25,6 @@ function QuickSearch() {
   const { searchEvent } = useEvents()
   const eventConfigurations = useEventConfigurations()
 
-  console.log('location', location)
   const searchParams = parse(location.search, {
     arrayFormat: 'comma'
   }) as Record<string, string>
