@@ -14,7 +14,7 @@ WORKDIR /app/packages/migration
 
 COPY --chown=node:node packages/migration /app/packages/migration
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 600000
 RUN yarn build
 
 WORKDIR /app/packages/migration

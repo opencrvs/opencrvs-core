@@ -5,7 +5,7 @@ USER node
 
 WORKDIR /app/packages/auth
 COPY --chown=node:node packages/auth/*.json /app/packages/auth/
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 600000
 COPY --chown=node:node packages/auth /app/packages/auth
 RUN yarn build
 

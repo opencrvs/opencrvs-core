@@ -5,7 +5,7 @@ USER node
 
 WORKDIR /app/packages/documents
 COPY --chown=node:node packages/documents/*.json /app/packages/documents/
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 600000
 COPY --chown=node:node packages/documents /app/packages/documents
 RUN yarn build
 

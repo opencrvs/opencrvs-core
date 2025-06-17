@@ -8,7 +8,7 @@ COPY --chown=node:node packages/events /app/packages/events
 WORKDIR /app/packages/gateway
 COPY --chown=node:node packages/gateway/*.json /app/packages/gateway/
 
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 600000
 COPY --chown=node:node packages/gateway /app/packages/gateway
 RUN yarn build
 

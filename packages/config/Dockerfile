@@ -5,7 +5,7 @@ USER node
 
 WORKDIR /app/packages/config
 COPY --chown=node:node packages/config/*.json /app/packages/config/
-RUN yarn install --frozen-lockfile
+RUN yarn install --frozen-lockfile --network-timeout 600000
 COPY --chown=node:node packages/config /app/packages/config
 RUN yarn build
 

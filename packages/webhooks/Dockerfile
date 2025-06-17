@@ -5,6 +5,6 @@ USER node
 
 WORKDIR /app/packages/webhooks
 COPY --chown=node:node packages/webhooks /app/packages/webhooks
-RUN yarn install --frozen-lockfile && yarn build
+RUN yarn install --frozen-lockfile --network-timeout 600000 && yarn build
 
 CMD [ "yarn", "start:prod" ]
