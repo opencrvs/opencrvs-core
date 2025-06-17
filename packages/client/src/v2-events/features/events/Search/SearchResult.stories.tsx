@@ -17,11 +17,11 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
-import { SearchResult } from './SearchResult'
+import { SearchResultComponent } from './SearchResult'
 
-const meta: Meta<typeof SearchResult> = {
+const meta: Meta<typeof SearchResultComponent> = {
   title: 'Components/SearchResult',
-  component: SearchResult,
+  component: SearchResultComponent,
   parameters: {
     layout: 'centered'
   },
@@ -36,7 +36,7 @@ const meta: Meta<typeof SearchResult> = {
 
 export default meta
 
-type Story = StoryObj<typeof SearchResult>
+type Story = StoryObj<typeof SearchResultComponent>
 
 const queryData = Array.from({ length: 12 }, (_, i) =>
   eventQueryDataGenerator(undefined, i)
