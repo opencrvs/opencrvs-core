@@ -86,10 +86,12 @@ const declarationUpdateActionValues = [
   ...declarationActionValues,
   ActionTypes.enum.REQUEST_CORRECTION
 ] as const
+
 /** Actions that can modify declaration data. Request can be corrected after declaring it. */
 export const DeclarationUpdateActions = ActionTypes.extract(
   declarationUpdateActionValues
 )
+
 export type DeclarationUpdateActionType = z.infer<
   typeof DeclarationUpdateActions
 >
@@ -105,3 +107,27 @@ export const writeActions = ActionTypes.exclude([
   ActionType.ASSIGN,
   ActionType.UNASSIGN
 ])
+
+/** Actions which are visible in action menu and workqueue */
+export const workqueueActions = ActionTypes.exclude([
+  ActionType.CREATE,
+  ActionType.NOTIFY,
+  ActionType.DETECT_DUPLICATE,
+  ActionType.REJECT,
+  ActionType.MARKED_AS_DUPLICATE,
+  ActionType.ARCHIVE,
+  ActionType.REJECT_CORRECTION,
+  ActionType.APPROVE_CORRECTION
+])
+
+export type WorkqueueActionType = z.infer<typeof workqueueActions>
+
+const META_ACTIONS: ActionType[] = [
+  ActionType.ASSIGN,
+  ActionType.UNASSIGN,
+  ActionType.READ
+]
+
+export function isMetaAction(actionType: ActionType) {
+  return META_ACTIONS.includes(actionType)
+}

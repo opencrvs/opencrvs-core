@@ -102,9 +102,9 @@ export const eventRouter = router({
       })
       return createEvent({
         transactionId: input.transactionId,
-        config,
         eventInput: input,
-        user: ctx.user
+        user: ctx.user,
+        config
       })
     }),
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
@@ -255,7 +255,8 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
-      return getIndexedEvents(userId)
+      const eventConfigs = await getEventConfigurations(ctx.token)
+      return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure
     .meta({
@@ -269,7 +270,10 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
     .output(z.array(EventIndex))
-    .query(async ({ input }) => getIndex(input)),
+    .query(async ({ input, ctx }) => {
+      const eventConfigs = await getEventConfigurations(ctx.token)
+      return getIndex(input, eventConfigs)
+    }),
   import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({

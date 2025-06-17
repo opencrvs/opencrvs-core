@@ -10,7 +10,7 @@
  */
 import { intersection } from 'lodash'
 import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
-import { ActionType } from './ActionType'
+import { ActionType, isMetaAction } from './ActionType'
 
 type RequiresNoScope = null
 type NotAvailableAsAction = [] // pseudo actions
@@ -121,10 +121,7 @@ export function filterUnallowedActions(
   })
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
   const hasOtherAllowedActions = allowedActions.some(
-    (action) =>
-      action !== ActionType.READ &&
-      action !== ActionType.ASSIGN &&
-      action !== ActionType.UNASSIGN
+    (action) => !isMetaAction(action)
   )
 
   if (hasOtherAllowedActions) {

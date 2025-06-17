@@ -12,20 +12,22 @@
 import React from 'react'
 import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
-import { SearchQueryParams, dateOfEventColumn } from '@opencrvs/commons/client'
+import { SearchQueryParams, mandatoryColumns } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { SearchResult } from './SearchResult'
+import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
+import { SearchResultComponent } from './SearchResult'
 import {
-  ADVANCED_SEARCH_KEY,
   buildDataCondition,
-  toQueryType,
+  toAdvancedSearchQueryType,
   parseFieldSearchParams
 } from './utils'
 
 export const SearchResultIndex = () => {
+  const intl = useIntl()
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const location = useLocation()
@@ -41,15 +43,30 @@ export const SearchResultIndex = () => {
   )
 
   const queryData = searchEvent.useSuspenseQuery(
-    toQueryType(eventType, formattedSearchParams, ADVANCED_SEARCH_KEY)
+    toAdvancedSearchQueryType(formattedSearchParams, eventType)
   )
 
   return (
-    <SearchResult
-      columns={dateOfEventColumn}
-      eventConfig={eventConfig}
+    <SearchResultComponent
+      columns={mandatoryColumns}
+      eventConfigs={[eventConfig]}
       queryData={queryData}
-      searchParams={searchParams}
+      tabBarContent={
+        <SearchCriteriaPanel
+          eventConfig={eventConfig}
+          searchParams={searchParams}
+        />
+      }
+      title={intl.formatMessage(
+        {
+          id: 'v2.search.advancedSearch.result.title',
+          description: 'Advanced search result title',
+          defaultMessage: 'Search results ({count})'
+        },
+        {
+          count: queryData.length
+        }
+      )}
     />
   )
 }

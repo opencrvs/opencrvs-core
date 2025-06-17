@@ -141,7 +141,9 @@ const fullAndPayload: QueryType = {
 
 describe('test buildElasticQueryFromSearchPayload', () => {
   test('builds query with exact status', () => {
-    const result = buildElasticQueryFromSearchPayload(exactStatusPayload)
+    const result = buildElasticQueryFromSearchPayload(exactStatusPayload, [
+      tennisClubMembershipEvent
+    ])
     expect(result).toEqual({
       bool: {
         must: [
@@ -158,7 +160,10 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   })
 
   test('builds query with exact legalStatus.REGISTERED.createdAt', () => {
-    const result = buildElasticQueryFromSearchPayload(exactRegisteredAtPayload)
+    const result = buildElasticQueryFromSearchPayload(
+      exactRegisteredAtPayload,
+      [tennisClubMembershipEvent]
+    )
     expect(result).toEqual({
       bool: {
         must: [
@@ -170,7 +175,10 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   })
 
   test('builds query with range legalStatus.REGISTERED.createdAt', () => {
-    const result = buildElasticQueryFromSearchPayload(rangeRegisteredAtPayload)
+    const result = buildElasticQueryFromSearchPayload(
+      rangeRegisteredAtPayload,
+      [tennisClubMembershipEvent]
+    )
     expect(result).toEqual({
       bool: {
         must: [
@@ -190,7 +198,8 @@ describe('test buildElasticQueryFromSearchPayload', () => {
 
   test('builds query with exact legalStatus.REGISTERED.createdAtLocation', () => {
     const result = buildElasticQueryFromSearchPayload(
-      exactRegisteredAtLocationPayload
+      exactRegisteredAtLocationPayload,
+      [tennisClubMembershipEvent]
     )
     expect(result).toEqual({
       bool: {
@@ -207,7 +216,9 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   })
 
   test('builds query with anyOf status', () => {
-    const result = buildElasticQueryFromSearchPayload(anyOfStatusPayload)
+    const result = buildElasticQueryFromSearchPayload(anyOfStatusPayload, [
+      tennisClubMembershipEvent
+    ])
     expect(result).toEqual({
       bool: {
         must: [{ terms: { status: ['REGISTERED', 'VALIDATED'] } }]
@@ -216,7 +227,9 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   })
 
   test('builds complex AND query', () => {
-    const result = buildElasticQueryFromSearchPayload(fullAndPayload)
+    const result = buildElasticQueryFromSearchPayload(fullAndPayload, [
+      tennisClubMembershipEvent
+    ])
     expect(result).toMatchObject({
       bool: {
         must: expect.arrayContaining([
@@ -251,7 +264,9 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         }
       ]
     }
-    const result = buildElasticQueryFromSearchPayload(orPayload)
+    const result = buildElasticQueryFromSearchPayload(orPayload, [
+      tennisClubMembershipEvent
+    ])
     expect(result).toEqual({
       bool: {
         should: [
@@ -277,11 +292,21 @@ describe('test buildElasticQueryFromSearchPayload', () => {
   })
 
   test('returns match_all for invalid input', () => {
-    const result = buildElasticQueryFromSearchPayload({
-      // @ts-expect-error testing invalid input
-      type: 'invalid',
-      clauses: []
-    })
+    const result = buildElasticQueryFromSearchPayload(
+      {
+        // @ts-expect-error testing invalid input
+        type: 'invalid',
+        clauses: [
+          {
+            status: {
+              type: 'exact',
+              term: 'ARCHIVED'
+            }
+          }
+        ]
+      },
+      tennisClubMembershipEvent
+    )
     expect(result).toEqual({
       bool: { must_not: { match_all: {} } }
     })

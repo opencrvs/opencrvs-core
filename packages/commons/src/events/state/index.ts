@@ -33,27 +33,27 @@ export function getStatusFromActions(actions: Array<Action>) {
   )
 
   if (hasRejectedAction) {
-    return EventStatus.REJECTED
+    return EventStatus.enum.REJECTED
   }
 
   return actions.reduce<EventStatus>((status, action) => {
     switch (action.type) {
       case ActionType.CREATE:
-        return EventStatus.CREATED
+        return EventStatus.enum.CREATED
       case ActionType.DECLARE:
-        return EventStatus.DECLARED
+        return EventStatus.enum.DECLARED
       case ActionType.VALIDATE:
-        return EventStatus.VALIDATED
+        return EventStatus.enum.VALIDATED
       case ActionType.REGISTER:
-        return EventStatus.REGISTERED
+        return EventStatus.enum.REGISTERED
       case ActionType.REJECT:
-        return EventStatus.REJECTED
+        return EventStatus.enum.REJECTED
       case ActionType.ARCHIVE:
-        return EventStatus.ARCHIVED
+        return EventStatus.enum.ARCHIVED
       case ActionType.NOTIFY:
-        return EventStatus.NOTIFIED
+        return EventStatus.enum.NOTIFIED
       case ActionType.PRINT_CERTIFICATE:
-        return EventStatus.CERTIFIED
+        return EventStatus.enum.CERTIFIED
       case ActionType.ASSIGN:
       case ActionType.UNASSIGN:
       case ActionType.REQUEST_CORRECTION:
@@ -64,7 +64,7 @@ export function getStatusFromActions(actions: Array<Action>) {
       default:
         return status
     }
-  }, EventStatus.CREATED)
+  }, EventStatus.enum.CREATED)
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
@@ -167,7 +167,7 @@ export function deepDropNulls<T>(obj: T): NonNullableDeep<T> {
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
-  return status === EventStatus.CREATED
+  return status === EventStatus.enum.CREATED
 }
 export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(

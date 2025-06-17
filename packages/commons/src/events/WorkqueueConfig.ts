@@ -23,8 +23,9 @@ import {
 } from './CountryConfigQueryInput'
 import { AvailableIcons } from '../icons'
 import { QueryType } from './EventIndex'
+import { workqueueActions } from './ActionType'
 
-export const dateOfEventColumn = defineWorkqueuesColumns([
+export const mandatoryColumns = defineWorkqueuesColumns([
   {
     label: {
       id: 'workqueues.dateOfEvent',
@@ -43,6 +44,15 @@ export const dateOfEventColumn = defineWorkqueuesColumns([
   }
 ])
 
+export const WorkqueueActionsWithDefault = z.enum([
+  ...workqueueActions.options,
+  'DEFAULT'
+] as const)
+
+export type WorkqueueActionsWithDefault = z.infer<
+  typeof WorkqueueActionsWithDefault
+>
+
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
  */
@@ -55,11 +65,11 @@ export const WorkqueueConfig = z
     query: CountryConfigQueryType,
     actions: z.array(
       z.object({
-        type: z.string(),
+        type: WorkqueueActionsWithDefault,
         conditionals: z.array(Conditional).optional()
       })
     ),
-    columns: z.array(WorkqueueColumn).default(dateOfEventColumn),
+    columns: z.array(WorkqueueColumn).default(mandatoryColumns),
     icon: AvailableIcons
   })
   .describe('Configuration for workqueue.')
@@ -72,11 +82,11 @@ export const WorkqueueConfigInput = z.object({
   query: CountryConfigQueryInputType,
   actions: z.array(
     z.object({
-      type: z.string(),
+      type: WorkqueueActionsWithDefault,
       conditionals: z.array(Conditional).optional()
     })
   ),
-  columns: z.array(WorkqueueColumn).default(dateOfEventColumn),
+  columns: z.array(WorkqueueColumn).default(mandatoryColumns),
   icon: AvailableIcons
 })
 

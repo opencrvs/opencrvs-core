@@ -32,36 +32,23 @@ export const tennisClubMembershipEvent = defineConfig({
     id: 'v2.event.tennis-club-membership.label'
   },
   title: {
-    defaultMessage: '{applicant.firstname} {applicant.surname}',
+    defaultMessage: '{applicant.name.firstname} {applicant.name.surname}',
     description: 'This is the title of the summary',
     id: 'v2.event.tennis-club-membership.title'
   },
   summary: {
     fields: [
       {
-        id: 'applicant.firstname',
+        fieldId: 'applicant.name',
         label: {
-          defaultMessage: "Applicant's first name",
+          defaultMessage: "Applicant's name",
           description: 'This is the label for the field',
           id: 'event.tennis-club-membership.summary.field.firstname.label'
-        },
-        value: {
-          defaultMessage: '{applicant.firstname}',
-          description: 'This is the value to show in the summary',
-          id: 'event.tennis-club-membership.summary.field.firstname'
         },
         emptyValueMessage: {
           defaultMessage: 'First name is not provided',
           description: 'This is the message to show when the field is empty',
           id: 'event.tennis-club-membership.summary.field.firstname.empty'
-        }
-      },
-      {
-        fieldId: 'applicant.surname',
-        label: {
-          defaultMessage: "Applicant's last name",
-          description: 'Label for surname',
-          id: 'v2.event.tennis-club-membership.summary.field.surname.label'
         }
       },
       {
@@ -423,8 +410,7 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'v2.event.tennis-club-membership.search.applicants'
       },
       fields: [
-        field('applicant.firstname').fuzzy(),
-        field('applicant.surname').fuzzy(),
+        field('applicant.name').fuzzy(),
         field('applicant.dob').range(),
         field('applicant.email').exact()
       ]
@@ -435,10 +421,7 @@ export const tennisClubMembershipEvent = defineConfig({
         description: 'Recommender details search field section title',
         id: 'v2.event.tennis-club-membership.search.recommender'
       },
-      fields: [
-        field('recommender.firstname').fuzzy(),
-        field('recommender.surname').fuzzy()
-      ]
+      fields: [field('recommender.name').fuzzy()]
     }
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM

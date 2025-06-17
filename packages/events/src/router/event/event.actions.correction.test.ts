@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   AddressType,
+  createPrng,
   EventDocument,
   generateActionDeclarationInput,
   getAcceptedActions,
@@ -175,8 +176,10 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
     declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.dobUnknown': false,
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
+      'applicant.name': {
+        firstname: 'John',
+        surname: 'Doe'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -203,8 +206,10 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   const form = {
     'applicant.dob': '2024-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -238,8 +243,10 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   const form = {
     'applicant.dob': '2040-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -304,6 +311,8 @@ describe('when a correction request exists', () => {
   let withCorrectionRequest: EventDocument
   let client: ReturnType<typeof createTestClient>
 
+  const rng = createPrng(94842)
+
   beforeEach(async () => {
     const { user, generator } = await setupTestCase()
     client = createTestClient(user)
@@ -337,9 +346,13 @@ describe('when a correction request exists', () => {
         declaration: {
           ...generateActionDeclarationInput(
             tennisClubMembershipEvent,
-            ActionType.DECLARE
+            ActionType.DECLARE,
+            rng
           ),
-          'applicant.firstname': 'Johnny'
+          'applicant.name': {
+            firstname: 'Johnny',
+            surname: 'Doe'
+          }
         }
       })
     )
@@ -415,7 +428,10 @@ test(`${ActionType.REQUEST_CORRECTION} is idempotent`, async () => {
     transactionId: getUUID()
   })
   const correctionRequestPayload = generator.event.actions.correction.request(
-    registeredEvent.id
+    registeredEvent.id,
+    {
+      keepAssignment: true
+    }
   )
   const firstResponse = await client.event.actions.correction.request(
     correctionRequestPayload
@@ -458,7 +474,7 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
   })
 
   const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(registeredEvent.id)
+    generator.event.actions.correction.request(registeredEvent.id, {})
   )
 
   await client.event.actions.assignment.assign({
@@ -468,7 +484,8 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
 
   const approveCorrectionPayload = generator.event.actions.correction.approve(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id
+    withCorrectionRequest.actions.at(-1).id,
+    { keepAssignment: true }
   )
 
   const firstResponse = await client.event.actions.correction.approve(
@@ -521,7 +538,8 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
 
   const rejectCorrectionPayload = generator.event.actions.correction.reject(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id
+    withCorrectionRequest.actions.at(-1).id,
+    { keepAssignment: true }
   )
 
   const firstResponse = await client.event.actions.correction.reject(
