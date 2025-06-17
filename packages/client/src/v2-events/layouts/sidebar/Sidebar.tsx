@@ -33,10 +33,15 @@ import {
 } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
 import { joinValues } from '@client/v2-events/utils'
+import {
+  hasOutboxWorkqueue,
+  WORKQUEUE_OUTBOX
+} from '@client/v2-events/features/workqueues/Outbox'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -49,14 +54,31 @@ export const Sidebar = ({
 }) => {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
-  const workqueues = useWorkqueueConfigurations()
+  const scopes = useSelector(getScope)
+
+  const { getOutbox } = useEvents()
+  const outbox = getOutbox()
+
+  const workqueuesWithoutOutboxOrDraft = useWorkqueueConfigurations()
+
+  const hasOutbox = hasOutboxWorkqueue(scopes ?? [])
+
+  const workqueues = [
+    ...(hasOutbox ? [WORKQUEUE_OUTBOX] : []),
+    ...workqueuesWithoutOutboxOrDraft
+  ]
   const navigate = useNavigate()
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
 
   const { getCount } = useWorkqueue(workqueueSlug)
-  const counts = getCount.useSuspenseQuery()
+  const countsWithoutOutboxOrDraft = getCount.useSuspenseQuery()
+
+  const counts = {
+    ...(hasOutbox ? { [WORKQUEUE_OUTBOX.slug]: outbox.length } : {}),
+    ...countsWithoutOutboxOrDraft
+  }
 
   let name = ''
   if (userDetails?.name) {
