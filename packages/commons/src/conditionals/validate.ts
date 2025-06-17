@@ -143,6 +143,11 @@ export const errorMessages = {
     defaultMessage: 'Invalid input',
     description: 'Error message when generic field is invalid',
     id: 'v2.error.invalid'
+  },
+  unexpectedField: {
+    defaultMessage: 'Unexpected field',
+    description: 'Error message when field is not expected',
+    id: 'v2.error.unexpectedField'
   }
 }
 
