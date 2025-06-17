@@ -27,7 +27,11 @@ on:
       - main
 jobs:
   base:
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
@@ -82,9 +86,9 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}
-            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
-          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}
+            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}-${{ matrix.runner }}
+            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}-${{ matrix.runner }}
+          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}-${{ matrix.runner }}
           cache-to: type=inline
 
     outputs:
@@ -92,13 +96,38 @@ jobs:
       version: ${{ steps.set-version-and-branch.outputs.version }}
       branch: ${{ steps.set-version-and-branch.outputs.branch }}
 
+  merge-manifest:
+    needs: [base]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # 
+      - name: Create and push multi-arch manifest
+        run: |
+          for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
+            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-base:$TAG"
+            docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG \
+              --amend ghcr.io/opencrvs/ocrvs-base:$TAG-ubuntu-24.04 \
+              --amend ghcr.io/opencrvs/ocrvs-base:$TAG-ubuntu-24.04-arm
+            docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
+          done
   build:
-    needs: base
+    needs: [base,merge-manifest]
     strategy:
       fail-fast: false
       matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
         service: ${{ fromJSON(needs.base.outputs.services) }}
-    runs-on: ubuntu-24.04
+        exclude:
+          # metabase/metabase:v0.50.30.1 doesn't support arm arch
+          - service: 'dashboards'
+            runner: 'ubuntu-24.04-arm'
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
         if: github.event_name == 'workflow_dispatch'
@@ -127,10 +156,41 @@ jobs:
           push: true
           context: .
           tags: |
-            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}
-            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
-          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}
+            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}-${{ matrix.runner }}
+            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}-${{ matrix.runner }}
+          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}-${{ matrix.runner }}
           cache-to: type=inline
+
+  merge-services-manifest:
+    needs: [base,build]
+    strategy:
+      fail-fast: false
+      matrix:
+        service: ${{ fromJSON(needs.base.outputs.services) }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create and push multi-arch manifest
+        run: |
+          for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
+            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG"
+            if [ ${{ matrix.service }} == 'dashboards' ]
+            then
+              docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
+                --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-ubuntu-24.04
+            else
+              docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
+                --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-ubuntu-24.04 \
+                --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-ubuntu-24.04-arm
+            fi
+            docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
+          done
 
   security-scans-pr:
     needs: [build, base]
