@@ -40,6 +40,7 @@ describe('stringifyEventMetadata', () => {
     const { declaration, ...metadata } = eventQueryDataGenerator({
       id: 'seabeast-clad-stad-elia-oleocellosis',
       assignedTo: userId,
+      creator: 'user',
       createdBy: userId,
       trackingId: 'B77FF6',
       createdAt: new Date(2000, 1, 1).toISOString(),

@@ -103,6 +103,7 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
           request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
         createdBy:
           request?.createdBy ?? accept?.createdBy ?? metadata.createdBy,
+        creator: request?.creator ?? accept?.creator ?? metadata.creator,
         createdAtLocation:
           request?.createdAtLocation ??
           accept?.createdAtLocation ??
@@ -116,6 +117,7 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
     {
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
+      creator: createAction.creator,
       createdAtLocation: createAction.createdAtLocation,
       createdByRole: createAction.createdByRole
     }

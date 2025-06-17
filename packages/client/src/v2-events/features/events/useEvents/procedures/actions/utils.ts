@@ -48,6 +48,7 @@ export function updateEventOptimistically<T extends ActionInput>(
           type: actionType,
           declaration: variables.declaration,
           createdAt: new Date().toISOString(),
+          creator: 'user',
           createdBy: '@todo',
           createdAtLocation: '@todo',
           status: ActionStatus.Requested

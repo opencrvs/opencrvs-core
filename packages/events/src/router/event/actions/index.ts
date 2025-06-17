@@ -295,6 +295,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
+          creator: 'user',
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,

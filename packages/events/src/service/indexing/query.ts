@@ -106,6 +106,12 @@ function buildClause(clause: QueryExpression) {
     })
   }
 
+  if (clause.creator) {
+    must.push({
+      term: { creator: clause.creator }
+    })
+  }
+
   if (clause.updatedBy) {
     must.push({
       term: { updatedBy: clause.updatedBy.term }

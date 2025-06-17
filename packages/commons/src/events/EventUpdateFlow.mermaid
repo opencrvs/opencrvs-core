@@ -22,6 +22,7 @@ flowchart TD
       status: EventStatuses,
       createdAt: datetime,
       createdBy: string,
+      creator: string,
       createdAtLocation: string,
       modifiedAt: datetime,
       assignedTo?: string | null
@@ -56,6 +57,7 @@ flowchart TD
       id: string,
       createdAt: datetime,
       createdBy: string,
+      creator: string,
       createdAtLocation: string,
       declaration: ActionUpdate,
       annotation: ActionUpdate,

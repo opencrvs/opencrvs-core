@@ -495,6 +495,7 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
+            creator: 'user',
             createdByRole: 'some-role',
             declaration: {},
             createdAtLocation: '123456',

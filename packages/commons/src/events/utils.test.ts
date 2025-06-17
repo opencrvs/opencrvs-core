@@ -33,6 +33,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
+        creator: 'user',
         createdAt: '2023-01-01T00:00:00Z'
       }
     ],
@@ -43,11 +44,13 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
+        creator: 'user',
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
+        creator: 'user',
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       }
@@ -55,6 +58,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
     expected: {
       ...commonAction,
       type: ActionType.ASSIGN,
+      creator: 'user',
       createdAt: '2023-01-01T01:00:00Z',
       assignedTo: 'user-id-2'
     }
@@ -64,17 +68,20 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
+        creator: 'user',
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
+        creator: 'user',
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       },
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
+        creator: 'user',
         createdAt: '2023-01-01T02:00:00Z',
         assignedTo: null
       }
@@ -82,6 +89,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
     expected: {
       ...commonAction,
       type: ActionType.UNASSIGN,
+      creator: 'user',
       createdAt: '2023-01-01T02:00:00Z',
       assignedTo: null
     }
@@ -91,23 +99,27 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
       {
         ...commonAction,
         type: ActionType.CREATE,
+        creator: 'user',
         createdAt: '2023-01-01T00:00:00Z'
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
+        creator: 'user',
         createdAt: '2023-01-01T01:00:00Z',
         assignedTo: 'user-id-2'
       },
       {
         ...commonAction,
         type: ActionType.UNASSIGN,
+        creator: 'user',
         createdAt: '2023-01-01T02:00:00Z',
         assignedTo: null
       },
       {
         ...commonAction,
         type: ActionType.ASSIGN,
+        creator: 'user',
         createdAt: '2023-01-01T03:00:00Z',
         assignedTo: 'user-id-4'
       }
@@ -115,6 +127,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
     expected: {
       ...commonAction,
       type: ActionType.ASSIGN,
+      creator: 'user',
       createdAt: '2023-01-01T03:00:00Z',
       assignedTo: 'user-id-4'
     }
