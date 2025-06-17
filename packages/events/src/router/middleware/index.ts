@@ -72,29 +72,6 @@ export const conflictIfWaitingForCorrection: MiddlewareFunction<
   return next()
 }
 
-export const checkForDuplicateAction: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
-  ActionInputWithType
-> = async ({ input, next, ctx }) => {
-  const event = await getEventById(input.eventId)
-
-  // First check if the action is a duplicate
-  if (
-    'transactionId' in input &&
-    event.actions.some((action) => action.transactionId === input.transactionId)
-  ) {
-    throw new TRPCError({
-      code: 'CONFLICT',
-      message: JSON.stringify('Action is a duplicate')
-    })
-  }
-
-  return next()
-}
-
 export * from './authorization'
 export * from './validate'
 export * from './utils'
