@@ -92,7 +92,7 @@ export const transformData = (
               ? `${groomName} & ${brideName}`
               : brideName || groomName || EMPTY_STRING
 
-          dateOfEvent = marriageReg && reg.dateOfMarriage
+          dateOfEvent = marriageReg.dateOfMarriage
         }
       }
       const status =
