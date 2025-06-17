@@ -82,7 +82,7 @@ CREATE TABLE event_actions (
       AND reason_is_duplicate IS NOT NULL
     )
     OR (
-      action_type NOT IN ('ASSIGN', 'UNASSIGN', 'REGISTER')
+      action_type NOT IN ('ASSIGN', 'UNASSIGN', 'REGISTER', 'REJECT')
     )
   )
 );

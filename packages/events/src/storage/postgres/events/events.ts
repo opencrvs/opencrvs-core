@@ -36,10 +36,16 @@ async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
 
   const result = {
     ...event,
-    actions: actions.map(({ actionType, ...action }) => ({
-      ...action,
-      type: actionType
-    }))
+    actions: actions.map(
+      ({ actionType, reasonIsDuplicate, reasonMessage, ...action }) => ({
+        ...action,
+        type: actionType,
+        reason: (reasonIsDuplicate || reasonMessage) && {
+          isDuplicate: reasonIsDuplicate,
+          message: reasonMessage
+        }
+      })
+    )
   }
 
   return EventDocument.parse(result)
@@ -141,7 +147,9 @@ async function getOrCreateEventInTrx(
       createdBy: input.createdBy,
       createdByRole: input.createdByRole,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation
+      createdAtLocation: input.createdAtLocation,
+      reasonIsDuplicate: input.reasonIsDuplicate,
+      reasonMessage: input.reasonMessage
     },
     trx
   )
@@ -181,7 +189,9 @@ async function getOrCreateEventAndAssignInTrx(
       createdBy: input.createdBy,
       createdByRole: input.createdByRole,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation
+      createdAtLocation: input.createdAtLocation,
+      reasonIsDuplicate: input.reasonIsDuplicate,
+      reasonMessage: input.reasonMessage
     },
     trx
   )
@@ -196,7 +206,9 @@ async function getOrCreateEventAndAssignInTrx(
       createdByRole: input.createdByRole,
       createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
-      assignedTo: input.createdBy
+      assignedTo: input.createdBy,
+      reasonIsDuplicate: input.reasonIsDuplicate,
+      reasonMessage: input.reasonMessage
     },
     trx
   )

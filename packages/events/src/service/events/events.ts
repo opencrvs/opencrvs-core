@@ -250,7 +250,9 @@ export async function addAction(
       createdByRole: user.role,
       createdBySignature: user.signature ?? undefined,
       createdAtLocation: user.primaryOfficeId,
-      originalActionId: input.originalActionId
+      originalActionId: input.originalActionId,
+      reasonMessage: input.reason.message,
+      reasonIsDuplicate: true
     })
   } else if (input.type === ActionType.ASSIGN) {
     await eventsRepo.createAction({
@@ -267,6 +269,9 @@ export async function addAction(
       assignedTo: user.id
     })
   } else {
+    const hasReason =
+      input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+
     await eventsRepo.createAction({
       eventId,
       registrationNumber:
@@ -282,10 +287,10 @@ export async function addAction(
       createdByRole: user.role,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
-      reasonMessage:
-        input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
-          ? input.reason.message
-          : undefined
+      reasonIsDuplicate: hasReason
+        ? (input.reason.isDuplicate ?? false)
+        : undefined,
+      reasonMessage: hasReason ? input.reason.message : undefined
     })
   }
 
