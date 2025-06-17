@@ -199,6 +199,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
+      creator: 'user',
       createdBy: '@todo',
       createdAtLocation: '@todo',
       status: ActionStatus.Accepted,

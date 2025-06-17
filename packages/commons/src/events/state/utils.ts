@@ -70,6 +70,7 @@ function getDeclarationActionCreationMetadata(
     // When 3rd party API returns 200 OK, we assume that the request was accepted, and persist single 'accepted' action.
     createdAt: requestAction?.createdAt ?? acceptAction.createdAt,
     createdBy: requestAction?.createdBy ?? acceptAction.createdBy,
+    creator: requestAction?.creator ?? acceptAction.creator,
     createdAtLocation:
       requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
     acceptedAt: acceptAction.createdAt,
