@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '../ActionType'
+import { ActionType, StatusChangingActions } from '../ActionType'
 import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
@@ -87,13 +87,13 @@ function getDeclarationActionCreationMetadata(
  * @see EventIndex for the description of the returned object.
  *
  * */
-export function getDeclarationActionUpdateMetadata(actions: Action[]) {
+export function getActionUpdateMetadata(actions: Action[]) {
   const createAction = getOrThrow(
     actions.find((action) => action.type === ActionType.CREATE),
     `Event has no ${ActionType.CREATE} action`
   )
 
-  return [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER].reduce(
+  return StatusChangingActions.options.reduce(
     (metadata, actionType) => {
       const { accept, request } = getActionRequests(actionType, actions)
 
