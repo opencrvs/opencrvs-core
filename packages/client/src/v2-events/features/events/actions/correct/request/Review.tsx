@@ -12,7 +12,10 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -28,6 +31,9 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const intl = useIntl()
   const [modal, openModal] = useModal()
@@ -62,7 +68,8 @@ export function Review() {
         ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
           fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
@@ -108,7 +115,8 @@ export function Review() {
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath(
                 {
                   eventId
-                }
+                },
+                { workqueue: slug }
               )
             )
           }}
