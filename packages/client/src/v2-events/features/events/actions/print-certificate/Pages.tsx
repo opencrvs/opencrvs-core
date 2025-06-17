@@ -72,14 +72,17 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
-          eventId,
-          pageId: currentPageId
-        }),
+        ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
+          {
+            eventId,
+            pageId: currentPageId
+          },
+          searchParams
+        ),
         { replace: true }
       )
     }
-  }, [pageId, currentPageId, navigate, eventId])
+  }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   return (
     <FormLayout
@@ -110,17 +113,23 @@ export function Pages() {
         validateBeforeNextPage={true}
         onPageChange={(nextPageId: string) => {
           return navigate(
-            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              { workqueue: searchParams.workqueue }
+            )
           )
         }}
         onSubmit={() => {
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.buildPath(
               { eventId },
-              { templateId: String(annotation[CERT_TEMPLATE_ID]) }
+              {
+                templateId: String(annotation[CERT_TEMPLATE_ID]),
+                workqueue: searchParams.workqueue
+              }
             )
           )
         }}

@@ -12,8 +12,11 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { isEqual } from 'lodash'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { buttonMessages } from '@client/i18n/messages'
@@ -28,6 +31,9 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const intl = useIntl()
   const navigate = useNavigate()
@@ -40,6 +46,37 @@ export function Review() {
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
   const form = getFormValues()
+
+  async function handleEdit({
+    pageId,
+    fieldId,
+    confirmation
+  }: {
+    pageId: string
+    fieldId?: string
+    confirmation?: boolean
+  }) {
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close} />
+      )))
+
+    if (confirmedEdit) {
+      navigate(
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+          { pageId, eventId },
+          {
+            from: 'review',
+            workqueue: slug
+          },
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
+        )
+      )
+    }
+    return
+  }
+
   const previousFormValues = event.declaration
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => !isEqual(previousFormValues[key], value)
@@ -84,7 +121,10 @@ export function Review() {
           id="continue_button"
           onClick={() => {
             navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({ eventId })
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
+                { eventId },
+                { workqueue: slug }
+              )
             )
           }}
         >

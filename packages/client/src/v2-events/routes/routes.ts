@@ -24,24 +24,46 @@ export const ROUTES = {
         {},
         {
           VIEW: route('view/:eventId', {
-            params: { eventId: string().defined() }
+            params: { eventId: string().defined() },
+            searchParams: {
+              workqueue: string()
+            }
           }),
           OVERVIEW: route('overview/:eventId', {
-            params: { eventId: string().defined() }
+            params: { eventId: string().defined() },
+            searchParams: {
+              workqueue: string()
+            }
           }),
-          CREATE: route('create'),
-          DELETE: route('delete/:eventId'),
+          CREATE: route('create', {
+            searchParams: {
+              workqueue: string()
+            }
+          }),
+          DELETE: route('delete/:eventId', {
+            searchParams: {
+              workqueue: string()
+            }
+          }),
           DECLARE: route(
             'declare/:eventId',
             {
-              params: { eventId: string().defined() }
+              params: { eventId: string().defined() },
+              searchParams: {
+                workqueue: string()
+              }
             },
             {
-              REVIEW: route('review'),
+              REVIEW: route('review', {
+                searchParams: {
+                  workqueue: string()
+                }
+              }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
-                  from: string()
+                  from: string(),
+                  workqueue: string()
                 },
                 hash: hashValues()
               })
@@ -50,14 +72,22 @@ export const ROUTES = {
           VALIDATE: route(
             'validate/:eventId',
             {
-              params: { eventId: string().defined() }
+              params: { eventId: string().defined() },
+              searchParams: {
+                workqueue: string()
+              }
             },
             {
-              REVIEW: route('review'),
+              REVIEW: route('review', {
+                searchParams: {
+                  workqueue: string()
+                }
+              }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
-                  from: string()
+                  from: string(),
+                  workqueue: string()
                 },
                 hash: hashValues()
               })
@@ -66,14 +96,22 @@ export const ROUTES = {
           REGISTER: route(
             'register/:eventId',
             {
-              params: { eventId: string().defined() }
+              params: { eventId: string().defined() },
+              searchParams: {
+                workqueue: string()
+              }
             },
             {
-              REVIEW: route('review'),
+              REVIEW: route('review', {
+                searchParams: {
+                  workqueue: string()
+                }
+              }),
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
-                  from: string()
+                  from: string(),
+                  workqueue: string()
                 },
                 hash: hashValues()
               })
@@ -82,18 +120,25 @@ export const ROUTES = {
           PRINT_CERTIFICATE: route(
             'print-certificate/:eventId',
             {
-              params: { eventId: string().defined() }
+              params: { eventId: string().defined() },
+              searchParams: {
+                workqueue: string()
+              }
             },
             {
               PAGES: route('pages/:pageId', {
                 params: { pageId: string() },
                 searchParams: {
-                  from: string()
+                  from: string(),
+                  workqueue: string()
                 },
                 hash: hashValues()
               }),
               REVIEW: route('review', {
-                searchParams: { templateId: string() }
+                searchParams: {
+                  templateId: string(),
+                  workqueue: string()
+                }
               })
             }
           ),
@@ -104,7 +149,8 @@ export const ROUTES = {
       ADVANCED_SEARCH: route('advanced-search'),
       SEARCH_RESULT: route('search-result/:eventType', {
         params: { eventType: string().defined() }
-      })
+      }),
+      SEARCH: route('search')
     }
   )
 }

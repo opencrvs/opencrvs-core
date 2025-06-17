@@ -41,11 +41,14 @@ import {
   isEmailFieldType,
   isDataFieldType,
   EventConfig,
-  getDeclarationFields
+  getDeclarationFields,
+  isNameFieldType,
+  isPhoneFieldType,
+  isIdFieldType,
+  getValidatorsForField
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
-
 import {
   BulletList,
   Checkbox,
@@ -67,6 +70,8 @@ import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
@@ -158,6 +163,53 @@ export const GeneratedInputField = React.memo(
       value
     }
 
+    if (isNameFieldType(field)) {
+      const validation = getValidatorsForField(
+        makeFormikFieldIdOpenCRVSCompatible(field.config.id),
+        field.config.validation || []
+      )
+
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Name.Input
+            id={fieldDefinition.id}
+            maxLength={field.config.configuration?.maxLength}
+            validation={validation}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isPhoneFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            type="text"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
+    if (isIdFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <Text.Input
+            {...inputProps}
+            isDisabled={disabled}
+            type="text"
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+
     if (isDateFieldType(field)) {
       return (
         <InputField {...field.inputFieldProps}>
@@ -178,6 +230,7 @@ export const GeneratedInputField = React.memo(
           <DateRangeField.Input
             {...inputProps}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => {
               //@TODO: We need to come up with a general solution for complex types.
               // @ts-ignore
@@ -422,6 +475,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             searchableResource={['locations']}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
@@ -435,6 +489,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             searchableResource={['offices']}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
@@ -448,6 +503,7 @@ export const GeneratedInputField = React.memo(
             {...field.config}
             searchableResource={['facilities']}
             value={field.value}
+            onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>

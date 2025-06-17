@@ -1,27 +1,441 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
+exports[`event.actions.notify > NOTIFY action fails if invalid value is sent 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2050-01-01"}]]`;
+
+exports[`event.actions.notify > NOTIFY action fails if payload includes field that is not in the declaration 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"hello"}]]`;
+
+exports[`event.actions.notify > NOTIFY action fails if payload includes field with unexpected type 1`] = `
+[TRPCError: [
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "object",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected string, received object"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "object",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected string, received object"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_union",
+            "unionErrors": [
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "string",
+                    "received": "object",
+                    "path": [
+                      "declaration",
+                      "applicant.name"
+                    ],
+                    "message": "Expected string, received object"
+                  }
+                ],
+                "name": "ZodError"
+              },
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "array",
+                    "received": "object",
+                    "path": [
+                      "declaration",
+                      "applicant.name"
+                    ],
+                    "message": "Expected array, received object"
+                  }
+                ],
+                "name": "ZodError"
+              }
+            ],
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Invalid input"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "boolean",
+            "received": "object",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected boolean, received object"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "number",
+            "received": "object",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected number, received object"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "filename"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "originalFilename"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "type"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "array",
+            "received": "object",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected array, received object"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "country"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_literal",
+            "expected": "DOMESTIC",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "addressType"
+            ],
+            "message": "Invalid literal value, expected \\"DOMESTIC\\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "province"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "district"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_literal",
+            "expected": "URBAN",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "urbanOrRural"
+            ],
+            "message": "Invalid literal value, expected \\"URBAN\\""
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "country"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_literal",
+            "expected": "DOMESTIC",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "addressType"
+            ],
+            "message": "Invalid literal value, expected \\"DOMESTIC\\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "province"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "district"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_literal",
+            "expected": "RURAL",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "urbanOrRural"
+            ],
+            "message": "Invalid literal value, expected \\"RURAL\\""
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "undefined",
+            "received": "object",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected undefined, received object"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "country"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_literal",
+            "expected": "INTERNATIONAL",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "addressType"
+            ],
+            "message": "Invalid literal value, expected \\"INTERNATIONAL\\""
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "state"
+            ],
+            "message": "Required"
+          },
+          {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "undefined",
+            "path": [
+              "declaration",
+              "applicant.name",
+              "district2"
+            ],
+            "message": "Required"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_union",
+            "unionErrors": [
+              {
+                "issues": [
+                  {
+                    "code": "invalid_union",
+                    "unionErrors": [
+                      {
+                        "issues": [
+                          {
+                            "code": "invalid_type",
+                            "expected": "string",
+                            "received": "number",
+                            "path": [
+                              "declaration",
+                              "applicant.name",
+                              "firstname"
+                            ],
+                            "message": "Expected string, received number"
+                          }
+                        ],
+                        "name": "ZodError"
+                      },
+                      {
+                        "issues": [
+                          {
+                            "code": "invalid_type",
+                            "expected": "null",
+                            "received": "object",
+                            "path": [
+                              "declaration",
+                              "applicant.name"
+                            ],
+                            "message": "Expected null, received object"
+                          }
+                        ],
+                        "name": "ZodError"
+                      }
+                    ],
+                    "path": [
+                      "declaration",
+                      "applicant.name"
+                    ],
+                    "message": "Invalid input"
+                  }
+                ],
+                "name": "ZodError"
+              },
+              {
+                "issues": [
+                  {
+                    "code": "invalid_type",
+                    "expected": "undefined",
+                    "received": "object",
+                    "path": [
+                      "declaration",
+                      "applicant.name"
+                    ],
+                    "message": "Expected undefined, received object"
+                  }
+                ],
+                "name": "ZodError"
+              }
+            ],
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Invalid input"
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [
+      "declaration",
+      "applicant.name"
+    ],
+    "message": "Invalid input"
+  }
+]]
+`;
+
 exports[`event.actions.notify > allows sending partial payload as NOTIFY action 1`] = `
 {
-  "applicant.address": {
-    "addressType": "DOMESTIC",
-    "country": "FAR",
-    "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-    "number": "55",
-    "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-    "residentialArea": "Example Residential Area",
-    "street": "Example Street",
-    "town": "Example Town",
-    "urbanOrRural": "URBAN",
-    "zipCode": "123456",
-  },
-  "applicant.age": 19,
-  "applicant.dobUnknown": true,
-  "applicant.image": {
-    "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
-    "originalFilename": "abcd.png",
-    "type": "image/png",
-  },
-  "recommender.none": true,
+  "applicant.dob": "2025-05-16",
+  "applicant.firstname": "John",
 }
 `;
 

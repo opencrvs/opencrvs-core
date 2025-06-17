@@ -167,6 +167,9 @@ function DateRangeInput({
   const handleDateRangeActiveChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
+    if (!event.target.checked) {
+      onChange('')
+    }
     setDateValue((d) => ({
       ...d,
       isDateRangeActive: event.target.checked
@@ -264,7 +267,7 @@ function DateRangeOutput({ value }: { value?: string | [string, string] }) {
     }
   }
 
-  return value ?? ''
+  return String(value ?? '')
 }
 
 export const DateRangeField = {

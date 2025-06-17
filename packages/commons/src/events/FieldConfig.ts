@@ -313,6 +313,33 @@ const Select = BaseField.extend({
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
+const NameField = BaseField.extend({
+  type: z.literal(FieldType.NAME),
+  defaultValue: z
+    .object({
+      firstname: NonEmptyTextValue,
+      surname: NonEmptyTextValue
+    })
+    .optional(),
+  configuration: z
+    .object({
+      maxLength: z.number().optional().describe('Maximum length of the text'),
+      prefix: TranslationConfig.optional(),
+      postfix: TranslationConfig.optional()
+    })
+    .optional()
+}).describe('Name input field')
+
+const PhoneField = BaseField.extend({
+  defaultValue: NonEmptyTextValue.optional(),
+  type: z.literal(FieldType.PHONE)
+}).describe('Phone input field')
+
+const IdField = BaseField.extend({
+  defaultValue: NonEmptyTextValue.optional(),
+  type: z.literal(FieldType.ID)
+}).describe('ID input field')
+
 const Checkbox = BaseField.extend({
   type: z.literal(FieldType.CHECKBOX),
   defaultValue: CheckboxFieldValue.optional()
@@ -440,6 +467,9 @@ export type AllFields =
   | typeof BulletList
   | typeof PageHeader
   | typeof Select
+  | typeof NameField
+  | typeof PhoneField
+  | typeof IdField
   | typeof Checkbox
   | typeof File
   | typeof Country
@@ -466,6 +496,9 @@ export type Inferred =
   | z.infer<typeof BulletList>
   | z.infer<typeof PageHeader>
   | z.infer<typeof Select>
+  | z.infer<typeof NameField>
+  | z.infer<typeof PhoneField>
+  | z.infer<typeof IdField>
   | z.infer<typeof Checkbox>
   | z.infer<typeof File>
   | z.infer<typeof FileUploadWithOptions>
@@ -495,6 +528,9 @@ export type InferredInput =
   | z.input<typeof BulletList>
   | z.input<typeof PageHeader>
   | z.input<typeof Select>
+  | z.input<typeof NameField>
+  | z.input<typeof PhoneField>
+  | z.input<typeof IdField>
   | z.input<typeof Checkbox>
   | z.input<typeof File>
   | z.input<typeof FileUploadWithOptions>
@@ -521,6 +557,9 @@ export const FieldConfig = z
     BulletList,
     PageHeader,
     Select,
+    NameField,
+    PhoneField,
+    IdField,
     Checkbox,
     File,
     Country,
@@ -540,6 +579,9 @@ export const FieldConfig = z
   })
 
 export type SelectField = z.infer<typeof Select>
+export type NameField = z.infer<typeof NameField>
+export type PhoneField = z.infer<typeof PhoneField>
+export type IdField = z.infer<typeof IdField>
 export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
