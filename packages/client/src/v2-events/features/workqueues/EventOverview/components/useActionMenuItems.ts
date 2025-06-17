@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   ActionType,
   filterUnallowedActions,
@@ -20,12 +21,13 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  IndexMap
+  WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { getScope } from '@client/profile/profileSelectors'
 
 function getAssignmentActions(
   assignmentStatus: keyof typeof AssignmentStatus,
@@ -59,18 +61,18 @@ function getUserActionsByStatus(
   userScopes: Scope[]
 ): ActionType[] {
   switch (status) {
-    case EventStatus.CREATED: {
+    case EventStatus.enum.CREATED: {
       return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
     }
-    case EventStatus.NOTIFIED:
-    case EventStatus.DECLARED: {
+    case EventStatus.enum.NOTIFIED:
+    case EventStatus.enum.DECLARED: {
       return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
     }
-    case EventStatus.VALIDATED: {
+    case EventStatus.enum.VALIDATED: {
       return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
     }
-    case EventStatus.CERTIFIED:
-    case EventStatus.REGISTERED: {
+    case EventStatus.enum.CERTIFIED:
+    case EventStatus.enum.REGISTERED: {
       return [
         ...assignmentActions,
         ActionType.READ,
@@ -78,7 +80,7 @@ function getUserActionsByStatus(
         ActionType.REQUEST_CORRECTION
       ]
     }
-    case EventStatus.REJECTED: {
+    case EventStatus.enum.REJECTED: {
       const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
       const canValidate = hasAnyOfScopes(userScopes, validateScopes)
 
@@ -92,14 +94,14 @@ function getUserActionsByStatus(
       return [...assignmentActions, ActionType.READ, declarationAction]
     }
 
-    case EventStatus.ARCHIVED:
+    case EventStatus.enum.ARCHIVED:
       return [...assignmentActions, ActionType.READ]
     default:
       return [ActionType.READ]
   }
 }
 
-interface ActionConfig {
+export interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
@@ -151,13 +153,11 @@ export const actionLabels = {
   }
 } as const
 
-/**
- * @returns a list of action menu items based on the event state and scopes provided.
- */
-export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
+export function useAction(event: EventIndex) {
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
+
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
@@ -179,66 +179,99 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
-  const config = {
-    [ActionType.READ]: {
-      label: actionLabels[ActionType.READ],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
-    },
-    [ActionType.ASSIGN]: {
-      label: actionLabels[ActionType.ASSIGN],
-      onClick: async (eventId: string) => {
-        await events.actions.assignment.assign.mutate({
-          eventId,
-          assignedTo: authentication.sub,
-          refetchEvent
-        })
+  return {
+    config: {
+      [ActionType.READ]: {
+        label: actionLabels[ActionType.READ],
+        onClick: (workqueue?: string) =>
+          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+      },
+      [ActionType.ASSIGN]: {
+        label: actionLabels[ActionType.ASSIGN],
+        onClick: async (workqueue?: string) => {
+          await events.actions.assignment.assign.mutate({
+            eventId: event.id,
+            assignedTo: authentication.sub,
+            refetchEvent
+          })
+        }
+      },
+      [ActionType.UNASSIGN]: {
+        label: actionLabels[ActionType.UNASSIGN],
+        onClick: async (workqueue?: string) => {
+          await events.actions.assignment.unassign.mutateAsync({
+            eventId: event.id,
+            transactionId: getUUID(),
+            assignedTo: null
+          })
+        }
+      },
+      [ActionType.DECLARE]: {
+        label: actionLabels[ActionType.DECLARE],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf
+      },
+      [ActionType.VALIDATE]: {
+        label: actionLabels[ActionType.VALIDATE],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf
+      },
+      [ActionType.REGISTER]: {
+        label: actionLabels[ActionType.REGISTER],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf
+      },
+      [ActionType.PRINT_CERTIFICATE]: {
+        label: actionLabels[ActionType.PRINT_CERTIFICATE],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf
+      },
+      [ActionType.DELETE]: {
+        label: actionLabels[ActionType.DELETE],
+        onClick: (workqueue?: string) => {
+          deleteEvent({
+            eventId: event.id
+          })
+          if (!workqueue) {
+            navigate(ROUTES.V2.buildPath({}))
+          }
+        }
       }
-    },
-    [ActionType.UNASSIGN]: {
-      label: actionLabels[ActionType.UNASSIGN],
-      onClick: async (eventId: string) => {
-        await events.actions.assignment.unassign.mutateAsync({
-          eventId,
-          transactionId: getUUID(),
-          assignedTo: null
-        })
-      }
-    },
-    [ActionType.DECLARE]: {
-      label: actionLabels[ActionType.DECLARE],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.VALIDATE]: {
-      label: actionLabels[ActionType.VALIDATE],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.REGISTER]: {
-      label: actionLabels[ActionType.REGISTER],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.PRINT_CERTIFICATE]: {
-      label: actionLabels[ActionType.PRINT_CERTIFICATE],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.DELETE]: {
-      label: actionLabels[ActionType.DELETE],
-      onClick: (eventId: string) => {
-        deleteEvent({
-          eventId
-        })
-        navigate(ROUTES.V2.buildPath({}))
-      }
-    }
-  } satisfies Partial<Record<ActionType, ActionConfig>>
+    } satisfies Record<WorkqueueActionType, ActionConfig>,
+    authentication
+  }
+}
+
+/**
+ * @returns a list of action menu items based on the event state and scopes provided.
+ */
+export function useActionMenuItems(event: EventIndex) {
+  const scopes = useSelector(getScope) ?? []
+  const { config, authentication } = useAction(event)
 
   const assignmentActions = getAssignmentActions(
     getAssignmentStatus(event, authentication.sub),

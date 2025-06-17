@@ -8,7 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import startOfDay from 'date-fns/startOfDay'
+import addMinutes from 'date-fns/addMinutes'
+import endOfDay from 'date-fns/endOfDay'
+import parse from 'date-fns/parse'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -19,15 +22,16 @@ import {
   QueryType,
   SearchQueryParams,
   Inferred,
-  EventState
+  EventState,
+  FieldType,
+  QueryExpression
 } from '@opencrvs/commons/client'
-import { FieldType } from '@opencrvs/commons/client'
-import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
+import { getAllUniqueFields } from '@client/v2-events/utils'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -142,7 +146,8 @@ export const getDefaultSearchFields = (
   return searchFields
 }
 
-const StatusesForAdvancedSearch = {
+// @TODO: Could we just use EventStatus?
+const RegStatus = {
   Created: 'CREATED',
   Notified: 'NOTIFIED',
   Declared: 'DECLARED',
@@ -166,7 +171,40 @@ type Condition =
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
 
-export const ADVANCED_SEARCH_KEY = 'and'
+/**
+ * Represents advanced search behavior where **all conditions must match**.
+ * Used to build ElasticSearch queries with `must` clauses (logical AND).
+ */
+const ADVANCED_SEARCH_KEY = 'and' as const
+/**
+ * Represents quick search behavior where **any condition may match**.
+ * Used to build ElasticSearch queries with `should` clauses (logical OR).
+ */
+const QUICK_SEARCH_KEY = 'or' as const
+
+export function toAdvancedSearchQueryType(
+  searchParams: QueryInputType,
+  eventType?: string,
+  type = ADVANCED_SEARCH_KEY
+): QueryType {
+  const metadata: Record<string, unknown> = {}
+  const declaration: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([_, value]) => {
+    const prefixRegex = new RegExp(`^event${FIELD_SEPARATOR}`)
+    const key = _.replace(prefixRegex, '').replaceAll(FIELD_SEPARATOR, '.')
+    if (_.startsWith(`event${FIELD_SEPARATOR}`)) {
+      metadata[key] = value
+    } else {
+      declaration[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...metadata, eventType, data: declaration }]
+  }
+}
 
 function buildCondition(
   value: string,
@@ -188,25 +226,36 @@ function buildCondition(
 }
 
 function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values(StatusesForAdvancedSearch) }
+  return { type: 'anyOf', terms: Object.values(RegStatus) }
 }
+/**
+ * Converts a date range input string into a UTC-based range string.
+ *
+ * This function:
+ * - Takes a date range input in the format "YYYY-MM-DD,YYYY-MM-DD" or "YYYY-MM-DD".
+ * - Converts the local date(s) to UTC by adjusting for the current timezone offset.
+ * - Returns a string formatted as "startUTC,endUTC".
+ *
+ * @param {string} inputDateString - The date range input string.
+ * @returns {string} A comma-separated string of ISO-formatted UTC start and end timestamps.
+ */
+function getUtcRangeFromInput(inputDateString: string) {
+  const offsetMinutes = new Date().getTimezoneOffset()
 
-function formatValue(
-  rawInput: EventState,
-  fieldId: string,
-  fieldConfig?: FieldConfig
-): string | undefined {
-  const value = rawInput[fieldId]
+  const [startDateStr, endDateStr] = inputDateString
+    .split(',')
+    .map((s) => s.trim())
 
-  if (
-    fieldConfig &&
-    fieldConfig.type === FieldType.DATE_RANGE &&
-    Array.isArray(value) &&
-    value.length === 2
-  ) {
-    return `${value[0]},${value[1]}`
-  }
-  return value ? String(value) : undefined
+  const dateFormat = 'yyyy-MM-dd'
+  const startLocal = startOfDay(parse(startDateStr, dateFormat, new Date()))
+  const endLocal = endOfDay(
+    parse(endDateStr || startDateStr, dateFormat, new Date())
+  )
+
+  const utcStart = addMinutes(startLocal, offsetMinutes)
+  const utcEnd = addMinutes(endLocal, offsetMinutes)
+
+  return `${utcStart.toISOString()},${utcEnd.toISOString()}`
 }
 
 /**
@@ -241,20 +290,36 @@ function buildDataConditionFromSearchKeys(
   rawInput: EventState // values from UI or query string
 ): Record<string, Condition> {
   return searchKeys.reduce(
-    (result: Record<string, Condition>, { fieldId, config, fieldConfig }) => {
-      // Format the raw field value based on its type (e.g., date range value is a string tuple, format it as comma-separated string)
-      const value = formatValue(rawInput, fieldId, fieldConfig)
+    (
+      result: Record<string, Condition>,
+      { fieldId, fieldType, config, fieldConfig }
+    ) => {
+      let value = String(rawInput[fieldId])
       if (fieldId === 'event.status' && value === 'ALL') {
         const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = buildConditionForStatus()
       } else if (value) {
+        let searchType = config?.type
+        // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
+        // we treat the input as a range, regardless of whether the user entered a single date (e.g., "2023-01-01")
+        // or a date range (e.g., "2023-01-01,2023-12-31").
+        // In both cases, we convert the local date(s) into a UTC-based range to ensure
+        // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
+        if (
+          (fieldConfig?.type === FieldType.DATE_RANGE ||
+            fieldConfig?.type === FieldType.DATE) &&
+          fieldType === 'event'
+        ) {
+          searchType = 'range'
+          value = getUtcRangeFromInput(value)
+        }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
         // but "2023-01-01" should be treated as an exact match
-        const searchType =
-          config?.type === 'range' && value.split(',').length === 1
-            ? 'exact'
-            : config?.type
+        else if (config?.type === 'range' && value.split(',').length === 1) {
+          searchType = 'exact'
+        }
+
         const condition = buildCondition(value, searchType)
         const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
         result[transformedKey] = condition
@@ -360,27 +425,111 @@ export function parseFieldSearchParams(
   return filteredSearchParams
 }
 
-export function toQueryType(
-  eventType: string,
-  searchParams: QueryInputType,
-  type: 'and' | 'or'
-): QueryType {
-  const topLevelFields: Record<string, unknown> = {}
-  const dataFields: Record<string, unknown> = {}
+const searchFieldTypeMapping = {
+  [FieldType.NAME]: 'fuzzy',
+  [FieldType.ID]: 'exact',
+  [FieldType.EMAIL]: 'exact',
+  [FieldType.PHONE]: 'exact'
+} as const
 
-  const regex = new RegExp(`^event${FIELD_SEPARATOR}`)
-  Object.entries(searchParams).forEach(([encodedKey, value]) => {
-    const key = encodedKey.replace(regex, '').replaceAll(FIELD_SEPARATOR, '.')
+const searchFields = Object.keys(
+  searchFieldTypeMapping
+) as (keyof typeof searchFieldTypeMapping)[]
 
-    if (encodedKey.startsWith(`event${FIELD_SEPARATOR}`)) {
-      topLevelFields[key] = value
-    } else {
-      dataFields[key] = value
+function metadataFieldTypeMapping(value: string) {
+  return [
+    {
+      trackingId: {
+        term: value,
+        type: 'exact' as const
+      },
+      // @TODO: Registration number should be read from legalStatuses
+      registrationNumber: {
+        term: value,
+        type: 'exact' as const
+      }
     }
-  })
+  ]
+}
+
+function addMetadataFieldsInQuickSearchQuery(
+  clauses: QueryExpression[],
+  terms: string[]
+): QueryExpression[] {
+  const metadataClauses = terms.reduce<QueryExpression[]>((acc, term) => {
+    const mappings = metadataFieldTypeMapping(term)
+
+    for (const mapping of mappings) {
+      for (const [field, config] of Object.entries(mapping)) {
+        acc.push({ [field]: config })
+      }
+    }
+
+    return acc
+  }, [])
+
+  return [...clauses, ...metadataClauses]
+}
+
+function buildQueryFromQuickSearchFields(
+  searchableFields: Inferred[],
+  terms: string[]
+): QueryType {
+  let clauses: QueryExpression[] = []
+  for (const field of searchableFields) {
+    const matchType =
+      searchFieldTypeMapping[field.type as keyof typeof searchFieldTypeMapping]
+
+    for (const term of terms) {
+      const queryClause: QueryExpression = Object.keys(
+        searchFieldTypeMapping
+      ).includes(field.type) // Check if the field type is in the mapping to determine if it's a declaration field
+        ? { data: { [field.id]: { type: matchType, term } } }
+        : { [field.id]: { type: matchType, term } }
+
+      clauses.push(queryClause)
+    }
+  }
+
+  clauses = addMetadataFieldsInQuickSearchQuery(clauses, terms)
 
   return {
-    type,
-    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
-  }
+    type: QUICK_SEARCH_KEY,
+    clauses
+  } as QueryType
+}
+
+/**
+ * Builds a quick search query for Elasticsearch based on the provided search parameters and event configurations.
+ *
+ * Quick search is designed for user-friendly, broad matching. It performs:
+ * - `fuzzy` matches on fields like name.
+ * - `exact` matches on fields like ID, email, phone.
+ * - additional exact matches on metadata fields like `trackingId` and `registrationNumber`.
+ *
+ * The resulting query uses `OR` logic (`type: 'or'`), meaning any matching clause is sufficient.
+ *
+ * @param searchParams - A flat object of field-value pairs submitted from the UI.
+ * @param events - The event configurations to extract searchable fields from.
+ * @returns QueryType - A structured query used to hit Elasticsearch.
+ */
+export function buildQuickSearchQuery(
+  searchParams: Record<string, string>,
+  events: EventConfig[]
+): QueryType {
+  // Flatten all searchable fields from the selected events
+  const fieldsOfEvents = events.reduce<Inferred[]>((acc, event) => {
+    const fields = getAllUniqueFields(event)
+    return [...acc, ...fields]
+  }, [])
+
+  // Filter fields to only include those that are supported in quick search
+  const fieldsToSearch = fieldsOfEvents.filter((field) =>
+    searchFields.includes(field.type as keyof typeof searchFieldTypeMapping)
+  )
+  // Get all non-empty search terms from user input
+  const terms = Object.values(searchParams).filter(Boolean)
+
+  // Delegate to the actual query builder
+  return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
 }
