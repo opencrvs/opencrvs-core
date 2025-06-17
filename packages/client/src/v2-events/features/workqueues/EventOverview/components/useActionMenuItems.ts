@@ -104,7 +104,7 @@ function getUserActionsByStatus(
 
 export interface ActionConfig {
   label: TranslationConfig
-  onClick: (eventId: string) => Promise<void> | void
+  onClick: (workqueue?: string) => Promise<void> | void
   disabled?: boolean
 }
 
@@ -181,6 +181,8 @@ export function useAction(event: EventIndex) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
+  const eventId = event.id
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -189,14 +191,13 @@ export function useAction(event: EventIndex) {
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
-        onClick: (workqueue?: string) =>
-          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+        onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
-        onClick: async (workqueue?: string) => {
+        onClick: async () => {
           await events.actions.assignment.assign.mutate({
-            eventId: event.id,
+            eventId,
             assignedTo: authentication.sub,
             refetchEvent
           })
@@ -204,9 +205,9 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
-        onClick: async (workqueue?: string) => {
+        onClick: async () => {
           await events.actions.assignment.unassign.mutateAsync({
-            eventId: event.id,
+            eventId,
             transactionId: getUUID(),
             assignedTo: null
           })
@@ -214,10 +215,10 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
-        onClick: (workqueue?: string) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -225,10 +226,10 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
-        onClick: (workqueue?: string) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -236,10 +237,10 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
-        onClick: (workqueue?: string) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -247,10 +248,10 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        onClick: (workqueue?: string) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -258,10 +259,8 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
-        onClick: (workqueue?: string) => {
-          deleteEvent({
-            eventId: event.id
-          })
+        onClick: (workqueue?) => {
+          deleteEvent({ eventId })
           if (!workqueue) {
             navigate(ROUTES.V2.buildPath({}))
           }
@@ -269,7 +268,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
-        onClick: (eventId: string) => {
+        onClick: () => {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
           )?.correctionForm.pages
@@ -281,9 +280,7 @@ export function useAction(event: EventIndex) {
           // If no pages are configured, skip directly to review page
           if (correctionPages.length === 0) {
             navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-                eventId
-              })
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
             )
             return
           }
@@ -297,8 +294,8 @@ export function useAction(event: EventIndex) {
           )
         },
         disabled: !eventIsAssignedToSelf
-      } satisfies Record<WorkqueueActionType, ActionConfig>
-    },
+      }
+    } satisfies Record<WorkqueueActionType, ActionConfig>,
     authentication
   }
 }
