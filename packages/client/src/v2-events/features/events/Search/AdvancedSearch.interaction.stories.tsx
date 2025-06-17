@@ -272,9 +272,19 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        const locationInput = await canvas.findByTestId(
-          'event____legalStatus____REGISTERED____createdAtLocation'
-        )
+        let locationInput: HTMLElement | undefined
+
+        await waitFor(async () => {
+          const input = await canvas.findByTestId(
+            'event____legalStatus____REGISTERED____createdAtLocation'
+          )
+          await expect(input).toBeVisible()
+          locationInput = input
+        })
+
+        if (!locationInput) {
+          throw new Error('locationInput not found after waitFor')
+        }
 
         await expect(locationInput).toHaveValue('Ibombo District Office')
         await userEvent.clear(locationInput)

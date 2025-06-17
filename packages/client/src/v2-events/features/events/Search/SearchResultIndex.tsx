@@ -61,7 +61,7 @@ export const SearchResultIndex = () => {
         {
           id: 'v2.search.advancedSearch.result.title',
           description: 'Advanced search result title',
-          defaultMessage: 'Search result ({count})'
+          defaultMessage: 'Search results ({count})'
         },
         {
           count: queryData.length
