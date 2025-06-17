@@ -47,36 +47,6 @@ export function Review() {
 
   const form = getFormValues()
 
-  async function handleEdit({
-    pageId,
-    fieldId,
-    confirmation
-  }: {
-    pageId: string
-    fieldId?: string
-    confirmation?: boolean
-  }) {
-    const confirmedEdit =
-      confirmation ||
-      (await openModal<boolean | null>((close) => (
-        <ReviewComponent.EditModal close={close} />
-      )))
-
-    if (confirmedEdit) {
-      navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
-          { pageId, eventId },
-          {
-            from: 'review',
-            workqueue: slug
-          },
-          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
-        )
-      )
-    }
-    return
-  }
-
   const previousFormValues = event.declaration
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => !isEqual(previousFormValues[key], value)
