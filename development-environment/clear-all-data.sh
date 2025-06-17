@@ -46,6 +46,6 @@ fi
 echo "Running migrations"
 echo
 
-yarn --cwd="$DIR/packages/migration" start
+pnpm --dir "$DIR/packages/migration" start
 
 echo

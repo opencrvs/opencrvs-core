@@ -21,12 +21,11 @@
     "noUnusedLocals": true,
     "types": ["fhir", "jest"]
   },
-  "include": ["resources/**/*.ts", "src/**/*.ts", "typings"],
+  "include": ["resources/**/*.ts", "src/**/*.ts", "test/setupJest.ts", "typings"],
   "exclude": [
     "node_modules",
     "build",
     "scripts",
-    "acceptance-tests",
-    "src/setupTests.ts"
+    "acceptance-tests"
   ]
 }

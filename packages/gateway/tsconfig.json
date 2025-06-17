@@ -23,6 +23,6 @@
     "types": ["fhir", "jest"],
     "esModuleInterop": true
   },
-  "include": ["src/**/*.ts", "typings"],
+  "include": ["src/**/*.ts", "test/setupJest.ts", "typings"],
   "exclude": ["node_modules", "build", "scripts", "acceptance-tests"]
 }

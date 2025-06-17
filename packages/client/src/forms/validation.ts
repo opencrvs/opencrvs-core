@@ -20,7 +20,7 @@ import {
   getConditionalActionsForField,
   getFieldValidation,
   isFieldButton
-} from '@opencrvs/client/src/forms/utils'
+} from '@client/forms/utils'
 import { IOfflineData } from '@client/offline/reducer'
 import { MessageDescriptor } from 'react-intl'
 import { httpErrorResponseValidator } from '@client/components/form/http'

@@ -12,8 +12,6 @@ import { IAuthHeader } from '@opencrvs/commons'
 import { getTokenPayload, getUser } from './features/user/utils'
 import { SEARCH_URL } from './constants'
 
-import fetch from '@gateway/fetch'
-
 export async function postAssignmentSearch(
   authHeader: IAuthHeader,
   compositionId: string
@@ -27,7 +25,7 @@ export async function postAssignmentSearch(
     body: JSON.stringify({ compositionId })
   })
     .then((response) => {
-      return response.json()
+      return response.json() as { practitionerId?: string }
     })
     .catch((error) => {
       return Promise.reject(
@@ -40,8 +38,7 @@ export async function findUserAssignment(
   id: string,
   authHeader: IAuthHeader
 ): Promise<string | undefined> {
-  const { practitionerId }: { practitionerId?: string } =
-    await postAssignmentSearch(authHeader, id)
+  const { practitionerId } = await postAssignmentSearch(authHeader, id)
   return practitionerId
 }
 

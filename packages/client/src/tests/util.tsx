@@ -21,7 +21,7 @@ import { offlineDataReady, setOfflineData } from '@client/offline/actions'
 import { AppStore, createStore, IStoreState } from '@client/store'
 import { ThemeProvider } from 'styled-components'
 import { getSchema } from '@client/tests/graphql-schema-mock'
-import { I18nContainer } from '@opencrvs/client/src/i18n/components/I18nContainer'
+import { I18nContainer } from '@client/i18n/components/I18nContainer'
 import { getTheme } from '@opencrvs/components/lib/theme'
 import { join } from 'path'
 import {

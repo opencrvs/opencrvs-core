@@ -22,12 +22,12 @@ cp index.html $WORK_DIR/build/countryconfig/index.html
 # Build OpenAPI docs for Events service
 EVENTS_YML="$WORK_DIR/build/events/openapi.yml"
 touch $EVENTS_YML
-(cd $WORK_DIR/../events && NODE_ENV=develop npx tsx src/openapi.ts) > $EVENTS_YML
+(cd $WORK_DIR/../events && NODE_ENV=develop pnpm exec tsx src/openapi.ts) > $EVENTS_YML
 
 # Build OpenAPI docs for country config
 COUNTRYCONFIG_YML="$WORK_DIR/build/countryconfig/openapi.yml"
 touch $COUNTRYCONFIG_YML
-(cd $WORK_DIR/../commons && npx tsx src/countryconfig/openapi.ts) > $COUNTRYCONFIG_YML
+(cd $WORK_DIR/../commons && pnpm exec tsx src/countryconfig/openapi.ts) > $COUNTRYCONFIG_YML
 
 echo "Events YAML: $EVENTS_YML"
 echo "Countryconfig YAML: $COUNTRYCONFIG_YML"

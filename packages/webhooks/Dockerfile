@@ -5,6 +5,6 @@ USER node
 
 WORKDIR /app/packages/webhooks
 COPY --chown=node:node packages/webhooks /app/packages/webhooks
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "pnpm", "start:prod" ]

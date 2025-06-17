@@ -11,7 +11,6 @@
 import { GQLResolver, GQLVSExport } from '@gateway/graphql/schema'
 import { FILTER_BY } from '@gateway/features/metrics/root-resolvers'
 import { USER_MANAGEMENT_URL } from '@gateway/constants'
-import fetch from '@gateway/fetch'
 import { getPresignedUrlFromUri } from '@gateway/features/registration/utils'
 import { fetchLocation } from '@gateway/location'
 import { resourceIdentifierToUUID } from '@opencrvs/commons/types'

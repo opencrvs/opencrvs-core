@@ -32,7 +32,7 @@ import { profileReducer, ProfileState } from '@client/profile/profileReducer'
 import {
   IReviewFormState,
   reviewReducer
-} from '@opencrvs/client/src/forms/register/reviewReducer'
+} from '@client/forms/register/reviewReducer'
 import {
   advancedSearchParamReducer,
   IAdvancedSearchParamState

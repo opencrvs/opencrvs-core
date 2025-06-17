@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { CONFIG_API_URL } from '@metrics/constants'
 import { Document } from 'mongoose'
 import { UUID } from '@opencrvs/commons'
@@ -75,7 +74,7 @@ export async function getApplicationConfig(
     }
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<{ config: IApplicationConfig }>
     })
     .then((response) => {
       return response.config
@@ -97,7 +96,9 @@ export async function getDashboardQueries(): Promise<
     }
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<
+        Array<{ collection: string; aggregate: Document[] }>
+      >
     })
     .catch((error) => {
       return Promise.reject(

@@ -22,28 +22,28 @@ SCRIPT_PATH=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 export NODE_OPTIONS=--dns-result-order=ipv4first
 
 # hearth migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $HEARTH_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $HEARTH_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $HEARTH_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $HEARTH_CONFIG
 
 # events migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $EVENTS_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $EVENTS_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $EVENTS_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $EVENTS_CONFIG
 
 #openhim migrations
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $OPENHIM_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $OPENHIM_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $OPENHIM_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $OPENHIM_CONFIG
 
 # Application Config migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $APP_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $APP_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $APP_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $APP_CONFIG
 
 # User mgnt migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $USER_MGNT_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $USER_MGNT_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $USER_MGNT_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $USER_MGNT_CONFIG
 
 # performance migration
-yarn --cwd $SCRIPT_PATH migrate-mongo up --file $PERFORMANCE_CONFIG
-yarn --cwd $SCRIPT_PATH migrate-mongo status --file $PERFORMANCE_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $PERFORMANCE_CONFIG
+pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $PERFORMANCE_CONFIG
 
 # search migration / reindex
-yarn --cwd $SCRIPT_PATH reindex-search
+pnpm --dir $SCRIPT_PATH reindex-search

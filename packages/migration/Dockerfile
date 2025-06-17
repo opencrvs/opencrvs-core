@@ -14,9 +14,9 @@ WORKDIR /app/packages/migration
 
 COPY --chown=node:node packages/migration /app/packages/migration
 
-RUN yarn install --frozen-lockfile
-RUN yarn build
+RUN pnpm install --frozen-lockfile
+RUN pnpm build
 
 WORKDIR /app/packages/migration
 
-CMD ["/bin/sh", "-c", "/app/wait && yarn start:prod"]
+CMD ["/bin/sh", "-c", "/app/wait && pnpm start:prod"]
