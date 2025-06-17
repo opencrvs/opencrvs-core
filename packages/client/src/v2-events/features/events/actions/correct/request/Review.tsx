@@ -78,7 +78,8 @@ export function Review() {
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
               { pageId, eventId },
               {
-                from: 'review'
+                from: 'review',
+                workqueue: slug
               },
               fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
             )
