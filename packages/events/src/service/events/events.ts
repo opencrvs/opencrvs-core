@@ -125,7 +125,7 @@ export async function deleteEvent(
   const eventStatus = getStatusFromActions(event.actions)
 
   // Once an event is declared or notified, it can not be deleted anymore
-  if (eventStatus !== EventStatus.CREATED) {
+  if (eventStatus !== EventStatus.enum.CREATED) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'A declared or notified event can not be deleted'
@@ -144,7 +144,7 @@ export async function deleteEvent(
 const TRACKING_ID_LENGTH = 6
 const TRACKING_ID_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-function generateTrackingId(): string {
+export function generateTrackingId(): string {
   let result = ''
   for (let i = 0; i < TRACKING_ID_LENGTH; i++) {
     const randomIndex = Math.floor(
@@ -155,7 +155,7 @@ function generateTrackingId(): string {
   return result
 }
 
-type EventDocumentWithTransActionId = EventDocument & { transactionId: string }
+type EventDocumentWithTransactionId = EventDocument & { transactionId: string }
 
 export async function createEvent({
   eventInput,
@@ -175,7 +175,7 @@ export async function createEvent({
   }
 
   const db = await events.getClient()
-  const collection = db.collection<EventDocumentWithTransActionId>('events')
+  const collection = db.collection<EventDocumentWithTransactionId>('events')
 
   const now = new Date().toISOString()
   const id = getUUID()
@@ -377,15 +377,14 @@ export async function addAction(
       {
         $push: {
           actions: {
-            ...input,
             ...createdByDetails,
             transactionId: getUUID(),
             type: ActionType.UNASSIGN,
             declaration: {},
             assignedTo: null,
             createdAt: now,
-            id: actionId,
-            status
+            id: getUUID(), // use a new UUID for unassign action
+            status: ActionStatus.Accepted
           }
         },
         $set: { updatedAt: now }

@@ -24,7 +24,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
-import { SearchResultComponent } from '../events/AdvancedSearch/SearchResult'
+import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 import { Outbox } from './Outbox'
 

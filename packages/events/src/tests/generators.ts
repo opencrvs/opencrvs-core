@@ -10,8 +10,15 @@
  */
 
 import { Db } from 'mongodb'
-import { getUUID, eventPayloadGenerator } from '@opencrvs/commons'
+import {
+  getUUID,
+  eventPayloadGenerator,
+  EventDocument,
+  ActionType,
+  ActionStatus
+} from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
+import { generateTrackingId } from '../service/events/events'
 
 interface Name {
   use: string
@@ -35,7 +42,7 @@ interface CreateUser {
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
-export function payloadGenerator() {
+export function payloadGenerator(rng: () => number) {
   const user = {
     create: (input: CreateUser) => ({
       role: input.role ?? 'REGISTRATION_AGENT',
@@ -65,7 +72,7 @@ export function payloadGenerator() {
     }
   }
 
-  return { event: eventPayloadGenerator, locations, user }
+  return { event: eventPayloadGenerator(rng), locations, user }
 }
 
 /**
@@ -83,11 +90,51 @@ export function seeder() {
       id: createdUser.insertedId.toString()
     }
   }
+
   const seedLocations = async (db: Db, locations: Location[]) =>
     db.collection('locations').insertMany(locations)
 
+  const seedEvent = async (
+    db: Db,
+    user: CreatedUser & { signature?: string },
+    event: Partial<EventDocument> = {}
+  ) => {
+    const now = new Date().toISOString()
+    const id = getUUID()
+    const transactionId = getUUID()
+    const trackingId = generateTrackingId()
+
+    const createdByDetails = {
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdAtLocation: user.primaryOfficeId,
+      createdBySignature: user.signature
+    }
+
+    await db.collection('events').insertOne({
+      id,
+      transactionId,
+      createdAt: now,
+      updatedAt: now,
+      trackingId,
+      actions: [
+        {
+          ...createdByDetails,
+          type: ActionType.CREATE,
+          createdAt: now,
+          id: getUUID(),
+          declaration: {},
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
+        }
+      ],
+      ...event
+    })
+  }
+
   return {
     user: seedUser,
-    locations: seedLocations
+    locations: seedLocations,
+    event: seedEvent
   }
 }
