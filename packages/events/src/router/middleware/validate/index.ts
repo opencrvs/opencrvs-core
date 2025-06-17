@@ -123,13 +123,15 @@ function validateDeclarationUpdateAction({
 
   const declarationConfig = getDeclaration(eventConfig)
 
-  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed (e.g. when dob is unknown anduser has send the age previously. Now they only send dob, without setting dob unknown to false).
+  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
+  // (e.g. when dob is unknown anduser has send the age previously.Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
     completeDeclaration
   )
 
-  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid. Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
+  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
   const invalidKeys = getInvalidUpdateKeys({
     update: declarationUpdate,
     cleaned: cleanedDeclaration
@@ -196,6 +198,47 @@ function validateActionAnnotation({
   return errors
 }
 
+function validateNotifyAction({
+  eventConfig,
+  annotation = {},
+  declaration = {}
+}: {
+  eventConfig: EventConfig
+  annotation?: ActionUpdate
+  declaration: ActionUpdate
+}) {
+  const declarationConfig = getDeclaration(eventConfig)
+
+  const formFields = declarationConfig.pages.flatMap(({ fields }) =>
+    fields.flatMap((field) => field)
+  )
+
+  // TODO CIHAN annotation
+
+  return Object.entries(declaration).flatMap(([key, value]) => {
+    const field = formFields.find((f) => f.id === key)
+
+    if (!field) {
+      return {
+        message: errorMessages.unexpectedField.defaultMessage,
+        id: key,
+        value
+      }
+    }
+
+    const fieldErrors = runFieldValidations({
+      field,
+      values: declaration
+    })
+
+    return fieldErrors.errors.map((error) => ({
+      message: error.message.defaultMessage,
+      id: field.id,
+      value: declaration[field.id]
+    }))
+  })
+}
+
 export function validateAction(actionType: ActionType) {
   return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
     const event = await getEventById(input.eventId)
@@ -205,6 +248,17 @@ export function validateAction(actionType: ActionType) {
     })
 
     const declaration = getCurrentEventState(event, eventConfig).declaration
+
+    if (actionType === ActionType.NOTIFY) {
+      const errors = validateNotifyAction({
+        eventConfig,
+        annotation: input.annotation,
+        declaration: input.declaration
+      })
+
+      throwWhenNotEmpty(errors)
+      return next()
+    }
 
     const declarationUpdateAction =
       DeclarationUpdateActions.safeParse(actionType)
@@ -219,6 +273,7 @@ export function validateAction(actionType: ActionType) {
       })
 
       throwWhenNotEmpty(errors)
+      return next()
     }
 
     const annotationActionParse = annotationActions.safeParse(actionType)
@@ -232,8 +287,9 @@ export function validateAction(actionType: ActionType) {
       })
 
       throwWhenNotEmpty(errors)
+      return next()
     }
 
-    return next()
+    throw new Error('Trying to validate unsupported action type')
   }
 }
