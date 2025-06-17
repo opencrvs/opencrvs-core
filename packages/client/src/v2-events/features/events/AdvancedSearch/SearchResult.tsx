@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -264,6 +264,12 @@ export const SearchResultComponent = ({
   const [sortOrder, setSortOrder] = useState<
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
   >(SORT_ORDER.DESCENDING)
+
+  useEffect(() => {
+    setCurrentPageNumber(1)
+    setSortedCol(COLUMNS.LAST_UPDATED)
+    setSortOrder(SORT_ORDER.DESCENDING)
+  }, [contentTitle])
 
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
