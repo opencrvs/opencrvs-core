@@ -109,10 +109,6 @@ const messages = {
   }
 }
 
-/**
- *
- * @returns
- */
 export const SearchToolbar = () => {
   const intl = useIntl()
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)

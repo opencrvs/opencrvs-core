@@ -131,7 +131,7 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
                 {
                   fieldId: 'recommender.none'
                 },
-                // recommender.name.firstname is not rendered, because recommender.none is true
+                // recommender.name is not rendered, because recommender.none is true
                 {
                   fieldId: 'recommender.name'
                 }
@@ -188,7 +188,7 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
                 {
                   fieldId: 'applicant.name'
                 },
-                // recommender.name.firstname is rendered, because recommender.none is false
+                // recommender.name is rendered, because recommender.none is false
                 {
                   fieldId: 'recommender.name'
                 }
