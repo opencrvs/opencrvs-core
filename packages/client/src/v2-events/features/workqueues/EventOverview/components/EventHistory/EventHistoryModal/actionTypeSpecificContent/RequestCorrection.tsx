@@ -40,6 +40,8 @@ export function RequestCorrection({
 
   console.log(action)
 
+  // TODO CIHAN: we need event state before change?
+
   const formConfig = getDeclaration(eventConfiguration)
 
   return (
