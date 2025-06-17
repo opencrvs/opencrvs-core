@@ -28,7 +28,12 @@ export function getActionTypeSpecificContent(
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {
-    return <RequestCorrection eventConfiguration={eventConfiguration} />
+    return (
+      <RequestCorrection
+        action={action}
+        eventConfiguration={eventConfiguration}
+      />
+    )
   }
 
   return null

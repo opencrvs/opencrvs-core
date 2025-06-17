@@ -11,47 +11,47 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
-import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionType,
   EventConfig,
-  getDeclaration
+  getDeclaration,
+  RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
-const SectionTitle = styled(Text)`
-  margin-bottom: 20px;
-`
-
-const CorrectionInformationSectionTitle = styled(SectionTitle)`
-  margin-top: 20px;
+const CorrectionSectionTitle = styled(Text)`
+  margin: 20px 0;
 `
 
 export function RequestCorrection({
-  eventConfiguration
+  eventConfiguration,
+  action
 }: {
   eventConfiguration: EventConfig
+  action: RequestedCorrectionAction
 }) {
   const intl = useIntl()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
-      (action) => action.type === ActionType.REQUEST_CORRECTION
+      (a) => a.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
+
+  console.log(action)
 
   const formConfig = getDeclaration(eventConfiguration)
 
   return (
     <>
       {correctionFormPages.map((page) => (
-        <div key={page.id}>
-          <CorrectionInformationSectionTitle element="h3" variant="h3">
-            {intl.formatMessage(page.title)}
-          </CorrectionInformationSectionTitle>
-        </div>
+        <div key={page.id}>{'todo'}</div>
       ))}
+      <CorrectionSectionTitle element="h3" variant="h3">
+        {intl.formatMessage(
+          correctionMessages.correctionInformationSectionTitle
+        )}
+      </CorrectionSectionTitle>
     </>
   )
 }
