@@ -96,12 +96,9 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
 
 function TRPCPrefetcher() {
   useEffect(() => {
-    async function prefetch() {
-      await queryClient.prefetchQuery({
-        queryKey: trpcOptionsProxy.locations.get.queryKey()
-      })
-    }
-    void prefetch()
+    queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.locations.get.queryKey()
+    })
   }, [])
 
   return null
