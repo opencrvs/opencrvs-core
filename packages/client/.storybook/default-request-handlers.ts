@@ -96,6 +96,96 @@ export const handlers = {
           externalId: 'dbTLdTi7s8F',
           name: 'Chuminga',
           partOf: null
+        },
+        {
+          id: '62a0ccb4-880d-4f30-8882-f256007dfff9',
+          externalId: 'oEBf29y8JP8',
+          name: 'Ibombo',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: '967032fd-3f81-478a-826c-30cb8fe121bd',
+          externalId: 'ntoX1PkiWri',
+          name: 'Isamba',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: '89a33893-b17d-481d-a26d-6461e7ac1651',
+          externalId: 'QTtxiWj8ONP',
+          name: 'Itambo',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: 'd42ab2fe-e7ed-470e-8b31-4fb27f9b8250',
+          externalId: 'ydyJb1RAy4U',
+          name: 'Ezhi',
+          partOf: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c'
+        },
+        {
+          id: '423d000f-101b-47c0-8b86-21a908067cee',
+          externalId: 'pXhz0PLiYZX',
+          name: 'Chamakubi Health Post',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '4d3279be-d026-420c-88f7-f0a4ae986973',
+          externalId: 'di3U5u7F8Y3',
+          name: 'Ibombo Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '190902f4-1d77-476a-8947-41145af1db7d',
+          externalId: 'B5LpoYehUfI',
+          name: 'Chikobo Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: 'f5ecbd9b-a01e-4a65-910e-70e86ab41b71',
+          externalId: 'g42i3akwlpj',
+          name: 'Chilochabalenje Health Post',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: 'dbfc178f-7295-4b90-b28d-111c95b03127',
+          externalId: 'FhCAve1Ndla',
+          name: 'Chipeso Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '09862bfe-c7ac-46cd-987b-668681533c80',
+          externalId: 'uhVtTq0ICIF',
+          name: 'Chisamba Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '834ce389-e95b-4fb0-96a0-33e9ab323059',
+          externalId: 'dhcU6eMvhRQ',
+          name: 'Chitanda Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '0431c433-6062-4a4c-aee9-25271aec61ee',
+          externalId: 'xUFGW5vo7No',
+          name: 'Golden Valley Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: 'bc84d0b6-7ba7-480d-a339-5d9920d90eb2',
+          externalId: 'h1YIvEZ6dla',
+          name: 'Ipongo Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '4cf1f53b-b730-41d2-8649-dff7eeed970d',
+          externalId: 'VEhbknBaEOz',
+          name: 'Itumbwe Health Post',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
+        },
+        {
+          id: '4b3676cb-9355-4942-9eb9-2ce46acaf0e0',
+          externalId: 'sbFApO4who4',
+          name: 'Kabangalala Rural Health Centre',
+          partOf: '62a0ccb4-880d-4f30-8882-f256007dfff9'
         }
       ]
     })

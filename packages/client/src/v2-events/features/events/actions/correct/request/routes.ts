@@ -14,22 +14,36 @@ import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 export const routes = route(
   'request-correction/:eventId',
   {
-    params: { eventId: string().defined() }
+    params: { eventId: string().defined() },
+    searchParams: {
+      workqueue: string()
+    }
   },
   {
     ONBOARDING: route('onboarding/:pageId', {
       params: { pageId: string() },
+      searchParams: {
+        workqueue: string()
+      },
       hash: hashValues()
     }),
     PAGES: route('pages/:pageId', {
       params: { pageId: string() },
       searchParams: {
-        from: string()
+        from: string(),
+        workqueue: string()
       },
       hash: hashValues()
     }),
-    REVIEW: route('review'),
+    REVIEW: route('review', {
+      searchParams: {
+        workqueue: string()
+      }
+    }),
     SUMMARY: route('summary', {
+      searchParams: {
+        workqueue: string()
+      },
       hash: hashValues()
     })
   }

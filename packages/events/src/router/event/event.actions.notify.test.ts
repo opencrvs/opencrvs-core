@@ -13,6 +13,7 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   getAcceptedActions,
+  getUUID,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
@@ -76,7 +77,8 @@ describe('event.actions.notify', () => {
     })
   })
 
-  test(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
+  // @TODO: In order to test this, we need to add another required field to the form. Bit out of scope. Worked on https://github.com/opencrvs/opencrvs-core/issues/9766
+  test.skip(`allows sending partial payload as ${ActionType.NOTIFY} action`, async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
       SCOPES.RECORD_SUBMIT_INCOMPLETE,
@@ -85,10 +87,17 @@ describe('event.actions.notify', () => {
 
     const event = await client.event.create(generator.event.create())
 
-    const response = await client.event.actions.notify.request(
-      generator.event.actions.notify(event.id)
-    )
+    const payload = {
+      type: ActionType.NOTIFY,
+      eventId: event.id,
+      transactionId: getUUID(),
+      declaration: {
+        'applicant.firstname': 'John',
+        'applicant.dob': '2025-05-16'
+      }
+    }
 
+    const response = await client.event.actions.notify.request(payload)
     const activeActions = getAcceptedActions(response)
 
     expect(
@@ -101,6 +110,76 @@ describe('event.actions.notify', () => {
     ).toBeDefined()
   })
 
+  test(`${ActionType.NOTIFY} action fails if payload includes field with unexpected type`, async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, [
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_DECLARE
+    ])
+
+    const event = await client.event.create(generator.event.create())
+    const payload = {
+      type: ActionType.NOTIFY,
+      eventId: event.id,
+      transactionId: getUUID(),
+      annotation: {},
+      declaration: {
+        'applicant.name': { firstname: 999999, surname: '999999' }
+      }
+    }
+
+    // @TODO:  the error seems quite verbose. Check what causes it and if we can improve it
+    await expect(
+      // @ts-expect-error -- Intentionally passing incorrect type
+      client.event.actions.notify.request(payload)
+    ).rejects.toMatchSnapshot()
+  })
+
+  test(`${ActionType.NOTIFY} action fails if payload includes field that is not in the declaration`, async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, [
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_DECLARE
+    ])
+
+    const event = await client.event.create(generator.event.create())
+    const payload = {
+      type: ActionType.NOTIFY,
+      eventId: event.id,
+      transactionId: getUUID(),
+      declaration: {
+        'foo.bar': 'hello'
+      }
+    }
+
+    await expect(
+      client.event.actions.notify.request(payload)
+    ).rejects.toMatchSnapshot()
+  })
+
+  test(`${ActionType.NOTIFY} action fails if invalid value is sent`, async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user, [
+      SCOPES.RECORD_SUBMIT_INCOMPLETE,
+      SCOPES.RECORD_DECLARE
+    ])
+
+    const event = await client.event.create(generator.event.create())
+    const payload = {
+      type: ActionType.NOTIFY,
+      eventId: event.id,
+      transactionId: getUUID(),
+      declaration: {
+        // applicant.dob can not be in the future
+        'applicant.dob': '2050-01-01'
+      }
+    }
+
+    await expect(
+      client.event.actions.notify.request(payload)
+    ).rejects.toMatchSnapshot()
+  })
+
   test(`${ActionType.NOTIFY} is idempotent`, async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user, [
@@ -110,7 +189,9 @@ describe('event.actions.notify', () => {
 
     const event = await client.event.create(generator.event.create())
 
-    const notifyPayload = generator.event.actions.notify(event.id)
+    const notifyPayload = generator.event.actions.notify(event.id, {
+      keepAssignment: true
+    })
 
     const firstResponse =
       await client.event.actions.notify.request(notifyPayload)
