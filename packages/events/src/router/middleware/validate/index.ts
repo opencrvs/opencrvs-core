@@ -213,30 +213,59 @@ function validateNotifyAction({
     fields.flatMap((field) => field)
   )
 
-  // TODO CIHAN annotation
+  const reviewFields = getActionReviewFields(eventConfig, ActionType.DECLARE)
 
-  return Object.entries(declaration).flatMap(([key, value]) => {
-    const field = formFields.find((f) => f.id === key)
+  const annotationErrors = Object.entries(annotation).flatMap(
+    ([key, value]) => {
+      const field = reviewFields.find((f) => f.id === key)
 
-    if (!field) {
-      return {
-        message: errorMessages.unexpectedField.defaultMessage,
-        id: key,
-        value
+      if (!field) {
+        return {
+          message: errorMessages.unexpectedField.defaultMessage,
+          id: key,
+          value
+        }
       }
+
+      const fieldErrors = runFieldValidations({
+        field,
+        values: annotation
+      })
+
+      return fieldErrors.errors.map((error) => ({
+        message: error.message.defaultMessage,
+        id: field.id,
+        value: annotation[field.id]
+      }))
     }
+  )
 
-    const fieldErrors = runFieldValidations({
-      field,
-      values: declaration
-    })
+  const declarationErrors = Object.entries(declaration).flatMap(
+    ([key, value]) => {
+      const field = formFields.find((f) => f.id === key)
 
-    return fieldErrors.errors.map((error) => ({
-      message: error.message.defaultMessage,
-      id: field.id,
-      value: declaration[field.id]
-    }))
-  })
+      if (!field) {
+        return {
+          message: errorMessages.unexpectedField.defaultMessage,
+          id: key,
+          value
+        }
+      }
+
+      const fieldErrors = runFieldValidations({
+        field,
+        values: declaration
+      })
+
+      return fieldErrors.errors.map((error) => ({
+        message: error.message.defaultMessage,
+        id: field.id,
+        value: declaration[field.id]
+      }))
+    }
+  )
+
+  return [...annotationErrors, ...declarationErrors]
 }
 
 export function validateAction(actionType: ActionType) {
