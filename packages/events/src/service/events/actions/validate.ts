@@ -46,10 +46,13 @@ export async function validate(
 
   let duplicates: EventIndex[] = []
 
-  const createdBy = user.id
-  const createdByRole = user.role
-  const createdAtLocation = user.primaryOfficeId
-  const createdBySignature = user.signature
+  const createdByDetails = {
+    createdBy: user.id,
+    creator: user.type,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId,
+    createdBySignature: user.signature
+  }
 
   const futureEventState = getCurrentEventState(
     {
@@ -58,12 +61,9 @@ export async function validate(
         ...storedEvent.actions,
         {
           ...input,
+          ...createdByDetails,
           createdAt: new Date().toISOString(),
-          createdBy,
-          createdByRole,
-          createdBySignature,
           id: getUUID(),
-          createdAtLocation,
           status: ActionStatus.Accepted
         }
       ]

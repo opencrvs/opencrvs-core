@@ -183,6 +183,7 @@ export async function createEvent({
 
   const createdByDetails = {
     createdBy: user.id,
+    creator: user.type,
     createdByRole: user.role,
     createdAtLocation: user.primaryOfficeId,
     createdBySignature: user.signature
@@ -315,6 +316,7 @@ export async function addAction(
 
   const createdByDetails = {
     createdBy: user.id,
+    creator: user.type,
     createdByRole: user.role,
     createdAtLocation: user.primaryOfficeId,
     createdBySignature: user.signature
