@@ -12,12 +12,9 @@
 import React from 'react'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import {
-  ActionScopes,
-  Scope,
-  WorkqueueConfigWithoutQuery
-} from '@opencrvs/commons/client'
+import { defineWorkqueuesColumns, event } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
+import { emptyMessage, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { useEvents } from '../events/useEvents/useEvents'
 import { SearchResultComponent } from '../events/AdvancedSearch/SearchResult'
@@ -30,28 +27,28 @@ export function Outbox() {
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
 
+  const outboxColumns = defineWorkqueuesColumns([
+    {
+      label: {
+        id: 'workqueues.dateOfEvent',
+        defaultMessage: 'Date of Event',
+        description: 'Label for workqueue column: dateOfEvent'
+      },
+      value: event.field('dateOfEvent')
+    },
+    {
+      label: emptyMessage,
+      value: event.field('outbox')
+    }
+  ])
+
   return (
     <SearchResultComponent
-      columns={[]}
+      columns={outboxColumns}
       eventConfigs={eventConfigs}
       queryData={outbox}
-      title={'Outbox'}
+      title={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
       {...searchParams}
     />
   )
-}
-
-export function hasOutboxWorkqueue(scopes: Scope[]) {
-  return scopes.some((scope) => ActionScopes.safeParse(scope).success)
-}
-
-export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
-  name: {
-    id: 'workqueues.outbox.title',
-    defaultMessage: 'Outbox',
-    description: 'Title of outbox workqueue'
-  },
-  actions: [],
-  slug: 'outbox',
-  icon: 'PaperPlaneTilt'
 }

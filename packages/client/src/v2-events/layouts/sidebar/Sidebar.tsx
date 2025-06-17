@@ -37,10 +37,7 @@ import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
 import { joinValues } from '@client/v2-events/utils'
-import {
-  hasOutboxWorkqueue,
-  WORKQUEUE_OUTBOX
-} from '@client/v2-events/features/workqueues/Outbox'
+import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 const SCREEN_LOCK = 'screenLock'

@@ -40,6 +40,7 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
+import { useOnlineStatus } from '@client/utils'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   ActionConfig,
@@ -164,6 +165,16 @@ const searchResultMessages = {
     id: `v2.events.status`,
     defaultMessage:
       '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
+  },
+  waitingForAction: {
+    id: `v2.events.outbox.waitingForAction`,
+    defaultMessage:
+      'Waiting to {action, select, DECLARE {declare} REGISTER {register} VALIDATE {validate} other {action}}'
+  },
+  waitingToRetry: {
+    defaultMessage: 'Waiting to retry',
+    description: 'Label for declaration status waiting for connection',
+    id: 'v2.events.outbox.waitingForAction.waitingToRetry'
   }
 }
 
@@ -239,6 +250,7 @@ export const SearchResultComponent = ({
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
+  const isOnline = useOnlineStatus()
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const { getOutbox } = useEvents()
@@ -267,9 +279,10 @@ export const SearchResultComponent = ({
     eventData: (EventIndex & {
       title: string | null
       useFallbackTitle: boolean
+      workqueueMeta?: Record<string, unknown>
     })[]
   ) => {
-    return eventData.map((event) => {
+    return eventData.map(({ workqueueMeta, ...event }) => {
       const actionConfigs = actions.map((actionType) => ({
         actionComponent: (
           <ActionComponent actionType={actionType} event={event} />
@@ -322,7 +335,15 @@ export const SearchResultComponent = ({
           >
             <IconWithName name={event.title} status={status} />
           </TextButton>
-        )
+        ),
+        outbox: isOnline
+          ? intl.formatMessage(messages.waitingForAction, {
+              action:
+                typeof workqueueMeta?.actionType === 'string'
+                  ? workqueueMeta.actionType
+                  : ''
+            })
+          : intl.formatMessage(messages.waitingToRetry)
       }
     })
   }

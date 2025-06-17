@@ -52,9 +52,11 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
 
+  // @ToDo: hide actions when conditions are not met
   const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
     <SearchResultComponent
+      actions={actions}
       columns={workqueueConfig.columns}
       eventConfigs={eventConfigs}
       queryData={events}

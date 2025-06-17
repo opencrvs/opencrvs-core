@@ -50,7 +50,9 @@ function filterOutboxEventsWithMutation<
 ) {
   return getPendingMutations(mutation).flatMap((m) => {
     const variables = m.state.variables
-    return events.filter((event) => filter(event, variables))
+    return events
+      .filter((event) => filter(event, variables))
+      .map((event) => ({ ...event, workqueueMeta: m.options.meta }))
   })
 }
 
