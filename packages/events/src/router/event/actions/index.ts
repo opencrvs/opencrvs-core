@@ -47,20 +47,17 @@ import {
  * @interface ActionProcedureConfig
  * @property {z.ZodType} inputSchema - The Zod schema for validating the action input
  * @property {z.ZodType | undefined} notifyApiPayloadSchema - Schema for notify API response payload if applicable. This will be sent either in the initial HTTP 200 response, or when the action is asynchronously accepted.
- * @property {boolean} validatePayload - Whether the payload should be strictly validated against the inputSchema schema
  * @property {OpenApiMeta} [meta] - Meta information, incl. OpenAPI definition
  */
 interface ActionProcedureConfig {
   inputSchema: z.ZodType
   notifyApiPayloadSchema: z.ZodType | undefined
-  validatePayload: boolean
   meta?: OpenApiMeta
 }
 
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
     notifyApiPayloadSchema: undefined,
-    validatePayload: false,
     inputSchema: NotifyActionInput,
     meta: {
       openapi: {
@@ -74,32 +71,26 @@ const ACTION_PROCEDURE_CONFIG = {
   },
   [ActionType.DECLARE]: {
     notifyApiPayloadSchema: undefined,
-    validatePayload: true,
     inputSchema: DeclareActionInput
   },
   [ActionType.VALIDATE]: {
     notifyApiPayloadSchema: undefined,
-    validatePayload: true,
     inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
-    validatePayload: true,
     inputSchema: RegisterActionInput
   },
   [ActionType.REJECT]: {
     notifyApiPayloadSchema: undefined,
-    validatePayload: true,
     inputSchema: RejectDeclarationActionInput
   },
   [ActionType.ARCHIVE]: {
     notifyApiPayloadSchema: undefined,
-    validatePayload: true,
     inputSchema: ArchiveActionInput
   },
   [ActionType.PRINT_CERTIFICATE]: {
     notifyApiPayloadSchema: undefined,
-    validatePayload: true,
     inputSchema: PrintCertificateActionInput
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
@@ -135,7 +126,7 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { notifyApiPayloadSchema, validatePayload, inputSchema } = actionConfig
+  const { notifyApiPayloadSchema, inputSchema } = actionConfig
 
   let acceptInputFields = z.object({ actionId: UUID })
 
@@ -157,11 +148,7 @@ export function getDefaultActionProcedures(
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
-      .use(
-        validatePayload
-          ? middleware.validateAction(actionType)
-          : async ({ next }) => next()
-      )
+      .use(middleware.validateAction(actionType))
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
@@ -228,11 +215,7 @@ export function getDefaultActionProcedures(
     accept: systemProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(
-        validatePayload
-          ? middleware.validateAction(actionType)
-          : async ({ next }) => next()
-      )
+      .use(middleware.validateAction(actionType))
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input

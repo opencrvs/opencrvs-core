@@ -86,10 +86,12 @@ const declarationUpdateActionValues = [
   ...declarationActionValues,
   ActionTypes.enum.REQUEST_CORRECTION
 ] as const
+
 /** Actions that can modify declaration data. Request can be corrected after declaring it. */
 export const DeclarationUpdateActions = ActionTypes.extract(
   declarationUpdateActionValues
 )
+
 export type DeclarationUpdateActionType = z.infer<
   typeof DeclarationUpdateActions
 >
