@@ -122,12 +122,15 @@ describe('event.actions.notify', () => {
       type: ActionType.NOTIFY,
       eventId: event.id,
       transactionId: getUUID(),
+      annotation: {},
       declaration: {
-        'applicant.firstname': 999999
+        'applicant.name': { firstname: 999999, surname: '999999' }
       }
     }
 
+    // @TODO:  the error seems quite verbose. Check what causes it and if we can improve it
     await expect(
+      // @ts-expect-error -- Intentionally passing incorrect type
       client.event.actions.notify.request(payload)
     ).rejects.toMatchSnapshot()
   })
