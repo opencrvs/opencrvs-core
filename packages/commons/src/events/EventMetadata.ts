@@ -47,6 +47,7 @@ export const CustomFlags = {
   CERTIFICATE_PRINTED: 'certificate-printed',
   CORRECTION_REQUESTED: 'correction-requested'
 } as const
+
 export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
 
 export const Flag = z

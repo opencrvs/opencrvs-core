@@ -23,10 +23,10 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/RegistrationAgent/CorrectionRequested'
+  title: 'ActionMenu/LocalRegistrar/CorrectionRequested'
 } as Meta<typeof ActionMenu>
 
-const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
+const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
   {
     name: 'Unassigned',
     actions: [
@@ -40,9 +40,10 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.DISABLED,
+      [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
       [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
   },
@@ -61,6 +62,7 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
       [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
   },
@@ -78,16 +80,18 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
+      [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
       [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  correctionRequestedScenariosForRegistrationAgent,
-  UserRoles.REGISTRATION_AGENT
+  correctionRequestedScenariosForLocalRegistrar,
+  UserRoles.LOCAL_REGISTRAR
 )
 
 export const Unassigned = stories['Unassigned']

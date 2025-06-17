@@ -20,7 +20,6 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  IndexMap,
   CustomFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -204,7 +203,11 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
           assignedTo: authentication.sub,
           refetchEvent
         })
-      }
+      },
+      disabled:
+        // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
+        eventIsWaitingForCorrection &&
+        !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
     },
     [ActionType.UNASSIGN]: {
       label: actionLabels[ActionType.UNASSIGN],
