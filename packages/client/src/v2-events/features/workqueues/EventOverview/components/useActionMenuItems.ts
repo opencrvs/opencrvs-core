@@ -215,7 +215,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
-        onClick: (workqueue) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
               { eventId },
@@ -226,7 +226,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
-        onClick: (workqueue) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
               { eventId },
@@ -237,7 +237,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
-        onClick: (workqueue) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
               { eventId },
@@ -248,7 +248,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        onClick: (workqueue) =>
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
               { eventId },
@@ -259,7 +259,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
-        onClick: (workqueue) => {
+        onClick: (workqueue?) => {
           deleteEvent({ eventId })
           if (!workqueue) {
             navigate(ROUTES.V2.buildPath({}))
