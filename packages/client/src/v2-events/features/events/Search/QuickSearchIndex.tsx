@@ -16,14 +16,16 @@ import { mandatoryColumns } from '@opencrvs/commons/client'
 import { SearchResultComponent } from '@client/v2-events/features/events/Search/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { buildQuickSearchQuery } from './utils'
 
-export const QuickSearchIndex = () => {
+function QuickSearch() {
   const intl = useIntl()
   const location = useLocation()
   const { searchEvent } = useEvents()
   const eventConfigurations = useEventConfigurations()
 
+  console.log('location', location)
   const searchParams = parse(location.search, {
     arrayFormat: 'comma'
   }) as Record<string, string>
@@ -40,8 +42,7 @@ export const QuickSearchIndex = () => {
         {
           id: 'v2.search.quickSearch.result.title',
           description: 'Title for search result page',
-          defaultMessage:
-            'Search result for “{searchTerm}”,résultat de la recherche pour “{searchTerm}“'
+          defaultMessage: 'Search result for “{searchTerm}”'
         },
         {
           searchTerm: searchParams.keys
@@ -50,3 +51,5 @@ export const QuickSearchIndex = () => {
     />
   )
 }
+
+export const QuickSearchIndex = withSuspense(QuickSearch)
