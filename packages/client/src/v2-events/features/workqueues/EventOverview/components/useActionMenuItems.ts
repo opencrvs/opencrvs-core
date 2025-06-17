@@ -297,8 +297,8 @@ export function useAction(event: EventIndex) {
           )
         },
         disabled: !eventIsAssignedToSelf
-      } satisfies Record<WorkqueueActionType, ActionConfig>
-    },
+      }
+    } satisfies Record<WorkqueueActionType, ActionConfig>,
     authentication
   }
 }
