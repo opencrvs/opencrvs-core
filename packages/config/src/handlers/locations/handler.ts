@@ -126,7 +126,6 @@ const locationRequestSchema = Joi.object({
   statistics: Joi.array()
     .items(locationStatisticSchema)
     .optional()
-    .default([])
     .label('Statistics')
 }).label('LocationPayload')
 
