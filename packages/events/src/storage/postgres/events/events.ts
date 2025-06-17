@@ -16,7 +16,7 @@ import {
   EventDocument,
   UUID
 } from '@opencrvs/commons'
-import { db } from './db'
+import { getClient } from '@events/storage/postgres/events'
 import { NewEventActions } from './schema/app/EventActions'
 import { NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
@@ -52,12 +52,15 @@ async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
 }
 
 export const getEventById = async (id: UUID) => {
+  const db = getClient()
   return db.transaction().execute(async (trx) => {
     return getEventByIdInTrx(id, trx)
   })
 }
 
 export async function deleteEventById(eventId: UUID) {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     await trx
       .deleteFrom('eventActions')
@@ -76,6 +79,8 @@ export const createEvent = async ({
   transactionId: string
   trackingId: string
 }) => {
+  const db = getClient()
+
   const result = await db
     .insertInto('events')
     .values({
@@ -110,6 +115,8 @@ async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
 }
 
 export const createAction = async (action: NewEventActions) => {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     return createActionInTrx(action, trx)
   })
@@ -219,6 +226,8 @@ async function getOrCreateEventAndAssignInTrx(
 export const getOrCreateEvent = async (
   input: Parameters<typeof getOrCreateEventInTrx>[0]
 ) => {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventInTrx(input, trx)
   })
@@ -227,6 +236,8 @@ export const getOrCreateEvent = async (
 export const getOrCreateEventAndAssign = async (
   input: Parameters<typeof getOrCreateEventAndAssignInTrx>[0]
 ) => {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventAndAssignInTrx(input, trx)
   })

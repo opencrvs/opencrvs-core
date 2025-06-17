@@ -10,8 +10,8 @@
  */
 
 import { Db } from 'mongodb'
-import { getUUID, eventPayloadGenerator } from '@opencrvs/commons'
-import { Location } from '@events/service/locations/locations'
+import { getUUID, eventPayloadGenerator, UUID } from '@opencrvs/commons'
+import { Location, setLocations } from '@events/service/locations/locations'
 
 interface Name {
   use: string
@@ -21,13 +21,13 @@ interface Name {
 
 export interface CreatedUser {
   id: string
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   role: string
   name: Array<Name>
 }
 
 interface CreateUser {
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   role?: string
   name?: Array<Name>
 }
@@ -83,8 +83,7 @@ export function seeder() {
       id: createdUser.insertedId.toString()
     }
   }
-  const seedLocations = async (db: Db, locations: Location[]) =>
-    db.collection('locations').insertMany(locations)
+  const seedLocations = async (locations: Location[]) => setLocations(locations)
 
   return {
     user: seedUser,

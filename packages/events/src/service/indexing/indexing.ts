@@ -33,7 +33,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { postgresPool } from '@events/storage/postgres/events/db'
+import { getPool } from '@events/storage/postgres/events'
 import Events from '@events/storage/postgres/events/schema/app/Events'
 import EventActions from '@events/storage/postgres/events/schema/app/EventActions'
 import {
@@ -322,7 +322,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     }
   })
 
-  const client = await postgresPool.connect()
+  const client = await getPool().connect()
   try {
     const pgStream = client.query(streamQuery)
 

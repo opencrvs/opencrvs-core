@@ -12,7 +12,7 @@
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
 import { Pool, types } from 'pg'
 import { env } from '@events/environment'
-import Schema from './schema/Database' // this is the Database interface we defined earlier
+import Schema from './events/schema/Database' // this is the Database interface we defined earlier
 
 const connectionString = env.EVENTS_POSTGRES_URL
 
@@ -22,15 +22,28 @@ const connectionString = env.EVENTS_POSTGRES_URL
 //                                 ^^^ (yes, we don't cut the milliseconds, Zod still accepts it)
 types.setTypeParser(1184, (str) => str.replace(' ', 'T').replace('+00', 'Z'))
 
-const pool = new Pool({ connectionString })
-const dialect = new PostgresDialect({
-  pool: new Pool({ connectionString })
-})
+let db: Kysely<Schema> | undefined
+let pool: Pool | undefined
 
-export const db = new Kysely<Schema>({
-  dialect,
-  plugins: [new CamelCasePlugin()]
-})
+export const getPool = () => {
+  if (!pool) {
+    pool = new Pool({ connectionString })
+  }
 
-/** export pool for streaming */
-export const postgresPool = pool
+  return pool
+}
+
+export function getClient() {
+  if (!db) {
+    const dialect = new PostgresDialect({
+      pool: getPool()
+    })
+
+    db = new Kysely<Schema>({
+      dialect,
+      plugins: [new CamelCasePlugin()]
+    })
+  }
+
+  return db
+}
