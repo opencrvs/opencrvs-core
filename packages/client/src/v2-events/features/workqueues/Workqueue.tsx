@@ -24,7 +24,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
-import { SearchResult } from '../events/Search/SearchResult'
+import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 
 const FabContainer = styled.div`
@@ -52,9 +52,11 @@ export function WorkqueueContainer() {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
 
+  const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
     <>
-      <SearchResult
+      <SearchResultComponent
+        actions={actions}
         columns={workqueueConfig.columns}
         eventConfigs={eventConfigs}
         queryData={events}

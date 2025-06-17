@@ -141,7 +141,7 @@ export const SortWorkqueue: Story = {
       const updatedAtInFirstPage = formattedUpdatedAt.slice(0, 10)
       const cells = canvasElement.querySelectorAll('div[id^="row_"]')
       const updatedAtCell = Array.from(cells).map(
-        (cell: Element) => cell.lastElementChild?.textContent
+        (cell: Element) => cell.children[3].textContent
       )
       await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
     })
@@ -152,7 +152,7 @@ export const SortWorkqueue: Story = {
       const updatedAtInFirstPage = reverseFormattedUpdatedAt.slice(0, 10)
       const cells = canvasElement.querySelectorAll('div[id^="row_"]')
       const updatedAtCell = Array.from(cells).map(
-        (cell: Element) => cell.lastElementChild?.textContent
+        (cell: Element) => cell.children[3].textContent
       )
       await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
     })
@@ -190,7 +190,7 @@ export const SortWorkqueue: Story = {
       const updatedAtInFirstPage = formattedUpdatedAt.slice(10)
       const cells = canvasElement.querySelectorAll('div[id^="row_"]')
       const updatedAtCell = Array.from(cells).map(
-        (cell: Element) => cell.lastElementChild?.textContent
+        (cell: Element) => cell.children[3].textContent
       )
       await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
     })
@@ -201,7 +201,7 @@ export const SortWorkqueue: Story = {
       const updatedAtInFirstPage = reverseFormattedUpdatedAt.slice(10)
       const cells = canvasElement.querySelectorAll('div[id^="row_"]')
       const updatedAtCell = Array.from(cells).map(
-        (cell: Element) => cell.lastElementChild?.textContent
+        (cell: Element) => cell.children[3].textContent
       )
       await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
     })

@@ -21,8 +21,6 @@ import {
 import { removeCached } from '@client/v2-events/cache'
 import { precacheFile } from './useFileUpload'
 
-const FILE_STORAGE_BUCKET = 'ocrvs'
-
 /**
  *
  * @param storageKey - minio path including the bucket details. e.g. /ocrvs/signature.png
@@ -30,14 +28,20 @@ const FILE_STORAGE_BUCKET = 'ocrvs'
  *
  */
 function extractFilenameFromStorageKey(storageKey: string) {
-  const regex = new RegExp(`^/${FILE_STORAGE_BUCKET}/([^/?#]+)`)
-  const match = storageKey.match(regex)
+  try {
+    const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/([^/?#]+)`)
+    const match = storageKey.match(regex)
 
-  if (match && match[1]) {
-    return match[1]
+    if (match && match[1]) {
+      return match[1]
+    }
+    // Since the key is defined in the window (external to us), we want to ensure we do not crash because of manual changes to the config.
+  } catch (error) {
+    // eslint-disable-next-line no-console
+    console.error('Error extracting filename from storage key:', error)
+
+    return undefined
   }
-
-  return undefined
 }
 
 export function getFilenamesFromActionDocument(

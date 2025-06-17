@@ -14,6 +14,7 @@ import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
 import { orderBy } from 'lodash'
 import styled from 'styled-components'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventIndex,
   EventConfig,
@@ -22,7 +23,8 @@ import {
   deepDropNulls,
   applyDraftsToEventIndex,
   EventState,
-  getEventConfigById
+  WorkqueueActionsWithDefault,
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -30,7 +32,7 @@ import {
   SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Link as TextButton } from '@opencrvs/components'
+import { Button, Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -38,6 +40,11 @@ import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventTitle } from '../useEvents/useEventTitle'
+import {
+  ActionConfig,
+  useAction,
+  useActionMenuItems
+} from '../../workqueues/EventOverview/components/useActionMenuItems'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -173,14 +180,49 @@ const ExtendedEventStatuses = {
   DRAFT: 'DRAFT'
 } as const
 
-export const SearchResult = ({
+function ActionComponent({
+  event,
+  actionType
+}: {
+  event: EventIndex
+  actionType: WorkqueueActionsWithDefault
+}) {
+  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+
+  const { config: configs } = useAction(event)
+  const actionMenuItems = useActionMenuItems(event)
+
+  const intl = useIntl()
+
+  const config =
+    actionType === 'DEFAULT'
+      ? actionMenuItems.find(({ type }) => !isMetaAction(type))
+      : configs[actionType]
+
+  if (!config) {
+    return null
+  }
+
+  return (
+    <Button
+      disabled={'disabled' in config && Boolean(config.disabled)}
+      type="primary"
+      onClick={() => config.onClick(slug)}
+    >
+      {intl.formatMessage(config.label)}
+    </Button>
+  )
+}
+
+export const SearchResultComponent = ({
   columns,
   queryData,
   eventConfigs,
   limit = 10,
   offset = 0,
   title: contentTitle,
-  tabBarContent
+  tabBarContent,
+  actions = []
 }: {
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -189,6 +231,7 @@ export const SearchResult = ({
   offset?: number
   title: string
   tabBarContent?: React.ReactNode
+  actions?: WorkqueueActionsWithDefault[]
 }) => {
   const intl = useIntl()
   const navigate = useNavigate()
@@ -225,70 +268,69 @@ export const SearchResult = ({
       useFallbackTitle: boolean
     })[]
   ) => {
-    return eventData
-      .map((event) => {
-        const eventConfig = eventConfigs.find(({ id }) => id === event.type)
-        if (!eventConfig) {
-          throw new Error(
-            'Event configuration not found for event:' + event.type
-          )
-        }
-
-        return {
-          label: eventConfig.label,
-          ...event
-        }
-      })
-      .map((doc) => {
-        const isInOutbox = outbox.some(
-          (outboxEvent) => outboxEvent.id === doc.id
+    return eventData.map((event) => {
+      const actionConfigs = actions.map((actionType) => ({
+        actionComponent: (
+          <ActionComponent actionType={actionType} event={event} />
         )
-        const isInDrafts = drafts.some((draft) => draft.id === doc.id)
+      }))
 
-        const getEventStatus = () => {
-          if (isInOutbox) {
-            return ExtendedEventStatuses.OUTBOX
-          }
-          if (isInDrafts) {
-            return ExtendedEventStatuses.DRAFT
-          }
-          return doc.status
-        }
+      const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+      if (!eventConfig) {
+        throw new Error('Event configuration not found for event:' + event.type)
+      }
 
-        const status = getEventStatus()
-        return {
-          ...doc,
-          type: intl.formatMessage(doc.label),
-          createdAt: formattedDuration(new Date(doc.createdAt)),
-          updatedAt: formattedDuration(new Date(doc.updatedAt)),
-          status: intl.formatMessage(messages.eventStatus, {
-            status
-          }),
-          title: isInOutbox ? (
-            <IconWithName name={doc.title} status={status} />
-          ) : (
-            <TextButton
-              color={doc.useFallbackTitle ? 'red' : 'primary'}
-              onClick={() => {
-                return navigate(
-                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                    eventId: doc.id
-                  })
-                )
-              }}
-            >
-              <IconWithName name={doc.title} status={status} />
-            </TextButton>
-          )
+      const isInOutbox = outbox.some(
+        (outboxEvent) => outboxEvent.id === event.id
+      )
+      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+
+      const getEventStatus = () => {
+        if (isInOutbox) {
+          return ExtendedEventStatuses.OUTBOX
         }
-      })
+        if (isInDrafts) {
+          return ExtendedEventStatuses.DRAFT
+        }
+        return event.status
+      }
+
+      const status = getEventStatus()
+      return {
+        ...event,
+        actions: actionConfigs,
+        label: eventConfig.label,
+        type: intl.formatMessage(eventConfig.label),
+        createdAt: formattedDuration(new Date(event.createdAt)),
+        updatedAt: formattedDuration(new Date(event.updatedAt)),
+        status: intl.formatMessage(messages.eventStatus, {
+          status
+        }),
+        title: isInOutbox ? (
+          <IconWithName name={event.title} status={status} />
+        ) : (
+          <TextButton
+            color={event.useFallbackTitle ? 'red' : 'primary'}
+            onClick={() => {
+              return navigate(
+                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                  eventId: event.id
+                })
+              )
+            }}
+          >
+            <IconWithName name={event.title} status={status} />
+          </TextButton>
+        )
+      }
+    })
   }
 
   function getDefaultColumns(): Array<Column> {
     return defaultWorkqueueColumns.map(
       ({ label, value }): Column => ({
         label: intl.formatMessage(label),
-        width: 25,
+        width: value.$event === 'title' ? 35 : 15,
         key: value.$event,
         sortFunction: onColumnClick,
         isSorted: sortedCol === value.$event
@@ -302,7 +344,7 @@ export const SearchResult = ({
     if (windowWidth > theme.grid.breakpoints.lg) {
       return columns.map(({ label, value }) => ({
         label: intl.formatMessage(label),
-        width: 35,
+        width: 15,
         key: value.$event,
         sortFunction: onColumnClick,
         isSorted: sortedCol === value.$event
@@ -311,7 +353,7 @@ export const SearchResult = ({
       return columns
         .map(({ label, value }) => ({
           label: intl.formatMessage(label),
-          width: 35,
+          width: 15,
           key: value.$event,
           sortFunction: onColumnClick,
           isSorted: sortedCol === value.$event
@@ -372,7 +414,16 @@ export const SearchResult = ({
         onPageChange={(page) => setCurrentPageNumber(page)}
       >
         <Workqueue
-          columns={[...getDefaultColumns(), ...getColumns()]}
+          columns={[
+            ...getDefaultColumns(),
+            ...getColumns(),
+            {
+              width: 20,
+              key: COLUMNS.ACTIONS,
+              isActionColumn: true,
+              alignment: ColumnContentAlignment.RIGHT
+            }
+          ]}
           content={paginatedData}
           hideLastBorder={!isShowPagination}
           sortOrder={sortOrder}
