@@ -20,7 +20,11 @@ import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  ActionType,
+  EventConfig
+} from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
@@ -32,7 +36,7 @@ import { getOfflineData } from '@client/offline/selectors'
 import {
   EventHistoryModal,
   eventHistoryStatusMessage
-} from './EventHistoryModal'
+} from './EventHistoryModal/EventHistoryModal'
 import { UserAvatar } from './UserAvatar'
 
 /**
@@ -130,7 +134,13 @@ function getSystemAvatar(name: string) {
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({ history }: { history: ActionDocument[] }) {
+export function EventHistory({
+  history,
+  eventConfiguration
+}: {
+  history: ActionDocument[]
+  eventConfiguration: EventConfig
+}) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const { systems } = useSelector(getOfflineData)
 
@@ -141,7 +151,12 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
-      <EventHistoryModal close={close} history={item} userName={userName} />
+      <EventHistoryModal
+        action={item}
+        close={close}
+        eventConfiguration={eventConfiguration}
+        userName={userName}
+      />
     ))
   }
 
@@ -175,9 +190,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
         action: (
           <Link
             font="bold14"
-            onClick={() => {
-              onHistoryRowClick(action, userName)
-            }}
+            onClick={() => onHistoryRowClick(action, userName)}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
               status: action.type

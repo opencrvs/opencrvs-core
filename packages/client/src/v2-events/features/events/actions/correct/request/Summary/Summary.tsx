@@ -90,12 +90,8 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
   }, {})
 }
 
-const SectionTitle = styled(Text)`
-  margin-bottom: 20px;
-`
-
-const CorrectionInformationSectionTitle = styled(SectionTitle)`
-  margin-top: 20px;
+const CorrectionSectionTitle = styled(Text)`
+  margin: 20px 0;
 `
 
 export function Summary() {
@@ -200,9 +196,56 @@ export function Summary() {
             </SecondaryButton>
           ]}
         >
-          <SectionTitle element="h3" variant="h3">
+          {correctionFormPages.map((page) => {
+            const pageFields = page.fields
+              .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+              .map((field) => {
+                const valueDisplay = Output({
+                  field,
+                  value: annotation[field.id],
+                  showPreviouslyMissingValuesAsChanged: false
+                })
+
+                return { ...field, valueDisplay }
+              })
+              .filter((f) => f.valueDisplay)
+
+            return (
+              <Table
+                key={`correction-form-table-${page.id}`}
+                columns={[
+                  {
+                    label: intl.formatMessage(page.title),
+                    width: 34,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'firstColumn'
+                  },
+                  {
+                    label: '',
+                    width: 64,
+                    alignment: ColumnContentAlignment.LEFT,
+                    key: 'secondColumn'
+                  }
+                ]}
+                content={pageFields.map(({ valueDisplay, label }) => {
+                  if (label.defaultMessage) {
+                    return {
+                      firstColumn: intl.formatMessage(label),
+                      secondColumn: valueDisplay
+                    }
+                  }
+
+                  // If no label is defined for the field, we just show the value on the first column
+                  return { firstColumn: valueDisplay }
+                })}
+                hideTableBottomBorder={true}
+              ></Table>
+            )
+          })}
+
+          <CorrectionSectionTitle element="h3" variant="h3">
             {intl.formatMessage(correctionMessages.correctionSectionTitle)}
-          </SectionTitle>
+          </CorrectionSectionTitle>
 
           {formConfig.pages.map((page) => {
             const changedFields = page.fields
@@ -268,59 +311,6 @@ export function Summary() {
                 content={changedFields}
                 hideTableBottomBorder={true}
                 id={`corrections-table-${page.id}`}
-              ></Table>
-            )
-          })}
-
-          <CorrectionInformationSectionTitle element="h3" variant="h3">
-            {intl.formatMessage(
-              correctionMessages.correctionInformationSectionTitle
-            )}
-          </CorrectionInformationSectionTitle>
-
-          {correctionFormPages.map((page) => {
-            const pageFields = page.fields
-              .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
-              .map((field) => {
-                const valueDisplay = Output({
-                  field,
-                  value: annotation[field.id],
-                  showPreviouslyMissingValuesAsChanged: false
-                })
-
-                return { ...field, valueDisplay }
-              })
-              .filter((f) => f.valueDisplay)
-
-            return (
-              <Table
-                key={`correction-form-table-${page.id}`}
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    width: 34,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'firstColumn'
-                  },
-                  {
-                    label: '',
-                    width: 64,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'secondColumn'
-                  }
-                ]}
-                content={pageFields.map(({ valueDisplay, label }) => {
-                  if (label.defaultMessage) {
-                    return {
-                      firstColumn: intl.formatMessage(label),
-                      secondColumn: valueDisplay
-                    }
-                  }
-
-                  // If no label is defined for the field, we just show the value on the first column
-                  return { firstColumn: valueDisplay }
-                })}
-                hideTableBottomBorder={true}
               ></Table>
             )
           })}

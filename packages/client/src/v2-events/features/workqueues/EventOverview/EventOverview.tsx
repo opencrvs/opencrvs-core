@@ -104,7 +104,7 @@ function EventOverview({
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />
-      <EventHistory history={actions} />
+      <EventHistory eventConfiguration={eventConfiguration} history={actions} />
     </Content>
   )
 }
