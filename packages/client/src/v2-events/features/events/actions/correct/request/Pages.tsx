@@ -73,15 +73,21 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              { workqueue: searchParams.workqueue }
+            )
           )
         }
         onSubmit={() =>
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
           )
         }
       />

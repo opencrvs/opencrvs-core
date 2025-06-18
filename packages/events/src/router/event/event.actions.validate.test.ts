@@ -105,8 +105,10 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
     declaration: {
       'applicant.dob': '02-1-2024',
       'applicant.dobUnknown': false,
-      'applicant.firstname': 'John',
-      'applicant.surname': 'Doe',
+      'applicant.name': {
+        firstname: 'John',
+        surname: 'Doe'
+      },
       'recommender.none': true,
       'applicant.address': {
         country: 'FAR',
@@ -147,8 +149,10 @@ test('Skips required field validation when they are conditionally hidden', async
   const form = {
     'applicant.dob': '2024-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -196,8 +200,10 @@ test('Prevents adding birth date in future', async () => {
   const form = {
     'applicant.dob': '2040-02-01',
     'applicant.dobUnknown': false,
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': {
       country: 'FAR',
@@ -239,7 +245,8 @@ test('validation prevents including hidden fields', async () => {
     declaration: {
       ...generateActionDeclarationInput(
         tennisClubMembershipEvent,
-        ActionType.VALIDATE
+        ActionType.VALIDATE,
+        () => 0.1
       ),
       'recommender.firstname': 'this should not be here'
     }
@@ -295,30 +302,40 @@ test('valid action is appended to event actions', async () => {
 })
 
 test(`${ActionType.VALIDATE} is idempotent`, async () => {
-  const { user, generator } = await setupTestCase()
+  const { user, generator, eventsDb } = await setupTestCase(100)
   const client = createTestClient(user)
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
+  const declarePayload = generator.event.actions.declare(event.id)
+  await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
   )
 
-  const createAction = event.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(event.id, {
-    assignedTo: createAction[0].createdBy
+  const validatePayload = generator.event.actions.validate(event.id, {
+    keepAssignment: true
   })
 
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  const validatePayload = generator.event.actions.validate(event.id)
   const firstResponse =
     await client.event.actions.validate.request(validatePayload)
+
+  const databaseResultAfterFirst = await eventsDb
+    .collection('events')
+    .find()
+    .toArray()
   const secondResponse =
     await client.event.actions.validate.request(validatePayload)
+
+  const databaseResultAfterSecond = await eventsDb
+    .collection('events')
+    .find()
+    .toArray()
+
+  expect(databaseResultAfterFirst).toEqual(databaseResultAfterSecond)
 
   expect(firstResponse).toEqual(secondResponse)
 })

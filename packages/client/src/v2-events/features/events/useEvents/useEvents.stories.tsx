@@ -93,7 +93,12 @@ const handlers = {
   drafts: [
     trpcMsw.event.draft.list.query(() => {
       spies.draftList++
-      return [generateEventDraftDocument(createdEvent.id, ActionType.DECLARE)]
+      return [
+        generateEventDraftDocument({
+          eventId: createdEvent.id,
+          actionType: ActionType.DECLARE
+        })
+      ]
     })
   ],
   event: [

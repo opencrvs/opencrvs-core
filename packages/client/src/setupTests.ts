@@ -34,6 +34,7 @@ const config = {
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   MINIO_BUCKET: 'ocrvs',
+  MINIO_BASE_URL: 'http://localhost:3535',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {

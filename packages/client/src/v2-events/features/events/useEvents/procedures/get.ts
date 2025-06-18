@@ -11,18 +11,12 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import {
-  EventDocument,
-  EventIndex,
-  getCurrentEventState
-} from '@opencrvs/commons/client'
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
+import { EventDocument } from '@opencrvs/commons/client'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
-import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
+import { useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
+
 import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 
@@ -96,6 +90,9 @@ export function useGetEvent() {
         refetchOnWindowFocus: false
       })
     },
+    /*
+     * This downloads the event document from the server without caching it
+     */
     viewEvent: (id: string) => {
       const eventConfig = useEventConfigurations()
 
@@ -123,29 +120,21 @@ export function useGetEvent() {
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
 
-      if (!queryClient.getQueryData(trpc.event.get.queryKey(id))) {
-        throw new Error(
-          `Event with id ${id} not found in cache. Please ensure the event exists or use useQuery instead.`
-        )
-      }
-
-      return [
-        useSuspenseQuery({
-          ...queryOptions,
-          queryKey: trpc.event.get.queryKey(id),
-          meta: {
-            eventConfig
-          },
-          /*
-           * We never want to refetch this query automatically
-           * because it is the user's explicit (audit logged) action to fetch a record
-           */
-          staleTime: Infinity,
-          refetchOnMount: false,
-          refetchOnReconnect: false,
-          refetchOnWindowFocus: false
-        }).data
-      ]
+      return useSuspenseQuery({
+        ...queryOptions,
+        queryKey: trpc.event.get.queryKey(id),
+        meta: {
+          eventConfig
+        },
+        /*
+         * We never want to refetch this query automatically
+         * because it is the user's explicit (audit logged) action to fetch a record
+         */
+        staleTime: Infinity,
+        refetchOnMount: false,
+        refetchOnReconnect: false,
+        refetchOnWindowFocus: false
+      }).data
     }
   }
 }

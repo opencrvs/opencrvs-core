@@ -10,7 +10,7 @@
  */
 
 import { z, ZodType } from 'zod'
-import { EventMetadata, EventStatusEnum } from './EventMetadata'
+import { EventMetadata, EventStatus } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -58,7 +58,7 @@ export const AnyOf = z
 export const ExactStatus = z
   .object({
     type: z.literal('exact'),
-    term: EventStatusEnum
+    term: EventStatus
   })
   .openapi({
     ref: 'ExactStatus'
@@ -67,7 +67,7 @@ export const ExactStatus = z
 export const AnyOfStatus = z
   .object({
     type: z.literal('anyOf'),
-    terms: z.array(EventStatusEnum)
+    terms: z.array(EventStatus)
   })
   .openapi({
     ref: 'AnyOfStatus'
@@ -137,6 +137,7 @@ export const QueryExpression = z
     'legalStatus.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
+    'legalStatus.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
@@ -173,32 +174,26 @@ export const QueryType = z
 
         // This preprocessing ensures consistent handling of `clauses` regardless of how the client submits the data.
       },
-      z.array(QueryExpression).openapi({
-        default: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            status: {
-              type: 'anyOf',
-              terms: [
-                'CREATED',
-                'NOTIFIED',
-                'DECLARED',
-                'VALIDATED',
-                'REGISTERED',
-                'CERTIFIED',
-                'REJECTED',
-                'ARCHIVED'
-              ]
-            },
-            updatedAt: {
-              type: 'range',
-              gte: '2025-05-22',
-              lte: '2025-05-29'
-            },
-            data: {}
-          }
-        ]
-      })
+      z
+        .array(QueryExpression)
+        .nonempty('At least one clause is required.')
+        .openapi({
+          default: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              status: {
+                type: 'anyOf',
+                terms: EventStatus.options
+              },
+              updatedAt: {
+                type: 'range',
+                gte: '2025-05-22',
+                lte: '2025-05-29'
+              },
+              data: {}
+            }
+          ]
+        })
     )
   })
   .openapi({

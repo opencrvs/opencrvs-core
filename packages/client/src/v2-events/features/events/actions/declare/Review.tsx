@@ -11,7 +11,10 @@
 
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
@@ -38,12 +41,15 @@ import { useReviewActionConfig } from './useReviewActionConfig'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const drafts = useDrafts()
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const { goToHome } = useEventFormNavigation()
+  const { redirectToOrigin } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const event = events.searchEventById.useSuspenseQuery(eventId)[0]
@@ -88,7 +94,8 @@ export function Review() {
         ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
           fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
@@ -122,8 +129,7 @@ export function Review() {
 
     if (confirmedDeclaration) {
       reviewActionConfiguration.onConfirm(eventId)
-
-      goToHome()
+      redirectToOrigin(slug)
     }
   }
 
@@ -133,7 +139,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          redirectToOrigin(slug)
         })
       }
     >

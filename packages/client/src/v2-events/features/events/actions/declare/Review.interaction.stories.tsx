@@ -450,7 +450,12 @@ export const ChangeFieldInReview: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [generateEventDraftDocument(eventId, ActionType.REGISTER)]
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.REGISTER
+              })
+            ]
           })
         ],
         events: [
@@ -466,9 +471,9 @@ export const ChangeFieldInReview: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await step('Start changing the surname', async () => {
+    await step('Start changing the name', async () => {
       const surnameChangeButton = await canvas.findByTestId(
-        'change-button-applicant.surname'
+        'change-button-applicant.name'
       )
 
       await userEvent.click(surnameChangeButton)
@@ -478,9 +483,7 @@ export const ChangeFieldInReview: Story = {
     })
 
     await step('Change input field value', async () => {
-      const surnameInput = await canvas.findByTestId(
-        'text__applicant____surname'
-      )
+      const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
       await userEvent.type(surnameInput, 'Nileem-Rowa')
     })
@@ -489,10 +492,8 @@ export const ChangeFieldInReview: Story = {
       const backToReviewButton = await canvas.findByText('Back to review')
       await userEvent.click(backToReviewButton)
 
-      const surnameValue = await canvas.findByTestId(
-        'row-value-applicant.surname'
-      )
-      await expect(surnameValue).toHaveTextContent('Nileem-Rowa')
+      await canvas.findByText("Applicant's name")
+      await canvas.findByText('John Nileem-Rowa')
     })
   }
 }

@@ -11,14 +11,12 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
 
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
-import { getScope } from '@client/profile/profileSelectors'
 import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({
@@ -29,7 +27,6 @@ export function ActionMenu({
   onAction?: () => void
 }) {
   const intl = useIntl()
-  const scopes = useSelector(getScope)
   const { searchEventById } = useEvents()
 
   const getEventQuery = searchEventById.useSuspenseQuery(eventId)
@@ -41,7 +38,7 @@ export function ActionMenu({
   const eventIndex = eventResults[0]
 
   const eventState = eventIndex
-  const actionMenuItems = useActionMenuItems(eventState, scopes ?? [])
+  const actionMenuItems = useActionMenuItems(eventState)
 
   return (
     <>

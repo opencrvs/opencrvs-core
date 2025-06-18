@@ -26,7 +26,6 @@ import {
   Frame,
   Icon,
   INavigationType,
-  SearchTool,
   Stack
 } from '@opencrvs/components'
 import { BackArrow } from '@opencrvs/components/lib/icons'
@@ -42,6 +41,7 @@ import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
+import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -107,24 +107,7 @@ export function EventOverviewLayout({
               >
                 <Plus />
               </Button>
-
-              <SearchTool
-                language="en"
-                navigationList={
-                  advancedSearchEvents.length > 0
-                    ? advancedSearchNavigationList // only available when enable in at least one form
-                    : []
-                }
-                searchHandler={noop}
-                searchTypeList={[
-                  {
-                    name: 'TRACKING_ID',
-                    label: 'Tracking ID',
-                    icon: <Icon name="MagnifyingGlass" size="small" />,
-                    placeHolderText: 'Search'
-                  }
-                ]}
-              />
+              <SearchToolbar />
             </Stack>
           }
           desktopRight={<ProfileMenu key="profileMenu" />}

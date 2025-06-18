@@ -11,14 +11,8 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import {
-  EventIndex,
-  QueryInputType,
-  QueryType,
-  getUUID
-} from '@opencrvs/commons/client'
+import { EventIndex, QueryType, getUUID } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
-import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'

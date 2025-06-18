@@ -16,6 +16,7 @@ import { within } from '@testing-library/dom'
 import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
+  createPrng,
   generateEventDocument,
   generateEventDraftDocument,
   getCurrentEventState,
@@ -48,6 +49,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const rng = createPrng(122)
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
@@ -55,11 +57,16 @@ const eventDocument = generateEventDocument({
     ActionType.DECLARE,
     ActionType.VALIDATE,
     ActionType.REGISTER
-  ]
+  ],
+  rng
 })
 
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument(eventId)
+const draft = generateEventDraftDocument({
+  eventId,
+  actionType: ActionType.DECLARE,
+  rng
+})
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
   loaders: [
@@ -79,23 +86,22 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       const actionButton = await canvas.findByRole('button', {
         name: 'Action'
       })
+
       await userEvent.click(actionButton)
     })
 
     await step('User is taken to the view record page', async () => {
-      const ViewRecordMenus = await canvas.findAllByText('View record')
-      if (ViewRecordMenus.length > 0) {
-        await userEvent.click(ViewRecordMenus[0])
+      const list = await canvas.findByRole('list')
+      await userEvent.click(within(list).getByText('View record'))
 
-        await waitFor(async () => {
-          await canvas.findByText('Riku')
-          await canvas.findByText('This value is from a draft')
-          await canvas.findByText(
-            'Member declaration for Riku This value is from a draft'
-          )
-          await canvas.findByText('Tennis club membership application')
-        })
-      }
+      await waitFor(async () => {
+        await canvas.findByText("Applicant's name")
+        await canvas.findByText('Riku This value is from a draft')
+        await canvas.findByText(
+          'Member declaration for Riku This value is from a draft'
+        )
+        await canvas.findByText('Tennis club membership application')
+      })
     })
   },
   parameters: {
@@ -122,14 +128,17 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
-                }
-              )
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
+                },
+                rng
+              })
             ]
           })
         ],
