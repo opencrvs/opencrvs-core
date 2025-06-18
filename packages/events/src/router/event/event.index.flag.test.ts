@@ -203,9 +203,15 @@ test(`Removes ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.APPROVE
     transactionId: getUUID()
   })
 
+  const actionId = withCorrectionRequest.actions.at(-1)?.id
+
+  if (!actionId) {
+    throw new Error('Request ID is undefined')
+  }
+
   const approveCorrectionPayload = generator.event.actions.correction.approve(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id
+    actionId
   )
 
   await client.event.actions.correction.approve(approveCorrectionPayload)

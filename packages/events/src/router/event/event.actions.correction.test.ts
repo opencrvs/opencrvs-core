@@ -437,9 +437,15 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
     transactionId: getUUID()
   })
 
+  const actionId = withCorrectionRequest.actions.at(-1)?.id
+
+  if (!actionId) {
+    throw new Error('Request ID is undefined')
+  }
+
   const approveCorrectionPayload = generator.event.actions.correction.approve(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id,
+    actionId,
     { keepAssignment: true }
   )
 
@@ -491,9 +497,15 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
     transactionId: getUUID()
   })
 
+  const actionId = withCorrectionRequest.actions.at(-1)?.id
+
+  if (!actionId) {
+    throw new Error('Request ID is undefined')
+  }
+
   const rejectCorrectionPayload = generator.event.actions.correction.reject(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id,
+    actionId,
     { keepAssignment: true }
   )
 
