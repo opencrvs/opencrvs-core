@@ -37,6 +37,7 @@ import {
   addAction,
   addAsyncRejectAction
 } from '@events/service/events/events'
+import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -53,11 +54,17 @@ interface ActionProcedureConfig {
   inputSchema: z.ZodType
   notifyApiPayloadSchema: z.ZodType | undefined
   meta?: OpenApiMeta
+  allowIfWaitingForCorrection: boolean
 }
+
+const defaultConfig = {
+  notifyApiPayloadSchema: undefined,
+  allowIfWaitingForCorrection: true
+} as const
 
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: NotifyActionInput,
     meta: {
       openapi: {
@@ -70,28 +77,32 @@ const ACTION_PROCEDURE_CONFIG = {
     }
   },
   [ActionType.DECLARE]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: DeclareActionInput
   },
   [ActionType.VALIDATE]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
+    ...defaultConfig,
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     inputSchema: RegisterActionInput
   },
   [ActionType.REJECT]: {
+    ...defaultConfig,
     notifyApiPayloadSchema: undefined,
     inputSchema: RejectDeclarationActionInput
   },
   [ActionType.ARCHIVE]: {
+    ...defaultConfig,
     notifyApiPayloadSchema: undefined,
     inputSchema: ArchiveActionInput
   },
   [ActionType.PRINT_CERTIFICATE]: {
-    notifyApiPayloadSchema: undefined,
-    inputSchema: PrintCertificateActionInput
+    ...defaultConfig,
+    inputSchema: PrintCertificateActionInput,
+    allowIfWaitingForCorrection: false
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
@@ -126,7 +137,8 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { notifyApiPayloadSchema, inputSchema } = actionConfig
+  const { notifyApiPayloadSchema, inputSchema, allowIfWaitingForCorrection } =
+    actionConfig
 
   let acceptInputFields = z.object({ actionId: z.string() })
 
@@ -151,12 +163,17 @@ export function getDefaultActionProcedures(
       .use(middleware.validateAction(actionType))
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
+        const { token, user, isDuplicateAction } = ctx
         const { eventId } = input
         const actionId = getUUID()
 
-        if (ctx.isDuplicateAction) {
+        if (isDuplicateAction) {
           return ctx.event
+        }
+
+        // Certain actions are not allowed if the event is waiting for correction
+        if (!allowIfWaitingForCorrection) {
+          await throwConflictIfWaitingForCorrection(eventId, token)
         }
 
         const event = await getEventById(eventId)

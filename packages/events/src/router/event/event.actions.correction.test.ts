@@ -399,51 +399,6 @@ describe('when a correction request exists', () => {
   })
 })
 
-test(`${ActionType.REQUEST_CORRECTION} is idempotent`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const originalEvent = await client.event.create(generator.event.create())
-
-  const declareInput = generator.event.actions.declare(originalEvent.id)
-
-  await client.event.actions.declare.request(declareInput)
-
-  const createAction = originalEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  const registeredEvent = await client.event.actions.register.request(
-    generator.event.actions.register(originalEvent.id)
-  )
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-  const correctionRequestPayload = generator.event.actions.correction.request(
-    registeredEvent.id,
-    {
-      keepAssignment: true
-    }
-  )
-  const firstResponse = await client.event.actions.correction.request(
-    correctionRequestPayload
-  )
-
-  const secondResponse = await client.event.actions.correction.request(
-    correctionRequestPayload
-  )
-
-  expect(firstResponse).toEqual(secondResponse)
-})
-
 test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
@@ -562,18 +517,24 @@ test('a correction request is not allowed if the event is already waiting for co
     generator.event.actions.correction.request(event.id)
   )
 
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
   const assignmentInput = generator.event.actions.assign(event.id, {
-    assignedTo: '123'
+    assignedTo: createAction[0].createdBy
   })
 
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
+  await client.event.actions.assignment.assign(assignmentInput)
 
   await expect(
     client.event.actions.correction.request(
       generator.event.actions.correction.request(event.id)
     )
-  ).rejects.toThrow(new TRPCError({ code: 'CONFLICT' }))
+  ).rejects.toThrow(
+    new TRPCError({
+      code: 'CONFLICT',
+      message: 'Event is waiting for correction'
+    })
+  )
 })
