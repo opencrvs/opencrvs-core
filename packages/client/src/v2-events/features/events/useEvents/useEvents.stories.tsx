@@ -56,7 +56,11 @@ const router = {
         /*
          * Explicitly trigger the download of the event
          */
-        const event = getEvent.findFromCache(createdEvent.id, true)
+        const event = getEvent.findFromCache(createdEvent.id)
+
+        React.useEffect(() => {
+          void event.refetch()
+        }, [event, event.refetch])
         /*
          * Explicitly call the hook to trigger draft fetching
          */
