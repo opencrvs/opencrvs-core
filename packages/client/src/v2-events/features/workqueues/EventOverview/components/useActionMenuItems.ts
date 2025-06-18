@@ -232,16 +232,23 @@ export function useAction(event: EventIndex) {
   }
 }
 
-// Some actions 'override' other actions.
-// For example, if an event is in rejected state, the user can EITHER declare or validate depending on their scope.
 const ACTION_OVERRIDES = {
   [ActionType.DECLARE]: ActionType.VALIDATE
 } satisfies Partial<Record<ActionType, ActionType>>
 
+/**
+ * Filters out actions that are overridden by other actions based on user scopes.
+ *
+ * Some actions can override other actions depending on the user's permissions.
+ * For example, if an event is in rejected state, a user can either DECLARE or VALIDATE
+ * depending on their scope - if they have VALIDATE scope, DECLARE will be filtered out.
+ *
+ * @param actions - Array of action types to filter
+ * @param scopes - Array of user scopes to check against
+ * @returns Filtered array of actions with overridden actions removed
+ */
 function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
   return actions.filter((a) => {
-    // If an action has an override, we need to check if the user has the scopes to perform the override action.
-    // If they do, we don't show the overridden action.
     if (a in ACTION_OVERRIDES) {
       const overrideAction =
         ACTION_OVERRIDES[a as keyof typeof ACTION_OVERRIDES]
