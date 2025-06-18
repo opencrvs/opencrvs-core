@@ -130,11 +130,11 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
  */
 export function getLegalStatuses(actions: Action[]) {
   return {
-    [EventStatus.DECLARED]: getDeclarationActionCreationMetadata(
+    [EventStatus.enum.DECLARED]: getDeclarationActionCreationMetadata(
       ActionType.DECLARE,
       actions
     ),
-    [EventStatus.REGISTERED]: getDeclarationActionCreationMetadata(
+    [EventStatus.enum.REGISTERED]: getDeclarationActionCreationMetadata(
       ActionType.REGISTER,
       actions
     )

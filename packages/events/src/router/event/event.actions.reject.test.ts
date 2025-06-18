@@ -95,7 +95,9 @@ test(`${ActionType.REJECT} is idempotent`, async () => {
     ...assignmentInput,
     transactionId: getUUID()
   })
-  const rejectPayload = generator.event.actions.reject(originalEvent.id)
+  const rejectPayload = generator.event.actions.reject(originalEvent.id, {
+    keepAssignment: true
+  })
   const firstResponse = await client.event.actions.reject.request(rejectPayload)
   const secondResponse =
     await client.event.actions.reject.request(rejectPayload)

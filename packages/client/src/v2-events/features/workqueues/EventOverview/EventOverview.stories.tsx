@@ -18,7 +18,7 @@ import {
   generateEventDraftDocument,
   ActionStatus,
   getUUID,
-  createPseudoRandomNumberGenerator,
+  createPrng,
   getRandomDatetime
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
@@ -74,14 +74,16 @@ export const Overview: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
-              )
+              })
             ]
           })
         ]
@@ -108,14 +110,16 @@ export const WithAcceptedRegisterEvent: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
-              )
+              })
             ]
           })
         ]
@@ -159,14 +163,16 @@ export const WithRejectedAction: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
-              )
+              })
             ]
           })
         ]
@@ -187,7 +193,7 @@ export const WithSystemUserActions: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            const rng = createPseudoRandomNumberGenerator(1234)
+            const rng = createPrng(1234)
 
             return {
               ...tennisClubMembershipEventDocument,
@@ -282,14 +288,16 @@ export const WithSystemUserActions: Story = {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
-              )
+              })
             ]
           })
         ]

@@ -24,7 +24,8 @@ import {
   getCurrentEventState,
   getDeclarationFields,
   QueryType,
-  WorkqueueCountInput
+  WorkqueueCountInput,
+  getEventConfigById
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -46,7 +47,7 @@ function eventToEventIndex(
   event: EventDocument,
   config: EventConfig
 ): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event, config))
+  return encodeEventIndex(getCurrentEventState(event, config), config)
 }
 
 /*
@@ -92,6 +93,8 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.ID:
+    case FieldType.PHONE:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -128,6 +131,15 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           filename: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.NAME:
+      return {
+        type: 'object',
+        properties: {
+          firstname: { type: 'text' },
+          surname: { type: 'text' },
+          __fullname: { type: 'text' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -188,7 +200,7 @@ export async function createIndex(
           legalStatuses: {
             type: 'object',
             properties: {
-              [EventStatus.DECLARED]: {
+              [EventStatus.enum.DECLARED]: {
                 type: 'object',
                 properties: {
                   createdAt: { type: 'date' },
@@ -203,7 +215,7 @@ export async function createIndex(
                   estypes.MappingProperty
                 >
               },
-              [EventStatus.REGISTERED]: {
+              [EventStatus.enum.REGISTERED]: {
                 type: 'object',
                 properties: {
                   createdAt: { type: 'date' },
@@ -315,7 +327,10 @@ export async function deleteEventIndex(event: EventDocument) {
   return response
 }
 
-export async function getIndexedEvents(userId: string) {
+export async function getIndexedEvents(
+  userId: string,
+  eventConfigs: EventConfig[]
+) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -336,13 +351,13 @@ export async function getIndexedEvents(userId: string) {
       should: [
         {
           bool: {
-            must_not: [{ term: { status: EventStatus.CREATED } }]
+            must_not: [{ term: { status: EventStatus.enum.CREATED } }]
           }
         },
         {
           bool: {
             must: [
-              { term: { status: EventStatus.CREATED } },
+              { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
             ]
           }
@@ -362,47 +377,57 @@ export async function getIndexedEvents(userId: string) {
   return response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map(decodeEventIndex)
+    .map((event) =>
+      decodeEventIndex(getEventConfigById(eventConfigs, event.type), event)
+    )
 }
 
-export async function getIndex(eventParams: QueryType) {
-  const esClient = getOrCreateClient()
-
-  if (eventParams.type === 'or') {
-    const { clauses } = eventParams
-    // @todo: implement or query for quick search
-    // eslint-disable-next-line no-console
-    console.log({ clauses })
-    return []
-  }
-
-  if (Object.values(eventParams).length === 0) {
+export async function getIndex(
+  eventParams: QueryType,
+  eventConfigs: EventConfig[]
+) {
+  if (
+    Object.values(eventParams).length === 0 ||
+    eventParams.clauses.length === 0
+  ) {
     throw new Error('No search params provided')
   }
 
-  const query = buildElasticQueryFromSearchPayload(eventParams)
+  const esClient = getOrCreateClient()
+  const query = buildElasticQueryFromSearchPayload(eventParams, eventConfigs)
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     size: DEFAULT_SIZE,
     request_cache: false,
-    query
+    query,
+    sort: {
+      _score: {
+        order: 'desc'
+      }
+    }
   })
 
   const events = response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((event) => decodeEventIndex(event))
+    .map((event) =>
+      decodeEventIndex(getEventConfigById(eventConfigs, event.type), event)
+    )
 
   return events
 }
 
-export async function getEventCount(queries: WorkqueueCountInput) {
+export async function getEventCount(
+  queries: WorkqueueCountInput,
+  eventConfigs: EventConfig[]
+) {
   return (
-    //  @ToDo: write a query that does everything in one go.
+    //  @TODO: write a query that does everything in one go.
     (
       await Promise.all(
         queries.map(async ({ slug, query }) => {
-          const count = (await getIndex(query)).length
+          const count = (await getIndex(query, eventConfigs)).length
           return { slug, count }
         })
       )

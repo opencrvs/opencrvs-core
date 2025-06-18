@@ -210,7 +210,7 @@ export function Review() {
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleValidation}
           onReject={
-            currentEventState.status === EventStatus.REJECTED
+            currentEventState.status === EventStatus.enum.REJECTED
               ? undefined
               : handleRejection
           }

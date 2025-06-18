@@ -14,6 +14,7 @@ import {
   ActionType,
   EventDocument,
   EventIndex,
+  EventStatus,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
@@ -24,7 +25,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   id: uuid(),
   type: TENNIS_CLUB_MEMBERSHIP,
   trackingId: 'TEST12',
-  status: 'CREATED',
+  status: EventStatus.enum.CREATED,
   createdAt: '2023-03-01T00:00:00.000Z',
   legalStatuses: {},
   createdBy: uuid(),
@@ -37,8 +38,10 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   updatedByUserRole: 'system',
   flags: [],
   declaration: {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'applicant.dob': '1990-01-01'
   }
 }
@@ -66,11 +69,15 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       id: '8db635cf-ee30-40ca-8117-a7188256a2b1',
       status: ActionStatus.Accepted,
       declaration: {
-        'applicant.firstname': 'Riku',
-        'applicant.surname': 'Rouvila',
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        },
         'applicant.dob': '2025-01-23',
-        'recommender.firstname': 'Euan',
-        'recommender.surname': 'Millar'
+        'recommender.name': {
+          firstname: 'Euan',
+          surname: 'Millar'
+        }
       },
       // Metadata is required to display a register action workflow in Storybook.
       // It mimics the behavior of the declare action, with annotation added to this declaration.
@@ -91,11 +98,15 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
       status: ActionStatus.Accepted,
       declaration: {
-        'applicant.firstname': 'Riku',
-        'applicant.surname': 'Rouvila',
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        },
         'applicant.dob': '2025-01-23',
-        'recommender.firstname': 'Euan',
-        'recommender.surname': 'Millar'
+        'recommender.name': {
+          firstname: 'Euan',
+          surname: 'Millar'
+        }
       },
       type: 'VALIDATE',
       createdBy: localRegistrarId,
@@ -109,11 +120,15 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
       status: ActionStatus.Accepted,
       declaration: {
-        'applicant.firstname': 'Riku',
-        'applicant.surname': 'Rouvila',
+        'applicant.name': {
+          firstname: 'Riku',
+          surname: 'Rouvila'
+        },
         'applicant.dob': '2025-01-23',
-        'recommender.firstname': 'Euan',
-        'recommender.surname': 'Millar'
+        'recommender.name': {
+          firstname: 'Euan',
+          surname: 'Millar'
+        }
       },
       type: 'REGISTER',
       createdBy: localRegistrarId,

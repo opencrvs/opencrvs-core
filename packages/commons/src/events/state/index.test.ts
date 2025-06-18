@@ -31,7 +31,7 @@ describe('getCurrentEventState()', () => {
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
 
-    expect(state.legalStatuses[EventStatus.DECLARED]).toEqual({
+    expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
       createdAt: event.actions[1].createdAt,
       createdBy: event.actions[1].createdBy,
       creator: event.actions[1].creator,
@@ -40,7 +40,7 @@ describe('getCurrentEventState()', () => {
       acceptedAt: event.actions[1].createdAt
     })
 
-    expect(state.legalStatuses[EventStatus.REGISTERED]).toEqual({
+    expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toEqual({
       createdAt: event.actions[2].createdAt,
       createdBy: event.actions[2].createdBy,
       creator: event.actions[1].creator,
@@ -77,9 +77,9 @@ describe('getCurrentEventState()', () => {
 
     const state = getCurrentEventState(event, tennisClubMembershipEvent)
 
-    expect(state.legalStatuses[EventStatus.DECLARED]).toBe(undefined)
+    expect(state.legalStatuses[EventStatus.enum.DECLARED]).toBe(undefined)
 
-    expect(state.legalStatuses[EventStatus.REGISTERED]).toBe(undefined)
+    expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toBe(undefined)
   })
 
   test('legalStatuses are shown when requests have been accepted async', () => {
@@ -145,7 +145,7 @@ describe('getCurrentEventState()', () => {
         action.status === ActionStatus.Accepted
     )
 
-    expect(state.legalStatuses[EventStatus.DECLARED]).toEqual({
+    expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
       createdAt: declareRequest?.createdAt,
       createdBy: declareRequest?.createdBy,
       creator: declareRequest?.creator,
@@ -154,7 +154,7 @@ describe('getCurrentEventState()', () => {
       acceptedAt: declareAccept?.createdAt
     })
 
-    expect(state.legalStatuses[EventStatus.REGISTERED]).toEqual({
+    expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toEqual({
       createdAt: registerRequest?.createdAt,
       createdBy: registerRequest?.createdBy,
       creator: registerRequest?.creator,
@@ -284,14 +284,14 @@ describe('getCurrentEventState()', () => {
       id: event.id,
       type: event.type,
       trackingId: event.trackingId,
-      status: EventStatus.REGISTERED,
+      status: EventStatus.enum.REGISTERED,
       updatedByUserRole: registerRequestAction.createdByRole,
       updatedAtLocation: registerRequestAction.createdAtLocation,
       declaration: deepDropNulls(declareRequestAction.declaration),
       dateOfEvent: event.createdAt.split('T')[0],
       flags: [],
       legalStatuses: {
-        [EventStatus.DECLARED]: {
+        [EventStatus.enum.DECLARED]: {
           createdAt: declareRequestAction.createdAt,
           createdBy: declareRequestAction.createdBy,
           creator: declareRequestAction.creator,
@@ -300,7 +300,7 @@ describe('getCurrentEventState()', () => {
           createdByRole: declareRequestAction.createdByRole,
           acceptedAt: declareAcceptAction.createdAt
         },
-        [EventStatus.REGISTERED]: {
+        [EventStatus.enum.REGISTERED]: {
           createdAt: registerRequestAction.createdAt,
           createdBy: registerRequestAction.createdBy,
           creator: registerRequestAction.creator,
@@ -403,14 +403,14 @@ describe('getCurrentEventState()', () => {
       id: event.id,
       type: event.type,
       trackingId: event.trackingId,
-      status: EventStatus.REGISTERED,
+      status: EventStatus.enum.REGISTERED,
       updatedByUserRole: registerAcceptAction.createdByRole,
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration),
       dateOfEvent: event.createdAt.split('T')[0],
       flags: [],
       legalStatuses: {
-        [EventStatus.DECLARED]: {
+        [EventStatus.enum.DECLARED]: {
           createdAt: declareAcceptAction.createdAt,
           createdBy: declareAcceptAction.createdBy,
           creator: declareAcceptAction.creator,
@@ -419,7 +419,7 @@ describe('getCurrentEventState()', () => {
           acceptedAt: declareAcceptAction.createdAt,
           createdByRole: declareAcceptAction.createdByRole
         },
-        [EventStatus.REGISTERED]: {
+        [EventStatus.enum.REGISTERED]: {
           createdAt: registerAcceptAction.createdAt,
           createdBy: registerAcceptAction.createdBy,
           creator: registerAcceptAction.creator,
@@ -604,8 +604,10 @@ describe('address state transitions', () => {
 
   const initialForm = {
     'applicant.dob': '2000-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
+    'applicant.name': {
+      firstname: 'John',
+      surname: 'Doe'
+    },
     'recommender.none': true,
     'applicant.address': { ...initialAddress }
   }

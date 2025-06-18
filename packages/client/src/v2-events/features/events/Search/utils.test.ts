@@ -30,10 +30,10 @@ describe('getAdvancedSearchFieldErrors', () => {
       mockFormValues
     )
     expect(errors).toEqual({
-      'applicant.firstname': {
+      'applicant.name': {
         errors: []
       },
-      'applicant.surname': {
+      'recommender.name': {
         errors: []
       },
       'applicant.email': {
@@ -56,12 +56,6 @@ describe('getAdvancedSearchFieldErrors', () => {
             }
           }
         ]
-      },
-      'recommender.firstname': {
-        errors: []
-      },
-      'recommender.surname': {
-        errors: []
       }
     })
   })
@@ -119,14 +113,14 @@ describe('buildDataCondition', () => {
     expect(result[eventStatusField]).toEqual({
       type: 'anyOf',
       terms: [
-        EventStatus.CREATED,
-        EventStatus.NOTIFIED,
-        EventStatus.DECLARED,
-        EventStatus.VALIDATED,
-        EventStatus.REGISTERED,
-        EventStatus.CERTIFIED,
-        EventStatus.REJECTED,
-        EventStatus.ARCHIVED
+        EventStatus.enum.CREATED,
+        EventStatus.enum.NOTIFIED,
+        EventStatus.enum.DECLARED,
+        EventStatus.enum.VALIDATED,
+        EventStatus.enum.REGISTERED,
+        EventStatus.enum.CERTIFIED,
+        EventStatus.enum.REJECTED,
+        EventStatus.enum.ARCHIVED
       ]
     })
   })
