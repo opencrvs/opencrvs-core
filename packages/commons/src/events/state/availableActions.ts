@@ -11,7 +11,7 @@
 import { ActionType } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
 
-const AVAILABLE_ACTIONS_BY_STATUS = {
+const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.CREATED]: [
     ActionType.READ,
     ActionType.DECLARE,
@@ -43,5 +43,5 @@ const AVAILABLE_ACTIONS_BY_STATUS = {
 } as const satisfies Record<EventStatus, ActionType[]>
 
 export function getAvailableActionsByStatus(status: EventStatus) {
-  return AVAILABLE_ACTIONS_BY_STATUS[status]
+  return AVAILABLE_ACTIONS_BY_EVENT_STATUS[status]
 }
