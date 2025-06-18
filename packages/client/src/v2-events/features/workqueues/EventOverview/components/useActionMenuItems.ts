@@ -294,12 +294,8 @@ function filterUnallowedActions(
     (action) => !isMetaAction(action)
   )
 
-  if (hasOtherAllowedActions) {
-    return allowedActions
-  }
-
   // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
-  return [ActionType.READ]
+  return hasOtherAllowedActions ? allowedActions : [ActionType.READ]
 }
 
 /**
