@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 1e1af250-54d8-4222-bf0e-679dc279aa82
+                transactionId: bca1e053-5415-4194-b550-7020b316488b
                 type: v2.birth
       responses:
         "200":
@@ -458,7 +458,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 98373a0d-c6cb-466b-9dbd-a989a0cfcb27
+                transactionId: f2b5a571-5c7b-452c-8ed8-2880292ef6ab
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -614,6 +614,7 @@ paths:
                         properties:
                           id:
                             type: string
+                            format: uuid
                           transactionId:
                             type: string
                           createdAt:
@@ -4116,6 +4117,7 @@ components:
                 properties:
                   id:
                     type: string
+                    format: uuid
                   transactionId:
                     type: string
                   createdAt:
@@ -4201,6 +4203,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4573,6 +4576,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4942,6 +4946,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -5324,6 +5329,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -5693,6 +5699,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6075,6 +6082,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6444,6 +6452,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6815,6 +6824,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7184,6 +7194,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7556,6 +7567,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7925,6 +7937,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8297,6 +8310,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8669,6 +8683,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -9041,6 +9056,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -9410,6 +9426,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:

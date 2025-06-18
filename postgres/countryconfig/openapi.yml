@@ -3321,6 +3321,7 @@ components:
                 properties:
                   id:
                     type: string
+                    format: uuid
                   transactionId:
                     type: string
                   createdAt:
@@ -3415,6 +3416,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -3803,6 +3805,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4187,6 +4190,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4584,6 +4588,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4968,6 +4973,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -5365,6 +5371,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -5749,6 +5756,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6135,6 +6143,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6519,6 +6528,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6906,6 +6916,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7290,6 +7301,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7677,6 +7689,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8064,6 +8077,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8451,6 +8465,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8835,6 +8850,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -10682,7 +10698,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: cfa560cd-e5f6-4fab-b12b-09ab11e33360
+        transactionId: 830df53d-6a93-4377-97b8-2b9bbf9d0be7
         declaration: {}
         annotation: {}
         type: NOTIFY
