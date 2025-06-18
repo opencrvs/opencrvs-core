@@ -25,7 +25,7 @@ import {
   createTRPCContext,
   createTRPCOptionsProxy
 } from '@trpc/tanstack-react-query'
-import React, { useEffect } from 'react'
+import React from 'react'
 import superjson from 'superjson'
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
@@ -94,16 +94,6 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
   client: trpcClient
 })
 
-function TRPCPrefetcher() {
-  useEffect(() => {
-    queryClient.prefetchQuery({
-      queryKey: trpcOptionsProxy.locations.get.queryKey()
-    })
-  }, [])
-
-  return null
-}
-
 export function TRPCProvider({ children }: { children: React.ReactNode }) {
   return (
     <PersistQueryClientProvider
@@ -138,7 +128,6 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
-        <TRPCPrefetcher />
         {children}
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
