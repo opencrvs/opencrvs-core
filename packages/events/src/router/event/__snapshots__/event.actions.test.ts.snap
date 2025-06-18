@@ -9,6 +9,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
       "status": "Accepted",
@@ -22,6 +23,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
       "status": "Accepted",
@@ -42,6 +44,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
@@ -82,6 +85,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
       "status": "Accepted",
@@ -95,6 +99,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "eventId": "[sanitized]",
       "id": "[sanitized]",
@@ -116,6 +121,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
@@ -157,6 +163,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
       "status": "Accepted",
@@ -170,6 +177,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "eventId": "[sanitized]",
       "id": "[sanitized]",
@@ -191,6 +199,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {
         "applicant.address": {
           "addressType": "DOMESTIC",
@@ -232,6 +241,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "id": "[sanitized]",
       "status": "Accepted",
@@ -244,6 +254,7 @@ exports[`Event document contains all created actions 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "creator": "[sanitized]",
       "declaration": {},
       "eventId": "[sanitized]",
       "id": "[sanitized]",
