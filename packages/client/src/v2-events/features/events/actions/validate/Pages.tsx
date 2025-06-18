@@ -41,7 +41,7 @@ export function Pages() {
   const { modal, goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

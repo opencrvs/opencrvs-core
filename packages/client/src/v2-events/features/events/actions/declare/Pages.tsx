@@ -38,7 +38,7 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

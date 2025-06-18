@@ -63,7 +63,7 @@ export function Review() {
 
   const registerMutation = events.actions.register
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const [event] = events.getEvent.getFromCache(eventId)
 
   const previousAnnotation = getActionAnnotation({
     event,

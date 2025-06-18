@@ -130,7 +130,7 @@ function EventOverviewContainer() {
   const getEventQuery = searchEventById.useQuery(params.eventId)
   const eventIndex = getEventQuery.data
 
-  const fullEvent = getEvent.useQuery(params.eventId, false).data
+  const fullEvent = getEvent.findFromCache(params.eventId).data
 
   if (!eventIndex) {
     return

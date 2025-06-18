@@ -54,7 +54,7 @@ export function Review() {
   const navigate = useNavigate()
   const { goToHome } = useEventFormNavigation()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const [event] = events.getEvent.getFromCache(eventId)
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
 

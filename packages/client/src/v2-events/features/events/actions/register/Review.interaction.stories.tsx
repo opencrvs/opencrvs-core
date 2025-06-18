@@ -24,6 +24,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import { Review } from './index'
 
 const generator = testDataGenerator()
@@ -37,9 +38,22 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
 
 const meta: Meta<typeof Review> = {
   title: 'Register/Review/Interaction/Local Registrar',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventDocument.id, eventDocument)
+  },
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
@@ -60,13 +74,6 @@ const meta: Meta<typeof Review> = {
 export default meta
 
 type Story = StoryObj<typeof Review>
-
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
 
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
@@ -284,9 +291,9 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           'event.actions.register.request': false,
           'event.actions.reject.request': false,
           'event.actions.validate.request': false,
-          'event.config.get': true,
+          'event.config.get': false,
           'event.create': false,
-          'event.get': true,
+          'event.get': false,
           'event.list': true
         })
       })

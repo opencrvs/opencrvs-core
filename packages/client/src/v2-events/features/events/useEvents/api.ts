@@ -26,6 +26,12 @@ export function findLocalEventConfig(eventType: string) {
     .getQueryData(trpcOptionsProxy.event.config.get.queryKey())
     ?.find(({ id }: EventConfig) => id === eventType) as EventConfig | undefined
 }
+export function setLocalEventConfig(config: EventConfig) {
+  return queryClient.setQueryData(
+    trpcOptionsProxy.event.config.get.queryKey(),
+    [config]
+  )
+}
 
 export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
   return queryClient.setQueryData(

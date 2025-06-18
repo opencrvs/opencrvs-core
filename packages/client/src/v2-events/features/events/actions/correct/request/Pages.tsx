@@ -33,7 +33,7 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

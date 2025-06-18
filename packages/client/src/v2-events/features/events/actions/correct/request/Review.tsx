@@ -33,7 +33,7 @@ export function Review() {
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
   const formConfig = getDeclaration(config)

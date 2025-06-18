@@ -158,7 +158,7 @@ export function Review() {
   const [modal, openModal] = useModal()
 
   const { getEvent, onlineActions } = useEvents()
-  const [fullEvent] = getEvent.useSuspenseQuery(eventId)
+  const [fullEvent] = getEvent.getFromCache(eventId)
 
   const actions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(actions)

@@ -111,7 +111,7 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const previousFormValues = event.declaration

@@ -39,7 +39,7 @@ export function Pages() {
   const navigate = useNavigate()
   const drafts = useDrafts()
   const { modal, goToHome } = useEventFormNavigation()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

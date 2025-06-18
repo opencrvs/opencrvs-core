@@ -86,7 +86,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
 
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
-  const [event] = getEvent.useSuspenseQuery(params.eventId)
+  const [event] = getEvent.getFromCache(params.eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type

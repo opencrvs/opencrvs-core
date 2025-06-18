@@ -51,7 +51,7 @@ export function FormHeader({
     throw new Error('Event id is required')
   }
   const events = useEvents()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
 
   const onExit = useCallback(async () => {
     await exit(event)

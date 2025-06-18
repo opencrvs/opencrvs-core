@@ -176,7 +176,7 @@ describe('events that have unsynced actions', () => {
     })
 
     const getHook = renderHook(
-      () => useEvents().getEvent.useQuery('_TEST_TRANSACTION_'),
+      () => useEvents().getEvent.findFromCache('_TEST_TRANSACTION_'),
       { wrapper }
     )
 
@@ -202,7 +202,7 @@ describe('events that have unsynced actions', () => {
     )
 
     const getHook = renderHook(
-      () => useEvents().getEvent.useQuery('_REAL_UUID_'),
+      () => useEvents().getEvent.findFromCache('_REAL_UUID_'),
       { wrapper }
     )
 

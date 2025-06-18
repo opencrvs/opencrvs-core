@@ -20,12 +20,23 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import * as Validate from './index'
 
 const generator = testDataGenerator()
 
 const meta: Meta<typeof Validate.Review> = {
-  title: 'Validate/Review'
+  title: 'Validate/Review',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(
+      tennisClubMembershipEventDocument.id,
+      tennisClubMembershipEventDocument
+    )
+  }
 }
 
 export default meta

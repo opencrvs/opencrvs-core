@@ -46,7 +46,7 @@ export function Review() {
   const { goToHome } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 

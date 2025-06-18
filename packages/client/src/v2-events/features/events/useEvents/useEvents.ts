@@ -19,7 +19,7 @@ import {
 } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
-import { useGetEvent, useGetEventState } from './procedures/get'
+import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
 import { useDeleteEvent } from './procedures/delete'
@@ -41,8 +41,6 @@ export function useEvents() {
     /** Returns an event with full history. If you only need the state of the event, use getEventState. */
     getEvent,
     getEvents,
-    /** Returns an event with aggregated history. If you need the history of the event, use getEvent. */
-    getEventState: useGetEventState(),
     useGetEventCounts,
     deleteEvent: {
       useMutation: useDeleteEvent
