@@ -131,8 +131,3 @@ export const EventTopBar = (props: IEventTopBarProps) => {
     </TopBar>
   )
 }
-
-/** @deprecated since the introduction of `<Frame>` */
-export const FixedEventTopBar = styled(EventTopBar)`
-  position: fixed;
-`

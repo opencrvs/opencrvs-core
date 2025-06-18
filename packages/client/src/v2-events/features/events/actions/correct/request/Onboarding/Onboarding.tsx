@@ -14,14 +14,13 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { ActionType } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
-import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { buttonMessages } from '@client/i18n/messages'
-import { generateGoToHomeTabUrl } from '@client/navigation'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 
 const messages = defineMessages({
   title: {
@@ -33,6 +32,7 @@ const messages = defineMessages({
 
 export function Onboarding() {
   const navigate = useNavigate()
+  const { goToHome } = useEventFormNavigation()
 
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
@@ -59,7 +59,7 @@ export function Onboarding() {
     )
   }
 
-  const formPages = actionConfiguration.onboardingForm
+  const formPages = actionConfiguration.correctionForm.pages
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -82,18 +82,11 @@ export function Onboarding() {
     <ActionPageLight
       hideBackground
       goBack={() => navigate(-1)}
-      goHome={() =>
-        navigate(
-          generateGoToHomeTabUrl({
-            tabId: WORKQUEUE_TABS.readyForReview
-          })
-        )
-      }
+      goHome={goToHome}
       id="corrector_form"
       title={intl.formatMessage(messages.title)}
     >
       <PagesComponent
-        // @TODO: Use subscription if needed
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         declaration={event.declaration}
         eventConfig={configuration}
@@ -102,6 +95,7 @@ export function Onboarding() {
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
         showReviewButton={false}
+        validateBeforeNextPage={true}
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({

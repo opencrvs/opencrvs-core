@@ -13,6 +13,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
+import { expect, waitFor, within } from '@storybook/test'
 import { ActionType } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -52,6 +53,39 @@ function FormClear() {
   return <Outlet />
 }
 
+export const ReviewWithoutChanges: Story = {
+  parameters: {
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Outlet />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeDisabled()
+    })
+  }
+}
+
 export const ReviewWithChanges: Story = {
   parameters: {
     reactRouter: {
@@ -73,29 +107,17 @@ export const ReviewWithChanges: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeEnabled()
+    })
   }
 }
 
-export const AdditionalDetails: Story = {
-  parameters: {
-    reactRouter: {
-      router: router,
-      initialPath:
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath({
-          eventId: tennisClubMembershipEventDocument.id
-        })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
 export const Summary: Story = {
   parameters: {
     reactRouter: {
