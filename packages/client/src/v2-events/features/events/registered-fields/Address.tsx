@@ -43,6 +43,7 @@ type FieldConfigWithoutAddress = Exclude<
 
 type Props = FieldProps<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
+  fields?: Array<FieldConfigWithoutAddress>
   value?: AddressFieldValue
 }
 
@@ -450,17 +451,21 @@ type _ExpectTrue = Expect<
 function AddressInput(props: Props) {
   const { onChange, defaultValue, value = {}, ...otherProps } = props
 
-  const fields = [
-    ...ADMIN_STRUCTURE,
-    ...URBAN_FIELDS,
-    ...RURAL_FIELDS,
-    ...GENERIC_ADDRESS_FIELDS
-  ] satisfies Array<FieldConfigWithoutAddress>
+  const fields =
+    props.fields ??
+    ([
+      ...ADMIN_STRUCTURE,
+      ...URBAN_FIELDS,
+      ...RURAL_FIELDS,
+      ...GENERIC_ADDRESS_FIELDS
+    ] satisfies Array<FieldConfigWithoutAddress>)
 
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
+      fields={
+        defaultValue ? [...fields].map(addDefaultValue(defaultValue)) : fields
+      }
       initialValues={{ ...defaultValue, ...value }}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />

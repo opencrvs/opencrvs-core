@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useIntl, defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { stringify } from 'query-string'
 import { useEffect, useRef, useState } from 'react'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -30,10 +29,12 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
+
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields
+  getDefaultSearchFields,
+  objectToQueryParams
 } from './utils'
 
 const MIN_PARAMS_TO_SEARCH = 2
@@ -222,7 +223,7 @@ export function TabSearch({
   const nonEmptyValues = filterEmptyValues(formValues)
 
   const handleSearch = () => {
-    const searchParams = stringify(nonEmptyValues)
+    const searchParams = objectToQueryParams(nonEmptyValues)
     const path = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: enhancedEvent.id
     })

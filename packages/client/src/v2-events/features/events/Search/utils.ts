@@ -12,6 +12,7 @@ import startOfDay from 'date-fns/startOfDay'
 import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
+import { parse as parseQuery, stringify } from 'query-string'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -532,4 +533,53 @@ export function buildQuickSearchQuery(
 
   // Delegate to the actual query builder
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
+}
+
+export function objectToQueryParams(
+  eventState: Record<string, unknown>
+): string {
+  const simplifiedValue = Object.entries(eventState).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (Array.isArray(value) && value.length === 0) {
+          acc[key] = value.map((v) =>
+            typeof v === 'object' ? JSON.stringify(v) : v
+          )
+        } else if (typeof value === 'object' && !Array.isArray(value)) {
+          acc[key] = JSON.stringify(value)
+        } else {
+          acc[key] = value
+        }
+      }
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+  return stringify(simplifiedValue)
+}
+
+export function queryParamsToObject(queryParams: string): EventState {
+  return Object.entries(parseQuery(queryParams)).reduce((acc, [key, value]) => {
+    if (typeof value === 'string') {
+      try {
+        acc[key] = JSON.parse(value)
+      } catch {
+        acc[key] = value
+      }
+    } else if (Array.isArray(value)) {
+      acc[key] = value.map((v) => {
+        if (typeof v === 'string') {
+          try {
+            return JSON.parse(v)
+          } catch {
+            return v
+          }
+        }
+        return v
+      })
+    } else {
+      acc[key] = value
+    }
+    return acc
+  }, {} as EventState)
 }
