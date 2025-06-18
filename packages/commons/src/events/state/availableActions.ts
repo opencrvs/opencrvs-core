@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Scope } from 'src/scopes'
 import { ActionType } from '../ActionType'
 import { EventStatus } from '../EventMetadata'
 
@@ -18,43 +17,21 @@ const AVAILABLE_ACTIONS_BY_STATUS = {
     ActionType.DECLARE,
     ActionType.DELETE
   ],
-  [EventStatus.enum.NOTIFIED]: [
-    ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN,
-    ActionType.VALIDATE
-  ],
-  [EventStatus.enum.DECLARED]: [
-    ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN,
-    ActionType.VALIDATE
-  ],
-  [EventStatus.enum.VALIDATED]: [
-    ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN,
-    ActionType.REGISTER
-  ],
+  [EventStatus.enum.NOTIFIED]: [ActionType.READ, ActionType.VALIDATE],
+  [EventStatus.enum.DECLARED]: [ActionType.READ, ActionType.VALIDATE],
+  [EventStatus.enum.VALIDATED]: [ActionType.READ, ActionType.REGISTER],
   [EventStatus.enum.REJECTED]: [
     ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN,
-    // If event is rejected, user can either declare or validate depending on their scope
     ActionType.DECLARE,
     ActionType.VALIDATE
   ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN,
     ActionType.PRINT_CERTIFICATE,
     ActionType.REQUEST_CORRECTION
   ],
   [EventStatus.enum.CERTIFIED]: [
     ActionType.READ,
-    ActionType.ASSIGN,
-    ActionType.UNASSIGN,
     ActionType.PRINT_CERTIFICATE,
     ActionType.REQUEST_CORRECTION
   ],
@@ -67,13 +44,4 @@ const AVAILABLE_ACTIONS_BY_STATUS = {
 
 export function getAvailableActionsByStatus(status: EventStatus) {
   return AVAILABLE_ACTIONS_BY_STATUS[status]
-}
-
-export function getAvailableActionsByStatusAndScope(
-  status: EventStatus,
-  scopes: Scope[]
-) {
-  const availableActions = getAvailableActionsByStatus(status)
-  console.log('availableActions', availableActions)
-  return 'todo'
 }
