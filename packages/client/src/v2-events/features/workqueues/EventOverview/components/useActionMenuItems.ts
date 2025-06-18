@@ -23,6 +23,7 @@ import {
   hasAnyOfScopes,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
+import { getAvailableActionsByStatusAndScope } from '@opencrvs/commons'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -54,12 +55,16 @@ function getAssignmentActions(
 /**
  * Actions that can be performed on an event based on its status and user scope.
  */
-
 function getUserActionsByStatus(
   status: EventStatus,
   assignmentActions: ActionType[],
   userScopes: Scope[]
 ): ActionType[] {
+  const availableActions = getAvailableActionsByStatusAndScope(
+    status,
+    userScopes
+  )
+
   switch (status) {
     case EventStatus.enum.CREATED: {
       return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
