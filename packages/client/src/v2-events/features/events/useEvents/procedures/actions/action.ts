@@ -331,7 +331,10 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
 export function useEventCustomAction(mutationKey: string[]) {
   const eventConfigurations = useEventConfigurations()
-  const mutation = useMutation(queryClient.getMutationDefaults(mutationKey))
+  const mutation = useMutation({
+    mutationKey: [mutationKey],
+    ...queryClient.getMutationDefaults(mutationKey)
+  })
 
   return {
     mutate: (params: customApi.OnDeclareParams) => {

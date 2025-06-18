@@ -13,22 +13,23 @@ import { hashKey, Mutation, useQuery } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
   inferInput,
-  inferOutput
+  inferOutput,
+  TRPCMutationKey
 } from '@trpc/tanstack-react-query'
 import { EventIndex } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { customMutationKeys } from './procedures/actions/action'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getPendingMutations<T extends DecorateMutationProcedure<any>>(
+function getMutationKey<T extends DecorateMutationProcedure<any>>(
   procedure: T
 ) {
-  // type MutationFn = Exclude<T['mutationFn'], undefined>
-  type Data = inferOutput<T>
-  type Variables = inferInput<T>
-
   const mutationOptions = procedure.mutationOptions()
   const key = mutationOptions.mutationKey
+  return key
+}
 
+function getPendingMutations(key: TRPCMutationKey) {
   return queryClient
     .getMutationCache()
     .getAll()
@@ -37,7 +38,7 @@ function getPendingMutations<T extends DecorateMutationProcedure<any>>(
       (mutation) =>
         mutation.options.mutationKey &&
         hashKey(mutation.options.mutationKey) === hashKey(key)
-    ) as Mutation<Data, Error, Variables>[]
+    )
 }
 
 function filterOutboxEventsWithMutation<
@@ -45,14 +46,24 @@ function filterOutboxEventsWithMutation<
   T extends DecorateMutationProcedure<any>
 >(
   events: EventIndex[],
-  mutation: T,
+  mutationKey: TRPCMutationKey,
   filter: (event: EventIndex, parameters: inferInput<T>) => boolean
 ) {
-  return getPendingMutations(mutation).flatMap((m) => {
+  const pendingMutations = getPendingMutations(mutationKey)
+
+  return pendingMutations.flatMap((m) => {
     const variables = m.state.variables
     return events
       .filter((event) => filter(event, variables))
-      .map((event) => ({ ...event, workqueueMeta: m.options.meta }))
+      .map(({ declaration, ...event }) => ({
+        ...event,
+        workqueueMeta: m.options.meta,
+        declaration: {
+          ...declaration,
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          ...((variables as any).declaration || {})
+        }
+      }))
   })
 }
 
@@ -67,7 +78,7 @@ export function useOutbox() {
 
   const eventFromDeclareActions = filterOutboxEventsWithMutation(
     eventsList,
-    trpc.event.actions.declare.request,
+    getMutationKey(trpc.event.actions.declare.request),
     (event, parameters) => {
       return event.id === parameters.eventId
     }
@@ -75,7 +86,7 @@ export function useOutbox() {
 
   const eventFromValidateActions = filterOutboxEventsWithMutation(
     eventsList,
-    trpc.event.actions.validate.request,
+    getMutationKey(trpc.event.actions.validate.request),
     (event, parameters) => {
       return event.id === parameters.eventId
     }
@@ -83,7 +94,15 @@ export function useOutbox() {
 
   const eventFromRegisterActions = filterOutboxEventsWithMutation(
     eventsList,
-    trpc.event.actions.register.request,
+    getMutationKey(trpc.event.actions.register.request),
+    (event, parameters) => {
+      return event.id === parameters.eventId
+    }
+  )
+
+  const eventFromRegisterOnDeclareActions = filterOutboxEventsWithMutation(
+    eventsList,
+    [customMutationKeys.registerOnDeclare],
     (event, parameters) => {
       return event.id === parameters.eventId
     }
@@ -93,6 +112,7 @@ export function useOutbox() {
     .concat(eventFromDeclareActions)
     .concat(eventFromValidateActions)
     .concat(eventFromRegisterActions)
+    .concat(eventFromRegisterOnDeclareActions)
     .filter(
       /* uniqueById */
       (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
