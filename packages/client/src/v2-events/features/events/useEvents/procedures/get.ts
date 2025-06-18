@@ -111,10 +111,11 @@ export function useGetEvent() {
         useSuspenseQuery({
           // In this case we can use the queryFn as this is a ad-hoc query
           ...trpc.event.get.queryOptions(id),
-          queryKey: [['view-event']],
+          queryKey: [['view-event', id]],
           meta: {
             eventConfig
           },
+          gcTime: 0,
           /*
            * We never want to refetch this query automatically
            * because it is the user's explicit (audit logged) action to fetch a record

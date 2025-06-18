@@ -28,6 +28,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
+import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 
 function getAssignmentActions(
   assignmentStatus: keyof typeof AssignmentStatus,
@@ -157,6 +158,8 @@ export function useAction(event: EventIndex) {
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
+  const { findFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(findFromCache(event.id).data)
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -173,7 +176,7 @@ export function useAction(event: EventIndex) {
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const eventIsAssignedToSelf =
-    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
