@@ -188,3 +188,27 @@ test('Throws with malformed token', async () => {
     new TRPCError({ code: 'UNAUTHORIZED' })
   )
 })
+
+test('UNAUTHORIZED error is thrown when authorization header is missing', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+
+  await expect(
+    customClient.event.create.mutate(
+      {
+        transactionId: getUUID(),
+        type: TENNIS_CLUB_MEMBERSHIP
+      },
+      {
+        context: {
+          headers: {}
+        }
+      }
+    )
+  ).rejects.toThrow(
+    new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
+  )
+})
