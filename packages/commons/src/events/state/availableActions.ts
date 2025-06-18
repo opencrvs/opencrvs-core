@@ -40,7 +40,7 @@ const AVAILABLE_ACTIONS_BY_STATUS = {
     ActionType.ASSIGN,
     ActionType.UNASSIGN
   ]
-} satisfies Record<EventStatus, ActionType[]>
+} as const satisfies Record<EventStatus, ActionType[]>
 
 export function getAvailableActionsByStatus(status: EventStatus) {
   return AVAILABLE_ACTIONS_BY_STATUS[status]
