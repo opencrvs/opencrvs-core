@@ -24,6 +24,7 @@ import {
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
 import { useGetEventCounts } from './procedures/count'
+import { findLocalEventIndex } from './api'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -65,15 +66,8 @@ export function useEvents() {
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
           initialData: () => {
-            const list = queryClient
-              .getQueriesData<EventIndex>({
-                queryKey: trpc.event.search.queryKey()
-              })
-              .flatMap(([, data]) => data)
-              .filter((event): event is EventIndex => Boolean(event))
-              .filter((e) => e.id === id)
-
-            return list.length === 0 ? undefined : list
+            const eventIndex = findLocalEventIndex(id)
+            return eventIndex ? [eventIndex] : undefined
           }
         })
       },
@@ -86,15 +80,8 @@ export function useEvents() {
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
           initialData: () => {
-            const list = queryClient
-              .getQueriesData<EventIndex>({
-                queryKey: trpc.event.search.queryKey()
-              })
-              .flatMap(([, data]) => data)
-              .filter((event): event is EventIndex => Boolean(event))
-              .filter((e) => e.id === id)
-
-            return list.length === 0 ? undefined : list
+            const eventIndex = findLocalEventIndex(id)
+            return eventIndex ? [eventIndex] : undefined
           }
         }).data
       }

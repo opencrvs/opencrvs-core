@@ -28,6 +28,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 import {
   cleanUpOnUnassign,
   findLocalEventDocument,
+  findLocalEventIndex,
   onAssign,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
@@ -283,7 +284,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
   function getMutationPayload(params: ActionMutationInput) {
     const { eventId } = params
-    const localEvent = findLocalEventDocument(eventId)
+    const localEvent = findLocalEventIndex(eventId)
 
     const eventConfiguration = eventConfigurations.find(
       (event) => event.id === localEvent?.type

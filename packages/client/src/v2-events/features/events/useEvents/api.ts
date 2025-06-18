@@ -40,6 +40,16 @@ export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
   )
 }
 
+export function findLocalEventIndex(id: string) {
+  return queryClient
+    .getQueriesData<EventIndex>({
+      queryKey: trpcOptionsProxy.event.search.queryKey()
+    })
+    .flatMap(([, data]) => data)
+    .filter((event): event is EventIndex => Boolean(event))
+    .find((e) => e.id === id)
+}
+
 export function updateLocalEventIndex(updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
   if (!config) {
