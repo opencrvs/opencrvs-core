@@ -98,14 +98,14 @@ export const Within = z
   })
 
 export const RangeDate = Range.extend({
-  gte: z.string().date(),
-  lte: z.string().date()
+  gte: z.string().date().or(z.string().datetime()),
+  lte: z.string().date().or(z.string().datetime())
 }).openapi({
   ref: 'RangeDate'
 })
 
 export const ExactDate = Exact.extend({
-  term: z.string().date()
+  term: z.string().date().or(z.string().datetime())
 }).openapi({
   ref: 'ExactDate'
 })
