@@ -17,8 +17,8 @@ import {
   UUID
 } from '@opencrvs/commons'
 import { db } from './db'
-import { NewEventActions } from './schema/app/EventActions'
-import { NewEvents } from './schema/app/Events'
+import { EventActions, NewEventActions } from './schema/app/EventActions'
+import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
 async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
@@ -51,13 +51,13 @@ async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return EventDocument.parse(result)
 }
 
-export const getEventById = async (id: UUID) => {
+export const getEventById = (id: UUID) => {
   return db.transaction().execute(async (trx) => {
     return getEventByIdInTrx(id, trx)
   })
 }
 
-export async function deleteEventById(eventId: UUID) {
+export function deleteEventById(eventId: UUID) {
   return db.transaction().execute(async (trx) => {
     await trx
       .deleteFrom('eventActions')
@@ -67,26 +67,21 @@ export async function deleteEventById(eventId: UUID) {
     await trx.deleteFrom('events').where('id', '=', eventId).execute()
   })
 }
-export const createEvent = async ({
-  type,
-  transactionId,
-  trackingId
-}: {
-  type: string
-  transactionId: string
-  trackingId: string
-}) => {
-  const result = await db
+
+async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
+  const result = await trx
     .insertInto('events')
-    .values({
-      eventType: type,
-      transactionId,
-      trackingId
-    })
+    .values(event)
     .returning('id')
     .executeTakeFirstOrThrow()
 
   return { id: result.id }
+}
+
+export const createEvent = (event: Parameters<typeof createEventInTrx>[0]) => {
+  return db.transaction().execute(async (trx) => {
+    return createEventInTrx(event, trx)
+  })
 }
 
 /**
@@ -95,11 +90,7 @@ export const createEvent = async ({
  * @returns action id
  */
 async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
-  await trx
-    .insertInto('eventActions')
-    .values(action)
-    .onConflict((oc) => oc.columns(['transactionId', 'actionType']).doNothing())
-    .execute()
+  await trx.insertInto('eventActions').values(action).execute()
 
   return trx
     .selectFrom('eventActions')
@@ -109,7 +100,7 @@ async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
     .executeTakeFirstOrThrow()
 }
 
-export const createAction = async (action: NewEventActions) => {
+export const createAction = (action: NewEventActions) => {
   return db.transaction().execute(async (trx) => {
     return createActionInTrx(action, trx)
   })
@@ -216,7 +207,7 @@ async function getOrCreateEventAndAssignInTrx(
   return getEventByIdInTrx(newId, trx)
 }
 
-export const getOrCreateEvent = async (
+export const getOrCreateEvent = (
   input: Parameters<typeof getOrCreateEventInTrx>[0]
 ) => {
   return db.transaction().execute(async (trx) => {
@@ -224,10 +215,25 @@ export const getOrCreateEvent = async (
   })
 }
 
-export const getOrCreateEventAndAssign = async (
+export const getOrCreateEventAndAssign = (
   input: Parameters<typeof getOrCreateEventAndAssignInTrx>[0]
 ) => {
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventAndAssignInTrx(input, trx)
+  })
+}
+
+export const createEventWithActions = (
+  event: Events,
+  actions: Array<Omit<EventActions, 'eventId'>>
+) => {
+  return db.transaction().execute(async (trx) => {
+    const { id: eventId } = await createEventInTrx(event, trx)
+
+    for (const action of actions) {
+      await createActionInTrx({ ...action, eventId }, trx)
+    }
+
+    return getEventByIdInTrx(eventId, trx)
   })
 }
