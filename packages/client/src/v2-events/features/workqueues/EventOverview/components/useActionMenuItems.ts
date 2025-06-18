@@ -236,6 +236,12 @@ const ACTION_OVERRIDES = {
   [ActionType.DECLARE]: ActionType.VALIDATE
 } satisfies Partial<Record<ActionType, ActionType>>
 
+function actionHasOverride(
+  action: ActionType
+): action is keyof typeof ACTION_OVERRIDES {
+  return action in ACTION_OVERRIDES
+}
+
 /**
  * Filters out actions that are overridden by other actions based on user scopes.
  *
@@ -249,11 +255,11 @@ const ACTION_OVERRIDES = {
  */
 function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
   return actions.filter((a) => {
-    if (!(a in ACTION_OVERRIDES)) {
+    if (!actionHasOverride(a)) {
       return true
     }
 
-    const overrideAction = ACTION_OVERRIDES[a as keyof typeof ACTION_OVERRIDES]
+    const overrideAction = ACTION_OVERRIDES[a]
     const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
     return !hasAnyOfScopes(scopes, overrideActionScopes)
   })
