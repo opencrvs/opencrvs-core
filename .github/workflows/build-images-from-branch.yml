@@ -125,6 +125,7 @@ jobs:
         service: ${{ fromJSON(needs.base.outputs.services) }}
         exclude:
           # metabase/metabase:v0.50.30.1 doesn't support arm arch
+          # https://discourse.metabase.com/t/install-with-docker-on-arm/18501
           - service: 'dashboards'
             runner: 'ubuntu-24.04-arm'
     runs-on: ${{ matrix.runner }}
