@@ -10,7 +10,7 @@
  */
 import { intersection } from 'lodash'
 import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
-import { ActionType, isMetaAction } from './ActionType'
+import { ActionType } from './ActionType'
 
 type RequiresNoScope = null
 type NotAvailableAsAction = [] // pseudo actions
