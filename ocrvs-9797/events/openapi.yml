@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 338e3d63-0719-4473-9885-17e0c8cf9ad8
+                transactionId: ba025480-1656-46a8-ab66-c67e92826de5
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ed75cf59-aa77-4494-b208-6a230054090d
+                transactionId: f3063aab-e9ca-491d-899c-4e1a3b7f9d6a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -620,7 +620,6 @@ paths:
                         required:
                           - id
                           - transactionId
-                          - creator
                           - createdAt
                           - createdBy
                           - createdByRole
@@ -3934,7 +3933,6 @@ components:
                 required:
                   - id
                   - transactionId
-                  - creator
                   - createdAt
                   - createdBy
                   - createdByRole
@@ -4319,7 +4317,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -4658,7 +4655,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -5009,7 +5005,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -5349,7 +5344,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -5700,7 +5694,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -6040,7 +6033,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -6381,7 +6373,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -6720,7 +6711,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -7061,7 +7051,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -7401,7 +7390,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -7742,7 +7730,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -8084,7 +8071,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -8426,7 +8412,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -8766,7 +8751,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -9105,7 +9089,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole

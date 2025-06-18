@@ -3184,7 +3184,6 @@ components:
                 required:
                   - id
                   - transactionId
-                  - creator
                   - createdAt
                   - createdBy
                   - createdByRole
@@ -3581,7 +3580,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -3931,7 +3929,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -4293,7 +4290,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -4644,7 +4640,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -5006,7 +5001,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -5357,7 +5351,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -5709,7 +5702,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -6059,7 +6051,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -6411,7 +6402,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -6762,7 +6752,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -7114,7 +7103,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -7467,7 +7455,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -7820,7 +7807,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -8171,7 +8157,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -8521,7 +8506,6 @@ components:
       required:
         - id
         - transactionId
-        - creator
         - createdAt
         - createdBy
         - createdByRole
@@ -9859,7 +9843,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: bea0c6e9-02ef-4610-b86d-9960177763b8
+        transactionId: 5c958e88-9df1-444e-9db2-c02dd783d181
         declaration: {}
         annotation: {}
         type: NOTIFY
