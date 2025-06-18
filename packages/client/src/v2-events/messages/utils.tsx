@@ -122,6 +122,27 @@ function flattenNestedObject(
 export function useIntlFormatMessageWithFlattenedParams() {
   const intl = useIntl()
 
+  function getDefaultMessage(messageDescriptor: MessageDescriptor): string {
+    const defaultMessage =
+      intl.messages[messageDescriptor.id as keyof typeof intl.messages] ||
+      messageDescriptor.defaultMessage
+    if (typeof defaultMessage !== 'string') {
+      // eslint-disable-next-line no-console
+      console.error(
+        'Message must be a string. Encountered',
+        defaultMessage,
+        'when searching with',
+        messageDescriptor.id
+      )
+      throw new Error('Message must be a string')
+    }
+    return defaultMessage
+  }
+
+  function variablesUsed(message: string): string[] {
+    return parse(message).flatMap(getVariablesFromElement)
+  }
+
   function formatMessage<T extends {}>(
     message: MessageDescriptor,
     params?: T
@@ -130,25 +151,8 @@ export function useIntlFormatMessageWithFlattenedParams() {
     const flattenedParams = flattenNestedObject(params ?? {})
     const variables = convertDotToTripleUnderscore(flattenedParams)
 
-    const originalMessage =
-      intl.messages[message.id as keyof typeof intl.messages] ||
-      message.defaultMessage
-
-    if (typeof originalMessage !== 'string') {
-      // eslint-disable-next-line no-console
-      console.error(
-        'Message must be a string. Encountered',
-        originalMessage,
-        'when searching with',
-        message.id
-      )
-      throw new Error('Message must be a string')
-    }
-
-    const defaultMessage = convertDotInCurlyBraces(originalMessage)
-    const variablesInMessage = parse(defaultMessage).flatMap(
-      getVariablesFromElement
-    )
+    const defaultMessage = convertDotInCurlyBraces(getDefaultMessage(message))
+    const variablesInMessage = variablesUsed(defaultMessage)
     const variablesWithEmptyValues = Object.fromEntries(
       variablesInMessage.map((variable) => [variable, EMPTY_TOKEN])
     )
@@ -166,6 +170,8 @@ export function useIntlFormatMessageWithFlattenedParams() {
 
   return {
     ...intl,
-    formatMessage
+    formatMessage,
+    variablesUsed: (message: MessageDescriptor) =>
+      variablesUsed(getDefaultMessage(message))
   }
 }
