@@ -33,7 +33,10 @@ import {
   TextAreaField,
   TextField,
   NumberField,
-  DataField
+  DataField,
+  NameField,
+  PhoneField,
+  IdField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -53,7 +56,9 @@ import {
   AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  AddressType
+  AddressType,
+  NameFieldValue,
+  NameFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -100,6 +105,8 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.ADMINISTRATIVE_AREA:
     case FieldType.FACILITY:
     case FieldType.OFFICE:
+    case FieldType.PHONE:
+    case FieldType.ID:
       schema = required ? NonEmptyTextValue : TextValue
       break
     case FieldType.NUMBER:
@@ -121,6 +128,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.DATA:
       schema = DataFieldValue
       break
+    case FieldType.NAME:
+      schema = required ? NameFieldValue : NameFieldUpdateValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -137,62 +147,6 @@ export function createValidationSchema(config: FieldConfig[]) {
   }
 
   return z.object(shape)
-}
-
-/**
- * Quick-and-dirty mock data generator for event actions.
- */
-export function mapFieldTypeToMockValue(field: FieldConfig, i: number) {
-  switch (field.type) {
-    case FieldType.DIVIDER:
-    case FieldType.TEXT:
-    case FieldType.TEXTAREA:
-    case FieldType.BULLET_LIST:
-    case FieldType.PAGE_HEADER:
-    case FieldType.LOCATION:
-    case FieldType.SELECT:
-    case FieldType.COUNTRY:
-    case FieldType.RADIO_GROUP:
-    case FieldType.PARAGRAPH:
-    case FieldType.ADMINISTRATIVE_AREA:
-    case FieldType.FACILITY:
-    case FieldType.OFFICE:
-      return `${field.id}-${field.type}-${i}`
-    case FieldType.NUMBER:
-      return 19
-    case FieldType.EMAIL:
-      return 'test@opencrvs.org'
-    case FieldType.ADDRESS:
-      return {
-        country: 'FAR',
-        addressType: AddressType.DOMESTIC,
-        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-        urbanOrRural: 'URBAN',
-        town: 'Example Town',
-        residentialArea: 'Example Residential Area',
-        street: 'Example Street',
-        number: '55',
-        zipCode: '123456'
-      }
-    case FieldType.DATE:
-      return '2021-01-01'
-    case FieldType.DATE_RANGE:
-      return ['2021-01-01', '2021-01-02']
-    case FieldType.CHECKBOX:
-      return true
-    case FieldType.SIGNATURE:
-    case FieldType.FILE:
-      return {
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
-        originalFilename: 'abcd.png',
-        type: 'image/png'
-      } satisfies FileFieldValue
-    case FieldType.FILE_WITH_OPTIONS:
-      return null
-    case FieldType.DATA:
-      return {}
-  }
 }
 
 /**
@@ -219,6 +173,9 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.DATA:
+    case FieldType.NAME:
+    case FieldType.PHONE:
+    case FieldType.ID:
       return null
     case FieldType.ADDRESS:
       return {
@@ -285,6 +242,27 @@ export const isNumberFieldType = (field: {
   value: FieldValue
 }): field is { value: number; config: NumberField } => {
   return field.config.type === FieldType.NUMBER
+}
+
+export const isNameFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: NameFieldValue; config: NameField } => {
+  return field.config.type === FieldType.NAME
+}
+
+export const isPhoneFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: PhoneField } => {
+  return field.config.type === FieldType.PHONE
+}
+
+export const isIdFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: IdField } => {
+  return field.config.type === FieldType.ID
 }
 
 export const isTextAreaFieldType = (field: {

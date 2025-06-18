@@ -39,7 +39,6 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   ActionConfig,
@@ -171,8 +170,8 @@ const messages = defineMessages(searchResultMessages)
 
 interface Props {
   columns: WorkqueueColumn[]
-  eventConfig: EventConfig
-  searchParams: EventState
+  eventConfigs: EventConfig[]
+  searchParams?: EventState
   queryData: EventIndex[]
 }
 
@@ -431,32 +430,5 @@ export const SearchResultComponent = ({
         />
       </WQContentWrapper>
     </WithTestId>
-  )
-}
-export const SearchResult = ({
-  columns,
-  eventConfig,
-  searchParams,
-  queryData
-}: Props) => {
-  const intl = useIntl()
-  const total = queryData.length
-
-  return (
-    <SearchResultComponent
-      actions={[WorkqueueActionsWithDefault.Values.DEFAULT]}
-      columns={columns}
-      eventConfigs={[eventConfig]}
-      queryData={queryData}
-      tabBarContent={
-        <SearchCriteriaPanel
-          eventConfig={eventConfig}
-          searchParams={searchParams}
-        />
-      }
-      title={`${intl.formatMessage(messages.searchResult)} ${
-        ' (' + total + ')'
-      }`}
-    />
   )
 }

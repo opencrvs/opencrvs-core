@@ -19,30 +19,17 @@ import { CreatedAtLocation } from './CreatedAtLocation'
 /**
  * Event statuses recognized by the system
  */
-export const EventStatus = {
-  CREATED: 'CREATED',
-  NOTIFIED: 'NOTIFIED',
-  DECLARED: 'DECLARED',
-  VALIDATED: 'VALIDATED',
-  REGISTERED: 'REGISTERED',
-  CERTIFIED: 'CERTIFIED',
-  REJECTED: 'REJECTED',
-  ARCHIVED: 'ARCHIVED'
-} as const
-export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
-
-const eventStatusValues = [
-  EventStatus.CREATED,
-  EventStatus.NOTIFIED,
-  EventStatus.DECLARED,
-  EventStatus.VALIDATED,
-  EventStatus.REGISTERED,
-  EventStatus.CERTIFIED,
-  EventStatus.REJECTED,
-  EventStatus.ARCHIVED
-] as const
-
-export const EventStatusEnum = z.enum(eventStatusValues)
+export const EventStatus = z.enum([
+  'CREATED',
+  'NOTIFIED',
+  'DECLARED',
+  'VALIDATED',
+  'REGISTERED',
+  'CERTIFIED',
+  'REJECTED',
+  'ARCHIVED'
+])
+export type EventStatus = z.infer<typeof EventStatus>
 
 export const CustomFlags = {
   CERTIFICATE_PRINTED: 'certificate-printed'
@@ -64,9 +51,6 @@ export const Flag = z
   .or(z.nativeEnum(CustomFlags))
 
 export type Flag = z.infer<typeof Flag>
-
-export const eventStatuses = Object.values(EventStatus)
-export const EventStatuses = z.nativeEnum(EventStatus)
 
 export const ZodDate = z.string().date()
 
@@ -110,8 +94,8 @@ export type RegistrationCreationMetadata = z.infer<
 
 // @TODO: In the future REVOKE should be added to the list of statuses
 export const LegalStatuses = z.object({
-  [EventStatus.DECLARED]: ActionCreationMetadata.nullish(),
-  [EventStatus.REGISTERED]: RegistrationCreationMetadata.nullish()
+  [EventStatus.enum.DECLARED]: ActionCreationMetadata.nullish(),
+  [EventStatus.enum.REGISTERED]: RegistrationCreationMetadata.nullish()
 })
 
 /**
@@ -124,7 +108,7 @@ export const EventMetadata = z.object({
   type: z
     .string()
     .describe('The type of event, such as birth, death, or marriage.'),
-  status: EventStatuses,
+  status: EventStatus,
   legalStatuses: LegalStatuses.describe(
     'Metadata related to the legal registration of the event, such as who registered it and when.'
   ),

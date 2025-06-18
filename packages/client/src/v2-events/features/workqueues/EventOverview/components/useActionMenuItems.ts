@@ -61,18 +61,18 @@ function getUserActionsByStatus(
   userScopes: Scope[]
 ): ActionType[] {
   switch (status) {
-    case EventStatus.CREATED: {
+    case EventStatus.enum.CREATED: {
       return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
     }
-    case EventStatus.NOTIFIED:
-    case EventStatus.DECLARED: {
+    case EventStatus.enum.NOTIFIED:
+    case EventStatus.enum.DECLARED: {
       return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
     }
-    case EventStatus.VALIDATED: {
+    case EventStatus.enum.VALIDATED: {
       return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
     }
-    case EventStatus.CERTIFIED:
-    case EventStatus.REGISTERED: {
+    case EventStatus.enum.CERTIFIED:
+    case EventStatus.enum.REGISTERED: {
       return [
         ...assignmentActions,
         ActionType.READ,
@@ -80,7 +80,7 @@ function getUserActionsByStatus(
         ActionType.REQUEST_CORRECTION
       ]
     }
-    case EventStatus.REJECTED: {
+    case EventStatus.enum.REJECTED: {
       const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
       const canValidate = hasAnyOfScopes(userScopes, validateScopes)
 
@@ -94,7 +94,7 @@ function getUserActionsByStatus(
       return [...assignmentActions, ActionType.READ, declarationAction]
     }
 
-    case EventStatus.ARCHIVED:
+    case EventStatus.enum.ARCHIVED:
       return [...assignmentActions, ActionType.READ]
     default:
       return [ActionType.READ]
