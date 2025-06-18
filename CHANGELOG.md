@@ -7,7 +7,6 @@
 - **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
 - Build OpenCRVS release images for arm devices [#9455](https://github.com/opencrvs/opencrvs-core/issues/9455)
 
-
 ### Bug fixes
 - When the building the graphql payload from form data, we now check if a field was changed. If so then include it in the payload even if it might have been changed to an empty value.[#9369](https://github.com/opencrvs/opencrvs-core/issues/9369)
 
@@ -17,6 +16,9 @@
 - **Github runners upgraded** to latest Ubuntu LTS release 24.04 [#7045](https://github.com/opencrvs/opencrvs-core/issues/7045)
 - **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
 - **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
+- **`GH_TOKEN` secret is deprecated** and replaced with `GITHUB_GHCR_PUBLISH_TOKEN` and `E2E_WORKFLOWS_TOKEN` secrets. `GH_TOKEN` secret was widely used within workflows for manipulations with PRs and triggering e2e and deploy workflows in Country config template repositories. We segregated tokens with more restricted access. Please create following secrets in your repository:
+  - Secret `GITHUB_GHCR_PUBLISH_TOKEN` is classic token with permissions `repo, write:packages`. Required to build and push OpenCRVS Core images.
+  - Secret `E2E_WORKFLOWS_TOKEN` is fine-grained token scoped to your fork of country config template repository with permissions `Contents: Read and Write`.
 
 ## 1.7.2
 

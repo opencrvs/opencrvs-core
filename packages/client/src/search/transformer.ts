@@ -79,6 +79,7 @@ export const transformData = (
             : EMPTY_STRING
           dateOfEvent = deathReg && deathReg.dateOfDeath
         } else if (isMarriageEvent(reg)) {
+          marriageReg = reg
           groomName = reg.groomName
             ? getLocalisedName(intl, reg.groomName[0] as HumanName)
             : EMPTY_STRING
@@ -91,7 +92,7 @@ export const transformData = (
               ? `${groomName} & ${brideName}`
               : brideName || groomName || EMPTY_STRING
 
-          dateOfEvent = marriageReg && reg.dateOfMarriage
+          dateOfEvent = marriageReg.dateOfMarriage
         }
       }
       const status =
