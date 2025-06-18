@@ -312,21 +312,20 @@ export function useActionMenuItems(event: EventIndex) {
   const scopes = useSelector(getScope) ?? []
   const { config, authentication } = useAction(event)
 
-  const availableActionsByStatus =
-    AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
-
   const availableAssignmentActions = getAvailableAssignmentActions(
     event.status,
     getAssignmentStatus(event, authentication.sub),
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
-  const availableActions = [
-    ...availableAssignmentActions,
-    ...filterOverriddenActions(availableActionsByStatus, scopes)
-  ]
+  const availableActions = filterOverriddenActions(
+    AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status],
+    scopes
+  )
 
-  const allowedActions = filterUnallowedActions(availableActions, scopes)
+  const actions = [...availableAssignmentActions, ...availableActions]
+
+  const allowedActions = filterUnallowedActions(actions, scopes)
   return allowedActions
     .filter((action): action is keyof typeof config =>
       Object.keys(config).includes(action)
