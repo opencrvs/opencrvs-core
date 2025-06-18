@@ -263,6 +263,18 @@ function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
   })
 }
 
+/**
+ * Filters out actions that the user is not allowed to perform based on their scopes.
+ *
+ * This function checks each action against the user's scopes to determine if they
+ * have the necessary permissions to perform that action. If the user can only perform
+ * meta actions (READ, ASSIGN, UNASSIGN), they are restricted to only READ to prevent
+ * assignment operations when they lack other permissions.
+ *
+ * @param actions - Array of action types to check for permissions
+ * @param userScopes - Array of user scopes to validate against
+ * @returns Filtered array of actions that the user is allowed to perform
+ */
 function filterUnallowedActions(
   actions: ActionType[],
   userScopes: Scope[]
