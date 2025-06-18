@@ -15,101 +15,87 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  SummaryConfig,
   getMixedPath
 } from '@opencrvs/commons/client'
-import { FieldValue, TranslationConfig } from '@opencrvs/commons/client'
+import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
-/**
- * @returns default fields for the event summary
- */
-function getDefaultFields(
-  eventLabel: TranslationConfig
-): SummaryConfig['fields'] {
-  return [
-    {
-      id: 'assignedTo',
-      label: {
-        id: 'v2.event.summary.assignedTo.label',
-        defaultMessage: 'Assigned to',
-        description: 'Assigned to label'
-      },
-      value: {
-        id: 'v2.event.summary.assignedTo.value',
-        defaultMessage: '{event.assignedTo}',
-        description: 'Assigned to value'
-      },
-      emptyValueMessage: {
-        id: 'v2.event.summary.assignedTo.empty',
-        defaultMessage: 'Not assigned',
-        description: 'Not assigned message'
-      }
+const messages = {
+  assignedTo: {
+    label: {
+      id: 'v2.event.summary.assignedTo.label',
+      defaultMessage: 'Assigned to',
+      description: 'Assigned to label'
     },
-    {
-      id: 'status',
-      label: {
-        id: 'v2.event.summary.status.label',
-        defaultMessage: 'Status',
-        description: 'Status of the event'
-      },
-      value: {
-        id: 'v2.event.summary.status.value',
-        defaultMessage:
-          '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
-        description: 'Status of the event'
-      }
+    value: {
+      id: 'v2.event.summary.assignedTo.value',
+      defaultMessage: '{event.assignedTo}',
+      description: 'Assigned to value'
     },
-    {
-      id: 'event',
-      label: {
-        id: 'v2.event.summary.event.label',
-        defaultMessage: 'Event',
-        description: 'Event label'
-      },
-      value: eventLabel
-    },
-    {
-      id: 'tracking-id',
-      label: {
-        id: 'v2.event.summary.trackingId.label',
-        defaultMessage: 'Tracking ID',
-        description: 'Tracking id label'
-      },
-      emptyValueMessage: {
-        id: 'v2.event.summary.trackingId.empty',
-        defaultMessage: 'No tracking ID',
-        description: 'No tracking ID message'
-      },
-      value: {
-        id: 'v2.event.summary.trackingId.value',
-        defaultMessage: '{event.trackingId}',
-        description: 'Tracking id value'
-      }
-    },
-    {
-      id: 'registrationNumber',
-      label: {
-        id: 'v2.event.summary.registrationNumber.label',
-        defaultMessage: 'Registration Number',
-        description: 'Registration Number label'
-      },
-      emptyValueMessage: {
-        id: 'v2.event.summary.registrationNumber.empty',
-        defaultMessage: 'No registration number',
-        description: 'No registration number message'
-      },
-      value: {
-        id: 'v2.event.summary.registrationNumber.value',
-        defaultMessage: '{event.registrationNumber}',
-        description: 'Registration number value'
-      }
+    emptyValueMessage: {
+      id: 'v2.event.summary.assignedTo.empty',
+      defaultMessage: 'Not assigned',
+      description: 'Not assigned message'
     }
-  ]
+  },
+  status: {
+    label: {
+      id: 'v2.event.summary.status.label',
+      defaultMessage: 'Status',
+      description: 'Status of the event'
+    },
+    value: {
+      id: 'v2.event.summary.status.value',
+      defaultMessage:
+        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+      description: 'Status of the event'
+    }
+  },
+  event: {
+    label: {
+      id: 'v2.event.summary.event.label',
+      defaultMessage: 'Event',
+      description: 'Event label'
+    }
+  },
+  trackingId: {
+    label: {
+      id: 'v2.event.summary.trackingId.label',
+      defaultMessage: 'Tracking ID',
+      description: 'Tracking id label'
+    },
+    emptyValueMessage: {
+      id: 'v2.event.summary.trackingId.empty',
+      defaultMessage: 'No tracking ID',
+      description: 'No tracking ID message'
+    },
+    value: {
+      id: 'v2.event.summary.trackingId.value',
+      defaultMessage: '{event.trackingId}',
+      description: 'Tracking id value'
+    }
+  },
+  registrationNumber: {
+    label: {
+      id: 'v2.event.summary.registrationNumber.label',
+      defaultMessage: 'Registration Number',
+      description: 'Registration Number label'
+    },
+    emptyValueMessage: {
+      id: 'v2.event.summary.registrationNumber.empty',
+      defaultMessage: 'No registration number',
+      description: 'No registration number message'
+    },
+    value: {
+      id: 'v2.event.summary.registrationNumber.value',
+      defaultMessage: '{event.registrationNumber}',
+      description: 'Registration number value'
+    }
+  }
 }
 
 export function EventSummary({
@@ -120,12 +106,10 @@ export function EventSummary({
   eventConfiguration: EventConfig
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const { summary, label } = eventConfiguration
-  const defaultFields = getDefaultFields(label)
-  const summaryPageFields = [...defaultFields, ...summary.fields]
+  const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
 
-  const fields = summaryPageFields.map((field) => {
+  const fields = summary.fields.map((field) => {
     if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
       return null
     }
@@ -162,6 +146,45 @@ export function EventSummary({
   return (
     <>
       <Summary id="summary">
+        <Summary.Row
+          key="assignedTo"
+          data-testid="assignedTo"
+          label={intl.formatMessage(messages.assignedTo.label)}
+          placeholder={intl.formatMessage(
+            messages.assignedTo.emptyValueMessage
+          )}
+          value={intl.formatMessage(messages.assignedTo.value, event)}
+        />
+        <Summary.Row
+          key="status"
+          data-testid="status"
+          label={intl.formatMessage(messages.status.label)}
+          value={intl.formatMessage(messages.status.value, event)}
+        />
+        <Summary.Row
+          key="event"
+          data-testid="event"
+          label={intl.formatMessage(messages.event.label)}
+          value={intl.formatMessage(eventLabelMessage)}
+        />
+        <Summary.Row
+          key="tracking-id"
+          data-testid="tracking-id"
+          label={intl.formatMessage(messages.trackingId.label)}
+          placeholder={intl.formatMessage(
+            messages.trackingId.emptyValueMessage
+          )}
+          value={intl.formatMessage(messages.trackingId.value, event)}
+        />
+        <Summary.Row
+          key="registrationNumber"
+          data-testid="registrationNumber"
+          label={intl.formatMessage(messages.registrationNumber.label)}
+          placeholder={intl.formatMessage(
+            messages.registrationNumber.emptyValueMessage
+          )}
+          value={intl.formatMessage(messages.registrationNumber.value, event)}
+        />
         {fields
           .filter((f): f is NonNullable<typeof f> => f !== null)
           .map((field) => (
