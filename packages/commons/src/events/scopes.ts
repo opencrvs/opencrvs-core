@@ -104,29 +104,3 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
 }
-
-export function filterUnallowedActions(
-  actions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  const allowedActions = actions.filter((action) => {
-    const requiredScopes = ACTION_ALLOWED_SCOPES[action]
-
-    if (requiredScopes === null) {
-      return true
-    }
-
-    return hasAnyOfScopes(userScopes, requiredScopes)
-  })
-  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOtherAllowedActions = allowedActions.some(
-    (action) => !isMetaAction(action)
-  )
-
-  if (hasOtherAllowedActions) {
-    return allowedActions
-  }
-
-  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
-  return [ActionType.READ]
-}

@@ -12,7 +12,6 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
-  filterUnallowedActions,
   EventIndex,
   getUUID,
   TranslationConfig,
@@ -21,7 +20,9 @@ import {
   hasAnyOfScopes,
   WorkqueueActionType,
   getAvailableActionsByStatus,
-  EventStatus
+  EventStatus,
+  Scope,
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -237,6 +238,50 @@ const OVERRIDES = {
   [ActionType.DECLARE]: ActionType.VALIDATE
 } satisfies Partial<Record<ActionType, ActionType>>
 
+function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
+  return actions.filter((a) => {
+    // If an action has an override, we need to check if the user has the scopes to perform the override action.
+    // If they do, we don't show the overridden action.
+    if (a in OVERRIDES) {
+      const overrideAction = OVERRIDES[a as keyof typeof OVERRIDES]
+      const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
+
+      if (hasAnyOfScopes(scopes, overrideActionScopes)) {
+        return false
+      }
+    }
+
+    return true
+  })
+}
+
+function filterUnallowedActions(
+  actions: ActionType[],
+  userScopes: Scope[]
+): ActionType[] {
+  const allowedActions = actions.filter((action) => {
+    const requiredScopes = ACTION_ALLOWED_SCOPES[action]
+
+    if (requiredScopes === null) {
+      return true
+    }
+
+    return hasAnyOfScopes(userScopes, requiredScopes)
+  })
+
+  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  const hasOtherAllowedActions = allowedActions.some(
+    (action) => !isMetaAction(action)
+  )
+
+  if (hasOtherAllowedActions) {
+    return allowedActions
+  }
+
+  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
+  return [ActionType.READ]
+}
+
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
@@ -246,23 +291,6 @@ export function useActionMenuItems(event: EventIndex) {
 
   const availableActionsByStatus = getAvailableActionsByStatus(event.status)
 
-  const availableActionsWithoutOverrides = availableActionsByStatus.filter(
-    (a) => {
-      // If an action has an override, we need to check if the user has the scopes to perform the override action.
-      // If they do, we don't show the overridden action.
-      if (a in OVERRIDES) {
-        const overrideAction = OVERRIDES[a as keyof typeof OVERRIDES]
-        const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
-
-        if (hasAnyOfScopes(scopes, overrideActionScopes)) {
-          return false
-        }
-      }
-
-      return true
-    }
-  )
-
   const availableAssignmentActions = getAvailableAssignmentActions(
     event.status,
     getAssignmentStatus(event, authentication.sub),
@@ -271,7 +299,7 @@ export function useActionMenuItems(event: EventIndex) {
 
   const availableActions = [
     ...availableAssignmentActions,
-    ...availableActionsWithoutOverrides
+    ...filterOverriddenActions(availableActionsByStatus, scopes)
   ]
 
   const allowedActions = filterUnallowedActions(availableActions, scopes)
