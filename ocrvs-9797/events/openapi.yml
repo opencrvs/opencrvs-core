@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: add151c9-277c-4b7e-9cc9-973e8adfd78c
+                transactionId: a60e03a8-f7b5-4218-b9c2-64fe3c5215df
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 51e886da-1896-4f1c-9947-4359ee8ad8b6
+                transactionId: 151ac472-9972-4bd0-8e19-9fd32e50b355
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9999,9 +9999,11 @@ components:
                   description: Location of the user who created the action request.
                 creator:
                   type: string
-                  enum: &a13
+                  nullable: true
+                  enum:
                     - user
                     - system
+                    - null
                   description: Whether the user us a normal user or a system.
                 acceptedAt:
                   type: string
@@ -10017,7 +10019,6 @@ components:
               required:
                 - createdAt
                 - createdBy
-                - creator
                 - acceptedAt
                 - createdByRole
             REGISTERED:
@@ -10037,7 +10038,11 @@ components:
                   description: Location of the user who created the action request.
                 creator:
                   type: string
-                  enum: *a13
+                  nullable: true
+                  enum:
+                    - user
+                    - system
+                    - null
                   description: Whether the user us a normal user or a system.
                 acceptedAt:
                   type: string
@@ -10057,7 +10062,6 @@ components:
               required:
                 - createdAt
                 - createdBy
-                - creator
                 - acceptedAt
                 - createdByRole
                 - registrationNumber
@@ -10076,9 +10080,11 @@ components:
           description: ID of the user who created the event.
         creator:
           type: string
+          nullable: true
           enum:
             - user
             - system
+            - null
           description: Whether the user us a normal user or a system.
         updatedByUserRole:
           type: string
@@ -10290,7 +10296,6 @@ components:
         - legalStatuses
         - createdAt
         - createdBy
-        - creator
         - updatedByUserRole
         - updatedAt
         - trackingId
