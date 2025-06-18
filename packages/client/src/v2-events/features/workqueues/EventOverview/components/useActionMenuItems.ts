@@ -19,7 +19,7 @@ import {
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
   WorkqueueActionType,
-  getAvailableActionsByStatus,
+  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
   EventStatus,
   Scope,
   isMetaAction
@@ -312,7 +312,8 @@ export function useActionMenuItems(event: EventIndex) {
   const scopes = useSelector(getScope) ?? []
   const { config, authentication } = useAction(event)
 
-  const availableActionsByStatus = getAvailableActionsByStatus(event.status)
+  const availableActionsByStatus =
+    AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
 
   const availableAssignmentActions = getAvailableAssignmentActions(
     event.status,
