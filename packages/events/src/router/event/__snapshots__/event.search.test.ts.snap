@@ -247,8 +247,6 @@ exports[`Returns relevant events in right order 3`] = `
 ]
 `;
 
-exports[`Throws error without proper scope 1`] = `[TRPCError: FORBIDDEN]`;
-
 exports[`Throws when date field is invalid 1`] = `
 [TRPCError: [
   {
@@ -305,22 +303,6 @@ exports[`Throws when searching with empty clauses 1`] = `
     "message": "At least one clause is required.",
     "path": [
       "clauses"
-    ]
-  }
-]]
-`;
-
-exports[`Throws when searching with invalid date field 1`] = `
-[TRPCError: [
-  {
-    "code": "invalid_string",
-    "validation": "date",
-    "message": "Invalid date",
-    "path": [
-      "clauses",
-      0,
-      "updatedAt",
-      "gte"
     ]
   }
 ]]

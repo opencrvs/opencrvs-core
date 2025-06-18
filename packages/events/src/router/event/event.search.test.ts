@@ -73,7 +73,7 @@ test('Throws error without proper scope', async () => {
         }
       ]
     })
-  ).rejects.toMatchSnapshot()
+  ).rejects.toThrowError('FORBIDDEN')
 })
 
 test('Returns empty list when no events match search criteria', async () => {
@@ -183,26 +183,6 @@ test('Throws when date field is invalid', async () => {
 })
 
 test('Throws when one of the date range fields has invalid date', async () => {
-  const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
-
-  await expect(
-    client.event.search({
-      type: 'and',
-      clauses: [
-        {
-          updatedAt: {
-            type: 'range',
-            gte: 'invalid-date',
-            lte: '2023-01-01'
-          }
-        }
-      ]
-    })
-  ).rejects.toMatchSnapshot()
-})
-
-test('Throws when searching with invalid date field', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
 
