@@ -77,7 +77,7 @@ export function setEventData(id: string, data: EventDocument) {
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
 }
 
-function deleteEventData(id: string) {
+export function deleteEventData(id: string) {
   queryClient.removeQueries({
     queryKey: trpcOptionsProxy.event.get.queryKey(id)
   })

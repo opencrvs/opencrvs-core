@@ -30,6 +30,12 @@ import {
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import {
+  setEventData,
+  deleteEventData,
+  setLocalEventConfig
+} from '@client/v2-events/features/events/useEvents/api'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useActionMenuItems'
 
@@ -194,6 +200,7 @@ export const getHiddenActions = () =>
 
 export interface Scenario {
   name: string
+  recordDownloaded: boolean
   actions: (keyof typeof mockActions)[]
   expected: Record<ActionType, AssertType>
 }
@@ -203,7 +210,8 @@ export function createStoriesFromScenarios(
   role: UserRoles
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
-    (acc, { name, actions, expected }) => {
+    (acc, { name, actions, expected, recordDownloaded }) => {
+      const event = getMockEvent(actions, role)
       acc[name] = {
         loaders: [
           async () => {
@@ -232,10 +240,7 @@ export function createStoriesFromScenarios(
             handlers: {
               event: [
                 tRPCMsw.event.search.query(() => [
-                  getCurrentEventState(
-                    getMockEvent(actions, role),
-                    tennisClubMembershipEvent
-                  )
+                  getCurrentEventState(event, tennisClubMembershipEvent)
                 ])
               ]
             }
@@ -243,9 +248,18 @@ export function createStoriesFromScenarios(
         },
         render: () => (
           <React.Suspense fallback={<span>{'Loading…'}</span>}>
-            <ActionMenu eventId="some-event" />
+            <ActionMenu eventId={event.id} />
           </React.Suspense>
         ),
+        beforeEach: () => {
+          /*
+           * Ensure record is "downloaded offline" in th user's browser
+           */
+          if (recordDownloaded) {
+            setLocalEventConfig(tennisClubMembershipEvent)
+            setEventData(event.id, event)
+          }
+        },
         play: async () => {
           const actionButton = await screen.findByRole('button', {
             name: 'Action'

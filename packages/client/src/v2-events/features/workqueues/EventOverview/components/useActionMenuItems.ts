@@ -288,6 +288,7 @@ export function useActionMenuItems(event: EventIndex) {
   )
 
   const allowedActions = filterUnallowedActions(availableActions, scopes)
+
   return allowedActions
     .filter((action): action is keyof typeof config =>
       Object.keys(config).includes(action)

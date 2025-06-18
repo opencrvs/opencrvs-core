@@ -38,6 +38,7 @@ export function ActionMenu({
   const eventIndex = eventResults[0]
 
   const eventState = eventIndex
+
   const actionMenuItems = useActionMenuItems(eventState)
 
   return (
