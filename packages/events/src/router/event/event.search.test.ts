@@ -263,6 +263,7 @@ test('Returns events based on the updatedAt column', async () => {
     type: 'and',
     clauses: [
       {
+        // updatedAt changes are triggered by certain status changes, in which CREATED is included.  See up-to-date definition for updatedAt in EventMetadata.ts.
         updatedAt: {
           type: 'range',
           gte: '2022-01-01',

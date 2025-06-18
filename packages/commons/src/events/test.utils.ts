@@ -590,8 +590,7 @@ export function generateActionDocument({
   configuration,
   action,
   rng = () => 0.1,
-  defaults = {},
-  user = {}
+  defaults = {}
 }: {
   configuration: EventConfig
   action: ActionType
@@ -608,11 +607,10 @@ export function generateActionDocument({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: user.id ?? getUUID(),
-    createdByRole: user.role ?? TestUserRole.Enum.FIELD_AGENT,
+    createdBy: getUUID(),
+    createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
-    createdAtLocation:
-      user.primaryOfficeId ?? 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     declaration: generateActionDeclarationInput(configuration, action, rng),
     annotation: {},
     status: ActionStatus.Accepted,
