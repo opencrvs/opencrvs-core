@@ -54,6 +54,21 @@ import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { FieldType } from './FieldType'
 import { AddressType, FileFieldValue } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
+import { z } from 'zod'
+
+/**
+ * In real application, the roles are defined in the countryconfig.
+ * These are just for testing purposes to generate realistic mock data.
+ */
+export const TestUserRole = z.enum([
+  'FIELD_AGENT',
+  'LOCAL_REGISTRAR',
+  'LOCAL_SYSTEM_ADMIN',
+  'NATIONAL_REGISTRAR',
+  'REGISTRATION_AGENT'
+])
+
+export type TestUserRole = z.infer<typeof TestUserRole>
 
 function pickRandom<T>(rng: () => number, items: T[]): T {
   return items[Math.floor(rng() * items.length)]
@@ -575,21 +590,29 @@ export function generateActionDocument({
   configuration,
   action,
   rng = () => 0.1,
-  defaults = {}
+  defaults = {},
+  user = {}
 }: {
   configuration: EventConfig
   action: ActionType
   rng?: () => number
   defaults?: Partial<ActionDocument>
+  user?: Partial<{
+    signature: string
+    primaryOfficeId: string
+    role: TestUserRole
+    id: string
+  }>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: getUUID(),
-    createdByRole: 'FIELD_AGENT',
+    createdBy: user.id ?? getUUID(),
+    createdByRole: user.role ?? TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    createdAtLocation:
+      user.primaryOfficeId ?? 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
     declaration: generateActionDeclarationInput(configuration, action, rng),
     annotation: {},
     status: ActionStatus.Accepted,
