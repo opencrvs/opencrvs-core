@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: b1208491-f10f-4ee5-b1bd-97e9505d0e34
+                transactionId: 8ef2f34f-c773-4afa-8f1e-1b89e963ac5f
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 00e989bc-eb65-4450-9411-0b7e3d94ca3e
+                transactionId: be699df9-4274-4d5d-8af1-2dd9f3e2594c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9832,8 +9832,11 @@ components:
           enum:
             - exact
         term:
-          type: string
-          format: date
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - term
@@ -9860,11 +9863,17 @@ components:
           enum:
             - range
         gte:
-          type: string
-          format: date
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
         lte:
-          type: string
-          format: date
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - gte
