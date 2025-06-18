@@ -101,13 +101,13 @@ export const RangeDate = Range.extend({
   gte: z.string().date(),
   lte: z.string().date()
 }).openapi({
-  ref: 'DateRange'
+  ref: 'RangeDate'
 })
 
 export const ExactDate = Exact.extend({
   term: z.string().date()
 }).openapi({
-  ref: 'DateRange'
+  ref: 'ExactDate'
 })
 
 export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
