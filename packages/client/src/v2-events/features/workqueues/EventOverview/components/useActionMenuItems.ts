@@ -260,6 +260,11 @@ function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
     }
 
     const overrideAction = ACTION_OVERRIDES[a]
+
+    if (!actions.includes(overrideAction)) {
+      return true
+    }
+
     const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
     return !hasAnyOfScopes(scopes, overrideActionScopes)
   })
