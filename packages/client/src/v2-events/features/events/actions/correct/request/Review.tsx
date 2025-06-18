@@ -34,26 +34,25 @@ export function Review() {
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.VALIDATE.REVIEW
   )
-  const events = useEvents()
   const intl = useIntl()
   const navigate = useNavigate()
+  const events = useEvents()
 
   const event = events.getEventState.useSuspenseQuery(eventId)
-
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const formConfig = getDeclaration(config)
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const formConfig = getDeclaration(eventConfiguration)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-
   const form = getFormValues()
 
   const previousFormValues = event.declaration
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => !isEqual(previousFormValues[key], value)
   )
+
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
-  const actionConfig = config.actions.find(
+  const actionConfig = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 

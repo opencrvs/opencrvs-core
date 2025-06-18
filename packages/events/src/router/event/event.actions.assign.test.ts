@@ -36,7 +36,7 @@ test(`Should add an ${ActionType.ASSIGN} action when last action is not ${Action
   expect(sanitizeForSnapshot(response, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
 })
 
-test(`Should not add any new actions when assigned to the same user`, async () => {
+test('Should not add any new actions when assigned to the same user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -66,7 +66,7 @@ test(`Should not add any new actions when assigned to the same user`, async () =
   ])
 })
 
-test(`Should throw error when assigned to a different user`, async () => {
+test('Should throw error when assigned to a different user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -78,3 +78,30 @@ test(`Should throw error when assigned to a different user`, async () => {
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'CONFLICT' }))
 })
+
+// @TODO CIHAN: implement the logic for this test
+test.todo(
+  'Should not allow assignment if the event is waiting for correction and the current user is not allowed to correct',
+  async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const originalEvent = await client.event.create(generator.event.create())
+
+    await client.event.actions.correction.request(
+      generator.event.actions.correction.request(originalEvent.id)
+    )
+
+    await client.event.actions.assignment.assign(
+      generator.event.actions.assign(originalEvent.id, { assignedTo: user.id })
+    )
+
+    await expect(
+      client.event.actions.assignment.assign(
+        generator.event.actions.assign(originalEvent.id, {
+          assignedTo: 'user-2'
+        })
+      )
+    ).rejects.toMatchObject(new TRPCError({ code: 'CONFLICT' }))
+  }
+)

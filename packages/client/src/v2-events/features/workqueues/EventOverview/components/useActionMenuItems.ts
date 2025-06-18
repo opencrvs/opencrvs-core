@@ -21,6 +21,7 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
+  CustomFlags,
   WorkqueueActionType
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -160,6 +161,7 @@ export const actionLabels = {
 } as const
 
 export function useAction(event: EventIndex) {
+  const scopes = useSelector(getScope) ?? []
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
@@ -181,6 +183,9 @@ export function useAction(event: EventIndex) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
 
+  const eventIsWaitingForCorrection = event.flags.includes(
+    CustomFlags.CORRECTION_REQUESTED
+  )
   const eventId = event.id
 
   /**
@@ -201,7 +206,11 @@ export function useAction(event: EventIndex) {
             assignedTo: authentication.sub,
             refetchEvent
           })
-        }
+        },
+        disabled:
+          // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
+          eventIsWaitingForCorrection &&
+          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
@@ -293,7 +302,7 @@ export function useAction(event: EventIndex) {
             })
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
       }
     } satisfies Record<WorkqueueActionType, ActionConfig>,
     authentication

@@ -31,25 +31,21 @@ const messages = defineMessages({
 })
 
 export function Onboarding() {
-  const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
-
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
-  const events = useEvents()
-  const annotation = useActionAnnotation((state) => state.getAnnotation())
-  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
-
+  const navigate = useNavigate()
   const intl = useIntl()
+  const { goToHome } = useEventFormNavigation()
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const events = useEvents()
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
+  const event = events.getEventState.useSuspenseQuery(eventId)
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
-  const actionConfiguration = configuration.actions.find(
+  const actionConfiguration = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
@@ -89,7 +85,7 @@ export function Onboarding() {
       <PagesComponent
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
         declaration={event.declaration}
-        eventConfig={configuration}
+        eventConfig={eventConfiguration}
         form={annotation}
         formPages={formPages}
         pageId={currentPageId}
@@ -99,16 +95,14 @@ export function Onboarding() {
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId: event.id,
+              eventId,
               pageId: nextPageId
             })
           )
         }}
         onSubmit={() => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-              eventId: event.id
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
           )
         }}
       />
