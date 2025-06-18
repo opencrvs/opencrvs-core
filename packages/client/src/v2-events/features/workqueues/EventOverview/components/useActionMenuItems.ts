@@ -249,17 +249,13 @@ const ACTION_OVERRIDES = {
  */
 function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
   return actions.filter((a) => {
-    if (a in ACTION_OVERRIDES) {
-      const overrideAction =
-        ACTION_OVERRIDES[a as keyof typeof ACTION_OVERRIDES]
-      const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
-
-      if (hasAnyOfScopes(scopes, overrideActionScopes)) {
-        return false
-      }
+    if (!(a in ACTION_OVERRIDES)) {
+      return true
     }
 
-    return true
+    const overrideAction = ACTION_OVERRIDES[a as keyof typeof ACTION_OVERRIDES]
+    const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
+    return !hasAnyOfScopes(scopes, overrideActionScopes)
   })
 }
 
