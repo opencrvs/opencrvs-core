@@ -66,6 +66,7 @@ export const ActionCreationMetadata = z.object({
   ),
   creator: z
     .enum(['user', 'system'])
+    .nullish()
     .describe('Whether the user us a normal user or a system.'),
   acceptedAt: z
     .string()
@@ -122,6 +123,7 @@ export const EventMetadata = z.object({
   createdBy: z.string().describe('ID of the user who created the event.'),
   creator: z
     .enum(['user', 'system'])
+    .nullish()
     .describe('Whether the user us a normal user or a system.'),
   updatedByUserRole: z
     .string()
