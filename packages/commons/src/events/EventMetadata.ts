@@ -127,7 +127,7 @@ export const EventMetadata = z.object({
     .describe('Whether the user is a normal user or a system.'),
   updatedByUserRole: z
     .string()
-    .describe('Role of the user who last updated the declaration.'),
+    .describe('Role of the user who last changed the status.'),
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the event.'
   ),
@@ -138,11 +138,13 @@ export const EventMetadata = z.object({
   updatedAtLocation: z
     .string()
     .nullish()
-    .describe('Location of the user who last updated the declaration.'),
+    .describe('Location of the user who last changed the status.'),
   updatedAt: z
     .string()
     .datetime()
-    .describe('Timestamp of the most recent declaration update.'),
+    .describe(
+      'Timestamp of the most recent *accepted* status change. Possibly 3rd party update, if action is validation asynchronously.'
+    ),
   assignedTo: z
     .string()
     .nullish()
@@ -150,7 +152,7 @@ export const EventMetadata = z.object({
   updatedBy: z
     .string()
     .nullish()
-    .describe('ID of the user who last updated the declaration.'),
+    .describe('ID of the user who last changed the status.'),
   trackingId: z
     .string()
     .describe(

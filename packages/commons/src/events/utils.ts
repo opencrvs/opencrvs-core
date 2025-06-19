@@ -43,6 +43,7 @@ import { getUUID } from '../uuid'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
+import { TokenUserType } from '../authentication'
 
 function isDeclarationActionConfig(
   action: ActionConfig

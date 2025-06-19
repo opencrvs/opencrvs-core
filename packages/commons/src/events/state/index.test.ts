@@ -52,8 +52,12 @@ describe('getCurrentEventState()', () => {
   })
 
   test('legalStatuses are not set when actions are not accepted', () => {
-    const actions = [
-      ActionType.CREATE,
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE
+    })
+
+    const declarationRequestActions = [
       ActionType.DECLARE,
       ActionType.REGISTER
     ].map((action) =>
@@ -65,6 +69,8 @@ describe('getCurrentEventState()', () => {
         }
       })
     )
+
+    const actions = [createAction, ...declarationRequestActions]
 
     const event = {
       trackingId: getUUID(),
@@ -279,7 +285,7 @@ describe('getCurrentEventState()', () => {
       createdBy: createAction.createdBy,
       createdAtLocation: createAction.createdAtLocation,
       createdBySignature: createAction.createdBySignature,
-      updatedAt: registerRequestAction.createdAt,
+      updatedAt: registerAcceptAction.createdAt,
       updatedBy: registerRequestAction.createdBy,
       creator: registerRequestAction.creator,
       id: event.id,

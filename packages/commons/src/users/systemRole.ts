@@ -20,13 +20,3 @@ export const SystemRole = z.enum([
 ])
 
 export type SystemRole = z.infer<typeof SystemRole>
-
-export const UserRole = z.enum([
-  'FIELD_AGENT',
-  'LOCAL_REGISTRAR',
-  'LOCAL_SYSTEM_ADMIN',
-  'NATIONAL_REGISTRAR',
-  'REGISTRATION_AGENT'
-])
-export const TokenUserType = z.enum(['user', 'system'])
-export type TokenUserType = z.infer<typeof TokenUserType>
