@@ -39,14 +39,14 @@ export const ActionStatus = {
 export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
-  id: z.string(),
+  id: UUID,
   transactionId: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdByRole: z.string(),
   createdBySignature: z
     .string()
-    .nullish() // @TODO: Check where the null comes from
+    .nullish()
     .describe('Reference to signature of the user who created the action'),
   createdAtLocation: CreatedAtLocation,
   declaration: ActionUpdate,

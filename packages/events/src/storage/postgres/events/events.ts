@@ -17,8 +17,8 @@ import {
   UUID
 } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import { NewEventActions } from './schema/app/EventActions'
-import { NewEvents } from './schema/app/Events'
+import { EventActions, NewEventActions } from './schema/app/EventActions'
+import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
 async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
@@ -70,28 +70,25 @@ export async function deleteEventById(eventId: UUID) {
     await trx.deleteFrom('events').where('id', '=', eventId).execute()
   })
 }
-export const createEvent = async ({
-  type,
-  transactionId,
-  trackingId
-}: {
-  type: string
-  transactionId: string
-  trackingId: string
-}) => {
-  const db = getClient()
 
-  const result = await db
+async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
+  const result = await trx
     .insertInto('events')
-    .values({
-      eventType: type,
-      transactionId,
-      trackingId
-    })
+    .values(event)
     .returning('id')
     .executeTakeFirstOrThrow()
 
   return { id: result.id }
+}
+
+export const createEvent = async (
+  event: Parameters<typeof createEventInTrx>[0]
+) => {
+  const db = getClient()
+
+  return db.transaction().execute(async (trx) => {
+    return createEventInTrx(event, trx)
+  })
 }
 
 /**
@@ -100,11 +97,7 @@ export const createEvent = async ({
  * @returns action id
  */
 async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
-  await trx
-    .insertInto('eventActions')
-    .values(action)
-    .onConflict((oc) => oc.columns(['transactionId', 'actionType']).doNothing())
-    .execute()
+  await trx.insertInto('eventActions').values(action).execute()
 
   return trx
     .selectFrom('eventActions')
@@ -116,7 +109,6 @@ async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
 
 export const createAction = async (action: NewEventActions) => {
   const db = getClient()
-
   return db.transaction().execute(async (trx) => {
     return createActionInTrx(action, trx)
   })
@@ -240,5 +232,21 @@ export const getOrCreateEventAndAssign = async (
 
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventAndAssignInTrx(input, trx)
+  })
+}
+
+export const createEventWithActions = async (
+  event: Events,
+  actions: Array<Omit<EventActions, 'eventId'>>
+) => {
+  const db = getClient()
+  return db.transaction().execute(async (trx) => {
+    const { id: eventId } = await createEventInTrx(event, trx)
+
+    for (const action of actions) {
+      await createActionInTrx({ ...action, eventId }, trx)
+    }
+
+    return getEventByIdInTrx(eventId, trx)
   })
 }

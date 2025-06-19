@@ -101,7 +101,7 @@ export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
   const eventStatus = getStatusFromActions(event.actions)
 
   // Once an event is declared or notified, it can not be deleted anymore
-  if (eventStatus !== EventStatus.CREATED) {
+  if (eventStatus !== EventStatus.enum.CREATED) {
     throw new TRPCError({
       code: 'BAD_REQUEST',
       message: 'A declared or notified event can not be deleted'
@@ -120,7 +120,7 @@ export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
 const TRACKING_ID_LENGTH = 6
 const TRACKING_ID_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-function generateTrackingId(): string {
+export function generateTrackingId(): string {
   let result = ''
   for (let i = 0; i < TRACKING_ID_LENGTH; i++) {
     const randomIndex = Math.floor(

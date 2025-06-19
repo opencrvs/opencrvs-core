@@ -8,12 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { readFileSync } from 'fs'
 import { join } from 'path'
+import { times, flatten, constant } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import {
-  createPseudoRandomNumberGenerator,
+  ActionType,
+  createPrng,
   generateRandomSignature,
   Scope,
   SCOPES,
@@ -41,7 +42,11 @@ export const UNSTABLE_EVENT_FIELDS = [
   'eventId',
   'createdBy',
   'createdAtLocation',
-  'assignedTo'
+  'assignedTo',
+  'updatedAtLocation',
+  'updatedBy',
+  'acceptedAt',
+  'dateOfEvent'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -155,12 +160,11 @@ export function createTestClient(
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
  */
-export const setupTestCase = async () => {
-  const generator = payloadGenerator()
+export const setupTestCase = async (rngSeed?: number) => {
+  const rng = createPrng(rngSeed ?? 101)
+  const generator = payloadGenerator(rng)
   const eventsDb = getClient()
   const userMgntDb = await userMgnt.getClient()
-
-  const rng = createPseudoRandomNumberGenerator(101)
 
   const seed = seeder()
   const locations = generator.locations.set(5)
@@ -184,4 +188,114 @@ export const setupTestCase = async () => {
     seed,
     generator
   }
+}
+
+/**
+ *
+ * @param client trpc client
+ * @param generator payload generator
+ * @param action action to be performed on the event
+ * @returns corresponding client action method for the given action type, with prefilled payload
+ */
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  action: ActionType
+) {
+  //
+  switch (action) {
+    case ActionType.CREATE:
+      return async () => client.event.create(generator.event.create())
+    case ActionType.DECLARE:
+      return async (eventId: string) =>
+        client.event.actions.declare.request(
+          generator.event.actions.declare(eventId, { keepAssignment: true })
+        )
+    case ActionType.VALIDATE:
+      return async (eventId: string) =>
+        client.event.actions.validate.request(
+          generator.event.actions.validate(eventId, { keepAssignment: true })
+        )
+    case ActionType.REJECT:
+      return async (eventId: string) =>
+        client.event.actions.reject.request(
+          generator.event.actions.reject(eventId, { keepAssignment: true })
+        )
+    case ActionType.ARCHIVE:
+      return async (eventId: string) =>
+        client.event.actions.archive.request(
+          generator.event.actions.archive(eventId, { keepAssignment: true })
+        )
+    case ActionType.REGISTER:
+      return async (eventId: string) =>
+        client.event.actions.register.request(
+          generator.event.actions.register(eventId, { keepAssignment: true })
+        )
+    case ActionType.PRINT_CERTIFICATE:
+      return async (eventId: string) =>
+        client.event.actions.printCertificate.request(
+          generator.event.actions.printCertificate(eventId, {
+            keepAssignment: true
+          })
+        )
+
+    case ActionType.NOTIFY:
+    case ActionType.DETECT_DUPLICATE:
+    case ActionType.REQUEST_CORRECTION:
+    case ActionType.APPROVE_CORRECTION:
+    case ActionType.ASSIGN:
+    case ActionType.UNASSIGN:
+    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.REJECT_CORRECTION:
+    case ActionType.DELETE:
+    case ActionType.READ:
+    default:
+      throw new Error(
+        `Unsupported action type: ${action}. Create a case for it if you need it.`
+      )
+  }
+}
+
+/**
+ * Create event based on actions to be used in tests.
+ * Created through API to make sure it get indexed properly. (To seed directly to database we need: https://github.com/opencrvs/opencrvs-core/issues/8884)
+ */
+export async function createEvent(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  actions: ActionType[]
+) {
+  let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+
+  for (const action of actions) {
+    const clientAction = actionToClientAction(client, generator, action)
+
+    if (action === ActionType.CREATE) {
+      // @ts-expect-error -- createEvent does not accept any arguments
+      createdEvent = await clientAction()
+    } else if (!createdEvent) {
+      throw new Error('Event must be created before performing actions on it')
+    } else {
+      await clientAction(createdEvent.id)
+    }
+  }
+}
+
+/**
+ * Returns ordered combinations of actions, starting with single action and growing to the full set.
+ * Useful for generating test combinations based on a set of actions.
+ *
+ * @example getGrowingCombinations(['a', 'b', 'c']) --> [['a'], ['a', 'b'], ['a', 'b', 'c']]
+ * @example getGrowingCombinations(['a', 'b', 'c'], 2) --> [['a'], ['a'], ['a', 'b'], ['a', 'b'], ['a', 'b', 'c'], ['a', 'b', 'c']
+ *
+ */
+export function getGrowingCombinations<T>(arr: T[], count: number = 1): T[][] {
+  if (count < 1) {
+    throw new Error('Count must be a positive integer')
+  }
+
+  const combination = arr.map((_, i) => arr.slice(0, i + 1))
+
+  // flatten out and duplicate the combinations as many time as needed.
+  return flatten(times(count, constant(combination)))
 }

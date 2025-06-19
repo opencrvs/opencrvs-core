@@ -15,6 +15,7 @@ import {
   getUUID,
   UUID
 } from '@opencrvs/commons'
+import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
@@ -161,11 +162,15 @@ async function findDuplicates(
     index: getEventIndexName(),
     id: getUUID(),
     body: {
-      doc: encodeEventIndex({
-        id: getUUID(),
-        transactionId: getUUID(),
-        declaration: existingComposition
-      } as unknown as EventIndex),
+      doc: encodeEventIndex(
+        {
+          id: getUUID(),
+          transactionId: getUUID(),
+          type: 'v2-birth',
+          declaration: existingComposition
+        } as unknown as EventIndex,
+        v2BirthEvent
+      ),
       doc_as_upsert: true
     },
     refresh: 'wait_for'
@@ -190,7 +195,8 @@ async function findDuplicates(
       updatedByUserRole: 'test',
       flags: []
     },
-    DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
+    DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
+    v2BirthEvent
   )
 
   return results
@@ -271,7 +277,8 @@ describe('deduplication tests', () => {
         updatedByUserRole: 'test',
         flags: []
       },
-      DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES)
+      DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
+      v2BirthEvent
     )
     expect(results).toHaveLength(0)
   })

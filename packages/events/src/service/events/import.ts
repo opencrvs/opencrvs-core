@@ -8,16 +8,43 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventDocument } from '@opencrvs/commons'
+import { omit } from 'lodash'
+import { EventDocument, getUUID } from '@opencrvs/commons'
+import { createEventWithActions } from '@events/storage/postgres/events/events'
+import { getEventConfigurationById } from '../config/config'
+import { indexEvent } from '../indexing/indexing'
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-export async function importEvent(_event: EventDocument, _token: string) {
-  return new Promise<EventDocument>((_, reject) =>
-    reject('TODO: Importing is not supported in Postgres yet')
+export async function importEvent(eventDocument: EventDocument, token: string) {
+  const transactionId = getUUID()
+  const { actions, ...event } = eventDocument
+
+  const eventType = event.type
+  const eventActions = actions.map(({ type, ...action }) => ({
+    ...omit(action, 'type'),
+    actionType: type,
+
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    annotation: (action as any).annotation ?? undefined,
+    declaration: (action as any).declaration ?? undefined,
+    reasonIsDuplicate: (action as any).reason?.isDuplicate ?? undefined,
+    reasonMessage: (action as any).reason?.message ?? undefined,
+    registrationNumber: (action as any).registrationNumber ?? undefined,
+    assignedTo: (action as any).assignedTo ?? undefined,
+    createdBySignature: action.createdBySignature ?? null,
+    createdAtLocation: action.createdAtLocation ?? null,
+    originalActionId: action.originalActionId ?? null
+    /* eslint-enable @typescript-eslint/no-explicit-any */
+  }))
+
+  const createdEvent = await createEventWithActions(
+    { ...omit(event, 'type'), eventType, transactionId },
+    eventActions
   )
-  // const config = await getEventConfigurationById({
-  //   token,
-  //   eventType: event.type
-  // })
-  // await indexEvent(event)
+  const config = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
+  await indexEvent(createdEvent, config)
+
+  return createdEvent
 }
