@@ -8,13 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fs from 'node:fs'
-import { join } from 'node:path'
-import { DataType, IBackup, newDb } from 'pg-mem'
-import { CamelCasePlugin, Kysely } from 'kysely'
-import { types } from 'pg'
-import { getUUID } from '@opencrvs/commons'
-import Schema from '@events/storage/postgres/events/schema/Database'
+
+import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
+import { Pool, types } from 'pg'
+import { inject } from 'vitest'
+import Schema from '../events/schema/Database'
+
+/**
+ * @important
+ * If you update this file, @see {@link ../events.ts}
+ *
+ * This file runs everything in transaction so tests can rollback in between.
+ */
+
+const connectionString = inject('EVENTS_APP_POSTGRES_URI')
 
 // Override timestamptz (OID 1184) to return ISO 8601 strings instead of Date objects
 //       `pg`: 2025-06-16 12:55:51.507875+00
@@ -22,29 +29,28 @@ import Schema from '@events/storage/postgres/events/schema/Database'
 //                                 ^^^ (yes, we don't cut the milliseconds, Zod still accepts it)
 types.setTypeParser(1184, (str) => str.replace(' ', 'T').replace('+00', 'Z'))
 
-let backup: IBackup | undefined
 let db: Kysely<Schema> | undefined
+let pool: Pool | undefined
 
-export const getClient = () => {
-  const mem = newDb()
+export const getPool = () => {
+  if (!pool) {
+    pool = new Pool({ connectionString })
+  }
 
+  return pool
+}
+
+export function getClient() {
   if (!db) {
-    mem.public.registerFunction({
-      name: 'gen_random_uuid',
-      returns: DataType.uuid,
-      implementation: getUUID,
-      impure: true
+    const dialect = new PostgresDialect({
+      pool: getPool()
     })
-    mem.public.none(fs.readFileSync(join(__dirname, 'events.sql'), 'utf8'))
-    backup = mem.backup()
-    db = mem.adapters.createKysely(0, {
+
+    db = new Kysely<Schema>({
+      dialect,
       plugins: [new CamelCasePlugin()]
-    }) as import('kysely').Kysely<Schema>
+    })
   }
 
   return db
-}
-
-export const resetServer = () => {
-  backup?.restore()
 }

@@ -11,14 +11,12 @@
 import { inject, vi } from 'vitest'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getDeclarationFields } from '@opencrvs/commons/events'
-import {
-  resetServer as resetEventsPostgresServer,
-  getClient
-} from '@events/storage/postgres/__mocks__/events'
+import { getClient } from '@events/storage/postgres/__mocks__/events'
 import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
 
 import { createIndex } from '@events/service/indexing/indexing'
 import { mswServer } from './msw'
+import { migrate } from './postgres'
 
 vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
@@ -36,11 +34,7 @@ async function resetESServer() {
 }
 
 beforeEach(async () =>
-  Promise.all([
-    resetEventsPostgresServer(),
-    resetUserMgntMongoServer(),
-    resetESServer()
-  ])
+  Promise.all([migrate.up(), resetUserMgntMongoServer(), resetESServer()])
 )
 
 beforeAll(() =>
@@ -56,5 +50,8 @@ beforeAll(() =>
     }
   })
 )
-afterEach(() => mswServer.resetHandlers())
+afterEach(async () => {
+  mswServer.resetHandlers()
+  await migrate.down()
+})
 afterAll(() => mswServer.close())

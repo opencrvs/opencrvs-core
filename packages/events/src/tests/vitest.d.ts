@@ -16,5 +16,7 @@ declare module 'vitest' {
     EVENTS_MONGO_URI: string
     USER_MGNT_MONGO_URI: string
     ELASTICSEARCH_URI: string
+    EVENTS_APP_POSTGRES_URI: string
+    EVENTS_MIGRATOR_POSTGRES_URI: string
   }
 }

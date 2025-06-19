@@ -12,7 +12,12 @@
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
 import { Pool, types } from 'pg'
 import { env } from '@events/environment'
-import Schema from './events/schema/Database' // this is the Database interface we defined earlier
+import Schema from './events/schema/Database'
+
+/**
+ * @important
+ * If you update this file, @see {@link ./__mocks__/events.ts}
+ */
 
 const connectionString = env.EVENTS_POSTGRES_URL
 
