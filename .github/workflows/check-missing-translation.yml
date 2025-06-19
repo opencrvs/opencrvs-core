@@ -64,10 +64,13 @@ jobs:
           fi
           echo "countryconfig_path=$HOME/countryconfig/opencrvs-countryconfig" >> $GITHUB_OUTPUT
 
-      - name: Setup Node.js
+      - run: |
+          ls -l
+          pwd
+      - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
-          node-version: 18
+          node-version-file: core/.nvmrc
 
       - name: Clone the Core repository and Check for missing translation
         run: |
