@@ -22,7 +22,7 @@ import { EventIndex } from '../EventIndex'
 import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import { deepMerge, findActiveDrafts } from '../utils'
-import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
+import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 
 export function getStatusFromActions(actions: Array<Action>) {
@@ -236,9 +236,11 @@ export function getCurrentEventState(
     a.createdAt.localeCompare(b.createdAt)
   )
 
-  const declarationUpdateMetadata = getDeclarationActionUpdateMetadata(
-    event.actions
-  )
+  // Includes the metadata of the last action. Whether it was a 'request' by user or 'accept' by user or 3rd party.
+  const requestActionMetadata = getActionUpdateMetadata(event.actions)
+
+  // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
+  const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
@@ -263,14 +265,14 @@ export function getCurrentEventState(
     createdBy: creationAction.createdBy,
     createdAtLocation: creationAction.createdAtLocation,
     createdBySignature: creationAction.createdBySignature,
-    updatedAt: declarationUpdateMetadata.createdAt,
+    updatedAt: acceptedActionMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
-    updatedBy: declarationUpdateMetadata.createdBy,
-    updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
+    updatedBy: requestActionMetadata.createdBy,
+    updatedAtLocation: requestActionMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
-    updatedByUserRole: declarationUpdateMetadata.createdByRole,
+    updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent,
     flags: getFlagsFromActions(event.actions)
   })
