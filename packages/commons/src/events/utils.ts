@@ -214,7 +214,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
-      creator: 'user',
+      creator: TokenUserType.Enum.user,
       createdBy: '@todo',
       createdAtLocation: '@todo',
       status: ActionStatus.Accepted,

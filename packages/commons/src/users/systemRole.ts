@@ -28,3 +28,5 @@ export const UserRole = z.enum([
   'NATIONAL_REGISTRAR',
   'REGISTRATION_AGENT'
 ])
+export const TokenUserType = z.enum(['user', 'system'])
+export type TokenUserType = z.infer<typeof TokenUserType>

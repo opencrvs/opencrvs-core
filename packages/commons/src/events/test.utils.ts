@@ -54,6 +54,7 @@ import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { FieldType } from './FieldType'
 import { AddressType, FileFieldValue } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
+import { TokenUserType } from '../authentication'
 
 function pickRandom<T>(rng: () => number, items: T[]): T {
   return items[Math.floor(rng() * items.length)]
@@ -270,7 +271,7 @@ export function eventPayloadGenerator(rng: () => number) {
             },
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
-            creator: 'user',
+            creator: TokenUserType.Enum.user,
             createdByRole: '@todo',
             createdAtLocation: '@todo'
           }
@@ -588,7 +589,7 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
-    creator: 'user',
+    creator: TokenUserType.Enum.user,
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
     createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',

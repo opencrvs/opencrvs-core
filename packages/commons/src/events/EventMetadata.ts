@@ -67,7 +67,7 @@ export const ActionCreationMetadata = z.object({
   creator: z
     .enum(['user', 'system'])
     .nullish()
-    .describe('Whether the user us a normal user or a system.'),
+    .describe('Whether the user is a normal user or a system.'),
   acceptedAt: z
     .string()
     .datetime()
@@ -124,7 +124,7 @@ export const EventMetadata = z.object({
   creator: z
     .enum(['user', 'system'])
     .nullish()
-    .describe('Whether the user us a normal user or a system.'),
+    .describe('Whether the user is a normal user or a system.'),
   updatedByUserRole: z
     .string()
     .describe('Role of the user who last updated the declaration.'),

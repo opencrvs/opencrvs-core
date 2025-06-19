@@ -18,7 +18,8 @@ import {
   Draft,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TokenUserType
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -67,7 +68,7 @@ function createDraftHandlers() {
           ...req,
           declaration: req.declaration || {},
           createdBy: 'test-user',
-          creator: 'user',
+          creator: TokenUserType.Enum.user,
           createdByRole: 'test-role',
           createdAtLocation: 'test-location',
           createdAt: new Date().toISOString(),
