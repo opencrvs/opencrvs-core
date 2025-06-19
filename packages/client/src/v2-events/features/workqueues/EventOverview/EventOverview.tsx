@@ -165,6 +165,7 @@ function EventOverviewProtected({
       ]}
     >
       <EventSummary
+        hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />

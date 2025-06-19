@@ -100,16 +100,21 @@ const messages = {
 
 export function EventSummary({
   event,
-  eventConfiguration
+  eventConfiguration,
+  hideSecuredFields = false
 }: {
   event: Record<string, FieldValue | null>
   eventConfiguration: EventConfig
+  hideSecuredFields?: boolean
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
   const { summary, label: eventLabelMessage } = eventConfiguration
   const declarationFields = getDeclarationFields(eventConfiguration)
+  const securedFields = declarationFields
+    .filter(({ secured }) => secured)
+    .map(({ id }) => id)
 
-  const fields = summary.fields.map((field) => {
+  const configuredFields = summary.fields.map((field) => {
     if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
       return null
     }
@@ -127,6 +132,7 @@ export function EventSummary({
         // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
         label: field.label ?? config.label,
         emptyValueMessage: field.emptyValueMessage,
+        secured: config.secured ?? false,
         value: Output({
           field: config,
           showPreviouslyMissingValuesAsChanged: false,
@@ -135,9 +141,14 @@ export function EventSummary({
       }
     }
 
+    const accessedFields = intl.variablesUsed(field.value)
+
     return {
       id: field.id,
       label: field.label,
+      secured: accessedFields.some((fieldId) =>
+        securedFields.includes(fieldId)
+      ),
       emptyValueMessage: field.emptyValueMessage,
       value: intl.formatMessage(field.value, event)
     }
@@ -185,13 +196,14 @@ export function EventSummary({
           )}
           value={intl.formatMessage(messages.registrationNumber.value, event)}
         />
-        {fields
+        {configuredFields
           .filter((f): f is NonNullable<typeof f> => f !== null)
           .map((field) => (
             <Summary.Row
               key={field.id}
               data-testid={field.id}
               label={intl.formatMessage(field.label)}
+              locked={field.secured && hideSecuredFields}
               placeholder={
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
