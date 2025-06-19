@@ -39,6 +39,7 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   ActionConfig,
@@ -269,11 +270,17 @@ export const SearchResultComponent = ({
     })[]
   ) => {
     return eventData.map((event) => {
-      const actionConfigs = actions.map((actionType) => ({
-        actionComponent: (
-          <ActionComponent actionType={actionType} event={event} />
-        )
-      }))
+      const actionConfigs = actions
+        .map((actionType) => ({
+          actionComponent: (
+            <ActionComponent actionType={actionType} event={event} />
+          )
+        }))
+        .concat({
+          actionComponent: (
+            <DownloadButton key={`DownloadButton-${event.id}`} event={event} />
+          )
+        })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
       if (!eventConfig) {

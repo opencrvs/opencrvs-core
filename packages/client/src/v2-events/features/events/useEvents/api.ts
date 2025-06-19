@@ -57,13 +57,32 @@ export function updateLocalEventIndex(updatedEvent: EventDocument) {
       `Event configuration for type ${updatedEvent.type} not found`
     )
   }
-  return queryClient.setQueryData(
-    trpcOptionsProxy.event.search.queryKey({
-      type: 'and',
-      clauses: [{ id: updatedEvent.id }]
-    }),
-    () => [getCurrentEventState(updatedEvent, config)]
+  // Update the local event index with the updated event
+  setEventListData((eventIndices) =>
+    eventIndices?.map((eventIndex) =>
+      eventIndex.id === updatedEvent.id
+        ? { ...eventIndex, ...getCurrentEventState(updatedEvent, config) }
+        : eventIndex
+    )
   )
+
+  /*
+   * Update all searches where this event is present
+   */
+  queryClient
+    .getQueriesData<EventIndex[]>({
+      queryKey: trpcOptionsProxy.event.search.queryKey()
+    })
+    .forEach(([queryKey, eventIndices]) => {
+      queryClient.setQueryData(
+        queryKey,
+        (eventIndices || []).map((eventIndex) =>
+          eventIndex.id === updatedEvent.id
+            ? { ...eventIndex, ...getCurrentEventState(updatedEvent, config) }
+            : eventIndex
+        )
+      )
+    })
 }
 
 export function findLocalEventDocument(eventId: string) {
