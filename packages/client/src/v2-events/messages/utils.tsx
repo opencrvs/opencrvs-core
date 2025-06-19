@@ -140,7 +140,18 @@ export function useIntlFormatMessageWithFlattenedParams() {
   }
 
   function variablesUsed(message: string): string[] {
-    return parse(message).flatMap(getVariablesFromElement)
+    // intl-messageformat-parser does not support dot notation in the variables,
+    // so we need to convert dots to triple underscores
+    const sanitizedMessage = convertDotInCurlyBraces(message)
+    const variables = parse(sanitizedMessage).flatMap(getVariablesFromElement)
+    // We replace the triple underscopes back to dots only if there
+    // was a conversion done in the first place
+    if (message !== sanitizedMessage) {
+      return variables.map((variable) =>
+        variable.replace(new RegExp(`${INTERNAL_SEPARATOR}`, 'g'), '.')
+      )
+    }
+    return variables
   }
 
   function formatMessage<T extends {}>(
