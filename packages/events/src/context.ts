@@ -21,13 +21,14 @@ import {
   logger,
   SystemRole,
   TokenUserType,
-  TokenWithBearer
+  TokenWithBearer,
+  UUID
 } from '@opencrvs/commons'
 import { env } from './environment'
 
 const UserContext = z.object({
   id: z.string(),
-  primaryOfficeId: z.string(),
+  primaryOfficeId: UUID,
   role: z.string(),
   signature: z
     .string()
@@ -35,7 +36,7 @@ const UserContext = z.object({
     .describe('Storage key for the user signature. e.g. /ocrvs/signature.png'),
   type: TokenUserType.extract(['user'])
 })
-type UserContext = z.infer<typeof UserContext>
+export type UserContext = z.infer<typeof UserContext>
 
 export const SystemContext = z.object({
   id: z.string(),

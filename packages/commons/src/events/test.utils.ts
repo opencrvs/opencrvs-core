@@ -12,7 +12,7 @@
 import { merge, omitBy, isString } from 'lodash'
 import addDays from 'date-fns/addDays'
 import { tennisClubMembershipEvent } from '../fixtures'
-import { getUUID } from '../uuid'
+import { getUUID, UUID } from '../uuid'
 import {
   ActionBase,
   ActionDocument,
@@ -243,7 +243,7 @@ export function eventPayloadGenerator(rng: () => number) {
       id
     }),
     draft: (
-      { eventId, actionType }: { eventId: string; actionType: ActionType },
+      { eventId, actionType }: { eventId: UUID; actionType: ActionType },
       input: Partial<Draft> = {}
     ): Draft =>
       merge(
@@ -271,7 +271,7 @@ export function eventPayloadGenerator(rng: () => number) {
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
             createdByRole: '@todo',
-            createdAtLocation: '@todo'
+            createdAtLocation: '@todo' as UUID
           }
         } satisfies Draft,
         input
@@ -589,7 +589,7 @@ export function generateActionDocument({
     createdBy: getUUID(),
     createdByRole: 'FIELD_AGENT',
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
     declaration: generateActionDeclarationInput(configuration, action, rng),
     annotation: {},
     status: ActionStatus.Accepted,
@@ -674,7 +674,7 @@ export function generateEventDraftDocument({
   rng = () => 0.1,
   declaration = {}
 }: {
-  eventId: string
+  eventId: UUID
   actionType: ActionType
   rng?: () => number
   declaration?: EventState
@@ -751,12 +751,12 @@ export function createPrng(seed: number) {
   }
 }
 
-function generateUuid(rng: () => number): string {
+function generateUuid(rng: () => number) {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.floor(rng() * 16)
     const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
-  })
+  }) as UUID
 }
 
 function generateTrackingId(rng: () => number): string {

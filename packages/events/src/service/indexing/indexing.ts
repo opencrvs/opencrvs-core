@@ -11,6 +11,7 @@
 
 import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
+import QueryStream from 'pg-query-stream'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -28,12 +29,14 @@ import {
   getEventConfigById
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
-import * as eventsDb from '@events/storage/mongodb/events'
 import {
   getEventAliasName,
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
+import { postgresPool } from '@events/storage/postgres/events/db'
+import Events from '@events/storage/postgres/events/schema/app/Events'
+import EventActions from '@events/storage/postgres/events/schema/app/EventActions'
 import {
   decodeEventIndex,
   DEFAULT_SIZE,
@@ -263,19 +266,65 @@ type _Combine<
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 
-export async function indexAllEvents(eventConfiguration: EventConfig) {
-  const mongoClient = await eventsDb.getClient()
-  const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
+const EVENT_COLUMNS = {
+  id: 'id',
+  eventType: 'event_type',
+  createdAt: 'created_at',
+  updatedAt: 'updated_at',
+  trackingId: 'tracking_id',
+  transactionId: 'transaction_id'
+} satisfies Record<keyof Events, string>
 
+const EVENT_ACTION_COLUMNS = {
+  id: 'id',
+  actionType: 'type',
+  annotation: 'annotation',
+  assignedTo: 'assigned_to',
+  createdAt: 'created_at',
+  createdAtLocation: 'created_at_location',
+  createdBy: 'created_by',
+  createdByRole: 'created_by_role',
+  createdBySignature: 'created_by_signature',
+  declaration: 'declaration',
+  eventId: 'event_id',
+  originalActionId: 'original_action_id',
+  reasonIsDuplicate: 'reason_is_duplicate',
+  reasonMessage: 'reason_message',
+  registrationNumber: 'registration_number',
+  status: 'status',
+  transactionId: 'transaction_id'
+} satisfies Record<keyof EventActions, string>
+
+export async function indexAllEvents(eventConfiguration: EventConfig) {
+  const indexName = getEventIndexName(eventConfiguration.id)
+  const esClient = getOrCreateClient()
+
+  const hasEventsIndex = await esClient.indices.exists({ index: indexName })
   if (!hasEventsIndex) {
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   }
 
-  const stream = mongoClient.collection(indexName).find().stream()
+  const streamQuery = new QueryStream(
+    `SELECT
+      ${Object.entries(EVENT_COLUMNS)
+        .map(([camelCase, snakeCase]) => `e.${snakeCase} AS ${camelCase}`)
+        .join(', ')},
+      COALESCE(
+        json_agg(
+          jsonb_build_object(
+            ${Object.entries(EVENT_ACTION_COLUMNS)
+              .map(([camelCase, snakeCase]) => `'${camelCase}', a.${snakeCase}`)
+              .join(', ')}
+          )
+        ) FILTER (
+          WHERE a.id IS NOT NULL
+        ),
+        '[]'::json
+      ) AS actions
+    FROM events e
+    LEFT JOIN event_actions a ON a.event_id = e.id
+    GROUP BY e.id`
+  )
 
   const transformedStreamData = new Transform({
     readableObjectMode: true,
@@ -285,18 +334,25 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     }
   })
 
-  await esClient.helpers.bulk({
-    retries: 3,
-    wait: 3000,
-    datasource: stream.pipe(transformedStreamData),
-    onDocument: (doc: EventIndex) => ({
-      index: {
-        _index: indexName,
-        _id: doc.id
-      }
-    }),
-    refresh: 'wait_for'
-  })
+  const client = await postgresPool.connect()
+  try {
+    const pgStream = client.query(streamQuery)
+
+    await esClient.helpers.bulk({
+      retries: 3,
+      wait: 3000,
+      datasource: pgStream.pipe(transformedStreamData),
+      onDocument: (doc: EventIndex) => ({
+        index: {
+          _index: indexName,
+          _id: doc.id
+        }
+      }),
+      refresh: 'wait_for'
+    })
+  } finally {
+    client.release()
+  }
 }
 
 export async function indexEvent(event: EventDocument, config: EventConfig) {

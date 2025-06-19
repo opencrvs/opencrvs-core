@@ -28,7 +28,7 @@ const trpcConfig: Parameters<typeof createHTTPHandler>[0] = {
     logger.info(`Request: ${stringifyRequest(req)}`)
     return next()
   },
-  onError: ({ req, error }) => {
+  onError: ({ error, req }) => {
     logger.warn(
       `Error for request: ${stringifyRequest(req)}. Error: '${error.message}'`
     )

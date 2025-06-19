@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -110,7 +110,7 @@ export const eventRouter = router({
   /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
-    .input(z.string())
+    .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const updatedEvent = await addAction(
@@ -273,8 +273,8 @@ export const eventRouter = router({
       const eventConfigs = await getEventConfigurations(ctx.token)
       return getIndex(input, eventConfigs)
     }),
-  import: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+  import: publicProcedure
+    // .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({
       openapi: {
         summary: 'Import full event record',

@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
 
 extendZodWithOpenApi(z)
@@ -38,25 +39,25 @@ export const ActionStatus = {
 export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
-  id: z.string(),
+  id: UUID,
   transactionId: z.string(),
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdByRole: z.string(),
   createdBySignature: z
     .string()
-    .nullish() // @TODO: Check where the null comes from
+    .nullish()
     .describe('Reference to signature of the user who created the action'),
   createdAtLocation: CreatedAtLocation,
   declaration: ActionUpdate,
-  annotation: ActionUpdate.optional(),
+  annotation: ActionUpdate.optional().nullable(),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
     ActionStatus.Rejected
   ]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
-  originalActionId: z.string().optional()
+  originalActionId: UUID.optional().nullable()
 })
 
 export type ActionBase = z.infer<typeof ActionBase>

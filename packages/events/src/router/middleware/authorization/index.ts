@@ -27,6 +27,7 @@ import {
   ConfigurableScopeType,
   ConfigurableScopes,
   IAuthHeader,
+  UUID,
   EventDocument
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
@@ -163,7 +164,7 @@ export const eventTypeAuthorization: MiddlewareFunction<
   OpenApiMeta,
   CtxWithAuthorizedEntities,
   CtxWithAuthorizedEntities,
-  { eventId: string } | { type: string }
+  { eventId: UUID } | { type: string }
 > = async ({ input, next, ctx }) => {
   let eventType = 'type' in input ? input.type : undefined
 
@@ -217,7 +218,7 @@ export const requireAssignment: MiddlewareFunction<
   if (user.id !== assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
-      message: JSON.stringify('You are not assigned to this event')
+      message: 'You are not assigned to this event'
     })
   }
 
