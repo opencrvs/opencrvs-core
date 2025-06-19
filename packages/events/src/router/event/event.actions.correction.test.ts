@@ -107,15 +107,11 @@ test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test('a correction request can be added to a created event', async () => {
+test('a correction request can be added to a registered event', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
   const originalEvent = await client.event.create(generator.event.create())
-
-  const declareInput = generator.event.actions.declare(originalEvent.id)
-
-  await client.event.actions.declare.request(declareInput)
 
   const createAction = originalEvent.actions.filter(
     (action) => action.type === ActionType.CREATE
@@ -125,7 +121,23 @@ test('a correction request can be added to a created event', async () => {
     assignedTo: createAction[0].createdBy
   })
 
-  await client.event.actions.assignment.assign(assignmentInput)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(originalEvent.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
 
   const registeredEvent = await client.event.actions.register.request(
     generator.event.actions.register(originalEvent.id)
@@ -265,46 +277,6 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   await expect(
     client.event.actions.correction.request(payload)
   ).rejects.matchSnapshot()
-})
-
-test('a correction request can be added to a created event', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const originalEvent = await client.event.create(generator.event.create())
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(originalEvent.id)
-  )
-
-  const createAction = originalEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  const registeredEvent = await client.event.actions.register.request(
-    generator.event.actions.register(originalEvent.id)
-  )
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-  const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(registeredEvent.id)
-  )
-
-  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
-    expect.objectContaining({
-      type: ActionType.REQUEST_CORRECTION
-    }),
-    expect.objectContaining({ type: ActionType.UNASSIGN })
-  ])
 })
 
 describe('when a correction request exists', () => {

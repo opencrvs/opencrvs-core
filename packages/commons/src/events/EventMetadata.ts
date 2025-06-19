@@ -28,6 +28,7 @@ export const EventStatus = z.enum([
   'REJECTED',
   'ARCHIVED'
 ])
+
 export type EventStatus = z.infer<typeof EventStatus>
 
 export const CustomFlags = {

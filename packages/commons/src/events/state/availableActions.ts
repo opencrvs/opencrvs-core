@@ -17,9 +17,24 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.DECLARE,
     ActionType.DELETE
   ],
-  [EventStatus.enum.NOTIFIED]: [ActionType.READ, ActionType.VALIDATE],
-  [EventStatus.enum.DECLARED]: [ActionType.READ, ActionType.VALIDATE],
-  [EventStatus.enum.VALIDATED]: [ActionType.READ, ActionType.REGISTER],
+  [EventStatus.enum.NOTIFIED]: [
+    ActionType.READ,
+    ActionType.VALIDATE,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ],
+  [EventStatus.enum.DECLARED]: [
+    ActionType.READ,
+    ActionType.VALIDATE,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ],
+  [EventStatus.enum.VALIDATED]: [
+    ActionType.READ,
+    ActionType.REGISTER,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ],
   [EventStatus.enum.REJECTED]: [
     ActionType.READ,
     ActionType.DECLARE,
