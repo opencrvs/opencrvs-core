@@ -13,6 +13,7 @@ import { cloneDeep } from 'lodash'
 import { Action } from './ActionDocument'
 import { ActionType } from './ActionType'
 import { findLastAssignmentAction, getMixedPath } from './utils'
+import { TokenUserType } from '../authentication'
 
 const commonAction = {
   status: 'Requested' as const,

@@ -6,6 +6,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -44,6 +45,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
     },
   },
   "status": "DECLARED",
@@ -62,6 +64,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -100,6 +103,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
     },
   },
   "status": "DECLARED",
