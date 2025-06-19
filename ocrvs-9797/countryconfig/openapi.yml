@@ -3322,7 +3322,7 @@ components:
                     type: string
                   transactionId:
                     type: string
-                  creator:
+                  createdByUserType:
                     type: string
                     enum:
                       &a9
@@ -3418,7 +3418,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -3803,7 +3803,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -4184,7 +4184,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -4578,7 +4578,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -4959,7 +4959,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -5353,7 +5353,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -5734,7 +5734,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -6117,7 +6117,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -6498,7 +6498,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -6882,7 +6882,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -7263,7 +7263,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -7647,7 +7647,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -8031,7 +8031,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -8415,7 +8415,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -8796,7 +8796,7 @@ components:
           type: string
         transactionId:
           type: string
-        creator:
+        createdByUserType:
           type: string
           enum: *a9
         createdAt:
@@ -10629,7 +10629,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 97b831a6-ff36-4e83-999d-a8b6ad6fdc39
+        transactionId: 7c27e685-080a-47de-8b8e-84b214979194
         declaration: {}
         annotation: {}
         type: NOTIFY
