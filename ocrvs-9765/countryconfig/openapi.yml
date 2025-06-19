@@ -358,6 +358,22 @@ components:
                             rendered in the advanced search form.
 
                             \      "
+                        validations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              validator:
+                                $ref: "#/components/schemas/Conditional"
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - validator
+                              - message
+                          default:
+                            &a4 []
+                          description: In advanced search, we sometimes need to override the default field
+                            validations.
                         fieldId:
                           type: string
                         fieldType:
@@ -492,6 +508,21 @@ components:
                             rendered in the advanced search form.
 
                             \      "
+                        validations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              validator:
+                                $ref: "#/components/schemas/Conditional"
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - validator
+                              - message
+                          default: *a4
+                          description: In advanced search, we sometimes need to override the default field
+                            validations.
                         fieldId:
                           type: string
                           enum:
@@ -603,7 +634,7 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default:
-            &a8 []
+            &a9 []
         draft:
           type: boolean
         type:
@@ -650,7 +681,7 @@ components:
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default:
-                &a4 []
+                &a5 []
             required:
               type: boolean
               default: false
@@ -669,7 +700,7 @@ components:
                   - validator
                   - message
               default:
-                &a5 []
+                &a6 []
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -784,7 +815,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -802,7 +833,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -856,7 +887,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -874,7 +905,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -923,7 +954,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -941,7 +972,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -996,7 +1027,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1014,7 +1045,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1058,7 +1089,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1076,7 +1107,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1132,7 +1163,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1150,7 +1181,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1173,7 +1204,7 @@ components:
                     fontVariant:
                       type: string
                       enum:
-                        &a6
+                        &a7
                         - reg12
                         - reg14
                         - reg16
@@ -1207,7 +1238,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1225,7 +1256,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1288,7 +1319,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1306,7 +1337,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1332,7 +1363,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a6
+                      enum: *a7
               default: {}
           required:
             - id
@@ -1359,7 +1390,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1377,7 +1408,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1414,7 +1445,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1432,7 +1463,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1484,7 +1515,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1502,7 +1533,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1558,7 +1589,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1576,7 +1607,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1613,7 +1644,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1631,7 +1662,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1668,7 +1699,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1686,7 +1717,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1722,7 +1753,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1740,7 +1771,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1776,7 +1807,7 @@ components:
                   items:
                     type: string
                     enum:
-                      &a7
+                      &a8
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -1822,7 +1853,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1840,7 +1871,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1877,7 +1908,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1895,7 +1926,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1953,7 +1984,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1971,7 +2002,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2004,7 +2035,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2022,7 +2053,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2059,7 +2090,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2077,7 +2108,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2114,7 +2145,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2132,7 +2163,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2169,7 +2200,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2187,7 +2218,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2214,7 +2245,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a7
+                    enum: *a8
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2245,7 +2276,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2263,7 +2294,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2307,7 +2338,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2325,7 +2356,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2380,7 +2411,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a7
+                    enum: *a8
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2410,7 +2441,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2428,7 +2459,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2549,7 +2580,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2608,7 +2639,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2667,7 +2698,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2710,7 +2741,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2753,7 +2784,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2796,7 +2827,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2855,7 +2886,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2898,7 +2929,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3030,7 +3061,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3123,7 +3154,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3166,7 +3197,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3769,7 +3800,7 @@ components:
         status:
           type: string
           enum:
-            &a9
+            &a10
             - Requested
             - Accepted
             - Rejected
@@ -4150,7 +4181,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -4528,7 +4559,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -4919,7 +4950,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5297,7 +5328,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -5688,7 +5719,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6066,7 +6097,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6446,7 +6477,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -6824,7 +6855,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7205,7 +7236,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7583,7 +7614,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -7964,7 +7995,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -8345,7 +8376,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -8726,7 +8757,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -9104,7 +9135,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type: string
         type:
@@ -9313,7 +9344,7 @@ components:
                           - surname
                       - type: "null"
           default:
-            &a10 {}
+            &a11 {}
         annotation:
           type: object
           additionalProperties:
@@ -9674,7 +9705,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -10036,7 +10067,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -10395,7 +10426,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -10578,7 +10609,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 75907968-e18c-403f-86f6-f8ad7adaa4c5
+        transactionId: cb788345-a7ca-468b-884d-110596dddb6b
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10758,7 +10789,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -11115,7 +11146,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -11485,7 +11516,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -11842,7 +11873,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -12212,7 +12243,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -12572,7 +12603,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -12932,7 +12963,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -13289,7 +13320,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -13646,7 +13677,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -14006,7 +14037,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -14366,7 +14397,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
