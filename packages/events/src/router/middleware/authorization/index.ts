@@ -224,7 +224,11 @@ export const requireAssignment: MiddlewareFunction<
   // Check for duplicate only when we know the user is assigned to the event. Otherwise we will effectively leak the event (allow reading it) to users who are not assigned to it.
   if (
     'transactionId' in input &&
-    event.actions.some((action) => action.transactionId === input.transactionId)
+    event.actions.some(
+      (action) =>
+        action.transactionId === input.transactionId &&
+        action.type === input.type
+    )
   ) {
     return next({
       ctx: { ...ctx, isDuplicateAction: true, event },

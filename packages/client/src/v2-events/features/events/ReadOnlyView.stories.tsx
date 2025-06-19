@@ -19,6 +19,7 @@ import {
   createPrng,
   generateEventDocument,
   generateEventDraftDocument,
+  getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -29,6 +30,7 @@ import {
   tennisClubMembershipEventIndex
 } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
+import { setEventData, setLocalEventConfig } from './useEvents/api'
 
 const generator = testDataGenerator()
 
@@ -68,6 +70,16 @@ const draft = generateEventDraftDocument({
 })
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(
+      tennisClubMembershipEventDocument.id,
+      tennisClubMembershipEventDocument
+    )
+  },
   loaders: [
     async () => {
       window.localStorage.setItem(
@@ -116,7 +128,13 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
-          })
+          }),
+          tRPCMsw.event.search.query(() => [
+            getCurrentEventState(
+              tennisClubMembershipEventDocument,
+              tennisClubMembershipEvent
+            )
+          ])
         ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
@@ -149,7 +167,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
-                signatureFilename: undefined
+                signatureFilename: undefined,
+                avatarURL: undefined
               }
             ]
           }),
@@ -158,7 +177,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined
+              signatureFilename: undefined,
+              avatarURL: undefined
             }
           })
         ]
@@ -168,6 +188,13 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 }
 
 export const ReadOnlyViewForUserWithReadPermission: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventDocument.id, eventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -213,7 +240,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                   }
                 ],
                 role: 'SOCIAL_WORKER',
-                signatureFilename: undefined
+                signatureFilename: undefined,
+                avatarURL: undefined
               }
             ]
           }),
@@ -222,7 +250,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined
+              signatureFilename: undefined,
+              avatarURL: undefined
             }
           })
         ]

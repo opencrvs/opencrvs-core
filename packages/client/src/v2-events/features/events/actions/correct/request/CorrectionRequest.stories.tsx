@@ -13,17 +13,28 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { setEventData, setLocalEventConfig } from '../../../useEvents/api'
 import { router } from './router'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest'
+  title: 'CorrectionRequest',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(
+      tennisClubMembershipEventDocument.id,
+      tennisClubMembershipEventDocument
+    )
+  }
 }
 
 export default meta

@@ -29,6 +29,7 @@ export default {
 const notifiedScenariosForLocalRegistrar: Scenario[] = [
   {
     name: 'Unassigned',
+    recordDownloaded: false,
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
@@ -44,6 +45,7 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
   },
   {
     name: 'AssignedToSelf',
+    recordDownloaded: true,
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
@@ -60,6 +62,7 @@ const notifiedScenariosForLocalRegistrar: Scenario[] = [
   },
   {
     name: 'AssignedToOthers',
+    recordDownloaded: false,
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,

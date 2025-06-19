@@ -11,6 +11,7 @@
 import { intersection } from 'lodash'
 import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
 import { ActionType, isMetaAction } from './ActionType'
+import { EventStatus } from './EventMetadata'
 
 type RequiresNoScope = null
 type NotAvailableAsAction = [] // pseudo actions
@@ -129,4 +130,54 @@ export function filterUnallowedActions(
 
   // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
   return [ActionType.READ]
+}
+
+/**
+ * Actions that can be performed on an event based on its status and user scope.
+ */
+
+export function getUserActionsByStatus(
+  status: EventStatus,
+  assignmentActions: ActionType[],
+  userScopes: Scope[]
+): ActionType[] {
+  switch (status) {
+    case EventStatus.enum.CREATED: {
+      return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
+    }
+    case EventStatus.enum.NOTIFIED:
+    case EventStatus.enum.DECLARED: {
+      return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
+    }
+    case EventStatus.enum.VALIDATED: {
+      return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
+    }
+    case EventStatus.enum.CERTIFIED:
+    case EventStatus.enum.REGISTERED: {
+      return [
+        ...assignmentActions,
+        ActionType.READ,
+        ActionType.PRINT_CERTIFICATE,
+        ActionType.REQUEST_CORRECTION
+      ]
+    }
+    case EventStatus.enum.REJECTED: {
+      const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
+      const canValidate = hasAnyOfScopes(userScopes, validateScopes)
+
+      /**
+       * Show 'higher' action when the user has the required scopes.
+       */
+      const declarationAction = canValidate
+        ? ActionType.VALIDATE
+        : ActionType.DECLARE
+
+      return [...assignmentActions, ActionType.READ, declarationAction]
+    }
+
+    case EventStatus.enum.ARCHIVED:
+      return [...assignmentActions, ActionType.READ]
+    default:
+      return [ActionType.READ]
+  }
 }

@@ -29,6 +29,7 @@ export default {
 const craetedScenariosForFieldAgent: Scenario[] = [
   {
     name: 'AssignedToSelf',
+    recordDownloaded: true,
     actions: [ActionType.CREATE, AssignmentStatus.ASSIGNED_TO_SELF],
     expected: {
       ...getHiddenActions(),

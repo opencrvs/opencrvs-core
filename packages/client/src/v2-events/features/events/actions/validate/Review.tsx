@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
 import {
@@ -60,7 +60,21 @@ export function Review() {
   const navigate = useNavigate()
   const { redirectToOrigin } = useEventFormNavigation()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEvent.findFromCache(eventId).data
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
 

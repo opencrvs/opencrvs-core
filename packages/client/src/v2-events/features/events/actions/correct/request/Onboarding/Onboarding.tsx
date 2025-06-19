@@ -12,7 +12,7 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { buttonMessages } from '@client/i18n/messages'
@@ -41,7 +41,7 @@ export function Onboarding() {
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
   const intl = useIntl()
 
@@ -58,7 +58,7 @@ export function Onboarding() {
       `User got to a request correction flow without configuration defined for action type: ${ActionType.REQUEST_CORRECTION}, eventId: ${eventId}, pageId: ${pageId}`
     )
   }
-
+  const eventIndex = getCurrentEventState(event, configuration)
   const formPages = actionConfiguration.onboardingForm
 
   const currentPageId =
@@ -95,7 +95,7 @@ export function Onboarding() {
       <PagesComponent
         // @TODO: Use subscription if needed
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        declaration={event.declaration}
+        declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={annotation}
         formPages={formPages}

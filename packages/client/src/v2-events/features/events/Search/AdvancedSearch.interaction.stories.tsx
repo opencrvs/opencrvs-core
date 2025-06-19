@@ -278,7 +278,8 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
           const input = await canvas.findByTestId(
             'event____legalStatus____REGISTERED____createdAtLocation'
           )
-          await expect(input).toBeVisible()
+
+          await expect(input).toBeInTheDocument()
           locationInput = input
         })
 

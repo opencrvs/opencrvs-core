@@ -25,6 +25,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
+import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -37,6 +38,12 @@ const declareEventDocument = generateEventDocument({
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(declareEventDocument.id, declareEventDocument)
+
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declareEventDocument,
@@ -60,13 +67,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 
 const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
-
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
   name: [
@@ -77,7 +77,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
@@ -105,7 +106,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: declareEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -329,8 +330,21 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
   }
 }
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventId, eventDocument)
+
     // For this test, we want to have empty form values in zustand state
     useEventFormData.setState({ formValues: {} })
   },
@@ -350,7 +364,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: eventId
       })
     },
     chromatic: { disableSnapshot: true },
@@ -418,6 +432,13 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 }
 
 export const ChangeFieldInReview: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(declareEventDocument.id, declareEventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,

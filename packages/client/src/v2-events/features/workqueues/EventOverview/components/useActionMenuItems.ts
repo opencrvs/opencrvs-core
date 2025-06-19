@@ -13,6 +13,7 @@ import { useSelector } from 'react-redux'
 import {
   ActionType,
   filterUnallowedActions,
+  getUserActionsByStatus,
   Scope,
   EventIndex,
   getUUID,
@@ -28,6 +29,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
+import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 
 function getAssignmentActions(
   assignmentStatus: keyof typeof AssignmentStatus,
@@ -49,56 +51,6 @@ function getAssignmentActions(
   }
 
   return []
-}
-
-/**
- * Actions that can be performed on an event based on its status and user scope.
- */
-
-function getUserActionsByStatus(
-  status: EventStatus,
-  assignmentActions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  switch (status) {
-    case EventStatus.enum.CREATED: {
-      return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
-    }
-    case EventStatus.enum.NOTIFIED:
-    case EventStatus.enum.DECLARED: {
-      return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
-    }
-    case EventStatus.enum.VALIDATED: {
-      return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
-    }
-    case EventStatus.enum.CERTIFIED:
-    case EventStatus.enum.REGISTERED: {
-      return [
-        ...assignmentActions,
-        ActionType.READ,
-        ActionType.PRINT_CERTIFICATE,
-        ActionType.REQUEST_CORRECTION
-      ]
-    }
-    case EventStatus.enum.REJECTED: {
-      const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
-      const canValidate = hasAnyOfScopes(userScopes, validateScopes)
-
-      /**
-       * Show 'higher' action when the user has the required scopes.
-       */
-      const declarationAction = canValidate
-        ? ActionType.VALIDATE
-        : ActionType.DECLARE
-
-      return [...assignmentActions, ActionType.READ, declarationAction]
-    }
-
-    case EventStatus.enum.ARCHIVED:
-      return [...assignmentActions, ActionType.READ]
-    default:
-      return [ActionType.READ]
-  }
 }
 
 export interface ActionConfig {
@@ -157,12 +109,14 @@ export function useAction(event: EventIndex) {
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
+  const { findFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(findFromCache(event.id).data)
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
-  const { refetch: refetchEvent } = events.getEvent.useQuery(event.id, false)
+  const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
 
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
 
@@ -173,7 +127,7 @@ export function useAction(event: EventIndex) {
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const eventIsAssignedToSelf =
-    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -285,6 +239,7 @@ export function useActionMenuItems(event: EventIndex) {
   )
 
   const allowedActions = filterUnallowedActions(availableActions, scopes)
+
   return allowedActions
     .filter((action): action is keyof typeof config =>
       Object.keys(config).includes(action)

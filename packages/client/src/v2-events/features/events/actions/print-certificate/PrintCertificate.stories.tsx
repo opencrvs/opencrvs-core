@@ -28,10 +28,21 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { CERT_TEMPLATE_ID } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Review> = {
-  title: 'Print Certificate'
+  title: 'Print Certificate',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(
+      tennisClubMembershipEventDocument.id,
+      tennisClubMembershipEventDocument
+    )
+  }
 }
 
 export default meta
@@ -136,6 +147,9 @@ const alreadyPrintedEvent = {
 
 export const FormSetup: Story = {
   name: 'Form is empty when printing second time',
+  beforeEach: () => {
+    setEventData(alreadyPrintedEvent.id, tennisClubMembershipEventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -163,6 +177,9 @@ export const FormSetup: Story = {
 }
 export const FormSetupWithDraft: Story = {
   name: 'Form is filled from draft data',
+  beforeEach: () => {
+    setEventData(alreadyPrintedEvent.id, tennisClubMembershipEventDocument)
+  },
   parameters: {
     reactRouter: {
       router: {

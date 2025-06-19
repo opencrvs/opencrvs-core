@@ -1188,7 +1188,8 @@ export const handlers = {
           id: testDataGenerator().user.id.localRegistrar,
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
-          signatureFilename: undefined
+          signatureFilename: undefined,
+          avatarURL: undefined
         }
       ]
     }),
@@ -1203,7 +1204,8 @@ export const handlers = {
           }
         ],
         role: 'LOCAL_REGISTRAR',
-        signatureFilename: 'signature.png'
+        signatureFilename: 'signature.png',
+        avatarURL: undefined
       }
     })
   ],
