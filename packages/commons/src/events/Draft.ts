@@ -16,7 +16,7 @@ import { ActionTypes } from './ActionType'
 
 /*
  * A temporary storage for an action.
- * Stored with details of the event, createdByUserType and creation time.
+ * Stored with details of the event, creator and creation time.
  * Drafts are deleted when the action is committed.
  */
 export const Draft = z.object({
