@@ -112,6 +112,21 @@ export function setEventListData(
 }
 
 export async function invalidateEventsList() {
+  /*
+   * Invalidate search queries
+   */
+  await Promise.all(
+    queryClient
+      .getQueriesData<EventIndex[]>({
+        queryKey: trpcOptionsProxy.event.search.queryKey()
+      })
+      .map(async ([queryKey, eventIndices]) =>
+        queryClient.invalidateQueries({
+          queryKey
+        })
+      )
+  )
+
   return queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.event.list.queryKey()
   })

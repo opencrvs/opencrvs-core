@@ -355,12 +355,20 @@ export async function addAction(
     status: status
   }
 
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
+  await db.collection<EventDocument>('events').updateOne(
+    {
+      id: eventId,
+      actions: {
+        $not: {
+          $elemMatch: {
+            transactionId: input.transactionId,
+            type: input.type
+          }
+        }
+      }
+    },
+    { $push: { actions: action }, $set: { updatedAt: now } }
+  )
 
   // We want to unassign only if:
   // - Action is a write action, since we dont want to unassign from e.g. READ action
