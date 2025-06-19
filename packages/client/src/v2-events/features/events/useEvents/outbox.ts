@@ -9,112 +9,78 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { hashKey, Mutation, useQuery } from '@tanstack/react-query'
-import type {
-  DecorateMutationProcedure,
-  inferInput,
-  inferOutput,
-  TRPCMutationKey
-} from '@trpc/tanstack-react-query'
-import { EventIndex } from '@opencrvs/commons/client'
+import { useEffect, useState } from 'react'
+import { EventIndex, getCurrentEventState } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
-import { customMutationKeys } from './procedures/actions/action'
+import { useEventConfigurations } from '../useEventConfiguration'
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function getMutationKey<T extends DecorateMutationProcedure<any>>(
-  procedure: T
-) {
-  const mutationOptions = procedure.mutationOptions()
-  const key = mutationOptions.mutationKey
-  return key
-}
-
-function getPendingMutations(key: TRPCMutationKey) {
-  return queryClient
-    .getMutationCache()
-    .getAll()
-    .filter((mutation) => mutation.state.status !== 'success')
-    .filter(
-      (mutation) =>
-        mutation.options.mutationKey &&
-        hashKey(mutation.options.mutationKey) === hashKey(key)
-    )
-}
-
-function filterOutboxEventsWithMutation<
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  T extends DecorateMutationProcedure<any>
->(
-  events: EventIndex[],
-  mutationKey: TRPCMutationKey,
-  filter: (event: EventIndex, parameters: inferInput<T>) => boolean
-) {
-  const pendingMutations = getPendingMutations(mutationKey)
-
-  return pendingMutations.flatMap((m) => {
-    const variables = m.state.variables
-    return events
-      .filter((event) => filter(event, variables))
-      .map(({ declaration, ...event }) => ({
-        ...event,
-        workqueueMeta: m.options.meta,
-        declaration: {
-          ...declaration,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ...((variables as any).declaration || {})
-        }
-      }))
-  })
-}
+const mutationCache = queryClient.getMutationCache()
 
 export function useOutbox() {
+  const [outbox, setOutbox] = useState<EventIndex[]>([])
+
   const trpc = useTRPC()
-  const eventListQuery = useQuery({
-    ...trpc.event.list.queryOptions(),
-    queryKey: trpc.event.list.queryKey()
-  })
+  const eventConfigurations = useEventConfigurations()
 
-  const eventsList = eventListQuery.data ?? []
+  useEffect(() => {
+    const getOutboxEvents = () => {
+      const pendingMutation = mutationCache
+        .getAll()
+        .filter((mutation) => mutation.state.status !== 'success')
 
-  const eventFromDeclareActions = filterOutboxEventsWithMutation(
-    eventsList,
-    getMutationKey(trpc.event.actions.declare.request),
-    (event, parameters) => {
-      return event.id === parameters.eventId
+      const outboxEvents = pendingMutation
+        .map((mutation) => {
+          const variables = mutation.state.variables
+          if (
+            variables &&
+            typeof variables === 'object' &&
+            'eventId' in variables
+          ) {
+            const { eventId, declaration } = variables as {
+              eventId: string
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              declaration: Record<string, any> | undefined | null
+            }
+
+            const event = queryClient.getQueryData(
+              trpc.event.get.queryKey(eventId)
+            )
+
+            if (!event) {
+              return event
+            }
+
+            const eventConfiguration = eventConfigurations.find(
+              (config) => config.id === event.type
+            )
+            if (!eventConfiguration) {
+              return null
+            }
+
+            const eventState = getCurrentEventState(event, eventConfiguration)
+            if (declaration) {
+              return {
+                ...eventState,
+                declaration: { ...eventState.declaration, ...declaration },
+                workqueueMeta: mutation.options.meta
+              }
+            }
+            return eventState
+          }
+          return null
+        })
+        .filter((event) => event !== null && event !== undefined)
+
+      setOutbox(outboxEvents)
     }
-  )
 
-  const eventFromValidateActions = filterOutboxEventsWithMutation(
-    eventsList,
-    getMutationKey(trpc.event.actions.validate.request),
-    (event, parameters) => {
-      return event.id === parameters.eventId
-    }
-  )
+    getOutboxEvents()
+    const unsubscribe = mutationCache.subscribe(() => {
+      getOutboxEvents()
+    })
 
-  const eventFromRegisterActions = filterOutboxEventsWithMutation(
-    eventsList,
-    getMutationKey(trpc.event.actions.register.request),
-    (event, parameters) => {
-      return event.id === parameters.eventId
-    }
-  )
+    return unsubscribe
+  }, [eventConfigurations, trpc.event.get])
 
-  const eventFromRegisterOnDeclareActions = filterOutboxEventsWithMutation(
-    eventsList,
-    [customMutationKeys.registerOnDeclare],
-    (event, parameters) => {
-      return event.id === parameters.eventId
-    }
-  )
-
-  return eventFromDeclareActions
-    .concat(eventFromDeclareActions)
-    .concat(eventFromValidateActions)
-    .concat(eventFromRegisterActions)
-    .concat(eventFromRegisterOnDeclareActions)
-    .filter(
-      /* uniqueById */
-      (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
-    )
+  return outbox
 }
