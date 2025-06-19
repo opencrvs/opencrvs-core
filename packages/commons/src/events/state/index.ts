@@ -261,7 +261,7 @@ export function getCurrentEventState(
     legalStatuses: getLegalStatuses(event.actions),
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
-    creator: creationAction.creator,
+    createdByUserType: creationAction.createdByUserType,
     createdAtLocation: creationAction.createdAtLocation,
     createdBySignature: creationAction.createdBySignature,
     updatedAt: acceptedActionMetadata.createdAt,

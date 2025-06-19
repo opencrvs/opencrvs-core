@@ -119,7 +119,7 @@ exports[`Returns relevant events in right order 1`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-  "creator": "[sanitized]",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -158,7 +158,7 @@ exports[`Returns relevant events in right order 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "creator": "[sanitized]",
+      "createdByUserType": "[sanitized]",
     },
   },
   "status": "DECLARED",
@@ -178,7 +178,7 @@ exports[`Returns relevant events in right order 2`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-  "creator": "[sanitized]",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -217,7 +217,7 @@ exports[`Returns relevant events in right order 2`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "creator": "[sanitized]",
+      "createdByUserType": "[sanitized]",
     },
     "REGISTERED": {
       "acceptedAt": "[sanitized]",
@@ -226,7 +226,7 @@ exports[`Returns relevant events in right order 2`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "creator": "[sanitized]",
+      "createdByUserType": "[sanitized]",
       "registrationNumber": "1234567890AB",
     },
   },

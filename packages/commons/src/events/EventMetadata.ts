@@ -64,7 +64,7 @@ export const ActionCreationMetadata = z.object({
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the action request.'
   ),
-  creator: z
+  createdByUserType: z
     .enum(['user', 'system'])
     .nullish()
     .describe('Whether the user is a normal user or a system.'),
@@ -121,7 +121,7 @@ export const EventMetadata = z.object({
     .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
   createdBy: z.string().describe('ID of the user who created the event.'),
-  creator: z
+  createdByUserType: z
     .enum(['user', 'system'])
     .nullish()
     .describe('Whether the user is a normal user or a system.'),
@@ -170,7 +170,7 @@ export const EventMetadataKeysArray = [
   'createdAt',
   'dateOfEvent',
   'createdBy',
-  'creator',
+  'createdByUserType',
   'updatedByUserRole',
   'createdAtLocation',
   'updatedAtLocation',
@@ -204,10 +204,10 @@ export const eventMetadataLabelMap: Record<
     defaultMessage: 'Created',
     description: 'Created At'
   },
-  'event.creator': {
-    id: 'event.creator.label',
-    defaultMessage: 'Creator',
-    description: 'Creator:user or system'
+  'event.createdByUserType': {
+    id: 'event.createdByUserType.label',
+    defaultMessage: 'createdByUserType',
+    description: 'createdByUserType:user or system'
   },
   'event.dateOfEvent': {
     id: 'event.dateOfEvent.label',

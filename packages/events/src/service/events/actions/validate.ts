@@ -48,7 +48,7 @@ export async function validate(
 
   const createdByDetails = {
     createdBy: user.id,
-    creator: user.type,
+    createdByUserType: user.type,
     createdByRole: user.role,
     createdAtLocation: user.primaryOfficeId,
     createdBySignature: user.signature

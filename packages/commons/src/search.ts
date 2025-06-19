@@ -125,7 +125,7 @@ export interface SearchDocument {
   createdBy?: string
   updatedBy?: string
   createdAt?: string
-  creator?: string
+  createdByUserType?: string
   modifiedAt?: string
   assignment?: IAssignment | null
   operationHistories?: IOperationHistory[]

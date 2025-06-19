@@ -38,7 +38,7 @@ const generator = testDataGenerator()
 const actionProps: ActionBase = {
   createdAt: '2025-04-18T08:34:20.711Z',
   createdBy: '67f6607c3866c994bcc0335a',
-  creator: TokenUserType.Enum.user,
+  createdByUserType: TokenUserType.Enum.user,
   createdByRole: 'some-user-role',
   createdAtLocation: '03c4aab4-cd46-4fb1-b30d-2e3b7ba0bfe8',
   id: '827bf7e8-0e1e-4cef-aee7-66e71287a2c8',

@@ -157,7 +157,7 @@ export const QueryExpression = z
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
-    creator: TokenUserType.optional(),
+    createdByUserType: TokenUserType.optional(),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),

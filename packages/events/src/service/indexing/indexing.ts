@@ -184,7 +184,7 @@ export async function createIndex(
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
-          creator: { type: 'keyword' },
+          createdByUserType: { type: 'keyword' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
           updatedAtLocation: { type: 'keyword' },
@@ -205,7 +205,7 @@ export async function createIndex(
                 properties: {
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
-                  creator: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   createdBySignature: { type: 'keyword' },
@@ -220,7 +220,7 @@ export async function createIndex(
                 properties: {
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
-                  creator: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   createdBySignature: { type: 'keyword' },

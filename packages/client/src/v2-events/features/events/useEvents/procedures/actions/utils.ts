@@ -49,7 +49,7 @@ export function updateEventOptimistically<T extends ActionInput>(
           type: actionType,
           declaration: variables.declaration,
           createdAt: new Date().toISOString(),
-          creator: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.Enum.user,
           createdBy: '@todo',
           createdAtLocation: '@todo',
           status: ActionStatus.Requested

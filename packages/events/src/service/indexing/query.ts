@@ -142,9 +142,9 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     })
   }
 
-  if (clause.creator) {
+  if (clause.createdByUserType) {
     must.push({
-      term: { creator: clause.creator }
+      term: { createdByUserType: clause.createdByUserType }
     })
   }
 

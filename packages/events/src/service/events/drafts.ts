@@ -39,7 +39,7 @@ export async function createDraft(
       ...input,
       type: input.type,
       createdBy: user.id,
-      creator: user.type,
+      createdByUserType: user.type,
       createdByRole: user.role,
       createdAt: now,
       createdAtLocation: user.primaryOfficeId,

@@ -286,7 +286,7 @@ export function eventPayloadGenerator(rng: () => number) {
             },
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
-            creator: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.Enum.user,
             createdByRole: '@todo',
             createdAtLocation: '@todo'
           }
@@ -610,7 +610,7 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: getUUID(),
-    creator: TokenUserType.Enum.user,
+    createdByUserType: TokenUserType.Enum.user,
     createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
     createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
@@ -810,7 +810,7 @@ export const eventQueryDataGenerator = (
     type: overrides.type ?? TENNIS_CLUB_MEMBERSHIP,
     status: overrides.status ?? pickRandom(rng, EventStatus.options),
     createdAt: overrides.createdAt ?? createdAt,
-    creator: overrides.creator ?? 'user',
+    createdByUserType: overrides.createdByUserType ?? 'user',
     createdBy: overrides.createdBy ?? generateUuid(rng),
     createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),
     updatedAtLocation: overrides.updatedAtLocation ?? generateUuid(rng),
