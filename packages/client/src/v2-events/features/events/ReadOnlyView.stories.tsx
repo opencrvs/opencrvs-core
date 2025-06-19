@@ -30,6 +30,7 @@ import {
   tennisClubMembershipEventIndex
 } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
+import { setEventData, setLocalEventConfig } from './useEvents/api'
 
 const generator = testDataGenerator()
 
@@ -69,6 +70,16 @@ const draft = generateEventDraftDocument({
 })
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(
+      tennisClubMembershipEventDocument.id,
+      tennisClubMembershipEventDocument
+    )
+  },
   loaders: [
     async () => {
       window.localStorage.setItem(
@@ -177,6 +188,13 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 }
 
 export const ReadOnlyViewForUserWithReadPermission: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventDocument.id, eventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
