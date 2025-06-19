@@ -12,16 +12,17 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
-  filterUnallowedActions,
-  Scope,
   EventIndex,
   getUUID,
   TranslationConfig,
-  EventStatus,
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  WorkqueueActionType
+  WorkqueueActionType,
+  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
+  EventStatus,
+  Scope,
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -29,10 +30,25 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
 
-function getAssignmentActions(
+const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
+  EventStatus.enum.NOTIFIED,
+  EventStatus.enum.DECLARED,
+  EventStatus.enum.VALIDATED,
+  EventStatus.enum.REJECTED,
+  EventStatus.enum.REGISTERED,
+  EventStatus.enum.CERTIFIED,
+  EventStatus.enum.ARCHIVED
+]
+
+function getAvailableAssignmentActions(
+  eventStatus: EventStatus,
   assignmentStatus: keyof typeof AssignmentStatus,
   mayUnassignOthers: boolean
 ) {
+  if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {
+    return []
+  }
+
   if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
     return [ActionType.ASSIGN]
   }
@@ -49,56 +65,6 @@ function getAssignmentActions(
   }
 
   return []
-}
-
-/**
- * Actions that can be performed on an event based on its status and user scope.
- */
-
-function getUserActionsByStatus(
-  status: EventStatus,
-  assignmentActions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  switch (status) {
-    case EventStatus.enum.CREATED: {
-      return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
-    }
-    case EventStatus.enum.NOTIFIED:
-    case EventStatus.enum.DECLARED: {
-      return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
-    }
-    case EventStatus.enum.VALIDATED: {
-      return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
-    }
-    case EventStatus.enum.CERTIFIED:
-    case EventStatus.enum.REGISTERED: {
-      return [
-        ...assignmentActions,
-        ActionType.READ,
-        ActionType.PRINT_CERTIFICATE,
-        ActionType.REQUEST_CORRECTION
-      ]
-    }
-    case EventStatus.enum.REJECTED: {
-      const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
-      const canValidate = hasAnyOfScopes(userScopes, validateScopes)
-
-      /**
-       * Show 'higher' action when the user has the required scopes.
-       */
-      const declarationAction = canValidate
-        ? ActionType.VALIDATE
-        : ActionType.DECLARE
-
-      return [...assignmentActions, ActionType.READ, declarationAction]
-    }
-
-    case EventStatus.enum.ARCHIVED:
-      return [...assignmentActions, ActionType.READ]
-    default:
-      return [ActionType.READ]
-  }
 }
 
 export interface ActionConfig {
@@ -266,6 +232,79 @@ export function useAction(event: EventIndex) {
   }
 }
 
+const ACTION_OVERRIDES = {
+  [ActionType.DECLARE]: ActionType.VALIDATE
+} satisfies Partial<Record<ActionType, ActionType>>
+
+function actionHasOverride(
+  action: ActionType
+): action is keyof typeof ACTION_OVERRIDES {
+  return action in ACTION_OVERRIDES
+}
+
+/**
+ * Filters out actions that are overridden by other actions based on user scopes.
+ *
+ * Some actions can override other actions depending on the user's permissions.
+ * For example, if an event is in rejected state, a user can either DECLARE or VALIDATE
+ * depending on their scope - if they have VALIDATE scope, DECLARE will be filtered out.
+ *
+ * @param actions - Array of action types to filter
+ * @param scopes - Array of user scopes to check against
+ * @returns Filtered array of actions with overridden actions removed
+ */
+function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
+  return actions.filter((a) => {
+    if (!actionHasOverride(a)) {
+      return true
+    }
+
+    const overrideAction = ACTION_OVERRIDES[a]
+
+    if (!actions.includes(overrideAction)) {
+      return true
+    }
+
+    const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
+    return !hasAnyOfScopes(scopes, overrideActionScopes)
+  })
+}
+
+/**
+ * Filters out actions that the user is not allowed to perform based on their scopes.
+ *
+ * This function checks each action against the user's scopes to determine if they
+ * have the necessary permissions to perform that action. If the user can only perform
+ * meta actions (READ, ASSIGN, UNASSIGN), they are restricted to only READ to prevent
+ * assignment operations when they lack other permissions.
+ *
+ * @param actions - Array of action types to check for permissions
+ * @param userScopes - Array of user scopes to validate against
+ * @returns Filtered array of actions that the user is allowed to perform
+ */
+function filterUnallowedActions(
+  actions: ActionType[],
+  userScopes: Scope[]
+): ActionType[] {
+  const allowedActions = actions.filter((action) => {
+    const requiredScopes = ACTION_ALLOWED_SCOPES[action]
+
+    if (requiredScopes === null) {
+      return true
+    }
+
+    return hasAnyOfScopes(userScopes, requiredScopes)
+  })
+
+  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  const hasOtherAllowedActions = allowedActions.some(
+    (action) => !isMetaAction(action)
+  )
+
+  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
+  return hasOtherAllowedActions ? allowedActions : [ActionType.READ]
+}
+
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
@@ -273,18 +312,20 @@ export function useActionMenuItems(event: EventIndex) {
   const scopes = useSelector(getScope) ?? []
   const { config, authentication } = useAction(event)
 
-  const assignmentActions = getAssignmentActions(
+  const availableAssignmentActions = getAvailableAssignmentActions(
+    event.status,
     getAssignmentStatus(event, authentication.sub),
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
-  const availableActions = getUserActionsByStatus(
-    event.status,
-    assignmentActions,
+  const availableActions = filterOverriddenActions(
+    AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status],
     scopes
   )
 
-  const allowedActions = filterUnallowedActions(availableActions, scopes)
+  const actions = [...availableAssignmentActions, ...availableActions]
+
+  const allowedActions = filterUnallowedActions(actions, scopes)
   return allowedActions
     .filter((action): action is keyof typeof config =>
       Object.keys(config).includes(action)

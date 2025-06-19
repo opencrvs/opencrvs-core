@@ -32,7 +32,7 @@ test('prevents forbidden access if missing required scope', async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access with required scope`, async () => {
+test('allows access with required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 

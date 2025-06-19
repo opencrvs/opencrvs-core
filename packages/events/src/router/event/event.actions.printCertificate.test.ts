@@ -98,6 +98,36 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
   ).resolves.toBeDefined()
 })
 
+test(`${ActionType.PRINT_CERTIFICATE} action can not be performed on a declared, non-registered event`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const declaredEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id)
+  )
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await expect(
+    client.event.actions.printCertificate.request(
+      generator.event.actions.printCertificate(declaredEvent.id)
+    )
+  ).rejects.toThrowErrorMatchingSnapshot()
+})
+
 test(`${ActionType.PRINT_CERTIFICATE} action can be added to registered event`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
