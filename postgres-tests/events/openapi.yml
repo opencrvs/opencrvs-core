@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: a1a31c7a-61b4-47da-9020-ef09b3ef670c
+                transactionId: 531c50c0-2bf9-4bc9-9ce1-2b77420631c0
                 type: v2.birth
       responses:
         "200":
@@ -264,6 +264,21 @@ paths:
                           - addressType
                           - state
                           - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
                   default: {}
                 annotation:
                   type: object
@@ -413,6 +428,21 @@ paths:
                           - addressType
                           - state
                           - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
                 originalActionId:
                   type: string
                   format: uuid
@@ -428,7 +458,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 372e747d-845b-4aae-b904-cfe97ec8ee49
+                transactionId: 5dbc5cef-5a70-44cb-a80a-68ad3f6bab74
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -490,11 +520,12 @@ paths:
             type: array
             items:
               $ref: "#/components/schemas/QueryExpression"
+            minItems: 1
             default:
               - eventType: tennis-club-membership
                 status:
                   type: anyOf
-                  terms:
+                  terms: &a11
                     - CREATED
                     - NOTIFIED
                     - DECLARED
@@ -583,6 +614,7 @@ paths:
                         properties:
                           id:
                             type: string
+                            format: uuid
                           transactionId:
                             type: string
                           createdAt:
@@ -864,7 +896,7 @@ components:
 
                             \    This property determines whether to add a
                             prefix (such as \"Child\" or \"Applicant\") before
-                            the field label\ 
+                            the field label
 
                             \    when rendering search parameter labels — for
                             example, in the search results page to indicate
@@ -872,7 +904,7 @@ components:
 
 
                             \    For example, a field config like { id:
-                            \"child.firstname\", label: { defaultMessage:
+                            \"child.name.firstname\", label: { defaultMessage:
                             \"First Name(s)\" } } would render as \"First
                             Name(s)\" by default.
 
@@ -882,22 +914,21 @@ components:
                             also render as \"First Name(s)\" by default.
 
 
-                            \    So, if both child.firstname and
+                            \    So, if both child.name.firstname and
                             mother.firstname are used in a search, the resulting
                             search criteria labels would be \"First Name(s)\",
-                            \"First Name(s)\",\ 
+                            \"First Name(s)\",
 
                             \    which is ambiguous.
 
 
                             \    Now, if we treat the field ID prefix as a label
                             (e.g., \"applicant.firstname\" → \"Applicant\"), and
-                            the field label is already\ 
+                            the field label is already
 
                             \    descriptive — like { id:
                             \"applicant.firstname\", label: { defaultMessage:
-                            \"Applicant's First Name\" } } — then the
-                            resulting\ 
+                            \"Applicant's First Name\" } } — then the resulting
 
                             \    label would be \"Applicant Applicant's First
                             Name\", which is redundant and awkward.
@@ -905,7 +936,7 @@ components:
 
                             \    By setting searchCriteriaLabelPrefix to a
                             translation config object, we can explicitly define
-                            the desired prefix\ 
+                            the desired prefix
 
                             \    in the country-config > event.advancedSearch
                             configuration. For example: field(\"child.dob\", {
@@ -924,27 +955,25 @@ components:
                             \       In advanced search, we sometimes need to
                             override the default field visibility conditionals.
 
-                            \      \ 
 
                             \       For example, Informant fields in the
-                            declaration form may have conditional logic\ 
+                            declaration form may have conditional logic
 
                             \       that hides them based on other field values.
-                            Since the advanced search form reuses\ 
+                            Since the advanced search form reuses
 
                             \       the declaration form config, those same
                             conditionals would apply by default.
 
-                            \      \ 
 
                             \       However, in advanced search we often want to
                             make all Informant fields searchable,
 
                             \       regardless of their original visibility
-                            logic. To do this, we explicitly set their\ 
+                            logic. To do this, we explicitly set their
 
                             \       'conditionals' to an empty array ('[]') in
-                            the search config. This ensures they\ 
+                            the search config. This ensures they
 
                             \       are always rendered in the advanced search
                             form.
@@ -991,7 +1020,7 @@ components:
 
                             \    This property determines whether to add a
                             prefix (such as \"Child\" or \"Applicant\") before
-                            the field label\ 
+                            the field label
 
                             \    when rendering search parameter labels — for
                             example, in the search results page to indicate
@@ -999,7 +1028,7 @@ components:
 
 
                             \    For example, a field config like { id:
-                            \"child.firstname\", label: { defaultMessage:
+                            \"child.name.firstname\", label: { defaultMessage:
                             \"First Name(s)\" } } would render as \"First
                             Name(s)\" by default.
 
@@ -1009,22 +1038,21 @@ components:
                             also render as \"First Name(s)\" by default.
 
 
-                            \    So, if both child.firstname and
+                            \    So, if both child.name.firstname and
                             mother.firstname are used in a search, the resulting
                             search criteria labels would be \"First Name(s)\",
-                            \"First Name(s)\",\ 
+                            \"First Name(s)\",
 
                             \    which is ambiguous.
 
 
                             \    Now, if we treat the field ID prefix as a label
                             (e.g., \"applicant.firstname\" → \"Applicant\"), and
-                            the field label is already\ 
+                            the field label is already
 
                             \    descriptive — like { id:
                             \"applicant.firstname\", label: { defaultMessage:
-                            \"Applicant's First Name\" } } — then the
-                            resulting\ 
+                            \"Applicant's First Name\" } } — then the resulting
 
                             \    label would be \"Applicant Applicant's First
                             Name\", which is redundant and awkward.
@@ -1032,7 +1060,7 @@ components:
 
                             \    By setting searchCriteriaLabelPrefix to a
                             translation config object, we can explicitly define
-                            the desired prefix\ 
+                            the desired prefix
 
                             \    in the country-config > event.advancedSearch
                             configuration. For example: field(\"child.dob\", {
@@ -1051,27 +1079,25 @@ components:
                             \       In advanced search, we sometimes need to
                             override the default field visibility conditionals.
 
-                            \      \ 
 
                             \       For example, Informant fields in the
-                            declaration form may have conditional logic\ 
+                            declaration form may have conditional logic
 
                             \       that hides them based on other field values.
-                            Since the advanced search form reuses\ 
+                            Since the advanced search form reuses
 
                             \       the declaration form config, those same
                             conditionals would apply by default.
 
-                            \      \ 
 
                             \       However, in advanced search we often want to
                             make all Informant fields searchable,
 
                             \       regardless of their original visibility
-                            logic. To do this, we explicitly set their\ 
+                            logic. To do this, we explicitly set their
 
                             \       'conditionals' to an empty array ('[]') in
-                            the search config. This ensures they\ 
+                            the search config. This ensures they
 
                             \       are always rendered in the advanced search
                             form.
@@ -2073,6 +2099,193 @@ components:
             - type
             - options
           description: Select input
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a4
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a5
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            type:
+              type: string
+              enum:
+                - NAME
+            defaultValue:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  minLength: 1
+                surname:
+                  type: string
+                  minLength: 1
+              required:
+                - firstname
+                - surname
+            configuration:
+              type: object
+              properties:
+                maxLength:
+                  type: number
+                  description: Maximum length of the text
+                prefix:
+                  $ref: "#/components/schemas/TranslationConfig"
+                postfix:
+                  $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - id
+            - label
+            - type
+          description: Name input field
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a4
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a5
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            defaultValue:
+              type: string
+              minLength: 1
+            type:
+              type: string
+              enum:
+                - PHONE
+          required:
+            - id
+            - label
+            - type
+          description: Phone input field
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a4
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a5
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            defaultValue:
+              type: string
+              minLength: 1
+            type:
+              type: string
+              enum:
+                - ID
+          required:
+            - id
+            - label
+            - type
+          description: ID input field
         - type: object
           properties:
             id:
@@ -3904,6 +4117,7 @@ components:
                 properties:
                   id:
                     type: string
+                    format: uuid
                   transactionId:
                     type: string
                   createdAt:
@@ -3989,6 +4203,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4154,6 +4369,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -4303,6 +4533,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: &a10
@@ -4331,6 +4576,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4496,6 +4742,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -4645,6 +4906,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -4670,6 +4946,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -4835,6 +5112,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -4984,6 +5276,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -5022,6 +5329,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -5187,6 +5495,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -5336,6 +5659,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -5361,6 +5699,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -5526,6 +5865,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -5675,6 +6029,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -5713,6 +6082,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -5878,6 +6248,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -6027,6 +6412,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -6052,6 +6452,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6217,6 +6618,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -6366,6 +6782,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -6393,6 +6824,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6558,6 +6990,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -6707,6 +7154,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -6732,6 +7194,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -6897,6 +7360,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -7046,6 +7524,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -7074,6 +7567,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7239,6 +7733,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -7388,6 +7897,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -7413,6 +7937,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7578,6 +8103,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -7727,6 +8267,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -7755,6 +8310,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -7920,6 +8476,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8069,6 +8640,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -8097,6 +8683,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8262,6 +8849,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8411,6 +9013,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -8439,6 +9056,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8604,6 +9222,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8753,6 +9386,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -8778,6 +9426,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdAt:
@@ -8943,6 +9592,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -9092,6 +9756,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
           enum: *a10
@@ -9162,6 +9841,8 @@ components:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
+        legalStatus.REGISTERED.registrationNumber:
+          $ref: "#/components/schemas/Exact"
         createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
@@ -9197,15 +9878,7 @@ components:
           type: array
           items:
             type: string
-            enum: &a11
-              - CREATED
-              - NOTIFIED
-              - DECLARED
-              - VALIDATED
-              - REGISTERED
-              - CERTIFIED
-              - REJECTED
-              - ARCHIVED
+            enum: *a11
       required:
         - type
         - terms
@@ -9335,15 +10008,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum:
-            - CREATED
-            - NOTIFIED
-            - DECLARED
-            - VALIDATED
-            - REGISTERED
-            - CERTIFIED
-            - REJECTED
-            - ARCHIVED
+          enum: *a11
         legalStatuses:
           type: object
           properties:
@@ -9608,6 +10273,32 @@ components:
                   - addressType
                   - state
                   - district2
+              - type: object
+                properties:
+                  firstname:
+                    type: string
+                  surname:
+                    type: string
+                  middlename:
+                    type: string
+                required:
+                  - firstname
+                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
       required:
         - id
         - type
