@@ -74,4 +74,22 @@ describe('parseScope()', () => {
     const result = parseScope(scope)
     expect(result).toEqual(undefined)
   })
+
+  it('should return undefined for an invalid scope with search', () => {
+    const scope = 'search[event=]'
+    const result = parseScope(scope)
+    expect(result).toEqual(undefined)
+  })
+
+  it('should return scope for a valid scope with search', () => {
+    const scope =
+      'search[event=tennis-club-membership:my-jurisdiction|birth:all]'
+    const result = parseScope(scope)
+    expect(result).toEqual({
+      type: 'search',
+      options: {
+        event: ['tennis-club-membership:my-jurisdiction', 'birth:all']
+      }
+    })
+  })
 })

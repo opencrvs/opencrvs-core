@@ -225,7 +225,7 @@ const LiteralScopes = z.union([
 // - user.create[role=first-role|second-role]
 // - record.notify[event=v2.birth]
 const rawConfigurableScopeRegex =
-  /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
+  /^([a-zA-Z\.]+)\[((?:\w+=[\w:.-]+(?:\|[\w:.-]+)*)(?:,[\w]+=[\w:.-]+(?:\|[\w:.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -257,11 +257,20 @@ const NotifyRecordScope = z.object({
   })
 })
 
+const SearchScope = z.object({
+  type: z.literal('search'),
+  options: z.object({
+    event: z.array(z.string()),
+    jurisdiction: z.literal('my-jurisdiction').optional()
+  })
+})
+
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  NotifyRecordScope
+  NotifyRecordScope,
+  SearchScope
 ])
 
 export type ConfigurableScopeType = ConfigurableScopes['type']
@@ -332,7 +341,7 @@ export function parseScope(scope: string) {
  * })
  * // Returns: "record.notify[event=v2.birth|tennis-club-membership]"
  */
-export function stringifyScope(scope: ConfigurableScopes) {
+export function stringifyScope(scope: z.infer<typeof NotifyRecordScope>) {
   const options = Object.entries(scope.options)
     .map(([key, value]) => `${key}=${value.join('|')}`)
     .join(',')
