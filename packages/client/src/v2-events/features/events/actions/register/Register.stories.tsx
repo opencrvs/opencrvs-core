@@ -11,13 +11,25 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { AppRouter } from '@client/v2-events/trpc'
+import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'Register'
+  title: 'Register',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(
+      tennisClubMembershipEventDocument.id,
+      tennisClubMembershipEventDocument
+    )
+  }
 }
 
 export default meta

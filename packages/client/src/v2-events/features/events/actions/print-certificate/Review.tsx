@@ -172,6 +172,7 @@ export function Review() {
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
+
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
 

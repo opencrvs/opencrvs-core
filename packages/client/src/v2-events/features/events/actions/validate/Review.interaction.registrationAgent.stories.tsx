@@ -93,7 +93,7 @@ const mockUser = {
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
     /*
-     * Ensure record is "downloaded offline" in th user's browser
+     * Ensure record is "downloaded offline" in the user's browser
      */
     setLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)
@@ -180,7 +180,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 export const ReviewForRegistrationAgentArchiveInteraction: Story = {
   beforeEach: () => {
     /*
-     * Ensure record is "downloaded offline" in th user's browser
+     * Ensure record is "downloaded offline" in the user's browser
      */
     setLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)
@@ -310,7 +310,7 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
 export const ReviewForRegistratinAgentRejectInteraction: Story = {
   beforeEach: () => {
     /*
-     * Ensure record is "downloaded offline" in th user's browser
+     * Ensure record is "downloaded offline" in the user's browser
      */
     setLocalEventConfig(tennisClubMembershipEvent)
     setEventData(eventId, eventDocument)

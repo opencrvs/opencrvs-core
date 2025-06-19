@@ -64,6 +64,9 @@ export function Review() {
 
   useEffect(() => {
     if (!event) {
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
       return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
     }
   }, [event, eventId, navigate])

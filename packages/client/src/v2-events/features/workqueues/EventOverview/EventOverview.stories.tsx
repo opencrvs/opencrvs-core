@@ -19,16 +19,28 @@ import {
   ActionStatus,
   getUUID,
   createPrng,
-  getRandomDatetime
+  getRandomDatetime,
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { setEventData, setLocalEventConfig } from '../../events/useEvents/api'
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
   title: 'EventOverview',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(
+      tennisClubMembershipEventDocument.id,
+      tennisClubMembershipEventDocument
+    )
+  },
   component: EventOverviewIndex,
   decorators: [
     (Story) => (

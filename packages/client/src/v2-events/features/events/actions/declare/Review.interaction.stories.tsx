@@ -39,7 +39,7 @@ const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   beforeEach: () => {
     /*
-     * Ensure record is "downloaded offline" in th user's browser
+     * Ensure record is "downloaded offline" in the user's browser
      */
     setLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)
@@ -339,7 +339,7 @@ const eventId = eventDocument.id
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
     /*
-     * Ensure record is "downloaded offline" in th user's browser
+     * Ensure record is "downloaded offline" in the user's browser
      */
     setLocalEventConfig(tennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
@@ -433,7 +433,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 export const ChangeFieldInReview: Story = {
   beforeEach: () => {
     /*
-     * Ensure record is "downloaded offline" in th user's browser
+     * Ensure record is "downloaded offline" in the user's browser
      */
     setLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)

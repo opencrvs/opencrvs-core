@@ -57,15 +57,27 @@ export function updateLocalEventIndex(updatedEvent: EventDocument) {
       `Event configuration for type ${updatedEvent.type} not found`
     )
   }
+  const updatedEventIndex = getCurrentEventState(updatedEvent, config)
   // Update the local event index with the updated event
   setEventListData((eventIndices) =>
     eventIndices?.map((eventIndex) =>
       eventIndex.id === updatedEvent.id
-        ? { ...eventIndex, ...getCurrentEventState(updatedEvent, config) }
+        ? { ...eventIndex, ...updatedEventIndex }
         : eventIndex
     )
   )
 
+  /*
+   * Ensure there exists a local cached search query for this event
+   */
+
+  queryClient.setQueryData(
+    trpcOptionsProxy.event.search.queryKey({
+      type: 'and',
+      clauses: [{ id: updatedEvent.id }]
+    }),
+    () => [updatedEventIndex]
+  )
   /*
    * Update all searches where this event is present
    */
@@ -78,7 +90,7 @@ export function updateLocalEventIndex(updatedEvent: EventDocument) {
         queryKey,
         (eventIndices || []).map((eventIndex) =>
           eventIndex.id === updatedEvent.id
-            ? { ...eventIndex, ...getCurrentEventState(updatedEvent, config) }
+            ? { ...eventIndex, ...updatedEventIndex }
             : eventIndex
         )
       )

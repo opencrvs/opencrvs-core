@@ -22,16 +22,32 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
+  tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex,
   TestImage
 } from '@client/v2-events/features/events/fixtures'
 
+import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Declare'
+  title: 'Declare',
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in th user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventId, eventDocument)
+  }
 }
 
 export default meta
@@ -46,12 +62,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
 const draft = generateEventDraftDocument({
   eventId,
   actionType: ActionType.REGISTER
@@ -374,6 +384,13 @@ const createdEvent = generateEventDocument({
 })
 
 export const ReviewShowsFilesFromDraft: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    setLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventId, createdEvent)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,

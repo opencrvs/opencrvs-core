@@ -29,7 +29,7 @@ const meta: Meta<typeof Validate.Review> = {
   title: 'Validate/Review',
   beforeEach: () => {
     /*
-     * Ensure record is "downloaded offline" in th user's browser
+     * Ensure record is "downloaded offline" in the user's browser
      */
     setLocalEventConfig(tennisClubMembershipEvent)
     setEventData(
