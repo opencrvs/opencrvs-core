@@ -41,18 +41,11 @@ export const Fuzzy = z
   .openapi({
     ref: 'Fuzzy'
   })
+
 export const Exact = z
   .object({ type: z.literal('exact'), term: z.string() })
   .openapi({
     ref: 'Exact'
-  })
-export const AnyOf = z
-  .object({
-    type: z.literal('anyOf'),
-    terms: z.array(z.string())
-  })
-  .openapi({
-    ref: 'AnyOf'
   })
 
 export const ExactStatus = z
@@ -62,6 +55,15 @@ export const ExactStatus = z
   })
   .openapi({
     ref: 'ExactStatus'
+  })
+
+export const AnyOf = z
+  .object({
+    type: z.literal('anyOf'),
+    terms: z.array(z.string())
+  })
+  .openapi({
+    ref: 'AnyOf'
   })
 
 export const AnyOfStatus = z
@@ -82,6 +84,7 @@ export const Range = z
   .openapi({
     ref: 'Range'
   })
+
 export const Not = z
   .object({ type: z.literal('not'), term: z.string() })
   .openapi({
@@ -94,7 +97,20 @@ export const Within = z
     ref: 'Within'
   })
 
-export const DateCondition = z.union([Exact, Range]).openapi({
+export const RangeDate = Range.extend({
+  gte: z.string().date().or(z.string().datetime()),
+  lte: z.string().date().or(z.string().datetime())
+}).openapi({
+  ref: 'RangeDate'
+})
+
+export const ExactDate = Exact.extend({
+  term: z.string().date().or(z.string().datetime())
+}).openapi({
+  ref: 'ExactDate'
+})
+
+export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
   ref: 'DateCondition'
 })
 
@@ -147,6 +163,9 @@ export const QueryExpression = z
     data: QueryInput
   })
   .partial()
+  .refine((obj) => Object.values(obj).some((val) => val !== undefined), {
+    message: 'At least one query field must be specified.'
+  })
   .openapi({
     ref: 'QueryExpression'
   })
