@@ -59,7 +59,7 @@ export function ActionMenu({
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
-                  await action.onClick(eventIndex.id)
+                  await action.onClick()
                   onAction?.()
                 }}
               >
