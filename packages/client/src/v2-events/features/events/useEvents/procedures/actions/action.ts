@@ -284,7 +284,14 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
   function getMutationPayload(params: ActionMutationInput) {
     const { eventId } = params
-    const localEvent = findLocalEventDocument(eventId)
+    const localEvent =
+      /*
+       * In most cases an event should be stored in browser as a full event. This applies when:
+       * - You are submitting an action flow. Every action flow needs to have downloaded the full event first
+       * In other cases, the user might not have the full event downloaded, but only the index. This can happen when:
+       * - The user is on event overview page and is assigning / unassigning
+       */
+      findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
 
     const eventConfiguration = eventConfigurations.find(
       (event) => event.id === localEvent?.type
