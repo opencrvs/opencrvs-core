@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f9ffcd30-30c1-4c9a-8ff9-c04c5fcbb6db
+                transactionId: 85b766bf-f3c2-4fa3-9b30-5dbfcdefd978
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5b973450-786e-4e5b-badc-29d44039769d
+                transactionId: 34b9cc0c-a2fe-402a-b8e0-2a1130685156
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9810,8 +9810,8 @@ components:
         - term
     DateCondition:
       anyOf:
-        - $ref: "#/components/schemas/Exact"
-        - $ref: "#/components/schemas/Range"
+        - $ref: "#/components/schemas/ExactDate"
+        - $ref: "#/components/schemas/RangeDate"
     Exact:
       type: object
       properties:
@@ -9821,6 +9821,22 @@ components:
             - exact
         term:
           type: string
+      required:
+        - type
+        - term
+    ExactDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - term
@@ -9835,6 +9851,29 @@ components:
           type: string
         lte:
           type: string
+      required:
+        - type
+        - gte
+        - lte
+    RangeDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - range
+        gte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
+        lte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - gte
@@ -10006,7 +10045,7 @@ components:
           description: ID of the user who created the event.
         updatedByUserRole:
           type: string
-          description: Role of the user who last updated the declaration.
+          description: Role of the user who last changed the status.
         createdAtLocation:
           type: string
           nullable: true
@@ -10018,11 +10057,12 @@ components:
         updatedAtLocation:
           type: string
           nullable: true
-          description: Location of the user who last updated the declaration.
+          description: Location of the user who last changed the status.
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp of the most recent declaration update.
+          description: Timestamp of the most recent *accepted* status change. Possibly 3rd
+            party update, if action is validation asynchronously.
         assignedTo:
           type: string
           nullable: true
@@ -10030,7 +10070,7 @@ components:
         updatedBy:
           type: string
           nullable: true
-          description: ID of the user who last updated the declaration.
+          description: ID of the user who last changed the status.
         trackingId:
           type: string
           description: System-generated tracking ID used by informants or registrars to
