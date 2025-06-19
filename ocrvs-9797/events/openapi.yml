@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 7f5aa325-a962-483e-9a67-a64e9ebe8bbe
+                transactionId: 45ba4365-ad14-41df-92e9-a18a3aa73590
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f17829d4-249a-4357-8e1b-0efa93fd499b
+                transactionId: 74657ffa-db64-443f-83b7-22c9b9c73946
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9821,9 +9821,7 @@ components:
           $ref: "#/components/schemas/Exact"
         creator:
           type: string
-          enum:
-            - user
-            - system
+          enum: *a9
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -9868,8 +9866,8 @@ components:
         - term
     DateCondition:
       anyOf:
-        - $ref: "#/components/schemas/Exact"
-        - $ref: "#/components/schemas/Range"
+        - $ref: "#/components/schemas/ExactDate"
+        - $ref: "#/components/schemas/RangeDate"
     Exact:
       type: object
       properties:
@@ -9879,6 +9877,22 @@ components:
             - exact
         term:
           type: string
+      required:
+        - type
+        - term
+    ExactDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - term
@@ -9893,6 +9907,29 @@ components:
           type: string
         lte:
           type: string
+      required:
+        - type
+        - gte
+        - lte
+    RangeDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - range
+        gte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
+        lte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - gte
@@ -10004,7 +10041,7 @@ components:
                     - user
                     - system
                     - null
-                  description: Whether the user us a normal user or a system.
+                  description: Whether the user is a normal user or a system.
                 acceptedAt:
                   type: string
                   format: date-time
@@ -10043,7 +10080,7 @@ components:
                     - user
                     - system
                     - null
-                  description: Whether the user us a normal user or a system.
+                  description: Whether the user is a normal user or a system.
                 acceptedAt:
                   type: string
                   format: date-time
@@ -10085,10 +10122,10 @@ components:
             - user
             - system
             - null
-          description: Whether the user us a normal user or a system.
+          description: Whether the user is a normal user or a system.
         updatedByUserRole:
           type: string
-          description: Role of the user who last updated the declaration.
+          description: Role of the user who last changed the status.
         createdAtLocation:
           type: string
           nullable: true
@@ -10100,11 +10137,12 @@ components:
         updatedAtLocation:
           type: string
           nullable: true
-          description: Location of the user who last updated the declaration.
+          description: Location of the user who last changed the status.
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp of the most recent declaration update.
+          description: Timestamp of the most recent *accepted* status change. Possibly 3rd
+            party update, if action is validation asynchronously.
         assignedTo:
           type: string
           nullable: true
@@ -10112,7 +10150,7 @@ components:
         updatedBy:
           type: string
           nullable: true
-          description: ID of the user who last updated the declaration.
+          description: ID of the user who last changed the status.
         trackingId:
           type: string
           description: System-generated tracking ID used by informants or registrars to
