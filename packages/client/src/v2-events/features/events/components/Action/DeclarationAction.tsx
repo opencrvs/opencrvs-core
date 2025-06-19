@@ -91,6 +91,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
 
   useEffect(() => {
     if (!event) {
+      // eslint-disable-next-line no-console
       console.warn(
         `Event with id ${eventId} not found in cache. Redirecting to overview.`
       )

@@ -50,6 +50,15 @@ export function findLocalEventIndex(id: string) {
     .find((e) => e.id === id)
 }
 
+export function setEventListData(
+  updater: (eventIndices: EventIndex[] | undefined) => EventIndex[] | undefined
+) {
+  return queryClient.setQueryData(
+    trpcOptionsProxy.event.list.queryKey(),
+    updater
+  )
+}
+
 export function updateLocalEventIndex(updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
   if (!config) {
@@ -112,15 +121,6 @@ export function deleteEventData(id: string) {
   queryClient.removeQueries({
     queryKey: trpcOptionsProxy.event.get.queryKey(id)
   })
-}
-
-export function setEventListData(
-  updater: (eventIndices: EventIndex[] | undefined) => EventIndex[] | undefined
-) {
-  return queryClient.setQueryData(
-    trpcOptionsProxy.event.list.queryKey(),
-    updater
-  )
 }
 
 export async function invalidateEventsList() {

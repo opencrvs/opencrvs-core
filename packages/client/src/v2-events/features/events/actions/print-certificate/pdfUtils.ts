@@ -409,7 +409,6 @@ export function compileSvg({
       }
     }
   )
-  console.log({ templateString })
 
   const template = Handlebars.compile(templateString)
   $declaration = formatAllNonStringValues($declaration, intl)
