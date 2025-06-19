@@ -30,6 +30,7 @@ export function ActionMenu({
   const { searchEventById } = useEvents()
 
   const getEventQuery = searchEventById.useSuspenseQuery(eventId)
+
   const eventResults = getEventQuery
 
   if (eventResults.length === 0) {

@@ -15,7 +15,10 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import {
+  getCurrentEventState,
+  getDeclarationPages
+} from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -38,7 +41,8 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
+  const event = events.getEvent.getFromCache(eventId)
+
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -99,7 +103,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={event.declaration}
+        declaration={getCurrentEventState(event, configuration).declaration}
         eventConfig={configuration}
         form={formValues}
         formPages={declarationPages}

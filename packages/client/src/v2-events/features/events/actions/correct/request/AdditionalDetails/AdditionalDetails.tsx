@@ -12,7 +12,7 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
 import { generateGoToHomeTabUrl } from '@client/navigation'
@@ -41,13 +41,14 @@ export function AdditionalDetails() {
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
+  const event = events.getEvent.getFromCache(eventId)
 
   const intl = useIntl()
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const actionConfiguration = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
@@ -97,7 +98,7 @@ export function AdditionalDetails() {
         <PagesComponent
           // @TODO: Use subscription if needed
           continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-          declaration={event.declaration}
+          declaration={eventIndex.declaration}
           eventConfig={configuration}
           form={annotation}
           formPages={formPages}

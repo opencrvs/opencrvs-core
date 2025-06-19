@@ -284,7 +284,7 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
   function getMutationPayload(params: ActionMutationInput) {
     const { eventId } = params
-    const localEvent = findLocalEventIndex(eventId)
+    const localEvent = findLocalEventDocument(eventId)
 
     const eventConfiguration = eventConfigurations.find(
       (event) => event.id === localEvent?.type

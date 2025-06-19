@@ -52,7 +52,7 @@ export function Review() {
   const { redirectToOrigin } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
-  const event = events.searchEventById.useSuspenseQuery(eventId)[0]
+  const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
