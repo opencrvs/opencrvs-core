@@ -12,6 +12,7 @@ import startOfDay from 'date-fns/startOfDay'
 import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
+import { parse as parseQuery, stringify } from 'query-string'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -24,7 +25,8 @@ import {
   Inferred,
   EventState,
   FieldType,
-  QueryExpression
+  QueryExpression,
+  NameFieldValue
 } from '@opencrvs/commons/client'
 import {
   Errors,
@@ -32,6 +34,7 @@ import {
 } from '@client/v2-events/components/forms/validation'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -45,11 +48,28 @@ export const getAdvancedSearchFieldErrors = (
         advancedSearchFieldIds.includes(field.id)
       )
 
-      const modifiedFields = advancedSearchFields.map((f) => ({
-        ...f,
-        required: false, // advanced search fields need not be required
-        validation: formValues[f.id] ? f.validation : [] // need to validate fields only when they are not empty
-      }))
+      const modifiedFields = advancedSearchFields.map((f) => {
+        const overRiddenValidationFromAdvancedSearch =
+          currentSection.fields.find(
+            (field) => field.fieldId === f.id
+          )?.validations
+        return {
+          ...f,
+          required: false, // advanced search fields need not be required
+          validation: (() => {
+            if (formValues[f.id]) {
+              if (overRiddenValidationFromAdvancedSearch) {
+                return overRiddenValidationFromAdvancedSearch
+              } else {
+                return f.validation
+              }
+            } else {
+              // need to validate fields only when they are not empty
+              return []
+            }
+          })()
+        }
+      })
 
       const err = getValidationErrorsForForm(modifiedFields, formValues)
 
@@ -313,6 +333,12 @@ function buildDataConditionFromSearchKeys(
           searchType = 'range'
           value = getUtcRangeFromInput(value)
         }
+        if (
+          fieldConfig?.type === FieldType.NAME &&
+          NameFieldValue.safeParse(rawInput[fieldId]).success
+        ) {
+          value = Name.stringify(rawInput[fieldId] as NameFieldValue)
+        }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
         // but "2023-01-01" should be treated as an exact match
@@ -532,4 +558,53 @@ export function buildQuickSearchQuery(
 
   // Delegate to the actual query builder
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
+}
+
+export function serializeSearchParams(
+  eventState: Record<string, unknown>
+): string {
+  const simplifiedValue = Object.entries(eventState).reduce(
+    (acc, [key, value]) => {
+      if (value !== undefined && value !== null) {
+        if (Array.isArray(value) && value.length > 0) {
+          acc[key] = value.map((v) =>
+            typeof v === 'object' ? JSON.stringify(v) : v
+          )
+        } else if (typeof value === 'object' && !Array.isArray(value)) {
+          acc[key] = JSON.stringify(value)
+        } else {
+          acc[key] = value
+        }
+      }
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+  return stringify(simplifiedValue, { skipEmptyString: true })
+}
+
+export function deserializeSearchParams(queryParams: string): EventState {
+  return Object.entries(parseQuery(queryParams)).reduce((acc, [key, value]) => {
+    if (typeof value === 'string') {
+      try {
+        acc[key] = JSON.parse(value)
+      } catch {
+        acc[key] = value
+      }
+    } else if (Array.isArray(value)) {
+      acc[key] = value.map((v) => {
+        if (typeof v === 'string') {
+          try {
+            return JSON.parse(v)
+          } catch {
+            return v
+          }
+        }
+        return v
+      })
+    } else {
+      acc[key] = value
+    }
+    return acc
+  }, {} as EventState)
 }
