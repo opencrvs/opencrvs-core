@@ -10,11 +10,16 @@
  */
 
 import { useMutationState } from '@tanstack/react-query'
+import * as z from 'zod'
 import { getCurrentEventState } from '@opencrvs/commons/client'
+import { EventState } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { useEventConfigurations } from '../useEventConfiguration'
 
-const mutationCache = queryClient.getMutationCache()
+const MutationVariables = z.object({
+  eventId: z.string(),
+  declaration: EventState.optional()
+})
 
 export function useOutbox() {
   const trpc = useTRPC()
@@ -27,42 +32,38 @@ export function useOutbox() {
 
   const outboxEvents = pendingMutations
     .map((mutation) => {
-      const variables = mutation.state.variables
-      if (
-        variables &&
-        typeof variables === 'object' &&
-        'eventId' in variables
-      ) {
-        const { eventId, declaration } = variables as {
-          eventId: string
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          declaration: Record<string, any> | undefined | null
-        }
+      const maybeVariables = mutation.state.variables
 
-        const event = queryClient.getQueryData(trpc.event.get.queryKey(eventId))
+      const parsedVariables = MutationVariables.safeParse(maybeVariables)
 
-        if (!event) {
-          return null
-        }
-
-        const eventConfiguration = eventConfigurations.find(
-          (config) => config.id === event.type
-        )
-        if (!eventConfiguration) {
-          return null
-        }
-
-        const eventState = getCurrentEventState(event, eventConfiguration)
-        if (declaration) {
-          return {
-            ...eventState,
-            declaration: { ...eventState.declaration, ...declaration },
-            meta: mutation.options.meta
-          }
-        }
-        return eventState
+      if (!parsedVariables.success) {
+        return null
       }
-      return null
+
+      const { eventId, declaration } = parsedVariables.data
+
+      const event = queryClient.getQueryData(trpc.event.get.queryKey(eventId))
+
+      if (!event) {
+        return null
+      }
+
+      const eventConfiguration = eventConfigurations.find(
+        (config) => config.id === event.type
+      )
+      if (!eventConfiguration) {
+        return null
+      }
+
+      const eventState = getCurrentEventState(event, eventConfiguration)
+      if (declaration) {
+        return {
+          ...eventState,
+          declaration: { ...eventState.declaration, ...declaration },
+          meta: mutation.options.meta
+        }
+      }
+      return eventState
     })
     .filter((event) => event !== null)
 
