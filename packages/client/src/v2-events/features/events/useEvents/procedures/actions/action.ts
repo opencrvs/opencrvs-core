@@ -221,7 +221,10 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
-  onError: errorToastOnConflict
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.VALIDATE
+  }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
@@ -229,7 +232,10 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
-  onError: errorToastOnConflict
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.REGISTER
+  }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
@@ -237,7 +243,10 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
-  onError: errorToastOnConflict
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.REGISTER
+  }
 })
 
 /**

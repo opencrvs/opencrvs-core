@@ -283,10 +283,10 @@ export const SearchResultComponent = ({
     eventData: (EventIndex & {
       title: string | null
       useFallbackTitle: boolean
-      workqueueMeta?: Record<string, unknown>
+      meta?: Record<string, unknown>
     })[]
   ) => {
-    return eventData.map(({ workqueueMeta, ...event }) => {
+    return eventData.map(({ meta, ...event }) => {
       const actionConfigs = actions.map((actionType) => ({
         actionComponent: (
           <ActionComponent actionType={actionType} event={event} />
@@ -343,9 +343,7 @@ export const SearchResultComponent = ({
         outbox: isOnline
           ? intl.formatMessage(messages.waitingForAction, {
               action:
-                typeof workqueueMeta?.actionType === 'string'
-                  ? workqueueMeta.actionType
-                  : ''
+                typeof meta?.actionType === 'string' ? meta.actionType : ''
             })
           : intl.formatMessage(messages.waitingToRetry)
       }
