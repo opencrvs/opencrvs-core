@@ -266,8 +266,10 @@ export const eventRouter = router({
         path: '/events/search'
       }
     })
+    // @todo: remove legacy scopes once all users are configured with new search scopes
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
+    .use(middleware.requireSearchScope)
     .output(z.array(EventIndex))
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)

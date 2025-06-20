@@ -29,6 +29,7 @@ import {
   IAuthHeader,
   EventDocument
 } from '@opencrvs/commons'
+import { QueryType } from '@opencrvs/commons/events'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 
@@ -249,5 +250,21 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
+  return next()
+}
+
+export const requireSearchScope: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext,
+  QueryType
+> = async ({ next, ctx }) => {
+  const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
+
+  if (!findScope(scopes, 'search')) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
   return next()
 }
