@@ -74,11 +74,9 @@ export const WorkqueueConfig = z
   })
   .describe('Configuration for workqueue.')
 
-export const WorkqueueConfigWithoutQuery = WorkqueueConfig.pick({
-  slug: true,
-  name: true,
-  icon: true,
-  actions: true
+export const WorkqueueConfigWithoutQuery = WorkqueueConfig.omit({
+  query: true,
+  columns: true
 })
 
 export const WorkqueueConfigInput = z.object({
