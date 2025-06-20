@@ -176,9 +176,10 @@ const DeclareScopes = z.union([
   z.literal(SCOPES.RECORD_DECLARE_MARRIAGE),
   z.literal(SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION),
   z.literal(SCOPES.RECORD_SUBMIT_INCOMPLETE),
-  z.literal(SCOPES.RECORD_SUBMIT_FOR_REVIEW),
-  z.literal(SCOPES.RECORD_UNASSIGN_OTHERS)
+  z.literal(SCOPES.RECORD_SUBMIT_FOR_REVIEW)
 ])
+
+const UnassignScope = z.literal(SCOPES.RECORD_UNASSIGN_OTHERS)
 
 // Validate
 const ValidateScopes = z.union([
@@ -218,7 +219,7 @@ const CorrectionScopes = z.union([
 ])
 
 // Search
-const SearchScopes = z.union([
+export const SearchScopes = z.union([
   z.literal(SCOPES.SEARCH_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.SEARCH_BIRTH),
   z.literal(SCOPES.SEARCH_DEATH_MY_JURISDICTION),
@@ -277,6 +278,7 @@ const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
 const LiteralScopes = z.union([
   LegacyScopes,
   IntegrationScopes,
+  UnassignScope,
   DeclareScopes,
   ValidateScopes,
   RegisterScope,

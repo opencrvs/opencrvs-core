@@ -30,7 +30,7 @@ export function Outbox() {
   const outboxColumns = defineWorkqueuesColumns([
     {
       label: {
-        id: 'workqueues.dateOfEvent',
+        id: 'v2.workqueues.dateOfEvent',
         defaultMessage: 'Date of Event',
         description: 'Label for workqueue column: dateOfEvent'
       },

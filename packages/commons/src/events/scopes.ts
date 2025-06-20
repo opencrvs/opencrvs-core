@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
+import { ConfigurableScopeType, Scope, SCOPES, SearchScopes } from '../scopes'
 import { ActionType, isMetaAction } from './ActionType'
 
 type RequiresNoScope = null
@@ -32,14 +32,7 @@ export const CONFIG_GET_ALLOWED_SCOPES = [
   SCOPES.CONFIG_UPDATE_ALL
 ] satisfies RequiresAnyOfScopes
 
-export const CONFIG_SEARCH_ALLOWED_SCOPES = [
-  SCOPES.SEARCH_BIRTH,
-  SCOPES.SEARCH_DEATH,
-  SCOPES.SEARCH_MARRIAGE,
-  SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
-  SCOPES.SEARCH_DEATH_MY_JURISDICTION,
-  SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION
-]
+export const CONFIG_SEARCH_ALLOWED_SCOPES = SearchScopes.options
 
 export const ACTION_ALLOWED_SCOPES = {
   [ActionType.READ]: [
