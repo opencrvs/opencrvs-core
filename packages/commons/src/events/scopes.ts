@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { intersection } from 'lodash'
-import { ConfigurableScopeType, Scope, SCOPES, SearchScopes } from '../scopes'
+import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
 import { ActionType, isMetaAction } from './ActionType'
 
 type RequiresNoScope = null
