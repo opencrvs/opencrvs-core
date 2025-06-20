@@ -12,6 +12,7 @@ import startOfDay from 'date-fns/startOfDay'
 import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
+import { useSelector } from 'react-redux'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -26,10 +27,12 @@ import {
   FieldType,
   QueryExpression
 } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
 import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { getScope } from '@client/profile/profileSelectors'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 
@@ -532,4 +535,18 @@ export function buildQuickSearchQuery(
 
   // Delegate to the actual query builder
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
+}
+
+/**
+ * @returns a boolean indicating whether the current user has the scope to search for an event
+ */
+export function checkScopeForEventSearch(eventId: string) {
+  const scopes = useSelector(getScope)
+  const searchScopes = findScope(scopes ?? [], 'search')
+
+  const isEventSearchAllowed =
+    searchScopes &&
+    Object.keys(searchScopes.options).some((id) => eventId === id)
+
+  return isEventSearchAllowed
 }
