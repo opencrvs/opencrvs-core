@@ -15,21 +15,36 @@ import {
   getAllUniqueFields,
   Inferred,
   QueryExpression,
-  QueryType
+  QueryType,
+  DateCondition,
+  QueryInputType
 } from '@opencrvs/commons/events'
 import { encodeFieldId } from './utils'
+
+/** Convert API date clause format to elastic syntax */
+function dateClauseToElasticQuery(clause: DateCondition, propertyName: string) {
+  if (clause.type === 'exact') {
+    return { term: { [propertyName]: clause.term } }
+  } else {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { timezone, type, ...rest } = clause
+    return {
+      range: {
+        [propertyName]: {
+          ...rest,
+          time_zone: timezone
+        }
+      }
+    }
+  }
+}
 
 /**
  * Generates an Elasticsearch query to search within `document.declaration`
  * using the provided search payload.
  */
 function generateQuery(
-  event: Record<
-    string,
-    | { type: 'exact' | 'fuzzy'; term: string }
-    | { type: 'anyOf'; terms: string[] }
-    | { type: 'range'; gte: string; lte: string }
-  >,
+  event: QueryInputType,
   eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
   const allEventFields = eventConfigs.reduce<Inferred[]>((acc, eventConfig) => {
@@ -87,13 +102,12 @@ function generateQuery(
       }
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (search.type === 'range') {
       return {
         range: {
           [field]: {
             gte: search.gte,
-            lte: search.lte
+            lt: search.lt
           }
         }
       }
@@ -107,158 +121,75 @@ function generateQuery(
 
 const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
 
+function typedEntries<T extends object>(obj: T): [keyof T, T[keyof T]][] {
+  return Object.entries(obj) as [keyof T, T[keyof T]][]
+}
+
 function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
-  if (clause.eventType) {
-    must.push({
-      term: { type: clause.eventType }
-    })
-  }
-
-  if (clause.status) {
-    if (clause.status.type === 'anyOf') {
-      must.push({ terms: { status: clause.status.terms } })
-    } else {
-      must.push({ term: { status: clause.status.term } })
+  for (const [key, value] of typedEntries(clause)) {
+    if (!value) {
+      continue
     }
-  }
 
-  if (clause.trackingId) {
-    must.push({
-      term: { trackingId: clause.trackingId.term }
-    })
-  }
+    switch (key) {
+      case 'eventType':
+        must.push({ term: { type: value } })
+        break
 
-  if (clause.assignedTo) {
-    must.push({
-      term: { assignedTo: clause.assignedTo.term }
-    })
-  }
-
-  if (clause.createdBy) {
-    must.push({
-      term: { createdBy: clause.createdBy.term }
-    })
-  }
-
-  if (clause.createdByUserType) {
-    must.push({
-      term: { createdByUserType: clause.createdByUserType }
-    })
-  }
-
-  if (clause.updatedBy) {
-    must.push({
-      term: { updatedBy: clause.updatedBy.term }
-    })
-  }
-
-  if (clause['legalStatus.REGISTERED.createdAt']) {
-    if (clause['legalStatus.REGISTERED.createdAt'].type === 'exact') {
-      must.push({
-        term: {
-          'legalStatuses.REGISTERED.createdAt':
-            clause['legalStatus.REGISTERED.createdAt'].term
+      case 'status':
+        if (value.type === 'anyOf') {
+          must.push({ terms: { status: value.terms } })
+        } else {
+          must.push({ term: { status: value.term } })
         }
-      })
-    } else {
-      must.push({
-        range: {
-          'legalStatuses.REGISTERED.createdAt': {
-            gte: clause['legalStatus.REGISTERED.createdAt'].gte,
-            lte: clause['legalStatus.REGISTERED.createdAt'].lte
-          }
+        break
+
+      case 'createdByUserType':
+      case 'trackingId':
+      case 'assignedTo':
+      case 'createdBy':
+      case 'updatedBy':
+      case 'legalStatuses.REGISTERED.registrationNumber':
+        must.push({ term: { [key]: value.term } })
+        break
+
+      case 'createdAt':
+      case 'updatedAt':
+      case 'legalStatuses.REGISTERED.acceptedAt':
+        must.push(dateClauseToElasticQuery(value, key))
+        break
+
+      case 'createdAtLocation':
+      case 'updatedAtLocation':
+      case 'legalStatuses.REGISTERED.createdAtLocation':
+        if (value.type === 'exact') {
+          must.push({ term: { [key]: value.term } })
+        } else {
+          must.push({
+            geo_distance: {
+              distance: EXACT_SEARCH_LOCATION_DISTANCE,
+              location: value.location
+            }
+          })
         }
-      })
-    }
-  }
-  if (clause['legalStatus.REGISTERED.createdAtLocation']) {
-    if (clause['legalStatus.REGISTERED.createdAtLocation'].type === 'exact') {
-      must.push({
-        term: {
-          'legalStatuses.REGISTERED.createdAtLocation':
-            clause['legalStatus.REGISTERED.createdAtLocation'].term
+        break
+
+      case 'data':
+        const dataQuery = generateQuery(value, eventConfigs)
+        const innerMust = dataQuery.bool?.must
+        if (Array.isArray(innerMust)) {
+          must.push(...innerMust)
+        } else if (innerMust) {
+          must.push(innerMust)
         }
-      })
-    }
-  }
+        break
 
-  if (clause['legalStatus.REGISTERED.registrationNumber']) {
-    must.push({
-      term: {
-        'legalStatuses.REGISTERED.registrationNumber':
-          clause['legalStatus.REGISTERED.registrationNumber'].term
-      }
-    })
-  }
-
-  if (clause.createdAt) {
-    if (clause.createdAt.type === 'exact') {
-      must.push({ term: { createdAt: clause.createdAt.term } })
-    } else {
-      must.push({
-        range: {
-          createdAt: {
-            gte: clause.createdAt.gte,
-            lte: clause.createdAt.lte
-          }
-        }
-      })
-    }
-  }
-
-  if (clause.updatedAt) {
-    if (clause.updatedAt.type === 'exact') {
-      must.push({ term: { updatedAt: clause.updatedAt.term } })
-    } else {
-      must.push({
-        range: {
-          updatedAt: {
-            gte: clause.updatedAt.gte,
-            lte: clause.updatedAt.lte
-          }
-        }
-      })
-    }
-  }
-
-  if (clause.createdAtLocation) {
-    if (clause.createdAtLocation.type === 'exact') {
-      must.push({ term: { createdAtLocation: clause.createdAtLocation.term } })
-    } else {
-      must.push({
-        geo_distance: {
-          distance: EXACT_SEARCH_LOCATION_DISTANCE,
-          location: clause.createdAtLocation.location
-        }
-      })
-    }
-  }
-
-  if (clause.updatedAtLocation) {
-    if (clause.updatedAtLocation.type === 'exact') {
-      must.push({
-        term: { updatedAtLocation: clause.updatedAtLocation.term }
-      })
-    } else {
-      must.push({
-        geo_distance: {
-          distance: EXACT_SEARCH_LOCATION_DISTANCE,
-          location: clause.updatedAtLocation.location
-        }
-      })
-    }
-  }
-
-  if (clause.data) {
-    const dataQuery = generateQuery(clause.data, eventConfigs)
-    const innerMust = dataQuery.bool?.must
-
-    if (Array.isArray(innerMust)) {
-      must.push(...innerMust)
-    } else if (innerMust) {
-      must.push(innerMust)
+      case 'flags':
+      default:
+        console.warn('Unsupported query field:', key)
+        break
     }
   }
 

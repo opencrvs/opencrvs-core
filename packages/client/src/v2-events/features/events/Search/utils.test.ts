@@ -94,8 +94,8 @@ describe('getDefaultSearchFields', () => {
       tennisClubMembershipEvent.advancedSearch[0]
     )
     const ids = fields.map((f) => f.id)
-    expect(ids).toContain('event.legalStatus.REGISTERED.createdAtLocation')
-    expect(ids).toContain('event.legalStatus.REGISTERED.createdAt')
+    expect(ids).toContain('event.legalStatuses.REGISTERED.createdAtLocation')
+    expect(ids).toContain('event.legalStatuses.REGISTERED.acceptedAt')
     expect(ids).toContain('event.status')
     expect(ids).toContain('event.updatedAt')
   })
@@ -126,10 +126,12 @@ describe('buildDataCondition', () => {
   })
 
   it('should generate exact match condition for trackingId', () => {
-    const state = { 'event.legalStatus.REGISTERED.createdAtLocation': 'ABC123' }
+    const state = {
+      'event.legalStatuses.REGISTERED.createdAtLocation': 'ABC123'
+    }
     const result = buildDataCondition(state, tennisClubMembershipEvent)
     const field = joinValues(
-      'event.legalStatus.REGISTERED.createdAtLocation'.split('.'),
+      'event.legalStatuses.REGISTERED.createdAtLocation'.split('.'),
       FIELD_SEPARATOR
     )
     expect(

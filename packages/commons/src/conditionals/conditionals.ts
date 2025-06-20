@@ -12,7 +12,6 @@
 import { EventDocument } from '../events/EventDocument'
 import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
-import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
 import { userSerializer } from '../events/serializers/user/serializer'
 
@@ -152,44 +151,6 @@ export const user = Object.assign(userSerializer, {
       required: ['$user']
     })
 })
-
-/**
- *
- * Generate conditional rules for event.
- */
-export function createEventConditionals() {
-  return {
-    /**
-     * Checks if the event contains a specific action type.
-     * @param action - The action type to check for.
-     */
-    hasAction: (action: ActionType) =>
-      defineConditional({
-        type: 'object',
-        properties: {
-          $event: {
-            type: 'object',
-            properties: {
-              actions: {
-                type: 'array',
-                contains: {
-                  type: 'object',
-                  properties: {
-                    type: {
-                      const: action
-                    }
-                  },
-                  required: ['type']
-                }
-              }
-            },
-            required: ['actions']
-          }
-        },
-        required: ['$event']
-      })
-  }
-}
 
 function getDateFromNow(days: number) {
   return new Date(Date.now() - days * 24 * 60 * 60 * 1000)

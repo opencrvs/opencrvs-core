@@ -69,8 +69,8 @@ const defaultSearchFieldGenerator: Record<
   EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
-  [EventFieldId.enum['legalStatus.REGISTERED.createdAtLocation']]: (_) => ({
-    id: 'event.legalStatus.REGISTERED.createdAtLocation',
+  [EventFieldId.enum['legalStatuses.REGISTERED.createdAtLocation']]: (_) => ({
+    id: 'event.legalStatuses.REGISTERED.createdAtLocation',
     type: FieldType.OFFICE,
     label: {
       defaultMessage: 'Place of registration',
@@ -83,11 +83,11 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.registeredAtLocation.helperText'
     }
   }),
-  [EventFieldId.enum['legalStatus.REGISTERED.createdAt']]: (_) => ({
-    id: 'event.legalStatus.REGISTERED.createdAt',
+  [EventFieldId.enum['legalStatuses.REGISTERED.acceptedAt']]: (_) => ({
+    id: 'event.legalStatuses.REGISTERED.acceptedAt',
     type: FieldType.DATE_RANGE,
     label: {
-      defaultMessage: 'Date of registration',
+      defaultMessage: 'Date of the registration was accepted',
       description: 'Label for date of registration field',
       id: 'v2.advancedSearch.registeredAt'
     }
@@ -168,7 +168,7 @@ const MatchType = {
 type Condition =
   | { type: 'fuzzy'; term: string }
   | { type: 'exact'; term: string }
-  | { type: 'range'; gte: string; lte: string }
+  | { type: 'range'; gte: string; lt: string }
   | { type: 'anyOf'; terms: string[] }
 
 /**
@@ -218,8 +218,8 @@ function buildCondition(
     case MatchType.anyOf:
       return { type: 'anyOf', terms: value.split(',') }
     case MatchType.range:
-      const [gte, lte] = value.split(',')
-      return { type: 'range', gte, lte }
+      const [gte, lt] = value.split(',')
+      return { type: 'range', gte, lt }
     default:
       return { type: 'exact', term: value } // Fallback to exact match
   }
@@ -227,35 +227,6 @@ function buildCondition(
 
 function buildConditionForStatus(): Condition {
   return { type: 'anyOf', terms: Object.values(RegStatus) }
-}
-/**
- * Converts a date range input string into a UTC-based range string.
- *
- * This function:
- * - Takes a date range input in the format "YYYY-MM-DD,YYYY-MM-DD" or "YYYY-MM-DD".
- * - Converts the local date(s) to UTC by adjusting for the current timezone offset.
- * - Returns a string formatted as "startUTC,endUTC".
- *
- * @param {string} inputDateString - The date range input string.
- * @returns {string} A comma-separated string of ISO-formatted UTC start and end timestamps.
- */
-function getUtcRangeFromInput(inputDateString: string) {
-  const offsetMinutes = new Date().getTimezoneOffset()
-
-  const [startDateStr, endDateStr] = inputDateString
-    .split(',')
-    .map((s) => s.trim())
-
-  const dateFormat = 'yyyy-MM-dd'
-  const startLocal = startOfDay(parse(startDateStr, dateFormat, new Date()))
-  const endLocal = endOfDay(
-    parse(endDateStr || startDateStr, dateFormat, new Date())
-  )
-
-  const utcStart = addMinutes(startLocal, offsetMinutes)
-  const utcEnd = addMinutes(endLocal, offsetMinutes)
-
-  return `${utcStart.toISOString()},${utcEnd.toISOString()}`
 }
 
 /**
@@ -311,7 +282,8 @@ function buildDataConditionFromSearchKeys(
           fieldType === 'event'
         ) {
           searchType = 'range'
-          value = getUtcRangeFromInput(value)
+          console.log('value', value)
+          value = value
         }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range

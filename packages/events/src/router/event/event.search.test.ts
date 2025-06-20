@@ -194,7 +194,7 @@ test('Throws when one of the date range fields has invalid date', async () => {
           updatedAt: {
             type: 'range',
             gte: 'invalid-date',
-            lte: '2023-01-01'
+            lt: '2023-01-01'
           }
         }
       ]
@@ -267,7 +267,7 @@ test('Returns events based on the updatedAt column', async () => {
         updatedAt: {
           type: 'range',
           gte: '2022-01-01',
-          lte: '2023-01-01'
+          lt: '2023-01-02'
         }
       }
     ]
@@ -287,8 +287,8 @@ test('Returns events based on the updatedAt column', async () => {
     )
   )
 
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const today = new Date().toISOString()
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()
 
   const acceptedTodayResult = await client.event.search({
     type: 'and',
@@ -296,8 +296,8 @@ test('Returns events based on the updatedAt column', async () => {
       {
         updatedAt: {
           type: 'range',
-          gte: yesterday.split('T')[0],
-          lte: today.split('T')[0]
+          gte: today.split('T')[0],
+          lt: tomorrow.split('T')[0]
         }
       }
     ]
@@ -996,7 +996,7 @@ test('Returns relevant events in right order', async () => {
           eventType: TENNIS_CLUB_MEMBERSHIP,
           type: 'range',
           gte: '2020-01-01',
-          lte: '2022-01-01'
+          lt: '2022-01-01'
         }
       }
     ]

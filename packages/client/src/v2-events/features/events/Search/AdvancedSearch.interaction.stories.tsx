@@ -129,8 +129,8 @@ const query = stringify(
       firstname: 'Nina',
       surname: 'Roy'
     }),
-    ['event.legalStatus.REGISTERED.createdAt']: ['2024-06-01', '2025-06-30'],
-    ['event.legalStatus.REGISTERED.createdAtLocation']:
+    ['event.legalStatuses.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
+    ['event.legalStatuses.REGISTERED.createdAtLocation']:
       '028d2c85-ca31-426d-b5d1-2cef545a4902',
     'event.status': 'ALL',
     'event.updatedAt': ['2025-05-03', '2025-06-03'],

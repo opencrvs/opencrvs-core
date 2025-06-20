@@ -80,7 +80,7 @@ export const Range = z
   .object({
     type: z.literal('range'),
     gte: z.string(),
-    lte: z.string()
+    lt: z.string()
   })
   .openapi({
     ref: 'Range'
@@ -98,15 +98,42 @@ export const Within = z
     ref: 'Within'
   })
 
-export const RangeDate = Range.extend({
-  gte: z.string().date().or(z.string().datetime()),
-  lte: z.string().date().or(z.string().datetime())
-}).openapi({
-  ref: 'RangeDate'
+function isValidIanaTimezone(tz: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-US', { timeZone: tz })
+    return true
+  } catch {
+    return false
+  }
+}
+
+const IanaTimezone = z.string().refine(isValidIanaTimezone, {
+  message: 'Invalid IANA time zone'
 })
 
+const RangeDate = z
+  .object({
+    type: z.literal('range'),
+    gte: z.string().date(),
+    lt: z.string().date(),
+    timezone: IanaTimezone.optional().describe(
+      'IANA time zone for date range. If not provided, UTC will be used.'
+    )
+  })
+  .or(
+    z.object({
+      type: z.literal('range'),
+      lte: z.string().date(),
+      gt: z.string().date(),
+      timezone: IanaTimezone.optional().describe(
+        'IANA time zone for date range. If not provided, UTC will be used.'
+      )
+    })
+  )
+  .openapi({ ref: 'RangeDate' })
+
 export const ExactDate = Exact.extend({
-  term: z.string().date().or(z.string().datetime())
+  term: z.string().date()
 }).openapi({
   ref: 'ExactDate'
 })
@@ -114,6 +141,7 @@ export const ExactDate = Exact.extend({
 export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
   ref: 'DateCondition'
 })
+export type DateCondition = z.infer<typeof DateCondition>
 
 // Use `ZodType` here to avoid locking the output type prematurely —
 // this keeps recursive inference intact and allows `z.infer<typeof QueryInput>` to work correctly.
@@ -149,11 +177,11 @@ export const QueryExpression = z
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
-    'legalStatus.REGISTERED.createdAt': z.optional(DateCondition),
-    'legalStatus.REGISTERED.createdAtLocation': z.optional(
+    'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
+    'legalStatuses.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
-    'legalStatus.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
@@ -208,7 +236,7 @@ export const QueryType = z
               updatedAt: {
                 type: 'range',
                 gte: '2025-05-22',
-                lte: '2025-05-29'
+                lt: '2025-05-29'
               },
               data: {}
             }

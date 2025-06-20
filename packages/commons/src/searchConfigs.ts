@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { SelectOption } from './events'
+
 /**
  * Returns configuration options for the field.
  */
@@ -19,14 +21,15 @@ export function createSearchConfig<T extends {}>(baseField: T) {
      *
      * @returns An object containing the field ID and a configuration object with a type of 'range'.
      *
-     * @example event('legalStatus.REGISTERED.createdAt').range()
+     * @example event('legalStatuses.REGISTERED.acceptedAt').range()
      * // {
      * //   ...
      * //   config: { type: 'range' }
      * // }
      */
-    range: () => ({
+    range: (options?: SelectOption[]) => ({
       ...baseField,
+      options,
       config: { type: 'range' as const }
     }),
     /**
@@ -38,8 +41,9 @@ export function createSearchConfig<T extends {}>(baseField: T) {
      * //   config: { type: 'exact' }
      * // }
      */
-    exact: () => ({
+    exact: (options?: SelectOption[]) => ({
       ...baseField,
+      options,
       config: { type: 'exact' as const }
     }),
     /**
