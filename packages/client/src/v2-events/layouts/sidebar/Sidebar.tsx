@@ -56,26 +56,17 @@ export const Sidebar = ({
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
 
-  const workqueuesWithoutOutboxOrDraft = useWorkqueueConfigurations()
+  const workqueues = useWorkqueueConfigurations()
 
   const hasOutbox = hasOutboxWorkqueue(scopes ?? [])
 
-  const workqueues = [
-    ...(hasOutbox ? [WORKQUEUE_OUTBOX] : []),
-    ...workqueuesWithoutOutboxOrDraft
-  ]
   const navigate = useNavigate()
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
 
   const { getCount } = useWorkqueue(workqueueSlug)
-  const countsWithoutOutboxOrDraft = getCount.useSuspenseQuery()
-
-  const counts = {
-    ...(hasOutbox ? { [WORKQUEUE_OUTBOX.slug]: outbox.length } : {}),
-    ...countsWithoutOutboxOrDraft
-  }
+  const counts = getCount.useSuspenseQuery()
 
   let name = ''
   if (userDetails?.name) {
@@ -112,6 +103,24 @@ export const Sidebar = ({
       role={role}
     >
       <NavigationGroup>
+        {hasOutbox && (
+          <NavigationItem
+            key={WORKQUEUE_OUTBOX.slug}
+            count={counts[WORKQUEUE_OUTBOX.slug] || 0}
+            icon={() => <Icon name={WORKQUEUE_OUTBOX.icon} size="small" />}
+            id={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}
+            isSelected={WORKQUEUE_OUTBOX.slug === workqueueSlug}
+            label={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
+            onClick={() => {
+              navigate(
+                ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+                  slug: WORKQUEUE_OUTBOX.slug
+                })
+              )
+              menuCollapse && menuCollapse()
+            }}
+          />
+        )}
         {workqueues.map(({ name: label, slug, icon }) => (
           <NavigationItem
             key={slug}
