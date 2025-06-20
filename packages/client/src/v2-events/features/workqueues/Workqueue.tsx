@@ -56,6 +56,7 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
     <SearchResultComponent
+      key={workqueueSlug}
       actions={actions}
       columns={workqueueConfig.columns}
       eventConfigs={eventConfigs}

@@ -263,12 +263,6 @@ export const SearchResultComponent = ({
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
   >(SORT_ORDER.DESCENDING)
 
-  useEffect(() => {
-    setCurrentPageNumber(1)
-    setSortedCol(COLUMNS.LAST_UPDATED)
-    setSortOrder(SORT_ORDER.DESCENDING)
-  }, [contentTitle])
-
   const onColumnClick = (columnName: string) => {
     const { newSortedCol, newSortOrder } = changeSortedColumn(
       columnName,
