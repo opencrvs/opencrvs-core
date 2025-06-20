@@ -29,6 +29,11 @@ interface Props {
   validation: FieldConfig['validation']
   value?: NameFieldValue
 }
+export const defailtNameFieldValue: NameFieldValue = {
+  firstname: '',
+  middlename: '',
+  surname: ''
+}
 
 function NameInput(props: Props) {
   const { id, onChange, required = true, value = {}, maxLength } = props

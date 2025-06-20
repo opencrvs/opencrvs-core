@@ -13,6 +13,7 @@ import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
 import { parse as parseQuery, stringify } from 'query-string'
+import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -560,22 +561,30 @@ export function buildQuickSearchQuery(
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
 }
 
+function serializeValue(value: unknown) {
+  if (isArray(value)) {
+    return value.length > 0
+      ? value.map((v) => (isPlainObject(v) ? JSON.stringify(v) : v))
+      : undefined
+  }
+  if (isPlainObject(value)) {
+    return JSON.stringify(value)
+  }
+
+  return value
+}
+
 export function serializeSearchParams(
   eventState: Record<string, unknown>
 ): string {
   const simplifiedValue = Object.entries(eventState).reduce(
     (acc, [key, value]) => {
-      if (value !== undefined && value !== null) {
-        if (Array.isArray(value) && value.length > 0) {
-          acc[key] = value.map((v) =>
-            typeof v === 'object' ? JSON.stringify(v) : v
-          )
-        } else if (typeof value === 'object' && !Array.isArray(value)) {
-          acc[key] = JSON.stringify(value)
-        } else {
-          acc[key] = value
-        }
+      const serialized = serializeValue(value)
+      // If we don't care about the empty objects, we might be able to keep it as simple as this:
+      if (!isNil(serialized)) {
+        acc[key] = serialized
       }
+
       return acc
     },
     {} as Record<string, unknown>
@@ -583,28 +592,44 @@ export function serializeSearchParams(
   return stringify(simplifiedValue, { skipEmptyString: true })
 }
 
-export function deserializeSearchParams(queryParams: string): EventState {
-  return Object.entries(parseQuery(queryParams)).reduce((acc, [key, value]) => {
-    if (typeof value === 'string') {
-      try {
-        acc[key] = JSON.parse(value)
-      } catch {
-        acc[key] = value
-      }
-    } else if (Array.isArray(value)) {
-      acc[key] = value.map((v) => {
-        if (typeof v === 'string') {
-          try {
-            return JSON.parse(v)
-          } catch {
-            return v
-          }
-        }
-        return v
-      })
+/* eslint-disable max-lines */
+
+function tryParse(value: unknown): unknown {
+  if (!isString(value)) {
+    return value
+  }
+
+  try {
+    if (isArray(value)) {
+      return value.map(tryParse)
     } else {
-      acc[key] = value
+      const parsed = JSON.parse(value)
+      // Only return parsed if it's an object or array (i.e., something we stringified before)
+      if (typeof parsed === 'object' && parsed !== null) {
+        return parsed
+      }
     }
-    return acc
-  }, {} as EventState)
+  } catch {}
+
+  return value
+}
+export function deserializeSearchParams(
+  queryParams: string
+): Record<string, unknown> {
+  const parsedParams = parseQuery(queryParams)
+
+  const deserialized = Object.entries(parsedParams).reduce(
+    (acc, [key, value]) => {
+      if (isArray(value)) {
+        acc[key] = value.map(tryParse)
+      } else {
+        acc[key] = tryParse(value)
+      }
+
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+
+  return deserialized
 }
