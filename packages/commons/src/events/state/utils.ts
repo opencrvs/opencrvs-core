@@ -70,6 +70,8 @@ function getDeclarationActionCreationMetadata(
     // When 3rd party API returns 200 OK, we assume that the request was accepted, and persist single 'accepted' action.
     createdAt: requestAction?.createdAt ?? acceptAction.createdAt,
     createdBy: requestAction?.createdBy ?? acceptAction.createdBy,
+    createdByUserType:
+      requestAction?.createdByUserType ?? acceptAction.createdByUserType,
     createdAtLocation:
       requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
     acceptedAt: acceptAction.createdAt,
@@ -102,6 +104,10 @@ export function getActionUpdateMetadata(actions: Action[]) {
           request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
         createdBy:
           request?.createdBy ?? accept?.createdBy ?? metadata.createdBy,
+        createdByUserType:
+          request?.createdByUserType ??
+          accept?.createdByUserType ??
+          metadata.createdByUserType,
         createdAtLocation:
           request?.createdAtLocation ??
           accept?.createdAtLocation ??
@@ -115,6 +121,7 @@ export function getActionUpdateMetadata(actions: Action[]) {
     {
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
+      createdByUserType: createAction.createdByUserType,
       createdAtLocation: createAction.createdAtLocation,
       createdByRole: createAction.createdByRole
     }

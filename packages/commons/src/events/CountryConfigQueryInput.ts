@@ -20,6 +20,7 @@ import {
   Not,
   QueryInput
 } from './EventIndex'
+import { TokenUserType } from '../authentication'
 
 const SerializableExact = z.object({
   type: z.literal('exact'),
@@ -45,6 +46,7 @@ export const SerializedQueryExpression = z
     ),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
+    createdByUserType: TokenUserType,
     updatedBy: z.optional(SerializableExact),
     trackingId: z.optional(Exact),
     flags: z.optional(z.array(z.union([AnyOf, Not]))),
