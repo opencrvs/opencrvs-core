@@ -259,10 +259,7 @@ const NotifyRecordScope = z.object({
 
 const SearchScope = z.object({
   type: z.literal('search'),
-  options: z.object({
-    event: z.array(z.string()),
-    jurisdiction: z.literal('my-jurisdiction').optional()
-  })
+  options: z.record(z.enum(['my-jurisdiction', 'all']))
 })
 
 const ConfigurableScopes = z.discriminatedUnion('type', [
@@ -285,6 +282,25 @@ export function findScope<T extends ConfigurableScopeType>(
     (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
       parsedScope?.type === scopeType
   )
+}
+
+/**
+ * Parses a raw options string from a search scope into an object.
+ * @param {string} rawOptions - The raw options string to parse
+ * @returns {Record<string, string>} An object mapping option keys to their values
+ * @example
+ * getSearchScopeOptions("id=tennis-club-membership:my-jurisdiction|v2-birth:all")
+ * // Returns: { 'tennis-club-membership': "my-jurisdiction", 'v2-birth': "all" }
+ */
+function getSearchScopeOptions(rawOptions: string) {
+  return rawOptions
+    .split('=')[1]
+    .split('|')
+    .reduce((acc: Record<string, string>, option) => {
+      const [key, value] = option.split(':')
+      acc[key] = value
+      return acc
+    }, {})
 }
 
 /**
@@ -313,13 +329,16 @@ export function parseScope(scope: string) {
 
   // Different options are separated by commas, and each option value is separated by a pipe e.g.:
   // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
-  const options = rawOptions
-    .split(',')
-    .reduce((acc: Record<string, string[]>, option) => {
-      const [key, value] = option.split('=')
-      acc[key] = value.split('|')
-      return acc
-    }, {})
+  const options =
+    type !== 'search'
+      ? rawOptions
+          .split(',')
+          .reduce((acc: Record<string, string[]>, option) => {
+            const [key, value] = option.split('=')
+            acc[key] = value.split('|')
+            return acc
+          }, {})
+      : getSearchScopeOptions(rawOptions)
 
   const parsedScope = {
     type,

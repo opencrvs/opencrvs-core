@@ -82,13 +82,37 @@ describe('parseScope()', () => {
   })
 
   it('should return scope for a valid scope with search', () => {
+    const scope = 'search[event=tennis-club-membership:all|birth:all]'
+    const result = parseScope(scope)
+    expect(result).toEqual({
+      type: 'search',
+      options: {
+        birth: 'all',
+        'tennis-club-membership': 'all'
+      }
+    })
+  })
+
+  it('should return scope for a valid scope with search for different jurisdiction', () => {
     const scope =
       'search[event=tennis-club-membership:my-jurisdiction|birth:all]'
     const result = parseScope(scope)
     expect(result).toEqual({
       type: 'search',
       options: {
-        event: ['tennis-club-membership:my-jurisdiction', 'birth:all']
+        birth: 'all',
+        'tennis-club-membership': 'my-jurisdiction'
+      }
+    })
+  })
+
+  it('should return scope for a valid scope with search for a single event', () => {
+    const scope = 'search[event=tennis-club-membership:all]'
+    const result = parseScope(scope)
+    expect(result).toEqual({
+      type: 'search',
+      options: {
+        'tennis-club-membership': 'all'
       }
     })
   })
