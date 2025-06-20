@@ -46,7 +46,7 @@ export const SerializedQueryExpression = z
     ),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
-    createdByUserType: TokenUserType.optional(),
+    createdByUserType: TokenUserType,
     updatedBy: z.optional(SerializableExact),
     trackingId: z.optional(Exact),
     flags: z.optional(z.array(z.union([AnyOf, Not]))),
