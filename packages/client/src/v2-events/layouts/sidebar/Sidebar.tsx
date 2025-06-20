@@ -33,10 +33,12 @@ import {
 } from '@client/utils/userUtils'
 import { getOfflineData } from '@client/offline/selectors'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
 import { joinValues } from '@client/v2-events/utils'
+import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -49,7 +51,15 @@ export const Sidebar = ({
 }) => {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
+  const scopes = useSelector(getScope)
+
+  const { getOutbox } = useEvents()
+  const outbox = getOutbox()
+
   const workqueues = useWorkqueueConfigurations()
+
+  const hasOutbox = hasOutboxWorkqueue(scopes ?? [])
+
   const navigate = useNavigate()
   const offlineCountryConfig = useSelector(getOfflineData)
   const userDetails = useSelector(getUserDetails)
@@ -93,6 +103,24 @@ export const Sidebar = ({
       role={role}
     >
       <NavigationGroup>
+        {hasOutbox && (
+          <NavigationItem
+            key={WORKQUEUE_OUTBOX.slug}
+            count={counts[WORKQUEUE_OUTBOX.slug] || 0}
+            icon={() => <Icon name={WORKQUEUE_OUTBOX.icon} size="small" />}
+            id={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}
+            isSelected={WORKQUEUE_OUTBOX.slug === workqueueSlug}
+            label={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
+            onClick={() => {
+              navigate(
+                ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+                  slug: WORKQUEUE_OUTBOX.slug
+                })
+              )
+              menuCollapse && menuCollapse()
+            }}
+          />
+        )}
         {workqueues.map(({ name: label, slug, icon }) => (
           <NavigationItem
             key={slug}
