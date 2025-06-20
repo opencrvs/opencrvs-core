@@ -10,7 +10,6 @@
  */
 
 import React from 'react'
-import { parse } from 'query-string'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
@@ -23,7 +22,8 @@ import { SearchResultComponent } from './SearchResult'
 import {
   buildDataCondition,
   toAdvancedSearchQueryType,
-  parseFieldSearchParams
+  parseFieldSearchParams,
+  deserializeSearchParams
 } from './utils'
 
 export const SearchResultIndex = () => {
@@ -33,7 +33,9 @@ export const SearchResultIndex = () => {
   const location = useLocation()
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = SearchQueryParams.parse(parse(location.search))
+  const searchParams = SearchQueryParams.parse(
+    deserializeSearchParams(location.search)
+  )
 
   const filteredSearchParams = parseFieldSearchParams(eventConfig, searchParams)
 

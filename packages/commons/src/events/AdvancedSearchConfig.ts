@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { SelectOption } from './FieldConfig'
+import { SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
 
@@ -58,6 +58,13 @@ const BaseField = z.object({
        'conditionals' to an empty array ('[]') in the search config. This ensures they
        are always rendered in the advanced search form.
       `
+    ),
+  validations: z
+    .array(ValidationConfig)
+    .default([])
+    .optional()
+    .describe(
+      `In advanced search, we sometimes need to override the default field validations.`
     )
 })
 

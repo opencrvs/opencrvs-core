@@ -10,7 +10,6 @@
  */
 import React, { useCallback, useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
-import { parse } from 'query-string'
 import { useLocation } from 'react-router-dom'
 import {
   Content,
@@ -25,7 +24,7 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
-import { parseFieldSearchParams } from './utils'
+import { parseFieldSearchParams, deserializeSearchParams } from './utils'
 
 export const advancedSearchMessages = {
   advancedSearch: {
@@ -48,7 +47,9 @@ export function AdvancedSearch() {
   const allEvents = useEventConfigurations()
   const location = useLocation()
 
-  const searchParams = SearchQueryParams.parse(parse(location.search))
+  const searchParams = SearchQueryParams.parse(
+    deserializeSearchParams(location.search)
+  )
 
   const advancedSearchEvents = allEvents.filter(
     (event) => event.advancedSearch.length > 0

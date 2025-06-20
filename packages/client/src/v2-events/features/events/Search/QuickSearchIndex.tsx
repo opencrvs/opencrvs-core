@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { parse } from 'query-string'
 import { useLocation } from 'react-router-dom'
 import { useIntl } from 'react-intl'
 import { mandatoryColumns } from '@opencrvs/commons/client'
@@ -17,7 +16,7 @@ import { SearchResultComponent } from '@client/v2-events/features/events/Search/
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { buildQuickSearchQuery } from './utils'
+import { buildQuickSearchQuery, deserializeSearchParams } from './utils'
 
 function QuickSearch() {
   const intl = useIntl()
@@ -25,9 +24,10 @@ function QuickSearch() {
   const { searchEvent } = useEvents()
   const eventConfigurations = useEventConfigurations()
 
-  const searchParams = parse(location.search, {
-    arrayFormat: 'comma'
-  }) as Record<string, string>
+  const searchParams = deserializeSearchParams(location.search) as Record<
+    string,
+    string
+  >
 
   const query = buildQuickSearchQuery(searchParams, eventConfigurations)
   const queryData = searchEvent.useSuspenseQuery(query)

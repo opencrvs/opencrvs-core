@@ -12,7 +12,6 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useIntl, defineMessages } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { stringify } from 'query-string'
 import { useEffect, useRef, useState } from 'react'
 import { Accordion } from '@opencrvs/components'
 import { Icon } from '@opencrvs/components/lib/Icon'
@@ -25,17 +24,20 @@ import {
   Inferred,
   SearchField,
   TranslationConfig,
-  EventState
+  EventState,
+  NameFieldValue
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
+import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
+import { defailtNameFieldValue } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields
+  getDefaultSearchFields,
+  serializeSearchParams
 } from './utils'
-
 const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
@@ -158,7 +160,8 @@ function buildSearchSections({
       return {
         ...f,
         required: false as const,
-        conditionals: fieldSearchConfig?.conditionals ?? f.conditionals
+        conditionals: fieldSearchConfig?.conditionals ?? f.conditionals,
+        validation: fieldSearchConfig?.validations ?? f.validation
       }
     })
 
@@ -209,6 +212,26 @@ export function TabSearch({
   })
 
   const handleFieldChange = (fieldId: string, value: FieldValue) => {
+    const fieldTypesToBeFilledWithDefaults: FieldType[] = [FieldType.NAME]
+    const fieldConfig = enhancedEvent.declaration.pages
+      .flatMap((x) => x.fields)
+      .find((f) => f.id === fieldId)
+
+    // If the field is a NAME type, we want to merge the default value with the current value
+    // This is to ensure that the NAME field always has a default structure
+    // even if the user has not filled it yet. Otherwise, it will throw invalid field error
+    // when the user tries to search without filling all the NAME fields (ex: { firstname: "Jhon", surname: undefined }).
+    if (
+      fieldConfig &&
+      fieldTypesToBeFilledWithDefaults.includes(fieldConfig.type)
+    ) {
+      if (fieldConfig.type === FieldType.NAME) {
+        value = mergeWithoutNullsOrUndefined(
+          defailtNameFieldValue,
+          value as NameFieldValue
+        )
+      }
+    }
     setFormValues((prev) => ({
       ...prev,
       [fieldId]: value
@@ -222,11 +245,11 @@ export function TabSearch({
   const nonEmptyValues = filterEmptyValues(formValues)
 
   const handleSearch = () => {
-    const searchParams = stringify(nonEmptyValues)
+    const serializedParams = serializeSearchParams(nonEmptyValues)
     const path = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: enhancedEvent.id
     })
-    navigate(`${path}?${searchParams.toString()}`)
+    navigate(`${path}?${serializedParams}`)
   }
 
   const hasEnoughParams =

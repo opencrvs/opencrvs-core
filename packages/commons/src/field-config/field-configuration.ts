@@ -10,6 +10,7 @@
  */
 
 import { FieldConditional, TranslationConfig } from 'src/events'
+import { ValidationConfig } from 'src/events/FieldConfig'
 import { createSearchConfig } from '../searchConfigs'
 
 /**
@@ -19,6 +20,7 @@ export function createFieldConfig(
   fieldId: string,
   options: {
     conditionals?: FieldConditional[]
+    validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig
   }
 ) {

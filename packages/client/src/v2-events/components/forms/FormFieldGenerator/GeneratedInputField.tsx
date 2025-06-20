@@ -174,6 +174,7 @@ export const GeneratedInputField = React.memo(
           <Name.Input
             id={fieldDefinition.id}
             maxLength={field.config.configuration?.maxLength}
+            required={fieldDefinition.required}
             validation={validation}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}

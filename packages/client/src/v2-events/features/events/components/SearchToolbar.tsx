@@ -12,11 +12,11 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { stringify } from 'query-string'
 import { ClearText } from '@opencrvs/components/src/icons'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/src/Icon'
 import { ROUTES } from '@client/v2-events/routes'
+import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 
 const SearchBox = styled.div`
   background: ${({ theme }) => theme.colors.grey100};
@@ -130,15 +130,9 @@ export const SearchToolbar = () => {
       return
     }
 
-    const stringifiedSearchParams = stringify(
-      { keys: searchTerm },
-      {
-        arrayFormat: 'comma',
-        skipEmptyString: true
-      }
-    )
+    const serializedParams = serializeSearchParams({ keys: searchTerm })
 
-    navigate(`${searchUrl}?${stringifiedSearchParams.toString()}`)
+    navigate(`${searchUrl}?${serializedParams}`)
   }
 
   return (
