@@ -81,6 +81,8 @@ const mockUser = {
 
 const mockSystem = {
   name: 'MOSIP',
+  id: '123',
+  officeId: '123',
   createdBy: '123',
   username: 'j.doe1',
   client_id: '123',
