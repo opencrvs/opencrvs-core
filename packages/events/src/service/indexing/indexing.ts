@@ -39,7 +39,8 @@ import {
   DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId
+  encodeFieldId,
+  removeSecuredFields
 } from './utils'
 import { buildElasticQueryFromSearchPayload } from './query'
 
@@ -374,9 +375,11 @@ export async function getIndexedEvents(
   return response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((event) =>
-      decodeEventIndex(getEventConfigById(eventConfigs, event.type), event)
-    )
+    .map((eventIndex) => {
+      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
+      return removeSecuredFields(eventConfig, decodedEventIndex)
+    })
 }
 
 export async function getIndex(
@@ -408,9 +411,11 @@ export async function getIndex(
   const events = response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map((event) =>
-      decodeEventIndex(getEventConfigById(eventConfigs, event.type), event)
-    )
+    .map((eventIndex) => {
+      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
+      return removeSecuredFields(eventConfig, decodedEventIndex)
+    })
 
   return events
 }
