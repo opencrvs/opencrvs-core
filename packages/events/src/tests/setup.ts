@@ -24,14 +24,6 @@ import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
 vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
-vi.mock('@events/storage/postgres/events', async (importOriginal) => {
-  const actual = await importOriginal<any>()
-
-  return {
-    ...actual,
-    getPool: vi.fn()
-  }
-})
 
 async function resetESServer() {
   const { getEventIndexName, getEventAliasName } = await import(
@@ -47,7 +39,7 @@ async function resetESServer() {
 async function resetPostgresServer() {
   const targetDb = `events_${Date.now()}_${Math.random()}`
 
-  const EVENTS_APP_POSTGRES_URI = `postgres://events_app:app_password@${inject('POSTGRES_URI')}/app_password`
+  const EVENTS_APP_POSTGRES_URI = `postgres://events_app:app_password@${inject('POSTGRES_URI')}/${targetDb}`
   const EVENTS_MIGRATOR_POSTGRES_URI = `postgres://events_migrator:migrator_password@${inject('POSTGRES_URI')}/${targetDb}`
 
   const clusterInitializer = new Client({
