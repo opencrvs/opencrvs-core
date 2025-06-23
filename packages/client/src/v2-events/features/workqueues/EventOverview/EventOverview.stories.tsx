@@ -55,6 +55,15 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 export const Overview: Story = {
+  beforeEach: () => {
+    const event = {
+      ...tennisClubMembershipEventDocument,
+      actions: tennisClubMembershipEventDocument.actions.filter(
+        (action) => action.type !== ActionType.REGISTER
+      )
+    }
+    setEventData(event.id, event)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -64,16 +73,6 @@ export const Overview: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return {
-              ...tennisClubMembershipEventDocument,
-              actions: tennisClubMembershipEventDocument.actions.filter(
-                (action) => action.type !== ActionType.REGISTER
-              )
-            }
-          })
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
@@ -105,11 +104,6 @@ export const WithAcceptedRegisterEvent: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
@@ -132,6 +126,27 @@ export const WithAcceptedRegisterEvent: Story = {
 }
 
 export const WithRejectedAction: Story = {
+  beforeEach: () => {
+    const event = {
+      ...tennisClubMembershipEventDocument,
+      actions: tennisClubMembershipEventDocument.actions.concat([
+        {
+          type: ActionType.ARCHIVE,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: new Date().toISOString(),
+          createdByUserType: TokenUserType.Enum.user,
+          createdBy: '123',
+          createdAtLocation: '123',
+          createdByRole: 'LOCAL_REGISTRAR',
+          declaration: {},
+          reason: { message: 'Archived', isDuplicate: true }
+        }
+      ])
+    }
+    setEventData(event.id, event)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -141,28 +156,6 @@ export const WithRejectedAction: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return {
-              ...tennisClubMembershipEventDocument,
-              actions: tennisClubMembershipEventDocument.actions.concat([
-                {
-                  type: ActionType.ARCHIVE,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: new Date().toISOString(),
-                  createdByUserType: TokenUserType.Enum.user,
-                  createdBy: '123',
-                  createdAtLocation: '123',
-                  createdByRole: 'LOCAL_REGISTRAR',
-                  declaration: {},
-                  reason: { message: 'Archived', isDuplicate: true }
-                }
-              ])
-            }
-          })
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
@@ -185,6 +178,99 @@ export const WithRejectedAction: Story = {
 }
 
 export const WithSystemUserActions: Story = {
+  beforeEach: () => {
+    const rng = createPrng(1234)
+
+    const event = {
+      ...tennisClubMembershipEventDocument,
+      actions: [
+        {
+          type: ActionType.CREATE,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-01-01'),
+            new Date('2024-02-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: TokenUserType.Enum.system,
+          createdByRole: SystemRole.enum.HEALTH,
+          assignedTo: '010101',
+          declaration: {}
+        },
+        {
+          type: ActionType.ASSIGN,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-02-01'),
+            new Date('2024-03-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: TokenUserType.Enum.system,
+          createdByRole: SystemRole.enum.HEALTH,
+          assignedTo: '010101',
+          declaration: {}
+        },
+        {
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: TokenUserType.Enum.system,
+          createdByRole: SystemRole.enum.HEALTH,
+          declaration: {}
+        },
+        {
+          type: ActionType.UNASSIGN,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-04-01'),
+            new Date('2024-05-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: TokenUserType.Enum.system,
+          createdByRole: SystemRole.enum.HEALTH,
+          assignedTo: null,
+          declaration: {}
+        },
+        {
+          type: ActionType.DECLARE,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-05-01'),
+            new Date('2024-06-01')
+          ),
+          createdBy: '123',
+          createdByUserType: TokenUserType.Enum.user,
+          createdAtLocation: '123',
+          createdByRole: 'LOCAL_REGISTRAR',
+          declaration: {}
+        }
+      ]
+    }
+    setEventData(event.id, event)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -194,100 +280,6 @@ export const WithSystemUserActions: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            const rng = createPrng(1234)
-
-            return {
-              ...tennisClubMembershipEventDocument,
-              actions: [
-                {
-                  type: ActionType.CREATE,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-01-01'),
-                    new Date('2024-02-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByUserType: TokenUserType.Enum.system,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  assignedTo: '010101',
-                  declaration: {}
-                },
-                {
-                  type: ActionType.ASSIGN,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-02-01'),
-                    new Date('2024-03-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByUserType: TokenUserType.Enum.system,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  assignedTo: '010101',
-                  declaration: {}
-                },
-                {
-                  type: ActionType.NOTIFY,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-03-01'),
-                    new Date('2024-04-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByUserType: TokenUserType.Enum.system,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  declaration: {}
-                },
-                {
-                  type: ActionType.UNASSIGN,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-04-01'),
-                    new Date('2024-05-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByUserType: TokenUserType.Enum.system,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  assignedTo: null,
-                  declaration: {}
-                },
-                {
-                  type: ActionType.DECLARE,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-05-01'),
-                    new Date('2024-06-01')
-                  ),
-                  createdBy: '123',
-                  createdByUserType: TokenUserType.Enum.user,
-                  createdAtLocation: '123',
-                  createdByRole: 'LOCAL_REGISTRAR',
-                  declaration: {}
-                }
-              ]
-            }
-          })
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [

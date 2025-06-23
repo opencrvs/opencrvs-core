@@ -25,8 +25,16 @@ import * as Validate from './index'
 
 const generator = testDataGenerator()
 
+const event = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+})
+
 const meta: Meta<typeof Validate.Review> = {
-  title: 'Validate/Review'
+  title: 'Validate/Review',
+  beforeEach: () => {
+    setEventData(event.id, event)
+  }
 }
 
 export default meta
@@ -69,27 +77,8 @@ export const ReviewForLocalRegistrarComplete: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: event.id
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          })
-        ]
-      }
     }
   }
 }
@@ -111,27 +100,8 @@ export const ReviewForRegistrationAgentComplete: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: event.id
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return generateEventDocument({
-              configuration: tennisClubMembershipEvent,
-              actions: [
-                ActionType.CREATE,
-                ActionType.DECLARE,
-                ActionType.VALIDATE
-              ]
-            })
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          })
-        ]
-      }
     }
   }
 }
@@ -152,20 +122,8 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: event.id
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          })
-        ]
-      }
     }
   }
 }

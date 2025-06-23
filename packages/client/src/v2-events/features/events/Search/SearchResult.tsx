@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { PropsWithChildren, useState } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -224,7 +224,7 @@ export const SearchResultComponent = ({
   title: contentTitle,
   tabBarContent,
   actions = []
-}: {
+}: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
   queryData: EventIndex[]
@@ -233,7 +233,7 @@ export const SearchResultComponent = ({
   title: string
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
-}) => {
+}>) => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()

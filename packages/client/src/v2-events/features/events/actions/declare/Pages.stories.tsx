@@ -43,6 +43,9 @@ const undeclaredDraftEvent = {
 }
 
 export const Page: Story = {
+  beforeEach: () => {
+    setEventData(undeclaredDraftEvent.id, undeclaredDraftEvent)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,

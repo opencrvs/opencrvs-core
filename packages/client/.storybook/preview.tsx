@@ -42,6 +42,7 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { QueryKey } from '@tanstack/react-query'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -139,7 +140,7 @@ clearStorage()
 const preview: Preview = {
   loaders: [
     mswLoader,
-    async () => {
+    async (options) => {
       await clearStorage()
       queryClient.clear()
 
@@ -154,8 +155,14 @@ const preview: Preview = {
        * and that users cache has the user. This creates a situation identical to
        * when the user has assigned & downloaded a record
        */
+      const offlineData: Array<{ queryKey: QueryKey; data: unknown }> =
+        options.parameters.offline || []
+
+      offlineData.forEach(({ queryKey, data }) => {
+        queryClient.setQueryData(queryKey, data)
+      })
+
       addLocalEventConfig(tennisClubMembershipEvent)
-      addLocalEventConfig(footballClubMembershipEvent)
       setEventData(
         tennisClubMembershipEventDocument.id,
         tennisClubMembershipEventDocument
