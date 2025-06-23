@@ -1,4 +1,3 @@
--- Up Migration
 CREATE TABLE locations (
   id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   external_id text UNIQUE,
@@ -111,16 +110,3 @@ CREATE TABLE event_action_drafts (
 GRANT SELECT, INSERT, UPDATE, DELETE ON event_action_drafts TO events_app;
 
 COMMENT ON TABLE event_action_drafts IS 'Stores user-specific drafts of event-related actions. Drafts use client-supplied transaction_id for idempotency. Declaration fields may be incomplete. Each draft is owned exclusively by created_by.';
-
--- Down Migration
-DROP TABLE IF EXISTS event_action_drafts;
-
-DROP TABLE IF EXISTS event_actions;
-
-DROP TYPE IF EXISTS action_type;
-
-DROP TYPE IF EXISTS action_status;
-
-DROP TABLE IF EXISTS events;
-
-DROP TABLE IF EXISTS locations;

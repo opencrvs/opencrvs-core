@@ -10,33 +10,30 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
-import { Pool } from 'pg'
-import { inject } from 'vitest'
+import { Client } from 'pg'
 
-const MIGRATION_FILE_CONTENTS = fs
-  .readFileSync(path.resolve(__dirname, './0002_migrations.sql'))
+export const MIGRATION_SQL = fs
+  .readFileSync(path.resolve(__dirname, './postgres-migrations.sql'))
   .toString()
 
-export function getUpMigrations() {
-  return MIGRATION_FILE_CONTENTS.split('-- Down Migration')[0]
+export const migrate = async (client: Client) => {
+  await client.query(MIGRATION_SQL)
 }
 
-export function getDownMigrations() {
-  return MIGRATION_FILE_CONTENTS.split('-- Down Migration')[1]
+export const createDatabase = async (client: Client, databaseName: string) => {
+  await client.query(`CREATE DATABASE "${databaseName}"`)
+  await client.query(
+    `GRANT CONNECT ON DATABASE "${databaseName}" TO events_migrator, events_app`
+  )
 }
 
-async function runSql(sql: string) {
-  const migratorPool = new Pool({
-    connectionString: inject('EVENTS_MIGRATOR_POSTGRES_URI')
-  })
-  const migratorClient = await migratorPool.connect()
+export const initializeSchemaAccess = async (client: Client) => {
+  await client.query(`REVOKE CREATE ON SCHEMA public FROM PUBLIC`)
+  await client.query(`REVOKE CREATE ON SCHEMA public FROM events_migrator`)
 
-  await migratorClient.query(sql).finally(() => {
-    migratorClient.release()
-  })
-}
+  await client.query(`CREATE SCHEMA app AUTHORIZATION events_migrator`)
+  await client.query(`GRANT USAGE ON SCHEMA app TO events_app`)
 
-export const migrate = {
-  up: async () => runSql(getUpMigrations()),
-  down: async () => runSql(getDownMigrations())
+  await client.query(`ALTER ROLE events_migrator SET search_path = app`)
+  await client.query(`ALTER ROLE events_app SET search_path = app`)
 }

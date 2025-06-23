@@ -9,18 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { inject, vi } from 'vitest'
+import { Client, Pool } from 'pg'
+import { clientCallTypeToProcedureType } from '@trpc/client'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getDeclarationFields } from '@opencrvs/commons/events'
-import { getClient } from '@events/storage/postgres/__mocks__/events'
+import {
+  resetServer as resetEventsPostgresServer,
+  getPool
+} from '@events/storage/postgres/events'
 import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
 
 import { createIndex } from '@events/service/indexing/indexing'
 import { mswServer } from './msw'
-import { migrate } from './postgres'
+import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
 vi.mock('@events/storage/mongodb/user-mgnt')
 vi.mock('@events/storage/elasticsearch')
-vi.mock('@events/storage/postgres/events', () => ({ getClient }))
+vi.mock('@events/storage/postgres/events', async (importOriginal) => {
+  const actual = await importOriginal<any>()
+
+  return {
+    ...actual,
+    getPool: vi.fn()
+  }
+})
 
 async function resetESServer() {
   const { getEventIndexName, getEventAliasName } = await import(
@@ -33,8 +45,43 @@ async function resetESServer() {
   await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 
+async function resetPostgresServer() {
+  const targetDb = `events_${Date.now()}_${Math.random()}`
+
+  const EVENTS_APP_POSTGRES_URI = `postgres://events_app:app_password@${inject('POSTGRES_URI')}/app_password`
+  const EVENTS_MIGRATOR_POSTGRES_URI = `postgres://events_migrator:migrator_password@${inject('POSTGRES_URI')}/${targetDb}`
+
+  const clusterInitializer = new Client({
+    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/postgres`
+  })
+  await clusterInitializer.connect()
+  await createDatabase(clusterInitializer, targetDb)
+  await clusterInitializer.end()
+
+  const databaseInitializer = new Client({
+    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/${targetDb}`
+  })
+  await databaseInitializer.connect()
+  await initializeSchemaAccess(databaseInitializer)
+  await databaseInitializer.end()
+
+  const migrator = new Client({
+    connectionString: EVENTS_MIGRATOR_POSTGRES_URI
+  })
+  await migrator.connect()
+  await migrate(migrator)
+  await migrator.end()
+
+  resetEventsPostgresServer()
+  getPool(EVENTS_APP_POSTGRES_URI)
+}
+
 beforeEach(async () =>
-  Promise.all([migrate.up(), resetUserMgntMongoServer(), resetESServer()])
+  Promise.all([
+    resetPostgresServer(),
+    resetUserMgntMongoServer(),
+    resetESServer()
+  ])
 )
 
 beforeAll(() =>
@@ -50,8 +97,7 @@ beforeAll(() =>
     }
   })
 )
-afterEach(async () => {
+afterEach(() => {
   mswServer.resetHandlers()
-  await migrate.down()
 })
 afterAll(() => mswServer.close())

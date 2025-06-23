@@ -14,13 +14,6 @@ import { Pool, types } from 'pg'
 import { env } from '@events/environment'
 import Schema from './events/schema/Database'
 
-/**
- * @important
- * If you update this file, @see {@link ./__mocks__/events.ts}
- */
-
-const connectionString = env.EVENTS_POSTGRES_URL
-
 // Override timestamptz (OID 1184) to return ISO 8601 strings instead of Date objects
 //       `pg`: 2025-06-16 12:55:51.507875+00
 // `ISO 8601`: 2025-06-16T12:55:51.507Z
@@ -30,7 +23,7 @@ types.setTypeParser(1184, (str) => str.replace(' ', 'T').replace('+00', 'Z'))
 let db: Kysely<Schema> | undefined
 let pool: Pool | undefined
 
-export const getPool = () => {
+export const getPool = (connectionString = env.EVENTS_POSTGRES_URL) => {
   if (!pool) {
     pool = new Pool({ connectionString })
   }
@@ -51,4 +44,9 @@ export function getClient() {
   }
 
   return db
+}
+
+export function resetServer() {
+  db = undefined
+  pool = undefined
 }
