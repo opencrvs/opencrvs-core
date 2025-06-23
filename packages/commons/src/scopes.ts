@@ -142,7 +142,8 @@ export const SCOPES = {
   USER_DATA_SEEDING: 'user.data-seeding'
 } as const
 
-const LiteralScopes = z.union([
+// Legacy scopes
+const LegacyScopes = z.union([
   z.literal(SCOPES.NATLSYSADMIN),
   z.literal(SCOPES.BYPASSRATELIMIT),
   z.literal(SCOPES.DECLARE),
@@ -153,11 +154,20 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.PERFORMANCE),
   z.literal(SCOPES.SYSADMIN),
   z.literal(SCOPES.TEAMS),
-  z.literal(SCOPES.CONFIG),
+  z.literal(SCOPES.CONFIG)
+])
+
+// Systems / integrations
+const IntegrationScopes = z.union([
   z.literal(SCOPES.WEBHOOK),
   z.literal(SCOPES.NATIONALID),
   z.literal(SCOPES.NOTIFICATION_API),
-  z.literal(SCOPES.RECORDSEARCH),
+  z.literal(SCOPES.RECORDSEARCH)
+])
+
+// Declare
+const DeclareScopes = z.union([
+  z.literal(SCOPES.RECORD_DECLARE),
   z.literal(SCOPES.RECORD_IMPORT),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
@@ -166,15 +176,26 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.RECORD_DECLARE_MARRIAGE),
   z.literal(SCOPES.RECORD_DECLARE_MARRIAGE_MY_JURISDICTION),
   z.literal(SCOPES.RECORD_SUBMIT_INCOMPLETE),
-  z.literal(SCOPES.RECORD_SUBMIT_FOR_REVIEW),
-  z.literal(SCOPES.RECORD_UNASSIGN_OTHERS),
+  z.literal(SCOPES.RECORD_SUBMIT_FOR_REVIEW)
+])
+
+const UnassignScope = z.literal(SCOPES.RECORD_UNASSIGN_OTHERS)
+
+// Validate
+const ValidateScopes = z.union([
   z.literal(SCOPES.RECORD_SUBMIT_FOR_APPROVAL),
   z.literal(SCOPES.RECORD_SUBMIT_FOR_UPDATES),
   z.literal(SCOPES.RECORD_DECLARATION_EDIT),
   z.literal(SCOPES.RECORD_REVIEW_DUPLICATES),
   z.literal(SCOPES.RECORD_DECLARATION_ARCHIVE),
-  z.literal(SCOPES.RECORD_DECLARATION_REINSTATE),
-  z.literal(SCOPES.RECORD_REGISTER),
+  z.literal(SCOPES.RECORD_DECLARATION_REINSTATE)
+])
+
+// Register
+const RegisterScope = z.literal(SCOPES.RECORD_REGISTER)
+
+// Certify
+const CertifyScopes = z.union([
   z.literal(SCOPES.RECORD_EXPORT_RECORDS),
   z.literal(SCOPES.RECORD_DECLARATION_PRINT),
   z.literal(SCOPES.RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS),
@@ -182,7 +203,11 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.RECORD_PRINT_ISSUE_CERTIFIED_COPIES),
   z.literal(SCOPES.RECORD_PRINT_CERTIFIED_COPIES),
   z.literal(SCOPES.RECORD_BULK_PRINT_CERTIFIED_COPIES),
-  z.literal(SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES),
+  z.literal(SCOPES.RECORD_REGISTRATION_VERIFY_CERTIFIED_COPIES)
+])
+
+// Correct
+const CorrectionScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION),
   z.literal(SCOPES.RECORD_REGISTRATION_CORRECT),
   z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REVOCATION),
@@ -190,25 +215,49 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.RECORD_REGISTRATION_REQUEST_REINSTATEMENT),
   z.literal(SCOPES.RECORD_REGISTRATION_REINSTATE),
   z.literal(SCOPES.RECORD_CONFIRM_REGISTRATION),
-  z.literal(SCOPES.RECORD_REJECT_REGISTRATION),
+  z.literal(SCOPES.RECORD_REJECT_REGISTRATION)
+])
+
+// Search
+export const SearchScopes = z.union([
   z.literal(SCOPES.SEARCH_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.SEARCH_BIRTH),
   z.literal(SCOPES.SEARCH_DEATH_MY_JURISDICTION),
   z.literal(SCOPES.SEARCH_DEATH),
   z.literal(SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION),
-  z.literal(SCOPES.SEARCH_MARRIAGE),
+  z.literal(SCOPES.SEARCH_MARRIAGE)
+])
+
+// Audit
+const AuditScopes = z.union([
   z.literal(SCOPES.RECORD_READ),
   z.literal(SCOPES.RECORD_READ_AUDIT),
   z.literal(SCOPES.RECORD_READ_COMMENTS),
-  z.literal(SCOPES.RECORD_CREATE_COMMENTS),
+  z.literal(SCOPES.RECORD_CREATE_COMMENTS)
+])
+
+// Profile
+const ProfileScopes = z.union([
   z.literal(SCOPES.PROFILE_UPDATE),
-  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE),
+  z.literal(SCOPES.PROFILE_ELECTRONIC_SIGNATURE)
+])
+
+// Performance
+const PerformanceScopes = z.union([
   z.literal(SCOPES.PERFORMANCE_READ),
   z.literal(SCOPES.PERFORMANCE_READ_DASHBOARDS),
-  z.literal(SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS),
+  z.literal(SCOPES.PERFORMANCE_EXPORT_VITAL_STATISTICS)
+])
+
+// Organisation
+const OrganisationScopes = z.union([
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS),
   z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_OFFICE),
-  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION),
+  z.literal(SCOPES.ORGANISATION_READ_LOCATIONS_MY_JURISDICTION)
+])
+
+// User
+const UserScopes = z.union([
   z.literal(SCOPES.USER_READ),
   z.literal(SCOPES.USER_READ_MY_OFFICE),
   z.literal(SCOPES.USER_READ_MY_JURISDICTION),
@@ -216,9 +265,33 @@ const LiteralScopes = z.union([
   z.literal(SCOPES.USER_CREATE),
   z.literal(SCOPES.USER_CREATE_MY_JURISDICTION),
   z.literal(SCOPES.USER_UPDATE),
-  z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION),
-  z.literal(SCOPES.CONFIG_UPDATE_ALL),
-  z.literal(SCOPES.USER_DATA_SEEDING)
+  z.literal(SCOPES.USER_UPDATE_MY_JURISDICTION)
+])
+
+// Config
+const ConfigScope = z.literal(SCOPES.CONFIG_UPDATE_ALL)
+
+// Data seeding
+const DataSeedingScope = z.literal(SCOPES.USER_DATA_SEEDING)
+
+// Combine all
+const LiteralScopes = z.union([
+  LegacyScopes,
+  IntegrationScopes,
+  UnassignScope,
+  DeclareScopes,
+  ValidateScopes,
+  RegisterScope,
+  CertifyScopes,
+  CorrectionScopes,
+  SearchScopes,
+  AuditScopes,
+  ProfileScopes,
+  PerformanceScopes,
+  OrganisationScopes,
+  UserScopes,
+  ConfigScope,
+  DataSeedingScope
 ])
 
 // Configurable scopes are for example:
@@ -379,3 +452,13 @@ export type RawScopes = z.infer<typeof LiteralScopes> | (string & {})
 
 // for backwards compatibility
 export type Scope = RawScopes
+
+export const ActionScopes = z.union([
+  DeclareScopes,
+  ValidateScopes,
+  RegisterScope,
+  CertifyScopes,
+  CorrectionScopes
+])
+
+export type ActionScopes = z.infer<typeof ActionScopes>

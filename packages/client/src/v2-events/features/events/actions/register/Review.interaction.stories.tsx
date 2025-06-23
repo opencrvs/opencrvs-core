@@ -287,7 +287,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
           'event.config.get': true,
           'event.create': false,
           'event.get': true,
-          'event.list': true
+          'event.list': false
         })
       })
     })
