@@ -432,7 +432,7 @@ describe('correction requests', () => {
             createdByRole: 'some-role',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
-            id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
+            id: '63d19916-dcc8-4cf2-8161-eab9989765e8' as UUID,
             declaration: {},
             status: ActionStatus.Accepted,
             transactionId: getUUID()
@@ -445,7 +445,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
-            id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8',
+            id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
           },
@@ -457,7 +457,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
-            id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2',
+            id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
           },
@@ -469,7 +469,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:41.206Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba' as UUID,
             createdBySignature: '/ocrvs/signature.png',
-            id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
+            id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d' as UUID,
             status: ActionStatus.Accepted,
             transactionId: getUUID()
           }
