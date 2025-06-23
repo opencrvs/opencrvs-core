@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 65c69704-b778-4964-84c5-f7e709ce595e
+                transactionId: 95eb2521-841d-4ddd-862b-2ed40b667666
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5b6a05bf-c40b-46ec-867f-821e8522a362
+                transactionId: b911866a-a0f4-4240-a681-92a76ba9f35a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9846,11 +9846,9 @@ components:
         trackingId:
           $ref: "#/components/schemas/Exact"
         flags:
-          type: array
-          items:
-            anyOf:
-              - $ref: "#/components/schemas/AnyOf"
-              - $ref: "#/components/schemas/Not"
+          anyOf:
+            - $ref: "#/components/schemas/AnyOfFlags"
+            - $ref: "#/components/schemas/Not"
         data:
           $ref: "#/components/schemas/QueryInput"
     AnyOfStatus:
@@ -9963,7 +9961,7 @@ components:
       required:
         - type
         - location
-    AnyOf:
+    AnyOfFlags:
       type: object
       properties:
         type:
@@ -9973,7 +9971,18 @@ components:
         terms:
           type: array
           items:
-            type: string
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - certificate-printed
+                  - declaration-incomplete
+                  - declaration-requires-updates
+                  - declaration-pending-external-validation
+                  - registration-certify-new-registration
+                  - registration-re-certify-after-correction
+                  - registration-correction-requested
       required:
         - type
         - terms
@@ -10022,6 +10031,20 @@ components:
       required:
         - type
         - term
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
     EventIndex:
       type: object
       properties:
@@ -10181,6 +10204,12 @@ components:
               - type: string
                 enum:
                   - certificate-printed
+                  - declaration-incomplete
+                  - declaration-requires-updates
+                  - declaration-pending-external-validation
+                  - registration-certify-new-registration
+                  - registration-re-certify-after-correction
+                  - registration-correction-requested
         declaration:
           type: object
           additionalProperties:
