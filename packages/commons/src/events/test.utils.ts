@@ -10,7 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { merge, omitBy, isString } from 'lodash'
-import addDays from 'date-fns/addDays'
+import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID } from '../uuid'
 import {
