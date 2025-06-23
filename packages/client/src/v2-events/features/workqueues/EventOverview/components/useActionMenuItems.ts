@@ -67,7 +67,7 @@ function getAvailableAssignmentActions(
   return []
 }
 
-export interface ActionConfig {
+interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
