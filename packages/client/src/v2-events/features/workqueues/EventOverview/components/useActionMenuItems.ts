@@ -271,41 +271,6 @@ function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
 }
 
 /**
- * Filters out actions that the user is not allowed to perform based on their scopes.
- *
- * This function checks each action against the user's scopes to determine if they
- * have the necessary permissions to perform that action. If the user can only perform
- * meta actions (READ, ASSIGN, UNASSIGN), they are restricted to only READ to prevent
- * assignment operations when they lack other permissions.
- *
- * @param actions - Array of action types to check for permissions
- * @param userScopes - Array of user scopes to validate against
- * @returns Filtered array of actions that the user is allowed to perform
- */
-function filterUnallowedActions(
-  actions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  const allowedActions = actions.filter((action) => {
-    const requiredScopes = ACTION_ALLOWED_SCOPES[action]
-
-    if (requiredScopes === null) {
-      return true
-    }
-
-    return hasAnyOfScopes(userScopes, requiredScopes)
-  })
-
-  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOtherAllowedActions = allowedActions.some(
-    (action) => !isMetaAction(action)
-  )
-
-  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
-  return hasOtherAllowedActions ? allowedActions : [ActionType.READ]
-}
-
-/**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
 export function useActionMenuItems(event: EventIndex) {
@@ -325,15 +290,38 @@ export function useActionMenuItems(event: EventIndex) {
 
   const actions = [...availableAssignmentActions, ...availableActions]
 
-  const allowedActions = filterUnallowedActions(actions, scopes)
-  return allowedActions
-    .filter((action): action is keyof typeof config =>
+  const supportedActions = actions.filter(
+    (action): action is keyof typeof config =>
       Object.keys(config).includes(action)
-    )
-    .map((action) => {
+  )
+
+  const allowedActions = supportedActions.filter((a) => {
+    const requiredScopes = ACTION_ALLOWED_SCOPES[a]
+
+    if (requiredScopes === null) {
+      return true
+    }
+
+    return hasAnyOfScopes(scopes, requiredScopes)
+  })
+
+  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  const hasOtherAllowedActions = allowedActions.some((a) => !isMetaAction(a))
+
+  if (hasOtherAllowedActions) {
+    return allowedActions.map((a) => {
       return {
-        ...config[action],
-        type: action
+        ...config[a],
+        type: a
       }
     })
+  }
+
+  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
+  return [
+    {
+      ...config[ActionType.READ],
+      type: ActionType.READ
+    }
+  ]
 }
