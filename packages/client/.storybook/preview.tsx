@@ -157,13 +157,6 @@ const preview: Preview = {
        * and that users cache has the user. This creates a situation identical to
        * when the user has assigned & downloaded a record
        */
-      const offlineData: Array<{ queryKey: QueryKey; data: unknown }> =
-        options.parameters.offline || []
-
-      offlineData.forEach(({ queryKey, data }) => {
-        queryClient.setQueryData(queryKey, data)
-      })
-
       addLocalEventConfig(tennisClubMembershipEvent)
       setEventData(
         tennisClubMembershipEventDocument.id,
@@ -175,6 +168,13 @@ const preview: Preview = {
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: 'LOCAL_REGISTRAR',
         signatureFilename: undefined
+      })
+
+      const offlineData: Array<{ queryKey: QueryKey; data: unknown }> =
+        options.parameters.offline || []
+
+      offlineData.forEach(({ queryKey, data }) => {
+        queryClient.setQueryData(queryKey, data)
       })
 
       //  Intermittent failures starts to happen when global state gets out of whack.

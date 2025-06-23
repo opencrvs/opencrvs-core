@@ -21,7 +21,8 @@ import {
   TokenUserType,
   createPrng,
   getRandomDatetime,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
 import {
@@ -64,12 +65,20 @@ const event = {
     (action) => action.type !== ActionType.REGISTER
   )
 }
+
 export const Overview: Story = {
   parameters: {
     offline: [
       {
         queryKey: trpcOptionsProxy.event.get.queryKey(event.id),
         data: event
+      },
+      {
+        queryKey: trpcOptionsProxy.event.search.queryKey({
+          type: 'and',
+          clauses: [{ id: event.id }]
+        }),
+        data: [getCurrentEventState(event, tennisClubMembershipEvent)]
       }
     ],
     reactRouter: {
@@ -165,18 +174,7 @@ export const WithRejectedAction: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument({
-                eventId: tennisClubMembershipEventDocument.id,
-                actionType: ActionType.REGISTER,
-                declaration: {
-                  'applicant.name': {
-                    firstname: 'Riku',
-                    surname: 'This value is from a draft'
-                  }
-                }
-              })
-            ]
+            return []
           })
         ]
       }

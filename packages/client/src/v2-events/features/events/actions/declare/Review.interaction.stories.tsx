@@ -22,18 +22,27 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE, ActionType.DECLARE]
 })
+const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
@@ -56,16 +65,6 @@ const meta: Meta<typeof ReviewIndex> = {
 export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
-
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
@@ -110,10 +109,28 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
+    offline: [
+      {
+        queryKey: trpcOptionsProxy.event.get.queryKey(
+          declarationTrpcMsw.eventDocument.id
+        ),
+        data: declarationTrpcMsw.eventDocument
+      }
+    ],
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -124,6 +141,14 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
           }),
           tRPCMsw.user.get.query((id) => {
             return mockUser
@@ -199,7 +224,17 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -276,7 +311,17 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -375,7 +420,17 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
             return []
           })
         ],
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({

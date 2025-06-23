@@ -390,6 +390,12 @@ export const ReviewShowsFilesFromDraft: Story = {
         eventId
       })
     },
+    offline: [
+      {
+        queryKey: trpcOptionsProxy.event.get.queryKey(eventId),
+        data: createdEvent
+      }
+    ],
     msw: {
       handlers: {
         drafts: [
