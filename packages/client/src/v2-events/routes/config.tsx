@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Outlet, RouteObject, Routes } from 'react-router-dom'
 
 import { ActionType } from '@opencrvs/commons/client'
@@ -29,7 +29,11 @@ import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventO
 import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
 import { EventOverviewLayout, WorkqueueLayout } from '@client/v2-events/layouts'
 import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
-import { TRPCProvider } from '@client/v2-events/trpc'
+import {
+  queryClient,
+  trpcOptionsProxy,
+  TRPCProvider
+} from '@client/v2-events/trpc'
 import { DeclarationAction } from '@client/v2-events/features/events/components/Action/DeclarationAction'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
 import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
@@ -38,6 +42,16 @@ import { QuickSearchIndex } from '@client/v2-events/features/events/Search/Quick
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
+
+function PrefetchQueries() {
+  useEffect(() => {
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.locations.get.queryKey()
+    })
+  }, [])
+
+  return null
+}
 
 /**
  * Configuration for the routes of the v2-events feature.
@@ -54,6 +68,7 @@ export const routesConfig = {
           <Outlet />
           <Debug />
           <Toaster />
+          <PrefetchQueries />
         </TRPCProvider>
       </TRPCErrorBoundary>
     </NavigationHistoryProvider>

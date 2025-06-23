@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -39,6 +39,7 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
@@ -233,7 +234,7 @@ export const SearchResultComponent = ({
   title: contentTitle,
   tabBarContent,
   actions = []
-}: {
+}: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
   queryData: EventIndex[]
@@ -242,7 +243,7 @@ export const SearchResultComponent = ({
   title: string
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
-}) => {
+}>) => {
   const intl = useIntl()
   const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
@@ -252,9 +253,9 @@ export const SearchResultComponent = ({
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const { getOutbox } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
+  const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getRemoteDrafts()
+  const drafts = getAllRemoteDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
@@ -281,11 +282,17 @@ export const SearchResultComponent = ({
     })[]
   ) => {
     return eventData.map(({ meta, ...event }) => {
-      const actionConfigs = actions.map((actionType) => ({
-        actionComponent: (
-          <ActionComponent actionType={actionType} event={event} />
-        )
-      }))
+      const actionConfigs = actions
+        .map((actionType) => ({
+          actionComponent: (
+            <ActionComponent actionType={actionType} event={event} />
+          )
+        }))
+        .concat({
+          actionComponent: (
+            <DownloadButton key={`DownloadButton-${event.id}`} event={event} />
+          )
+        })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
       if (!eventConfig) {

@@ -27,10 +27,10 @@ import {
   getAcceptedActions,
   AsyncRejectActionDocument,
   ActionType,
-  EventStatus,
   isWriteAction,
   getStatusFromActions,
-  EventConfig
+  EventConfig,
+  AVAILABLE_ACTIONS_BY_EVENT_STATUS
 } from '@opencrvs/commons/events'
 import { getUUID, TokenUserType } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -109,6 +109,24 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
   }
 }
 
+export async function throwConflictIfActionNotAllowed(
+  eventId: string,
+  actionType: ActionType
+) {
+  const event = await getEventById(eventId)
+  const eventStatus = getStatusFromActions(event.actions)
+
+  const allowedActions: ActionType[] =
+    AVAILABLE_ACTIONS_BY_EVENT_STATUS[eventStatus]
+
+  if (!allowedActions.includes(actionType)) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${actionType}' cannot be performed on an event in '${eventStatus}' state. Available actions: ${allowedActions.join(', ')}.`
+    })
+  }
+}
+
 export async function deleteEvent(
   eventId: string,
   { token }: { token: string }
@@ -120,16 +138,6 @@ export async function deleteEvent(
 
   if (!event) {
     throw new EventNotFoundError(eventId)
-  }
-
-  const eventStatus = getStatusFromActions(event.actions)
-
-  // Once an event is declared or notified, it can not be deleted anymore
-  if (eventStatus !== EventStatus.enum.CREATED) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'A declared or notified event can not be deleted'
-    })
   }
 
   const { id } = event
@@ -357,12 +365,20 @@ export async function addAction(
     status: status
   }
 
-  await db
-    .collection<EventDocument>('events')
-    .updateOne(
-      { id: eventId, 'actions.transactionId': { $ne: input.transactionId } },
-      { $push: { actions: action }, $set: { updatedAt: now } }
-    )
+  await db.collection<EventDocument>('events').updateOne(
+    {
+      id: eventId,
+      actions: {
+        $not: {
+          $elemMatch: {
+            transactionId: input.transactionId,
+            type: input.type
+          }
+        }
+      }
+    },
+    { $push: { actions: action }, $set: { updatedAt: now } }
+  )
 
   // We want to unassign only if:
   // - Action is a write action, since we dont want to unassign from e.g. READ action
@@ -409,12 +425,10 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  if (action.type !== ActionType.READ) {
-    await indexEvent(updatedEvent, configuration)
+  await indexEvent(updatedEvent, configuration)
 
-    if (action.type !== ActionType.ASSIGN) {
-      await deleteDraftsByEventId(eventId)
-    }
+  if (action.type !== ActionType.READ && action.type !== ActionType.ASSIGN) {
+    await deleteDraftsByEventId(eventId)
   }
 
   return updatedEvent
