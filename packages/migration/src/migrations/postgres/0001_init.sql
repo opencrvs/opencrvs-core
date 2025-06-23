@@ -12,6 +12,3 @@ REVOKE CREATE ON SCHEMA public FROM events_migrator;
 
 CREATE SCHEMA app AUTHORIZATION events_migrator;
 GRANT USAGE ON SCHEMA app TO events_app;
-
-ALTER ROLE events_migrator SET search_path = app;
-ALTER ROLE events_app SET search_path = app;

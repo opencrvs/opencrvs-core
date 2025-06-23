@@ -17,6 +17,7 @@ export const MIGRATION_SQL = fs
   .toString()
 
 export const migrate = async (client: Client) => {
+  await client.query('SET search_path TO app')
   await client.query(MIGRATION_SQL)
 }
 
@@ -33,7 +34,4 @@ export const initializeSchemaAccess = async (client: Client) => {
 
   await client.query(`CREATE SCHEMA app AUTHORIZATION events_migrator`)
   await client.query(`GRANT USAGE ON SCHEMA app TO events_app`)
-
-  await client.query(`ALTER ROLE events_migrator SET search_path = app`)
-  await client.query(`ALTER ROLE events_app SET search_path = app`)
 }

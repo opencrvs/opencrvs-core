@@ -43,7 +43,7 @@ export function getClient() {
     })
   }
 
-  return db
+  return db.withSchema('app')
 }
 
 export function resetServer() {
