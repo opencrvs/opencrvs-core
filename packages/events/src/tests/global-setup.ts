@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import path from 'node:path'
 import { ElasticsearchContainer } from '@testcontainers/elasticsearch'
 import { PostgreSqlContainer } from '@testcontainers/postgresql'
 import { MongoMemoryServer } from 'mongodb-memory-server'
@@ -58,8 +57,6 @@ export default async function setup({ provide }: { provide: ProvideFunction }) {
   provide('ELASTICSEARCH_URI', `${es.getHost()}:${es.getMappedPort(9200)}`)
   provide('USER_MGNT_MONGO_URI', userMgntURI)
   provide('POSTGRES_URI', `${psql.getHost()}:${psql.getMappedPort(5432)}`)
-
-  console.log(psql.getConnectionUri())
 
   return async () => {
     await es.stop()

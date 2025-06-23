@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { inject, vi } from 'vitest'
-import { Client, Pool } from 'pg'
-import { clientCallTypeToProcedureType } from '@trpc/client'
+import { Client } from 'pg'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getDeclarationFields } from '@opencrvs/commons/events'
 import {
