@@ -18,16 +18,14 @@ import {
   generateEventDraftDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
-  tennisClubMembershipEventDocument,
   tennisClubMembershipEventIndex,
   TestImage
 } from '@client/v2-events/features/events/fixtures'
 
-import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -41,12 +39,13 @@ const eventId = eventDocument.id
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare',
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in th user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventId, eventDocument)
+  parameters: {
+    offline: [
+      {
+        queryKey: trpcOptionsProxy.event.get.queryKey(eventId),
+        data: eventDocument
+      }
+    ]
   }
 }
 
@@ -77,8 +76,7 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png',
-  avatarURL: undefined
+  signatureFilename: 'signature.png'
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {
@@ -303,9 +301,6 @@ export const ReviewForFieldAgentComplete: Story = {
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
           })
@@ -340,6 +335,12 @@ export const ReviewForFieldAgentIncomplete: Story = {
     }
   ],
   parameters: {
+    offline: [
+      {
+        queryKey: trpcOptionsProxy.event.get.queryKey(eventId),
+        data: eventDocument
+      }
+    ],
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -351,9 +352,6 @@ export const ReviewForFieldAgentIncomplete: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -385,13 +383,6 @@ const createdEvent = generateEventDocument({
 })
 
 export const ReviewShowsFilesFromDraft: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventId, createdEvent)
-  },
   parameters: {
     reactRouter: {
       router: routesConfig,

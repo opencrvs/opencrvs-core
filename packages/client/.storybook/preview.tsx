@@ -35,7 +35,9 @@ import { NavigationHistoryProvider } from '@client/v2-events/components/Navigati
 import {
   addUserToQueryData,
   setEventData,
-  addLocalEventConfig
+  addLocalEventConfig,
+  setEventListData,
+  updateLocalEventIndex
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   footballClubMembershipEvent,

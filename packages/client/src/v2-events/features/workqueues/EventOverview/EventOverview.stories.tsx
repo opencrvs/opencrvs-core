@@ -24,7 +24,11 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
-import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  trpcOptionsProxy,
+  TRPCProvider
+} from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { setEventData, addLocalEventConfig } from '../../events/useEvents/api'
@@ -54,21 +58,24 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const event = {
+  ...tennisClubMembershipEventDocument,
+  actions: tennisClubMembershipEventDocument.actions.filter(
+    (action) => action.type !== ActionType.REGISTER
+  )
+}
 export const Overview: Story = {
-  beforeEach: () => {
-    const event = {
-      ...tennisClubMembershipEventDocument,
-      actions: tennisClubMembershipEventDocument.actions.filter(
-        (action) => action.type !== ActionType.REGISTER
-      )
-    }
-    setEventData(event.id, event)
-  },
   parameters: {
+    offline: [
+      {
+        queryKey: trpcOptionsProxy.event.get.queryKey(event.id),
+        data: event
+      }
+    ],
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: event.id
       })
     },
     msw: {
@@ -77,7 +84,7 @@ export const Overview: Story = {
           tRPCMsw.event.draft.list.query(() => {
             return [
               generateEventDraftDocument({
-                eventId: tennisClubMembershipEventDocument.id,
+                eventId: event.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
                   'applicant.name': {
