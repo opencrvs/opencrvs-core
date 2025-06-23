@@ -262,6 +262,12 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     }
   }
 
+  if (clause.flags) {
+    if (clause.flags.type === 'anyOf') {
+      must.push({ terms: { flags: clause.flags.terms } })
+    }
+  }
+
   return must
 }
 

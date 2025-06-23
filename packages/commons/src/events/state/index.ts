@@ -19,11 +19,12 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
+import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import { deepMerge, findActiveDrafts } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
+import { getFlagsFromActions } from './flags'
 
 export function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -64,45 +65,6 @@ export function getStatusFromActions(actions: Array<Action>) {
         return status
     }
   }, EventStatus.enum.CREATED)
-}
-
-function getFlagsFromActions(actions: Action[]): Flag[] {
-  const sortedactions = actions.sort((a, b) =>
-    a.createdAt.localeCompare(b.createdAt)
-  )
-  const actionStatus = sortedactions.reduce(
-    (actionStatuses, { type, status }) => ({
-      ...actionStatuses,
-      [type]: status
-    }),
-    {} as Record<ActionType, ActionStatus>
-  )
-
-  const flags = Object.entries(actionStatus)
-    .filter(([, status]) => status !== ActionStatus.Accepted)
-    .map(([type, status]) => {
-      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
-      return flag satisfies Flag
-    })
-
-  const isCertificatePrinted = sortedactions.reduce<boolean>(
-    (prev, { type }) => {
-      if (type === ActionType.PRINT_CERTIFICATE) {
-        return true
-      }
-      if (type === ActionType.APPROVE_CORRECTION) {
-        return false
-      }
-      return prev
-    },
-    false
-  )
-
-  if (isCertificatePrinted) {
-    flags.push(CustomFlags.CERTIFICATE_PRINTED)
-  }
-
-  return flags
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {

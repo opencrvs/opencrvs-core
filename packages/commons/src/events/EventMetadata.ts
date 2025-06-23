@@ -31,7 +31,16 @@ export const EventStatus = z.enum([
 export type EventStatus = z.infer<typeof EventStatus>
 
 export const CustomFlags = {
-  CERTIFICATE_PRINTED: 'certificate-printed'
+  CERTIFICATE_PRINTED: 'certificate-printed',
+  DECLARATION_INCOMPLETE: 'declaration-incomplete',
+  DECLARATION_REQUIRES_UPDATES: 'declaration-requires-updates',
+  DECLARATION_PENDING_EXTERNAL_VALIDATION:
+    'declaration-pending-external-validation',
+  REGISTRATION_CERTIFY_NEW_REGISTRATION:
+    'registration-certify-new-registration',
+  REGISTRATION_RE_CERTIFY_AFTER_CORRECTION:
+    'registration-re-certify-after-correction',
+  REGISTRATION_CORRECTION_REQUESTED: 'registration-correction-requested'
 } as const
 export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
 

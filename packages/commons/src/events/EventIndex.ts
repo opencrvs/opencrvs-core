@@ -10,7 +10,7 @@
  */
 
 import { z, ZodType } from 'zod'
-import { EventMetadata, EventStatus } from './EventMetadata'
+import { EventMetadata, EventStatus, Flag } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
@@ -74,6 +74,15 @@ export const AnyOfStatus = z
   })
   .openapi({
     ref: 'AnyOfStatus'
+  })
+
+export const AnyOfFlags = z
+  .object({
+    type: z.literal('anyOf'),
+    terms: z.array(Flag)
+  })
+  .openapi({
+    ref: 'AnyOfFlags'
   })
 
 export const Range = z
@@ -161,7 +170,7 @@ export const QueryExpression = z
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
-    flags: z.optional(z.array(z.union([AnyOf, Not]))),
+    flags: z.optional(z.union([AnyOfFlags, Not])),
     data: QueryInput
   })
   .partial()
