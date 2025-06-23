@@ -25,7 +25,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '../../useEventFormData'
-import { setEventData, setLocalEventConfig } from '../../useEvents/api'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Pages } from './index'
 
 // Use an undeclared draft event for tests
@@ -42,7 +42,7 @@ const meta: Meta<typeof Pages> = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(undeclaredDraftEvent.id, undeclaredDraftEvent)
 
     useEventFormData.setState({ formValues: {} })

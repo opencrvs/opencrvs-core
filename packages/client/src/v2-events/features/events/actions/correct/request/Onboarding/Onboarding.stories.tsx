@@ -18,7 +18,7 @@ import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import {
   setEventData,
-  setLocalEventConfig
+  addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 
 const meta: Meta<typeof Onboarding> = {

@@ -20,7 +20,7 @@ import {
 } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { setEventData, setLocalEventConfig } from '../../useEvents/api'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Review> = {

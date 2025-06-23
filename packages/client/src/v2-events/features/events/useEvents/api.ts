@@ -35,10 +35,14 @@ export function findLocalEventConfig(eventType: string) {
     ?.find(({ id }: EventConfig) => id === eventType) as EventConfig | undefined
 }
 
-export function setLocalEventConfig(config: EventConfig) {
+export function addLocalEventConfig(config: EventConfig) {
+  const currentConfigs = queryClient.getQueryData<EventConfig[]>(
+    trpcOptionsProxy.event.config.get.queryKey()
+  )
+
   return queryClient.setQueryData(
     trpcOptionsProxy.event.config.get.queryKey(),
-    [config]
+    currentConfigs ? [...currentConfigs, config] : [config]
   )
 }
 
@@ -124,12 +128,6 @@ export function findLocalEventDocument(eventId: string) {
 export function setEventData(id: string, data: EventDocument) {
   updateLocalEventIndex(data)
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
-}
-
-export function deleteEventData(id: string) {
-  queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey(id)
-  })
 }
 
 export async function invalidateEventsList() {

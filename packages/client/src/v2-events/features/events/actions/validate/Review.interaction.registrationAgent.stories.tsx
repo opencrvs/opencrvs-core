@@ -24,7 +24,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { setEventData, setLocalEventConfig } from '../../useEvents/api'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Review } from './index'
 
 const generator = testDataGenerator()
@@ -96,7 +96,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)
 
     useEventFormData.setState({
@@ -183,7 +183,7 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)
   },
   parameters: {
@@ -313,7 +313,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
   },
   parameters: {

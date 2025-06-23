@@ -34,7 +34,7 @@ import { AssignmentStatus } from '@client/v2-events/utils'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   setEventData,
-  setLocalEventConfig
+  addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useActionMenuItems'
@@ -257,7 +257,7 @@ export function createStoriesFromScenarios(
            * Ensure record is "downloaded offline" in the user's browser
            */
           if (recordDownloaded) {
-            setLocalEventConfig(tennisClubMembershipEvent)
+            addLocalEventConfig(tennisClubMembershipEvent)
             setEventData(event.id, event)
           }
         },

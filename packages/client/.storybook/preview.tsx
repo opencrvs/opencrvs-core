@@ -35,9 +35,12 @@ import { NavigationHistoryProvider } from '@client/v2-events/components/Navigati
 import {
   addUserToQueryData,
   setEventData,
-  setLocalEventConfig
+  addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import {
+  footballClubMembershipEvent,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 WebFont.load({
   google: {
@@ -151,7 +154,8 @@ const preview: Preview = {
        * and that users cache has the user. This creates a situation identical to
        * when the user has assigned & downloaded a record
        */
-      setLocalEventConfig(tennisClubMembershipEvent)
+      addLocalEventConfig(tennisClubMembershipEvent)
+      addLocalEventConfig(footballClubMembershipEvent)
       setEventData(
         tennisClubMembershipEventDocument.id,
         tennisClubMembershipEventDocument

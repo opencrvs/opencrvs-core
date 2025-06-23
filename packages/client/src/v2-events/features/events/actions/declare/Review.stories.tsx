@@ -27,7 +27,7 @@ import {
   TestImage
 } from '@client/v2-events/features/events/fixtures'
 
-import { setEventData, setLocalEventConfig } from '../../useEvents/api'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -45,7 +45,7 @@ const meta: Meta<typeof ReviewIndex> = {
     /*
      * Ensure record is "downloaded offline" in th user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
   }
 }
@@ -389,7 +389,7 @@ export const ReviewShowsFilesFromDraft: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(eventId, createdEvent)
   },
   parameters: {

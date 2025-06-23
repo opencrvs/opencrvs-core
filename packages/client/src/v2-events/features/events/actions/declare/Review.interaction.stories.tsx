@@ -25,7 +25,7 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
-import { setEventData, setLocalEventConfig } from '../../useEvents/api'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
@@ -41,7 +41,7 @@ const meta: Meta<typeof ReviewIndex> = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)
 
     useEventFormData.setState({
@@ -342,7 +342,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(eventId, eventDocument)
 
     // For this test, we want to have empty form values in zustand state
@@ -436,7 +436,7 @@ export const ChangeFieldInReview: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(declareEventDocument.id, declareEventDocument)
   },
   parameters: {

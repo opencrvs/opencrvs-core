@@ -19,7 +19,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { setEventData, setLocalEventConfig } from '../../../useEvents/api'
+import { setEventData, addLocalEventConfig } from '../../../useEvents/api'
 import { router } from './router'
 import * as Request from './index'
 

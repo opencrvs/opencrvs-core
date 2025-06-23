@@ -30,7 +30,7 @@ import {
   tennisClubMembershipEventIndex
 } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
-import { setEventData, setLocalEventConfig } from './useEvents/api'
+import { setEventData, addLocalEventConfig } from './useEvents/api'
 
 const generator = testDataGenerator()
 
@@ -182,7 +182,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
     /*
      * Ensure record is "downloaded offline" in th user's browser
      */
-    setLocalEventConfig(tennisClubMembershipEvent)
+    addLocalEventConfig(tennisClubMembershipEvent)
     setEventData(eventDocument.id, eventDocument)
   },
   parameters: {
