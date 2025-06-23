@@ -26,17 +26,7 @@ import * as Validate from './index'
 const generator = testDataGenerator()
 
 const meta: Meta<typeof Validate.Review> = {
-  title: 'Validate/Review',
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    setLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(
-      tennisClubMembershipEventDocument.id,
-      tennisClubMembershipEventDocument
-    )
-  }
+  title: 'Validate/Review'
 }
 
 export default meta

@@ -16,16 +16,25 @@ import {
   EventDocument,
   EventIndex,
   findLastAssignmentAction,
-  getCurrentEventState
+  getCurrentEventState,
+  User
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
+
+export function addUserToQueryData(user: User) {
+  return queryClient.setQueryData(
+    trpcOptionsProxy.user.get.queryKey(user.id),
+    user
+  )
+}
 
 export function findLocalEventConfig(eventType: string) {
   return queryClient
     .getQueryData(trpcOptionsProxy.event.config.get.queryKey())
     ?.find(({ id }: EventConfig) => id === eventType) as EventConfig | undefined
 }
+
 export function setLocalEventConfig(config: EventConfig) {
   return queryClient.setQueryData(
     trpcOptionsProxy.event.config.get.queryKey(),

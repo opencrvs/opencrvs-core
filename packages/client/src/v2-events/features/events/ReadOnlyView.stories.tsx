@@ -70,16 +70,6 @@ const draft = generateEventDraftDocument({
 })
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in th user's browser
-     */
-    setLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(
-      tennisClubMembershipEventDocument.id,
-      tennisClubMembershipEventDocument
-    )
-  },
   loaders: [
     async () => {
       window.localStorage.setItem(

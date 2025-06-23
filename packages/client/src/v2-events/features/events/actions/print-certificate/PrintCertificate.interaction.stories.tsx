@@ -24,17 +24,7 @@ import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Review> = {
-  title: 'Print Certificate/Interaction',
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    setLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(
-      tennisClubMembershipEventDocument.id,
-      tennisClubMembershipEventDocument
-    )
-  }
+  title: 'Print Certificate/Interaction'
 }
 
 export default meta

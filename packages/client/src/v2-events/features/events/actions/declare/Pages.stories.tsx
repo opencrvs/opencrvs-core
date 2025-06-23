@@ -19,17 +19,7 @@ import { setEventData, setLocalEventConfig } from '../../useEvents/api'
 import { Pages } from './index'
 
 const meta: Meta<typeof Pages> = {
-  title: 'Declare',
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    setLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(
-      tennisClubMembershipEventDocument.id,
-      tennisClubMembershipEventDocument
-    )
-  }
+  title: 'Declare'
 }
 
 export default meta

@@ -24,17 +24,7 @@ import { router } from './router'
 import * as Request from './index'
 
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest',
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    setLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(
-      tennisClubMembershipEventDocument.id,
-      tennisClubMembershipEventDocument
-    )
-  }
+  title: 'CorrectionRequest'
 }
 
 export default meta

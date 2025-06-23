@@ -32,16 +32,6 @@ import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
   title: 'EventOverview',
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in th user's browser
-     */
-    setLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(
-      tennisClubMembershipEventDocument.id,
-      tennisClubMembershipEventDocument
-    )
-  },
   component: EventOverviewIndex,
   decorators: [
     (Story) => (

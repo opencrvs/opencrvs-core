@@ -22,17 +22,7 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 
 const meta: Meta<typeof Onboarding> = {
-  title: 'CorrectionRequest',
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    setLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(
-      tennisClubMembershipEventDocument.id,
-      tennisClubMembershipEventDocument
-    )
-  }
+  title: 'CorrectionRequest'
 }
 
 export default meta

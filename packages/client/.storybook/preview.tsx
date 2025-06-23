@@ -32,6 +32,13 @@ import { ThemeProvider } from 'styled-components'
 import WebFont from 'webfontloader'
 import { handlers } from './default-request-handlers'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
+import {
+  addUserToQueryData,
+  setEventData,
+  setLocalEventConfig
+} from '@client/v2-events/features/events/useEvents/api'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -137,6 +144,25 @@ const preview: Preview = {
         'opencrvs',
         generator.user.token.localRegistrar
       )
+
+      /*
+       * OFFLINE DATA INITIALISATION
+       * Ensure the default record is "downloaded offline" in the user's browser
+       * and that users cache has the user. This creates a situation identical to
+       * when the user has assigned & downloaded a record
+       */
+      setLocalEventConfig(tennisClubMembershipEvent)
+      setEventData(
+        tennisClubMembershipEventDocument.id,
+        tennisClubMembershipEventDocument
+      )
+
+      addUserToQueryData({
+        id: generator.user.id.localRegistrar,
+        name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+        role: 'LOCAL_REGISTRAR',
+        signatureFilename: undefined
+      })
 
       //  Intermittent failures starts to happen when global state gets out of whack.
       // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
