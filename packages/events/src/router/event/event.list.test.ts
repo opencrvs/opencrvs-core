@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, AddressType, EventStatus, SCOPES } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {

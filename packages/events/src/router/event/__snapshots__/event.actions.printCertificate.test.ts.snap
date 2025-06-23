@@ -4,6 +4,4 @@ exports[`Has validation errors when required VERIFICATION page fields are missin
 
 exports[`PRINT_CERTIFICATE action can not be performed on a declared, non-registered event 1`] = `[TRPCError: Action 'PRINT_CERTIFICATE' cannot be performed on an event in 'DECLARED' state. Available actions: READ, VALIDATE, ARCHIVE, REJECT.]`;
 
-exports[`can not print certificate for an event that is not first registered 1`] = `[TRPCError: Action 'PRINT_CERTIFICATE' cannot be performed on an event in 'VALIDATED' state. Available actions: READ, REGISTER, ARCHIVE, REJECT.]`;
-
 exports[`when mandatory field is invalid, conditional hidden fields are still skipped 1`] = `[TRPCError: [{"message":"Required for registration","id":"collector.requesterId"}]]`;
