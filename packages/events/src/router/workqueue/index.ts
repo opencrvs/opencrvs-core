@@ -11,6 +11,8 @@
 
 import { z } from 'zod'
 import {
+  findScope,
+  getScopes,
   WorkqueueConfig,
   WorkqueueCountInput,
   WorkqueueCountOutput
@@ -37,9 +39,13 @@ export const workqueueRouter = router({
     .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
     .query(async (options) => {
+      const scopes = getScopes({ Authorization: options.ctx.token })
+      const searchScopeOptions = findScope(scopes, 'search').options
       return getEventCount(
         options.input,
-        await getEventConfigurations(options.ctx.token)
+        await getEventConfigurations(options.ctx.token),
+        searchScopeOptions,
+        options.ctx.user.primaryOfficeId
       )
     })
 })

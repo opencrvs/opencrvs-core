@@ -17,7 +17,7 @@ import {
   QueryExpression,
   QueryType
 } from '@opencrvs/commons/events'
-import { encodeFieldId } from './utils'
+import { encodeFieldId, resolveLocationChildren } from './utils'
 
 /**
  * Generates an Elasticsearch query to search within `document.declaration`
@@ -305,4 +305,54 @@ export function buildElasticQueryFromSearchPayload(
         bool: { must_not: { match_all: {} }, should: undefined }
       }
   }
+}
+
+/**
+ * Adds jurisdiction filters to the query based on user office ID and options.
+ * @param query The original query to modify.
+ * @param options The options indicating which event jurisdictions to include.
+ * @param userOfficeId The ID of the user's office.
+ * @returns The modified query with jurisdiction filters.
+ */
+export async function withJurisdictionFilters(
+  query: estypes.QueryDslQueryContainer,
+  options: Record<string, 'my-jurisdiction' | 'all'>,
+  userOfficeId: string | undefined
+): Promise<estypes.QueryDslQueryContainer> {
+  if (Object.values(options).includes('my-jurisdiction') && userOfficeId) {
+    const childrenLocations = await resolveLocationChildren(userOfficeId)
+    const jurisdictionFilters: estypes.QueryDslQueryContainer[] = []
+
+    Object.entries(options).forEach(([eventType, value]) => {
+      if (value === 'my-jurisdiction') {
+        jurisdictionFilters.push({
+          bool: {
+            must: [
+              { term: { type: eventType } },
+              { terms: { updatedAtLocation: childrenLocations } }
+            ],
+            should: undefined
+          }
+        })
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      } else if (value === 'all') {
+        jurisdictionFilters.push({
+          bool: {
+            must: [{ term: { type: eventType } }],
+            should: undefined
+          }
+        })
+      }
+    })
+
+    return {
+      bool: {
+        must: [query],
+        should: jurisdictionFilters,
+        minimum_should_match: 1
+      }
+    }
+  }
+
+  return query
 }

@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { getScopes, getUUID, SCOPES, findScope } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -273,7 +273,14 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
-      return getIndex(input, eventConfigs)
+      const scopes = getScopes({ Authorization: ctx.token })
+      const searchScopeOptions = findScope(scopes, 'search').options
+      return getIndex(
+        input,
+        eventConfigs,
+        searchScopeOptions,
+        ctx.user.primaryOfficeId
+      )
     }),
   import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))

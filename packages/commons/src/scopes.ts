@@ -278,10 +278,16 @@ export function findScope<T extends ConfigurableScopeType>(
   scopeType: T
 ) {
   const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
-  return parsedScopes.find(
+  const foundScope = parsedScopes.find(
     (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
       parsedScope?.type === scopeType
   )
+  if (!foundScope) {
+    throw new Error(
+      `Scope of type "${scopeType}" not found in provided scopes.`
+    )
+  }
+  return foundScope
 }
 
 /**
