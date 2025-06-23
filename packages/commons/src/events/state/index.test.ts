@@ -19,6 +19,7 @@ import { EventStatus } from '../EventMetadata'
 import { generateActionDocument, generateEventDocument } from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
+import { TokenUserType } from '../../authentication'
 
 /* eslint-disable max-lines */
 
@@ -34,6 +35,7 @@ describe('getCurrentEventState()', () => {
     expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
       createdAt: event.actions[1].createdAt,
       createdBy: event.actions[1].createdBy,
+      createdByUserType: event.actions[1].createdByUserType,
       createdAtLocation: event.actions[1].createdAtLocation,
       createdByRole: event.actions[1].createdByRole,
       acceptedAt: event.actions[1].createdAt
@@ -42,6 +44,7 @@ describe('getCurrentEventState()', () => {
     expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toEqual({
       createdAt: event.actions[2].createdAt,
       createdBy: event.actions[2].createdBy,
+      createdByUserType: event.actions[1].createdByUserType,
       createdAtLocation: event.actions[2].createdAtLocation,
       createdByRole: event.actions[2].createdByRole,
       acceptedAt: event.actions[2].createdAt
@@ -49,8 +52,12 @@ describe('getCurrentEventState()', () => {
   })
 
   test('legalStatuses are not set when actions are not accepted', () => {
-    const actions = [
-      ActionType.CREATE,
+    const createAction = generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE
+    })
+
+    const declarationRequestActions = [
       ActionType.DECLARE,
       ActionType.REGISTER
     ].map((action) =>
@@ -62,6 +69,8 @@ describe('getCurrentEventState()', () => {
         }
       })
     )
+
+    const actions = [createAction, ...declarationRequestActions]
 
     const event = {
       trackingId: getUUID(),
@@ -146,6 +155,7 @@ describe('getCurrentEventState()', () => {
     expect(state.legalStatuses[EventStatus.enum.DECLARED]).toEqual({
       createdAt: declareRequest?.createdAt,
       createdBy: declareRequest?.createdBy,
+      createdByUserType: declareRequest?.createdByUserType,
       createdAtLocation: declareRequest?.createdAtLocation,
       createdByRole: declareRequest?.createdByRole,
       acceptedAt: declareAccept?.createdAt
@@ -154,6 +164,7 @@ describe('getCurrentEventState()', () => {
     expect(state.legalStatuses[EventStatus.enum.REGISTERED]).toEqual({
       createdAt: registerRequest?.createdAt,
       createdBy: registerRequest?.createdBy,
+      createdByUserType: registerRequest?.createdByUserType,
       createdAtLocation: registerRequest?.createdAtLocation,
       createdByRole: registerRequest?.createdByRole,
       acceptedAt: registerAccept?.createdAt
@@ -169,6 +180,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-01-01T00:00:00.000Z',
         createdBy: 'user1',
+        createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'location1',
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
@@ -183,6 +195,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-02-01T00:00:00.000Z',
         createdBy: 'user1',
+        createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'location1',
         createdBySignature: '/ocrvs/signature.png',
         createdByRole: 'FIELD_AGENT'
@@ -197,6 +210,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-03-01T00:00:00.000Z',
         createdBy: 'computer1',
+        createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'location2',
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: '3RD_PARTY_API'
@@ -210,6 +224,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-04-01T00:00:00.000Z',
         createdBy: 'user2',
+        createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'location3',
         createdBySignature: '/ocrvs/signature-2.png',
         createdByRole: 'REGISTRATION_AGENT'
@@ -223,6 +238,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Requested,
         createdAt: '2023-05-01T00:00:00.000Z',
         createdBy: 'user3',
+        createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'location4',
         createdByRole: 'LOCAL_REGISTRAR',
         createdBySignature: '/ocrvs/signature-3.png'
@@ -236,6 +252,7 @@ describe('getCurrentEventState()', () => {
         status: ActionStatus.Accepted,
         createdAt: '2023-06-01T00:00:00.000Z',
         createdBy: 'computer2',
+        createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'location5',
         createdBySignature: '/ocrvs/signature-4.png',
         createdByRole: '3RD_PARTY_API',
@@ -268,8 +285,9 @@ describe('getCurrentEventState()', () => {
       createdBy: createAction.createdBy,
       createdAtLocation: createAction.createdAtLocation,
       createdBySignature: createAction.createdBySignature,
-      updatedAt: registerRequestAction.createdAt,
+      updatedAt: registerAcceptAction.createdAt,
       updatedBy: registerRequestAction.createdBy,
+      createdByUserType: registerRequestAction.createdByUserType,
       id: event.id,
       type: event.type,
       trackingId: event.trackingId,
@@ -283,6 +301,7 @@ describe('getCurrentEventState()', () => {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareRequestAction.createdAt,
           createdBy: declareRequestAction.createdBy,
+          createdByUserType: declareRequestAction.createdByUserType,
           createdAtLocation: declareRequestAction.createdAtLocation,
           createdBySignature: declareRequestAction.createdBySignature,
           createdByRole: declareRequestAction.createdByRole,
@@ -291,6 +310,7 @@ describe('getCurrentEventState()', () => {
         [EventStatus.enum.REGISTERED]: {
           createdAt: registerRequestAction.createdAt,
           createdBy: registerRequestAction.createdBy,
+          createdByUserType: registerRequestAction.createdByUserType,
           createdAtLocation: registerRequestAction.createdAtLocation,
           createdBySignature: registerRequestAction.createdBySignature,
           acceptedAt: registerAcceptAction.createdAt,
@@ -310,6 +330,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-01-01T00:00:00.000Z',
+        createdByUserType: TokenUserType.Enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
         createdAtLocation: 'location1',
@@ -324,6 +345,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-02-01T00:00:00.000Z',
+        createdByUserType: TokenUserType.Enum.user,
         createdBy: 'user1',
         createdBySignature: '/ocrvs/signature.png',
         createdAtLocation: 'location1',
@@ -337,6 +359,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-04-01T00:00:00.000Z',
+        createdByUserType: TokenUserType.Enum.user,
         createdBySignature: '/ocrvs/signature-2.png',
         createdBy: 'user2',
         createdAtLocation: 'location3',
@@ -350,6 +373,7 @@ describe('getCurrentEventState()', () => {
       defaults: {
         status: ActionStatus.Accepted,
         createdAt: '2023-05-01T00:00:00.000Z',
+        createdByUserType: TokenUserType.Enum.user,
         createdBy: 'user3',
         createdBySignature: '/ocrvs/signature-3.png',
         createdAtLocation: 'location4',
@@ -378,6 +402,7 @@ describe('getCurrentEventState()', () => {
     expect(state).toStrictEqual({
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
+      createdByUserType: createAction.createdByUserType,
       createdAtLocation: createAction.createdAtLocation,
       createdBySignature: createAction.createdBySignature,
       updatedAt: registerAcceptAction.createdAt,
@@ -395,6 +420,7 @@ describe('getCurrentEventState()', () => {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareAcceptAction.createdAt,
           createdBy: declareAcceptAction.createdBy,
+          createdByUserType: declareAcceptAction.createdByUserType,
           createdAtLocation: declareAcceptAction.createdAtLocation,
           createdBySignature: declareAcceptAction.createdBySignature,
           acceptedAt: declareAcceptAction.createdAt,
@@ -403,6 +429,7 @@ describe('getCurrentEventState()', () => {
         [EventStatus.enum.REGISTERED]: {
           createdAt: registerAcceptAction.createdAt,
           createdBy: registerAcceptAction.createdBy,
+          createdByUserType: registerAcceptAction.createdByUserType,
           createdAtLocation: registerAcceptAction.createdAtLocation,
           createdBySignature: registerAcceptAction.createdBySignature,
           acceptedAt: registerAcceptAction.createdAt,
@@ -430,6 +457,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
+            createdByUserType: TokenUserType.Enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
             createdBySignature: '/ocrvs/signature.png',
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
@@ -442,6 +470,7 @@ describe('correction requests', () => {
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
+            createdByUserType: TokenUserType.Enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
             createdBySignature: '/ocrvs/signature.png',
@@ -454,6 +483,7 @@ describe('correction requests', () => {
             type: 'REGISTER',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
+            createdByUserType: TokenUserType.Enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
             createdBySignature: '/ocrvs/signature.png',
@@ -464,6 +494,7 @@ describe('correction requests', () => {
           {
             declaration: { name: 'Doe John' },
             type: 'REQUEST_CORRECTION',
+            createdByUserType: TokenUserType.Enum.user,
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdAt: '2025-01-23T02:21:41.206Z',
@@ -494,6 +525,7 @@ describe('correction requests', () => {
             createdAt: '2025-01-23T02:21:38.343Z',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
+            createdByUserType: TokenUserType.Enum.user,
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
             createdBySignature: '/ocrvs/signature.png',
             id: '63d19916-dcc8-4cf2-8161-eab9989765e8',
@@ -507,6 +539,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
+            createdByUserType: TokenUserType.Enum.user,
             createdAt: '2025-01-23T02:21:39.161Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
             id: 'eb4c18e5-93bc-42f6-b110-909815f6a7c8',
@@ -519,6 +552,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
+            createdByUserType: TokenUserType.Enum.user,
             createdAt: '2025-01-23T02:21:40.182Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
             id: 'bec6b33a-7a5f-4acd-9638-9e77db1800e2',
@@ -531,6 +565,7 @@ describe('correction requests', () => {
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
             createdBySignature: '/ocrvs/signature.png',
+            createdByUserType: TokenUserType.Enum.user,
             createdAt: '2025-01-23T02:21:41.206Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
             id: '8f4d3b15-dfe9-44fb-b2b4-4b6e294c1c8d',
@@ -543,6 +578,7 @@ describe('correction requests', () => {
             type: 'APPROVE_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
+            createdByUserType: TokenUserType.Enum.user,
             createdBySignature: '/ocrvs/signature.png',
             createdAt: '2025-01-23T02:21:42.230Z',
             createdAtLocation: '492a62a5-d55f-4421-84f5-defcfb9fe6ba',
