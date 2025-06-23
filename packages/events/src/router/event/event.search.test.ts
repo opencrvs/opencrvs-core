@@ -738,7 +738,6 @@ test('Returns relevant events in right order', async () => {
   // Until we have a way to reindex from mongodb, we create events through API.
   // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
   const actions = [
-    ActionType.CREATE,
     ActionType.DECLARE,
     ActionType.VALIDATE,
     ActionType.REJECT,

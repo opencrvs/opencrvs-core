@@ -202,7 +202,6 @@ function actionToClientAction(
   generator: ReturnType<typeof payloadGenerator>,
   action: ActionType
 ) {
-  //
   switch (action) {
     case ActionType.CREATE:
       return async () => client.event.create(generator.event.create())
@@ -264,21 +263,25 @@ export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
   actions: ActionType[]
-) {
+): Promise<Awaited<ReturnType<typeof client.event.create>>> {
   let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+
+  // Always first create the event
+  const createAction = actionToClientAction(
+    client,
+    generator,
+    ActionType.CREATE
+  )
+
+  // @ts-expect-error -- createEvent does not accept any arguments
+  createdEvent = await createAction()
 
   for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)
-
-    if (action === ActionType.CREATE) {
-      // @ts-expect-error -- createEvent does not accept any arguments
-      createdEvent = await clientAction()
-    } else if (!createdEvent) {
-      throw new Error('Event must be created before performing actions on it')
-    } else {
-      await clientAction(createdEvent.id)
-    }
+    createdEvent = await clientAction(createdEvent.id)
   }
+
+  return createdEvent
 }
 
 /**
