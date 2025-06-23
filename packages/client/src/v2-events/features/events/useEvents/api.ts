@@ -189,7 +189,6 @@ function deleteEventData(id: string) {
   })
 }
 
-
 export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
