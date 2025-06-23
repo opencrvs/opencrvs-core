@@ -106,7 +106,8 @@ export const Sidebar = ({
         {hasOutbox && (
           <NavigationItem
             key={WORKQUEUE_OUTBOX.slug}
-            count={counts[WORKQUEUE_OUTBOX.slug] || 0}
+            count={outbox.length || 0}
+            data-testid={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}
             icon={() => <Icon name={WORKQUEUE_OUTBOX.icon} size="small" />}
             id={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}
             isSelected={WORKQUEUE_OUTBOX.slug === workqueueSlug}
@@ -125,6 +126,7 @@ export const Sidebar = ({
           <NavigationItem
             key={slug}
             count={counts[slug] || 0}
+            data-testid={`navigation_workqueue_${slug}`}
             icon={() => <Icon name={icon} size="small" />}
             id={`navigation_workqueue_${slug}`}
             isSelected={slug === workqueueSlug}
