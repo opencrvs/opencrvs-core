@@ -232,6 +232,23 @@ export function useAction(event: EventIndex) {
   }
 }
 
+const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
+  [EventStatus.enum.NOTIFIED]: [
+    ActionType.READ,
+    ActionType.VALIDATE,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ],
+  [EventStatus.enum.REJECTED]: [
+    ActionType.READ,
+    ActionType.DECLARE,
+    ActionType.VALIDATE
+  ]
+} satisfies Partial<Record<EventStatus, ActionType[]>>
+
+// Some actions can override other actions depending on the user's permissions.
+// For example, if an event is in rejected state, a user can either DECLARE or VALIDATE
+// depending on their scope - if they have VALIDATE scope, DECLARE will be filtered out.
 const ACTION_OVERRIDES = {
   [ActionType.DECLARE]: ActionType.VALIDATE
 } satisfies Partial<Record<ActionType, ActionType>>
@@ -241,7 +258,6 @@ function actionHasOverride(
 ): action is keyof typeof ACTION_OVERRIDES {
   return action in ACTION_OVERRIDES
 }
-
 /**
  * Filters out actions that are overridden by other actions based on user scopes.
  *
@@ -283,45 +299,51 @@ export function useActionMenuItems(event: EventIndex) {
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
-  const availableActions = filterOverriddenActions(
-    AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status],
-    scopes
-  )
+  // Find actions available based on the event status
+  const availableActions =
+    event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+      ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
+          event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+        ]
+      : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
 
-  const actions = [...availableAssignmentActions, ...availableActions]
+  // Action menu should not for example show DECLARE if the user has VALIDATE scope
+  const filteredActions = filterOverriddenActions(availableActions, scopes)
 
+  const actions = [...availableAssignmentActions, ...filteredActions]
+
+  // Filter out actions which are not configured
   const supportedActions = actions.filter(
     (action): action is keyof typeof config =>
       Object.keys(config).includes(action)
   )
 
+  // Filter out actions which are not allowed based on user scopes
   const allowedActions = supportedActions.filter((a) => {
     const requiredScopes = ACTION_ALLOWED_SCOPES[a]
-
-    if (requiredScopes === null) {
-      return true
-    }
-
-    return hasAnyOfScopes(scopes, requiredScopes)
+    return requiredScopes === null
+      ? true
+      : hasAnyOfScopes(scopes, requiredScopes)
   })
 
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
   const hasOtherAllowedActions = allowedActions.some((a) => !isMetaAction(a))
 
-  if (hasOtherAllowedActions) {
-    return allowedActions.map((a) => {
-      return {
-        ...config[a],
-        type: a
+  // If user has no other allowed actions, return only READ.
+  // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
+  if (!hasOtherAllowedActions) {
+    return [
+      {
+        ...config[ActionType.READ],
+        type: ActionType.READ
       }
-    })
+    ]
   }
 
-  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
-  return [
-    {
-      ...config[ActionType.READ],
-      type: ActionType.READ
+  return allowedActions.map((a) => {
+    return {
+      ...config[a],
+      type: a
     }
-  ]
+  })
 }
