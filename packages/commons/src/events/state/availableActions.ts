@@ -15,6 +15,7 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.CREATED]: [
     ActionType.READ,
     ActionType.DECLARE,
+    ActionType.NOTIFY,
     ActionType.DELETE
   ],
   [EventStatus.enum.NOTIFIED]: [
