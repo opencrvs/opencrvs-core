@@ -21,6 +21,7 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
     ActionType.VALIDATE,
+    ActionType.DECLARE,
     ActionType.ARCHIVE,
     ActionType.REJECT
   ],

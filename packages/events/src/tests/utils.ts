@@ -10,7 +10,6 @@
  */
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { times, flatten, constant } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
@@ -282,23 +281,4 @@ export async function createEvent(
   }
 
   return createdEvent
-}
-
-/**
- * Returns ordered combinations of actions, starting with single action and growing to the full set.
- * Useful for generating test combinations based on a set of actions.
- *
- * @example getGrowingCombinations(['a', 'b', 'c']) --> [['a'], ['a', 'b'], ['a', 'b', 'c']]
- * @example getGrowingCombinations(['a', 'b', 'c'], 2) --> [['a'], ['a'], ['a', 'b'], ['a', 'b'], ['a', 'b', 'c'], ['a', 'b', 'c']
- *
- */
-export function getGrowingCombinations<T>(arr: T[], count: number = 1): T[][] {
-  if (count < 1) {
-    throw new Error('Count must be a positive integer')
-  }
-
-  const combination = arr.map((_, i) => arr.slice(0, i + 1))
-
-  // flatten out and duplicate the combinations as many time as needed.
-  return flatten(times(count, constant(combination)))
 }
