@@ -93,10 +93,7 @@ const declarationTrpcMsw = {
       procedure: tRPCMsw.event.actions.declare.request.mutation,
       handler: async () => {
         await new Promise((resolve) => setTimeout(resolve, OUTBOX_FREEZE_TIME))
-        return generateEventDocument({
-          configuration: tennisClubMembershipEvent,
-          actions: [ActionType.CREATE, ActionType.DECLARE]
-        })
+        return declareEventDocument
       }
     }
   ])
@@ -165,12 +162,26 @@ export const Outbox: Story = {
       )
       await expect(outboxButton).toHaveTextContent(/^Outbox1$/)
 
+      await userEvent.click(outboxButton)
+
+      const searchResult = await canvas.findByTestId('search-result')
+      const { firstname, surname } = getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration['applicant.name'] as { firstname: string; surname: string }
+
+      await expect(searchResult).toHaveTextContent(`${firstname} ${surname}`)
+
       await waitFor(
         async () => {
-          await expect(outboxButton).toHaveTextContent(/^Outbox$/)
+          await expect(searchResult).not.toHaveTextContent(
+            `${firstname} ${surname}`
+          )
         },
         { timeout: OUTBOX_FREEZE_TIME + 1000 } // Allow some buffer for the freeze time
       )
+
+      await expect(outboxButton).toHaveTextContent(/^Outbox$/)
     })
   }
 }
