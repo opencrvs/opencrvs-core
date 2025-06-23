@@ -183,6 +183,13 @@ export async function invalidateDraftsList() {
   })
 }
 
+function deleteEventData(id: string) {
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.get.queryKey(id)
+  })
+}
+
+
 export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
