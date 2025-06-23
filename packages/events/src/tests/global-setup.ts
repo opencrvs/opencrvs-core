@@ -10,12 +10,10 @@
  */
 
 import path from 'node:path'
-import fs from 'node:fs'
 import { ElasticsearchContainer } from '@testcontainers/elasticsearch'
 import { PostgreSqlContainer } from '@testcontainers/postgresql'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import type { ProvidedContext } from 'vitest'
-import { Pool } from 'pg'
 
 type ProvideFunction = <K extends keyof ProvidedContext>(
   key: K,
