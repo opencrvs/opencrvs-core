@@ -59,7 +59,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const event = {
+const defaultEvent = {
   ...tennisClubMembershipEventDocument,
   actions: tennisClubMembershipEventDocument.actions.filter(
     (action) => action.type !== ActionType.REGISTER
@@ -70,21 +70,21 @@ export const Overview: Story = {
   parameters: {
     offline: [
       {
-        queryKey: trpcOptionsProxy.event.get.queryKey(event.id),
-        data: event
+        queryKey: trpcOptionsProxy.event.get.queryKey(defaultEvent.id),
+        data: defaultEvent
       },
       {
         queryKey: trpcOptionsProxy.event.search.queryKey({
           type: 'and',
-          clauses: [{ id: event.id }]
+          clauses: [{ id: defaultEvent.id }]
         }),
-        data: [getCurrentEventState(event, tennisClubMembershipEvent)]
+        data: [getCurrentEventState(defaultEvent, tennisClubMembershipEvent)]
       }
     ],
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: event.id
+        eventId: defaultEvent.id
       })
     },
     msw: {
@@ -93,7 +93,7 @@ export const Overview: Story = {
           tRPCMsw.event.draft.list.query(() => {
             return [
               generateEventDraftDocument({
-                eventId: event.id,
+                eventId: defaultEvent.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
                   'applicant.name': {
