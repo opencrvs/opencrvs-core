@@ -109,14 +109,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    offline: [
-      {
-        queryKey: trpcOptionsProxy.event.get.queryKey(
-          declarationTrpcMsw.eventDocument.id
-        ),
-        data: declarationTrpcMsw.eventDocument
-      }
-    ],
+    offline: {
+      events: [declarationTrpcMsw.eventDocument]
+    },
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,

@@ -21,11 +21,10 @@ import {
   tennisClubMembershipEvent,
   TokenUserType
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '../../useEventFormData'
-import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Pages } from './index'
 
 // Use an undeclared draft event for tests
@@ -38,13 +37,12 @@ const undeclaredDraftEvent = {
 
 const meta: Meta<typeof Pages> = {
   title: 'Declare/Interaction',
+  parameters: {
+    offline: {
+      events: [undeclaredDraftEvent]
+    }
+  },
   beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(undeclaredDraftEvent.id, undeclaredDraftEvent)
-
     useEventFormData.setState({ formValues: {} })
   }
 }

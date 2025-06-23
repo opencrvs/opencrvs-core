@@ -12,7 +12,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
@@ -43,10 +43,10 @@ const undeclaredDraftEvent = {
 }
 
 export const Page: Story = {
-  beforeEach: () => {
-    setEventData(undeclaredDraftEvent.id, undeclaredDraftEvent)
-  },
   parameters: {
+    offline: {
+      events: [undeclaredDraftEvent]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.PAGES.buildPath({

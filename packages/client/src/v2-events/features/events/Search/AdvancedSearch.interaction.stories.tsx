@@ -22,11 +22,7 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import {
-  TRPCProvider,
-  AppRouter,
-  trpcOptionsProxy
-} from '@client/v2-events/trpc'
+import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 
@@ -66,12 +62,9 @@ const storyParams = {
   },
   chromatic: { disableSnapshot: true },
   msw: { handlers: defaultHandlers },
-  offline: [
-    {
-      queryKey: trpcOptionsProxy.event.config.get.queryKey(),
-      data: [tennisClubMembershipEvent, footballClubMembershipEvent]
-    }
-  ]
+  offline: {
+    configs: [footballClubMembershipEvent]
+  }
 }
 
 export const AdvancedSearchStory: Story = {
@@ -286,20 +279,13 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        let locationInput: HTMLElement | undefined
-
-        await waitFor(async () => {
-          const input = await canvas.findByTestId(
-            'event____legalStatus____REGISTERED____createdAtLocation'
-          )
-
-          await expect(input).toBeInTheDocument()
-          locationInput = input
-        })
-
-        if (!locationInput) {
-          throw new Error('locationInput not found after waitFor')
-        }
+        const locationInput = await canvas.findByTestId(
+          'event____legalStatus____REGISTERED____createdAtLocation',
+          {},
+          {
+            timeout: 5000
+          }
+        )
 
         await expect(locationInput).toHaveValue('Ibombo District Office')
         await userEvent.clear(locationInput)

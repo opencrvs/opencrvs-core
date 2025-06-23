@@ -22,7 +22,7 @@ import {
   getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
@@ -178,19 +178,15 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 }
 
 export const ReadOnlyViewForUserWithReadPermission: Story = {
-  beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in th user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventDocument.id, eventDocument)
-  },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VIEW.buildPath({
         eventId
       })
+    },
+    offline: {
+      events: [eventDocument]
     },
     msw: {
       handlers: {
@@ -202,9 +198,6 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]

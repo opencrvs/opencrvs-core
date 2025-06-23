@@ -68,19 +68,9 @@ const defaultEvent = {
 
 export const Overview: Story = {
   parameters: {
-    offline: [
-      {
-        queryKey: trpcOptionsProxy.event.get.queryKey(defaultEvent.id),
-        data: defaultEvent
-      },
-      {
-        queryKey: trpcOptionsProxy.event.search.queryKey({
-          type: 'and',
-          clauses: [{ id: defaultEvent.id }]
-        }),
-        data: [getCurrentEventState(defaultEvent, tennisClubMembershipEvent)]
-      }
-    ],
+    offline: {
+      events: [defaultEvent]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({

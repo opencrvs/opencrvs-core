@@ -40,12 +40,9 @@ const eventId = eventDocument.id
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare',
   parameters: {
-    offline: [
-      {
-        queryKey: trpcOptionsProxy.event.get.queryKey(eventId),
-        data: eventDocument
-      }
-    ]
+    offline: {
+      events: [eventDocument]
+    }
   }
 }
 
@@ -335,12 +332,9 @@ export const ReviewForFieldAgentIncomplete: Story = {
     }
   ],
   parameters: {
-    offline: [
-      {
-        queryKey: trpcOptionsProxy.event.get.queryKey(eventId),
-        data: eventDocument
-      }
-    ],
+    offline: {
+      events: [eventDocument]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -387,15 +381,12 @@ export const ReviewShowsFilesFromDraft: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: createdEvent.id
       })
     },
-    offline: [
-      {
-        queryKey: trpcOptionsProxy.event.get.queryKey(eventId),
-        data: createdEvent
-      }
-    ],
+    offline: {
+      events: [createdEvent]
+    },
     msw: {
       handlers: {
         drafts: [

@@ -65,6 +65,7 @@ export function useEvents() {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
+          enabled: !findLocalEventIndex(id),
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? [eventIndex] : undefined
@@ -72,17 +73,20 @@ export function useEvents() {
         })
       },
       useSuspenseQuery: (id: string) => {
+        const eventIndex = findLocalEventIndex(id)
+
+        if (eventIndex) {
+          return [eventIndex]
+        }
+        console.log('not found', id)
         const query = {
           type: 'and',
           clauses: [{ id }]
         } satisfies QueryType
+
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query),
-          initialData: () => {
-            const eventIndex = findLocalEventIndex(id)
-            return eventIndex ? [eventIndex] : undefined
-          }
+          queryKey: trpc.event.search.queryKey(query)
         }).data
       }
     },

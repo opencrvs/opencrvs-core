@@ -114,12 +114,9 @@ export const WorkqueueWithMultipleEventType: Story = {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
     },
-    offline: [
-      {
-        queryKey: trpcOptionsProxy.event.config.get.queryKey(),
-        data: [tennisClubMembershipEvent, libraryMembershipEvent]
-      }
-    ],
+    offline: {
+      configs: [tennisClubMembershipEvent, libraryMembershipEvent]
+    },
     msw: {
       handlers: {
         event: [

@@ -35,16 +35,14 @@ import { NavigationHistoryProvider } from '@client/v2-events/components/Navigati
 import {
   addUserToQueryData,
   setEventData,
-  addLocalEventConfig,
-  setEventListData,
-  updateLocalEventIndex
+  addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import {
-  footballClubMembershipEvent,
+  EventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { QueryKey } from '@tanstack/react-query'
+import { EventConfig } from '@opencrvs/commons/client'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -170,11 +168,18 @@ const preview: Preview = {
         signatureFilename: undefined
       })
 
-      const offlineData: Array<{ queryKey: QueryKey; data: unknown }> =
-        options.parameters.offline || []
+      const offlineEvents: Array<EventDocument> =
+        options.parameters?.offline?.events ?? []
 
-      offlineData.forEach(({ queryKey, data }) => {
-        queryClient.setQueryData(queryKey, data)
+      const offlineConfigs: Array<EventConfig> =
+        options.parameters?.offline?.configs ?? []
+
+      offlineEvents.forEach((event) => {
+        setEventData(event.id, event)
+      })
+
+      offlineConfigs.forEach((config) => {
+        addLocalEventConfig(config)
       })
 
       //  Intermittent failures starts to happen when global state gets out of whack.
