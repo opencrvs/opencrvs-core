@@ -57,7 +57,13 @@ const handlers = [
       role: 'REGISTRATION_AGENT',
       signature: '/ocrvs/signature.png'
     })
-  })
+  }),
+  http.get(
+    `${env.APPLICATION_CONFIG_URL}locations/:locationId/children`,
+    () => {
+      return HttpResponse.json([{ id: 'loc1' }, { id: 'loc2' }])
+    }
+  )
 ]
 
 export const mswServer = setupServer(...handlers)

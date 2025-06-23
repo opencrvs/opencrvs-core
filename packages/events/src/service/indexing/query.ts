@@ -334,14 +334,6 @@ export async function withJurisdictionFilters(
             should: undefined
           }
         })
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-      } else if (value === 'all') {
-        jurisdictionFilters.push({
-          bool: {
-            must: [{ term: { type: eventType } }],
-            should: undefined
-          }
-        })
       }
     })
 

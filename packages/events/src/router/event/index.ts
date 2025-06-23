@@ -281,7 +281,6 @@ export const eventRouter = router({
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
       const searchScopeOptions = searchScope.options
-
       return getIndex(
         input,
         eventConfigs,
