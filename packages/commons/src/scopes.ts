@@ -224,7 +224,7 @@ const LiteralScopes = z.union([
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
 // - record.notify[event=v2.birth]
-const rawConfigurableScopeRegex =
+export const rawConfigurableScopeRegex =
   /^([a-zA-Z\.]+)\[((?:\w+=[\w:.-]+(?:\|[\w:.-]+)*)(?:,[\w]+=[\w:.-]+(?:\|[\w:.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
@@ -292,7 +292,7 @@ export function findScope<T extends ConfigurableScopeType>(
  * getSearchScopeOptions("id=tennis-club-membership:my-jurisdiction|v2-birth:all")
  * // Returns: { 'tennis-club-membership': "my-jurisdiction", 'v2-birth': "all" }
  */
-function getSearchScopeOptions(rawOptions: string) {
+export function getSearchScopeOptions(rawOptions: string) {
   return rawOptions
     .split('=')[1]
     .split('|')
