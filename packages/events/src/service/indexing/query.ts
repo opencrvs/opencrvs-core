@@ -148,6 +148,12 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     })
   }
 
+  if (clause.createdByUserType) {
+    must.push({
+      term: { createdByUserType: clause.createdByUserType }
+    })
+  }
+
   if (clause.updatedBy) {
     must.push({
       term: { updatedBy: clause.updatedBy.term }

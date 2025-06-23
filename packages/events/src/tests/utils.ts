@@ -41,6 +41,7 @@ export const UNSTABLE_EVENT_FIELDS = [
   'trackingId',
   'eventId',
   'createdBy',
+  'createdByUserType',
   'createdAtLocation',
   'assignedTo',
   'updatedAtLocation',

@@ -14,6 +14,7 @@ import { EventMetadata, EventStatus } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
+import { TokenUserType } from '../authentication'
 extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
@@ -157,6 +158,7 @@ export const QueryExpression = z
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
+    createdByUserType: TokenUserType,
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),

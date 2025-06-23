@@ -18,6 +18,7 @@ import {
   Action,
   ActionStatus,
   ActionType,
+  ActionBase,
   ActionTypes,
   EventDocument,
   getCurrentEventState,
@@ -25,6 +26,7 @@ import {
   IndexMap,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
+  TokenUserType,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -32,18 +34,17 @@ import { AssignmentStatus } from '@client/v2-events/utils'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
   setEventData,
-  deleteEventData,
   setLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ActionMenu } from '../ActionMenu'
 import { actionLabels } from '../useActionMenuItems'
 
 const generator = testDataGenerator()
 
-const actionProps = {
+const actionProps: ActionBase = {
   createdAt: '2025-04-18T08:34:20.711Z',
   createdBy: '67f6607c3866c994bcc0335a',
+  createdByUserType: TokenUserType.Enum.user,
   createdByRole: 'some-user-role',
   createdAtLocation: '03c4aab4-cd46-4fb1-b30d-2e3b7ba0bfe8',
   id: '827bf7e8-0e1e-4cef-aee7-66e71287a2c8',

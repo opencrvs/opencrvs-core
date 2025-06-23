@@ -18,6 +18,7 @@ import {
   generateEventDraftDocument,
   ActionStatus,
   getUUID,
+  TokenUserType,
   createPrng,
   getRandomDatetime,
   tennisClubMembershipEvent
@@ -161,6 +162,7 @@ export const WithRejectedAction: Story = {
                   id: getUUID(),
                   transactionId: getUUID(),
                   createdAt: new Date().toISOString(),
+                  createdByUserType: TokenUserType.Enum.user,
                   createdBy: '123',
                   createdAtLocation: '123',
                   createdByRole: 'LOCAL_REGISTRAR',
@@ -221,6 +223,7 @@ export const WithSystemUserActions: Story = {
                   ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
+                  createdByUserType: TokenUserType.Enum.system,
                   createdByRole: SystemRole.enum.HEALTH,
                   assignedTo: '010101',
                   declaration: {}
@@ -237,6 +240,7 @@ export const WithSystemUserActions: Story = {
                   ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
+                  createdByUserType: TokenUserType.Enum.system,
                   createdByRole: SystemRole.enum.HEALTH,
                   assignedTo: '010101',
                   declaration: {}
@@ -253,6 +257,7 @@ export const WithSystemUserActions: Story = {
                   ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
+                  createdByUserType: TokenUserType.Enum.system,
                   createdByRole: SystemRole.enum.HEALTH,
                   declaration: {}
                 },
@@ -268,6 +273,7 @@ export const WithSystemUserActions: Story = {
                   ),
                   createdBy: '010101',
                   createdAtLocation: undefined,
+                  createdByUserType: TokenUserType.Enum.system,
                   createdByRole: SystemRole.enum.HEALTH,
                   assignedTo: null,
                   declaration: {}
@@ -283,6 +289,7 @@ export const WithSystemUserActions: Story = {
                     new Date('2024-06-01')
                   ),
                   createdBy: '123',
+                  createdByUserType: TokenUserType.Enum.user,
                   createdAtLocation: '123',
                   createdByRole: 'LOCAL_REGISTRAR',
                   declaration: {}
