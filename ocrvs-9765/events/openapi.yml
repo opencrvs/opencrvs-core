@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 8760c618-f3b4-4a0c-bfbe-568e1d59b412
+                transactionId: 9cbbd185-7d2e-4cd5-96f8-56643ecf3862
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 200be40e-ae32-4216-9e3d-914b97588be6
+                transactionId: 31abeade-676a-41cf-a7b0-9deab4faf2bd
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -523,7 +523,7 @@ paths:
               - eventType: tennis-club-membership
                 status:
                   type: anyOf
-                  terms: &a12
+                  terms: &a13
                     - CREATED
                     - NOTIFIED
                     - DECLARED
@@ -613,6 +613,11 @@ paths:
                             type: string
                           transactionId:
                             type: string
+                          createdByUserType:
+                            type: string
+                            enum: &a10
+                              - user
+                              - system
                           createdAt:
                             type: string
                             format: date-time
@@ -635,7 +640,7 @@ paths:
                             type: string
                           type:
                             type: string
-                            enum: &a10
+                            enum: &a11
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -646,6 +651,7 @@ paths:
                         required:
                           - id
                           - transactionId
+                          - createdByUserType
                           - createdAt
                           - createdBy
                           - createdByRole
@@ -4141,6 +4147,9 @@ components:
                     type: string
                   transactionId:
                     type: string
+                  createdByUserType:
+                    type: string
+                    enum: *a10
                   createdAt:
                     type: string
                     format: date-time
@@ -4163,10 +4172,11 @@ components:
                     type: string
                   type:
                     type: string
-                    enum: *a10
+                    enum: *a11
                 required:
                   - id
                   - transactionId
+                  - createdByUserType
                   - createdAt
                   - createdBy
                   - createdByRole
@@ -4223,6 +4233,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4565,7 +4578,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: &a11
+          enum: &a12
             - Requested
             - Accepted
             - Rejected
@@ -4578,6 +4591,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4591,6 +4605,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4933,7 +4950,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -4943,6 +4960,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4956,6 +4974,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5298,7 +5319,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -5320,6 +5341,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5334,6 +5356,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5676,7 +5701,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -5686,6 +5711,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5699,6 +5725,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6041,7 +6070,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -6063,6 +6092,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6077,6 +6107,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6419,7 +6452,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -6429,6 +6462,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6442,6 +6476,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6784,7 +6821,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -6796,6 +6833,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6809,6 +6847,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7151,7 +7192,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -7161,6 +7202,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7174,6 +7216,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7516,7 +7561,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -7528,6 +7573,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7542,6 +7588,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7884,7 +7933,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -7894,6 +7943,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7907,6 +7957,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8249,7 +8302,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -8261,6 +8314,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8275,6 +8329,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8617,7 +8674,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -8629,6 +8686,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8643,6 +8701,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8985,7 +9046,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -8997,6 +9058,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -9011,6 +9073,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -9353,7 +9418,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -9363,6 +9428,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -9376,6 +9442,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -9718,7 +9787,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a11
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -9728,6 +9797,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -9796,6 +9866,9 @@ components:
             - $ref: "#/components/schemas/Exact"
         assignedTo:
           $ref: "#/components/schemas/Exact"
+        createdByUserType:
+          type: string
+          enum: *a10
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -9821,7 +9894,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a12
+            enum: *a13
       required:
         - type
         - terms
@@ -9834,14 +9907,14 @@ components:
             - exact
         term:
           type: string
-          enum: *a12
+          enum: *a13
       required:
         - type
         - term
     DateCondition:
       anyOf:
-        - $ref: "#/components/schemas/Exact"
-        - $ref: "#/components/schemas/Range"
+        - $ref: "#/components/schemas/ExactDate"
+        - $ref: "#/components/schemas/RangeDate"
     Exact:
       type: object
       properties:
@@ -9851,6 +9924,22 @@ components:
             - exact
         term:
           type: string
+      required:
+        - type
+        - term
+    ExactDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - term
@@ -9865,6 +9954,29 @@ components:
           type: string
         lte:
           type: string
+      required:
+        - type
+        - gte
+        - lte
+    RangeDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - range
+        gte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
+        lte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - gte
@@ -9950,7 +10062,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a12
+          enum: *a13
         legalStatuses:
           type: object
           properties:
@@ -9969,6 +10081,14 @@ components:
                   type: string
                   nullable: true
                   description: Location of the user who created the action request.
+                createdByUserType:
+                  type: string
+                  nullable: true
+                  enum:
+                    - user
+                    - system
+                    - null
+                  description: Whether the user is a normal user or a system.
                 acceptedAt:
                   type: string
                   format: date-time
@@ -10000,6 +10120,14 @@ components:
                   type: string
                   nullable: true
                   description: Location of the user who created the action request.
+                createdByUserType:
+                  type: string
+                  nullable: true
+                  enum:
+                    - user
+                    - system
+                    - null
+                  description: Whether the user is a normal user or a system.
                 acceptedAt:
                   type: string
                   format: date-time
@@ -10034,9 +10162,17 @@ components:
         createdBy:
           type: string
           description: ID of the user who created the event.
+        createdByUserType:
+          type: string
+          nullable: true
+          enum:
+            - user
+            - system
+            - null
+          description: Whether the user is a normal user or a system.
         updatedByUserRole:
           type: string
-          description: Role of the user who last updated the declaration.
+          description: Role of the user who last changed the status.
         createdAtLocation:
           type: string
           nullable: true
@@ -10048,11 +10184,12 @@ components:
         updatedAtLocation:
           type: string
           nullable: true
-          description: Location of the user who last updated the declaration.
+          description: Location of the user who last changed the status.
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp of the most recent declaration update.
+          description: Timestamp of the most recent *accepted* status change. Possibly 3rd
+            party update, if action is validation asynchronously.
         assignedTo:
           type: string
           nullable: true
@@ -10060,7 +10197,7 @@ components:
         updatedBy:
           type: string
           nullable: true
-          description: ID of the user who last updated the declaration.
+          description: ID of the user who last changed the status.
         trackingId:
           type: string
           description: System-generated tracking ID used by informants or registrars to

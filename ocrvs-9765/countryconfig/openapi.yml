@@ -3353,6 +3353,12 @@ components:
                     type: string
                   transactionId:
                     type: string
+                  createdByUserType:
+                    type: string
+                    enum:
+                      &a10
+                      - user
+                      - system
                   createdAt:
                     type: string
                     format: date-time
@@ -3387,6 +3393,7 @@ components:
                 required:
                   - id
                   - transactionId
+                  - createdByUserType
                   - createdAt
                   - createdBy
                   - createdByRole
@@ -3443,6 +3450,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -3800,7 +3810,7 @@ components:
         status:
           type: string
           enum:
-            &a10
+            &a11
             - Requested
             - Accepted
             - Rejected
@@ -3812,6 +3822,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -3825,6 +3836,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4181,7 +4195,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -4190,6 +4204,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4203,6 +4218,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4559,7 +4577,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -4580,6 +4598,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4594,6 +4613,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4950,7 +4972,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -4959,6 +4981,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4972,6 +4995,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5328,7 +5354,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -5349,6 +5375,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5363,6 +5390,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5719,7 +5749,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -5728,6 +5758,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5741,6 +5772,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6097,7 +6131,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -6108,6 +6142,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6121,6 +6156,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6477,7 +6515,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -6486,6 +6524,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6499,6 +6538,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6855,7 +6897,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -6866,6 +6908,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6880,6 +6923,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7236,7 +7282,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -7245,6 +7291,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7258,6 +7305,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7614,7 +7664,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -7625,6 +7675,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7639,6 +7690,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7995,7 +8049,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -8006,6 +8060,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8020,6 +8075,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8376,7 +8434,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -8387,6 +8445,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8401,6 +8460,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8757,7 +8819,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -8766,6 +8828,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8779,6 +8842,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -9135,7 +9201,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a11
         originalActionId:
           type: string
         type:
@@ -9144,6 +9210,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -9344,7 +9411,7 @@ components:
                           - surname
                       - type: "null"
           default:
-            &a11 {}
+            &a12 {}
         annotation:
           type: object
           additionalProperties:
@@ -9705,7 +9772,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -10067,7 +10134,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -10426,7 +10493,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -10609,7 +10676,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 55326757-015a-441d-b5c9-fa9ec8d2ec15
+        transactionId: 2e8076bc-d3d3-4e44-ad40-0aa560a60d06
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10789,7 +10856,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -11146,7 +11213,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -11516,7 +11583,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -11873,7 +11940,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -12243,7 +12310,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -12603,7 +12670,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -12963,7 +13030,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -13320,7 +13387,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -13677,7 +13744,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -14037,7 +14104,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -14397,7 +14464,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a11
+          default: *a12
         annotation:
           type: object
           additionalProperties:
