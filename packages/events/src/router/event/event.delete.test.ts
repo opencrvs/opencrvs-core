@@ -19,7 +19,11 @@ import {
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createEvent,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -72,21 +76,7 @@ test('declared event can not be deleted', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
-
-  const createAction = event.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(event.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   await expect(
     client.event.delete({ eventId: event.id })
