@@ -254,7 +254,9 @@ export async function addAction(
       reasonMessage: input.reason.message,
       reasonIsDuplicate: true
     })
-  } else if (input.type === ActionType.ASSIGN) {
+  }
+
+  if (input.type === ActionType.ASSIGN) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
