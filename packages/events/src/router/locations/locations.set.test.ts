@@ -45,7 +45,7 @@ test('Creates single location', async () => {
 
   const locationPayload = [
     {
-      id: '123-456-789',
+      id: '00000000-0000-0000-0000-000000000000',
       partOf: null,
       name: 'Location foobar',
       externalId: 'foo-bar'
@@ -64,10 +64,10 @@ test('Creates multiple locations', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const parentId = 'parent-id' as UUID
+  const parentId = '00000000-0000-0000-0000-000000000001' as UUID
 
   const locationPayload = generator.locations.set([
-    { id: 'parentId' as UUID },
+    { id: '00000000-0000-0000-0000-000000000002' as UUID },
     { partOf: parentId },
     { partOf: parentId },
     {}
