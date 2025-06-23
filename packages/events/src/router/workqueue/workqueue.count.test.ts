@@ -1,7 +1,11 @@
 import { TRPCError } from '@trpc/server'
 import _ from 'lodash'
 import { WorkqueueCountInput } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createTestClient,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
@@ -53,7 +57,10 @@ test('Throws error if Query includes workqueue that the user does not have scope
 })
 test('Slugs in response matches input', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=v2.birth:all|tennis-club-membership:all]'
+  ])
   const input: WorkqueueCountInput = [
     {
       slug: 'recent',

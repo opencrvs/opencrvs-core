@@ -79,9 +79,9 @@ function inConfigurableScopes(
   configurableScopes: ConfigurableScopeType[]
 ) {
   const userScopes = getScopes(authHeader)
-  const foundScopes = configurableScopes.map((scope) =>
-    findScope(userScopes, scope)
-  )
+  const foundScopes = configurableScopes
+    .map((scope) => findScope(userScopes, scope))
+    .filter((scope) => scope !== undefined)
 
   if (!foundScopes.length) {
     throw new TRPCError({ code: 'FORBIDDEN' })
@@ -245,7 +245,7 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
 
-  const availableWorkqueues = findScope(scopes, 'workqueue').options.id ?? []
+  const availableWorkqueues = findScope(scopes, 'workqueue')?.options.id ?? []
 
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })

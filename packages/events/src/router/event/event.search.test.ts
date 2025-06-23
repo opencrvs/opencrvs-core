@@ -19,7 +19,6 @@ import {
   getCurrentEventState,
   getMixedPath,
   getUUID,
-  SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 
@@ -79,7 +78,7 @@ test('Throws error without proper scope', async () => {
 test('Returns empty list when no events match search criteria', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -127,7 +126,10 @@ test('Returns empty list when no events match search criteria', async () => {
 test('Throws when searching without payload', async () => {
   const { user } = await setupTestCase()
 
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]'
+  ])
 
   // @ts-expect-error - Intentionally passing an empty object to trigger the error
   await expect(client.event.search({})).rejects.toMatchSnapshot()
@@ -136,7 +138,10 @@ test('Throws when searching without payload', async () => {
 test('Throws when searching by unrelated properties', async () => {
   const { user } = await setupTestCase()
 
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]'
+  ])
 
   await expect(
     client.event.search({
@@ -153,7 +158,10 @@ test('Throws when searching by unrelated properties', async () => {
 test('Throws when searching with empty clauses', async () => {
   const { user } = await setupTestCase()
 
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]'
+  ])
 
   await expect(
     client.event.search({
@@ -165,7 +173,10 @@ test('Throws when searching with empty clauses', async () => {
 
 test('Throws when date field is invalid', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]'
+  ])
 
   await expect(
     client.event.search({
@@ -184,7 +195,10 @@ test('Throws when date field is invalid', async () => {
 
 test('Throws when one of the date range fields has invalid date', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]'
+  ])
 
   await expect(
     client.event.search({
@@ -206,7 +220,7 @@ test('Returns events based on the updatedAt column', async () => {
   const { user, generator, seed, eventsDb } = await setupTestCase()
 
   const client = createTestClient(user, [
-    SCOPES.SEARCH_BIRTH,
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     ...TEST_USER_DEFAULT_SCOPES
   ])
 
@@ -320,7 +334,7 @@ test('Returns events based on the updatedAt column', async () => {
 test.skip('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -416,7 +430,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -492,7 +506,7 @@ test('Returns events that match date of birth of applicant', async () => {
 test('Does not return events when searching with a similar but different date of birth', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -562,7 +576,7 @@ test('Does not return events when searching with a similar but different date of
 test('Returns single document after creation', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -610,7 +624,7 @@ test('Returns single document after creation', async () => {
 test('Returns multiple documents after creation', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -703,7 +717,7 @@ test('Returns multiple documents after creation', async () => {
 test('Returns no documents when search params are not matched', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -798,7 +812,7 @@ test('Returns no documents when search params are not matched', async () => {
 test('Throws error when search params are not matching proper schema', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -843,7 +857,7 @@ test('Throws error when search params are not matching proper schema', async () 
 test('Returns events assigned to a specific user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[id=v2.birth:all|tennis-club-membership:all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -935,7 +949,10 @@ test('Returns events assigned to a specific user', async () => {
 test('Returns relevant events in right order', async () => {
   const { user, generator } = await setupTestCase(4432)
 
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=v2.birth:all|tennis-club-membership:all]'
+  ])
 
   // Until we have a way to reindex from mongodb, we create events through API.
   // Since it is expensive and time consuming, we will run multiple checks against the same set of events.

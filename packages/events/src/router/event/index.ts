@@ -11,6 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { TRPCError } from '@trpc/server'
 import { getScopes, getUUID, SCOPES, findScope } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
@@ -274,7 +275,13 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
-      const searchScopeOptions = findScope(scopes, 'search').options
+      const searchScope = findScope(scopes, 'search')
+      // Only to satisfy type checking, as findScope will return undefined if no scope is found
+      if (!searchScope) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+      const searchScopeOptions = searchScope.options
+
       return getIndex(
         input,
         eventConfigs,
