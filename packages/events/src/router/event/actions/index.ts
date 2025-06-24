@@ -36,7 +36,8 @@ import { systemProcedure } from '@events/router/trpc'
 import {
   getEventById,
   addAction,
-  addAsyncRejectAction
+  addAsyncRejectAction,
+  throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import {
   ActionConfirmationResponse,
@@ -159,6 +160,8 @@ export function getDefaultActionProcedures(
         if (ctx.isDuplicateAction) {
           return ctx.event
         }
+
+        await throwConflictIfActionNotAllowed(eventId, actionType)
 
         const event = await getEventById(eventId)
 
