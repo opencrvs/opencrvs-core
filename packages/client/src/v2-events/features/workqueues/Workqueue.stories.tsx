@@ -20,11 +20,7 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { libraryMembershipEvent } from '@opencrvs/commons/client'
-import {
-  AppRouter,
-  trpcOptionsProxy,
-  TRPCProvider
-} from '@client/v2-events/trpc'
+import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import {
   tennisClubMembershipEventIndex,
@@ -114,11 +110,13 @@ export const WorkqueueWithMultipleEventType: Story = {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
     },
-    offline: {
-      configs: [tennisClubMembershipEvent, libraryMembershipEvent]
-    },
     msw: {
       handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent, libraryMembershipEvent]
+          })
+        ],
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
