@@ -377,6 +377,21 @@ export function getSearchScopeOptions(rawOptions: string) {
 }
 
 /**
+ * Parses a raw options string for non-search scopes (e.g., workqueues).
+ * @param rawOptions - The raw string, e.g. "event=v2.birth|club-reg,all"
+ * @returns An object like: { event: ['v2.birth', 'club-reg'], access: ['all'] }
+ */
+function getScopeOptions(rawOptions: string) {
+  return rawOptions
+    .split(',')
+    .reduce((acc: Record<string, string[]>, option) => {
+      const [key, value] = option.split('=')
+      acc[key] = value.split('|')
+      return acc
+    }, {})
+}
+
+/**
  * Parses a configurable scope string into a ConfigurableScopes object.
  * @param {string} scope - The scope string to parse
  * @returns {ConfigurableScopes | undefined} The parsed scope object if valid, undefined otherwise
@@ -403,15 +418,9 @@ export function parseScope(scope: string) {
   // Different options are separated by commas, and each option value is separated by a pipe e.g.:
   // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
   const options =
-    type !== 'search'
-      ? rawOptions
-          .split(',')
-          .reduce((acc: Record<string, string[]>, option) => {
-            const [key, value] = option.split('=')
-            acc[key] = value.split('|')
-            return acc
-          }, {})
-      : getSearchScopeOptions(rawOptions)
+    type === 'search'
+      ? getSearchScopeOptions(rawOptions)
+      : getScopeOptions(rawOptions)
 
   const parsedScope = {
     type,
