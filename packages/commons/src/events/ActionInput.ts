@@ -77,7 +77,8 @@ export const PrintCertificateActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.PRINT_CERTIFICATE)
-      .default(ActionType.PRINT_CERTIFICATE)
+      .default(ActionType.PRINT_CERTIFICATE),
+    templateId: z.string().optional()
   })
 )
 

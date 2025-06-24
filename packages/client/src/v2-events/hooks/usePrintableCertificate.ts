@@ -11,14 +11,14 @@
 
 import { Location } from '@events/service/locations/locations'
 import {
+  CertificateTemplateConfig,
+  EventConfig,
   EventDocument,
+  FieldType,
   getCurrentEventState,
   isMinioUrl,
-  User,
-  CertificateTemplateConfig,
   LanguageConfig,
-  EventConfig,
-  FieldType
+  User
 } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
@@ -28,6 +28,7 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { useEvents } from '../features/events/useEvents/useEvents'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,14 +77,24 @@ export const usePrintableCertificate = ({
     event,
     eventConfiguration
   )
+  const { getEvent } = useEvents()
+  const actions = getEvent.useSuspenseQuery(event.id)[0].actions
+  const copiesPrintedForTemplate =
+    actions.filter(
+      (action) =>
+        action.type === 'PRINT_CERTIFICATE' &&
+        'templateId' in action &&
+        action.templateId === certificateConfig?.id
+    ).length + 1 // +1 for the current print action
 
   const modifiedMetadata = {
     ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
     // the current certification date in the certificate preview on the review page.
-    modifiedAt: new Date().toISOString()
+    modifiedAt: new Date().toISOString(),
     // Since 'modifiedDate' represents the last action's 'createdAt' date, and when
     // we actually print certificate, in this particular case, last action is PRINT_CERTIFICATE
+    copiesPrintedForTemplate
   }
 
   if (!language || !certificateConfig) {
