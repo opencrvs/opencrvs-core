@@ -113,6 +113,7 @@ export const createEvent = async (
 async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
   // @TODO:
   const withoutUndefined = _.omitBy(action, _.isUndefined) as any
+
   await trx.insertInto('eventActions').values(withoutUndefined).execute()
 
   return trx
@@ -259,6 +260,8 @@ export const createEventWithActions = async (
   actions: Array<Omit<EventActions, 'eventId'>>
 ) => {
   const db = getClient()
+
+  // Could this be done in one insert?
   return db.transaction().execute(async (trx) => {
     const { id: eventId } = await createEventInTrx(event, trx)
 

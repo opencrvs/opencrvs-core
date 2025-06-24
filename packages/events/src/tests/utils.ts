@@ -26,6 +26,7 @@ import { appRouter } from '@events/router/router'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { SystemContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
+import { getLocations } from '../service/locations/locations'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 /**
@@ -167,9 +168,9 @@ export const setupTestCase = async (rngSeed?: number) => {
   const userMgntDb = await userMgnt.getClient()
 
   const seed = seeder()
-  const locations = generator.locations.set(5)
-  await seed.locations(locations)
+  await seed.locations(generator.locations.set(5))
 
+  const locations = await getLocations()
   const user = await seed.user(
     userMgntDb,
     generator.user.create({

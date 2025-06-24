@@ -31,7 +31,6 @@ test('allows access with import scope', async () => {
   const { user } = await setupTestCase()
   const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
 
-  console.log('user', user)
   await expect(
     client.event.import(
       generateEventDocument({
@@ -74,9 +73,9 @@ test('importing the same event twice overwrites the previous one', async () => {
   })
 
   await client.event.import(event)
-  console.log('foo')
+
   await client.event.import(event)
-  console.log('foo2')
+
   const events = await client.event.list()
   expect(events).toHaveLength(1)
   expect(events[0].id).toEqual(event.id)
