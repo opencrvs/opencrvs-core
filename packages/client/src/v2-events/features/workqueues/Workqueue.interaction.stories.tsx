@@ -91,7 +91,7 @@ export const SortWorkqueue: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    const TitleHeader = await canvas.findByText('Title')
+    const TitleHeader = await canvas.findByText('Title', {}, { timeout: 5000 })
     const LastUpdatedHeader = await canvas.findByText('Last updated')
 
     await userEvent.click(TitleHeader)

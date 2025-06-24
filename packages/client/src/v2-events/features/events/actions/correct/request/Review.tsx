@@ -19,6 +19,7 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -38,21 +39,26 @@ export function Review() {
   const navigate = useNavigate()
   const events = useEvents()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
-  const { eventConfiguration } = useEventConfiguration(event.type)
-  const formConfig = getDeclaration(eventConfiguration)
+  const event = events.getEvent.getFromCache(eventId)
+
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+  const eventIndex = getCurrentEventState(event, configuration)
+
+  const formConfig = getDeclaration(configuration)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
   const form = getFormValues()
 
-  const previousFormValues = event.declaration
+  const previousFormValues = eventIndex.declaration
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => !isEqual(previousFormValues[key], value)
   )
 
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
-  const actionConfig = eventConfiguration.actions.find(
+  const actionConfig = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 

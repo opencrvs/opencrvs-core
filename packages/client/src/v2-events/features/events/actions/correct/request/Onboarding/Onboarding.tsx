@@ -12,7 +12,7 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { buttonMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -34,18 +34,20 @@ export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
+  const events = useEvents()
+  const annotation = useActionAnnotation((state) => state.getAnnotation())
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
+
+  const event = events.getEvent.getFromCache(eventId)
 
   const navigate = useNavigate()
   const intl = useIntl()
   const { goToHome } = useEventFormNavigation()
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
 
-  const events = useEvents()
-  const { setAnnotation, getAnnotation } = useActionAnnotation()
-  const annotation = getAnnotation()
-  const event = events.getEventState.useSuspenseQuery(eventId)
-  const { eventConfiguration } = useEventConfiguration(event.type)
-
-  const actionConfiguration = eventConfiguration.actions.find(
+  const actionConfiguration = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
@@ -56,6 +58,7 @@ export function Onboarding() {
   }
 
   const formPages = actionConfiguration.correctionForm.pages
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -84,8 +87,8 @@ export function Onboarding() {
     >
       <PagesComponent
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        declaration={event.declaration}
-        eventConfig={eventConfiguration}
+        declaration={eventIndex.declaration}
+        eventConfig={configuration}
         form={annotation}
         formPages={formPages}
         pageId={currentPageId}

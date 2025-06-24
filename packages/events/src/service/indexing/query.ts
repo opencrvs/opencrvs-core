@@ -110,6 +110,12 @@ const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
 function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
+  if (clause.id) {
+    must.push({
+      term: { id: clause.id }
+    })
+  }
+
   if (clause.eventType) {
     must.push({
       term: { type: clause.eventType }

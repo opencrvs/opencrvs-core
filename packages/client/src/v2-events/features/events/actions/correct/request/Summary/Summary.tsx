@@ -24,7 +24,8 @@ import {
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getDeclaration
+  getDeclaration,
+  getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -111,10 +112,11 @@ export function Summary() {
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
 
-  const previousFormValues = event.declaration
+  const previousFormValues = eventIndex.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
   const form = getFormValues()
