@@ -268,7 +268,8 @@ export function Review() {
           annotation,
           content: { templateId },
           transactionId: uuid(),
-          type: ActionType.PRINT_CERTIFICATE
+          type: ActionType.PRINT_CERTIFICATE,
+          templateId
         })
 
         await handleCertify(fullEvent)

@@ -165,7 +165,9 @@ export const EventMetadata = z.object({
     .describe(
       'System-generated tracking ID used by informants or registrars to look up the event.'
     ),
-  flags: z.array(Flag)
+  flags: z.array(Flag),
+  copiesPrintedForTemplate: z.number().optional(),
+  modifiedAt: z.string().optional()
 })
 
 export type EventMetadata = z.infer<typeof EventMetadata>

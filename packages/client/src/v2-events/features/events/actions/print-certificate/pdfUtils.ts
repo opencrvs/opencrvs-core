@@ -165,7 +165,8 @@ export const stringifyEventMetadata = ({
               : undefined
           }
         : null
-    }
+    },
+    copiesPrintedForTemplate: metadata.copiesPrintedForTemplate
   }
 }
 
@@ -227,7 +228,7 @@ const cache = createIntlCache()
 
 export function compileSvg({
   templateString,
-  $metadata,
+  $metadata: $metadata,
   $declaration,
   locations,
   users,
@@ -235,7 +236,10 @@ export function compileSvg({
   config
 }: {
   templateString: string
-  $metadata: EventMetadata & { modifiedAt: string }
+  $metadata: EventMetadata & {
+    modifiedAt: string
+    copiesPrintedForTemplate?: number
+  }
   $declaration: EventState
   locations: Location[]
   users: User[]
@@ -336,6 +340,66 @@ export function compileSvg({
         id,
         defaultMessage: 'Missing translation for ' + id
       })
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+    } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
+  )
+
+  /**
+   * Handlebars helper: $intlWithParams
+   *
+   * Usage example in SVG template:
+   *   <tspan>{{ $intlWithParams 'constants.greeting' 'name' (lookup $declaration "child.name") }}</tspan>
+   * This helper allows for dynamic translation with parameters.
+   * It takes a translation ID as the first argument, followed by pairs of parameter names and values.
+   * The last argument is the Handlebars options object.
+   * It constructs a params object from the pairs and uses `intl.formatMessage`
+   * to fetch the localized translation with the provided parameters.
+   * If any parameter is undefined, it returns an empty string to prevent rendering issues.
+   * If the translation for the constructed ID is missing,
+   * it falls back to showing: 'Missing translation for [id]'.
+   * This is especially useful in templates where dynamic values
+   * (like names, dates, etc.)
+   * need to be translated using i18n keys with parameters.
+   */
+  /**
+   * @param this - The context object, not used in this helper.
+   * @param args - The arguments passed to the helper.
+   *   - The first argument is the translation ID (string).
+   *   - The subsequent arguments are pairs of parameter names and values.
+   *   - The last argument is the Handlebars options object.
+   * @returns The localized translation string with parameters or an empty string if any parameter is undefined.
+   *   If the translation for the ID is missing, it returns a fallback message.
+   */
+
+  Handlebars.registerHelper(
+    '$intlWithParams',
+
+    function (
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      this: any,
+      ...args: [...(string | undefined)[], Handlebars.HelperOptions]
+    ) {
+      const id = args[0] as string
+      const paramPairs = args.slice(1, -1)
+
+      // Build params object from pairs
+      const params: Record<string, unknown> = {}
+      for (let i = 0; i < paramPairs.length; i += 2) {
+        const key = paramPairs[i] as string | undefined
+        const value = paramPairs[i + 1]
+        if (key == undefined || value == undefined) {
+          return ''
+        }
+        params[key] = value
+      }
+
+      return intl.formatMessage(
+        {
+          id,
+          defaultMessage: 'Missing translation for ' + id
+        },
+        params as Record<string, string | number | boolean>
+      )
       /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     } as any /* This is here because Handlebars typing is insufficient and we can make the function type stricter */
   )
