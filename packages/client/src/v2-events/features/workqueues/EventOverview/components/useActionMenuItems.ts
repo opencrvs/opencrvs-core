@@ -21,7 +21,6 @@ import {
   WorkqueueActionType,
   AVAILABLE_ACTIONS_BY_EVENT_STATUS,
   EventStatus,
-  Scope,
   isMetaAction
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -286,8 +285,17 @@ export function useActionMenuItems(event: EventIndex) {
       : hasAnyOfScopes(scopes, requiredScopes)
   })
 
+  // Filter out actions which are not visible based on the action config
+  const visibleActions = allowedActions.filter((a) => {
+    const actionConfig = config[a]
+
+    return 'shouldHide' in actionConfig
+      ? !actionConfig.shouldHide(allowedActions)
+      : true
+  })
+
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOtherAllowedActions = allowedActions.some((a) => !isMetaAction(a))
+  const hasOtherAllowedActions = visibleActions.some((a) => !isMetaAction(a))
 
   // If user has no other allowed actions, return only READ.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
@@ -300,18 +308,5 @@ export function useActionMenuItems(event: EventIndex) {
     ]
   }
 
-  const actionsWithConfigs = allowedActions.map((a) => {
-    return {
-      ...config[a],
-      type: a
-    }
-  })
-
-  return actionsWithConfigs.filter((a) => {
-    if ('shouldHide' in a) {
-      return !a.shouldHide(allowedActions)
-    }
-
-    return true
-  })
+  return visibleActions.map((a) => ({ ...config[a], type: a }))
 }
