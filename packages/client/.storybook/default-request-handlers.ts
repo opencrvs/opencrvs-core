@@ -24,7 +24,9 @@ import { tennisClubMembershipCertifiedCertificateTemplate } from './tennisClubMe
 import {
   generateWorkqueues,
   TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  footballClubMembershipEvent,
+  libraryMembershipEvent
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -64,7 +66,11 @@ export const handlers = {
   ],
   events: [
     tRPCMsw.event.config.get.query(() => {
-      return [tennisClubMembershipEvent]
+      return [
+        tennisClubMembershipEvent,
+        footballClubMembershipEvent,
+        libraryMembershipEvent
+      ]
     }),
     tRPCMsw.event.list.query(() => {
       return [tennisClubMembershipEventIndex]

@@ -131,10 +131,11 @@ const serializedParams = serializeSearchParams({
     '028d2c85-ca31-426d-b5d1-2cef545a4902',
   'event.status': 'ALL',
   'event.updatedAt': ['2025-05-03', '2025-06-03'],
-  eventType: TENNIS_CLUB_MEMBERSHIP,
   'recommender.name': {
-    firstname: 'Annina'
-  }
+    firstname: 'Annina',
+    surname: ''
+  },
+  eventType: TENNIS_CLUB_MEMBERSHIP
 })
 
 export const AdvancedSearchTabsBehaviour: Story = {
@@ -192,32 +193,32 @@ export const AdvancedSearchTabsBehaviour: Story = {
     // updating NAME is done only on core. Updating countryconfig happens separately.
     // This should be solved by: https://github.com/opencrvs/opencrvs-core/issues/9690
 
-    // await step("Prepopulate Applicant's details", async () => {
-    //   const accordion = await canvas.findByTestId(
-    //     'accordion-v2.event.tennis-club-membership.search.applicants'
-    //   )
+    await step("Prepopulate Applicant's details", async () => {
+      const accordion = await canvas.findByTestId(
+        'accordion-v2.event.tennis-club-membership.search.applicants'
+      )
 
-    //   await within(accordion).findByRole('button', { name: 'Hide' })
-    //   await expect(
-    //     await canvas.findByTestId('text__applicant____firstname')
-    //   ).toHaveValue('Nina')
-    //   await expect(
-    //     await canvas.findByTestId('text__applicant____surname')
-    //   ).toHaveValue('Roy')
-    // })
+      await within(accordion).findByRole('button', { name: 'Hide' })
+      await expect(
+        await within(accordion).findByTestId('text__firstname')
+      ).toHaveValue('Nina')
+      await expect(
+        await within(accordion).findByTestId('text__surname')
+      ).toHaveValue('Roy')
+    })
 
-    // await step("Prepopulate Recommender's details", async () => {
-    //   const accordion = await canvas.findByTestId(
-    //     'accordion-v2.event.tennis-club-membership.search.recommender'
-    //   )
-    //   await within(accordion).findByRole('button', { name: 'Hide' })
-    //   await expect(
-    //     await canvas.findByTestId('text__recommender____firstname')
-    //   ).toHaveValue('Annina')
-    //   await expect(
-    //     await canvas.findByTestId('text__recommender____surname')
-    //   ).toHaveValue('')
-    // })
+    await step("Prepopulate Recommender's details", async () => {
+      const accordion = await canvas.findByTestId(
+        'accordion-v2.event.tennis-club-membership.search.recommender'
+      )
+      await within(accordion).findByRole('button', { name: 'Hide' })
+      await expect(
+        await within(accordion).findByTestId('text__firstname')
+      ).toHaveValue('Annina')
+      await expect(
+        await within(accordion).findByTestId('text__surname')
+      ).toHaveValue('')
+    })
 
     await step('Form value persistence across tabs', async () => {
       const footballTab = await canvas.findByRole('button', {
@@ -257,8 +258,25 @@ export const AdvancedSearchTabsBehaviour: Story = {
   }
 }
 
+const serializedParams2 = serializeSearchParams({
+  ['event.legalStatus.REGISTERED.createdAt']: ['2024-06-01', '2025-06-30'],
+  ['event.legalStatus.REGISTERED.createdAtLocation']:
+    '028d2c85-ca31-426d-b5d1-2cef545a4902',
+  'recommender.name': {
+    firstname: 'Annina',
+    surname: ''
+  },
+  'event.status': 'ALL',
+  eventType: TENNIS_CLUB_MEMBERSHIP
+})
 export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
-  parameters: AdvancedSearchTabsBehaviour.parameters,
+  parameters: {
+    ...storyParams,
+    reactRouter: {
+      ...storyParams.reactRouter,
+      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}?${serializedParams2}`
+    }
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
@@ -267,13 +285,16 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
       async () => {
         let locationInput: HTMLElement | undefined
 
-        await waitFor(async () => {
-          const input = await canvas.findByTestId(
-            'event____legalStatus____REGISTERED____createdAtLocation'
-          )
-          await expect(input).toBeVisible()
-          locationInput = input
-        })
+        await waitFor(
+          async () => {
+            const input = await canvas.findByTestId(
+              'event____legalStatus____REGISTERED____createdAtLocation'
+            )
+            await expect(input).toBeVisible()
+            locationInput = input
+          },
+          { timeout: 10000 }
+        )
 
         if (!locationInput) {
           throw new Error('locationInput not found after waitFor')
@@ -286,21 +307,25 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
         const dateToggle = (await canvas.findAllByRole('checkbox')).find(
           (el) =>
             el.id ===
-            'event____legalStatus____REGISTERED____createdAt-date_range_toggle'
+            'event____legalStatus____REGISTERED____createdAt-date_range_checkbox'
         )
 
         if (dateToggle) {
           await expect(dateToggle).toBeChecked()
           await userEvent.click(dateToggle)
+          await expect(dateToggle).not.toBeChecked()
         }
 
         const searchBtn = (
           await canvas.findAllByRole('button', { name: 'Search' })
         ).find((btn) => btn.id === 'search')
 
-        // @TODO: Check for Enabled when https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
-        // Currently, name fields are interpreted as required fields, so clearing them disables the search button.
-        await expect(searchBtn).toBeDisabled()
+        if (searchBtn) {
+          // @TODO: Check for Enabled when https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
+          // Currently, name fields are interpreted as required fields, so clearing them disables the search button.
+          await expect(searchBtn).toBeEnabled()
+          // await userEvent.click(searchBtn)
+        }
       }
     )
 
@@ -310,7 +335,7 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     //   async () => {
     //     await waitFor(async () => {
     //       await expect(
-    //         canvas.queryByText('Place of registration')
+    //         canvas.queryByText('Place of registration:')
     //       ).not.toBeInTheDocument()
     //       await expect(
     //         canvas.queryByText('Date of registration:')

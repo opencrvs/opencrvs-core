@@ -211,32 +211,11 @@ export function TabSearch({
     fieldValues
   })
 
-  const handleFieldChange = (fieldId: string, value: FieldValue) => {
-    const fieldTypesToBeFilledWithDefaults: FieldType[] = [FieldType.NAME]
-    const fieldConfig = enhancedEvent.declaration.pages
-      .flatMap((x) => x.fields)
-      .find((f) => f.id === fieldId)
-
-    // If the field is a NAME type, we want to merge the default value with the current value
-    // This is to ensure that the NAME field always has a default structure
-    // even if the user has not filled it yet. Otherwise, it will throw invalid field error
-    // when the user tries to search without filling all the NAME fields (ex: { firstname: "Jhon", surname: undefined }).
-    if (
-      fieldConfig &&
-      fieldTypesToBeFilledWithDefaults.includes(fieldConfig.type)
-    ) {
-      if (fieldConfig.type === FieldType.NAME) {
-        value = mergeWithoutNullsOrUndefined(
-          defailtNameFieldValue,
-          value as NameFieldValue
-        )
-      }
-    }
+  const handleFieldChange = (fieldId: string, value: FieldValue) =>
     setFormValues((prev) => ({
       ...prev,
       [fieldId]: value
     }))
-  }
 
   const errors = flattenFieldErrors(
     getAdvancedSearchFieldErrors(enhancedEvent, formValues)
@@ -245,11 +224,43 @@ export function TabSearch({
   const nonEmptyValues = filterEmptyValues(formValues)
 
   const handleSearch = () => {
-    const serializedParams = serializeSearchParams(nonEmptyValues)
-    const path = ROUTES.V2.SEARCH_RESULT.buildPath({
+    const fieldTypesWithDefaults: FieldType[] = [FieldType.NAME]
+
+    const fields = enhancedEvent.declaration.pages.flatMap(
+      (page) => page.fields
+    )
+
+    const updatedValues = Object.entries(nonEmptyValues).reduce(
+      (result, [fieldId, value]) => {
+        const field = fields.find((f) => f.id === fieldId)
+
+        if (field && fieldTypesWithDefaults.includes(field.type)) {
+          // If the field is a NAME type, we want to merge the default value with the current value
+          // This is to ensure that the NAME field always has a default structure
+          // even if the user has not filled it yet. Otherwise, it will throw invalid field error
+          // when the user tries to search without filling all the NAME fields (ex: { firstname: "Jhon", surname: undefined }).
+
+          if (field.type === FieldType.NAME) {
+            const mergedValue = mergeWithoutNullsOrUndefined(
+              defailtNameFieldValue,
+              value as NameFieldValue
+            )
+            return { ...result, [fieldId]: mergedValue }
+          }
+        }
+
+        return { ...result, [fieldId]: value }
+      },
+      {} as Record<string, unknown>
+    )
+
+    const queryString = serializeSearchParams(updatedValues)
+
+    const searchPath = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: enhancedEvent.id
     })
-    navigate(`${path}?${serializedParams}`)
+
+    navigate(`${searchPath}?${queryString}`)
   }
 
   const hasEnoughParams =
