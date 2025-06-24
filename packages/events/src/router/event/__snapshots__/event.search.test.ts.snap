@@ -206,8 +206,8 @@ exports[`Returns relevant events in right order 2`] = `
       "type": "image/png",
     },
     "applicant.name": {
-      "firstname": "Sarachella",
-      "surname": "Salamander",
+      "firstname": "John",
+      "surname": "Brown",
     },
     "recommender.none": true,
   },
@@ -249,9 +249,8 @@ exports[`Returns relevant events in right order 3`] = `
   "VALIDATED",
   "DECLARED",
   "REJECTED",
-  "REJECTED",
-  "ARCHIVED",
   "REGISTERED",
+  "ARCHIVED",
   "CERTIFIED",
 ]
 `;

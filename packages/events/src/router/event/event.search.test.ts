@@ -942,7 +942,6 @@ test('Returns relevant events in right order', async () => {
     [ActionType.DECLARE],
     [ActionType.DECLARE, ActionType.VALIDATE],
     [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REJECT],
-    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REJECT],
     [ActionType.DECLARE, ActionType.VALIDATE, ActionType.ARCHIVE],
     [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER],
     [
@@ -1037,7 +1036,7 @@ test('Returns relevant events in right order', async () => {
     ]
   })
 
-  expect(eventsByName).toHaveLength(3)
+  expect(eventsByName).toHaveLength(2)
   const names = eventsByName.map((event) => event.declaration['applicant.name'])
 
   expect(names).toEqual(
