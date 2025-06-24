@@ -3324,6 +3324,12 @@ components:
                     format: uuid
                   transactionId:
                     type: string
+                  createdByUserType:
+                    type: string
+                    enum:
+                      &a9
+                      - user
+                      - system
                   createdAt:
                     type: string
                     format: date-time
@@ -3349,6 +3355,8 @@ components:
                       - string
                       - "null"
                     format: uuid
+                    description: Reference to the original action that was asynchronously rejected
+                      or accepted by 3rd party integration.
                   type:
                     type: string
                     enum:
@@ -3362,6 +3370,7 @@ components:
                 required:
                   - id
                   - transactionId
+                  - createdByUserType
                   - createdAt
                   - createdBy
                   - createdByRole
@@ -3419,6 +3428,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -3779,7 +3791,7 @@ components:
         status:
           type: string
           enum:
-            &a9
+            &a10
             - Requested
             - Accepted
             - Rejected
@@ -3788,12 +3800,15 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: CREATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -3808,6 +3823,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -4167,18 +4185,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: VALIDATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4193,6 +4214,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -4552,12 +4576,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT
@@ -4576,6 +4602,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4591,6 +4618,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -4950,18 +4980,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: MARKED_AS_DUPLICATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4976,6 +5009,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -5335,12 +5371,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ARCHIVE
@@ -5359,6 +5397,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5374,6 +5413,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -5733,18 +5775,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: NOTIFY
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5759,6 +5804,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -6118,12 +6166,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REGISTER
@@ -6132,6 +6182,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6146,6 +6197,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -6505,18 +6559,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: DECLARE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6531,6 +6588,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -6890,12 +6950,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ASSIGN
@@ -6904,6 +6966,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6919,6 +6982,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -7278,18 +7344,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REQUEST_CORRECTION
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7304,6 +7373,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -7663,12 +7735,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: APPROVE_CORRECTION
@@ -7677,6 +7751,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7692,6 +7767,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -8051,12 +8129,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT_CORRECTION
@@ -8065,6 +8145,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8080,6 +8161,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -8439,12 +8523,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: UNASSIGN
@@ -8453,6 +8539,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8468,6 +8555,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -8827,18 +8917,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: PRINT_CERTIFICATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8853,6 +8946,9 @@ components:
           format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a9
         createdAt:
           type: string
           format: date-time
@@ -9212,18 +9308,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a10
         originalActionId:
           type:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: READ
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -9425,7 +9524,7 @@ components:
                           - surname
                       - type: "null"
           default:
-            &a10 {}
+            &a11 {}
         annotation:
           type: object
           additionalProperties:
@@ -9789,7 +9888,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -10153,7 +10252,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -10337,6 +10436,7 @@ components:
       required:
         - eventId
         - transactionId
+      additionalProperties: false
     NotifyActionInput:
       type: object
       properties:
@@ -10514,7 +10614,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -10698,7 +10798,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 837b7ac3-dd38-4198-a1b0-23d014dc39e8
+        transactionId: ac4e4eef-f9fb-4494-afb7-ab67dd0dc1e7
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10879,7 +10979,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -11238,7 +11338,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -11610,7 +11710,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -11969,7 +12069,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -12341,7 +12441,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -12703,7 +12803,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -13065,7 +13165,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -13424,7 +13524,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -13783,7 +13883,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -14145,7 +14245,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
@@ -14507,7 +14607,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a11
         annotation:
           type: object
           additionalProperties:
