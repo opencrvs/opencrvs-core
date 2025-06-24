@@ -19,18 +19,13 @@ import {
   createPrng,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import {
-  tennisClubMembershipEventDocument,
-  tennisClubMembershipEventIndex
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
-import { setEventData, addLocalEventConfig } from './useEvents/api'
 
 const generator = testDataGenerator()
 
@@ -113,19 +108,11 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       }),
       chromatic: { disableSnapshot: true }
     },
+    offline: {
+      events: [tennisClubMembershipEventDocument]
+    },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.search.query(() => [
-            getCurrentEventState(
-              tennisClubMembershipEventDocument,
-              tennisClubMembershipEvent
-            )
-          ])
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
@@ -157,8 +144,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
-                signatureFilename: undefined,
-                avatarURL: undefined
+                signatureFilename: undefined
               }
             ]
           }),
@@ -167,8 +153,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined,
-              avatarURL: undefined
+              signatureFilename: undefined
             }
           })
         ]
@@ -179,28 +164,20 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 
 export const ReadOnlyViewForUserWithReadPermission: Story = {
   parameters: {
+    offline: {
+      events: [eventDocument]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VIEW.buildPath({
         eventId
       })
     },
-    offline: {
-      events: [eventDocument]
-    },
     msw: {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [draft]
-          })
-        ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
           })
         ],
         user: [
@@ -223,8 +200,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                   }
                 ],
                 role: 'SOCIAL_WORKER',
-                signatureFilename: undefined,
-                avatarURL: undefined
+                signatureFilename: undefined
               }
             ]
           }),
@@ -233,8 +209,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined,
-              avatarURL: undefined
+              signatureFilename: undefined
             }
           })
         ]
