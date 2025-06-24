@@ -9,8 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
 import {
   ActionType,
   generateEventDocument,
@@ -18,36 +16,18 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import * as Validate from './index'
 
 const generator = testDataGenerator()
 
-const event = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
-})
-
 const meta: Meta<typeof Validate.Review> = {
-  title: 'Validate/Review',
-  beforeEach: () => {
-    setEventData(event.id, event)
-  }
+  title: 'Validate/Review'
 }
 
 export default meta
 
 type Story = StoryObj<typeof Validate.Pages>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
 
 export const ReviewForLocalRegistrarIncomplete: Story = {
   parameters: {
@@ -57,31 +37,34 @@ export const ReviewForLocalRegistrarIncomplete: Story = {
         eventId: tennisClubMembershipEventDocument.id
       })
     },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          })
-        ]
-      }
+    offline: {
+      events: [tennisClubMembershipEventDocument]
     }
   }
 }
+const eventForlocalRegistrarComplete = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+})
 
 export const ReviewForLocalRegistrarComplete: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: event.id
+        eventId: eventForlocalRegistrarComplete.id
       })
+    },
+    offline: {
+      events: [eventForlocalRegistrarComplete]
     }
   }
 }
+
+const eventForRegistrationAgentComplete = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
+})
 
 export const ReviewForRegistrationAgentComplete: Story = {
   loaders: [
@@ -100,8 +83,11 @@ export const ReviewForRegistrationAgentComplete: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: event.id
+        eventId: eventForRegistrationAgentComplete.id
       })
+    },
+    offline: {
+      events: [eventForRegistrationAgentComplete]
     }
   }
 }
@@ -119,10 +105,13 @@ export const ReviewForRegistrationAgentIncomplete: Story = {
     }
   ],
   parameters: {
+    offline: {
+      events: [tennisClubMembershipEventDocument]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
-        eventId: event.id
+        eventId: tennisClubMembershipEventDocument.id
       })
     }
   }

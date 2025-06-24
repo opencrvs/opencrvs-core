@@ -102,6 +102,13 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.DETECT_DUPLICATE]: []
 } satisfies Record<ActionType, ConfigurableScopeType[]>
 
+export const WRITE_ACTION_SCOPES = [
+  ...ACTION_ALLOWED_SCOPES[ActionType.DECLARE],
+  ...ACTION_ALLOWED_SCOPES[ActionType.VALIDATE],
+  ...ACTION_ALLOWED_SCOPES[ActionType.REGISTER],
+  ...ACTION_ALLOWED_SCOPES[ActionType.PRINT_CERTIFICATE]
+]
+
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
 }
