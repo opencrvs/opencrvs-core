@@ -596,7 +596,8 @@ export function generateActionDocument({
   configuration,
   action,
   rng = () => 0.1,
-  defaults = {}
+  defaults = {},
+  user = {}
 }: {
   configuration: EventConfig
   action: ActionType
@@ -604,7 +605,7 @@ export function generateActionDocument({
   defaults?: Partial<ActionDocument>
   user?: Partial<{
     signature: string
-    primaryOfficeId: string
+    primaryOfficeId: UUID
     role: TestUserRole
     id: string
   }>
@@ -613,11 +614,12 @@ export function generateActionDocument({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: getUUID(),
+    createdBy: user.id ?? getUUID(),
     createdByUserType: TokenUserType.Enum.user,
     createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+    createdAtLocation:
+      user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
     declaration: generateActionDeclarationInput(configuration, action, rng),
     annotation: {},
     status: ActionStatus.Accepted,
@@ -674,17 +676,24 @@ export function generateActionDocument({
 export function generateEventDocument({
   configuration,
   actions,
-  rng = () => 0.1
+  rng = () => 0.1,
+  user
 }: {
   configuration: EventConfig
   actions: ActionType[]
   rng?: () => number
+  user?: Partial<{
+    signature: string
+    primaryOfficeId: UUID
+    role: TestUserRole
+    id: string
+  }>
 }): EventDocument {
   return {
     trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
-      generateActionDocument({ configuration, action, rng })
+      generateActionDocument({ configuration, action, rng, user })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.

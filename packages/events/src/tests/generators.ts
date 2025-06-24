@@ -10,6 +10,7 @@
  */
 
 import { Db } from 'mongodb'
+import { Kysely } from 'kysely'
 import {
   getUUID,
   eventPayloadGenerator,
@@ -20,6 +21,7 @@ import {
 } from '@opencrvs/commons'
 import { Location, setLocations } from '@events/service/locations/locations'
 import { generateTrackingId } from '../service/events/events'
+import AppSchema from '../storage/postgres/events/schema/app/AppSchema'
 
 interface Name {
   use: string
@@ -94,7 +96,7 @@ export function seeder() {
   const seedLocations = async (locations: Location[]) => setLocations(locations)
 
   const seedEvent = async (
-    db: Db,
+    db: Kysely<AppSchema>,
     user: CreatedUser & { signature?: string },
     event: Partial<EventDocument> = {}
   ) => {
@@ -110,25 +112,29 @@ export function seeder() {
       createdBySignature: user.signature
     }
 
-    await db.collection('events').insertOne({
-      id,
-      transactionId,
-      createdAt: now,
-      updatedAt: now,
-      trackingId,
-      actions: [
-        {
-          ...createdByDetails,
-          type: ActionType.CREATE,
-          createdAt: now,
-          id: getUUID(),
-          declaration: {},
-          status: ActionStatus.Accepted,
-          transactionId: getUUID()
-        }
-      ],
-      ...event
-    })
+    await db
+      .insertInto('events')
+      // @ts-expect-error -- @todo: check the inference
+      .values({
+        id,
+        transactionId,
+        createdAt: now,
+        updatedAt: now,
+        trackingId,
+        actions: [
+          {
+            ...createdByDetails,
+            type: ActionType.CREATE,
+            createdAt: now,
+            id: getUUID(),
+            declaration: {},
+            status: ActionStatus.Accepted,
+            transactionId: getUUID()
+          }
+        ],
+        ...event
+      })
+      .execute()
   }
 
   return {

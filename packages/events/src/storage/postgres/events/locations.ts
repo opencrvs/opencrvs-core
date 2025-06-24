@@ -10,7 +10,7 @@
  */
 
 import { getClient } from '@events/storage/postgres/events'
-import { NewLocations } from './schema/app/Locations'
+import { Locations, NewLocations } from './schema/app/Locations'
 
 export async function createLocations(locations: NewLocations[]) {
   const db = getClient()
@@ -19,5 +19,6 @@ export async function createLocations(locations: NewLocations[]) {
 
 export async function getLocations() {
   const db = getClient()
-  return db.selectFrom('locations').selectAll().execute()
+  // @ts-expect-error - @TODO: check how to convey it to type generator
+  return (await db.selectFrom('locations').selectAll().execute()) as Locations
 }
