@@ -25,7 +25,7 @@ export class RequestNotFoundError extends TRPCError {
 
 /**
  * Throws an error if the event is waiting for correction.
- * This is used to prevent users from requesting correction if the event is already waiting for correction.
+ * This is used to prevent users from performing certain actions if the event is waiting for correction.
  *
  * Why is this not a middleware, you ask?
  * Because we want it to work together with the idempotency, which is only checked in the mutation with the 'isDuplicateAction' flag.
