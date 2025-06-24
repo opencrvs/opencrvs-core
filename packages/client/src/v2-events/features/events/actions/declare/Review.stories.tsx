@@ -96,9 +96,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
           })
