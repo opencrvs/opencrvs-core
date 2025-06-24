@@ -249,9 +249,8 @@ exports[`Returns relevant events in right order 3`] = `
   "VALIDATED",
   "DECLARED",
   "REJECTED",
-  "CREATED",
-  "ARCHIVED",
   "REGISTERED",
+  "ARCHIVED",
   "CERTIFIED",
 ]
 `;

@@ -203,22 +203,19 @@ export const requireAssignment: MiddlewareFunction<
     )
   )
 
-  if (ctx.user.type === TokenUserType.Enum.system) {
-    // System users don't require assignment
-    if (assignedTo) {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        cause: 'System user can not perform action on assigned event'
-      })
-    }
-
-    return next()
-  }
-
-  if (user.id !== assignedTo) {
+  // System users can not perform action on assigned events
+  if (user.type === TokenUserType.Enum.system && assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
-      message: JSON.stringify('You are not assigned to this event')
+      cause: 'System user can not perform action on assigned event'
+    })
+  }
+
+  // Normal users require assignment
+  if (user.type === TokenUserType.Enum.user && user.id !== assignedTo) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: 'You are not assigned to this event'
     })
   }
 
