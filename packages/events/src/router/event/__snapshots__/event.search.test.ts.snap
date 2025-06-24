@@ -365,3 +365,49 @@ exports[`Throws when searching without payload 1`] = `
   }
 ]]
 `;
+
+exports[`User with my-jurisdiction scope can see events from other offices based on their scopes 1`] = `
+{
+  "assignedTo": "[sanitized]",
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/9dcede43-d8f5-4b9e-b391-ecc7cde52c75.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {},
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {},
+  "status": "CREATED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;
+
+exports[`User with my-jurisdiction scope only sees events from their primary office 1`] = `
+{
+  "assignedTo": "[sanitized]",
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/6dcc4bb0-4ee4-46e2-a58d-4d22985dfda4.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {},
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {},
+  "status": "CREATED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;

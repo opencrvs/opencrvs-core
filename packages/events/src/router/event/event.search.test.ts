@@ -1063,3 +1063,118 @@ test('Returns relevant events in right order', async () => {
     ])
   )
 })
+
+test('User with my-jurisdiction scope only sees events from their primary office', async () => {
+  const { user, generator } = await setupTestCase(5541)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=tennis-club-membership:my-jurisdiction]'
+  ])
+
+  const ownOfficeId = user.primaryOfficeId
+
+  await createEvent(client, generator, [ActionType.CREATE])
+
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: 'OTHER_OFFICE_ID'
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=tennis-club-membership:my-jurisdiction]'
+  ])
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen, [ActionType.CREATE])
+
+  // Test user should only see their own event
+  const events = await client.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(events).toHaveLength(1)
+  expect(events[0].updatedAtLocation).toBe(ownOfficeId)
+  expect(
+    sanitizeForSnapshot(events[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
+
+test('User without an event in the scope should not be able to view events of that type', async () => {
+  const { user, generator } = await setupTestCase(5541)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=v2.birth:my-jurisdiction]'
+  ])
+
+  await createEvent(client, generator, [ActionType.CREATE])
+
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: 'OTHER_OFFICE_ID'
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=tennis-club-membership:my-jurisdiction]'
+  ])
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen, [ActionType.CREATE])
+
+  // Test user should only see their own event
+  const events = await client.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(events).toHaveLength(0)
+})
+
+test('User with my-jurisdiction scope can see events from other offices based on their scopes', async () => {
+  const { user: userA } = await setupTestCase(6003)
+
+  const clientA = createTestClient(userA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=tennis-club-membership:my-jurisdiction]'
+  ])
+
+  const { user: userB, generator: generatorB } = await setupTestCase(6004)
+  const userBOverride = {
+    ...userB,
+    primaryOfficeId: 'OTHER_OFFICE'
+  }
+
+  const clientB = createTestClient(userBOverride, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[id=tennis-club-membership:my-jurisdiction]'
+  ])
+
+  // Only user B creates event
+  await createEvent(clientB, generatorB, [ActionType.CREATE])
+
+  // user A should see nothing
+  const eventsA = await clientA.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(eventsA).toHaveLength(0)
+
+  // user B should see nothing
+  const eventsB = await clientB.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(eventsB).toHaveLength(1)
+  expect(eventsB[0].updatedAtLocation).toBe(userBOverride.primaryOfficeId)
+  expect(
+    sanitizeForSnapshot(eventsB[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
