@@ -232,7 +232,7 @@ export function useAction(event: EventIndex) {
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
@@ -328,7 +328,7 @@ export function useActionMenuItems(event: EventIndex) {
       : hasAnyOfScopes(scopes, requiredScopes)
   })
 
-  // Filter out actions which are not visible based on the action config
+  // Filter out actions which are not visible based on the action config 'shouldHide' function
   const visibleActions = allowedActions.filter((a) => {
     const actionConfig = config[a]
 
