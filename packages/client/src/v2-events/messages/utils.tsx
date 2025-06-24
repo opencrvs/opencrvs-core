@@ -148,7 +148,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
     // was a conversion done in the first place
     if (message !== sanitizedMessage) {
       return variables.map((variable) =>
-        variable.replace(new RegExp(`${INTERNAL_SEPARATOR}`, 'g'), '.')
+        variable.replace(new RegExp(INTERNAL_SEPARATOR, 'g'), '.')
       )
     }
     return variables
