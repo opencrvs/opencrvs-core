@@ -54,13 +54,25 @@ export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
 }
 
 export function findLocalEventIndex(id: string) {
-  return queryClient
-    .getQueriesData<EventIndex>({
-      queryKey: trpcOptionsProxy.event.search.queryKey()
-    })
+  const queries = queryClient.getQueriesData<EventIndex>({
+    queryKey: trpcOptionsProxy.event.search.queryKey()
+  })
+  const eventWithAMatchingId = queries
     .flatMap(([, data]) => data)
     .filter((event): event is EventIndex => Boolean(event))
     .find((e) => e.id === id)
+
+  if (eventWithAMatchingId) {
+    return eventWithAMatchingId
+  }
+
+  /*
+   * This branch can find a local even that was originally indexed with a temporary ID
+   * but has since been updated to a permanent ID.
+   */
+  return queries
+    .filter(([queryKey]) => JSON.stringify(queryKey).includes(id))
+    .flatMap(([, data]) => data)[0]
 }
 
 export function setEventListData(
@@ -72,7 +84,7 @@ export function setEventListData(
   )
 }
 
-export function updateLocalEventIndex(updatedEvent: EventDocument) {
+export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
 
   if (!config) {
@@ -84,7 +96,7 @@ export function updateLocalEventIndex(updatedEvent: EventDocument) {
   // Update the local event index with the updated event
   setEventListData((eventIndices) =>
     eventIndices?.map((eventIndex) =>
-      eventIndex.id === updatedEvent.id
+      eventIndex.id === id
         ? { ...eventIndex, ...updatedEventIndex }
         : eventIndex
     )
@@ -97,7 +109,7 @@ export function updateLocalEventIndex(updatedEvent: EventDocument) {
   queryClient.setQueryData(
     trpcOptionsProxy.event.search.queryKey({
       type: 'and',
-      clauses: [{ id: updatedEvent.id }]
+      clauses: [{ id }]
     }),
     () => [updatedEventIndex]
   )
@@ -112,7 +124,7 @@ export function updateLocalEventIndex(updatedEvent: EventDocument) {
       queryClient.setQueryData(
         queryKey,
         (eventIndices || []).map((eventIndex) =>
-          eventIndex.id === updatedEvent.id
+          eventIndex.id === id
             ? { ...eventIndex, ...updatedEventIndex }
             : eventIndex
         )
@@ -127,7 +139,7 @@ export function findLocalEventDocument(eventId: string) {
 }
 
 export function setEventData(id: string, data: EventDocument) {
-  updateLocalEventIndex(data)
+  updateLocalEventIndex(id, data)
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
 }
 

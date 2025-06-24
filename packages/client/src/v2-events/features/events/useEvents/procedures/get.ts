@@ -67,7 +67,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
       cacheUsersFromEventDocument(eventDocument)
     ])
 
-    updateLocalEventIndex(eventDocument)
+    updateLocalEventIndex(eventDocument.id, eventDocument)
 
     return eventDocument
   }

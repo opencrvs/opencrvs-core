@@ -20,7 +20,10 @@ import type {
   inferInput,
   inferOutput
 } from '@trpc/tanstack-react-query'
-import { findLocalEventIndex } from '@client/v2-events/features/events/useEvents/api'
+import {
+  findLocalEventDocument,
+  findLocalEventIndex
+} from '@client/v2-events/features/events/useEvents/api'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
 
@@ -35,8 +38,11 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
     }
 
     const localVersion = findLocalEventIndex(eventId)
+
     if (!localVersion || isTemporaryId(localVersion.id)) {
-      throw new Error('Event that has not been stored yet cannot be deleted')
+      throw new Error(
+        'Event that has not been stored yet cannot be actioned on'
+      )
     }
 
     return canonicalMutationFn({
