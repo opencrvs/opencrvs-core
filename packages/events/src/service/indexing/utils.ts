@@ -17,8 +17,6 @@ import {
   isNameFieldType,
   NameFieldValue
 } from '@opencrvs/commons/events'
-import { SavedLocation } from '@opencrvs/commons/types'
-import { env } from '@events/environment'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -119,21 +117,4 @@ export function decodeEventIndex(
 
 export function declarationReference(fieldName: string) {
   return `declaration.${fieldName}`
-}
-
-function FETCH_ALL_LOCATION_CHILDREN(id: string) {
-  return new URL(`/locations/${id}/children`, env.APPLICATION_CONFIG_URL)
-}
-
-export async function resolveLocationChildren(locationId: string) {
-  const response = await fetch(FETCH_ALL_LOCATION_CHILDREN(locationId))
-  if (!response.ok) {
-    throw new Error(
-      "Couldn't fetch the children of the location from config: " +
-        (await response.text())
-    )
-  }
-
-  const locations = (await response.json()) as Array<SavedLocation>
-  return locations.map((location) => location.id)
 }
