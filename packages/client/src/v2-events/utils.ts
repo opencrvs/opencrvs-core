@@ -76,9 +76,16 @@ export const getAllUniqueFields = (eventConfig: EventConfig) => {
   return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
-export function flattenEventIndex(event: NonNullable<EventIndex>) {
-  const { declaration, ...rest } = event
-  return { ...rest, ...declaration }
+export function flattenEventIndex(event: EventIndex) {
+  const { declaration, trackingId, status, ...rest } = event
+  return {
+    ...rest,
+    ...declaration,
+    'event.trackingId': trackingId,
+    'event.status': status,
+    'event.registrationNumber':
+      rest.legalStatuses.REGISTERED?.registrationNumber
+  }
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>

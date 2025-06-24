@@ -58,7 +58,7 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const { trackingId, status } = eventIndex
+  const { status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts(eventIndex.id)
   const eventWithDrafts = getCurrentEventStateWithDrafts({
@@ -79,13 +79,7 @@ function EventOverviewFull({
 
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
-    // @TODO: Ask why these are defined outside of flatten index?
-    'event.trackingId': trackingId,
-    'event.status': status,
-    // @TODO: Go through different interfaces and ensure this is unified. (e.g. does print certificate and event overview use the same interface?)
-    'event.registrationNumber':
-      eventIndex.legalStatuses.REGISTERED?.registrationNumber, // This should never be overridden by the draft.
-    'event.assignedTo': assignedTo
+    assignedTo
   }
 
   const { getEventTitle } = useEventTitle()
@@ -123,7 +117,7 @@ function EventOverviewProtected({
   onAction: () => void
 }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
-  const { trackingId, status } = eventIndex
+  const { status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts(eventIndex.id)
 
@@ -139,13 +133,7 @@ function EventOverviewProtected({
 
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
-    // @TODO: Ask why these are defined outside of flatten index?
-    'event.trackingId': trackingId,
-    'event.status': status,
-    // @TODO: Go through different interfaces and ensure this is unified. (e.g. does print certificate and event overview use the same interface?)
-    'event.registrationNumber':
-      eventIndex.legalStatuses.REGISTERED?.registrationNumber, // This should never be overridden by the draft.
-    'event.assignedTo': assignedTo
+    assignedTo
   }
 
   const { getEventTitle } = useEventTitle()
