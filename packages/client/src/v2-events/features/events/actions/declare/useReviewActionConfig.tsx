@@ -71,6 +71,7 @@ export function useReviewActionConfig({
         events.customActions.registerOnDeclare.mutate({
           eventId,
           declaration,
+          transactionId: uuid(),
           annotation
         }),
       messages: incomplete
@@ -88,6 +89,7 @@ export function useReviewActionConfig({
         events.customActions.validateOnDeclare.mutate({
           eventId,
           declaration,
+          transactionId: uuid(),
           annotation
         }),
       messages: incomplete

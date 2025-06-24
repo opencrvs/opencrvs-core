@@ -232,7 +232,9 @@ export function getCurrentEventState(
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const acceptedActions = getAcceptedActions(event)
+  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
 
   // Includes the metadata of the last action. Whether it was a 'request' by user or 'accept' by user or 3rd party.
   const requestActionMetadata = getActionUpdateMetadata(event.actions)

@@ -116,6 +116,7 @@ export const createDeclarationTrpcMsw = (
   trpcMsw: ReturnType<typeof createTRPCMsw<AppRouter>>
 ) => {
   return {
+    eventDocument,
     events: wrapHandlersWithSpies([
       {
         name: 'event.config.get',

@@ -32,6 +32,17 @@ import { ThemeProvider } from 'styled-components'
 import WebFont from 'webfontloader'
 import { handlers } from './default-request-handlers'
 import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
+import {
+  addUserToQueryData,
+  setEventData,
+  addLocalEventConfig
+} from '@client/v2-events/features/events/useEvents/api'
+import {
+  EventDocument,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
+import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { EventConfig } from '@opencrvs/commons/client'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -129,7 +140,7 @@ clearStorage()
 const preview: Preview = {
   loaders: [
     mswLoader,
-    async () => {
+    async (options) => {
       await clearStorage()
       queryClient.clear()
 
@@ -137,6 +148,38 @@ const preview: Preview = {
         'opencrvs',
         generator.user.token.localRegistrar
       )
+
+      /*
+       * OFFLINE DATA INITIALISATION
+       * Ensure the default record is "downloaded offline" in the user's browser
+       * and that users cache has the user. This creates a situation identical to
+       * when the user has assigned & downloaded a record
+       *
+       * If configs are not set explicitly, the default tennis club membership event
+       * If events are not set explicitly, the default tennis club membership event document
+       *
+       */
+
+      const offlineConfigs: Array<EventConfig> = options.parameters?.offline
+        ?.configs ?? [tennisClubMembershipEvent]
+
+      offlineConfigs.forEach((config) => {
+        addLocalEventConfig(config)
+      })
+
+      addUserToQueryData({
+        id: generator.user.id.localRegistrar,
+        name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+        role: 'LOCAL_REGISTRAR',
+        signatureFilename: undefined
+      })
+
+      const offlineEvents: Array<EventDocument> = options.parameters?.offline
+        ?.events ?? [tennisClubMembershipEventDocument]
+
+      offlineEvents.forEach((event) => {
+        setEventData(event.id, event)
+      })
 
       //  Intermittent failures starts to happen when global state gets out of whack.
       // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
