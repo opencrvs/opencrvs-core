@@ -29,6 +29,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
+import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -66,7 +67,6 @@ function getAvailableAssignmentActions(
 
   return []
 }
-
 interface ActionConfig {
   label: TranslationConfig
   onClick: (workqueue?: string) => Promise<void> | void
@@ -129,12 +129,15 @@ export function useAction(event: EventIndex) {
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
+  const { findFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(findFromCache(event.id).data)
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
-  const { refetch: refetchEvent } = events.getEvent.useQuery(event.id, false)
+  const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
+
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
   const { eventConfiguration } = useEventConfiguration(event.type)
 
@@ -145,7 +148,7 @@ export function useAction(event: EventIndex) {
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const eventIsAssignedToSelf =
-    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
   const eventId = event.id
 
@@ -333,6 +336,7 @@ export function useActionMenuItems(event: EventIndex) {
 
   // If user has no other allowed actions, return only READ.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
+
   if (!hasOtherAllowedActions) {
     return [
       {
