@@ -52,6 +52,7 @@ CREATE TABLE event_actions (
   created_at_location uuid REFERENCES locations(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
+  created_by_user_type text NOT NULL,
   created_by_signature text,
   declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
@@ -75,7 +76,6 @@ CREATE TABLE event_actions (
       action_type = 'REGISTER'
       AND status = 'Accepted'
       AND registration_number IS NOT NULL
-      AND original_action_id IS NOT NULL
     )
     OR (
       action_type = 'REGISTER'
@@ -86,7 +86,6 @@ CREATE TABLE event_actions (
       action_type = 'REGISTER'
       AND status = 'Rejected'
       AND registration_number IS NULL
-      AND original_action_id IS NOT NULL
     )
     OR (
       action_type = 'REJECT'
@@ -117,6 +116,7 @@ CREATE TABLE event_action_drafts (
   annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
+  created_by_user_type text NOT NULL,
   created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
   created_at timestamp with time zone DEFAULT now() NOT NULL,

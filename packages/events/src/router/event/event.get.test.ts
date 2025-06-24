@@ -104,13 +104,23 @@ test('Returns event with all actions', async () => {
   await client.event.actions.reject.request(
     generator.event.actions.reject(event.id)
   )
+
   await client.event.actions.assignment.assign({
     ...assignmentInput,
     transactionId: getUUID()
   })
 
-  await client.event.actions.archive.request(
-    generator.event.actions.archive(event.id)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(event.id)
   )
 
   await client.event.actions.assignment.assign({

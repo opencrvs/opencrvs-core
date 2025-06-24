@@ -14,7 +14,6 @@ import _ from 'lodash'
 import {
   ActionStatus,
   ActionType,
-  deepDropNulls,
   EventDocument,
   UUID
 } from '@opencrvs/commons'
@@ -162,6 +161,7 @@ async function getOrCreateEventInTrx(
       status: ActionStatus.Accepted,
       createdBy: input.createdBy,
       createdByRole: input.createdByRole,
+      createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
       reasonIsDuplicate: input.reasonIsDuplicate,
@@ -204,6 +204,7 @@ async function getOrCreateEventAndAssignInTrx(
       status: ActionStatus.Accepted,
       createdBy: input.createdBy,
       createdByRole: input.createdByRole,
+      createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
       reasonIsDuplicate: input.reasonIsDuplicate,
@@ -220,6 +221,7 @@ async function getOrCreateEventAndAssignInTrx(
       status: ActionStatus.Accepted,
       createdBy: input.createdBy,
       createdByRole: input.createdByRole,
+      createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
       assignedTo: input.createdBy,

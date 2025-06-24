@@ -11,7 +11,7 @@
 
 import { Selectable, sql } from 'kysely'
 import z from 'zod'
-import { ActionStatus, Draft, UUID } from '@opencrvs/commons'
+import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import EventActionDrafts, {
   NewEventActionDrafts
@@ -48,6 +48,8 @@ function transformDraft(draft: Selectable<EventActionDrafts>): Draft {
       createdBy: draft.createdBy,
       createdByRole: draft.createdByRole,
       createdAtLocation: draft.createdAtLocation,
+      // @TODO:
+      createdByUserType: draft.createdByUserType as TokenUserType,
       declaration: draft.declaration,
       annotation: draft.annotation,
       type: draft.actionType,

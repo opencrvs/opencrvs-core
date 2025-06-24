@@ -13,7 +13,8 @@ import {
   DeduplicationConfig,
   EventIndex,
   getUUID,
-  UUID
+  UUID,
+  TokenUserType
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
@@ -185,6 +186,7 @@ async function findDuplicates(
       status: 'CREATED',
       createdAt: '2025-01-01',
       createdBy: 'test',
+      createdByUserType: TokenUserType.Enum.user,
       createdAtLocation: 'test' as UUID,
       updatedAtLocation: 'test' as UUID,
       legalStatuses: {},
@@ -267,6 +269,7 @@ describe('deduplication tests', () => {
         status: 'CREATED',
         createdAt: '2025-01-01',
         createdBy: 'test',
+        createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'test' as UUID,
         updatedAtLocation: 'test' as UUID,
         legalStatuses: {},

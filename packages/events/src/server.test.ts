@@ -20,7 +20,7 @@ import {
   getTokenPayload,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  UserRole
+  TestUserRole
 } from '@opencrvs/commons'
 import { AppRouter } from './router'
 import { server } from './server'
@@ -94,7 +94,7 @@ test('Server starts up and returns an event based on context dependency values',
 
   const mockUserResponse = {
     primaryOfficeId: locations[0].id,
-    role: UserRole.enum.LOCAL_REGISTRAR,
+    role: TestUserRole.enum.LOCAL_REGISTRAR,
     signature: '/ocrvs/my-signature.png'
   }
 
@@ -158,7 +158,7 @@ test('Server will accept requests after error', async () => {
     http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
       return HttpResponse.json({
         primaryOfficeId: locations[0].id,
-        role: UserRole.enum.LOCAL_REGISTRAR,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
         signature: '/ocrvs/my-signature.png'
       })
     })
@@ -190,5 +190,29 @@ test('Throws with malformed token', async () => {
 
   await expect(createEvent('bad-token')).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
+  )
+})
+
+test('UNAUTHORIZED error is thrown when authorization header is missing', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+
+  await expect(
+    customClient.event.create.mutate(
+      {
+        transactionId: getUUID(),
+        type: TENNIS_CLUB_MEMBERSHIP
+      },
+      {
+        context: {
+          headers: {}
+        }
+      }
+    )
+  ).rejects.toThrow(
+    new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
   )
 })

@@ -43,6 +43,7 @@ import { getUUID, UUID } from '../uuid'
 import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
+import { TokenUserType } from '../authentication'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -214,6 +215,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
+      createdByUserType: TokenUserType.Enum.user,
       createdBy: '@todo',
       createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
       status: ActionStatus.Accepted,

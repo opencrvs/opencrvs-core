@@ -10,13 +10,11 @@
  */
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { times, flatten, constant } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
   generateRandomSignature,
-  getOrThrow,
   Scope,
   SCOPES,
   SystemRole,
@@ -42,6 +40,7 @@ export const UNSTABLE_EVENT_FIELDS = [
   'trackingId',
   'eventId',
   'createdBy',
+  'createdByUserType',
   'createdAtLocation',
   'assignedTo',
   'updatedAtLocation',
@@ -204,7 +203,6 @@ function actionToClientAction(
   generator: ReturnType<typeof payloadGenerator>,
   action: ActionType
 ) {
-  //
   switch (action) {
     case ActionType.CREATE:
       return async () => client.event.create(generator.event.create())
@@ -269,40 +267,20 @@ export async function createEvent(
 ): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
 
+  // Always first create the event
+  const createAction = actionToClientAction(
+    client,
+    generator,
+    ActionType.CREATE
+  )
+
+  // @ts-expect-error -- createEvent does not accept any arguments
+  createdEvent = await createAction()
+
   for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)
-
-    if (action === ActionType.CREATE) {
-      // @ts-expect-error -- createEvent does not accept any arguments
-      createdEvent = await clientAction()
-    } else if (!createdEvent) {
-      throw new Error('Event must be created before performing actions on it')
-    } else {
-      await clientAction(createdEvent.id)
-    }
+    createdEvent = await clientAction(createdEvent.id)
   }
 
-  return getOrThrow(
-    createdEvent,
-    'Event must be created before performing actions on it'
-  )
-}
-
-/**
- * Returns ordered combinations of actions, starting with single action and growing to the full set.
- * Useful for generating test combinations based on a set of actions.
- *
- * @example getGrowingCombinations(['a', 'b', 'c']) --> [['a'], ['a', 'b'], ['a', 'b', 'c']]
- * @example getGrowingCombinations(['a', 'b', 'c'], 2) --> [['a'], ['a'], ['a', 'b'], ['a', 'b'], ['a', 'b', 'c'], ['a', 'b', 'c']
- *
- */
-export function getGrowingCombinations<T>(arr: T[], count: number = 1): T[][] {
-  if (count < 1) {
-    throw new Error('Count must be a positive integer')
-  }
-
-  const combination = arr.map((_, i) => arr.slice(0, i + 1))
-
-  // flatten out and duplicate the combinations as many time as needed.
-  return flatten(times(count, constant(combination)))
+  return createdEvent
 }

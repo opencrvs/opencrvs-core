@@ -28,6 +28,7 @@ import {
   ACTION_ALLOWED_SCOPES,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
@@ -35,7 +36,8 @@ import { systemProcedure } from '@events/router/trpc'
 import {
   getEventById,
   addAction,
-  addAsyncRejectAction
+  addAsyncRejectAction,
+  throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import {
   ActionConfirmationResponse,
@@ -158,6 +160,8 @@ export function getDefaultActionProcedures(
         if (ctx.isDuplicateAction) {
           return ctx.event
         }
+
+        await throwConflictIfActionNotAllowed(eventId, actionType)
 
         const event = await getEventById(eventId)
 
@@ -294,6 +298,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
+          createdByUserType: TokenUserType.Enum.user,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,

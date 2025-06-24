@@ -52,6 +52,7 @@ CREATE TABLE event_actions (
   created_at_location uuid REFERENCES locations(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
+  created_by_user_type text NOT NULL,
   created_by_signature text,
   declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
@@ -75,7 +76,6 @@ CREATE TABLE event_actions (
       action_type = 'REGISTER'
       AND status = 'Accepted'
       AND registration_number IS NOT NULL
-      AND original_action_id IS NOT NULL
     )
     OR (
       action_type = 'REGISTER'
@@ -86,7 +86,6 @@ CREATE TABLE event_actions (
       action_type = 'REGISTER'
       AND status = 'Rejected'
       AND registration_number IS NULL
-      AND original_action_id IS NOT NULL
     )
     OR (
       action_type = 'REJECT'
@@ -101,31 +100,6 @@ CREATE TABLE event_actions (
     )
   )
 );
-
-GRANT SELECT, DELETE, INSERT ON event_actions TO events_app;
-
-COMMENT ON TABLE event_actions IS 'Stores actions performed on life events, including client-supplied transaction_id for idempotency. Event actions cannot be updated or deleted by the application database user. The same transaction id can only create action of one type. Each action is linked to a specific event.';
-
-COMMENT ON COLUMN event_actions.original_action_id IS 'References the original action if this is an asynchronous confirmation of it.';
-
-CREATE TABLE event_action_drafts (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  transaction_id text NOT NULL,
-  event_id uuid NOT NULL REFERENCES events(id) ON DELETE CASCADE,
-  action_type action_type NOT NULL,
-  declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
-  annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
-  created_by text NOT NULL,
-  created_by_role text NOT NULL,
-  created_by_signature text,
-  created_at_location uuid NOT NULL REFERENCES locations(id),
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
-  UNIQUE (transaction_id, action_type)
-);
-
-GRANT SELECT, INSERT, UPDATE, DELETE ON event_action_drafts TO events_app;
-
-COMMENT ON TABLE event_action_drafts IS 'Stores user-specific drafts of event-related actions. Drafts use client-supplied transaction_id for idempotency. Declaration fields may be incomplete. Each draft is owned exclusively by created_by.';
 
 -- Down Migration
 DROP TABLE IF EXISTS event_action_drafts;
