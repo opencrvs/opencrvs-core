@@ -71,6 +71,7 @@ interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
+  shouldHide?: (actions: ActionType[]) => boolean
 }
 
 export const actionLabels = {
@@ -181,7 +182,9 @@ export function useAction(event: EventIndex) {
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf,
+        // Action menu should not show DECLARE if the user can perform VALIDATE
+        shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
@@ -246,46 +249,6 @@ const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
   ]
 } satisfies Partial<Record<EventStatus, ActionType[]>>
 
-// Some actions can override other actions depending on the user's permissions.
-// For example, if an event is in rejected state, a user can either DECLARE or VALIDATE
-// depending on their scope - if they have VALIDATE scope, DECLARE will be filtered out.
-const ACTION_OVERRIDES = {
-  [ActionType.DECLARE]: ActionType.VALIDATE
-} satisfies Partial<Record<ActionType, ActionType>>
-
-function actionHasOverride(
-  action: ActionType
-): action is keyof typeof ACTION_OVERRIDES {
-  return action in ACTION_OVERRIDES
-}
-/**
- * Filters out actions that are overridden by other actions based on user scopes.
- *
- * Some actions can override other actions depending on the user's permissions.
- * For example, if an event is in rejected state, a user can either DECLARE or VALIDATE
- * depending on their scope - if they have VALIDATE scope, DECLARE will be filtered out.
- *
- * @param actions - Array of action types to filter
- * @param scopes - Array of user scopes to check against
- * @returns Filtered array of actions with overridden actions removed
- */
-function filterOverriddenActions(actions: ActionType[], scopes: Scope[]) {
-  return actions.filter((a) => {
-    if (!actionHasOverride(a)) {
-      return true
-    }
-
-    const overrideAction = ACTION_OVERRIDES[a]
-
-    if (!actions.includes(overrideAction)) {
-      return true
-    }
-
-    const overrideActionScopes = ACTION_ALLOWED_SCOPES[overrideAction]
-    return !hasAnyOfScopes(scopes, overrideActionScopes)
-  })
-}
-
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
@@ -307,10 +270,7 @@ export function useActionMenuItems(event: EventIndex) {
         ]
       : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
 
-  // Action menu should not for example show DECLARE if the user has VALIDATE scope
-  const filteredActions = filterOverriddenActions(availableActions, scopes)
-
-  const actions = [...availableAssignmentActions, ...filteredActions]
+  const actions = [...availableAssignmentActions, ...availableActions]
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
@@ -340,10 +300,18 @@ export function useActionMenuItems(event: EventIndex) {
     ]
   }
 
-  return allowedActions.map((a) => {
+  const actionsWithConfigs = allowedActions.map((a) => {
     return {
       ...config[a],
       type: a
     }
+  })
+
+  return actionsWithConfigs.filter((a) => {
+    if ('shouldHide' in a) {
+      return !a.shouldHide(allowedActions)
+    }
+
+    return true
   })
 }
