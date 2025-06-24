@@ -18,7 +18,7 @@ import {
   generateEventDraftDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import {
@@ -30,8 +30,20 @@ import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+
 const meta: Meta<typeof ReviewIndex> = {
-  title: 'Declare'
+  title: 'Declare',
+  parameters: {
+    offline: {
+      events: [eventDocument]
+    }
+  }
 }
 
 export default meta
@@ -46,12 +58,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
 const draft = generateEventDraftDocument({
   eventId,
   actionType: ActionType.REGISTER
@@ -67,7 +73,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {
@@ -89,9 +96,6 @@ export const ReviewForLocalRegistrarComplete: Story = {
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
           })
@@ -104,10 +108,10 @@ export const ReviewForLocalRegistrarComplete: Story = {
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [mockUser]
           }),
-          tRPCMsw.user.get.query((id) => {
+          tRPCMsw.user.get.query(() => {
             return mockUser
           })
         ]
@@ -292,9 +296,6 @@ export const ReviewForFieldAgentComplete: Story = {
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
           })
@@ -329,6 +330,9 @@ export const ReviewForFieldAgentIncomplete: Story = {
     }
   ],
   parameters: {
+    offline: {
+      events: [eventDocument]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
@@ -340,9 +344,6 @@ export const ReviewForFieldAgentIncomplete: Story = {
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
           }),
           tRPCMsw.event.list.query(() => {
             return [tennisClubMembershipEventIndex]
@@ -378,8 +379,11 @@ export const ReviewShowsFilesFromDraft: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: createdEvent.id
       })
+    },
+    offline: {
+      events: [createdEvent]
     },
     msw: {
       handlers: {

@@ -15,7 +15,11 @@ import { userEvent, within, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { waitFor } from '@testing-library/dom'
-import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/client'
+import {
+  footballClubMembershipEvent,
+  TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
@@ -55,7 +59,10 @@ const storyParams = {
     initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
   },
   chromatic: { disableSnapshot: true },
-  msw: { handlers: defaultHandlers }
+  msw: { handlers: defaultHandlers },
+  offline: {
+    configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+  }
 }
 
 export const AdvancedSearchStory: Story = {
@@ -283,22 +290,13 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        let locationInput: HTMLElement | undefined
-
-        await waitFor(
-          async () => {
-            const input = await canvas.findByTestId(
-              'event____legalStatus____REGISTERED____createdAtLocation'
-            )
-            await expect(input).toBeVisible()
-            locationInput = input
-          },
-          { timeout: 10000 }
+        const locationInput = await canvas.findByTestId(
+          'event____legalStatus____REGISTERED____createdAtLocation',
+          {},
+          {
+            timeout: 5000
+          }
         )
-
-        if (!locationInput) {
-          throw new Error('locationInput not found after waitFor')
-        }
 
         await expect(locationInput).toHaveValue('Ibombo District Office')
         await userEvent.clear(locationInput)
@@ -330,18 +328,18 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     )
 
     // @TODO: Bring back once issues in https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
-    // await step(
-    //   'Ensure cleared fields do not appear in search criteria',
-    //   async () => {
-    //     await waitFor(async () => {
-    //       await expect(
-    //         canvas.queryByText('Place of registration:')
-    //       ).not.toBeInTheDocument()
-    //       await expect(
-    //         canvas.queryByText('Date of registration:')
-    //       ).not.toBeInTheDocument()
-    //     })
-    //   }
-    // )
+    await step(
+      'Ensure cleared fields do not appear in search criteria',
+      async () => {
+        await waitFor(async () => {
+          await expect(
+            canvas.queryByText('Place of registration:')
+          ).not.toBeInTheDocument()
+          await expect(
+            canvas.queryByText('Date of registration:')
+          ).not.toBeInTheDocument()
+        })
+      }
+    )
   }
 }

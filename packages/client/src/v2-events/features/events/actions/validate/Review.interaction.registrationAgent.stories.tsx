@@ -24,6 +24,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Review } from './index'
 
 const generator = testDataGenerator()
@@ -86,11 +87,18 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(declareEventDocument.id, declareEventDocument)
+
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declareEventDocument,
@@ -171,6 +179,13 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 }
 
 export const ReviewForRegistrationAgentArchiveInteraction: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(declareEventDocument.id, declareEventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -294,6 +309,13 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
 }
 
 export const ReviewForRegistratinAgentRejectInteraction: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventId, eventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,

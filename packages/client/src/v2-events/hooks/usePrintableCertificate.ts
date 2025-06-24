@@ -91,6 +91,7 @@ export const usePrintableCertificate = ({
   }
 
   const certificateFonts = certificateConfig.fonts ?? {}
+
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
