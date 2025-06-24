@@ -73,7 +73,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {
@@ -110,10 +111,10 @@ export const ReviewForLocalRegistrarComplete: Story = {
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [mockUser]
           }),
-          tRPCMsw.user.get.query((id) => {
+          tRPCMsw.user.get.query(() => {
             return mockUser
           })
         ]

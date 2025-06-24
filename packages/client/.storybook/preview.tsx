@@ -154,12 +154,18 @@ const preview: Preview = {
        * Ensure the default record is "downloaded offline" in the user's browser
        * and that users cache has the user. This creates a situation identical to
        * when the user has assigned & downloaded a record
+       *
+       * If configs are not set explicitly, the default tennis club membership event
+       * If events are not set explicitly, the default tennis club membership event document
+       *
        */
-      addLocalEventConfig(tennisClubMembershipEvent)
-      setEventData(
-        tennisClubMembershipEventDocument.id,
-        tennisClubMembershipEventDocument
-      )
+
+      const offlineConfigs: Array<EventConfig> = options.parameters?.offline
+        ?.configs ?? [tennisClubMembershipEvent]
+
+      offlineConfigs.forEach((config) => {
+        addLocalEventConfig(config)
+      })
 
       addUserToQueryData({
         id: generator.user.id.localRegistrar,
@@ -168,18 +174,11 @@ const preview: Preview = {
         signatureFilename: undefined
       })
 
-      const offlineEvents: Array<EventDocument> =
-        options.parameters?.offline?.events ?? []
-
-      const offlineConfigs: Array<EventConfig> =
-        options.parameters?.offline?.configs ?? []
+      const offlineEvents: Array<EventDocument> = options.parameters?.offline
+        ?.events ?? [tennisClubMembershipEventDocument]
 
       offlineEvents.forEach((event) => {
         setEventData(event.id, event)
-      })
-
-      offlineConfigs.forEach((config) => {
-        addLocalEventConfig(config)
       })
 
       //  Intermittent failures starts to happen when global state gets out of whack.

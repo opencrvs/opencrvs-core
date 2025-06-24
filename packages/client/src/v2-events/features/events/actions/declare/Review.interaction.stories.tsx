@@ -46,13 +46,12 @@ const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
+  parameters: {
+    offline: {
+      events: [declareEventDocument]
+    }
+  },
   beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(declareEventDocument.id, declareEventDocument)
-
     useEventFormData.setState({
       formValues: getCurrentEventState(
         declareEventDocument,

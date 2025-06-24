@@ -74,6 +74,7 @@ export function setEventListData(
 
 export function updateLocalEventIndex(updatedEvent: EventDocument) {
   const config = findLocalEventConfig(updatedEvent.type)
+
   if (!config) {
     throw new Error(
       `Event configuration for type ${updatedEvent.type} not found`

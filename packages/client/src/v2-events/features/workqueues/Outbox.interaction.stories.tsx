@@ -99,7 +99,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 export const Outbox: Story = {
@@ -121,7 +122,7 @@ export const Outbox: Story = {
     chromatic: { disableSnapshot: true },
     offline: {
       events: [eventDocument, declareEventDocument],
-      configs: [footballClubMembershipEvent]
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {
       handlers: {
@@ -134,10 +135,10 @@ export const Outbox: Story = {
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [mockUser]
           }),
-          tRPCMsw.user.get.query((id) => {
+          tRPCMsw.user.get.query(() => {
             return mockUser
           })
         ]

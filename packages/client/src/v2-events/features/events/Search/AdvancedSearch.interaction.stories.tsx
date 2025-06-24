@@ -63,7 +63,7 @@ const storyParams = {
   chromatic: { disableSnapshot: true },
   msw: { handlers: defaultHandlers },
   offline: {
-    configs: [footballClubMembershipEvent]
+    configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
   }
 }
 
