@@ -16,6 +16,7 @@ import {
   ActionType,
   createPrng,
   generateRandomSignature,
+  getOrThrow,
   Scope,
   SCOPES,
   SystemRole,
@@ -185,6 +186,7 @@ export const setupTestCase = async (rngSeed?: number) => {
     },
     eventsDb,
     userMgntDb,
+    rng,
     seed,
     generator
   }
@@ -264,7 +266,7 @@ export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
   actions: ActionType[]
-) {
+): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
 
   for (const action of actions) {
@@ -279,6 +281,11 @@ export async function createEvent(
       await clientAction(createdEvent.id)
     }
   }
+
+  return getOrThrow(
+    createdEvent,
+    'Event must be created before performing actions on it'
+  )
 }
 
 /**

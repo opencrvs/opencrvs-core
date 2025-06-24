@@ -26,6 +26,7 @@ import { AppRouter } from './router'
 import { server } from './server'
 import { mswServer } from './tests/msw'
 import { env } from './environment'
+import { setupTestCase } from './tests/utils'
 
 /**
  * This test suite verifies that the server starts up correctly and handles basic dependencies.
@@ -87,11 +88,12 @@ async function createEvent(token: string) {
 }
 
 test('Server starts up and returns an event based on context dependency values', async () => {
+  const { locations } = await setupTestCase()
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
   const mockUserResponse = {
-    primaryOfficeId: getUUID(),
+    primaryOfficeId: locations[0].id,
     role: UserRole.enum.LOCAL_REGISTRAR,
     signature: '/ocrvs/my-signature.png'
   }
@@ -133,6 +135,8 @@ test('Server starts up and returns an event based on context dependency values',
 })
 
 test('Server will accept requests after error', async () => {
+  const { locations } = await setupTestCase()
+
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
@@ -153,7 +157,7 @@ test('Server will accept requests after error', async () => {
   mswServer.use(
     http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
       return HttpResponse.json({
-        primaryOfficeId: getUUID(),
+        primaryOfficeId: locations[0].id,
         role: UserRole.enum.LOCAL_REGISTRAR,
         signature: '/ocrvs/my-signature.png'
       })

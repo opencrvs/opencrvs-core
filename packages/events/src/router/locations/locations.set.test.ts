@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { SCOPES, UUID } from '@opencrvs/commons'
+import { generateUuid, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -45,7 +45,7 @@ test('Creates single location', async () => {
 
   const locationPayload = [
     {
-      id: '00000000-0000-0000-0000-000000000000',
+      id: generateUuid(),
       partOf: null,
       name: 'Location foobar',
       externalId: 'foo-bar'
@@ -61,13 +61,14 @@ test('Creates single location', async () => {
 })
 
 test('Creates multiple locations', async () => {
-  const { user, generator } = await setupTestCase()
+  const { user, generator, rng } = await setupTestCase()
+
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])
 
-  const parentId = '00000000-0000-0000-0000-000000000001' as UUID
+  const parentId = generateUuid(rng)
 
   const locationPayload = generator.locations.set([
-    { id: '00000000-0000-0000-0000-000000000002' as UUID },
+    { id: generateUuid(rng) },
     { partOf: parentId },
     { partOf: parentId },
     {}
@@ -80,6 +81,9 @@ test('Creates multiple locations', async () => {
   expect(locations).toEqual(locationPayload)
 })
 
+/**
+ * e.g. country-config removed a line from .csv config.
+ */
 test('Removes existing locations not in payload', async () => {
   const { user, generator } = await setupTestCase()
   const dataSeedingClient = createTestClient(user, [SCOPES.USER_DATA_SEEDING])

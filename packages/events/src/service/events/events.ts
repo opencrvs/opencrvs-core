@@ -252,7 +252,7 @@ export async function addAction(
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
       reasonMessage: input.reason.message,
-      reasonIsDuplicate: true
+      reasonIsDuplicate: input.reason.isDuplicate
     })
   }
 
@@ -263,7 +263,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
-      status,
+      status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
       createdAtLocation: user.primaryOfficeId,
@@ -310,7 +310,7 @@ export async function addAction(
       eventId,
       transactionId: input.transactionId,
       actionType: ActionType.UNASSIGN,
-      status,
+      status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
       createdAtLocation: user.primaryOfficeId

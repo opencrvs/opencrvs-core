@@ -444,7 +444,11 @@ export function eventPayloadGenerator(rng: () => number) {
         input: Partial<
           Pick<
             RegisterActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'registrationNumber'
           >
         > = {}
       ) => ({
@@ -751,7 +755,7 @@ export function createPrng(seed: number) {
   }
 }
 
-function generateUuid(rng: () => number) {
+export function generateUuid(rng: () => number = () => 0.1) {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.floor(rng() * 16)
     const v = c === 'x' ? r : (r & 0x3) | 0x8
@@ -763,6 +767,12 @@ function generateTrackingId(rng: () => number): string {
   const uuid = generateUuid(rng).replace(/-/g, '')
   const trackingId = uuid.slice(0, 6).toUpperCase()
   return trackingId
+}
+
+export function generateRegistrationNumber(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const registrationNumber = uuid.slice(0, 12).toUpperCase()
+  return registrationNumber
 }
 
 export function generateRandomSignature(rng: () => number): string {

@@ -13,8 +13,8 @@ CREATE TABLE events (
   event_type text NOT NULL,
   transaction_id text NOT NULL,
   tracking_id text NOT NULL UNIQUE,
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
-  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
+  updated_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
   UNIQUE (transaction_id, event_type)
 );
 
@@ -62,7 +62,7 @@ CREATE TABLE event_actions (
   status action_status NOT NULL,
   transaction_id text NOT NULL,
   UNIQUE (transaction_id, action_type),
-  CHECK (
+    CHECK (
     (
       action_type = 'ASSIGN'
       AND assigned_to IS NOT NULL
@@ -73,12 +73,27 @@ CREATE TABLE event_actions (
     )
     OR (
       action_type = 'REGISTER'
+      AND status = 'Accepted'
       AND registration_number IS NOT NULL
+      AND original_action_id IS NOT NULL
+    )
+    OR (
+      action_type = 'REGISTER'
+      AND status = 'Requested'
+      AND registration_number IS NULL
+    )
+    OR (
+      action_type = 'REGISTER'
+      AND status = 'Rejected'
+      AND registration_number IS NULL
+      AND original_action_id IS NOT NULL
     )
     OR (
       action_type = 'REJECT'
-      AND reason_message IS NOT NULL
-      AND reason_message <> ''
+      AND (
+        reason_message IS NULL
+        OR reason_message <> ''
+      )
       AND reason_is_duplicate IS NOT NULL
     )
     OR (

@@ -10,9 +10,11 @@
  */
 
 import { Kysely } from 'kysely'
+import _ from 'lodash'
 import {
   ActionStatus,
   ActionType,
+  deepDropNulls,
   EventDocument,
   UUID
 } from '@opencrvs/commons'
@@ -48,7 +50,20 @@ async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
     )
   }
 
-  return EventDocument.parse(result)
+  const cleanedActions = result.actions.map((action) =>
+    _.omitBy(
+      action,
+      (value, key) =>
+        _.isNil(value) &&
+        // For now, assignedTo is the only exception to the rule of dropping nulls.
+        !(action.type === ActionType.UNASSIGN && key === 'assignedTo')
+    )
+  )
+
+  return EventDocument.parse({
+    ...result,
+    actions: cleanedActions
+  })
 }
 
 export const getEventById = async (id: UUID) => {
@@ -97,7 +112,9 @@ export const createEvent = async (
  * @returns action id
  */
 async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
-  await trx.insertInto('eventActions').values(action).execute()
+  // @TODO:
+  const withoutUndefined = _.omitBy(action, _.isUndefined) as any
+  await trx.insertInto('eventActions').values(withoutUndefined).execute()
 
   return trx
     .selectFrom('eventActions')
