@@ -45,7 +45,9 @@ export function useEvents() {
       useQuery: (query: QueryType) => {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query)
+          queryKey: trpc.event.search.queryKey(query),
+          refetchOnMount: true,
+          staleTime: 0
         })
       },
       useSuspenseQuery: (query: QueryType) => {
