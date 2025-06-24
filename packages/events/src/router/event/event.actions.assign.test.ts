@@ -78,30 +78,3 @@ test('Should throw error when assigned to a different user', async () => {
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'CONFLICT' }))
 })
-
-// @TODO CIHAN: implement the logic for this test
-test.todo(
-  'Should not allow assignment if the event is waiting for correction and the current user is not allowed to correct',
-  async () => {
-    const { user, generator } = await setupTestCase()
-    const client = createTestClient(user)
-
-    const originalEvent = await client.event.create(generator.event.create())
-
-    await client.event.actions.correction.request(
-      generator.event.actions.correction.request(originalEvent.id)
-    )
-
-    await client.event.actions.assignment.assign(
-      generator.event.actions.assign(originalEvent.id, { assignedTo: user.id })
-    )
-
-    await expect(
-      client.event.actions.assignment.assign(
-        generator.event.actions.assign(originalEvent.id, {
-          assignedTo: 'user-2'
-        })
-      )
-    ).rejects.toMatchObject(new TRPCError({ code: 'CONFLICT' }))
-  }
-)
