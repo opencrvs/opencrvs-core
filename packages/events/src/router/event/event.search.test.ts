@@ -317,6 +317,55 @@ test('Returns events based on the updatedAt column', async () => {
   })
 })
 
+test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column and requsted timezone', async () => {
+  const { user, generator, seed, eventsDb } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    SCOPES.SEARCH_BIRTH,
+    ...TEST_USER_DEFAULT_SCOPES
+  ])
+
+  const oldEventCreatedAt = new Date(2022, 5, 6).toISOString()
+
+  const oldEventCreateAction = generateActionDocument({
+    configuration: tennisClubMembershipEvent,
+    action: ActionType.CREATE,
+    defaults: {
+      createdAt: oldEventCreatedAt
+    }
+  })
+
+  const oldEventDeclarationRequestActions = [
+    ActionType.DECLARE,
+    ActionType.REGISTER
+  ].map((action) =>
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action,
+      defaults: {
+        status: ActionStatus.Requested
+      }
+    })
+  )
+
+  const oldEventActions = [
+    oldEventCreateAction,
+    ...oldEventDeclarationRequestActions
+  ]
+
+  const oldDocumentWithoutAcceptedDeclaration = {
+    trackingId: getUUID(),
+    type: tennisClubMembershipEvent.id,
+    actions: oldEventActions,
+    createdAt: oldEventCreatedAt,
+    id: getUUID(),
+    updatedAt: new Date().toISOString()
+  }
+
+  await seed.event(eventsDb, user, oldDocumentWithoutAcceptedDeclaration)
+  await indexAllEvents(tennisClubMembershipEvent)
+})
+
 test.skip('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [

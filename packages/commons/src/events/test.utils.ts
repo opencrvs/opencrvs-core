@@ -58,6 +58,12 @@ import { TokenUserType } from '../authentication'
 import { z } from 'zod'
 
 /**
+ * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
+ * Since we query by range, providing UTC offset will result to different results when DST changes during the range.
+ */
+export const TEST_SYSTEM_IANA_TIMEZONE = 'Asia/Dhaka'
+
+/**
  * In real application, the roles are defined in the countryconfig.
  * These are just for testing purposes to generate realistic mock data.
  */
