@@ -60,7 +60,7 @@ function EventOverviewFull({
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { trackingId, status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(eventIndex.id)
   const eventWithDrafts = getCurrentEventStateWithDrafts({
     event,
     drafts,
