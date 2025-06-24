@@ -107,7 +107,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     event.type
   )
 
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(event.id)
   const activeDraft = findActiveDrafts(event, drafts)[0]
   const localDraft = getLocalDraftOrDefault(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

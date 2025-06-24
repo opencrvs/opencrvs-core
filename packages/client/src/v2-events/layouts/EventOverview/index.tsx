@@ -63,7 +63,7 @@ export function EventOverviewLayout({
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { searchEventById } = useEvents()
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(eventId)
   const allEvents = useEventConfigurations()
   const navigate = useNavigate()
   const intl = useIntl()

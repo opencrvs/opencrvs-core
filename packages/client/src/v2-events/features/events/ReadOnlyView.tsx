@@ -33,7 +33,7 @@ function ReadonlyView() {
   const [event] = events.getEvent.viewEvent(eventId)
 
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(event.id)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )

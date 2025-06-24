@@ -253,9 +253,9 @@ export const SearchResultComponent = ({
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const { getOutbox } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
+  const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getRemoteDrafts()
+  const drafts = getAllRemoteDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
