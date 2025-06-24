@@ -15,7 +15,8 @@ import { EventMetadataKeysArray } from './EventMetadata'
 
 export const WorkqueueColumnKeysArray = [
   ...EventMetadataKeysArray,
-  'title'
+  'title',
+  'outbox'
 ] as const
 export const WorkqueueColumnKeys = z.enum(WorkqueueColumnKeysArray)
 export type WorkqueueColumnKeys = z.infer<typeof WorkqueueColumnKeys>

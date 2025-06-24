@@ -12,7 +12,8 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { ActionStatus, Draft } from '@opencrvs/commons/client'
+import { Draft } from '@opencrvs/commons/client'
+import { TokenUserType } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   invalidateDraftsList,
@@ -103,6 +104,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
       action: {
         createdAt: new Date().toISOString(),
         createdBy: '@todo',
+        createdByUserType: TokenUserType.Enum.user,
         createdByRole: '@todo',
         createdAtLocation: '@todo',
         ...variables,
