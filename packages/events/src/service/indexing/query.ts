@@ -15,9 +15,10 @@ import {
   getAllUniqueFields,
   Inferred,
   QueryExpression,
-  QueryType
+  QueryType,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
-import { encodeFieldId, resolveLocationChildren } from './utils'
+import { encodeFieldId } from './utils'
 
 /**
  * Generates an Elasticsearch query to search within `document.declaration`
@@ -314,22 +315,24 @@ export function buildElasticQueryFromSearchPayload(
  * @param userOfficeId The ID of the user's office.
  * @returns The modified query with jurisdiction filters.
  */
-export async function withJurisdictionFilters(
+export function withJurisdictionFilters(
   query: estypes.QueryDslQueryContainer,
-  options: Record<string, 'my-jurisdiction' | 'all'>,
+  options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
-): Promise<estypes.QueryDslQueryContainer> {
-  if (Object.values(options).includes('my-jurisdiction') && userOfficeId) {
-    const childrenLocations = await resolveLocationChildren(userOfficeId)
+): estypes.QueryDslQueryContainer {
+  if (
+    Object.values(options).includes(SearchScopeAccessLevels.MY_JURISDICTION) &&
+    userOfficeId
+  ) {
     const jurisdictionFilters: estypes.QueryDslQueryContainer[] = []
 
     Object.entries(options).forEach(([eventType, value]) => {
-      if (value === 'my-jurisdiction') {
+      if (value === SearchScopeAccessLevels.MY_JURISDICTION) {
         jurisdictionFilters.push({
           bool: {
             must: [
               { term: { type: eventType } },
-              { terms: { updatedAtLocation: childrenLocations } }
+              { term: { updatedAtLocation: userOfficeId } }
             ],
             should: undefined
           }

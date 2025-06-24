@@ -392,7 +392,7 @@ export async function getIndex(
   userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
-  const query = await withJurisdictionFilters(
+  const query = withJurisdictionFilters(
     buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
     options,
     userOfficeId
