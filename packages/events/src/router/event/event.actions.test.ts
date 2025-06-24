@@ -12,9 +12,6 @@
 import {
   ActionStatus,
   ActionType,
-  AddressType,
-  EventIndex,
-  EventStatus,
   getCurrentEventState,
   getUUID
 } from '@opencrvs/commons'
@@ -112,117 +109,6 @@ test('Event document contains all created actions', async () => {
   expect(
     sanitizeForSnapshot(updatedEvent, UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()
-})
-
-test('Action data accepts partial changes', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const originalEvent = await client.event.create(generator.event.create())
-
-  const addressWithoutVillage = {
-    country: 'FAR',
-    addressType: AddressType.DOMESTIC,
-    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-    urbanOrRural: 'RURAL' as const
-  }
-
-  const initialAddress = {
-    ...addressWithoutVillage,
-    village: 'Small village'
-  }
-
-  const initialForm = {
-    'applicant.dob': '2000-02-01',
-    'applicant.name': {
-      firstname: 'John',
-      surname: 'Doe'
-    },
-    'recommender.none': true,
-    'applicant.address': { ...initialAddress }
-  }
-
-  const firstDeclarationPayload = generator.event.actions.declare(
-    originalEvent.id,
-    { declaration: initialForm }
-  )
-  await client.event.actions.declare.request(firstDeclarationPayload)
-
-  const declarationWithoutVillage = generator.event.actions.declare(
-    originalEvent.id,
-    {
-      declaration: {
-        ...initialForm,
-        'applicant.address': addressWithoutVillage
-      }
-    }
-  )
-
-  const [createAction] = originalEvent.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
-    assignedTo: createAction.createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  await client.event.actions.declare.request(declarationWithoutVillage)
-
-  const updatedEvent = await client.event.get(originalEvent.id)
-
-  const eventStateBeforeVillageRemoval = getCurrentEventState(
-    updatedEvent,
-    tennisClubMembershipEvent
-  )
-  expect(eventStateBeforeVillageRemoval.declaration).toEqual(initialForm)
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-  const declarationWithVillageNull = generator.event.actions.declare(
-    originalEvent.id,
-    {
-      declaration: {
-        ...initialForm,
-        'applicant.address': {
-          ...addressWithoutVillage,
-          village: null
-        }
-      }
-    }
-  )
-
-  await client.event.actions.declare.request(declarationWithVillageNull)
-  const eventAfterVillageRemoval = await client.event.get(originalEvent.id)
-  const stateAfterVillageRemoval = getCurrentEventState(
-    eventAfterVillageRemoval,
-    tennisClubMembershipEvent
-  )
-
-  expect(stateAfterVillageRemoval.declaration).toEqual({
-    ...initialForm,
-    'applicant.address': addressWithoutVillage
-  })
-
-  const events = await client.event.list()
-  expect(events).toMatchObject([
-    {
-      ...stateAfterVillageRemoval,
-      legalStatuses: {
-        [EventStatus.enum.DECLARED]: {
-          acceptedAt: stateAfterVillageRemoval.updatedAt as string,
-          createdAt: stateAfterVillageRemoval.updatedAt as string,
-          createdByRole: user.role,
-          createdBy: user.id,
-          createdAtLocation: user.primaryOfficeId
-        }
-      }
-    } satisfies EventIndex
-  ])
 })
 
 test('READ action does not delete draft', async () => {

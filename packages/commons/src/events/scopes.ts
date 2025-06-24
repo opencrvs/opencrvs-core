@@ -10,8 +10,7 @@
  */
 import { intersection } from 'lodash'
 import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
-import { ActionType, isMetaAction } from './ActionType'
-import { EventStatus } from './EventMetadata'
+import { ActionType } from './ActionType'
 
 type RequiresNoScope = null
 type NotAvailableAsAction = [] // pseudo actions
@@ -111,80 +110,4 @@ export const WRITE_ACTION_SCOPES = [
 
 export function hasAnyOfScopes(a: Scope[], b: Scope[]) {
   return intersection(a, b).length > 0
-}
-
-export function filterUnallowedActions(
-  actions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  const allowedActions = actions.filter((action) => {
-    const requiredScopes = ACTION_ALLOWED_SCOPES[action]
-
-    if (requiredScopes === null) {
-      return true
-    }
-
-    return hasAnyOfScopes(userScopes, requiredScopes)
-  })
-  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOtherAllowedActions = allowedActions.some(
-    (action) => !isMetaAction(action)
-  )
-
-  if (hasOtherAllowedActions) {
-    return allowedActions
-  }
-
-  // If the user can only perform READ, restrict them from ASSIGN or UNASSIGN
-  return [ActionType.READ]
-}
-
-/**
- * Actions that can be performed on an event based on its status and user scope.
- */
-
-export function getUserActionsByStatus(
-  status: EventStatus,
-  assignmentActions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  switch (status) {
-    case EventStatus.enum.CREATED: {
-      return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
-    }
-    case EventStatus.enum.NOTIFIED:
-    case EventStatus.enum.DECLARED: {
-      return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
-    }
-    case EventStatus.enum.VALIDATED: {
-      return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
-    }
-    case EventStatus.enum.CERTIFIED:
-    case EventStatus.enum.REGISTERED: {
-      return [
-        ...assignmentActions,
-        ActionType.READ,
-        ActionType.PRINT_CERTIFICATE,
-        ActionType.REQUEST_CORRECTION
-      ]
-    }
-    case EventStatus.enum.REJECTED: {
-      const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
-      const canValidate = hasAnyOfScopes(userScopes, validateScopes)
-
-      /**
-       * Show 'higher' action when the user has the required scopes.
-       */
-      const declarationAction = canValidate
-        ? ActionType.VALIDATE
-        : ActionType.DECLARE
-
-      return [...assignmentActions, ActionType.READ, declarationAction]
-    }
-
-    case EventStatus.enum.ARCHIVED:
-      return [...assignmentActions, ActionType.READ]
-    default:
-      return [ActionType.READ]
-  }
 }

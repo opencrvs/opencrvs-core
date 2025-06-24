@@ -9,23 +9,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { useDispatch, useSelector } from 'react-redux'
-import { InternalRefetchQueriesInclude, useApolloClient } from '@apollo/client'
 import { Button } from '@opencrvs/components/lib/Button'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { AvatarSmall } from '@client/components/Avatar'
-import {
-  downloadDeclaration,
-  DOWNLOAD_STATUS,
-  SUBMISSION_STATUS
-} from '@client/declarations'
-import { Action } from '@client/forms'
+import { DOWNLOAD_STATUS } from '@client/declarations'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
-import { IStoreState } from '@client/store'
 import { useOnlineStatus } from '@client/utils'
-import type { AssignmentData } from '@client/utils/gateway'
-import { EventType } from '@client/utils/gateway'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Download } from '@opencrvs/components/lib/icons'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
@@ -33,20 +23,13 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
-import { usePermissions } from '@client/hooks/useAuthorization'
 import styled from 'styled-components'
-import { useDeclaration } from '@client/declarations/selectors'
-import {
-  ActionType,
-  EventIndex,
-  filterUnallowedActions,
-  getUserActionsByStatus
-} from '@opencrvs/commons/client'
+import { ActionType, EventIndex } from '@opencrvs/commons/client'
 import { AssignmentStatus, getAssignmentStatus } from '../utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
-import { getScope } from '@client/profile/profileSelectors'
+import { useActionMenuItems } from '../features/workqueues/EventOverview/components/useActionMenuItems'
 
 interface DownloadButtonProps {
   id?: string
@@ -83,13 +66,6 @@ const NoConnectionViewContainer = styled.div`
     }
   }
 `
-
-const LOADING_STATUSES = [
-  DOWNLOAD_STATUS.READY_TO_DOWNLOAD,
-  DOWNLOAD_STATUS.DOWNLOADING,
-  DOWNLOAD_STATUS.READY_TO_UNASSIGN,
-  DOWNLOAD_STATUS.UNASSIGNING
-]
 
 function AssignModal({ close }: { close: (result: boolean) => void }) {
   const intl = useIntl()
@@ -133,7 +109,6 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
   const isOnline = useOnlineStatus()
 
   const [modal, openModal] = useModal()
-
   const authentication = useAuthentication()
   const { getEvent, actions } = useEvents()
   const users = useUsers()
@@ -141,8 +116,7 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
     enabled: !!event.assignedTo
   }).data
 
-  const scopes = useSelector(getScope) ?? []
-
+  const actionMenuItems = useActionMenuItems(event)
   const assignmentStatus = getAssignmentStatus(event, authentication?.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
@@ -219,14 +193,10 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
         aria-label={intl.formatMessage(constantsMessages.assignRecord)}
         className={className}
         disabled={
-          filterUnallowedActions(
-            getUserActionsByStatus(
-              event.status,
-              Object.values(ActionType),
-              scopes
-            ),
-            scopes
-          ).length === 0
+          !(
+            actionMenuItems.find(({ type }) => type === ActionType.UNASSIGN) ||
+            actionMenuItems.find(({ type }) => type === ActionType.ASSIGN)
+          )
         }
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
         type="icon"
