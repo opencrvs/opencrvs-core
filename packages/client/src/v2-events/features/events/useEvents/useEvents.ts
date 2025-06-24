@@ -78,7 +78,6 @@ export function useEvents() {
         if (eventIndex) {
           return [eventIndex]
         }
-        console.log('not found', id)
         const query = {
           type: 'and',
           clauses: [{ id }]
