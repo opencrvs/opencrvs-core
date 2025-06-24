@@ -19,12 +19,13 @@ import {
   createPrng,
   generateEventDocument,
   generateEventDraftDocument,
+  getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -104,20 +105,27 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: eventDocument.id
       }),
       chromatic: { disableSnapshot: true }
     },
-    offline: {
-      events: [tennisClubMembershipEventDocument]
-    },
     msw: {
       handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return [
+              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+            ]
+          })
+        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
               generateEventDraftDocument({
-                eventId: tennisClubMembershipEventDocument.id,
+                eventId: eventDocument.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
                   'applicant.name': {
@@ -166,9 +174,6 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 
 export const ReadOnlyViewForUserWithReadPermission: Story = {
   parameters: {
-    offline: {
-      events: [eventDocument]
-    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.VIEW.buildPath({
@@ -182,6 +187,17 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
             return [draft]
           })
         ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          })
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -190,7 +206,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [
               {
                 id: '67bda93bfc07dee78ae558cf',
@@ -207,7 +223,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               }
             ]
           }),
-          tRPCMsw.user.get.query((id) => {
+          tRPCMsw.user.get.query(() => {
             return {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
