@@ -30,6 +30,7 @@ export function ActionMenu({
   const { searchEventById } = useEvents()
 
   const getEventQuery = searchEventById.useSuspenseQuery(eventId)
+
   const eventResults = getEventQuery
 
   if (eventResults.length === 0) {
@@ -59,7 +60,7 @@ export function ActionMenu({
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
-                  await action.onClick(eventIndex.id)
+                  await action.onClick()
                   onAction?.()
                 }}
               >

@@ -63,7 +63,7 @@ export function EventOverviewLayout({
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { searchEventById } = useEvents()
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(eventId)
   const allEvents = useEventConfigurations()
   const navigate = useNavigate()
   const intl = useIntl()
@@ -72,7 +72,7 @@ export function EventOverviewLayout({
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 
   if (eventResults.length === 0) {
-    throw new Error(`Event ${eventId} not found`)
+    throw new Error(`Event details with id ${eventId} not found`)
   }
 
   const eventIndex = eventResults[0]

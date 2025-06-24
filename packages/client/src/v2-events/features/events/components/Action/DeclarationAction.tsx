@@ -91,6 +91,10 @@ function DeclarationActionComponent({ children, actionType }: Props) {
 
   useEffect(() => {
     if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
       return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
     }
   }, [event, eventId, navigate])
@@ -103,7 +107,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     event.type
   )
 
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(event.id)
   const activeDraft = findActiveDrafts(event, drafts)[0]
   const localDraft = getLocalDraftOrDefault(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

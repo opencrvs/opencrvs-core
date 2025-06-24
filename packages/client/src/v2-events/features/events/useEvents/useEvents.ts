@@ -45,13 +45,17 @@ export function useEvents() {
       useQuery: (query: QueryType) => {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query)
+          queryKey: trpc.event.search.queryKey(query),
+          refetchOnMount: true,
+          staleTime: 0
         })
       },
       useSuspenseQuery: (query: QueryType) => {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
-          queryKey: trpc.event.search.queryKey(query)
+          queryKey: trpc.event.search.queryKey(query),
+          refetchOnMount: true,
+          staleTime: 0
         }).data
       }
     },
@@ -65,6 +69,7 @@ export function useEvents() {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
+          enabled: !findLocalEventIndex(id),
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? [eventIndex] : undefined
@@ -76,6 +81,7 @@ export function useEvents() {
           type: 'and',
           clauses: [{ id }]
         } satisfies QueryType
+
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),

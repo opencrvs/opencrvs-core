@@ -12,16 +12,16 @@ import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import {
   ActionType,
-  filterUnallowedActions,
-  Scope,
   EventIndex,
   getUUID,
   TranslationConfig,
-  EventStatus,
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  WorkqueueActionType
+  WorkqueueActionType,
+  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
+  EventStatus,
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -30,10 +30,25 @@ import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 
-function getAssignmentActions(
+const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
+  EventStatus.enum.NOTIFIED,
+  EventStatus.enum.DECLARED,
+  EventStatus.enum.VALIDATED,
+  EventStatus.enum.REJECTED,
+  EventStatus.enum.REGISTERED,
+  EventStatus.enum.CERTIFIED,
+  EventStatus.enum.ARCHIVED
+]
+
+function getAvailableAssignmentActions(
+  eventStatus: EventStatus,
   assignmentStatus: keyof typeof AssignmentStatus,
   mayUnassignOthers: boolean
 ) {
+  if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {
+    return []
+  }
+
   if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
     return [ActionType.ASSIGN]
   }
@@ -51,61 +66,11 @@ function getAssignmentActions(
 
   return []
 }
-
-/**
- * Actions that can be performed on an event based on its status and user scope.
- */
-
-function getUserActionsByStatus(
-  status: EventStatus,
-  assignmentActions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  switch (status) {
-    case EventStatus.enum.CREATED: {
-      return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
-    }
-    case EventStatus.enum.NOTIFIED:
-    case EventStatus.enum.DECLARED: {
-      return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
-    }
-    case EventStatus.enum.VALIDATED: {
-      return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
-    }
-    case EventStatus.enum.CERTIFIED:
-    case EventStatus.enum.REGISTERED: {
-      return [
-        ...assignmentActions,
-        ActionType.READ,
-        ActionType.PRINT_CERTIFICATE,
-        ActionType.REQUEST_CORRECTION
-      ]
-    }
-    case EventStatus.enum.REJECTED: {
-      const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
-      const canValidate = hasAnyOfScopes(userScopes, validateScopes)
-
-      /**
-       * Show 'higher' action when the user has the required scopes.
-       */
-      const declarationAction = canValidate
-        ? ActionType.VALIDATE
-        : ActionType.DECLARE
-
-      return [...assignmentActions, ActionType.READ, declarationAction]
-    }
-
-    case EventStatus.enum.ARCHIVED:
-      return [...assignmentActions, ActionType.READ]
-    default:
-      return [ActionType.READ]
-  }
-}
-
-export interface ActionConfig {
+interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
+  shouldHide?: (actions: ActionType[]) => boolean
 }
 
 export const actionLabels = {
@@ -218,7 +183,9 @@ export function useAction(event: EventIndex) {
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf,
+        // Action menu should not show DECLARE if the user can perform VALIDATE
+        shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
@@ -269,6 +236,20 @@ export function useAction(event: EventIndex) {
   }
 }
 
+const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
+  [EventStatus.enum.NOTIFIED]: [
+    ActionType.READ,
+    ActionType.VALIDATE,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ],
+  [EventStatus.enum.REJECTED]: [
+    ActionType.READ,
+    ActionType.DECLARE,
+    ActionType.VALIDATE
+  ]
+} satisfies Partial<Record<EventStatus, ActionType[]>>
+
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
@@ -276,27 +257,59 @@ export function useActionMenuItems(event: EventIndex) {
   const scopes = useSelector(getScope) ?? []
   const { config, authentication } = useAction(event)
 
-  const assignmentActions = getAssignmentActions(
+  const availableAssignmentActions = getAvailableAssignmentActions(
+    event.status,
     getAssignmentStatus(event, authentication.sub),
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
-  const availableActions = getUserActionsByStatus(
-    event.status,
-    assignmentActions,
-    scopes
+  // Find actions available based on the event status
+  const availableActions =
+    event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+      ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
+          event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+        ]
+      : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+
+  const actions = [...availableAssignmentActions, ...availableActions]
+
+  // Filter out actions which are not configured
+  const supportedActions = actions.filter(
+    (action): action is keyof typeof config =>
+      Object.keys(config).includes(action)
   )
 
-  const allowedActions = filterUnallowedActions(availableActions, scopes)
+  // Filter out actions which are not allowed based on user scopes
+  const allowedActions = supportedActions.filter((a) => {
+    const requiredScopes = ACTION_ALLOWED_SCOPES[a]
+    return requiredScopes === null
+      ? true
+      : hasAnyOfScopes(scopes, requiredScopes)
+  })
 
-  return allowedActions
-    .filter((action): action is keyof typeof config =>
-      Object.keys(config).includes(action)
-    )
-    .map((action) => {
-      return {
-        ...config[action],
-        type: action
+  // Filter out actions which are not visible based on the action config
+  const visibleActions = allowedActions.filter((a) => {
+    const actionConfig = config[a]
+
+    return 'shouldHide' in actionConfig
+      ? !actionConfig.shouldHide(allowedActions)
+      : true
+  })
+
+  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  const hasOtherAllowedActions = visibleActions.some((a) => !isMetaAction(a))
+
+  // If user has no other allowed actions, return only READ.
+  // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
+
+  if (!hasOtherAllowedActions) {
+    return [
+      {
+        ...config[ActionType.READ],
+        type: ActionType.READ
       }
-    })
+    ]
+  }
+
+  return visibleActions.map((a) => ({ ...config[a], type: a }))
 }

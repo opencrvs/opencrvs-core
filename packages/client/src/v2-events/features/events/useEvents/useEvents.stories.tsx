@@ -64,7 +64,7 @@ const router = {
         /*
          * Explicitly call the hook to trigger draft fetching
          */
-        useDrafts().getRemoteDrafts()
+        useDrafts().getRemoteDrafts(createdEvent.id)
 
         return (
           <TRPCProvider>

@@ -125,7 +125,8 @@ function EventOverviewProtected({
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { trackingId, status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(eventIndex.id)
+
   const eventWithDrafts = deepDropNulls(
     applyDraftsToEventIndex(eventIndex, drafts)
   )

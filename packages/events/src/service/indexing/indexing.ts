@@ -185,6 +185,7 @@ export async function createIndex(
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
+          createdByUserType: { type: 'keyword' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
           updatedAtLocation: { type: 'keyword' },
@@ -205,6 +206,7 @@ export async function createIndex(
                 properties: {
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   createdBySignature: { type: 'keyword' },
@@ -219,6 +221,7 @@ export async function createIndex(
                 properties: {
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   createdBySignature: { type: 'keyword' },
@@ -276,7 +279,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   }
 
-  const stream = mongoClient.collection(indexName).find().stream()
+  const stream = mongoClient.collection('events').find().stream()
 
   const transformedStreamData = new Transform({
     readableObjectMode: true,
@@ -386,13 +389,6 @@ export async function getIndex(
   eventParams: QueryType,
   eventConfigs: EventConfig[]
 ) {
-  if (
-    Object.values(eventParams).length === 0 ||
-    eventParams.clauses.length === 0
-  ) {
-    throw new Error('No search params provided')
-  }
-
   const esClient = getOrCreateClient()
   const query = buildElasticQueryFromSearchPayload(eventParams, eventConfigs)
 

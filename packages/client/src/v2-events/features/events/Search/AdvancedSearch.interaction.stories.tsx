@@ -17,7 +17,11 @@ import superjson from 'superjson'
 import { waitFor } from '@testing-library/dom'
 
 import { stringify } from 'query-string'
-import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/client'
+import {
+  footballClubMembershipEvent,
+  TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
@@ -57,7 +61,10 @@ const storyParams = {
     initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
   },
   chromatic: { disableSnapshot: true },
-  msw: { handlers: defaultHandlers }
+  msw: { handlers: defaultHandlers },
+  offline: {
+    configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+  }
 }
 
 export const AdvancedSearchStory: Story = {
@@ -272,20 +279,13 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        let locationInput: HTMLElement | undefined
-
-        await waitFor(async () => {
-          const input = await canvas.findByTestId(
-            'event____legalStatus____REGISTERED____createdAtLocation'
-          )
-
-          await expect(input).toBeInTheDocument()
-          locationInput = input
-        })
-
-        if (!locationInput) {
-          throw new Error('locationInput not found after waitFor')
-        }
+        const locationInput = await canvas.findByTestId(
+          'event____legalStatus____REGISTERED____createdAtLocation',
+          {},
+          {
+            timeout: 5000
+          }
+        )
 
         await expect(locationInput).toHaveValue('Ibombo District Office')
         await userEvent.clear(locationInput)

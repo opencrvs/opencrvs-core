@@ -67,7 +67,7 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
       cacheUsersFromEventDocument(eventDocument)
     ])
 
-    updateLocalEventIndex(eventDocument)
+    updateLocalEventIndex(eventDocument.id, eventDocument)
 
     return eventDocument
   }
@@ -132,9 +132,16 @@ export function useGetEvent() {
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
 
+      const eventCachedByViewEvent = queryClient.getQueryData<EventDocument>([
+        ['view-event', id]
+      ])
+      if (eventCachedByViewEvent) {
+        return eventCachedByViewEvent
+      }
+
       if (!queryClient.getQueryData(trpc.event.get.queryKey(id))) {
         throw new Error(
-          `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser first.`
+          `Event with id ${id} not found in cache. Please ensure the event is first assigned and downloaded to the browser.`
         )
       }
 
