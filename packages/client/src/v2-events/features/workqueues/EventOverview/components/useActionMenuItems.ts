@@ -18,6 +18,7 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
+  CustomFlags,
   WorkqueueActionType,
   AVAILABLE_ACTIONS_BY_EVENT_STATUS,
   EventStatus,
@@ -126,6 +127,7 @@ export const actionLabels = {
 } as const
 
 export function useAction(event: EventIndex) {
+  const scopes = useSelector(getScope) ?? []
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
@@ -150,6 +152,9 @@ export function useAction(event: EventIndex) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
+  const eventIsWaitingForCorrection = event.flags.includes(
+    CustomFlags.CORRECTION_REQUESTED
+  )
   const eventId = event.id
 
   /**
@@ -170,7 +175,11 @@ export function useAction(event: EventIndex) {
             assignedTo: authentication.sub,
             refetchEvent
           })
-        }
+        },
+        disabled:
+          // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
+          eventIsWaitingForCorrection &&
+          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
@@ -226,7 +235,7 @@ export function useAction(event: EventIndex) {
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
@@ -264,7 +273,7 @@ export function useAction(event: EventIndex) {
             })
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
       }
     } satisfies Record<WorkqueueActionType, ActionConfig>,
     authentication
@@ -322,7 +331,7 @@ export function useActionMenuItems(event: EventIndex) {
       : hasAnyOfScopes(scopes, requiredScopes)
   })
 
-  // Filter out actions which are not visible based on the action config
+  // Filter out actions which are not visible based on the action config 'shouldHide' function
   const visibleActions = allowedActions.filter((a) => {
     const actionConfig = config[a]
 

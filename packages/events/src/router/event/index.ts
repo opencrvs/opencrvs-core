@@ -54,6 +54,7 @@ import {
 } from '@events/service/events/events'
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -199,14 +200,18 @@ export const eventRouter = router({
         .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async ({ input, ctx }) => {
-          if (ctx.isDuplicateAction) {
-            return ctx.event
+          const { token, isDuplicateAction, user, event } = ctx
+
+          if (isDuplicateAction) {
+            return event
           }
+
+          await throwConflictIfWaitingForCorrection(input.eventId, token)
 
           return addAction(input, {
             eventId: input.eventId,
-            user: ctx.user,
-            token: ctx.token,
+            user,
+            token,
             status: ActionStatus.Accepted
           })
         }),
@@ -223,6 +228,7 @@ export const eventRouter = router({
           if (ctx.isDuplicateAction) {
             return ctx.event
           }
+
           return approveCorrection(input, {
             eventId: input.eventId,
             user: ctx.user,

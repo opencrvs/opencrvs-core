@@ -31,9 +31,6 @@ const messages = defineMessages({
 })
 
 export function Onboarding() {
-  const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
-
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
@@ -43,8 +40,9 @@ export function Onboarding() {
 
   const event = events.getEvent.getFromCache(eventId)
 
+  const navigate = useNavigate()
   const intl = useIntl()
-
+  const { goToHome } = useEventFormNavigation()
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -100,16 +98,14 @@ export function Onboarding() {
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId: event.id,
+              eventId,
               pageId: nextPageId
             })
           )
         }}
         onSubmit={() => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-              eventId: event.id
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
           )
         }}
       />
