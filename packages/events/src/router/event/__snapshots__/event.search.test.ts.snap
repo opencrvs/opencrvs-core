@@ -211,7 +211,9 @@ exports[`Returns relevant events in right order 2`] = `
     },
     "recommender.none": true,
   },
-  "flags": [],
+  "flags": [
+    "registration-certify-new-registration",
+  ],
   "id": "[sanitized]",
   "legalStatuses": {
     "DECLARED": {
