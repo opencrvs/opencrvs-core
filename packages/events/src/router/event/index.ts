@@ -109,7 +109,6 @@ export const eventRouter = router({
         config
       })
     }),
-  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(z.string())

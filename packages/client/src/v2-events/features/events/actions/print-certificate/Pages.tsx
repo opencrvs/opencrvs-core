@@ -15,7 +15,12 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, EventConfig, getOrThrow } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventConfig,
+  getCurrentEventState,
+  getOrThrow
+} from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -52,10 +57,11 @@ export function Pages() {
   const { setAnnotation, getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const events = useEvents()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+  const eventIndex = getCurrentEventState(event, configuration)
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type
   )
@@ -91,7 +97,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={event.declaration}
+        declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={annotation}
         formPages={formPages.map((page) => {

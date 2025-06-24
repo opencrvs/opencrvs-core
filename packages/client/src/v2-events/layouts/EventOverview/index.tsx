@@ -15,7 +15,11 @@ import { noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
+import {
+  applyDraftsToEventIndex,
+  deepDropNulls,
+  getCurrentEventStateWithDrafts
+} from '@opencrvs/commons/client'
 import {
   AppBar,
   Button,
@@ -57,17 +61,23 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvent } = useEvents()
+  const { searchEventById } = useEvents()
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
-  const [event] = getEvent.useSuspenseQuery(eventId)
-
+  const drafts = getRemoteDrafts(eventId)
   const allEvents = useEventConfigurations()
-  const { eventConfiguration } = useEventConfiguration(event.type)
-
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+
+  const eventResults = searchEventById.useSuspenseQuery(eventId)
+
+  if (eventResults.length === 0) {
+    throw new Error(`Event details with id ${eventId} not found`)
+  }
+
+  const eventIndex = eventResults[0]
+
+  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 
   const advancedSearchEvents = allEvents.filter(
     (e) => e.advancedSearch.length > 0
@@ -110,11 +120,7 @@ export function EventOverviewLayout({
           mobileTitle={flattenedIntl.formatMessage(
             eventConfiguration.title,
             flattenEventIndex(
-              getCurrentEventStateWithDrafts({
-                event,
-                drafts,
-                configuration: eventConfiguration
-              })
+              deepDropNulls(applyDraftsToEventIndex(eventIndex, drafts))
             )
           )}
         />
