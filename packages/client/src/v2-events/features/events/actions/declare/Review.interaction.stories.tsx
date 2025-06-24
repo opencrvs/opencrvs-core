@@ -104,7 +104,7 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: declarationTrpcMsw.eventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
