@@ -28,6 +28,7 @@ export const EventStatus = z.enum([
   'REJECTED',
   'ARCHIVED'
 ])
+
 export type EventStatus = z.infer<typeof EventStatus>
 
 export const CustomFlags = {
@@ -66,6 +67,10 @@ export const ActionCreationMetadata = z.object({
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the action request.'
   ),
+  createdByUserType: z
+    .enum(['user', 'system'])
+    .nullish()
+    .describe('Whether the user is a normal user or a system.'),
   acceptedAt: z
     .string()
     .datetime()
@@ -119,9 +124,13 @@ export const EventMetadata = z.object({
     .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
   createdBy: z.string().describe('ID of the user who created the event.'),
+  createdByUserType: z
+    .enum(['user', 'system'])
+    .nullish()
+    .describe('Whether the user is a normal user or a system.'),
   updatedByUserRole: z
     .string()
-    .describe('Role of the user who last updated the declaration.'),
+    .describe('Role of the user who last changed the status.'),
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the event.'
   ),
@@ -132,11 +141,13 @@ export const EventMetadata = z.object({
   updatedAtLocation: z
     .string()
     .nullish()
-    .describe('Location of the user who last updated the declaration.'),
+    .describe('Location of the user who last changed the status.'),
   updatedAt: z
     .string()
     .datetime()
-    .describe('Timestamp of the most recent declaration update.'),
+    .describe(
+      'Timestamp of the most recent *accepted* status change. Possibly 3rd party update, if action is validation asynchronously.'
+    ),
   assignedTo: z
     .string()
     .nullish()
@@ -144,7 +155,7 @@ export const EventMetadata = z.object({
   updatedBy: z
     .string()
     .nullish()
-    .describe('ID of the user who last updated the declaration.'),
+    .describe('ID of the user who last changed the status.'),
   trackingId: z
     .string()
     .describe(
@@ -162,6 +173,7 @@ export const EventMetadataKeysArray = [
   'createdAt',
   'dateOfEvent',
   'createdBy',
+  'createdByUserType',
   'updatedByUserRole',
   'createdAtLocation',
   'updatedAtLocation',
@@ -194,6 +206,11 @@ export const eventMetadataLabelMap: Record<
     id: 'event.createdAt.label',
     defaultMessage: 'Created',
     description: 'Created At'
+  },
+  'event.createdByUserType': {
+    id: 'event.createdByUserType.label',
+    defaultMessage: 'createdByUserType',
+    description: 'createdByUserType:user or system'
   },
   'event.dateOfEvent': {
     id: 'event.dateOfEvent.label',

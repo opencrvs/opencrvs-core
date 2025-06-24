@@ -142,6 +142,12 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     })
   }
 
+  if (clause.createdByUserType) {
+    must.push({
+      term: { createdByUserType: clause.createdByUserType }
+    })
+  }
+
   if (clause.updatedBy) {
     must.push({
       term: { updatedBy: clause.updatedBy.term }
@@ -281,9 +287,12 @@ export function buildElasticQueryFromSearchPayload(
       const should = input.clauses.flatMap((clause) => ({
         bool: {
           must: buildClause(clause, eventConfigs),
+          // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
+          // when no `should` clauses are provided.
           should: undefined
         }
       }))
+
       return {
         bool: {
           should

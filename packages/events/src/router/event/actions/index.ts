@@ -28,6 +28,7 @@ import {
   ACTION_ALLOWED_SCOPES,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
@@ -35,7 +36,8 @@ import { systemProcedure } from '@events/router/trpc'
 import {
   getEventById,
   addAction,
-  addAsyncRejectAction
+  addAsyncRejectAction,
+  throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import {
@@ -170,6 +172,8 @@ export function getDefaultActionProcedures(
         if (isDuplicateAction) {
           return ctx.event
         }
+
+        await throwConflictIfActionNotAllowed(eventId, actionType)
 
         // Certain actions are not allowed if the event is waiting for correction
         if (!allowIfWaitingForCorrection) {
@@ -312,6 +316,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
+          createdByUserType: TokenUserType.Enum.user,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,

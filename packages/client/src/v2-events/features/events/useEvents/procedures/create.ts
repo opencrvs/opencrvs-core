@@ -20,7 +20,8 @@ import {
   getCurrentEventState,
   ActionStatus,
   getUUID,
-  EventInput
+  EventInput,
+  TokenUserType
 } from '@opencrvs/commons/client'
 
 import {
@@ -76,6 +77,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
+          createdByUserType: TokenUserType.Enum.user,
           createdByRole: 'offline',
           createdAtLocation: 'TODO',
           declaration: {},
