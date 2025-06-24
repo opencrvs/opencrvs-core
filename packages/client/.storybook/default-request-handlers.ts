@@ -2217,7 +2217,7 @@ export const handlers = {
 
       // Extract initials from name
       const initials = name
-        .split('+')
+        .split(' ')
         .map((word) => word.charAt(0).toUpperCase())
         .join('')
         .slice(0, 2)
