@@ -296,7 +296,8 @@ const EVENT_ACTION_COLUMNS = {
   reasonMessage: 'reason_message',
   registrationNumber: 'registration_number',
   status: 'status',
-  transactionId: 'transaction_id'
+  transactionId: 'transaction_id',
+  requestId: 'request_id'
 } satisfies Record<keyof EventActions, string>
 
 export async function indexAllEvents(eventConfiguration: EventConfig) {

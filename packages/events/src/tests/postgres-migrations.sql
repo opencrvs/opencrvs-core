@@ -59,6 +59,7 @@ CREATE TABLE event_actions (
   original_action_id uuid REFERENCES event_actions(id),
   reason_is_duplicate boolean,
   reason_message text,
+  request_id text,
   registration_number text UNIQUE,
   status action_status NOT NULL,
   transaction_id text NOT NULL,
@@ -96,7 +97,15 @@ CREATE TABLE event_actions (
       AND reason_is_duplicate IS NOT NULL
     )
     OR (
-      action_type NOT IN ('ASSIGN', 'UNASSIGN', 'REGISTER', 'REJECT')
+      action_type = 'REJECT_CORRECTION'
+      AND request_id IS NOT NULL
+    )
+    OR (
+      action_type = 'APPROVE_CORRECTION'
+      AND request_id IS NOT NULL
+    )
+    OR (
+      action_type NOT IN ('ASSIGN', 'UNASSIGN', 'REGISTER', 'REJECT', 'REJECT_CORRECTION', 'APPROVE_CORRECTION')
     )
   )
 );

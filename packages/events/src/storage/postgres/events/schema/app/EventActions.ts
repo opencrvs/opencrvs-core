@@ -55,6 +55,8 @@ export default interface EventActionsTable {
   status: ColumnType<ActionStatus, ActionStatus, ActionStatus>
 
   transactionId: ColumnType<string, string, string>
+
+  requestId: ColumnType<string | null, string | null, string | null>
 }
 
 export type EventActions = Selectable<EventActionsTable>

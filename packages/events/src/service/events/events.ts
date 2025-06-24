@@ -297,6 +297,10 @@ export async function addAction(
     const hasReason =
       input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
 
+    const hasRequestId =
+      input.type === ActionType.APPROVE_CORRECTION ||
+      input.type === ActionType.REJECT_CORRECTION
+
     await eventsRepo.createAction({
       eventId,
       registrationNumber:
@@ -313,6 +317,7 @@ export async function addAction(
       createdByUserType: user.type,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
+      requestId: hasRequestId ? input.requestId : undefined,
       reasonIsDuplicate: hasReason
         ? (input.reason.isDuplicate ?? false)
         : undefined,
