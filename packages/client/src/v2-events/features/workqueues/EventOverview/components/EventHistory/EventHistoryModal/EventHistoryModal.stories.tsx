@@ -133,16 +133,52 @@ export const PrintCertificate: Story = {
   }
 }
 
+const originalDeclaration = {
+  'applicant.email': 'foo@bar.fi',
+  'recommender.name': {
+    firstname: 'John',
+    surname: 'Doe'
+  }
+}
+
+const requestCorrectionAction = {
+  ...actionBase,
+  type: ActionType.REQUEST_CORRECTION,
+  declaration: {
+    'applicant.email': 'foo@baz.fi',
+    'recommender.name': {
+      firstname: 'Jane',
+      surname: 'Doe'
+    }
+  },
+  annotation: {
+    'correction.request.reason': 'My reason'
+  }
+}
+
 export const RequestCorrection: Story = {
   args: {
-    action: {
-      ...actionBase,
-      type: ActionType.REQUEST_CORRECTION
-    },
+    action: requestCorrectionAction,
     fullEvent: {
       id: '123',
       type: 'tennis-club-membership',
-      actions: [],
+      actions: [
+        {
+          ...actionBase,
+          type: ActionType.CREATE
+        },
+        {
+          ...actionBase,
+          type: ActionType.DECLARE,
+          declaration: originalDeclaration
+        },
+        {
+          ...actionBase,
+          type: ActionType.VALIDATE,
+          declaration: originalDeclaration
+        },
+        requestCorrectionAction
+      ],
       trackingId: 'ABCD123',
       updatedAt: '2021-01-01',
       createdAt: '2021-01-01'
