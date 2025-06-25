@@ -138,7 +138,8 @@ const NotifiedAction = ActionBase.merge(
 
 const PrintCertificateAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.PRINT_CERTIFICATE)
+    type: z.literal(ActionType.PRINT_CERTIFICATE),
+    templateId: z.string().optional()
   })
 )
 
