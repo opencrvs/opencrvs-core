@@ -23,9 +23,10 @@ import {
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { SystemContext } from '@events/context'
+import { getClient } from '@events/storage/postgres/events'
+import { getLocations } from '../service/locations/locations'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 /**
@@ -163,13 +164,13 @@ export function createTestClient(
 export const setupTestCase = async (rngSeed?: number) => {
   const rng = createPrng(rngSeed ?? 101)
   const generator = payloadGenerator(rng)
-  const eventsDb = await events.getClient()
+  const eventsDb = getClient()
   const userMgntDb = await userMgnt.getClient()
 
   const seed = seeder()
-  const locations = generator.locations.set(5)
-  await seed.locations(eventsDb, locations)
+  await seed.locations(generator.locations.set(5))
 
+  const locations = await getLocations()
   const user = await seed.user(
     userMgntDb,
     generator.user.create({
@@ -185,6 +186,7 @@ export const setupTestCase = async (rngSeed?: number) => {
     },
     eventsDb,
     userMgntDb,
+    rng,
     seed,
     generator
   }
@@ -263,7 +265,7 @@ export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
   actions: ActionType[]
-): Promise<Awaited<ReturnType<typeof client.event.create>>> {
+): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
 
   // Always first create the event

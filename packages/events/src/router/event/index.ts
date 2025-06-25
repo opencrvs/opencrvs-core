@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -276,8 +276,8 @@ export const eventRouter = router({
       const eventConfigs = await getEventConfigurations(ctx.token)
       return getIndex(input, eventConfigs)
     }),
-  import: publicProcedure
-    // .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+  import: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({
       openapi: {
         summary: 'Import full event record',

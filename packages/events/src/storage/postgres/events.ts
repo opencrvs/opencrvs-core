@@ -12,25 +12,41 @@
 import { CamelCasePlugin, Kysely, PostgresDialect } from 'kysely'
 import { Pool, types } from 'pg'
 import { env } from '@events/environment'
-import Schema from './schema/Database' // this is the Database interface we defined earlier
-
-const connectionString = env.EVENTS_POSTGRES_URL
+import Schema from './events/schema/Database'
 
 // Override timestamptz (OID 1184) to return ISO 8601 strings instead of Date objects
-//       `pg`: 2025-06-16 12:55:51.507875+00
+//  `pg`: 2025-06-16 12:55:51.507+00 -- postgres limits the precision to xxx milliseconds.
 // `ISO 8601`: 2025-06-16T12:55:51.507Z
-//                                 ^^^ (yes, we don't cut the milliseconds, Zod still accepts it)
+//                                 ^^^ (We set Z for UTC timezone)
 types.setTypeParser(1184, (str) => str.replace(' ', 'T').replace('+00', 'Z'))
 
-const pool = new Pool({ connectionString })
-const dialect = new PostgresDialect({
-  pool: new Pool({ connectionString })
-})
+let db: Kysely<Schema> | undefined
+let pool: Pool | undefined
 
-export const db = new Kysely<Schema>({
-  dialect,
-  plugins: [new CamelCasePlugin()]
-})
+export const getPool = (connectionString = env.EVENTS_POSTGRES_URL) => {
+  if (!pool) {
+    pool = new Pool({ connectionString })
+  }
 
-/** export pool for streaming */
-export const postgresPool = pool
+  return pool
+}
+
+export function getClient() {
+  if (!db) {
+    const dialect = new PostgresDialect({
+      pool: getPool()
+    })
+
+    db = new Kysely<Schema>({
+      dialect,
+      plugins: [new CamelCasePlugin()]
+    })
+  }
+
+  return db.withSchema('app')
+}
+
+export function resetServer() {
+  db = undefined
+  pool = undefined
+}

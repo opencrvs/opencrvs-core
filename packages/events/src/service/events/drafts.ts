@@ -36,10 +36,10 @@ export const createDraft = async (
     annotation: input.annotation,
     createdBy: user.id,
     createdByRole: user.role,
+    createdByUserType: user.type,
     createdAtLocation: user.primaryOfficeId,
     createdBySignature: user.signature,
-    createdAt: new Date().toISOString(),
-    createdByUserType: user.type
+    createdAt: new Date().toISOString()
   })
 
   if (!draft) {

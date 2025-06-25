@@ -12,13 +12,14 @@
 import { Selectable, sql } from 'kysely'
 import z from 'zod'
 import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
-import { db } from '@events/storage/postgres/events/db'
+import { getClient } from '@events/storage/postgres/events'
 import EventActionDrafts, {
   NewEventActionDrafts
 } from './schema/app/EventActionDrafts'
 import ActionType from './schema/app/ActionType'
 
 export async function createDraft(draft: NewEventActionDrafts) {
+  const db = getClient()
   const result = await db
     .insertInto('eventActionDrafts')
     .values(draft)
@@ -57,6 +58,7 @@ function transformDraft(draft: Selectable<EventActionDrafts>): Draft {
 }
 
 export async function getDraftsByUserId(createdBy: string) {
+  const db = getClient()
   const drafts = await db
     .selectFrom('eventActionDrafts')
     .where('createdBy', '=', createdBy)
@@ -72,6 +74,7 @@ export async function getDraftsForAction(
   createdBy: string,
   actionType: ActionType
 ) {
+  const db = getClient()
   const drafts = await db
     .selectFrom('eventActionDrafts')
     .where('eventId', '=', eventId)
@@ -84,7 +87,8 @@ export async function getDraftsForAction(
   return z.array(Draft).parse(draftDocuments satisfies Draft[])
 }
 
-export async function deleteDraftsByEventId(eventId: UUID) {
+export function deleteDraftsByEventId(eventId: UUID) {
+  const db = getClient()
   return db
     .deleteFrom('eventActionDrafts')
     .where('eventId', '=', eventId)

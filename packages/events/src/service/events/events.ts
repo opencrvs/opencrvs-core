@@ -274,16 +274,18 @@ export async function addAction(
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
       reasonMessage: input.reason.message,
-      reasonIsDuplicate: true
+      reasonIsDuplicate: input.reason.isDuplicate
     })
-  } else if (input.type === ActionType.ASSIGN) {
+  }
+
+  if (input.type === ActionType.ASSIGN) {
     await eventsRepo.createAction({
       eventId,
       transactionId: input.transactionId,
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
-      status,
+      status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
       createdByUserType: user.type,
@@ -294,6 +296,10 @@ export async function addAction(
   } else {
     const hasReason =
       input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+
+    const hasRequestId =
+      input.type === ActionType.APPROVE_CORRECTION ||
+      input.type === ActionType.REJECT_CORRECTION
 
     await eventsRepo.createAction({
       eventId,
@@ -311,6 +317,7 @@ export async function addAction(
       createdByUserType: user.type,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
+      requestId: hasRequestId ? input.requestId : undefined,
       reasonIsDuplicate: hasReason
         ? (input.reason.isDuplicate ?? false)
         : undefined,
@@ -332,7 +339,7 @@ export async function addAction(
       eventId,
       transactionId: input.transactionId,
       actionType: ActionType.UNASSIGN,
-      status,
+      status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
       createdByUserType: user.type,
@@ -372,6 +379,7 @@ type AsyncRejectActionInput = Omit<
   eventId: UUID
   originalActionId: UUID
   createdAtLocation?: UUID
+  createdByUserType: TokenUserType
   token: string
   eventType: string
 }
@@ -383,6 +391,7 @@ export async function addAsyncRejectAction({
   originalActionId,
   createdBy,
   createdByRole,
+  createdByUserType,
   createdAtLocation,
   token,
   eventType
@@ -400,7 +409,7 @@ export async function addAsyncRejectAction({
     originalActionId,
     createdBy,
     createdByRole,
-    createdByUserType: TokenUserType.enum.system,
+    createdByUserType,
     createdAtLocation
   })
 

@@ -10,18 +10,19 @@
  */
 
 import { Kysely } from 'kysely'
+import _ from 'lodash'
 import {
   ActionStatus,
   ActionType,
   EventDocument,
   UUID
 } from '@opencrvs/commons'
-import { db } from './db'
+import { getClient } from '@events/storage/postgres/events'
 import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
-async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
+export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   const event = await trx
     .selectFrom('events')
     .select(['id', 'eventType as type', 'createdAt', 'updatedAt', 'trackingId'])
@@ -48,16 +49,32 @@ async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
     )
   }
 
-  return EventDocument.parse(result)
+  const cleanedActions = result.actions.map((action) =>
+    _.omitBy(
+      action,
+      (value, key) =>
+        _.isNil(value) &&
+        // For now, assignedTo is the only exception to the rule of dropping nulls.
+        !(action.type === ActionType.UNASSIGN && key === 'assignedTo')
+    )
+  )
+
+  return EventDocument.parse({
+    ...result,
+    actions: cleanedActions
+  })
 }
 
-export const getEventById = (id: UUID) => {
+export const getEventById = async (id: UUID) => {
+  const db = getClient()
   return db.transaction().execute(async (trx) => {
     return getEventByIdInTrx(id, trx)
   })
 }
 
-export function deleteEventById(eventId: UUID) {
+export async function deleteEventById(eventId: UUID) {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     await trx
       .deleteFrom('eventActions')
@@ -68,7 +85,7 @@ export function deleteEventById(eventId: UUID) {
   })
 }
 
-async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
+export async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
   const result = await trx
     .insertInto('events')
     .values(event)
@@ -78,7 +95,11 @@ async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
   return { id: result.id }
 }
 
-export const createEvent = (event: Parameters<typeof createEventInTrx>[0]) => {
+export const createEvent = async (
+  event: Parameters<typeof createEventInTrx>[0]
+) => {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     return createEventInTrx(event, trx)
   })
@@ -89,8 +110,14 @@ export const createEvent = (event: Parameters<typeof createEventInTrx>[0]) => {
  * @idempotent with `transactionId, actionType`
  * @returns action id
  */
-async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
-  await trx.insertInto('eventActions').values(action).execute()
+export async function createActionInTrx(
+  action: NewEventActions,
+  trx: Kysely<Schema>
+) {
+  // @TODO:
+  const withoutUndefined = _.omitBy(action, _.isUndefined) as any
+
+  await trx.insertInto('eventActions').values(withoutUndefined).execute()
 
   return trx
     .selectFrom('eventActions')
@@ -100,7 +127,8 @@ async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
     .executeTakeFirstOrThrow()
 }
 
-export const createAction = (action: NewEventActions) => {
+export const createAction = async (action: NewEventActions) => {
+  const db = getClient()
   return db.transaction().execute(async (trx) => {
     return createActionInTrx(action, trx)
   })
@@ -137,8 +165,8 @@ async function getOrCreateEventInTrx(
       status: ActionStatus.Accepted,
       createdBy: input.createdBy,
       createdByRole: input.createdByRole,
-      createdBySignature: input.createdBySignature,
       createdByUserType: input.createdByUserType,
+      createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
       reasonIsDuplicate: input.reasonIsDuplicate,
       reasonMessage: input.reasonMessage
@@ -210,26 +238,33 @@ async function getOrCreateEventAndAssignInTrx(
   return getEventByIdInTrx(newId, trx)
 }
 
-export const getOrCreateEvent = (
+export const getOrCreateEvent = async (
   input: Parameters<typeof getOrCreateEventInTrx>[0]
 ) => {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventInTrx(input, trx)
   })
 }
 
-export const getOrCreateEventAndAssign = (
+export const getOrCreateEventAndAssign = async (
   input: Parameters<typeof getOrCreateEventAndAssignInTrx>[0]
 ) => {
+  const db = getClient()
+
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventAndAssignInTrx(input, trx)
   })
 }
 
-export const createEventWithActions = (
+export const createEventWithActions = async (
   event: Events,
   actions: Array<Omit<EventActions, 'eventId'>>
 ) => {
+  const db = getClient()
+
+  // Could this be done in one insert?
   return db.transaction().execute(async (trx) => {
     const { id: eventId } = await createEventInTrx(event, trx)
 

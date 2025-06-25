@@ -41,6 +41,8 @@ export default interface EventActionDraftsTable {
   createdAtLocation: ColumnType<UUID, UUID, UUID>
 
   createdAt: ColumnType<string, string | undefined, string>
+
+  requestId: ColumnType<string | null, string | null, string | null>
 }
 
 export type EventActionDrafts = Selectable<EventActionDraftsTable>

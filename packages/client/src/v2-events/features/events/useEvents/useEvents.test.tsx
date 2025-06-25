@@ -23,7 +23,6 @@ import {
   EventDocument,
   EventInput,
   getUUID,
-  TokenUserType,
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
   UUID
@@ -70,7 +69,7 @@ const createHandler = trpcHandler(async ({ request }) => {
         type: ActionType.CREATE,
         id: '_REAL_ACTION_UUID_' as UUID,
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: 'user',
         createdBy: '6733309827b97e6483877188',
         createdByRole: 'some-user-role',
         createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176' as UUID,

@@ -9,14 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export type { ProvidedContext } from 'vitest'
+import { parser, type } from 'react-router-typesafe-routes/dom'
+import { UUID } from '@opencrvs/commons/client'
 
-declare module 'vitest' {
-  export interface ProvidedContext {
-    USER_MGNT_MONGO_URI: string
-    ELASTICSEARCH_URI: string
-    POSTGRES_URI: string
-    EVENTS_APP_POSTGRES_URI: string
-    EVENTS_MIGRATOR_POSTGRES_URI: string
-  }
+/*
+ * Without this, the UUIDs in the URLs will have to be wrapped in quotes
+ * and URLs look like this:
+ * http://localhost:3000/events/overview/"ed3f89c3-2d8c-48a0-9208-f0b000129c4a"
+ */
+export function uuid<T>() {
+  return type((value: unknown) => UUID.parse(value), parser('string'))
 }

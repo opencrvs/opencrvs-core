@@ -13,8 +13,8 @@ CREATE TABLE events (
   event_type text NOT NULL,
   transaction_id text NOT NULL,
   tracking_id text NOT NULL UNIQUE,
-  created_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
-  updated_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
+created_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+updated_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
   UNIQUE (transaction_id, event_type)
 );
 
@@ -48,13 +48,12 @@ CREATE TABLE event_actions (
   action_type action_type NOT NULL,
   annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
   assigned_to text,
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
   created_at_location uuid REFERENCES locations(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_by_user_type text NOT NULL,
   created_by_signature text,
-  created_by_user_type text NOT NULL CHECK (created_by_user_type IN ('admin', 'user')),
   declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
   original_action_id uuid REFERENCES event_actions(id),
@@ -126,26 +125,13 @@ CREATE TABLE event_action_drafts (
   annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
-  created_by_user_type text NOT NULL CHECK (created_by_user_type IN ('admin', 'user')),
+  created_by_user_type text NOT NULL,
   created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
   UNIQUE (transaction_id, action_type)
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON event_action_drafts TO events_app;
 
 COMMENT ON TABLE event_action_drafts IS 'Stores user-specific drafts of event-related actions. Drafts use client-supplied transaction_id for idempotency. Declaration fields may be incomplete. Each draft is owned exclusively by created_by.';
-
--- Down Migration
-DROP TABLE IF EXISTS event_action_drafts;
-
-DROP TABLE IF EXISTS event_actions;
-
-DROP TYPE IF EXISTS action_type;
-
-DROP TYPE IF EXISTS action_status;
-
-DROP TABLE IF EXISTS events;
-
-DROP TABLE IF EXISTS locations;

@@ -22,7 +22,7 @@ export const BaseActionInput = z.object({
   transactionId: z.string(),
   declaration: ActionUpdate.default({}),
   annotation: ActionUpdate.optional(),
-  originalActionId: UUID.optional(),
+  originalActionId: UUID.optional(), // should not be part of base action.
   keepAssignment: z.boolean().optional()
 })
 
@@ -38,7 +38,7 @@ export const RegisterActionInput = BaseActionInput.merge(
     type: z.literal(ActionType.REGISTER).default(ActionType.REGISTER),
     registrationNumber: z.string().optional()
   })
-)
+).strict()
 
 export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
@@ -127,6 +127,7 @@ export const UnassignActionInput = BaseActionInput.merge(
     assignedTo: z.literal(null).default(null)
   })
 )
+
 export type UnassignActionInput = z.infer<typeof UnassignActionInput>
 
 export const RequestCorrectionActionInput = BaseActionInput.merge(

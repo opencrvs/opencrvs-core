@@ -31,9 +31,9 @@ export default interface EventActionsTable {
 
   createdByRole: ColumnType<string, string, string>
 
-  createdBySignature: ColumnType<string | null, string | null, string | null>
-
   createdByUserType: ColumnType<string, string, string>
+
+  createdBySignature: ColumnType<string | null, string | null, string | null>
 
   declaration: ColumnType<
     Record<string, any>,
@@ -55,6 +55,8 @@ export default interface EventActionsTable {
   status: ColumnType<ActionStatus, ActionStatus, ActionStatus>
 
   transactionId: ColumnType<string, string, string>
+
+  requestId: ColumnType<string | null, string | null, string | null>
 }
 
 export type EventActions = Selectable<EventActionsTable>

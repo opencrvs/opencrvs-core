@@ -30,16 +30,19 @@ export async function importEvent(eventDocument: EventDocument, token: string) {
     reasonMessage: (action as any).reason?.message ?? undefined,
     registrationNumber: (action as any).registrationNumber ?? undefined,
     assignedTo: (action as any).assignedTo ?? undefined,
-    createdBySignature: action.createdBySignature ?? null,
-    createdAtLocation: action.createdAtLocation ?? null,
-    originalActionId: action.originalActionId ?? null
+    createdBySignature: action.createdBySignature ?? undefined,
+    createdAtLocation: action.createdAtLocation ?? undefined,
+    originalActionId: action.originalActionId ?? undefined,
+    requestId: (action as any).requestId ?? undefined
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }))
 
   const createdEvent = await createEventWithActions(
     { ...omit(event, 'type'), eventType, transactionId },
+    // @ts-expect-error -- @TODO: check type inference
     eventActions
   )
+
   const config = await getEventConfigurationById({
     token,
     eventType: event.type

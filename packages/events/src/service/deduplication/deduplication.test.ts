@@ -13,8 +13,8 @@ import {
   DeduplicationConfig,
   EventIndex,
   getUUID,
-  TokenUserType,
-  UUID
+  UUID,
+  TokenUserType
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'

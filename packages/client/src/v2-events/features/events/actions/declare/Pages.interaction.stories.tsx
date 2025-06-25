@@ -19,7 +19,6 @@ import {
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  TokenUserType,
   UUID
 } from '@opencrvs/commons/client'
 import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
@@ -76,7 +75,7 @@ function createDraftHandlers() {
           originalActionId: req.originalActionId as UUID,
           declaration: req.declaration || {},
           createdBy: 'test-user',
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: 'user',
           createdByRole: 'test-role',
           createdAtLocation: 'test-location' as UUID,
           createdAt: new Date().toISOString(),

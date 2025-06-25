@@ -10,12 +10,7 @@
  */
 
 import { createIntl } from 'react-intl'
-import {
-  eventQueryDataGenerator,
-  User,
-  TokenUserType,
-  UUID
-} from '@opencrvs/commons/client'
+import { eventQueryDataGenerator, User, UUID } from '@opencrvs/commons/client'
 import { stringifyEventMetadata } from './pdfUtils'
 
 const locations = [
@@ -45,7 +40,7 @@ describe('stringifyEventMetadata', () => {
     const { declaration, ...metadata } = eventQueryDataGenerator({
       id: 'seabeast-clad-stad-elia-oleocellosis' as UUID,
       assignedTo: userId,
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: 'user',
       createdBy: userId,
       trackingId: 'B77FF6',
       createdAt: new Date(2000, 1, 1).toISOString(),
