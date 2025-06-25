@@ -14,9 +14,7 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getCurrentEventState,
   getAcceptedActions,
-  getCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls
@@ -30,21 +28,14 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import {
-  flattenEventIndex,
-  getUserIdsFromActions,
-  getUsersFullName
-} from '@client/v2-events/utils'
+import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
 import { ActionMenu } from './components/ActionMenu'
-import {
-  EventOverviewProvider,
-  useEventOverviewContext
-} from './EventOverviewContext'
+import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
  * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
@@ -113,11 +104,12 @@ function EventOverview({
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />
-<<<<<<< HEAD
-      <EventHistory eventConfiguration={eventConfiguration} history={actions} />
-=======
-      {fullEvent && <EventHistory history={getAcceptedActions(fullEvent)} />}
->>>>>>> origin/phase-3
+      {fullEvent && (
+        <EventHistory
+          eventConfiguration={eventConfiguration}
+          history={getAcceptedActions(fullEvent)}
+        />
+      )}
     </Content>
   )
 }
