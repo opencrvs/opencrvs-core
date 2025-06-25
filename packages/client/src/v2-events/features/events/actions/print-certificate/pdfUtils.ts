@@ -361,15 +361,6 @@ export function compileSvg({
    * (like names, dates, etc.)
    * need to be translated using i18n keys with parameters.
    */
-  /**
-   * @param this - The context object, not used in this helper.
-   * @param args - The arguments passed to the helper.
-   *   - The first argument is the translation ID (string).
-   *   - The subsequent arguments are pairs of parameter names and values.
-   *   - The last argument is the Handlebars options object.
-   * @returns The localized translation string with parameters or an empty string if any parameter is undefined.
-   *   If the translation for the ID is missing, it returns a fallback message.
-   */
 
   Handlebars.registerHelper(
     '$intlWithParams',
