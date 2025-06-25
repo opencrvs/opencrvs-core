@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { EventHistoryModal } from './EventHistoryModal'
 
 const meta: Meta<typeof EventHistoryModal> = {
@@ -138,6 +138,14 @@ export const RequestCorrection: Story = {
     action: {
       ...actionBase,
       type: ActionType.REQUEST_CORRECTION
+    },
+    fullEvent: {
+      id: '123',
+      type: 'tennis-club-membership',
+      actions: [],
+      trackingId: 'ABCD123',
+      updatedAt: '2021-01-01',
+      createdAt: '2021-01-01'
     }
   }
 }
