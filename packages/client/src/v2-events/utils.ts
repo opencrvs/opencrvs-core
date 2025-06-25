@@ -232,8 +232,7 @@ export function mergeWithoutNullsOrUndefined<T>(
 }
 
 export enum CoreWorkqueues {
-  OUTBOX = 'outbox',
-  DRAFT = 'draft'
+  OUTBOX = 'outbox'
 }
 
 export function hasOutboxWorkqueue(scopes: Scope[]) {
