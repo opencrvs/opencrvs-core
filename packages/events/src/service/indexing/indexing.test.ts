@@ -321,25 +321,29 @@ describe('withJurisdictionFilters', () => {
     term: { someField: 'someValue' }
   }
 
-  test('returns original query if no my-jurisdiction and no userOfficeId', async () => {
+  test('returns original query if no my-jurisdiction and no userOfficeId', () => {
     const options = { 'v2.birth': 'all' as const }
 
-    const result = await withJurisdictionFilters(baseQuery, options, undefined)
+    const result = withJurisdictionFilters(baseQuery, options, undefined)
 
     expect(result).toEqual(baseQuery)
   })
 
-  test('adds filters for my-jurisdiction eventTypes only', async () => {
+  test('returns original query if no my-jurisdiction scopes are available for multiple events', () => {
+    const options = { 'v2.birth': 'all' as const, 'v2.death': 'all' as const }
+
+    const result = withJurisdictionFilters(baseQuery, options, undefined)
+
+    expect(result).toEqual(baseQuery)
+  })
+
+  test('adds filters for my-jurisdiction eventTypes only', () => {
     const options = {
       'v2.birth': 'my-jurisdiction' as const,
       'v2.death': 'all' as const
     }
 
-    const result = await withJurisdictionFilters(
-      baseQuery,
-      options,
-      'office-123'
-    )
+    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
 
     expect(result).toEqual({
       bool: {
@@ -349,7 +353,7 @@ describe('withJurisdictionFilters', () => {
             bool: {
               must: [
                 { term: { type: 'v2.birth' } },
-                { terms: { updatedAtLocation: ['loc1', 'loc2'] } }
+                { term: { updatedAtLocation: 'office-123' } }
               ],
               should: undefined
             }
@@ -360,17 +364,13 @@ describe('withJurisdictionFilters', () => {
     })
   })
 
-  test('returns filtered query if multiple events are marked as my-jurisdiction', async () => {
+  test('returns filtered query if multiple events are marked as my-jurisdiction', () => {
     const options = {
       'v2.birth': 'my-jurisdiction' as const,
       'v2.death': 'my-jurisdiction' as const
     }
 
-    const result = await withJurisdictionFilters(
-      baseQuery,
-      options,
-      'office-123'
-    )
+    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
 
     expect(result).toEqual({
       bool: {
@@ -381,7 +381,7 @@ describe('withJurisdictionFilters', () => {
             bool: {
               must: [
                 { term: { type: 'v2.birth' } },
-                { terms: { updatedAtLocation: ['loc1', 'loc2'] } }
+                { term: { updatedAtLocation: 'office-123' } }
               ],
               should: undefined
             }
@@ -390,7 +390,34 @@ describe('withJurisdictionFilters', () => {
             bool: {
               must: [
                 { term: { type: 'v2.death' } },
-                { terms: { updatedAtLocation: ['loc1', 'loc2'] } }
+                { term: { updatedAtLocation: 'office-123' } }
+              ],
+              should: undefined
+            }
+          }
+        ]
+      }
+    })
+  })
+
+  test('returns filtered query if multiple events are marked with different jurisdiction access', () => {
+    const options = {
+      'v2.birth': 'my-jurisdiction' as const,
+      'v2.death': 'all' as const
+    }
+
+    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
+
+    expect(result).toEqual({
+      bool: {
+        minimum_should_match: 1,
+        must: [baseQuery],
+        should: [
+          {
+            bool: {
+              must: [
+                { term: { type: 'v2.birth' } },
+                { term: { updatedAtLocation: 'office-123' } }
               ],
               should: undefined
             }
