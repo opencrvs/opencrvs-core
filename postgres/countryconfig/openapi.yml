@@ -3386,6 +3386,8 @@ components:
                       - string
                       - "null"
                     format: uuid
+                    description: Reference to the original action that was asynchronously rejected
+                      or accepted by 3rd party integration.
                   type:
                     type: string
                     enum:
@@ -3829,6 +3831,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: CREATE
@@ -4218,6 +4222,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: VALIDATE
@@ -4607,6 +4613,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT
@@ -5009,6 +5017,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: MARKED_AS_DUPLICATE
@@ -5398,6 +5408,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ARCHIVE
@@ -5800,6 +5812,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: NOTIFY
@@ -6189,6 +6203,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REGISTER
@@ -6580,6 +6596,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: DECLARE
@@ -6969,6 +6987,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ASSIGN
@@ -7361,6 +7381,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -7750,6 +7772,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: APPROVE_CORRECTION
@@ -8142,6 +8166,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT_CORRECTION
@@ -8534,6 +8560,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: UNASSIGN
@@ -8926,6 +8954,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -9315,6 +9345,8 @@ components:
             - string
             - "null"
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: READ
@@ -10435,6 +10467,7 @@ components:
       required:
         - eventId
         - transactionId
+      additionalProperties: false
     NotifyActionInput:
       type: object
       properties:
@@ -10796,7 +10829,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: da9fe917-656a-47ff-a689-de028dafcde8
+        transactionId: 426cf1eb-1dbe-4500-a2d8-3b56391e8361
         declaration: {}
         annotation: {}
         type: NOTIFY

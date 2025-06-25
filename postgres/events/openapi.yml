@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 8850599d-f5da-4b4e-9ef2-1a9a166c3734
+                transactionId: d4043d86-fef3-4beb-bbd5-9e90e05038b4
                 type: v2.birth
       responses:
         "200":
@@ -458,7 +458,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 1b9468f7-8644-488a-8021-747c1590b477
+                transactionId: c77ca4c5-1de5-4583-ac01-6f7ab80ea1f4
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -645,6 +645,8 @@ paths:
                             type: string
                             nullable: true
                             format: uuid
+                            description: Reference to the original action that was asynchronously rejected
+                              or accepted by 3rd party integration.
                           type:
                             type: string
                             enum: &a11
@@ -4182,6 +4184,8 @@ components:
                     type: string
                     nullable: true
                     format: uuid
+                    description: Reference to the original action that was asynchronously rejected
+                      or accepted by 3rd party integration.
                   type:
                     type: string
                     enum: *a11
@@ -4601,6 +4605,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -4975,6 +4981,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -5349,6 +5357,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -5736,6 +5746,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -6110,6 +6122,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -6497,6 +6511,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -6871,6 +6887,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -7247,6 +7265,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -7621,6 +7641,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -7998,6 +8020,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -8372,6 +8396,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -8749,6 +8775,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -9126,6 +9154,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -9503,6 +9533,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -9877,6 +9909,8 @@ components:
           type: string
           nullable: true
           format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
