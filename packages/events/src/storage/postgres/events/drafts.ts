@@ -47,9 +47,8 @@ function transformDraft(draft: Selectable<EventActionDrafts>): Draft {
       createdAt: draft.createdAt,
       createdBy: draft.createdBy,
       createdByRole: draft.createdByRole,
-      createdAtLocation: draft.createdAtLocation,
-      // @TODO:
       createdByUserType: draft.createdByUserType as TokenUserType,
+      createdAtLocation: draft.createdAtLocation,
       declaration: draft.declaration,
       annotation: draft.annotation,
       type: draft.actionType,
@@ -88,7 +87,7 @@ export async function getDraftsForAction(
   return z.array(Draft).parse(draftDocuments satisfies Draft[])
 }
 
-export async function deleteDraftsByEventId(eventId: UUID) {
+export function deleteDraftsByEventId(eventId: UUID) {
   const db = getClient()
   return db
     .deleteFrom('eventActionDrafts')

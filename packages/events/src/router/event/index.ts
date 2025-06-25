@@ -109,7 +109,6 @@ export const eventRouter = router({
         config
       })
     }),
-  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(UUID)
@@ -146,6 +145,7 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .output(Draft)
       .mutation(async ({ input, ctx }) => {
         const { eventId } = input
         await getEventById(eventId)

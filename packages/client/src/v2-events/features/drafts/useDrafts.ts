@@ -12,8 +12,7 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { Draft } from '@opencrvs/commons/client'
-import { TokenUserType } from '@opencrvs/commons/client'
+import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   invalidateDraftsList,
@@ -99,15 +98,16 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
   onMutate: (variables) => {
     const optimisticDraft: Draft = {
       id: createTemporaryId(),
-      eventId: variables.eventId,
-      transactionId: variables.transactionId,
+      eventId: variables.eventId as UUID,
+      transactionId: variables.transactionId as UUID,
       action: {
         createdAt: new Date().toISOString(),
         createdBy: '@todo',
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: 'user',
         createdByRole: '@todo',
-        createdAtLocation: '@todo',
+        createdAtLocation: '@todo' as UUID,
         ...variables,
+        originalActionId: variables.originalActionId as UUID,
         declaration: variables.declaration || {}
       },
       createdAt: new Date().toISOString()
@@ -124,12 +124,14 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
 
 function useCreateDraft() {
   const options = trpcOptionsProxy.event.draft.create.mutationOptions()
+  const defaults = queryClient.getMutationDefaults(
+    trpcOptionsProxy.event.draft.create.mutationKey()
+  )
 
   return useMutation({
     ...options,
-    ...queryClient.getMutationDefaults(
-      trpcOptionsProxy.event.draft.create.mutationKey()
-    )
+    ...defaults,
+    mutationFn: defaults.mutationFn as typeof options.mutationFn
   })
 }
 
@@ -143,6 +145,18 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
+  function findAllRemoteDrafts(): Draft[] {
+    // Skip the queryFn defined by tRPC and use the one defined above
+    const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
+
+    const drafts = useSuspenseQuery({
+      ...options,
+      queryKey: trpc.event.draft.list.queryKey()
+    })
+
+    return drafts.data
+  }
+
   return {
     setLocalDraft: setDraft,
     getLocalDraftOrDefault: getLocalDraftOrDefault,
@@ -153,23 +167,16 @@ export function useDrafts() {
 
       createDraft.mutate({
         eventId: localDraft.eventId,
-        declaration: localDraft.action.declaration,
-        annotation: localDraft.action.annotation,
+        declaration: deepDropNulls(localDraft.action.declaration),
+        annotation: deepDropNulls(localDraft.action.annotation),
         transactionId: localDraft.transactionId,
         type: localDraft.action.type,
         status: localDraft.action.status
       })
     },
-    getRemoteDrafts: function useDraftList(): Draft[] {
-      // Skip the queryFn defined by tRPC and use the one defined above
-      const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
-
-      const drafts = useSuspenseQuery({
-        ...options,
-        queryKey: trpc.event.draft.list.queryKey()
-      })
-
-      return drafts.data
+    getAllRemoteDrafts: findAllRemoteDrafts,
+    getRemoteDrafts: function useDraftList(eventId: string): Draft[] {
+      return findAllRemoteDrafts().filter((draft) => draft.eventId === eventId)
     }
   }
 }

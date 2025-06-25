@@ -10,7 +10,12 @@
  */
 
 import { Db } from 'mongodb'
-import { getUUID, eventPayloadGenerator, UUID } from '@opencrvs/commons'
+import {
+  getUUID,
+  eventPayloadGenerator,
+  UUID,
+  TestUserRole
+} from '@opencrvs/commons'
 import { Location, setLocations } from '@events/service/locations/locations'
 
 interface Name {
@@ -20,7 +25,7 @@ interface Name {
 }
 
 export interface CreatedUser {
-  id: string
+  id: UUID
   primaryOfficeId: UUID
   role: string
   name: Array<Name>
@@ -38,7 +43,7 @@ interface CreateUser {
 export function payloadGenerator(rng: () => number) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? 'REGISTRATION_AGENT',
+      role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
@@ -79,8 +84,8 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
-      role: user.role,
-      id: createdUser.insertedId.toString()
+      role: user.role as TestUserRole,
+      id: createdUser.insertedId.toString() as UUID
     }
   }
   const seedLocations = async (locations: Location[]) => setLocations(locations)

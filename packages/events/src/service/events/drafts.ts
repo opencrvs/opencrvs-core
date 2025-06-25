@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DraftInput, UUID } from '@opencrvs/commons'
+import { Draft, DraftInput, UUID } from '@opencrvs/commons'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { UserContext } from '@events/context'
 
@@ -24,8 +24,9 @@ export const createDraft = async (
     user: UserContext
     transactionId: string
   }
-) => {
-  return draftsRepo.createDraft({
+): Promise<Draft> => {
+  const createdAt = new Date().toISOString()
+  const draft = await draftsRepo.createDraft({
     eventId,
     transactionId,
     // @TODO: Extract DELETE from ActionTypes. It's not an action that's stored!
@@ -37,8 +38,32 @@ export const createDraft = async (
     createdByRole: user.role,
     createdByUserType: user.type,
     createdAtLocation: user.primaryOfficeId,
-    createdBySignature: user.signature
+    createdBySignature: user.signature,
+    createdAt: new Date().toISOString()
   })
+
+  if (!draft) {
+    throw new Error('Failed to create draft')
+  }
+
+  return {
+    id: draft.id,
+    transactionId: draft.transactionId,
+    createdAt,
+    eventId: draft.eventId,
+    action: {
+      transactionId: draft.transactionId,
+      createdAt: createdAt,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdByUserType: user.type,
+      createdAtLocation: user.primaryOfficeId,
+      declaration: draft.declaration,
+      annotation: draft.annotation,
+      type: input.type,
+      status: 'Accepted'
+    }
+  }
 }
 
 export const getDraftsByUserId = draftsRepo.getDraftsByUserId

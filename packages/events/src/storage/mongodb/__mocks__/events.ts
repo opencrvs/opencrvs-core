@@ -9,15 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getClient } from '@events/storage/postgres/events'
-import { Locations, NewLocations } from './schema/app/Locations'
+export function resetServer() {}
 
-export async function createLocations(locations: NewLocations[]) {
-  const db = getClient()
-  await db.insertInto('locations').values(locations).execute()
-}
-
-export async function getLocations() {
-  const db = getClient()
-  return (await db.selectFrom('locations').selectAll().execute()) as Locations[]
-}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function getClient(): Promise<any> {}

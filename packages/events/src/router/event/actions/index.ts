@@ -101,14 +101,17 @@ type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
     output: EventDocument
+    meta: OpenApiMeta
   }>
   accept: MutationProcedure<{
     input: ActionInput & { actionId: string }
     output: EventDocument
+    meta: OpenApiMeta
   }>
   reject: MutationProcedure<{
     input: { eventId: string; actionId: string; transactionId: string }
     output: EventDocument
+    meta: OpenApiMeta
   }>
 }
 

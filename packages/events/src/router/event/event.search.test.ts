@@ -214,7 +214,6 @@ test.only('Returns events based on the updatedAt column', async () => {
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE,
-    // @ts-expect-error - `user` needs to be fixed
     user,
     defaults: {
       createdAt: oldEventCreatedAt
@@ -228,7 +227,6 @@ test.only('Returns events based on the updatedAt column', async () => {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action,
-      // @ts-expect-error - `user` needs to be fixed
       user,
       defaults: {
         status: ActionStatus.Requested

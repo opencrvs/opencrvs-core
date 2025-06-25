@@ -9,15 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { getClient } from '@events/storage/postgres/events'
-import { Locations, NewLocations } from './schema/app/Locations'
+import { parser, type } from 'react-router-typesafe-routes/dom'
+import { UUID } from '@opencrvs/commons/client'
 
-export async function createLocations(locations: NewLocations[]) {
-  const db = getClient()
-  await db.insertInto('locations').values(locations).execute()
-}
-
-export async function getLocations() {
-  const db = getClient()
-  return (await db.selectFrom('locations').selectAll().execute()) as Locations[]
+/*
+ * Without this, the UUIDs in the URLs will have to be wrapped in quotes
+ * and URLs look like this:
+ * http://localhost:3000/events/overview/"ed3f89c3-2d8c-48a0-9208-f0b000129c4a"
+ */
+export function uuid<T>() {
+  return type((value: unknown) => UUID.parse(value), parser('string'))
 }

@@ -22,20 +22,35 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
+const tRPCMsw = createTRPCMsw<AppRouter>({
+  links: [
+    httpLink({
+      url: '/api/events'
+    })
+  ],
+  transformer: { input: superjson, output: superjson }
+})
 
 const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE, ActionType.DECLARE]
 })
+const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
+  parameters: {
+    offline: {
+      events: [declareEventDocument]
+    }
+  },
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(
@@ -49,23 +64,6 @@ const meta: Meta<typeof ReviewIndex> = {
 export default meta
 
 type Story = StoryObj<typeof ReviewIndex>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
-
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
-
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
 
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
@@ -77,7 +75,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
@@ -105,14 +104,27 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: declarationTrpcMsw.eventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
+    offline: {
+      events: [declarationTrpcMsw.eventDocument]
+    },
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -123,6 +135,14 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
           }),
           tRPCMsw.user.get.query((id) => {
             return mockUser
@@ -198,7 +218,17 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -275,7 +305,17 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -329,8 +369,21 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
   }
 }
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventId, eventDocument)
+
     // For this test, we want to have empty form values in zustand state
     useEventFormData.setState({ formValues: {} })
   },
@@ -350,7 +403,7 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: eventId
       })
     },
     chromatic: { disableSnapshot: true },
@@ -361,7 +414,17 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
             return []
           })
         ],
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -418,6 +481,13 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 }
 
 export const ChangeFieldInReview: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(declareEventDocument.id, declareEventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
