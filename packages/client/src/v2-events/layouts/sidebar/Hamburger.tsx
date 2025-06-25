@@ -28,7 +28,11 @@ export function Hamburger() {
       <ExpandingMenu
         menuCollapse={toggleMenu}
         navigation={() => (
-          <Sidebar menuCollapse={toggleMenu} navigationWidth={320} />
+          <Sidebar
+            isMobileView
+            menuCollapse={toggleMenu}
+            navigationWidth={320}
+          />
         )}
         showMenu={showMenu}
       />
