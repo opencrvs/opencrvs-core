@@ -19,7 +19,9 @@ import {
   getAdvancedSearchFieldErrors,
   flattenFieldErrors,
   getDefaultSearchFields,
-  buildDataCondition
+  buildDataCondition,
+  serializeSearchParams,
+  deserializeSearchParams
 } from './utils'
 
 describe('getAdvancedSearchFieldErrors', () => {
@@ -141,5 +143,59 @@ describe('buildDataCondition', () => {
       type: 'exact',
       term: 'ABC123'
     })
+  })
+})
+
+describe('serializeSearchParams and deserializeSearchParams (full roundtrip)', () => {
+  const testObject = {
+    str: 'hello',
+    num: 123,
+    bool: true,
+    arrayPrimitives: ['x', 'y'],
+    arrayObjects: [{ a: 1 }, { b: 2 }],
+    plainObject: { foo: 'bar', count: 9 },
+    emptyArray: [],
+    nullVal: null,
+    undefinedVal: undefined
+  }
+
+  const expectedDeserialized = {
+    str: 'hello',
+    num: '123', // everything comes in as string from URL
+    bool: 'true',
+    arrayPrimitives: ['x', 'y'],
+    arrayObjects: [{ a: 1 }, { b: 2 }],
+    plainObject: { foo: 'bar', count: 9 }
+    // emptyArray is dropped
+    // nullVal, undefinedVal are dropped
+  }
+
+  it('serializes correctly (match raw string)', () => {
+    const output = serializeSearchParams(testObject)
+    // Note: the order of parameters may vary, so we check the content instead.
+    const expected =
+      `arrayObjects=${encodeURIComponent(JSON.stringify({ a: 1 }))}` +
+      `&arrayObjects=${encodeURIComponent(JSON.stringify({ b: 2 }))}` +
+      '&arrayPrimitives=x&arrayPrimitives=y' +
+      '&bool=true' +
+      '&num=123' +
+      `&plainObject=${encodeURIComponent(JSON.stringify({ foo: 'bar', count: 9 }))}` +
+      '&str=hello'
+
+    expect(output).toBe(expected)
+  })
+
+  it('deserializes correctly', () => {
+    const serialized = serializeSearchParams(testObject)
+    const deserialized = deserializeSearchParams(serialized)
+
+    expect(deserialized).toEqual(expectedDeserialized)
+  })
+
+  it('roundtrip preserves data shape and content', () => {
+    const serialized = serializeSearchParams(testObject)
+    const roundtrip = deserializeSearchParams(serialized)
+
+    expect(roundtrip).toEqual(expectedDeserialized)
   })
 })

@@ -53,8 +53,8 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const { getRemoteDrafts } = useDrafts()
-  const remoteDrafts = getRemoteDrafts()
+  const { getAllRemoteDrafts } = useDrafts()
+  const remoteDrafts = getAllRemoteDrafts()
   const deleteEvent = events.deleteEvent.useMutation()
 
   const [modal, openModal] = useModal()

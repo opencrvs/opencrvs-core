@@ -27,7 +27,6 @@ import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
-  getGrowingCombinations,
   sanitizeForSnapshot,
   setupTestCase,
   TEST_USER_DEFAULT_SCOPES,
@@ -988,17 +987,19 @@ test('Returns relevant events in right order', async () => {
 
   // Until we have a way to reindex from mongodb, we create events through API.
   // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
-  const actions = [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REJECT,
-    ActionType.ARCHIVE,
-    ActionType.REGISTER,
-    ActionType.PRINT_CERTIFICATE
+  const actionCombinations = [
+    [ActionType.DECLARE],
+    [ActionType.DECLARE, ActionType.VALIDATE],
+    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REJECT],
+    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.ARCHIVE],
+    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER],
+    [
+      ActionType.DECLARE,
+      ActionType.VALIDATE,
+      ActionType.REGISTER,
+      ActionType.PRINT_CERTIFICATE
+    ]
   ]
-
-  const actionCombinations = getGrowingCombinations(actions)
 
   // 1. Create events with all combinations of actions
   for (const actionCombination of actionCombinations) {
