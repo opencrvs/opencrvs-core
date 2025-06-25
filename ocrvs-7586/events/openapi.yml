@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 64fbd53a-6a23-4c5a-8239-b2aa777081f7
+                transactionId: f702d688-cdbe-427f-a70c-cdb186143d4c
                 type: v2.birth
       responses:
         "200":
@@ -426,7 +426,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: b2245260-bf02-493b-a402-5f470c3ffe0c
+                transactionId: cf2d8613-6653-4961-b9b5-7ff9d85cf1e2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9400,6 +9400,7 @@ components:
                   - certificate-printed
         copiesPrintedForTemplate:
           type: number
+          default: 0
         modifiedAt:
           type: string
         declaration:
@@ -9550,6 +9551,7 @@ components:
         - updatedAt
         - trackingId
         - flags
+        - copiesPrintedForTemplate
         - declaration
     error.NOT_FOUND:
       type: object
