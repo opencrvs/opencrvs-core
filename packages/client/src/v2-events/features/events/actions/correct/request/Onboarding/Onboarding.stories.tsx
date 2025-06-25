@@ -11,10 +11,15 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import {
+  setEventData,
+  addLocalEventConfig
+} from '@client/v2-events/features/events/useEvents/api'
 
 const meta: Meta<typeof Onboarding> = {
   title: 'CorrectionRequest'

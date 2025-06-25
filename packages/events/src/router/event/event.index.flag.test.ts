@@ -10,15 +10,13 @@
  */
 
 import { HttpResponse, http } from 'msw'
-import {
-  ActionStatus,
-  ActionType,
-  CustomFlags,
-  Flag,
-  getUUID
-} from '@opencrvs/commons'
+import { ActionStatus, ActionType, CustomFlags, Flag } from '@opencrvs/commons'
 import { env } from '@events/environment'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createEvent,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 
 function generateFlag(type: ActionType, status: ActionStatus): Flag {
@@ -29,7 +27,10 @@ test('Adds ACTION-requested flag while waiting for external validation', async (
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE
+  ])
 
   mswServer.use(
     http.post(
@@ -65,7 +66,10 @@ test('Does not add any flags when accepted form countryconfig', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE
+  ])
 
   mswServer.use(
     http.post(
@@ -101,7 +105,10 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE
+  ])
 
   mswServer.use(
     http.post(
@@ -137,21 +144,11 @@ test(`Adds ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.PRINT_CERT
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-
-  await client.event.actions.register.request(
-    generator.event.actions.register(event.id)
-  )
-
-  const createAction = event.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  await client.event.actions.assignment.assign(
-    generator.event.actions.assign(event.id, {
-      assignedTo: createAction[0].createdBy
-    })
-  )
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
 
   await client.event.actions.printCertificate.request(
     generator.event.actions.printCertificate(event.id)
@@ -166,46 +163,31 @@ test(`Removes ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.APPROVE
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-
-  await client.event.actions.register.request(
-    generator.event.actions.register(event.id)
-  )
-
-  const createAction = event.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(event.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
-
-  await client.event.actions.printCertificate.request(
-    generator.event.actions.printCertificate(event.id)
-  )
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER,
+    ActionType.PRINT_CERTIFICATE
+  ])
 
   const index = await client.event.list()
   expect(index[0].flags).toContain(CustomFlags.CERTIFICATE_PRINTED)
 
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-
   const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id)
+    generator.event.actions.correction.request(event.id, {
+      keepAssignment: true
+    })
   )
 
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
+  const actionId = withCorrectionRequest.actions.at(-1)?.id
+
+  if (!actionId) {
+    throw new Error('Request ID is undefined')
+  }
 
   const approveCorrectionPayload = generator.event.actions.correction.approve(
     withCorrectionRequest.id,
-    withCorrectionRequest.actions.at(-1).id
+    actionId
   )
 
   await client.event.actions.correction.approve(approveCorrectionPayload)

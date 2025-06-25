@@ -14,6 +14,7 @@ import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { CreatedAtLocation } from './CreatedAtLocation'
+import { TokenUserType } from '../authentication'
 
 extendZodWithOpenApi(z)
 
@@ -40,6 +41,7 @@ export type ActionStatus = keyof typeof ActionStatus
 export const ActionBase = z.object({
   id: z.string(),
   transactionId: z.string(),
+  createdByUserType: TokenUserType,
   createdAt: z.string().datetime(),
   createdBy: z.string(),
   createdByRole: z.string(),

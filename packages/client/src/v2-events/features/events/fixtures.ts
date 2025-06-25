@@ -14,6 +14,7 @@ import {
   ActionType,
   EventDocument,
   EventIndex,
+  TokenUserType,
   EventStatus,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons/client'
@@ -29,6 +30,7 @@ export const tennisClubMembershipEventIndex: EventIndex = {
   createdAt: '2023-03-01T00:00:00.000Z',
   legalStatuses: {},
   createdBy: uuid(),
+  createdByUserType: TokenUserType.Enum.user,
   createdAtLocation: uuid(),
   updatedAtLocation: uuid(),
   updatedAt: '2023-03-01T00:00:00.000Z',
@@ -57,6 +59,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: 'CREATE',
       status: ActionStatus.Accepted,
       createdAt: '2025-01-23T05:30:02.615Z',
+      createdByUserType: TokenUserType.Enum.user,
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
@@ -86,6 +89,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       },
       type: 'DECLARE',
       createdBy: localRegistrarId,
+      createdByUserType: TokenUserType.Enum.user,
       createdByRole: 'some-user-role',
       createdAt: '2025-01-23T05:30:08.847Z',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
@@ -108,6 +112,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: 'VALIDATE',
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
+      createdByUserType: TokenUserType.Enum.user,
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       transactionId: 'aasdk342-asdkj3423-kn234k24'
@@ -130,6 +135,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
       createdAt: '2025-01-23T05:35:27.689Z',
+      createdByUserType: TokenUserType.Enum.user,
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       registrationNumber: 'TEST12121212',
       transactionId: 'aasdk342-asdkj3423-kn234k25'
@@ -141,6 +147,7 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: ActionType.ASSIGN,
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
+      createdByUserType: TokenUserType.Enum.user,
       createdAt: '2025-01-23T05:35:27.689Z',
       createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
       assignedTo: testDataGenerator().user.id.localRegistrar,

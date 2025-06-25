@@ -49,10 +49,12 @@ import {
   addAction,
   createEvent,
   deleteEvent,
-  getEventById
+  getEventById,
+  throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -100,6 +102,7 @@ export const eventRouter = router({
         token: ctx.token,
         eventType: input.type
       })
+
       return createEvent({
         transactionId: input.transactionId,
         eventInput: input,
@@ -107,7 +110,6 @@ export const eventRouter = router({
         config
       })
     }),
-  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(z.string())
@@ -135,6 +137,7 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
+      await throwConflictIfActionNotAllowed(input.eventId, ActionType.DELETE)
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
@@ -197,14 +200,18 @@ export const eventRouter = router({
         .use(middleware.requireAssignment)
         .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
         .mutation(async ({ input, ctx }) => {
-          if (ctx.isDuplicateAction) {
-            return ctx.event
+          const { token, isDuplicateAction, user, event } = ctx
+
+          if (isDuplicateAction) {
+            return event
           }
+
+          await throwConflictIfWaitingForCorrection(input.eventId, token)
 
           return addAction(input, {
             eventId: input.eventId,
-            user: ctx.user,
-            token: ctx.token,
+            user,
+            token,
             status: ActionStatus.Accepted
           })
         }),
@@ -221,6 +228,7 @@ export const eventRouter = router({
           if (ctx.isDuplicateAction) {
             return ctx.event
           }
+
           return approveCorrection(input, {
             eventId: input.eventId,
             user: ctx.user,

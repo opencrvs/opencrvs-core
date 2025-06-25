@@ -24,6 +24,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { Review } from './index'
 
 const generator = testDataGenerator()
@@ -38,7 +39,21 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+
 const meta: Meta<typeof Review> = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(eventDocument.id, eventDocument)
+  },
   title: 'Validate/Review/Interaction/Local Registrar',
   loaders: [
     () => {
@@ -62,13 +77,6 @@ export default meta
 
 type Story = StoryObj<typeof Review>
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
-
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
   name: [
@@ -79,7 +87,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 const declareEventDocument = generateEventDocument({

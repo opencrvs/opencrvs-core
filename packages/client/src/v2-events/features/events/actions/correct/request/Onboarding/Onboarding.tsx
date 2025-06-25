@@ -12,7 +12,7 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { buttonMessages } from '@client/i18n/messages'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -31,9 +31,6 @@ const messages = defineMessages({
 })
 
 export function Onboarding() {
-  const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
-
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
@@ -41,10 +38,11 @@ export function Onboarding() {
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
+  const navigate = useNavigate()
   const intl = useIntl()
-
+  const { goToHome } = useEventFormNavigation()
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -60,6 +58,7 @@ export function Onboarding() {
   }
 
   const formPages = actionConfiguration.correctionForm.pages
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const currentPageId =
     formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
@@ -88,7 +87,7 @@ export function Onboarding() {
     >
       <PagesComponent
         continueButtonText={intl.formatMessage(buttonMessages.continueButton)}
-        declaration={event.declaration}
+        declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={annotation}
         formPages={formPages}
@@ -99,16 +98,14 @@ export function Onboarding() {
         onPageChange={(nextPageId: string) => {
           return navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
-              eventId: event.id,
+              eventId,
               pageId: nextPageId
             })
           )
         }}
         onSubmit={() => {
           return navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-              eventId: event.id
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
           )
         }}
       />

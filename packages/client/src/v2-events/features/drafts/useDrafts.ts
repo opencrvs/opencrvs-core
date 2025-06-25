@@ -12,7 +12,8 @@
 import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { ActionStatus, Draft } from '@opencrvs/commons/client'
+import { Draft } from '@opencrvs/commons/client'
+import { TokenUserType } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
   invalidateDraftsList,
@@ -103,6 +104,7 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
       action: {
         createdAt: new Date().toISOString(),
         createdBy: '@todo',
+        createdByUserType: TokenUserType.Enum.user,
         createdByRole: '@todo',
         createdAtLocation: '@todo',
         ...variables,
@@ -141,6 +143,18 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
+  function findAllRemoteDrafts(): Draft[] {
+    // Skip the queryFn defined by tRPC and use the one defined above
+    const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
+
+    const drafts = useSuspenseQuery({
+      ...options,
+      queryKey: trpc.event.draft.list.queryKey()
+    })
+
+    return drafts.data
+  }
+
   return {
     setLocalDraft: setDraft,
     getLocalDraftOrDefault: getLocalDraftOrDefault,
@@ -158,16 +172,9 @@ export function useDrafts() {
         status: localDraft.action.status
       })
     },
-    getRemoteDrafts: function useDraftList(): Draft[] {
-      // Skip the queryFn defined by tRPC and use the one defined above
-      const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
-
-      const drafts = useSuspenseQuery({
-        ...options,
-        queryKey: trpc.event.draft.list.queryKey()
-      })
-
-      return drafts.data
+    getAllRemoteDrafts: findAllRemoteDrafts,
+    getRemoteDrafts: function useDraftList(eventId: string): Draft[] {
+      return findAllRemoteDrafts().filter((draft) => draft.eventId === eventId)
     }
   }
 }
