@@ -41,10 +41,6 @@ export function CorrectionDetails({
   form: EventState
   annotation: EventState
 }) {
-  console.log('event', event)
-  console.log('form', form)
-  console.log('annotation', annotation)
-
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
 
