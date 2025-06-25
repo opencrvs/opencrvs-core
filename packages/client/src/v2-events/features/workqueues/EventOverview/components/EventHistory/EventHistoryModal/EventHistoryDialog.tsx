@@ -58,7 +58,7 @@ function prepareComments(history: ActionDocument) {
  *
  * @TODO: Add more details to the modal and ability to diff changes when more events are specified.
  */
-export function EventHistoryModal({
+export function EventHistoryDialog({
   action,
   userName,
   close,

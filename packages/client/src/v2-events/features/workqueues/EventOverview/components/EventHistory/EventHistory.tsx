@@ -35,9 +35,9 @@ import { useEventOverviewContext } from '@client/v2-events/features/workqueues/E
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import {
-  EventHistoryModal,
+  EventHistoryDialog,
   eventHistoryStatusMessage
-} from './EventHistoryModal/EventHistoryModal'
+} from './EventHistoryDialog/EventHistoryDialog'
 import { UserAvatar } from './UserAvatar'
 
 /**
@@ -146,7 +146,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
-      <EventHistoryModal
+      <EventHistoryDialog
         action={item}
         close={close}
         fullEvent={fullEvent}

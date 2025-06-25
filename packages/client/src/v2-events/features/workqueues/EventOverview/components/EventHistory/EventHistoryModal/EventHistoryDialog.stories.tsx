@@ -10,16 +10,16 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import { ActionType } from '@opencrvs/commons/client'
-import { EventHistoryModal } from './EventHistoryModal'
+import { EventHistoryDialog } from './EventHistoryDialog'
 
-const meta: Meta<typeof EventHistoryModal> = {
-  title: 'Components/EventHistoryModal',
-  component: EventHistoryModal
+const meta: Meta<typeof EventHistoryDialog> = {
+  title: 'Components/EventHistoryDialog',
+  component: EventHistoryDialog
 }
 
 export default meta
 
-type Story = StoryObj<typeof EventHistoryModal>
+type Story = StoryObj<typeof EventHistoryDialog>
 
 const actionBase = {
   id: '123',
