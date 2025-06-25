@@ -42,27 +42,7 @@ export async function countUsersByLocation(locationId: UUID | undefined) {
         role: { $in: registrarRoles }
       }
     },
-    {
-      $group: { _id: '$primaryOfficeId', registrars: { $addToSet: '$_id' } }
-    },
-    {
-      $project: {
-        _id: 0,
-        registrars: { $size: '$registrars' } // Count the number of unique user ids collected in registrars
-      }
-    },
-    {
-      $group: {
-        _id: null,
-        registrars: { $sum: '$registrars' }
-      }
-    },
-    {
-      $project: {
-        _id: 0,
-        registrars: 1
-      }
-    }
+    { $count: 'registrars' }
   ])
 
   return resArray[0] ?? { registrars: 0 }
