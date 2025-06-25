@@ -22378,10 +22378,10 @@ node-mock-http@^1.0.0:
   resolved "https://registry.yarnpkg.com/node-mock-http/-/node-mock-http-1.0.0.tgz#4b32cd509c7f46d844e68ea93fb8be405a18a42a"
   integrity sha512-0uGYQ1WQL1M5kKvGRXWQ3uZCHtLTO8hln3oBjIusM75WoesZ909uQJs/Hb946i2SS+Gsrhkaa6iAO17jRIv6DQ==
 
-node-pg-migrate@^8.0.1:
-  version "8.0.1"
-  resolved "https://registry.yarnpkg.com/node-pg-migrate/-/node-pg-migrate-8.0.1.tgz#0cbe9b052578272f70b4afa6293f3dc73907701d"
-  integrity sha512-v0WL07EHt1x1VOBqYuYDbLSnbabEQGXNdyXf0H1Z+YQ5Zw8x+emI6wLLCl1Q7lfLYYV5291aWXdj8ixvkDCqBw==
+node-pg-migrate@^8.0.3:
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/node-pg-migrate/-/node-pg-migrate-8.0.3.tgz#d5d79f3f9b54ca382eb92540e115eeee3829a932"
+  integrity sha512-oKzZyzTULTryO1jehX19VnyPCGf3G/3oWZg3gODphvID56T0WjPOShTVPVnxGdlcueaIW3uAVrr7M8xLZq5TcA==
   dependencies:
     glob "~11.0.0"
     yargs "~17.7.0"
