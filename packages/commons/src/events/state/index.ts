@@ -244,7 +244,10 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
-    flags: getFlagsFromActions(event.actions)
+    flags: getFlagsFromActions(event.actions),
+    copiesPrintedForTemplate:
+      (event as { copiesPrintedForTemplate?: number })
+        .copiesPrintedForTemplate ?? 0
   })
 }
 
