@@ -326,7 +326,31 @@ describe('withJurisdictionFilters', () => {
 
     const result = withJurisdictionFilters(baseQuery, options, undefined)
 
-    expect(result).toEqual(baseQuery)
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        type: 'v2.birth'
+                      }
+                    }
+                  ],
+                  should: undefined
+                }
+              }
+            ]
+          }
+        },
+        should: undefined
+      }
+    })
   })
 
   test('returns original query if no my-jurisdiction scopes are available for multiple events', () => {
@@ -334,7 +358,28 @@ describe('withJurisdictionFilters', () => {
 
     const result = withJurisdictionFilters(baseQuery, options, undefined)
 
-    expect(result).toEqual(baseQuery)
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.birth' } }]
+                }
+              },
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.death' } }]
+                }
+              }
+            ]
+          }
+        }
+      }
+    })
   })
 
   test('adds filters for my-jurisdiction eventTypes only', () => {
@@ -348,18 +393,26 @@ describe('withJurisdictionFilters', () => {
     expect(result).toEqual({
       bool: {
         must: [baseQuery],
-        should: [
-          {
-            bool: {
-              must: [
-                { term: { type: 'v2.birth' } },
-                { term: { updatedAtLocation: 'office-123' } }
-              ],
-              should: undefined
-            }
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.birth' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.death' } }]
+                }
+              }
+            ]
           }
-        ],
-        minimum_should_match: 1
+        }
       }
     })
   })
@@ -374,28 +427,30 @@ describe('withJurisdictionFilters', () => {
 
     expect(result).toEqual({
       bool: {
-        minimum_should_match: 1,
         must: [baseQuery],
-        should: [
-          {
-            bool: {
-              must: [
-                { term: { type: 'v2.birth' } },
-                { term: { updatedAtLocation: 'office-123' } }
-              ],
-              should: undefined
-            }
-          },
-          {
-            bool: {
-              must: [
-                { term: { type: 'v2.death' } },
-                { term: { updatedAtLocation: 'office-123' } }
-              ],
-              should: undefined
-            }
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.birth' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.death' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              }
+            ]
           }
-        ]
+        }
       }
     })
   })
@@ -410,19 +465,27 @@ describe('withJurisdictionFilters', () => {
 
     expect(result).toEqual({
       bool: {
-        minimum_should_match: 1,
-        must: [baseQuery],
-        should: [
-          {
-            bool: {
-              must: [
-                { term: { type: 'v2.birth' } },
-                { term: { updatedAtLocation: 'office-123' } }
-              ],
-              should: undefined
-            }
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.birth' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.death' } }]
+                }
+              }
+            ]
           }
-        ]
+        },
+        must: [baseQuery]
       }
     })
   })

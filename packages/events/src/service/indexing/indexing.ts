@@ -25,7 +25,8 @@ import {
   getDeclarationFields,
   QueryType,
   WorkqueueCountInput,
-  getEventConfigById
+  getEventConfigById,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import * as eventsDb from '@events/storage/mongodb/events'
@@ -388,7 +389,7 @@ export async function getIndexedEvents(
 export async function getIndex(
   eventParams: QueryType,
   eventConfigs: EventConfig[],
-  options: Record<string, 'my-jurisdiction' | 'all'>,
+  options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
@@ -423,7 +424,7 @@ export async function getIndex(
 export async function getEventCount(
   queries: WorkqueueCountInput,
   eventConfigs: EventConfig[],
-  options: Record<string, 'my-jurisdiction' | 'all'>,
+  options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
   return (

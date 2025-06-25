@@ -326,34 +326,42 @@ export function withJurisdictionFilters(
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ): estypes.QueryDslQueryContainer {
-  if (
-    Object.values(options).includes(SearchScopeAccessLevels.MY_JURISDICTION) &&
-    userOfficeId
-  ) {
-    const jurisdictionFilters: estypes.QueryDslQueryContainer[] = []
+  const filteredQueries = Object.entries(options).map(
+    ([eventType, accessLevel]) => {
+      const must: estypes.QueryDslQueryContainer[] = [
+        { term: { type: eventType } }
+      ]
 
-    Object.entries(options).forEach(([eventType, value]) => {
-      if (value === SearchScopeAccessLevels.MY_JURISDICTION) {
-        jurisdictionFilters.push({
-          bool: {
-            must: [
-              { term: { type: eventType } },
-              { term: { updatedAtLocation: userOfficeId } }
-            ],
-            should: undefined
-          }
-        })
+      if (
+        accessLevel === SearchScopeAccessLevels.MY_JURISDICTION &&
+        userOfficeId
+      ) {
+        must.push({ term: { updatedAtLocation: userOfficeId } })
       }
-    })
 
-    return {
-      bool: {
-        must: [query],
-        should: jurisdictionFilters,
-        minimum_should_match: 1
+      return {
+        bool: {
+          must,
+          should: undefined
+        }
+      }
+    }
+  )
+
+  if (filteredQueries.length === 0) {
+    throw new Error('Proper scope access levels are required for filtering')
+  }
+
+  return {
+    bool: {
+      must: [query],
+      should: undefined,
+      filter: {
+        bool: {
+          should: filteredQueries,
+          minimum_should_match: 1
+        }
       }
     }
   }
-
-  return query
 }
