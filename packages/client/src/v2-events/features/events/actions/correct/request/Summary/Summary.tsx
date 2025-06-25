@@ -15,27 +15,22 @@ import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { isEqual } from 'lodash'
-import styled from 'styled-components'
 import {
-  ActionType,
   FieldConfig,
   generateTransactionId,
   Scope,
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getDeclaration,
   getCurrentEventState
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Text } from '@opencrvs/components/lib/Text'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Check } from '@opencrvs/components/lib/icons'
+import { Text } from '@opencrvs/components/lib/Text'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { buttonMessages } from '@client/i18n/messages'
@@ -46,7 +41,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-import { Output } from '@client/v2-events/features/events/components/Output'
+import { CorrectionDetails } from './CorrectionDetails'
 
 function ContinueButton({
   onClick,
@@ -91,10 +86,6 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
   }, {})
 }
 
-const CorrectionSectionTitle = styled(Text)`
-  margin: 20px 0;
-`
-
 export function Summary() {
   const { eventId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
@@ -116,15 +107,9 @@ export function Summary() {
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
   const form = getFormValues()
-  const formConfig = getDeclaration(eventConfiguration)
   const fields = getDeclarationFields(eventConfiguration)
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
-
-  const correctionFormPages =
-    eventConfiguration.actions.find(
-      (action) => action.type === ActionType.REQUEST_CORRECTION
-    )?.correctionForm.pages || []
 
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.fromEntries(
@@ -196,124 +181,11 @@ export function Summary() {
             </SecondaryButton>
           ]}
         >
-          {correctionFormPages.map((page) => {
-            const pageFields = page.fields
-              .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
-              .map((field) => {
-                const valueDisplay = Output({
-                  field,
-                  value: annotation[field.id],
-                  showPreviouslyMissingValuesAsChanged: false
-                })
-
-                return { ...field, valueDisplay }
-              })
-              .filter((f) => f.valueDisplay)
-
-            return (
-              <Table
-                key={`correction-form-table-${page.id}`}
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    width: 34,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'firstColumn'
-                  },
-                  {
-                    label: '',
-                    width: 64,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'secondColumn'
-                  }
-                ]}
-                content={pageFields.map(({ valueDisplay, label }) => {
-                  if (label.defaultMessage) {
-                    return {
-                      firstColumn: intl.formatMessage(label),
-                      secondColumn: valueDisplay
-                    }
-                  }
-
-                  // If no label is defined for the field, we just show the value on the first column
-                  return { firstColumn: valueDisplay }
-                })}
-                hideTableBottomBorder={true}
-              ></Table>
-            )
-          })}
-
-          <CorrectionSectionTitle element="h3" variant="h3">
-            {intl.formatMessage(correctionMessages.correctionSectionTitle)}
-          </CorrectionSectionTitle>
-
-          {formConfig.pages.map((page) => {
-            const changedFields = page.fields
-              .filter((f) => {
-                const wasVisible = isFieldVisible(f, previousFormValues)
-                const isVisible = isFieldVisible(f, form)
-                const visibilityChanged = wasVisible !== isVisible
-                const valueHasChanged = !isEqual(
-                  previousFormValues[f.id],
-                  form[f.id]
-                )
-
-                return isVisible && (valueHasChanged || visibilityChanged)
-              })
-              .map((f) => {
-                const originalOutput = Output({
-                  field: f,
-                  value: previousFormValues[f.id],
-                  showPreviouslyMissingValuesAsChanged: false
-                })
-
-                const correctionOutput = Output({
-                  field: f,
-                  value: form[f.id],
-                  showPreviouslyMissingValuesAsChanged: false
-                })
-
-                return {
-                  fieldLabel: intl.formatMessage(f.label),
-                  original: originalOutput ?? '-',
-                  correction: correctionOutput ?? '-'
-                }
-              })
-
-            if (changedFields.length === 0) {
-              return
-            }
-
-            return (
-              <Table
-                key={`corrections-table-${page.id}`}
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    width: 34,
-                    key: 'fieldLabel'
-                  },
-                  {
-                    label: intl.formatMessage(
-                      correctionMessages.correctionSummaryOriginal
-                    ),
-                    width: 33,
-                    key: 'original'
-                  },
-                  {
-                    label: intl.formatMessage(
-                      correctionMessages.correctionSummaryCorrection
-                    ),
-                    width: 33,
-                    key: 'correction'
-                  }
-                ]}
-                content={changedFields}
-                hideTableBottomBorder={true}
-                id={`corrections-table-${page.id}`}
-              ></Table>
-            )
-          })}
+          <CorrectionDetails
+            annotation={annotation}
+            event={event}
+            form={form}
+          />
         </Content>
       </ActionPageLight>
       <Dialog
