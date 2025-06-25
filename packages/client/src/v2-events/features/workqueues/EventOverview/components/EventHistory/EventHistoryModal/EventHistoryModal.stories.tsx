@@ -26,6 +26,7 @@ const actionBase = {
   createdAt: '2021-01-01',
   createdBy: 'John Doe',
   createdByRole: 'User',
+  createdByUserType: 'user',
   status: 'Accepted',
   transactionId: '123',
   declaration: {},
