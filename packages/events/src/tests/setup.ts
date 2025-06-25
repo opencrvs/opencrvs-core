@@ -11,7 +11,6 @@
 import { inject, vi } from 'vitest'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getDeclarationFields } from '@opencrvs/commons/events'
-import { resetServer as resetEventsMongoServer } from '@events/storage/mongodb/__mocks__/events'
 import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
 
 import { createIndex } from '@events/service/indexing/indexing'
@@ -34,11 +33,7 @@ async function resetESServer() {
 }
 
 beforeEach(async () =>
-  Promise.all([
-    resetEventsMongoServer(),
-    resetUserMgntMongoServer(),
-    resetESServer()
-  ])
+  Promise.all([resetUserMgntMongoServer(), resetESServer()])
 )
 
 beforeAll(() =>

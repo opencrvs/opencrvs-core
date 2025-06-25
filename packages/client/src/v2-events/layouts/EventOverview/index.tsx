@@ -17,14 +17,12 @@ import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   applyDraftsToEventIndex,
-  deepDropNulls,
-  getCurrentEventStateWithDrafts
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import {
   AppBar,
   Button,
   Frame,
-  Icon,
   INavigationType,
   Stack
 } from '@opencrvs/components'

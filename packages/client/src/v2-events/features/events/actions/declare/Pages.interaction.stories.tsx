@@ -19,7 +19,8 @@ import {
   generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent,
-  TokenUserType
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
@@ -66,17 +67,18 @@ function createDraftHandlers() {
   return [
     tRPCMsw.event.draft.create.mutation((req) => {
       const response: Draft = {
-        id: 'test-draft-id',
-        eventId: req.eventId,
+        id: 'test-draft-id' as UUID,
+        eventId: req.eventId as UUID,
         transactionId: req.transactionId,
         createdAt: new Date().toISOString(),
         action: {
           ...req,
+          originalActionId: req.originalActionId as UUID,
           declaration: req.declaration || {},
           createdBy: 'test-user',
           createdByUserType: TokenUserType.Enum.user,
           createdByRole: 'test-role',
-          createdAtLocation: 'test-location',
+          createdAtLocation: 'test-location' as UUID,
           createdAt: new Date().toISOString(),
           status: ActionStatus.Accepted
         }

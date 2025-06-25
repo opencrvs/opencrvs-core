@@ -15,7 +15,8 @@ import {
   eventPayloadGenerator,
   EventDocument,
   ActionType,
-  ActionStatus
+  ActionStatus,
+  UUID
 } from '@opencrvs/commons'
 import { Location } from '@events/service/locations/locations'
 import { generateTrackingId } from '../service/events/events'
@@ -27,14 +28,14 @@ interface Name {
 }
 
 export interface CreatedUser {
-  id: string
-  primaryOfficeId: string
+  id: UUID
+  primaryOfficeId: UUID
   role: string
   name: Array<Name>
 }
 
 interface CreateUser {
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   role?: string
   name?: Array<Name>
 }
@@ -87,7 +88,7 @@ export function seeder() {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
       role: user.role,
-      id: createdUser.insertedId.toString()
+      id: createdUser.insertedId.toString() as UUID
     }
   }
 

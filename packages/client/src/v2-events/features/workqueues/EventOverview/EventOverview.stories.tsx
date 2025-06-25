@@ -22,7 +22,8 @@ import {
   createPrng,
   getRandomDatetime,
   tennisClubMembershipEvent,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
 import {
@@ -144,7 +145,7 @@ export const WithRejectedAction: Story = {
           createdAt: new Date().toISOString(),
           createdByUserType: TokenUserType.Enum.user,
           createdBy: '123',
-          createdAtLocation: '123',
+          createdAtLocation: '123' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {},
           reason: { message: 'Archived', isDuplicate: true }
@@ -258,7 +259,7 @@ export const WithSystemUserActions: Story = {
           ),
           createdBy: '123',
           createdByUserType: TokenUserType.Enum.user,
-          createdAtLocation: '123',
+          createdAtLocation: '123' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {}
         }

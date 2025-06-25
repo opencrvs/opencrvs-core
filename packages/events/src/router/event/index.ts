@@ -145,6 +145,7 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .output(Draft)
       .mutation(async ({ input, ctx }) => {
         const { eventId } = input
         await getEventById(eventId)

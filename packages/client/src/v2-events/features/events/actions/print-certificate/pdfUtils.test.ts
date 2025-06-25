@@ -13,25 +13,26 @@ import { createIntl } from 'react-intl'
 import {
   eventQueryDataGenerator,
   User,
-  TokenUserType
+  TokenUserType,
+  UUID
 } from '@opencrvs/commons/client'
 import { stringifyEventMetadata } from './pdfUtils'
 
 const locations = [
   {
-    id: '35391063-7dca-4e57-abd3-20dcc8538a64',
+    id: '35391063-7dca-4e57-abd3-20dcc8538a64' as UUID,
     externalId: '2OKicPQMNI',
     name: 'HQ Office',
-    partOf: 'f09c8dda-2156-420a-8215-2beda4c81d66'
+    partOf: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID
   },
   {
-    id: 'f09c8dda-2156-420a-8215-2beda4c81d66',
+    id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
     externalId: 'BxrIbNW7f3K',
     name: 'Embe',
-    partOf: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64'
+    partOf: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID
   },
   {
-    id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64',
+    id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
     externalId: 'B1u1bVtIA92',
     name: 'Pualula',
     partOf: null
@@ -42,7 +43,7 @@ const userId = '677fb08730f3abfa33072769'
 describe('stringifyEventMetadata', () => {
   test('Resolves event metadata', () => {
     const { declaration, ...metadata } = eventQueryDataGenerator({
-      id: 'seabeast-clad-stad-elia-oleocellosis',
+      id: 'seabeast-clad-stad-elia-oleocellosis' as UUID,
       assignedTo: userId,
       createdByUserType: TokenUserType.Enum.user,
       createdBy: userId,
