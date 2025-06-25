@@ -19,7 +19,7 @@ Install [PostgreSQL for VSCode](https://marketplace.visualstudio.com/items?itemN
 
 Unlike MongoDB and other NoSQL databases, PostgreSQL **requires** writing migrations to create tables where data is written into. This structure is called a schema.
 
-See [@opencrvs/migration](/packages/migration/README.md) for more information around the migrations. See the first migration to understand the format.
+See [@opencrvs/migration](/packages/migration/README.md) for more information around the migrations. See the first migration to understand the format. If you run migrations, see `## Tests` to update the test migration file.
 
 ## Directory structure
 
@@ -49,3 +49,7 @@ See [@opencrvs/migration](/packages/migration/README.md) for more information ar
 We're using [Kysely](https://kysely.dev/) to interact with PostgreSQL. It provides TypeScript IntelliSense through [Kanel](https://kristiandupont.github.io/kanel/) and `kanel-kysely`.
 
 The schema directory is generated with `yarn generate-db-types`, but runs automatically when @opencrvs/migration runs.
+
+## Tests
+
+Tests use a migration file that is essentially a dump of the database schema. You can find it from `src/tests/postgres-migrations.sql`. The tests spin up a testcontainer for Postgres and create a new database for each test.
