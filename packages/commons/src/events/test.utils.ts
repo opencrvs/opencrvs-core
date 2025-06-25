@@ -877,7 +877,8 @@ export const eventQueryDataGenerator = (
     flags: [],
     legalStatuses: overrides.legalStatuses ?? {},
     declaration: overrides.declaration ?? generateRandomApplicant(rng),
-    trackingId: overrides.trackingId ?? generateTrackingId(rng)
+    trackingId: overrides.trackingId ?? generateTrackingId(rng),
+    copiesPrintedForTemplate: overrides.copiesPrintedForTemplate ?? 0
   }
 }
 export const generateTranslationConfig = (
