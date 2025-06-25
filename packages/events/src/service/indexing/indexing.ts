@@ -280,7 +280,7 @@ const EVENT_COLUMNS = {
 
 const EVENT_ACTION_COLUMNS = {
   id: 'id',
-  actionType: 'type',
+  actionType: 'action_type',
   annotation: 'annotation',
   assignedTo: 'assigned_to',
   createdAt: 'created_at',
@@ -326,9 +326,9 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
         ),
         '[]'::json
       ) AS actions
-    FROM events e
-    LEFT JOIN event_actions a ON a.event_id = e.id
-    GROUP BY e.id`
+      FROM app.events e
+      LEFT JOIN app.event_actions a ON a.event_id = e.id
+      GROUP BY e.id`
   )
 
   const transformedStreamData = new Transform({
@@ -340,6 +340,7 @@ export async function indexAllEvents(eventConfiguration: EventConfig) {
   })
 
   const client = await getPool().connect()
+
   try {
     const pgStream = client.query(streamQuery)
 

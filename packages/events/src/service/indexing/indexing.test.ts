@@ -19,7 +19,7 @@ import {
 import { indexAllEvents } from './indexing'
 import { buildElasticQueryFromSearchPayload } from './query'
 
-test('indexes all records from MongoDB with one function call', async () => {
+test('indexes all records from postgres with one function call', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
