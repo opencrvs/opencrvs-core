@@ -187,6 +187,7 @@ export async function createIndex(
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
+          createdByUserType: { type: 'keyword' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
           updatedAtLocation: { type: 'keyword' },
@@ -207,6 +208,7 @@ export async function createIndex(
                 properties: {
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   createdBySignature: { type: 'keyword' },
@@ -221,6 +223,7 @@ export async function createIndex(
                 properties: {
                   createdAt: { type: 'date' },
                   createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
                   createdAtLocation: { type: 'keyword' },
                   createdByRole: { type: 'keyword' },
                   createdBySignature: { type: 'keyword' },
@@ -288,6 +291,7 @@ const EVENT_ACTION_COLUMNS = {
   declaration: 'declaration',
   eventId: 'event_id',
   originalActionId: 'original_action_id',
+  createdByUserType: 'created_by_user_type',
   reasonIsDuplicate: 'reason_is_duplicate',
   reasonMessage: 'reason_message',
   registrationNumber: 'registration_number',
@@ -439,13 +443,6 @@ export async function getIndex(
   eventParams: QueryType,
   eventConfigs: EventConfig[]
 ) {
-  if (
-    Object.values(eventParams).length === 0 ||
-    eventParams.clauses.length === 0
-  ) {
-    throw new Error('No search params provided')
-  }
-
   const esClient = getOrCreateClient()
   const query = buildElasticQueryFromSearchPayload(eventParams, eventConfigs)
 

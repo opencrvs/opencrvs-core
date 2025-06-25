@@ -10,7 +10,7 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import superjson from 'superjson'
-import React from 'react'
+import React, { Suspense } from 'react'
 import { within } from '@storybook/testing-library'
 import { waitFor, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
@@ -29,30 +29,49 @@ import {
   getCache
 } from '@client/v2-events/cache'
 import { ROUTES } from '@client/v2-events/routes'
-import { DeclarationAction } from './DeclarationAction'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { useDrafts } from '../../drafts/useDrafts'
+import { useEvents } from './useEvents'
 
-const meta: Meta<typeof DeclarationAction> = {
-  title: 'Components/DeclarationAction'
+const meta: Meta<unknown> = {
+  title: 'Hooks/useEvents'
 }
 
 export default meta
 
-type Story = StoryObj<typeof DeclarationAction>
+type Story = StoryObj<unknown>
+
+const createdEvent = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
 
 const router = {
   path: '/',
   children: [
     {
       path: ROUTES.V2.EVENTS.DECLARE.REVIEW.path,
-      Component: () => {
+      Component: withSuspense(() => {
+        const { getEvent } = useEvents()
+        /*
+         * Explicitly trigger the download of the event
+         */
+        const event = getEvent.findFromCache(createdEvent.id)
+
+        React.useEffect(() => {
+          void event.refetch()
+        }, [event, event.refetch])
+        /*
+         * Explicitly call the hook to trigger draft fetching
+         */
+        useDrafts().getRemoteDrafts(createdEvent.id)
+
         return (
           <TRPCProvider>
-            <DeclarationAction actionType={ActionType.DECLARE}>
-              <div>{'Test content'}</div>
-            </DeclarationAction>
+            {event.data && <div>{'Test content'}</div>}
           </TRPCProvider>
         )
-      }
+      })
     }
   ]
 }
@@ -64,11 +83,6 @@ const trpcMsw = createTRPCMsw<AppRouter>({
     })
   ],
   transformer: { input: superjson, output: superjson }
-})
-
-const createdEvent = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
 })
 
 const spies = {
@@ -119,8 +133,8 @@ const handlers = {
   ]
 }
 
-export const DeclarationDraftCache: Story = {
-  name: 'Precaches draft files for declaration action',
+export const GetEventHook: Story = {
+  name: 'Precaches declaration and draft files',
   args: {
     actionType: ActionType.DECLARE
   },
@@ -156,12 +170,20 @@ export const DeclarationDraftCache: Story = {
   play: async ({ canvasElement, step }) => {
     await step('No cache exists for the presigned urls', async () => {
       const cache = await getCache(CACHE_NAME)
-
       await expect(cache.matchAll()).resolves.toHaveLength(0)
     })
 
-    const canvas = within(canvasElement)
-    await canvas.findByText('Test content')
+    await step('Waits for test content to appear', async () => {
+      const canvas = within(canvasElement)
+      await waitFor(
+        async () => {
+          return expect(canvas.getByText('Test content')).toBeInTheDocument()
+        },
+        {
+          timeout: 5000
+        }
+      )
+    })
 
     await step('Retrieves presigned urls for draft files', async () => {
       await waitFor(async () => {

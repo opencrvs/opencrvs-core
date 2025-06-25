@@ -110,6 +110,12 @@ const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
 function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
+  if (clause.id) {
+    must.push({
+      term: { id: clause.id }
+    })
+  }
+
   if (clause.eventType) {
     must.push({
       term: { type: clause.eventType }
@@ -139,6 +145,12 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   if (clause.createdBy) {
     must.push({
       term: { createdBy: clause.createdBy.term }
+    })
+  }
+
+  if (clause.createdByUserType) {
+    must.push({
+      term: { createdByUserType: clause.createdByUserType }
     })
   }
 
@@ -281,9 +293,12 @@ export function buildElasticQueryFromSearchPayload(
       const should = input.clauses.flatMap((clause) => ({
         bool: {
           must: buildClause(clause, eventConfigs),
+          // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
+          // when no `should` clauses are provided.
           should: undefined
         }
       }))
+
       return {
         bool: {
           should

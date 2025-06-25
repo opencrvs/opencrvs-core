@@ -27,7 +27,8 @@ import * as customApi from '@client/v2-events/custom-api'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import {
   cleanUpOnUnassign,
-  findLocalEventData,
+  findLocalEventDocument,
+  findLocalEventIndex,
   onAssign,
   updateLocalEvent
 } from '@client/v2-events/features/events/useEvents/api'
@@ -221,7 +222,10 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
-  onError: errorToastOnConflict
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.VALIDATE
+  }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
@@ -229,7 +233,10 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
-  onError: errorToastOnConflict
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.REGISTER
+  }
 })
 
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
@@ -237,7 +244,10 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   retry: retryUnlessConflict,
   retryDelay: 10000,
   onSuccess: updateLocalEvent,
-  onError: errorToastOnConflict
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.REGISTER
+  }
 })
 
 /**
@@ -283,13 +293,23 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
   function getMutationPayload(params: ActionMutationInput) {
     const { eventId } = params
-    const localEvent = findLocalEventData(eventId)
+    const localEvent =
+      /*
+       * In most cases an event should be stored in browser as a full event. This applies when:
+       * - You are submitting an action flow. Every action flow needs to have downloaded the full event first
+       * In other cases, the user might not have the full event downloaded, but only the index. This can happen when:
+       * - The user is on event overview page and is assigning / unassigning
+       */
+      findLocalEventDocument(eventId) || findLocalEventIndex(eventId)
+
     const eventConfiguration = eventConfigurations.find(
       (event) => event.id === localEvent?.type
     )
 
     if (!eventConfiguration) {
-      throw new Error('Event configuration not found')
+      throw new Error(
+        `Event configuration not found for event: ${localEvent?.type}`
+      )
     }
 
     // Let's find the action configuration. For NOTIFY action, we can use the DECLARE action configuration.
@@ -331,11 +351,14 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
 
 export function useEventCustomAction(mutationKey: string[]) {
   const eventConfigurations = useEventConfigurations()
-  const mutation = useMutation(queryClient.getMutationDefaults(mutationKey))
+  const mutation = useMutation({
+    mutationKey: [mutationKey],
+    ...queryClient.getMutationDefaults(mutationKey)
+  })
 
   return {
     mutate: (params: customApi.OnDeclareParams) => {
-      const localEvent = findLocalEventData(params.eventId)
+      const localEvent = findLocalEventDocument(params.eventId)
 
       const eventConfiguration = eventConfigurations.find(
         (event) => event.id === localEvent?.type

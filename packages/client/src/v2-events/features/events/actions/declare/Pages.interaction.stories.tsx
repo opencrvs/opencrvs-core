@@ -18,16 +18,30 @@ import {
   Draft,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  TokenUserType
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
 
+// Use an undeclared draft event for tests
+const undeclaredDraftEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: tennisClubMembershipEventDocument.actions.filter(
+    ({ type }) => type === ActionType.CREATE || type === ActionType.ASSIGN
+  )
+}
+
 const meta: Meta<typeof Pages> = {
   title: 'Declare/Interaction',
+  parameters: {
+    offline: {
+      events: [undeclaredDraftEvent]
+    }
+  },
   beforeEach: () => {
     useEventFormData.setState({ formValues: {} })
   }
@@ -45,13 +59,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-// Use an undeclared draft event for tests
-const undeclaredDraftEvent = {
-  ...tennisClubMembershipEventDocument,
-  actions: tennisClubMembershipEventDocument.actions.filter(
-    ({ type }) => type === ActionType.CREATE || type === ActionType.ASSIGN
-  )
-}
 const spy = fn()
 
 function createDraftHandlers() {
@@ -67,6 +74,7 @@ function createDraftHandlers() {
           ...req,
           declaration: req.declaration || {},
           createdBy: 'test-user',
+          createdByUserType: TokenUserType.Enum.user,
           createdByRole: 'test-role',
           createdAtLocation: 'test-location',
           createdAt: new Date().toISOString(),

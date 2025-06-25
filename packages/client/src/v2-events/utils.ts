@@ -23,7 +23,11 @@ import {
   isFieldValueWithoutTemplates,
   compositeFieldTypes,
   getDeclarationFields,
-  SystemVariables
+  SystemVariables,
+  Scope,
+  ActionScopes,
+  WorkqueueConfigWithoutQuery,
+  UUID
 } from '@opencrvs/commons/client'
 
 /**
@@ -85,7 +89,7 @@ export function isTemporaryId(id: string) {
 }
 
 export function createTemporaryId() {
-  return `tmp-${uuid()}`
+  return `tmp-${uuid()}` as UUID
 }
 
 /**
@@ -214,4 +218,25 @@ export function filterEmptyValues(
 export interface Option<T = string> {
   value: T
   label: string
+}
+
+export function hasOutboxWorkqueue(scopes: Scope[]) {
+  return scopes.some((scope) => ActionScopes.safeParse(scope).success)
+}
+
+export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
+  name: {
+    id: 'workqueues.outbox.title',
+    defaultMessage: 'Outbox',
+    description: 'Title of outbox workqueue'
+  },
+  actions: [],
+  slug: 'outbox',
+  icon: 'PaperPlaneTilt'
+}
+
+export const emptyMessage = {
+  defaultMessage: '',
+  description: 'empty string',
+  id: 'v2.messages.emptyString'
 }

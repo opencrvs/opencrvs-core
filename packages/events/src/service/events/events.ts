@@ -27,10 +27,11 @@ import {
   getAcceptedActions,
   AsyncRejectActionDocument,
   ActionType,
-  EventStatus,
   isWriteAction,
   getStatusFromActions,
-  EventConfig
+  EventConfig,
+  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
+  EventStatus
 } from '@opencrvs/commons/events'
 import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -96,6 +97,25 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
     }
   }
 }
+
+export async function throwConflictIfActionNotAllowed(
+  eventId: UUID,
+  actionType: ActionType
+) {
+  const event = await getEventById(eventId)
+  const eventStatus = getStatusFromActions(event.actions)
+
+  const allowedActions: ActionType[] =
+    AVAILABLE_ACTIONS_BY_EVENT_STATUS[eventStatus]
+
+  if (!allowedActions.includes(actionType)) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${actionType}' cannot be performed on an event in '${eventStatus}' state. Available actions: ${allowedActions.join(', ')}.`
+    })
+  }
+}
+
 export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
   const event = await getEventById(eventId)
   const eventStatus = getStatusFromActions(event.actions)
@@ -153,6 +173,7 @@ export async function createEvent({
     transactionId: transactionId,
     trackingId: generateTrackingId(),
     createdBy: user.id,
+    createdByUserType: user.type,
     createdByRole: user.role,
     createdBySignature: user.signature,
     createdAtLocation: user.primaryOfficeId
@@ -248,6 +269,7 @@ export async function addAction(
       status,
       createdBy: user.id,
       createdByRole: user.role,
+      createdByUserType: user.type,
       createdBySignature: user.signature ?? undefined,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
@@ -264,6 +286,7 @@ export async function addAction(
       status,
       createdBy: user.id,
       createdByRole: user.role,
+      createdByUserType: user.type,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
       assignedTo: user.id
@@ -285,6 +308,7 @@ export async function addAction(
       status,
       createdBy: user.id,
       createdByRole: user.role,
+      createdByUserType: user.type,
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
       reasonIsDuplicate: hasReason
@@ -311,6 +335,7 @@ export async function addAction(
       status,
       createdBy: user.id,
       createdByRole: user.role,
+      createdByUserType: user.type,
       createdAtLocation: user.primaryOfficeId
     })
   }
@@ -330,12 +355,10 @@ export async function addAction(
 
   const updatedEvent = await getEventById(eventId)
 
-  if (input.type !== ActionType.READ) {
-    await indexEvent(updatedEvent, configuration)
+  await indexEvent(updatedEvent, configuration)
 
-    if (input.type !== ActionType.ASSIGN) {
-      await draftsRepo.deleteDraftsByEventId(eventId)
-    }
+  if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
+    await draftsRepo.deleteDraftsByEventId(eventId)
   }
 
   return updatedEvent
@@ -377,6 +400,7 @@ export async function addAsyncRejectAction({
     originalActionId,
     createdBy,
     createdByRole,
+    createdByUserType: TokenUserType.enum.system,
     createdAtLocation
   })
 

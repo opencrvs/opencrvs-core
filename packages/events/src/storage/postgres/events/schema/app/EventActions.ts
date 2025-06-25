@@ -33,6 +33,8 @@ export default interface EventActionsTable {
 
   createdBySignature: ColumnType<string | null, string | null, string | null>
 
+  createdByUserType: ColumnType<string, string, string>
+
   declaration: ColumnType<
     Record<string, any>,
     Record<string, any> | undefined,

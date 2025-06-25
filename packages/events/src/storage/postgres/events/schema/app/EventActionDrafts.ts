@@ -34,6 +34,8 @@ export default interface EventActionDraftsTable {
 
   createdByRole: ColumnType<string, string, string>
 
+  createdByUserType: ColumnType<string, string, string>
+
   createdBySignature: ColumnType<string | null, string | null, string | null>
 
   createdAtLocation: ColumnType<UUID, UUID, UUID>

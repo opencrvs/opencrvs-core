@@ -49,7 +49,8 @@ import {
   addAction,
   createEvent,
   deleteEvent,
-  getEventById
+  getEventById,
+  throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
@@ -100,6 +101,7 @@ export const eventRouter = router({
         token: ctx.token,
         eventType: input.type
       })
+
       return createEvent({
         transactionId: input.transactionId,
         eventInput: input,
@@ -107,7 +109,6 @@ export const eventRouter = router({
         config
       })
     }),
-  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(UUID)
@@ -135,6 +136,7 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
+      await throwConflictIfActionNotAllowed(input.eventId, ActionType.DELETE)
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({

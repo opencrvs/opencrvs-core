@@ -594,6 +594,7 @@ describe('"event" conditionals', () => {
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
+            createdByUserType: TokenUserType.Enum.user,
             createdByRole: 'some-role',
             declaration: {},
             createdAtLocation: '123456' as UUID,
