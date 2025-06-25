@@ -3,6 +3,7 @@
 
 import type { UUID } from '@opencrvs/commons'
 import type { default as ActionType } from './ActionType'
+import type { default as UserType } from './UserType'
 import type { default as ActionStatus } from './ActionStatus'
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely'
 
@@ -16,9 +17,9 @@ export default interface EventActionsTable {
   actionType: ColumnType<ActionType, ActionType, ActionType>
 
   annotation: ColumnType<
-    Record<string, any>,
-    Record<string, any> | undefined,
-    Record<string, any>
+    Record<string, any> | null,
+    Record<string, any> | null,
+    Record<string, any> | null
   >
 
   assignedTo: ColumnType<string | null, string | null, string | null>
@@ -31,9 +32,9 @@ export default interface EventActionsTable {
 
   createdByRole: ColumnType<string, string, string>
 
-  createdByUserType: ColumnType<string, string, string>
-
   createdBySignature: ColumnType<string | null, string | null, string | null>
+
+  createdByUserType: ColumnType<UserType, UserType, UserType>
 
   declaration: ColumnType<
     Record<string, any>,
@@ -52,11 +53,11 @@ export default interface EventActionsTable {
 
   registrationNumber: ColumnType<string | null, string | null, string | null>
 
+  requestId: ColumnType<string | null, string | null, string | null>
+
   status: ColumnType<ActionStatus, ActionStatus, ActionStatus>
 
   transactionId: ColumnType<string, string, string>
-
-  requestId: ColumnType<string | null, string | null, string | null>
 }
 
 export type EventActions = Selectable<EventActionsTable>

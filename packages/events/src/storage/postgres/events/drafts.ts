@@ -9,35 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Selectable, sql } from 'kysely'
+import { sql } from 'kysely'
 import z from 'zod'
 import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
-import EventActionDrafts, {
+import {
+  EventActionDrafts,
   NewEventActionDrafts
 } from './schema/app/EventActionDrafts'
 import ActionType from './schema/app/ActionType'
 
-export async function createDraft(draft: NewEventActionDrafts) {
-  const db = getClient()
-  const result = await db
-    .insertInto('eventActionDrafts')
-    .values(draft)
-    .onConflict((oc) =>
-      oc.columns(['transactionId', 'actionType']).doUpdateSet({
-        declaration: sql`EXCLUDED.declaration`,
-        annotation: sql`EXCLUDED.annotation`,
-        createdAt: sql`NOW()`
-      })
-    )
-    .returning(['id', 'eventId', 'transactionId', 'declaration', 'annotation'])
-    .executeTakeFirst()
-
-  return result
-}
-
-function transformDraft(draft: Selectable<EventActionDrafts>): Draft {
-  return {
+function toDraftDocument(draft: EventActionDrafts): Draft {
+  return Draft.parse({
     id: draft.id,
     transactionId: draft.transactionId,
     createdAt: draft.createdAt,
@@ -54,7 +37,37 @@ function transformDraft(draft: Selectable<EventActionDrafts>): Draft {
       type: draft.actionType,
       status: ActionStatus.Accepted
     }
-  }
+  })
+}
+
+export async function createDraft(draft: NewEventActionDrafts) {
+  const db = getClient()
+  const result = await db
+    .insertInto('eventActionDrafts')
+    .values(draft)
+    // @TODO
+    // Do this similarly as in events:
+    //
+    // use .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
+    // &
+    // const { id: newId } = await trx
+    // .selectFrom('eventActionDrafts')
+    // .select('id')
+    // .where('transactionId', '=', input.transactionId)
+    // .where('eventType', '=', input.eventType)
+    // .executeTakeFirstOrThrow()
+
+    .onConflict((oc) =>
+      oc.columns(['transactionId', 'actionType']).doUpdateSet({
+        declaration: sql`EXCLUDED.declaration`,
+        annotation: sql`EXCLUDED.annotation`,
+        createdAt: sql`NOW()`
+      })
+    )
+    .returning(['id', 'eventId', 'transactionId', 'declaration', 'annotation'])
+    .executeTakeFirst()
+
+  return result
 }
 
 export async function getDraftsByUserId(createdBy: string) {
@@ -64,7 +77,7 @@ export async function getDraftsByUserId(createdBy: string) {
     .where('createdBy', '=', createdBy)
     .selectAll()
     .execute()
-  const draftDocuments = drafts.map(transformDraft)
+  const draftDocuments = drafts.map(toDraftDocument)
 
   return z.array(Draft).parse(draftDocuments satisfies Draft[])
 }
@@ -82,12 +95,12 @@ export async function getDraftsForAction(
     .where('actionType', '=', actionType)
     .selectAll()
     .execute()
-  const draftDocuments = drafts.map(transformDraft)
+  const draftDocuments = drafts.map(toDraftDocument)
 
   return z.array(Draft).parse(draftDocuments satisfies Draft[])
 }
 
-export function deleteDraftsByEventId(eventId: UUID) {
+export async function deleteDraftsByEventId(eventId: UUID) {
   const db = getClient()
   return db
     .deleteFrom('eventActionDrafts')

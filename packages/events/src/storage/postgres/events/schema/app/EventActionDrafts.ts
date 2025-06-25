@@ -25,9 +25,9 @@ export default interface EventActionDraftsTable {
   >
 
   annotation: ColumnType<
-    Record<string, any>,
-    Record<string, any> | undefined,
-    Record<string, any>
+    Record<string, any> | null,
+    Record<string, any> | null,
+    Record<string, any> | null
   >
 
   createdBy: ColumnType<string, string, string>
@@ -41,8 +41,6 @@ export default interface EventActionDraftsTable {
   createdAtLocation: ColumnType<UUID, UUID, UUID>
 
   createdAt: ColumnType<string, string | undefined, string>
-
-  requestId: ColumnType<string | null, string | null, string | null>
 }
 
 export type EventActionDrafts = Selectable<EventActionDraftsTable>

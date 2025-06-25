@@ -18,14 +18,38 @@ import {
   UUID
 } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
+import { dropNulls } from '../drop-nulls'
 import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
+function toEventDocument(
+  { eventType, ...event }: Events,
+  actions: EventActions[]
+) {
+  const notNullActions = actions.map(
+    ({ actionType, reasonIsDuplicate, reasonMessage, ...action }) =>
+      dropNulls({
+        ...action,
+        type: actionType,
+        reason: (reasonIsDuplicate || reasonMessage) && {
+          isDuplicate: reasonIsDuplicate,
+          message: reasonMessage
+        }
+      })
+  )
+
+  return EventDocument.parse({
+    ...event,
+    type: eventType,
+    actions: notNullActions
+  })
+}
+
 export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   const event = await trx
     .selectFrom('events')
-    .select(['id', 'eventType as type', 'createdAt', 'updatedAt', 'trackingId'])
+    .selectAll()
     .where('id', '=', id)
     .executeTakeFirstOrThrow()
 
@@ -35,34 +59,7 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
     .where('eventId', '=', event.id)
     .execute()
 
-  const result = {
-    ...event,
-    actions: actions.map(
-      ({ actionType, reasonIsDuplicate, reasonMessage, ...action }) => ({
-        ...action,
-        type: actionType,
-        reason: (reasonIsDuplicate || reasonMessage) && {
-          isDuplicate: reasonIsDuplicate,
-          message: reasonMessage
-        }
-      })
-    )
-  }
-
-  const cleanedActions = result.actions.map((action) =>
-    _.omitBy(
-      action,
-      (value, key) =>
-        _.isNil(value) &&
-        // For now, assignedTo is the only exception to the rule of dropping nulls.
-        !(action.type === ActionType.UNASSIGN && key === 'assignedTo')
-    )
-  )
-
-  return EventDocument.parse({
-    ...result,
-    actions: cleanedActions
-  })
+  return toEventDocument(event, actions)
 }
 
 export const getEventById = async (id: UUID) => {
@@ -114,10 +111,7 @@ export async function createActionInTrx(
   action: NewEventActions,
   trx: Kysely<Schema>
 ) {
-  // @TODO:
-  const withoutUndefined = _.omitBy(action, _.isUndefined) as any
-
-  await trx.insertInto('eventActions').values(withoutUndefined).execute()
+  await trx.insertInto('eventActions').values(action).execute()
 
   return trx
     .selectFrom('eventActions')

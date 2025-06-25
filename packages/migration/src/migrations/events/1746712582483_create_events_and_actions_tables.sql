@@ -13,8 +13,8 @@ CREATE TABLE events (
   event_type text NOT NULL,
   transaction_id text NOT NULL,
   tracking_id text NOT NULL UNIQUE,
-  created_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
-  updated_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
+  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
+  updated_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
   UNIQUE (transaction_id, event_type)
 );
 
@@ -43,29 +43,33 @@ CREATE TYPE action_type AS ENUM (
   'UNASSIGN'
 );
 
+CREATE TYPE user_type AS ENUM (
+  'system',
+  'user'
+);
+
 CREATE TABLE event_actions (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   action_type action_type NOT NULL,
-  annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
+  annotation jsonb,
   assigned_to text,
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
   created_at_location uuid REFERENCES locations(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
-  created_by_user_type text NOT NULL,
   created_by_signature text,
-  created_by_user_type text NOT NULL CHECK (created_by_user_type IN ('admin', 'user')),
+  created_by_user_type user_type NOT NULL,
   declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
   event_id uuid NOT NULL REFERENCES events(id),
+  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
   original_action_id uuid REFERENCES event_actions(id),
   reason_is_duplicate boolean,
   reason_message text,
-  request_id text,
   registration_number text UNIQUE,
+  request_id text,
   status action_status NOT NULL,
   transaction_id text NOT NULL,
   UNIQUE (transaction_id, action_type),
-    CHECK (
+  CHECK (
     (
       action_type = 'ASSIGN'
       AND assigned_to IS NOT NULL
@@ -123,13 +127,13 @@ CREATE TABLE event_action_drafts (
   event_id uuid NOT NULL REFERENCES events(id) ON DELETE CASCADE,
   action_type action_type NOT NULL,
   declaration jsonb DEFAULT '{}' :: jsonb NOT NULL,
-  annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
+  annotation jsonb,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
   created_by_user_type text NOT NULL CHECK (created_by_user_type IN ('admin', 'user')),
   created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
   UNIQUE (transaction_id, action_type)
 );
 
@@ -141,6 +145,8 @@ COMMENT ON TABLE event_action_drafts IS 'Stores user-specific drafts of event-re
 DROP TABLE IF EXISTS event_action_drafts;
 
 DROP TABLE IF EXISTS event_actions;
+
+DROP TYPE IF EXISTS app.user_type;
 
 DROP TYPE IF EXISTS action_type;
 
