@@ -177,6 +177,11 @@ export const RequestCorrection: Story = {
           type: ActionType.VALIDATE,
           declaration: originalDeclaration
         },
+        {
+          ...actionBase,
+          type: ActionType.REGISTER,
+          declaration: originalDeclaration
+        },
         requestCorrectionAction
       ],
       trackingId: 'ABCD123',
