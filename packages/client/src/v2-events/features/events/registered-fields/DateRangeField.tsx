@@ -211,6 +211,7 @@ function DateRangeInput({
       <DateRangeBody>
         {dateValue.isDateRangeActive && (
           <Checkbox
+            id={props.id + '-date_range_checkbox'}
             label={dateRangeLabel || ''}
             name={props.id + 'date_range_toggle'}
             selected={dateValue.isDateRangeActive}
