@@ -143,8 +143,6 @@ export function Summary() {
 
     events.actions.correction.request.mutate({
       eventId,
-      // @TODO:
-      // @ts-ignore
       declaration: {
         ...formWithOnlyChangedValues,
         ...nullifiedHiddenValues

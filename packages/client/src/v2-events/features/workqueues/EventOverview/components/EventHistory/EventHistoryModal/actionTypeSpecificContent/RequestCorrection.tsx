@@ -12,6 +12,7 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { Text } from '@opencrvs/components/lib/Text'
+import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
   EventConfig,
@@ -19,6 +20,7 @@ import {
   RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
+import { Output } from '@client/v2-events/features/events/components/Output'
 
 const CorrectionSectionTitle = styled(Text)`
   margin: 20px 0;
@@ -38,21 +40,42 @@ export function RequestCorrection({
       (a) => a.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
-  console.log(action)
+  const { annotation } = action
 
-  // TODO CIHAN: we need event state before change?
+  if (annotation === undefined) {
+    return
+  }
 
+  // get event state before change
   const formConfig = getDeclaration(eventConfiguration)
 
   return (
     <>
-      {correctionFormPages.map((page) => (
-        <div key={page.id}>{'todo'}</div>
-      ))}
+      {correctionFormPages.map((page) => {
+        const pageFields = page.fields.map((field) => {
+          const value = annotation[field.id]
+
+          if (!value) {
+            return null
+          }
+
+          // const valueDisplay = Output({
+          //   field,
+          //   value, // TODO CIHAN: fix this whole thing
+          //   showPreviouslyMissingValuesAsChanged: false
+          // })
+        })
+
+        return (
+          <Table
+            key={`correction-form-table-${page.id}`}
+            columns={[]}
+            content={[]}
+          ></Table>
+        )
+      })}
       <CorrectionSectionTitle element="h3" variant="h3">
-        {intl.formatMessage(
-          correctionMessages.correctionInformationSectionTitle
-        )}
+        {intl.formatMessage(correctionMessages.correctionSectionTitle)}
       </CorrectionSectionTitle>
     </>
   )
