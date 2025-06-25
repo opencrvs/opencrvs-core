@@ -27,6 +27,8 @@ export function RequestCorrection({
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
 
+  // We need to get the state of the event before the correction request was made
+  // so that we can display the original, uncorrected values
   const eventBeforeCorrectionRequest = {
     ...fullEvent,
     actions: fullEvent.actions.slice(0, fullEvent.actions.indexOf(action))
