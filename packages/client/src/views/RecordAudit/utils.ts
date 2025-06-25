@@ -449,7 +449,7 @@ export const getGQLDeclaration = (
       })} & ${getLocalisedName(intl, {
         firstNames: data.bride.name[0]?.firstNames,
         middleName: data.bride.name[0]?.middleName,
-        familyName: data.bride.name[0]?.familyName
+        familyName: data.bride.name[0]?.firstNames
       })}`
     } else if (data.groom?.name) {
       name = getLocalisedName(intl, {

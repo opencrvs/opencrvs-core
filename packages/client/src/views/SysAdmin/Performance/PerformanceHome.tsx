@@ -292,11 +292,6 @@ const PerformanceHomeComponent = (props: Props) => {
     isAccessibleOfficeSelected(selectedLocation)
   )
 
-  const isStateOrCountrySelected = selectedLocation
-    ? selectedLocation.id === NATIONAL_ADMINISTRATIVE_LEVEL ||
-      locations[selectedLocation.id]?.jurisdictionType === 'STATE'
-    : false
-
   useEffect(() => {
     setOfficeSelected(isOfficeSelected(selectedLocation))
     setIsAccessibleOffice(isAccessibleOfficeSelected(selectedLocation))
@@ -461,7 +456,7 @@ const PerformanceHomeComponent = (props: Props) => {
 
                     return (
                       <>
-                        {isStateOrCountrySelected && (
+                        {!officeSelected && (
                           <CompletenessReport
                             data={data!.getTotalMetrics}
                             selectedEvent={

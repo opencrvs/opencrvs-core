@@ -151,7 +151,6 @@ export function generateStatisticalExtensions(
   const birthRates: Statistics = []
 
   for (const data of sourceStatistic) {
-    // Add statistics without validation
     femalePopulations.push({
       [data.year]: data.female_population
     })

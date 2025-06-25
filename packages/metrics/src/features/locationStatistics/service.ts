@@ -17,10 +17,7 @@ import {
 } from '@metrics/api'
 import { getPopulation } from '@metrics/features/metrics/utils'
 import { IAuthHeader } from '@metrics/features/registration'
-import {
-  JURISDICTION_TYPE_IDENTIFIER,
-  OPENCRVS_SPECIFICATION_URL
-} from '../metrics/constants'
+import { OPENCRVS_SPECIFICATION_URL } from '@metrics/features/metrics/constants'
 
 interface ILocationStatisticsResponse {
   registrars: number
@@ -93,13 +90,11 @@ async function cacheOfficeCount(authHeader: IAuthHeader) {
     .forEach((location) => dfs(locationsMap, location, adjacency))
 }
 
-function isState(location: Location) {
+function isOffice(location: Location) {
   return (
-    location.identifier?.find(
-      ({ system }) =>
-        system ===
-        `${OPENCRVS_SPECIFICATION_URL}${JURISDICTION_TYPE_IDENTIFIER}`
-    )?.value === 'STATE'
+    location.type?.coding?.find(
+      ({ system }) => system === `${OPENCRVS_SPECIFICATION_URL}location-type`
+    )?.code === 'CRVS_OFFICE'
   )
 }
 
@@ -109,21 +104,20 @@ async function getAdminLocationStatistics(
   populationYear: number,
   authHeader: IAuthHeader
 ): Promise<ILocationStatisticsResponse> {
-  if (isState(location)) {
-    if (!OFFICE_COUNT_CACHE[location.id]) {
-      await cacheOfficeCount(authHeader)
-    }
-    return {
-      population: getPopulation(location, populationYear),
-      offices: OFFICE_COUNT_CACHE[location.id] ?? 0,
-      registrars
-    }
-  } else {
+  if (isOffice(location)) {
     return {
       population: 0,
       offices: 1,
       registrars
     }
+  }
+  if (!OFFICE_COUNT_CACHE[location.id]) {
+    await cacheOfficeCount(authHeader)
+  }
+  return {
+    population: getPopulation(location, populationYear),
+    offices: OFFICE_COUNT_CACHE[location.id] ?? 0,
+    registrars
   }
 }
 

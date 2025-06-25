@@ -59,12 +59,20 @@ jobs:
           elif [ "${{ github.event_name }}" == 'pull_request' ]; then
             BRANCH=${{ github.event.pull_request.head.ref }}
           else
-          BRANCH=${{ inputs.branch_name }}
+            BRANCH=${{ inputs.branch_name }}
           fi
           ESCAPED_BRANCH=$(echo $BRANCH | sed 's/[^a-zA-Z0-9_.-]/-/g')
           echo "from branch $BRANCH"
           echo "branch=$ESCAPED_BRANCH" >> $GITHUB_OUTPUT
 
+      - name: Set arch label
+        id: arch_label
+        run: |
+          if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
+            echo "arch=-arm64" >> $GITHUB_OUTPUT
+          else
+            echo "arch=" >> $GITHUB_OUTPUT
+          fi
       - name: Get list of services
         id: get-services
         run: |
@@ -86,9 +94,9 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}-${{ matrix.runner }}
-            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}-${{ matrix.runner }}
-          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}-${{ matrix.runner }}
+            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.version }}${{ steps.arch_label.outputs.arch }}
+            ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-base:${{ steps.set-version-and-branch.outputs.branch }}${{ steps.arch_label.outputs.arch }}
           cache-to: type=inline
 
     outputs:
@@ -112,8 +120,8 @@ jobs:
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-base:$TAG"
             docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG \
-              --amend ghcr.io/opencrvs/ocrvs-base:$TAG-ubuntu-24.04 \
-              --amend ghcr.io/opencrvs/ocrvs-base:$TAG-ubuntu-24.04-arm
+              --amend ghcr.io/opencrvs/ocrvs-base:$TAG \
+              --amend ghcr.io/opencrvs/ocrvs-base:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
           done
   build:
@@ -147,6 +155,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set arch label
+        id: arch_label
+        run: |
+          if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
+            echo "arch=-arm64" >> $GITHUB_OUTPUT
+          else
+            echo "arch=" >> $GITHUB_OUTPUT
+          fi
+
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
@@ -157,9 +174,9 @@ jobs:
           push: true
           context: .
           tags: |
-            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}-${{ matrix.runner }}
-            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}-${{ matrix.runner }}
-          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}-${{ matrix.runner }}
+            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.version }}${{ steps.arch_label.outputs.arch }}
+            ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
+          cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
           cache-to: type=inline
 
   merge-services-manifest:
@@ -168,6 +185,10 @@ jobs:
       fail-fast: false
       matrix:
         service: ${{ fromJSON(needs.base.outputs.services) }}
+        exclude:
+          # metabase/metabase:v0.50.30.1 doesn't support arm arch
+          # https://discourse.metabase.com/t/install-with-docker-on-arm/18501
+          - service: 'dashboards'
     runs-on: ubuntu-latest
     steps:
       - name: Log in to GHCR
@@ -181,15 +202,9 @@ jobs:
         run: |
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG"
-            if [ ${{ matrix.service }} == 'dashboards' ]
-            then
-              docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
-                --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-ubuntu-24.04
-            else
-              docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
-                --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-ubuntu-24.04 \
-                --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-ubuntu-24.04-arm
-            fi
+            docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
+              --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
+              --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
           done
 
