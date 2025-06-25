@@ -231,6 +231,11 @@ export function mergeWithoutNullsOrUndefined<T>(
   })
 }
 
+export enum CoreWorkqueues {
+  OUTBOX = 'outbox',
+  DRAFT = 'draft'
+}
+
 export function hasOutboxWorkqueue(scopes: Scope[]) {
   return scopes.some((scope) => ActionScopes.safeParse(scope).success)
 }
@@ -242,7 +247,7 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     description: 'Title of outbox workqueue'
   },
   actions: [],
-  slug: 'outbox',
+  slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }
 
