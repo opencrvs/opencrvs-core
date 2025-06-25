@@ -136,9 +136,6 @@ function EventOverviewContainer() {
   if (!eventIndex) {
     return
   }
-  if (eventIndex.length === 0) {
-    throw new Error(`Event ${params.eventId} not found`)
-  }
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
