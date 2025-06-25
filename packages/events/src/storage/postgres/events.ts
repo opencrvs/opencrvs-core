@@ -15,9 +15,9 @@ import { env } from '@events/environment'
 import Schema from './events/schema/Database'
 
 // Override timestamptz (OID 1184) to return ISO 8601 strings instead of Date objects
-//       `pg`: 2025-06-16 12:55:51.507875+00
+//  `pg`: 2025-06-16 12:55:51.507+00 -- postgres limits the precision to xxx milliseconds.
 // `ISO 8601`: 2025-06-16T12:55:51.507Z
-//                                 ^^^ (yes, we don't cut the milliseconds, Zod still accepts it)
+//                                 ^^^ (We set Z for UTC timezone)
 types.setTypeParser(1184, (str) => str.replace(' ', 'T').replace('+00', 'Z'))
 
 let db: Kysely<Schema> | undefined

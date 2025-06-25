@@ -32,13 +32,14 @@ export async function importEvent(eventDocument: EventDocument, token: string) {
     assignedTo: (action as any).assignedTo ?? undefined,
     createdBySignature: action.createdBySignature ?? undefined,
     createdAtLocation: action.createdAtLocation ?? undefined,
-    originalActionId: action.originalActionId ?? undefined
+    originalActionId: action.originalActionId ?? undefined,
+    requestId: (action as any).requestId ?? undefined
     /* eslint-enable @typescript-eslint/no-explicit-any */
   }))
 
   const createdEvent = await createEventWithActions(
     { ...omit(event, 'type'), eventType, transactionId },
-    // @TODO
+    // @ts-expect-error -- @TODO: check type inference
     eventActions
   )
 

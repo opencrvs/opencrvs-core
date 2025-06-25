@@ -13,8 +13,8 @@ CREATE TABLE events (
   event_type text NOT NULL,
   transaction_id text NOT NULL,
   tracking_id text NOT NULL UNIQUE,
-  created_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
-  updated_at timestamp with time zone DEFAULT now() NOT NULL, -- ENSURE timezone is UTC
+created_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
+updated_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
   UNIQUE (transaction_id, event_type)
 );
 
@@ -48,7 +48,7 @@ CREATE TABLE event_actions (
   action_type action_type NOT NULL,
   annotation jsonb DEFAULT '{}' :: jsonb NOT NULL,
   assigned_to text,
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
   created_at_location uuid REFERENCES locations(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
@@ -128,7 +128,7 @@ CREATE TABLE event_action_drafts (
   created_by_user_type text NOT NULL,
   created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
-  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  created_at TIMESTAMPTZ(3) NOT NULL DEFAULT NOW(),
   UNIQUE (transaction_id, action_type)
 );
 

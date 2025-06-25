@@ -9,9 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
-import QueryStream from 'pg-query-stream'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -34,9 +32,6 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { getPool } from '@events/storage/postgres/events'
-import Events from '@events/storage/postgres/events/schema/app/Events'
-import EventActions from '@events/storage/postgres/events/schema/app/EventActions'
 import {
   decodeEventIndex,
   DEFAULT_SIZE,
@@ -268,98 +263,6 @@ type _Combine<
 
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
-
-const EVENT_COLUMNS = {
-  id: 'id',
-  eventType: 'event_type',
-  createdAt: 'created_at',
-  updatedAt: 'updated_at',
-  trackingId: 'tracking_id',
-  transactionId: 'transaction_id'
-} satisfies Record<keyof Events, string>
-
-const EVENT_ACTION_COLUMNS = {
-  id: 'id',
-  actionType: 'action_type',
-  annotation: 'annotation',
-  assignedTo: 'assigned_to',
-  createdAt: 'created_at',
-  createdAtLocation: 'created_at_location',
-  createdBy: 'created_by',
-  createdByRole: 'created_by_role',
-  createdByUserType: 'created_by_user_type',
-  createdBySignature: 'created_by_signature',
-  declaration: 'declaration',
-  eventId: 'event_id',
-  originalActionId: 'original_action_id',
-  reasonIsDuplicate: 'reason_is_duplicate',
-  reasonMessage: 'reason_message',
-  registrationNumber: 'registration_number',
-  status: 'status',
-  transactionId: 'transaction_id',
-  requestId: 'request_id'
-} satisfies Record<keyof EventActions, string>
-
-export async function indexAllEvents(eventConfiguration: EventConfig) {
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const esClient = getOrCreateClient()
-
-  const hasEventsIndex = await esClient.indices.exists({ index: indexName })
-  if (!hasEventsIndex) {
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
-  }
-
-  const streamQuery = new QueryStream(
-    `SELECT
-      ${Object.entries(EVENT_COLUMNS)
-        .map(([camelCase, snakeCase]) => `e.${snakeCase} AS ${camelCase}`)
-        .join(', ')},
-      COALESCE(
-        json_agg(
-          jsonb_build_object(
-            ${Object.entries(EVENT_ACTION_COLUMNS)
-              .map(([camelCase, snakeCase]) => `'${camelCase}', a.${snakeCase}`)
-              .join(', ')}
-          )
-        ) FILTER (
-          WHERE a.id IS NOT NULL
-        ),
-        '[]'::json
-      ) AS actions
-      FROM app.events e
-      LEFT JOIN app.event_actions a ON a.event_id = e.id
-      GROUP BY e.id`
-  )
-
-  const transformedStreamData = new Transform({
-    readableObjectMode: true,
-    writableObjectMode: true,
-    transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record, eventConfiguration))
-    }
-  })
-
-  const client = await getPool().connect()
-
-  try {
-    const pgStream = client.query(streamQuery)
-
-    await esClient.helpers.bulk({
-      retries: 3,
-      wait: 3000,
-      datasource: pgStream.pipe(transformedStreamData),
-      onDocument: (doc: EventIndex) => ({
-        index: {
-          _index: indexName,
-          _id: doc.id
-        }
-      }),
-      refresh: 'wait_for'
-    })
-  } finally {
-    client.release()
-  }
-}
 
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()

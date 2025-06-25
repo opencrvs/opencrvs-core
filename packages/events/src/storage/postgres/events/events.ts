@@ -22,7 +22,7 @@ import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
-async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
+export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   const event = await trx
     .selectFrom('events')
     .select(['id', 'eventType as type', 'createdAt', 'updatedAt', 'trackingId'])
@@ -85,7 +85,7 @@ export async function deleteEventById(eventId: UUID) {
   })
 }
 
-async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
+export async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
   const result = await trx
     .insertInto('events')
     .values(event)
@@ -110,7 +110,10 @@ export const createEvent = async (
  * @idempotent with `transactionId, actionType`
  * @returns action id
  */
-async function createActionInTrx(action: NewEventActions, trx: Kysely<Schema>) {
+export async function createActionInTrx(
+  action: NewEventActions,
+  trx: Kysely<Schema>
+) {
   // @TODO:
   const withoutUndefined = _.omitBy(action, _.isUndefined) as any
 
