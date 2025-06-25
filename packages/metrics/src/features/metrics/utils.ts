@@ -227,18 +227,18 @@ export const fetchEstimateByLocation = async (
   for (let i = 0; i < yearArray.length; i++) {
     totalEstimation =
       totalEstimation +
-        ((crudArray[i] * totalPopulationArray[i]) / 1000) *
-          (estimationForDaysArray[i] / 365) || 0
+      ((crudArray[i] * totalPopulationArray[i]) / 1000) *
+        (estimationForDaysArray[i] / 365)
 
     maleEstimation =
       maleEstimation +
-        ((crudArray[i] * malePopulationArray[i]) / 1000) *
-          (estimationForDaysArray[i] / 365) || 0
+      ((crudArray[i] * malePopulationArray[i]) / 1000) *
+        (estimationForDaysArray[i] / 365)
 
     femaleEstimation =
       femaleEstimation +
-        ((crudArray[i] * femalePopulationArray[i]) / 1000) *
-          (estimationForDaysArray[i] / 365) || 0
+      ((crudArray[i] * femalePopulationArray[i]) / 1000) *
+        (estimationForDaysArray[i] / 365)
   }
 
   return {
