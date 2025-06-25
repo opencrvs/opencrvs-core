@@ -29,6 +29,7 @@ export default {
 const registeredScenariosForFieldAgent: Scenario[] = [
   {
     name: 'Unassigned',
+    recordDownloaded: false,
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
@@ -44,6 +45,7 @@ const registeredScenariosForFieldAgent: Scenario[] = [
   },
   {
     name: 'AssignedToOthers',
+    recordDownloaded: false,
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,

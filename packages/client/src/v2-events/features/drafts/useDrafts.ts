@@ -143,6 +143,18 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
+  function findAllRemoteDrafts(): Draft[] {
+    // Skip the queryFn defined by tRPC and use the one defined above
+    const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
+
+    const drafts = useSuspenseQuery({
+      ...options,
+      queryKey: trpc.event.draft.list.queryKey()
+    })
+
+    return drafts.data
+  }
+
   return {
     setLocalDraft: setDraft,
     getLocalDraftOrDefault: getLocalDraftOrDefault,
@@ -160,16 +172,9 @@ export function useDrafts() {
         status: localDraft.action.status
       })
     },
-    getRemoteDrafts: function useDraftList(): Draft[] {
-      // Skip the queryFn defined by tRPC and use the one defined above
-      const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
-
-      const drafts = useSuspenseQuery({
-        ...options,
-        queryKey: trpc.event.draft.list.queryKey()
-      })
-
-      return drafts.data
+    getAllRemoteDrafts: findAllRemoteDrafts,
+    getRemoteDrafts: function useDraftList(eventId: string): Draft[] {
+      return findAllRemoteDrafts().filter((draft) => draft.eventId === eventId)
     }
   }
 }

@@ -69,16 +69,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const declarationTrpcMsw = {
   events: wrapHandlersWithSpies([
     {
-      name: 'event.config.get',
-      procedure: tRPCMsw.event.config.get.query,
-      handler: () => [tennisClubMembershipEvent, footballClubMembershipEvent]
-    },
-    {
-      name: 'event.get',
-      procedure: tRPCMsw.event.get.query,
-      handler: () => eventDocument
-    },
-    {
       name: 'event.list',
       procedure: tRPCMsw.event.list.query,
       handler: () => [tennisClubMembershipEventIndex]
@@ -109,7 +99,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png'
+  signatureFilename: 'signature.png',
+  avatarURL: undefined
 }
 
 export const Outbox: Story = {
@@ -129,6 +120,10 @@ export const Outbox: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
+    offline: {
+      events: [eventDocument, declareEventDocument],
+      configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+    },
     msw: {
       handlers: {
         events: [...declarationTrpcMsw.events.handlers],
@@ -140,10 +135,10 @@ export const Outbox: Story = {
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [mockUser]
           }),
-          tRPCMsw.user.get.query((id) => {
+          tRPCMsw.user.get.query(() => {
             return mockUser
           })
         ]
