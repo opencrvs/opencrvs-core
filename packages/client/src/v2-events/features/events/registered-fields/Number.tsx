@@ -66,10 +66,10 @@ export const Number = {
     const intl = useIntl()
     const prefix = config.configuration?.prefix
     return (
-      <span>
+      <>
         {prefix && intl.formatMessage(prefix)}
         {value?.toString() || ''}
-      </span>
+      </>
     )
   }
 }

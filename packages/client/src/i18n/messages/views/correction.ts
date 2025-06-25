@@ -370,7 +370,7 @@ const messagesToDefine = {
   // V2
   correctionSectionTitle: {
     id: 'v2.correction.summary.section.title',
-    defaultMessage: 'Corrections',
+    defaultMessage: 'Request correction(s)',
     description: 'Corrections section title'
   }
 }
