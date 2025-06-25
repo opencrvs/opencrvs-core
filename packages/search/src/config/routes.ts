@@ -233,7 +233,8 @@ export const getRoutes = () => {
             SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
             SCOPES.SEARCH_DEATH_MY_JURISDICTION,
             SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
-            SCOPES.RECORDSEARCH
+            SCOPES.RECORDSEARCH,
+            SCOPES.PERFORMANCE_READ
           ]
         },
         description:
