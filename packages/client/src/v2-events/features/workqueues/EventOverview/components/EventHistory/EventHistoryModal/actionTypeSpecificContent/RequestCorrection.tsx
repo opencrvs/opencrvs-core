@@ -98,8 +98,6 @@ export function RequestCorrection({
             return isOnPage
           })
           .map(([key, value]) => {
-            console.log('key')
-            console.log(key, value)
             const field = page.fields.find((field) => field.id === key)
 
             if (!field) {
@@ -112,15 +110,9 @@ export function RequestCorrection({
               showPreviouslyMissingValuesAsChanged: false
             })
 
-            const correctionValue = declaration[key]
-
-            if (!correctionValue) {
-              return
-            }
-
             const correctionOutput = Output({
               field,
-              value: correctionValue,
+              value,
               showPreviouslyMissingValuesAsChanged: false
             })
 
@@ -166,9 +158,6 @@ export function RequestCorrection({
             hideTableBottomBorder={true}
           ></Table>
         )
-
-        console.log('changedFields')
-        console.log(changedFields)
       })}
     </>
   )
