@@ -16,7 +16,8 @@ import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionType,
-  EventConfig
+  EventConfig,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { joinValues } from '@client/v2-events/utils'
 import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
@@ -62,12 +63,12 @@ export function EventHistoryModal({
   action,
   userName,
   close,
-  eventConfiguration
+  fullEvent
 }: {
   action: ActionDocument
   userName: string
   close: () => void
-  eventConfiguration: EventConfig
+  fullEvent: EventDocument
 }) {
   const intl = useIntl()
   const title = intl.formatMessage(eventHistoryStatusMessage, {
@@ -114,7 +115,7 @@ export function EventHistoryModal({
           noResultText=" "
         />
       )}
-      {getActionTypeSpecificContent(action, eventConfiguration)}
+      {getActionTypeSpecificContent(action, fullEvent)}
     </ResponsiveModal>
   )
 }

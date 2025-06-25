@@ -15,24 +15,27 @@ import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionType,
-  EventConfig,
+  EventDocument,
+  getCurrentEventState,
   getDeclaration,
   RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 
 const CorrectionSectionTitle = styled(Text)`
   margin: 20px 0;
 `
 
 export function RequestCorrection({
-  eventConfiguration,
-  action
+  action,
+  fullEvent
 }: {
-  eventConfiguration: EventConfig
   action: RequestedCorrectionAction
+  fullEvent: EventDocument
 }) {
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const intl = useIntl()
 
   const correctionFormPages =
@@ -40,25 +43,34 @@ export function RequestCorrection({
       (a) => a.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
-  const { annotation } = action
+  const { annotation, declaration } = action
+  const formConfig = getDeclaration(eventConfiguration)
 
   if (annotation === undefined) {
     return
   }
 
   // get event state before change
-  const formConfig = getDeclaration(eventConfiguration)
+  const eventIndex = getCurrentEventState(fullEvent, eventConfiguration)
+
+  const eventBeforeCorrectionRequest = {
+    ...fullEvent,
+    actions: fullEvent.actions.slice(0, fullEvent.actions.indexOf(action))
+  }
+
+  const eventIndexBeforeCorrectionRequest = getCurrentEventState(
+    eventBeforeCorrectionRequest,
+    eventConfiguration
+  )
 
   return (
     <>
       {correctionFormPages.map((page) => {
         const pageFields = page.fields.map((field) => {
-          const value = annotation[field.id]
-
-          if (!value) {
-            return null
-          }
-
+          // const value = annotation[field.id]
+          // if (!value) {
+          //   return null
+          // }
           // const valueDisplay = Output({
           //   field,
           //   value, // TODO CIHAN: fix this whole thing
@@ -71,12 +83,93 @@ export function RequestCorrection({
             key={`correction-form-table-${page.id}`}
             columns={[]}
             content={[]}
+            // @TODO CIHAN: remove this
+            noResultText={intl.formatMessage(page.title)}
           ></Table>
         )
       })}
       <CorrectionSectionTitle element="h3" variant="h3">
         {intl.formatMessage(correctionMessages.correctionSectionTitle)}
       </CorrectionSectionTitle>
+      {formConfig.pages.map((page) => {
+        const changedFields = Object.entries(declaration)
+          .filter(([key, _]) => {
+            const isOnPage = page.fields.some((field) => field.id === key)
+            return isOnPage
+          })
+          .map(([key, value]) => {
+            console.log('key')
+            console.log(key, value)
+            const field = page.fields.find((field) => field.id === key)
+
+            if (!field) {
+              return
+            }
+
+            const originalOutput = Output({
+              field,
+              value: eventIndexBeforeCorrectionRequest.declaration[key],
+              showPreviouslyMissingValuesAsChanged: false
+            })
+
+            const correctionValue = declaration[key]
+
+            if (!correctionValue) {
+              return
+            }
+
+            const correctionOutput = Output({
+              field,
+              value: correctionValue,
+              showPreviouslyMissingValuesAsChanged: false
+            })
+
+            return {
+              fieldLabel: intl.formatMessage(field.label),
+              original: originalOutput ?? '-',
+              correction: correctionOutput ?? '-'
+            }
+          })
+          .filter((field) => {
+            return field !== undefined
+          })
+
+        if (!changedFields.length) {
+          return
+        }
+
+        return (
+          <Table
+            key={`corrections-table-${page.id}`}
+            columns={[
+              {
+                label: intl.formatMessage(page.title),
+                width: 34,
+                key: 'fieldLabel'
+              },
+              {
+                label: intl.formatMessage(
+                  correctionMessages.correctionSummaryOriginal
+                ),
+                width: 33,
+                key: 'original'
+              },
+              {
+                label: intl.formatMessage(
+                  correctionMessages.correctionSummaryCorrection
+                ),
+                width: 33,
+                key: 'correction'
+              }
+            ]}
+            content={changedFields}
+            hideTableBottomBorder={true}
+          ></Table>
+        )
+
+        console.log('changedFields')
+        console.log(changedFields)
+      })}
     </>
   )
 }

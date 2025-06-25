@@ -372,11 +372,6 @@ const messagesToDefine = {
     id: 'v2.correction.summary.section.title',
     defaultMessage: 'Corrections',
     description: 'Corrections section title'
-  },
-  correctionInformationSectionTitle: {
-    id: 'v2.correction.summary.information.section.title',
-    defaultMessage: 'Correction information',
-    description: 'Correction information section title'
   }
 }
 

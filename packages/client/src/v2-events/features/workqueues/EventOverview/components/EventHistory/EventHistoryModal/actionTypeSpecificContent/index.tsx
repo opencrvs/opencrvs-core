@@ -12,14 +12,14 @@ import React from 'react'
 import {
   ActionDocument,
   ActionType,
-  EventConfig
+  EventDocument
 } from '@opencrvs/commons/client'
 import { Archive } from './Archive'
 import { RequestCorrection } from './RequestCorrection'
 
 export function getActionTypeSpecificContent(
   action: ActionDocument,
-  eventConfiguration: EventConfig
+  fullEvent: EventDocument
 ) {
   const { type } = action
 
@@ -28,12 +28,7 @@ export function getActionTypeSpecificContent(
   }
 
   if (type === ActionType.REQUEST_CORRECTION) {
-    return (
-      <RequestCorrection
-        action={action}
-        eventConfiguration={eventConfiguration}
-      />
-    )
+    return <RequestCorrection action={action} fullEvent={fullEvent} />
   }
 
   return null

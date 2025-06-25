@@ -23,7 +23,8 @@ import { Table } from '@opencrvs/components/lib/Table'
 import {
   ActionDocument,
   ActionType,
-  EventConfig
+  EventDocument,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
@@ -134,13 +135,7 @@ function getSystemAvatar(name: string) {
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({
-  history,
-  eventConfiguration
-}: {
-  history: ActionDocument[]
-  eventConfiguration: EventConfig
-}) {
+export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const { systems } = useSelector(getOfflineData)
 
@@ -154,11 +149,13 @@ export function EventHistory({
       <EventHistoryModal
         action={item}
         close={close}
-        eventConfiguration={eventConfiguration}
+        fullEvent={fullEvent}
         userName={userName}
       />
     ))
   }
+
+  const history = getAcceptedActions(fullEvent)
 
   const visibleHistory = history.filter(
     ({ type }) => type !== ActionType.CREATE

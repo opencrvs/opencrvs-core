@@ -138,8 +138,7 @@ export const RequestCorrection: Story = {
     action: {
       ...actionBase,
       type: ActionType.REQUEST_CORRECTION
-    },
-    eventConfiguration: tennisClubMembershipEvent
+    }
   }
 }
 

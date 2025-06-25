@@ -281,7 +281,7 @@ export function Summary() {
               })
 
             if (changedFields.length === 0) {
-              return null
+              return
             }
 
             return (
