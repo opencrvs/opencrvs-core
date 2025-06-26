@@ -48,7 +48,9 @@ export function CorrectionDetails({
   editable?: boolean
 }) {
   const intl = useIntl()
-  // TODO CIHAN: workqueue slug homma
+  const [{ workqueue }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+  )
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
@@ -117,10 +119,7 @@ export function CorrectionDetails({
                         pageId,
                         eventId: event.id
                       },
-                      {
-                        from: 'summary',
-                        workqueue: 'todo'
-                      },
+                      { workqueue },
                       id ? makeFormFieldIdFormikCompatible(id) : undefined
                     )
                   )
