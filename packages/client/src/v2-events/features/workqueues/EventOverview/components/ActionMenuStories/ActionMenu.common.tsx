@@ -73,8 +73,7 @@ export const mockActions: Record<
   },
   [ActionType.UNASSIGN]: {
     ...actionProps,
-    type: ActionType.UNASSIGN,
-    assignedTo: null
+    type: ActionType.UNASSIGN
   },
   [ActionType.READ]: { ...actionProps, type: ActionType.READ },
   [ActionType.NOTIFY]: { ...actionProps, type: ActionType.NOTIFY },
