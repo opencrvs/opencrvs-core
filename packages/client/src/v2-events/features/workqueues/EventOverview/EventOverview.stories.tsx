@@ -79,6 +79,13 @@ export const Overview: Story = {
     },
     msw: {
       handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return [
+              getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+            ]
+          })
+        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
