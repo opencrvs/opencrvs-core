@@ -24,6 +24,7 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
+import { CoreWorkqueues } from '@client/v2-events/utils'
 import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 import { Outbox } from './Outbox'
@@ -52,7 +53,6 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
     throw new Error('Workqueue configuration not found for' + workqueueSlug)
   }
 
-  // @ToDo: hide actions when conditions are not met
   const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
     <SearchResultComponent
@@ -69,7 +69,7 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
 
 function WorkqueueContent() {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-  if (workqueueSlug === 'outbox') {
+  if (workqueueSlug === CoreWorkqueues.OUTBOX) {
     return <Outbox />
   }
   return <ConfigurableWorkqueue workqueueSlug={workqueueSlug} />

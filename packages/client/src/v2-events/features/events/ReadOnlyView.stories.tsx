@@ -19,6 +19,7 @@ import {
   createPrng,
   generateEventDocument,
   generateEventDraftDocument,
+  generateWorkqueues,
   getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -119,6 +120,14 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return [
               getCurrentEventState(eventDocument, tennisClubMembershipEvent)
             ]
+          }),
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 7 }
+            }, {})
           })
         ],
         drafts: [
