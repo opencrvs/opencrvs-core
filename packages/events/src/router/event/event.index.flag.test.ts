@@ -10,7 +10,12 @@
  */
 
 import { HttpResponse, http } from 'msw'
-import { ActionStatus, ActionType, CustomFlags, Flag } from '@opencrvs/commons'
+import {
+  ActionStatus,
+  ActionType,
+  InherentFlags,
+  Flag
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
 import {
   createEvent,
@@ -140,7 +145,7 @@ test('Adds ACTION-rejected flag when rejected form countryconfig', async () => {
   )
 })
 
-test(`Adds ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.PRINT_CERTIFICATE} is called`, async () => {
+test(`Adds ${InherentFlags.PRINTED} flag after ${ActionType.PRINT_CERTIFICATE} is called`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -156,10 +161,10 @@ test(`Adds ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.PRINT_CERT
 
   const index = await client.event.list()
 
-  expect(index[0].flags).toContain(CustomFlags.CERTIFICATE_PRINTED)
+  expect(index[0].flags).toContain(InherentFlags.PRINTED)
 })
 
-test(`Removes ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.APPROVE_CORRECTION} is called`, async () => {
+test(`Removes ${InherentFlags.PRINTED} flag after ${ActionType.APPROVE_CORRECTION} is called`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -171,7 +176,7 @@ test(`Removes ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.APPROVE
   ])
 
   const index = await client.event.list()
-  expect(index[0].flags).toContain(CustomFlags.CERTIFICATE_PRINTED)
+  expect(index[0].flags).toContain(InherentFlags.PRINTED)
 
   const withCorrectionRequest = await client.event.actions.correction.request(
     generator.event.actions.correction.request(event.id, {
@@ -193,5 +198,5 @@ test(`Removes ${CustomFlags.CERTIFICATE_PRINTED} flag after ${ActionType.APPROVE
   await client.event.actions.correction.approve(approveCorrectionPayload)
 
   const index2 = await client.event.list()
-  expect(index2[0].flags).not.toContain(CustomFlags.CERTIFICATE_PRINTED)
+  expect(index2[0].flags).not.toContain(InherentFlags.PRINTED)
 })

@@ -76,15 +76,6 @@ export const AnyOfStatus = z
     ref: 'AnyOfStatus'
   })
 
-export const AnyOfFlags = z
-  .object({
-    type: z.literal('anyOf'),
-    terms: z.array(Flag)
-  })
-  .openapi({
-    ref: 'AnyOfFlags'
-  })
-
 export const Range = z
   .object({
     type: z.literal('range'),
@@ -95,10 +86,13 @@ export const Range = z
     ref: 'Range'
   })
 
-export const Not = z
-  .object({ type: z.literal('not'), term: z.string() })
+export const ContainsFlags = z
+  .object({
+    anyOf: z.array(Flag).optional(),
+    noneOf: z.array(Flag).optional()
+  })
   .openapi({
-    ref: 'Not'
+    ref: 'ContainsFlags'
   })
 
 export const Within = z
@@ -129,7 +123,7 @@ export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
 export const QueryInput: ZodType = z
   .lazy(() =>
     z.union([
-      z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf, Not]),
+      z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf]),
       z.record(z.string(), QueryInput)
     ])
   )
@@ -142,7 +136,6 @@ export type BaseInput =
   | z.infer<typeof Range>
   | z.infer<typeof Within>
   | z.infer<typeof AnyOf>
-  | z.infer<typeof Not>
 
 type QueryMap = {
   [key: string]: BaseInput | QueryMap
@@ -171,7 +164,7 @@ export const QueryExpression = z
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
-    flags: z.optional(z.union([AnyOfFlags, Not])),
+    flags: z.optional(ContainsFlags),
     data: QueryInput
   })
   .partial()

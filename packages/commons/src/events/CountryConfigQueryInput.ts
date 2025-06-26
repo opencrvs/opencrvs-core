@@ -12,12 +12,11 @@
 import { z } from 'zod'
 import { SerializedUserField } from './serializers/user/serializer'
 import {
-  AnyOfFlags,
   AnyOfStatus,
+  ContainsFlags,
   DateCondition,
   Exact,
   ExactStatus,
-  Not,
   QueryInput,
   Within
 } from './EventIndex'
@@ -55,7 +54,7 @@ export const SerializedQueryExpression = z
     createdByUserType: TokenUserType,
     updatedBy: z.optional(SerializableExact),
     trackingId: z.optional(Exact),
-    flags: z.optional(z.union([AnyOfFlags, Not])),
+    flags: z.optional(ContainsFlags),
     data: QueryInput
   })
   .partial()

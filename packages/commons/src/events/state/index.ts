@@ -27,44 +27,37 @@ import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
 
 export function getStatusFromActions(actions: Array<Action>) {
-  // If the event has any rejected action, we consider the event to be rejected.
-  const hasRejectedAction = actions.some(
-    (a) => a.status === ActionStatus.Rejected
-  )
-
-  if (hasRejectedAction) {
-    return EventStatus.enum.REJECTED
-  }
-
-  return actions.reduce<EventStatus>((status, action) => {
-    switch (action.type) {
-      case ActionType.CREATE:
-        return EventStatus.enum.CREATED
-      case ActionType.DECLARE:
-        return EventStatus.enum.DECLARED
-      case ActionType.VALIDATE:
-        return EventStatus.enum.VALIDATED
-      case ActionType.REGISTER:
-        return EventStatus.enum.REGISTERED
-      case ActionType.REJECT:
-        return EventStatus.enum.REJECTED
-      case ActionType.ARCHIVE:
-        return EventStatus.enum.ARCHIVED
-      case ActionType.NOTIFY:
-        return EventStatus.enum.NOTIFIED
-      case ActionType.PRINT_CERTIFICATE:
-        return EventStatus.enum.CERTIFIED
-      case ActionType.ASSIGN:
-      case ActionType.UNASSIGN:
-      case ActionType.REQUEST_CORRECTION:
-      case ActionType.APPROVE_CORRECTION:
-      case ActionType.MARKED_AS_DUPLICATE:
-      case ActionType.REJECT_CORRECTION:
-      case ActionType.READ:
-      default:
-        return status
-    }
-  }, EventStatus.enum.CREATED)
+  return actions
+    .filter(({ status }) => status === ActionStatus.Accepted)
+    .reduce<EventStatus>((status, action) => {
+      switch (action.type) {
+        case ActionType.CREATE:
+          return EventStatus.enum.CREATED
+        case ActionType.DECLARE:
+          return EventStatus.enum.DECLARED
+        case ActionType.VALIDATE:
+          return EventStatus.enum.VALIDATED
+        case ActionType.REGISTER:
+          return EventStatus.enum.REGISTERED
+        case ActionType.REJECT:
+          return EventStatus.enum.REJECTED
+        case ActionType.ARCHIVE:
+          return EventStatus.enum.ARCHIVED
+        case ActionType.NOTIFY:
+          return EventStatus.enum.NOTIFIED
+        case ActionType.PRINT_CERTIFICATE:
+          return EventStatus.enum.CERTIFIED
+        case ActionType.ASSIGN:
+        case ActionType.UNASSIGN:
+        case ActionType.REQUEST_CORRECTION:
+        case ActionType.APPROVE_CORRECTION:
+        case ActionType.MARKED_AS_DUPLICATE:
+        case ActionType.REJECT_CORRECTION:
+        case ActionType.READ:
+        default:
+          return status
+      }
+    }, EventStatus.enum.CREATED)
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {

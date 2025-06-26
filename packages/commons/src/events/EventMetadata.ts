@@ -31,19 +31,13 @@ export const EventStatus = z.enum([
 
 export type EventStatus = z.infer<typeof EventStatus>
 
-export const CustomFlags = {
-  CERTIFICATE_PRINTED: 'certificate-printed',
-  DECLARATION_INCOMPLETE: 'declaration-incomplete',
-  DECLARATION_REQUIRES_UPDATES: 'declaration-requires-updates',
-  DECLARATION_PENDING_EXTERNAL_VALIDATION:
-    'declaration-pending-external-validation',
-  REGISTRATION_CERTIFY_NEW_REGISTRATION:
-    'registration-certify-new-registration',
-  REGISTRATION_RE_CERTIFY_AFTER_CORRECTION:
-    'registration-re-certify-after-correction',
-  REGISTRATION_CORRECTION_REQUESTED: 'registration-correction-requested'
+export const InherentFlags = {
+  PRINTED: 'printed',
+  INCOMPLETE: 'incomplete',
+  REJECTED: 'rejected',
+  CORRECTION_REQUESTED: 'correction-requested'
 } as const
-export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
+export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
 export const Flag = z
   .string()
@@ -57,7 +51,7 @@ export const Flag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-  .or(z.nativeEnum(CustomFlags))
+  .or(z.nativeEnum(InherentFlags))
 
 export type Flag = z.infer<typeof Flag>
 

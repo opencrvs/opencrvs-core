@@ -15,7 +15,7 @@ import { getUUID } from '../../uuid'
 import { ActionStatus } from '../ActionDocument'
 import { ActionType } from '../ActionType'
 import { AddressType } from '../CompositeFieldValue'
-import { CustomFlags, EventStatus } from '../EventMetadata'
+import { EventStatus } from '../EventMetadata'
 import { generateActionDocument, generateEventDocument } from '../test.utils'
 import { EventIndex } from '../EventIndex'
 import { TENNIS_CLUB_MEMBERSHIP } from '../Constants'
@@ -296,7 +296,7 @@ describe('getCurrentEventState()', () => {
       updatedAtLocation: registerRequestAction.createdAtLocation,
       declaration: deepDropNulls(declareRequestAction.declaration),
       dateOfEvent: event.createdAt.split('T')[0],
-      flags: [CustomFlags.REGISTRATION_CERTIFY_NEW_REGISTRATION],
+      flags: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareRequestAction.createdAt,
@@ -415,7 +415,7 @@ describe('getCurrentEventState()', () => {
       updatedAtLocation: registerAcceptAction.createdAtLocation,
       declaration: deepDropNulls(declareAcceptAction.declaration),
       dateOfEvent: event.createdAt.split('T')[0],
-      flags: [CustomFlags.REGISTRATION_CERTIFY_NEW_REGISTRATION],
+      flags: [],
       legalStatuses: {
         [EventStatus.enum.DECLARED]: {
           createdAt: declareAcceptAction.createdAt,

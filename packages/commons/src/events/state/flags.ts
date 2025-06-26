@@ -12,7 +12,7 @@
 import { getStatusFromActions } from '.'
 import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
-import { CustomFlags, EventStatus, Flag } from '../EventMetadata'
+import { InherentFlags, EventStatus, Flag } from '../EventMetadata'
 
 function isCertificatePrinted(actions: Action[]) {
   return actions.reduce<boolean>((prev, { type }) => {
@@ -45,53 +45,30 @@ function isDeclarationIncomplete(actions: Action[]): boolean {
   return getStatusFromActions(actions) === EventStatus.enum.NOTIFIED
 }
 
-function doesRequireUpdates(actions: Action[]): boolean {
+function isRejected(actions: Action[]): boolean {
   return getStatusFromActions(actions) === EventStatus.enum.REJECTED
 }
 
-function isPendingExternalValidation(flags: Flag[]): boolean {
-  return flags.includes(`${ActionType.REGISTER}:${ActionStatus.Requested}`)
-}
-
-function isRegistrationCertifyNewRegistration(actions: Action[]): boolean {
-  if (
-    isCertificatePrinted(actions) ||
-    getStatusFromActions(actions) !== EventStatus.enum.REGISTERED
-  ) {
-    return false
-  }
-  if (actions.some(({ type }) => type === ActionType.PRINT_CERTIFICATE)) {
-    return false
-  }
-
-  return true
-}
-
-function isRegistrationReCertifyAfterCorrection(actions: Action[]): boolean {
-  if (
-    isCertificatePrinted(actions) ||
-    getStatusFromActions(actions) !== EventStatus.enum.REGISTERED
-  ) {
-    return false
-  }
-  if (!actions.some(({ type }) => type === ActionType.PRINT_CERTIFICATE)) {
-    return false
-  }
-  return true
-}
-
 export function getFlagsFromActions(actions: Action[]): Flag[] {
-  const sortedactions = actions
+  const sortedActions = actions
     .filter(({ type }) => !isMetaAction(type))
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const actionStatus = sortedactions.reduce(
+  const actionStatus = sortedActions.reduce<
+    Partial<Record<ActionType, ActionStatus>>
+  >(
     (actionStatuses, { type, status }) => ({
       ...actionStatuses,
       [type]: status
     }),
-    {} as Record<ActionType, ActionStatus>
+    {}
   )
+
+  /**
+   * Adds two types of flags:
+   *  - `ACTION-requested` : An action sent which is not yet accepted or rejected by country config.
+   *  - `ACTION-rejected`  : An action which was rejected by country config.
+   */
 
   const flags = Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
@@ -100,26 +77,17 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
       return flag satisfies Flag
     })
 
-  if (isCertificatePrinted(sortedactions)) {
-    flags.push(CustomFlags.CERTIFICATE_PRINTED)
+  if (isCertificatePrinted(sortedActions)) {
+    flags.push(InherentFlags.PRINTED)
   }
-  if (isCorrectionRequested(sortedactions)) {
-    flags.push(CustomFlags.REGISTRATION_CORRECTION_REQUESTED)
+  if (isCorrectionRequested(sortedActions)) {
+    flags.push(InherentFlags.CORRECTION_REQUESTED)
   }
-  if (isDeclarationIncomplete(sortedactions)) {
-    flags.push(CustomFlags.DECLARATION_INCOMPLETE)
+  if (isDeclarationIncomplete(sortedActions)) {
+    flags.push(InherentFlags.INCOMPLETE)
   }
-  if (doesRequireUpdates(sortedactions)) {
-    flags.push(CustomFlags.DECLARATION_REQUIRES_UPDATES)
-  }
-  if (isPendingExternalValidation(flags)) {
-    flags.push(CustomFlags.DECLARATION_PENDING_EXTERNAL_VALIDATION)
-  }
-  if (isRegistrationCertifyNewRegistration(sortedactions)) {
-    flags.push(CustomFlags.REGISTRATION_CERTIFY_NEW_REGISTRATION)
-  }
-  if (isRegistrationReCertifyAfterCorrection(sortedactions)) {
-    flags.push(CustomFlags.REGISTRATION_RE_CERTIFY_AFTER_CORRECTION)
+  if (isRejected(sortedActions)) {
+    flags.push(InherentFlags.REJECTED)
   }
 
   return flags
