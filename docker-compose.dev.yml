@@ -92,11 +92,11 @@ services:
 
   client:
     ports:
-      - '3000:80'
+      - '3000:3000'
 
   login:
     ports:
-      - '3020:80'
+      - '3020:3020'
 
   config:
     ports:
