@@ -101,16 +101,6 @@ export async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
     .executeTakeFirstOrThrow()
 }
 
-export const createEvent = async (
-  event: Parameters<typeof createEventInTrx>[0]
-) => {
-  const db = getClient()
-
-  return db.transaction().execute(async (trx) => {
-    return createEventInTrx(event, trx)
-  })
-}
-
 /**
  * Creates a new action in the event_actions table
  * @idempotent with `transactionId, actionType`

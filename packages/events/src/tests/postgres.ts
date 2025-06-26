@@ -12,7 +12,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { Client } from 'pg'
 
-export const MIGRATION_SQL = fs
+const MIGRATION_SQL = fs
   .readFileSync(path.resolve(__dirname, './postgres-migrations.sql'))
   .toString()
 

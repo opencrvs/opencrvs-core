@@ -140,7 +140,7 @@ export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
 const TRACKING_ID_LENGTH = 6
 const TRACKING_ID_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-export function generateTrackingId(): string {
+function generateTrackingId(): string {
   let result = ''
   for (let i = 0; i < TRACKING_ID_LENGTH; i++) {
     const randomIndex = Math.floor(
