@@ -68,7 +68,10 @@ export function getStatusFromActions(actions: Array<Action>) {
 }
 
 function getFlagsFromActions(actions: Action[]): Flag[] {
-  const actionStatus = actions.reduce(
+  const sortedactions = actions.sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
+  const actionStatus = sortedactions.reduce(
     (actionStatuses, { type, status }) => ({
       ...actionStatuses,
       [type]: status
@@ -83,15 +86,18 @@ function getFlagsFromActions(actions: Action[]): Flag[] {
       return flag satisfies Flag
     })
 
-  const isCertificatePrinted = actions.reduce<boolean>((prev, { type }) => {
-    if (type === ActionType.PRINT_CERTIFICATE) {
-      return true
-    }
-    if (type === ActionType.APPROVE_CORRECTION) {
-      return false
-    }
-    return prev
-  }, false)
+  const isCertificatePrinted = sortedactions.reduce<boolean>(
+    (prev, { type }) => {
+      if (type === ActionType.PRINT_CERTIFICATE) {
+        return true
+      }
+      if (type === ActionType.APPROVE_CORRECTION) {
+        return false
+      }
+      return prev
+    },
+    false
+  )
 
   if (isCertificatePrinted) {
     flags.push(CustomFlags.CERTIFICATE_PRINTED)
@@ -229,7 +235,9 @@ export function getCurrentEventState(
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const acceptedActions = getAcceptedActions(event)
+  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
 
   // Includes the metadata of the last action. Whether it was a 'request' by user or 'accept' by user or 3rd party.
   const requestActionMetadata = getActionUpdateMetadata(event.actions)
@@ -289,6 +297,10 @@ export function getCurrentEventStateWithDrafts({
   drafts: Draft[]
   configuration: EventConfig
 }): EventIndex {
+  const actions = event.actions
+    .slice()
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+
   const activeDrafts = findActiveDrafts(event, drafts)
     .map((draft) => draft.action)
     .flatMap((action) => {
@@ -308,7 +320,7 @@ export function getCurrentEventStateWithDrafts({
       return [action] as ActionDocument[]
     })
 
-  const actionWithDrafts = [...event.actions, ...activeDrafts].sort()
+  const actionWithDrafts = [...actions, ...activeDrafts].sort()
   const withDrafts: EventDocument = {
     ...event,
     actions: actionWithDrafts

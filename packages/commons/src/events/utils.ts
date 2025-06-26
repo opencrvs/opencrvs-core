@@ -185,7 +185,10 @@ export function omitHiddenPaginatedFields(
 }
 
 export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
-  const actions = event.actions.filter(({ type }) => type !== ActionType.READ)
+  const actions = event.actions
+    .slice()
+    .filter(({ type }) => type !== ActionType.READ)
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
   const lastAction = actions[actions.length - 1]
   return (
