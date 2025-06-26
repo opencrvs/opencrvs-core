@@ -79,6 +79,9 @@ function EventOverviewFull({
 
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
+    // drafts should not affect the status of the event
+    // so the status is taken from the eventIndex
+    'event.status': status,
     assignedTo
   }
 
@@ -133,6 +136,9 @@ function EventOverviewProtected({
 
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
+    // drafts should not affect the status of the event
+    // so the status is taken from the eventIndex
+    'event.status': status,
     assignedTo
   }
 
