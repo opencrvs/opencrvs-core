@@ -4,9 +4,9 @@ CREATE TABLE locations (
   external_id text UNIQUE,
   name text NOT NULL,
   parent_id uuid REFERENCES locations(id),
-  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
-  updated_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
-  deleted_at TIMESTAMPTZ(3)
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
+  deleted_at timestamp with time zone
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON locations TO events_app;
@@ -16,8 +16,8 @@ CREATE TABLE events (
   event_type text NOT NULL,
   transaction_id text NOT NULL,
   tracking_id text NOT NULL UNIQUE,
-  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
-  updated_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
+  updated_at timestamp with time zone DEFAULT now() NOT NULL,
   UNIQUE (transaction_id, event_type)
 );
 
@@ -55,7 +55,7 @@ CREATE TABLE event_actions (
   action_type action_type NOT NULL,
   annotation jsonb,
   assigned_to text,
-  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
   created_at_location uuid REFERENCES locations(id),
   created_by text NOT NULL,
   created_by_role text NOT NULL,
@@ -136,7 +136,7 @@ CREATE TABLE event_action_drafts (
   created_by_user_type user_type NOT NULL,
   created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
-  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
+  created_at timestamp with time zone DEFAULT now() NOT NULL,
   UNIQUE (transaction_id, action_type)
 );
 
