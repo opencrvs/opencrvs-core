@@ -12,6 +12,8 @@ import startOfDay from 'date-fns/startOfDay'
 import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
+import { parse as parseQuery, stringify } from 'query-string'
+import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -22,15 +24,18 @@ import {
   QueryType,
   SearchQueryParams,
   Inferred,
-  EventState
+  EventState,
+  FieldType,
+  QueryExpression,
+  NameFieldValue
 } from '@opencrvs/commons/client'
-import { FieldType } from '@opencrvs/commons/client'
-import { getAllUniqueFields } from '@client/v2-events/utils'
 import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
+import { getAllUniqueFields } from '@client/v2-events/utils'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -44,11 +49,28 @@ export const getAdvancedSearchFieldErrors = (
         advancedSearchFieldIds.includes(field.id)
       )
 
-      const modifiedFields = advancedSearchFields.map((f) => ({
-        ...f,
-        required: false, // advanced search fields need not be required
-        validation: formValues[f.id] ? f.validation : [] // need to validate fields only when they are not empty
-      }))
+      const modifiedFields = advancedSearchFields.map((f) => {
+        const overRiddenValidationFromAdvancedSearch =
+          currentSection.fields.find(
+            (field) => field.fieldId === f.id
+          )?.validations
+        return {
+          ...f,
+          required: false, // advanced search fields need not be required
+          validation: (() => {
+            if (formValues[f.id]) {
+              if (overRiddenValidationFromAdvancedSearch) {
+                return overRiddenValidationFromAdvancedSearch
+              } else {
+                return f.validation
+              }
+            } else {
+              // need to validate fields only when they are not empty
+              return []
+            }
+          })()
+        }
+      })
 
       const err = getValidationErrorsForForm(modifiedFields, formValues)
 
@@ -145,6 +167,7 @@ export const getDefaultSearchFields = (
   return searchFields
 }
 
+// @TODO: Could we just use EventStatus?
 const RegStatus = {
   Created: 'CREATED',
   Notified: 'NOTIFIED',
@@ -169,7 +192,40 @@ type Condition =
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
 
-export const ADVANCED_SEARCH_KEY = 'and'
+/**
+ * Represents advanced search behavior where **all conditions must match**.
+ * Used to build ElasticSearch queries with `must` clauses (logical AND).
+ */
+const ADVANCED_SEARCH_KEY = 'and' as const
+/**
+ * Represents quick search behavior where **any condition may match**.
+ * Used to build ElasticSearch queries with `should` clauses (logical OR).
+ */
+const QUICK_SEARCH_KEY = 'or' as const
+
+export function toAdvancedSearchQueryType(
+  searchParams: QueryInputType,
+  eventType?: string,
+  type = ADVANCED_SEARCH_KEY
+): QueryType {
+  const metadata: Record<string, unknown> = {}
+  const declaration: Record<string, unknown> = {}
+
+  Object.entries(searchParams).forEach(([_, value]) => {
+    const prefixRegex = new RegExp(`^event${FIELD_SEPARATOR}`)
+    const key = _.replace(prefixRegex, '').replaceAll(FIELD_SEPARATOR, '.')
+    if (_.startsWith(`event${FIELD_SEPARATOR}`)) {
+      metadata[key] = value
+    } else {
+      declaration[key] = value
+    }
+  })
+
+  return {
+    type,
+    clauses: [{ ...metadata, eventType, data: declaration }]
+  }
+}
 
 function buildCondition(
   value: string,
@@ -277,6 +333,12 @@ function buildDataConditionFromSearchKeys(
         ) {
           searchType = 'range'
           value = getUtcRangeFromInput(value)
+        }
+        if (
+          fieldConfig?.type === FieldType.NAME &&
+          NameFieldValue.safeParse(rawInput[fieldId]).success
+        ) {
+          value = Name.stringify(rawInput[fieldId] as NameFieldValue)
         }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
@@ -390,27 +452,184 @@ export function parseFieldSearchParams(
   return filteredSearchParams
 }
 
-export function toQueryType(
-  eventType: string,
-  searchParams: QueryInputType,
-  type: 'and' | 'or'
-): QueryType {
-  const topLevelFields: Record<string, unknown> = {}
-  const dataFields: Record<string, unknown> = {}
+const searchFieldTypeMapping = {
+  [FieldType.NAME]: 'fuzzy',
+  [FieldType.ID]: 'exact',
+  [FieldType.EMAIL]: 'exact',
+  [FieldType.PHONE]: 'exact'
+} as const
 
-  const regex = new RegExp(`^event${FIELD_SEPARATOR}`)
-  Object.entries(searchParams).forEach(([encodedKey, value]) => {
-    const key = encodedKey.replace(regex, '').replaceAll(FIELD_SEPARATOR, '.')
+const searchFields = Object.keys(
+  searchFieldTypeMapping
+) as (keyof typeof searchFieldTypeMapping)[]
 
-    if (encodedKey.startsWith(`event${FIELD_SEPARATOR}`)) {
-      topLevelFields[key] = value
-    } else {
-      dataFields[key] = value
+function metadataFieldTypeMapping(value: string) {
+  return [
+    {
+      trackingId: {
+        term: value,
+        type: 'exact' as const
+      },
+      // @TODO: Registration number should be read from legalStatuses
+      registrationNumber: {
+        term: value,
+        type: 'exact' as const
+      }
     }
-  })
+  ]
+}
+
+function addMetadataFieldsInQuickSearchQuery(
+  clauses: QueryExpression[],
+  terms: string[]
+): QueryExpression[] {
+  const metadataClauses = terms.reduce<QueryExpression[]>((acc, term) => {
+    const mappings = metadataFieldTypeMapping(term)
+
+    for (const mapping of mappings) {
+      for (const [field, config] of Object.entries(mapping)) {
+        acc.push({ [field]: config })
+      }
+    }
+
+    return acc
+  }, [])
+
+  return [...clauses, ...metadataClauses]
+}
+
+function buildQueryFromQuickSearchFields(
+  searchableFields: Inferred[],
+  terms: string[]
+): QueryType {
+  let clauses: QueryExpression[] = []
+  for (const field of searchableFields) {
+    const matchType =
+      searchFieldTypeMapping[field.type as keyof typeof searchFieldTypeMapping]
+
+    for (const term of terms) {
+      const queryClause: QueryExpression = Object.keys(
+        searchFieldTypeMapping
+      ).includes(field.type) // Check if the field type is in the mapping to determine if it's a declaration field
+        ? { data: { [field.id]: { type: matchType, term } } }
+        : { [field.id]: { type: matchType, term } }
+
+      clauses.push(queryClause)
+    }
+  }
+
+  clauses = addMetadataFieldsInQuickSearchQuery(clauses, terms)
 
   return {
-    type,
-    clauses: [{ ...topLevelFields, eventType, data: dataFields }]
+    type: QUICK_SEARCH_KEY,
+    clauses
+  } as QueryType
+}
+
+/**
+ * Builds a quick search query for Elasticsearch based on the provided search parameters and event configurations.
+ *
+ * Quick search is designed for user-friendly, broad matching. It performs:
+ * - `fuzzy` matches on fields like name.
+ * - `exact` matches on fields like ID, email, phone.
+ * - additional exact matches on metadata fields like `trackingId` and `registrationNumber`.
+ *
+ * The resulting query uses `OR` logic (`type: 'or'`), meaning any matching clause is sufficient.
+ *
+ * @param searchParams - A flat object of field-value pairs submitted from the UI.
+ * @param events - The event configurations to extract searchable fields from.
+ * @returns QueryType - A structured query used to hit Elasticsearch.
+ */
+export function buildQuickSearchQuery(
+  searchParams: Record<string, string>,
+  events: EventConfig[]
+): QueryType {
+  // Flatten all searchable fields from the selected events
+  const fieldsOfEvents = events.reduce<Inferred[]>((acc, event) => {
+    const fields = getAllUniqueFields(event)
+    return [...acc, ...fields]
+  }, [])
+
+  // Filter fields to only include those that are supported in quick search
+  const fieldsToSearch = fieldsOfEvents.filter((field) =>
+    searchFields.includes(field.type as keyof typeof searchFieldTypeMapping)
+  )
+  // Get all non-empty search terms from user input
+  const terms = Object.values(searchParams).filter(Boolean)
+
+  // Delegate to the actual query builder
+  return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
+}
+
+function serializeValue(value: unknown) {
+  if (isArray(value)) {
+    return value.length > 0
+      ? value.map((v) => (isPlainObject(v) ? JSON.stringify(v) : v))
+      : undefined
   }
+  if (isPlainObject(value)) {
+    return JSON.stringify(value)
+  }
+
+  return value
+}
+
+export function serializeSearchParams(
+  eventState: Record<string, unknown>
+): string {
+  const simplifiedValue = Object.entries(eventState).reduce(
+    (acc, [key, value]) => {
+      const serialized = serializeValue(value)
+      // If we don't care about the empty objects, we might be able to keep it as simple as this:
+      if (!isNil(serialized)) {
+        acc[key] = serialized
+      }
+
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+  return stringify(simplifiedValue, { skipEmptyString: true })
+}
+
+/* eslint-disable max-lines */
+
+function tryParse(value: unknown): unknown {
+  if (!isString(value)) {
+    return value
+  }
+
+  try {
+    if (isArray(value)) {
+      return value.map(tryParse)
+    } else {
+      const parsed = JSON.parse(value)
+      // Only return parsed if it's an object or array (i.e., something we stringified before)
+      if (typeof parsed === 'object' && parsed !== null) {
+        return parsed
+      }
+    }
+  } catch {}
+
+  return value
+}
+export function deserializeSearchParams(
+  queryParams: string
+): Record<string, unknown> {
+  const parsedParams = parseQuery(queryParams)
+
+  const deserialized = Object.entries(parsedParams).reduce(
+    (acc, [key, value]) => {
+      if (isArray(value)) {
+        acc[key] = value.map(tryParse)
+      } else {
+        acc[key] = tryParse(value)
+      }
+
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+
+  return deserialized
 }

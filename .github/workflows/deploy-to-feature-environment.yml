@@ -38,6 +38,7 @@ jobs:
       keep_e2e: ${{ steps.set_branch_and_pr_number.outputs.keep_e2e }}
       author: ${{ steps.get_author.outputs.AUTHOR }}
       slugified_branch: ${{ steps.slugify_bname.outputs.stack }}
+      e2e_branch: ${{ steps.get_e2e_branch.outputs.branch }}
     steps:
       - uses: actions/checkout@v3
 
@@ -95,7 +96,19 @@ jobs:
         if: ${{ github.event_name != 'workflow_dispatch' }}
         run: |
           echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
+      - name: Get e2e branch
+        id: get_e2e_branch
+        run: |
+          e2e_repo_url="https://github.com/opencrvs/e2e.git"
 
+          if git ls-remote --heads "$e2e_repo_url" | grep -q "refs/heads/${{ github.head_ref }}"; then
+            e2e_branch=${{ github.head_ref }}
+          elif git ls-remote --heads "$e2e_repo_url" | grep -q "refs/heads/${{ github.base_ref }}"; then
+            e2e_branch="${{ github.base_ref }}"
+          else
+            e2e_branch="develop"
+          fi
+          echo "branch=$e2e_branch" >> $GITHUB_OUTPUT
       - name: Get PR Author
         id: get_author
         env:
@@ -192,6 +205,7 @@ jobs:
           PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}
           Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}
           Keep e2e: ${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}
+          E2E Branch: ${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}
           Stack: ${{ steps.generate_stack.outputs.stack }}
           """
 
@@ -210,7 +224,8 @@ jobs:
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
                 stack: '${{  steps.generate_stack.outputs.stack  }}',
-                'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}'
+                'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
+                'branch': '${{ needs.generate_stack_name_and_branch.outputs.e2e_branch }}'
               }
             });
 

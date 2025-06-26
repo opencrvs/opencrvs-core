@@ -60,10 +60,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
-                },
-                {
-                  fieldId: 'applicant.surname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'applicant.dob'
@@ -89,9 +86,11 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
         ]}
         id="my-form"
         initialValues={{
-          'applicant.firstname': 'Tanya',
+          'applicant.name': {
+            firstname: 'Tanya',
+            surname: 'McQuaid'
+          },
           'applicant.id': '2370934578',
-          'applicant.surname': 'McQuaid',
           'applicant.dob': '1975-01-02'
         }}
         onChange={noop}
@@ -127,14 +126,14 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'recommender.none'
                 },
-                // recommender.firstname is not rendered, because recommender.none is true
+                // recommender.name is not rendered, because recommender.none is true
                 {
-                  fieldId: 'recommender.firstname'
+                  fieldId: 'recommender.name'
                 }
               ]
             }
@@ -143,8 +142,16 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
         id="my-form"
         initialValues={{
           'recommender.none': true,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
+          // @ts-ignore
+          'recommender.name': {
+            firstname: 'John',
+            surname: ''
+          },
+          // @ts-ignore
+          'applicant.name': {
+            firstname: 'Rasheed',
+            surname: ''
+          }
         }}
         onChange={noop}
       />
@@ -179,11 +186,11 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
+                  fieldId: 'applicant.name'
                 },
-                // recommender.firstname is rendered, because recommender.none is false
+                // recommender.name is rendered, because recommender.none is false
                 {
-                  fieldId: 'recommender.firstname'
+                  fieldId: 'recommender.name'
                 }
               ]
             }
@@ -191,9 +198,15 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
         ]}
         id="my-form"
         initialValues={{
-          'recommender.none': false,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
+          'recommender.name': {
+            firstname: 'John',
+            surname: ''
+          },
+          'applicant.name': {
+            firstname: 'Rasheed',
+            surname: ''
+          },
+          'recommender.none': false
         }}
         onChange={noop}
       />

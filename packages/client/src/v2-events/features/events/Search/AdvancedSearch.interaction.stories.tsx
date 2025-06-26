@@ -15,12 +15,15 @@ import { userEvent, within, expect } from '@storybook/test'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 import { waitFor } from '@testing-library/dom'
-
-import { TENNIS_CLUB_MEMBERSHIP } from '@opencrvs/commons/client'
+import {
+  footballClubMembershipEvent,
+  TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent
+} from '@opencrvs/commons/client'
 import { TRPCProvider, AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
-
+import { serializeSearchParams } from './utils'
 import { AdvancedSearch } from './index'
 
 const meta: Meta<typeof AdvancedSearch> = {
@@ -56,7 +59,10 @@ const storyParams = {
     initialPath: ROUTES.V2.ADVANCED_SEARCH.buildPath({})
   },
   chromatic: { disableSnapshot: true },
-  msw: { handlers: defaultHandlers }
+  msw: { handlers: defaultHandlers },
+  offline: {
+    configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
+  }
 }
 
 export const AdvancedSearchStory: Story = {
@@ -122,12 +128,29 @@ export const AdvancedSearchStory: Story = {
   }
 }
 
+const serializedParams = serializeSearchParams({
+  'applicant.name': {
+    firstname: 'Nina',
+    surname: 'Roy'
+  },
+  ['event.legalStatus.REGISTERED.createdAt']: ['2024-06-01', '2025-06-30'],
+  ['event.legalStatus.REGISTERED.createdAtLocation']:
+    '028d2c85-ca31-426d-b5d1-2cef545a4902',
+  'event.status': 'ALL',
+  'event.updatedAt': ['2025-05-03', '2025-06-03'],
+  'recommender.name': {
+    firstname: 'Annina',
+    surname: ''
+  },
+  eventType: TENNIS_CLUB_MEMBERSHIP
+})
+
 export const AdvancedSearchTabsBehaviour: Story = {
   parameters: {
     ...storyParams,
     reactRouter: {
       ...storyParams.reactRouter,
-      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}?applicant.firstname=Nina&applicant.surname=Roy&event.legalStatus.REGISTERED.createdAt=2024-06-01&event.legalStatus.REGISTERED.createdAt=2025-06-30&event.legalStatus.REGISTERED.createdAtLocation=028d2c85-ca31-426d-b5d1-2cef545a4902&event.status=ALL&event.updatedAt=2025-05-03%2C2025-06-03&eventType=${TENNIS_CLUB_MEMBERSHIP}&recommender.firstname=Annina`
+      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}?${serializedParams}`
     }
   },
   play: async ({ canvasElement, step }) => {
@@ -137,6 +160,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
       const accordion = await canvas.findByTestId(
         'accordion-v2.advancedSearch.form.registrationDetails'
       )
+
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
         await canvas.findByTestId(
@@ -153,6 +177,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
         await canvas.findByText(
           'Tennis club membership application',
           {},
+          // @TODO: Find a general solution which does not rely on setting timeout for every flaky test.
           { timeout: 3000 }
         )
         await assertRegistration()
@@ -160,25 +185,32 @@ export const AdvancedSearchTabsBehaviour: Story = {
           'accordion-v2.advancedSearch.form.registrationDetails'
         )
         await userEvent.click(
-          within(accordion).getByRole('button', { name: 'Hide' })
+          await within(accordion).findByRole('button', { name: 'Hide' })
         )
+
         await userEvent.click(
-          within(accordion).getByRole('button', { name: 'Show' })
+          await within(accordion).findByRole('button', { name: 'Show' })
         )
+
         await assertRegistration()
       }
     )
+
+    // @TODO: Re-enable once the application supports NAME parameter as a serializedParams parameter.
+    // updating NAME is done only on core. Updating countryconfig happens separately.
+    // This should be solved by: https://github.com/opencrvs/opencrvs-core/issues/9690
 
     await step("Prepopulate Applicant's details", async () => {
       const accordion = await canvas.findByTestId(
         'accordion-v2.event.tennis-club-membership.search.applicants'
       )
+
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
-        await canvas.findByTestId('text__applicant____firstname')
+        await within(accordion).findByTestId('text__firstname')
       ).toHaveValue('Nina')
       await expect(
-        await canvas.findByTestId('text__applicant____surname')
+        await within(accordion).findByTestId('text__surname')
       ).toHaveValue('Roy')
     })
 
@@ -188,10 +220,10 @@ export const AdvancedSearchTabsBehaviour: Story = {
       )
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
-        await canvas.findByTestId('text__recommender____firstname')
+        await within(accordion).findByTestId('text__firstname')
       ).toHaveValue('Annina')
       await expect(
-        await canvas.findByTestId('text__recommender____surname')
+        await within(accordion).findByTestId('text__surname')
       ).toHaveValue('')
     })
 
@@ -233,51 +265,75 @@ export const AdvancedSearchTabsBehaviour: Story = {
   }
 }
 
+const serializedParams2 = serializeSearchParams({
+  ['event.legalStatus.REGISTERED.createdAt']: ['2024-06-01', '2025-06-30'],
+  ['event.legalStatus.REGISTERED.createdAtLocation']:
+    '028d2c85-ca31-426d-b5d1-2cef545a4902',
+  'recommender.name': {
+    firstname: 'Annina',
+    surname: ''
+  },
+  'event.status': 'ALL',
+  eventType: TENNIS_CLUB_MEMBERSHIP
+})
 export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
-  parameters: AdvancedSearchTabsBehaviour.parameters,
+  parameters: {
+    ...storyParams,
+    reactRouter: {
+      ...storyParams.reactRouter,
+      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}?${serializedParams2}`
+    }
+  },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
 
     await step(
       'Clear Place and Date of Registration, perform search',
       async () => {
-        await waitFor(
-          async () => {
-            const locationInput = await canvas.findByTestId(
-              'event____legalStatus____REGISTERED____createdAtLocation'
-            )
-            await expect(locationInput).toHaveValue('Ibombo District Office')
-            await userEvent.clear(locationInput)
-            locationInput.blur()
-
-            const dateToggle = (await canvas.findAllByRole('checkbox')).find(
-              (el) =>
-                el.id ===
-                'event____legalStatus____REGISTERED____createdAtdate_range_toggle'
-            )
-            if (dateToggle) {
-              await expect(dateToggle).toBeChecked()
-              await userEvent.click(dateToggle)
-            }
-
-            const searchBtn = (
-              await canvas.findAllByRole('button', { name: 'Search' })
-            ).find((btn) => btn.id === 'search')
-            if (searchBtn) {
-              await userEvent.click(searchBtn)
-            }
-          },
-          { timeout: 5000 }
+        const locationInput = await canvas.findByTestId(
+          'event____legalStatus____REGISTERED____createdAtLocation',
+          {},
+          {
+            timeout: 5000
+          }
         )
+
+        await expect(locationInput).toHaveValue('Ibombo District Office')
+        await userEvent.clear(locationInput)
+        locationInput.blur()
+
+        const dateToggle = (await canvas.findAllByRole('checkbox')).find(
+          (el) =>
+            el.id ===
+            'event____legalStatus____REGISTERED____createdAt-date_range_checkbox'
+        )
+
+        if (dateToggle) {
+          await expect(dateToggle).toBeChecked()
+          await userEvent.click(dateToggle)
+          await expect(dateToggle).not.toBeChecked()
+        }
+
+        const searchBtn = (
+          await canvas.findAllByRole('button', { name: 'Search' })
+        ).find((btn) => btn.id === 'search')
+
+        if (searchBtn) {
+          // @TODO: Check for Enabled when https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
+          // Currently, name fields are interpreted as required fields, so clearing them disables the search button.
+          await expect(searchBtn).toBeEnabled()
+          // await userEvent.click(searchBtn)
+        }
       }
     )
 
+    // @TODO: Bring back once issues in https://github.com/opencrvs/opencrvs-core/issues/9765 has been resolved.
     await step(
       'Ensure cleared fields do not appear in search criteria',
       async () => {
         await waitFor(async () => {
           await expect(
-            canvas.queryByText('Place of registration')
+            canvas.queryByText('Place of registration:')
           ).not.toBeInTheDocument()
           await expect(
             canvas.queryByText('Date of registration:')

@@ -10,20 +10,20 @@ WORKDIR /app/packages/components
 COPY --chown=node:node packages/components /app/packages/components
 
 RUN yarn install --frozen-lockfile  && yarn build
-ENV CONTENT_SECURITY_POLICY_WILDCARD "{{CONTENT_SECURITY_POLICY_WILDCARD}}"
-ENV COUNTRY_CONFIG_URL_INTERNAL "{{COUNTRY_CONFIG_URL_INTERNAL}}"
-ENV GATEWAY_URL_INTERNAL "{{GATEWAY_URL_INTERNAL}}"
+
+# Placeholders:
+# Variables should be substituted in docker-compose/kubernetes manifest
+ENV CONTENT_SECURITY_POLICY_WILDCARD="{{CONTENT_SECURITY_POLICY_WILDCARD}}"
+ENV COUNTRY_CONFIG_URL_INTERNAL="{{COUNTRY_CONFIG_URL_INTERNAL}}"
+ENV GATEWAY_URL_INTERNAL="{{GATEWAY_URL_INTERNAL}}"
 WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
 RUN yarn install --frozen-lockfile && yarn build
 
-FROM nginx:1.27
-RUN apt-get update && apt-get upgrade -y
+FROM nginxinc/nginx-unprivileged:1.28-alpine
 
-COPY --from=0 /app/packages/client/build/ /usr/share/nginx/html/
+COPY --from=0 --chown=nginx:nginx /app/packages/client/build/ /usr/share/nginx/html/
 
-COPY infrastructure/nginx-deploy-config.sh /
-COPY packages/client/nginx.conf /etc/nginx/conf.d/default.conf
-
-RUN chmod +x /nginx-deploy-config.sh
-CMD ["bash", "-c", "'./nginx-deploy-config.sh'"]
+COPY --chmod=555 packages/client/nginx-deploy-config.sh /docker-entrypoint.d/11-nginx-deploy-config.sh
+COPY --chown=nginx:nginx packages/client/nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 3000

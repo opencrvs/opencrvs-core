@@ -21,7 +21,7 @@ import { useWorkqueueConfigurations } from '../features/events/useWorkqueueConfi
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from './useUsers'
 
-function getDeSerializedQuery(
+function getDeserializedQuery(
   workqueueConfig: WorkqueueConfig | undefined,
   user: User,
   primaryOfficeId: string | undefined
@@ -39,7 +39,7 @@ function getDeSerializedQuery(
 }
 
 export const useWorkqueue = (workqueueSlug: string) => {
-  // @ToDo: remove `legacyUser` once `getUser` provides primaryOfficeId
+  // @TODO: remove `legacyUser` once `getUser` provides primaryOfficeId
   const legacyUser = useSelector(getUserDetails)
   const { getUser } = useUsers()
   const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
@@ -52,12 +52,12 @@ export const useWorkqueue = (workqueueSlug: string) => {
 
   const deSerializedQueries = workqueues.map((wq) => ({
     slug: wq.slug,
-    query: getDeSerializedQuery(wq, user, legacyUser?.primaryOffice.id)
+    query: getDeserializedQuery(wq, user, legacyUser?.primaryOffice.id)
   }))
 
   return {
     getResult: () => {
-      const deSerializedQuery = getDeSerializedQuery(
+      const deSerializedQuery = getDeserializedQuery(
         workqueueConfig,
         user,
         legacyUser?.primaryOffice.id

@@ -110,8 +110,16 @@ export const WorkqueueWithMultipleEventType: Story = {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
     },
+    offline: {
+      configs: [tennisClubMembershipEvent, libraryMembershipEvent]
+    },
     msw: {
       handlers: {
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent, libraryMembershipEvent]
+          })
+        ],
         event: [
           tRPCMsw.event.get.query(() => {
             return tennisClubMembershipEventDocument
@@ -129,11 +137,6 @@ export const WorkqueueWithMultipleEventType: Story = {
           }),
           tRPCMsw.event.search.query((input) => {
             return queryDataWithMultipleEventType
-          })
-        ],
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent, libraryMembershipEvent]
           })
         ]
       }
@@ -197,7 +200,7 @@ export const ReadyToPrintWorkqueue: Story = {
           }),
           tRPCMsw.event.list.query(() => {
             return queryData.filter(
-              (record) => record.status === EventStatus.REGISTERED
+              (record) => record.status === EventStatus.enum.REGISTERED
             )
           }),
           tRPCMsw.workqueue.config.list.query(() => {
@@ -208,14 +211,14 @@ export const ReadyToPrintWorkqueue: Story = {
               return {
                 ...acc,
                 [slug]: queryData.filter(
-                  (record) => record.status === EventStatus.REGISTERED
+                  (record) => record.status === EventStatus.enum.REGISTERED
                 ).length
               }
             }, {})
           }),
           tRPCMsw.event.search.query((input) => {
             return queryData.filter(
-              (record) => record.status === EventStatus.REGISTERED
+              (record) => record.status === EventStatus.enum.REGISTERED
             )
           })
         ]
@@ -235,9 +238,6 @@ export const NoResults: Story = {
     msw: {
       handlers: {
         events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
           tRPCMsw.event.list.query(() => {
             return []
           }),

@@ -1,0 +1,366 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Returns events based on the updatedAt column 1`] = `
+{
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {
+    "applicant.address": {
+      "addressType": "DOMESTIC",
+      "country": "FAR",
+      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+      "number": "55",
+      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
+      "residentialArea": "Example Residential Area",
+      "street": "Example Street",
+      "town": "Example Town",
+      "urbanOrRural": "URBAN",
+      "zipCode": "123456",
+    },
+    "applicant.age": 19,
+    "applicant.dobUnknown": true,
+    "applicant.email": "test@opencrvs.org",
+    "applicant.image": {
+      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "originalFilename": "abcd.png",
+      "type": "image/png",
+    },
+    "applicant.name": {
+      "firstname": "Sara",
+      "surname": "Sarajanen",
+    },
+    "recommender.none": true,
+  },
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {
+    "DECLARED": {
+      "acceptedAt": "[sanitized]",
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
+    },
+  },
+  "status": "DECLARED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;
+
+exports[`Returns events based on the updatedAt column 2`] = `
+{
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {
+    "applicant.address": {
+      "addressType": "DOMESTIC",
+      "country": "FAR",
+      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+      "number": "55",
+      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
+      "residentialArea": "Example Residential Area",
+      "street": "Example Street",
+      "town": "Example Town",
+      "urbanOrRural": "URBAN",
+      "zipCode": "123456",
+    },
+    "applicant.age": 19,
+    "applicant.dobUnknown": true,
+    "applicant.email": "test@opencrvs.org",
+    "applicant.image": {
+      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "originalFilename": "abcd.png",
+      "type": "image/png",
+    },
+    "applicant.name": {
+      "firstname": "Sarachella",
+      "surname": "Smith",
+    },
+    "recommender.none": true,
+  },
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {
+    "DECLARED": {
+      "acceptedAt": "[sanitized]",
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
+    },
+  },
+  "status": "DECLARED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;
+
+exports[`Returns relevant events in right order 1`] = `
+{
+  "assignedTo": "[sanitized]",
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {
+    "applicant.address": {
+      "addressType": "DOMESTIC",
+      "country": "FAR",
+      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+      "number": "55",
+      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
+      "residentialArea": "Example Residential Area",
+      "street": "Example Street",
+      "town": "Example Town",
+      "urbanOrRural": "URBAN",
+      "zipCode": "123456",
+    },
+    "applicant.age": 19,
+    "applicant.dobUnknown": true,
+    "applicant.email": "test@opencrvs.org",
+    "applicant.image": {
+      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "originalFilename": "abcd.png",
+      "type": "image/png",
+    },
+    "applicant.name": {
+      "firstname": "Chris",
+      "surname": "Sarthua",
+    },
+    "recommender.none": true,
+  },
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {
+    "DECLARED": {
+      "acceptedAt": "[sanitized]",
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+      "createdByUserType": "[sanitized]",
+    },
+  },
+  "status": "DECLARED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;
+
+exports[`Returns relevant events in right order 2`] = `
+{
+  "assignedTo": "[sanitized]",
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {
+    "applicant.address": {
+      "addressType": "DOMESTIC",
+      "country": "FAR",
+      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
+      "number": "55",
+      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
+      "residentialArea": "Example Residential Area",
+      "street": "Example Street",
+      "town": "Example Town",
+      "urbanOrRural": "URBAN",
+      "zipCode": "123456",
+    },
+    "applicant.age": 19,
+    "applicant.dobUnknown": true,
+    "applicant.email": "test@opencrvs.org",
+    "applicant.image": {
+      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "originalFilename": "abcd.png",
+      "type": "image/png",
+    },
+    "applicant.name": {
+      "firstname": "John",
+      "surname": "Brown",
+    },
+    "recommender.none": true,
+  },
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {
+    "DECLARED": {
+      "acceptedAt": "[sanitized]",
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+      "createdByUserType": "[sanitized]",
+    },
+    "REGISTERED": {
+      "acceptedAt": "[sanitized]",
+      "createdAt": "[sanitized]",
+      "createdAtLocation": "[sanitized]",
+      "createdBy": "[sanitized]",
+      "createdByRole": "REGISTRATION_AGENT",
+      "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+      "createdByUserType": "[sanitized]",
+      "registrationNumber": "1234567890AB",
+    },
+  },
+  "status": "REGISTERED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;
+
+exports[`Returns relevant events in right order 3`] = `
+[
+  "VALIDATED",
+  "DECLARED",
+  "REJECTED",
+  "REGISTERED",
+  "ARCHIVED",
+  "CERTIFIED",
+]
+`;
+
+exports[`Throws when date field is invalid 1`] = `
+[TRPCError: [
+  {
+    "code": "invalid_string",
+    "validation": "date",
+    "message": "Invalid date",
+    "path": [
+      "clauses",
+      0,
+      "updatedAt",
+      "term"
+    ]
+  }
+]]
+`;
+
+exports[`Throws when one of the date range fields has invalid date 1`] = `
+[TRPCError: [
+  {
+    "code": "invalid_string",
+    "validation": "date",
+    "message": "Invalid date",
+    "path": [
+      "clauses",
+      0,
+      "updatedAt",
+      "gte"
+    ]
+  }
+]]
+`;
+
+exports[`Throws when searching by unrelated properties 1`] = `
+[TRPCError: [
+  {
+    "code": "custom",
+    "message": "At least one query field must be specified.",
+    "path": [
+      "clauses",
+      0
+    ]
+  }
+]]
+`;
+
+exports[`Throws when searching with empty clauses 1`] = `
+[TRPCError: [
+  {
+    "code": "too_small",
+    "minimum": 1,
+    "type": "array",
+    "inclusive": true,
+    "exact": false,
+    "message": "At least one clause is required.",
+    "path": [
+      "clauses"
+    ]
+  }
+]]
+`;
+
+exports[`Throws when searching without payload 1`] = `
+[TRPCError: [
+  {
+    "code": "invalid_type",
+    "expected": "array",
+    "received": "undefined",
+    "path": [
+      "clauses"
+    ],
+    "message": "Required"
+  },
+  {
+    "code": "invalid_union",
+    "unionErrors": [
+      {
+        "issues": [
+          {
+            "code": "invalid_literal",
+            "expected": "and",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \\"and\\""
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "code": "invalid_literal",
+            "expected": "or",
+            "path": [
+              "type"
+            ],
+            "message": "Invalid literal value, expected \\"or\\""
+          }
+        ],
+        "name": "ZodError"
+      }
+    ],
+    "path": [
+      "type"
+    ],
+    "message": "Invalid input"
+  }
+]]
+`;

@@ -24,8 +24,10 @@ import { useEventConfigurations } from '@client/v2-events/features/events/useEve
 
 import { ROUTES } from '@client/v2-events/routes'
 import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
-import { SearchResultComponent } from '../events/AdvancedSearch/SearchResult'
+import { CoreWorkqueues } from '@client/v2-events/utils'
+import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
+import { Outbox } from './Outbox'
 
 const FabContainer = styled.div`
   position: fixed;
@@ -36,8 +38,7 @@ const FabContainer = styled.div`
   }
 `
 
-export function WorkqueueContainer() {
-  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
   const workqueues = useWorkqueueConfigurations()
@@ -54,15 +55,30 @@ export function WorkqueueContainer() {
 
   const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
+    <SearchResultComponent
+      key={workqueueSlug}
+      actions={actions}
+      columns={workqueueConfig.columns}
+      eventConfigs={eventConfigs}
+      queryData={events}
+      title={intl.formatMessage(workqueueConfig.name)}
+      {...searchParams}
+    />
+  )
+}
+
+function WorkqueueContent() {
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
+  if (workqueueSlug === CoreWorkqueues.OUTBOX) {
+    return <Outbox />
+  }
+  return <ConfigurableWorkqueue workqueueSlug={workqueueSlug} />
+}
+
+export function WorkqueueContainer() {
+  return (
     <>
-      <SearchResultComponent
-        actions={actions}
-        columns={workqueueConfig.columns}
-        eventConfigs={eventConfigs}
-        queryData={events}
-        title={intl.formatMessage(workqueueConfig.name)}
-        {...searchParams}
-      />
+      <WorkqueueContent />
       <FabContainer>
         <Link to={ROUTES.V2.EVENTS.CREATE.path}>
           <FloatingActionButton

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useState, useEffect, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -39,10 +39,11 @@ import { WQContentWrapper } from '@client/v2-events/features/workqueues/componen
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { SearchCriteriaPanel } from '@client/v2-events/features/events/AdvancedSearch/SearchCriteriaPanel'
+import { DownloadButton } from '@client/v2-events/components/DownloadButton'
+import { useOnlineStatus } from '@client/utils'
+import { CoreWorkqueues } from '@client/v2-events/utils'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
-  ActionConfig,
   useAction,
   useActionMenuItems
 } from '../../workqueues/EventOverview/components/useActionMenuItems'
@@ -154,6 +155,11 @@ const searchResultMessages = {
     defaultMessage: 'No results',
     description: 'The no result text'
   },
+  noResultsOutbox: {
+    defaultMessage: 'No records require processing',
+    description: 'Text to display if there is no items in outbox',
+    id: 'v2.constants.noResultsOutbox'
+  },
   searchResult: {
     defaultMessage: 'Search results',
     description:
@@ -164,6 +170,16 @@ const searchResultMessages = {
     id: `v2.events.status`,
     defaultMessage:
       '{status, select, OUTBOX {Syncing..} CREATED {Draft} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} NOTIFIED {In progress} other {Unknown}}'
+  },
+  waitingForAction: {
+    id: `v2.events.outbox.waitingForAction`,
+    defaultMessage:
+      'Waiting to {action, select, DECLARE {declare} REGISTER {register} VALIDATE {validate} other {action}}'
+  },
+  waitingToRetry: {
+    defaultMessage: 'Waiting to retry',
+    description: 'Label for declaration status waiting for connection',
+    id: 'v2.events.outbox.waitingForAction.waitingToRetry'
   }
 }
 
@@ -171,8 +187,8 @@ const messages = defineMessages(searchResultMessages)
 
 interface Props {
   columns: WorkqueueColumn[]
-  eventConfig: EventConfig
-  searchParams: EventState
+  eventConfigs: EventConfig[]
+  searchParams?: EventState
   queryData: EventIndex[]
 }
 
@@ -224,7 +240,7 @@ export const SearchResultComponent = ({
   title: contentTitle,
   tabBarContent,
   actions = []
-}: {
+}: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
   queryData: EventIndex[]
@@ -233,18 +249,20 @@ export const SearchResultComponent = ({
   title: string
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
-}) => {
+}>) => {
+  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
+  const isOnline = useOnlineStatus()
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
   const { getOutbox } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
+  const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
-  const drafts = getRemoteDrafts()
+  const drafts = getAllRemoteDrafts()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
@@ -267,14 +285,21 @@ export const SearchResultComponent = ({
     eventData: (EventIndex & {
       title: string | null
       useFallbackTitle: boolean
+      meta?: Record<string, unknown>
     })[]
   ) => {
-    return eventData.map((event) => {
-      const actionConfigs = actions.map((actionType) => ({
-        actionComponent: (
-          <ActionComponent actionType={actionType} event={event} />
-        )
-      }))
+    return eventData.map(({ meta, ...event }) => {
+      const actionConfigs = actions
+        .map((actionType) => ({
+          actionComponent: (
+            <ActionComponent actionType={actionType} event={event} />
+          )
+        }))
+        .concat({
+          actionComponent: (
+            <DownloadButton key={`DownloadButton-${event.id}`} event={event} />
+          )
+        })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
       if (!eventConfig) {
@@ -322,7 +347,13 @@ export const SearchResultComponent = ({
           >
             <IconWithName name={event.title} status={status} />
           </TextButton>
-        )
+        ),
+        outbox: isOnline
+          ? intl.formatMessage(messages.waitingForAction, {
+              action:
+                typeof meta?.actionType === 'string' ? meta.actionType : ''
+            })
+          : intl.formatMessage(messages.waitingToRetry)
       }
     })
   }
@@ -407,7 +438,11 @@ export const SearchResultComponent = ({
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         noContent={queryData.length === 0}
-        noResultText={intl.formatMessage(messages.noResult)}
+        noResultText={intl.formatMessage(
+          slug === CoreWorkqueues.OUTBOX
+            ? messages.noResultsOutbox
+            : messages.noResult
+        )}
         paginationId={currentPageNumber}
         tabBarContent={tabBarContent}
         title={contentTitle}
@@ -431,32 +466,5 @@ export const SearchResultComponent = ({
         />
       </WQContentWrapper>
     </WithTestId>
-  )
-}
-export const SearchResult = ({
-  columns,
-  eventConfig,
-  searchParams,
-  queryData
-}: Props) => {
-  const intl = useIntl()
-  const total = queryData.length
-
-  return (
-    <SearchResultComponent
-      actions={[WorkqueueActionsWithDefault.Values.DEFAULT]}
-      columns={columns}
-      eventConfigs={[eventConfig]}
-      queryData={queryData}
-      tabBarContent={
-        <SearchCriteriaPanel
-          eventConfig={eventConfig}
-          searchParams={searchParams}
-        />
-      }
-      title={`${intl.formatMessage(messages.searchResult)} ${
-        ' (' + total + ')'
-      }`}
-    />
   )
 }

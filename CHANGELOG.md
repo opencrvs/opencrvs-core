@@ -14,11 +14,15 @@
 
   - Use nvm to upgrade your local development environment to use node version `22.x.x.`
 
+- Use unprivileged version of nginx container image [#6501](https://github.com/opencrvs/opencrvs-core/issues/6501)
+
 ## 1.8.0 Release candidate
 
 ### New features
 
 - **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
+- Build OpenCRVS release images for arm devices [#9455](https://github.com/opencrvs/opencrvs-core/issues/9455)
+
 
 ### Improvements
 

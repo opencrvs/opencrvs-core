@@ -15,21 +15,35 @@ import {
   EventConfig,
   EventDocument,
   EventIndex,
-  findLastAssignmentAction
+  findLastAssignmentAction,
+  getCurrentEventState,
+  User
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 
-export function findLocalEventData(eventId: string) {
-  return queryClient.getQueryData(
-    trpcOptionsProxy.event.get.queryKey(eventId)
-  ) as EventDocument | undefined
+export function addUserToQueryData(user: User) {
+  return queryClient.setQueryData(
+    trpcOptionsProxy.user.get.queryKey(user.id),
+    user
+  )
 }
 
 export function findLocalEventConfig(eventType: string) {
   return queryClient
     .getQueryData(trpcOptionsProxy.event.config.get.queryKey())
     ?.find(({ id }: EventConfig) => id === eventType) as EventConfig | undefined
+}
+
+export function addLocalEventConfig(config: EventConfig) {
+  const currentConfigs = queryClient.getQueryData<EventConfig[]>(
+    trpcOptionsProxy.event.config.get.queryKey()
+  )
+
+  return queryClient.setQueryData(
+    trpcOptionsProxy.event.config.get.queryKey(),
+    currentConfigs ? [...currentConfigs, config] : [config]
+  )
 }
 
 export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
@@ -39,14 +53,26 @@ export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
   )
 }
 
-export function setEventData(id: string, data: EventDocument) {
-  return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
-}
-
-function deleteEventData(id: string) {
-  queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey(id)
+export function findLocalEventIndex(id: string) {
+  const queries = queryClient.getQueriesData<EventIndex>({
+    queryKey: trpcOptionsProxy.event.search.queryKey()
   })
+  const eventWithAMatchingId = queries
+    .flatMap(([, data]) => data)
+    .filter((event): event is EventIndex => Boolean(event))
+    .find((e) => e.id === id)
+
+  if (eventWithAMatchingId) {
+    return eventWithAMatchingId
+  }
+
+  /*
+   * This branch can find a local even that was originally indexed with a temporary ID
+   * but has since been updated to a permanent ID.
+   */
+  return queries
+    .filter(([queryKey]) => JSON.stringify(queryKey).includes(id))
+    .flatMap(([, data]) => data)[0]
 }
 
 export function setEventListData(
@@ -58,7 +84,81 @@ export function setEventListData(
   )
 }
 
+export function updateLocalEventIndex(id: string, updatedEvent: EventDocument) {
+  const config = findLocalEventConfig(updatedEvent.type)
+
+  if (!config) {
+    throw new Error(
+      `Event configuration for type ${updatedEvent.type} not found`
+    )
+  }
+  const updatedEventIndex = getCurrentEventState(updatedEvent, config)
+  // Update the local event index with the updated event
+  setEventListData((eventIndices) =>
+    eventIndices?.map((eventIndex) =>
+      eventIndex.id === id
+        ? { ...eventIndex, ...updatedEventIndex }
+        : eventIndex
+    )
+  )
+
+  /*
+   * Ensure there exists a local cached search query for this event
+   */
+
+  queryClient.setQueryData(
+    trpcOptionsProxy.event.search.queryKey({
+      type: 'and',
+      clauses: [{ id }]
+    }),
+    () => [updatedEventIndex]
+  )
+  /*
+   * Update all searches where this event is present
+   */
+  queryClient
+    .getQueriesData<EventIndex[]>({
+      queryKey: trpcOptionsProxy.event.search.queryKey()
+    })
+    .forEach(([queryKey, eventIndices]) => {
+      queryClient.setQueryData(
+        queryKey,
+        (eventIndices || []).map((eventIndex) =>
+          eventIndex.id === id
+            ? { ...eventIndex, ...updatedEventIndex }
+            : eventIndex
+        )
+      )
+    })
+}
+
+export function findLocalEventDocument(eventId: string) {
+  return queryClient.getQueryData(
+    trpcOptionsProxy.event.get.queryKey(eventId)
+  ) as EventDocument | undefined
+}
+
+export function setEventData(id: string, data: EventDocument) {
+  updateLocalEventIndex(id, data)
+  return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
+}
+
 export async function invalidateEventsList() {
+  /*
+   * Invalidate search queries
+   */
+  await Promise.all(
+    queryClient
+      .getQueriesData<EventIndex[]>({
+        queryKey: trpcOptionsProxy.event.search.queryKey()
+      })
+      .map(async ([queryKey, eventIndices]) =>
+        queryClient.invalidateQueries({
+          queryKey
+        })
+      )
+  )
+
   return queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.event.list.queryKey()
   })
@@ -96,16 +196,15 @@ export async function invalidateDraftsList() {
   })
 }
 
+function deleteEventData(id: string) {
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.get.queryKey(id)
+  })
+}
+
 export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   const { id } = updatedEvent
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
   deleteEventData(id)
-
   await removeCachedFiles(updatedEvent)
-
-  /**
-   * deleteEventData() is overridden by updateLocalEvent().
-   * We should instead update the query that returns a specific eventIndex when it's implemented.
-   */
-  await updateLocalEvent(updatedEvent)
 }

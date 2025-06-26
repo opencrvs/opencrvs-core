@@ -69,7 +69,7 @@ export function Review() {
 
   const registerMutation = events.actions.register
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
   const previousAnnotation = getActionAnnotation({
     event,
@@ -215,7 +215,7 @@ export function Review() {
           primaryButtonType="positive"
           onConfirm={handleRegistration}
           onReject={
-            currentEventState.status === EventStatus.REJECTED
+            currentEventState.status === EventStatus.enum.REJECTED
               ? undefined
               : handleRejection
           }
