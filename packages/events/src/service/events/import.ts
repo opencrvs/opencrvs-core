@@ -10,7 +10,7 @@
  */
 import { omit } from 'lodash'
 import { EventDocument, getUUID } from '@opencrvs/commons'
-import { createEventWithActions } from '@events/storage/postgres/events/events'
+import { upsertEventWithActions } from '@events/storage/postgres/events/import'
 import { getEventConfigurationById } from '../config/config'
 import { indexEvent } from '../indexing/indexing'
 
@@ -30,16 +30,15 @@ export async function importEvent(eventDocument: EventDocument, token: string) {
     reasonMessage: (action as any).reason?.message ?? undefined,
     registrationNumber: (action as any).registrationNumber ?? undefined,
     assignedTo: (action as any).assignedTo ?? undefined,
-    createdBySignature: action.createdBySignature ?? undefined,
-    createdAtLocation: action.createdAtLocation ?? undefined,
-    originalActionId: action.originalActionId ?? undefined,
-    requestId: (action as any).requestId ?? undefined
+    requestId: (action as any).requestId ?? undefined,
     /* eslint-enable @typescript-eslint/no-explicit-any */
+    createdAtLocation: action.createdAtLocation ?? null,
+    originalActionId: action.originalActionId ?? null,
+    createdBySignature: action.createdBySignature ?? null
   }))
 
-  const createdEvent = await createEventWithActions(
+  const createdEvent = await upsertEventWithActions(
     { ...omit(event, 'type'), eventType, transactionId },
-    // @ts-expect-error -- @TODO: check type inference
     eventActions
   )
 

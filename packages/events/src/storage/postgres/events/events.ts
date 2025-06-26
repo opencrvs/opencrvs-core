@@ -9,8 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Kysely } from 'kysely'
-import _ from 'lodash'
+import { Kysely, sql } from 'kysely'
 import {
   ActionStatus,
   ActionType,
@@ -57,6 +56,11 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
     .selectFrom('eventActions')
     .selectAll()
     .where('eventId', '=', event.id)
+    .orderBy(
+      sql`CASE WHEN ${sql.ref('actionType')} = 'CREATE' THEN 0 ELSE 1 END`,
+      'asc'
+    )
+    .orderBy('createdAt', 'asc')
     .execute()
 
   return toEventDocument(event, actions)
@@ -69,27 +73,32 @@ export const getEventById = async (id: UUID) => {
   })
 }
 
+export async function deleteEventByIdInTrx(eventId: UUID, trx: Kysely<Schema>) {
+  await trx.deleteFrom('eventActions').where('eventId', '=', eventId).execute()
+  await trx.deleteFrom('events').where('id', '=', eventId).execute()
+}
+
 export async function deleteEventById(eventId: UUID) {
   const db = getClient()
 
   return db.transaction().execute(async (trx) => {
-    await trx
-      .deleteFrom('eventActions')
-      .where('eventId', '=', eventId)
-      .execute()
-
-    await trx.deleteFrom('events').where('id', '=', eventId).execute()
+    await deleteEventByIdInTrx(eventId, trx)
   })
 }
 
 export async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
-  const result = await trx
+  await trx
     .insertInto('events')
     .values(event)
-    .returning('id')
+    .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
     .executeTakeFirstOrThrow()
 
-  return { id: result.id }
+  return trx
+    .selectFrom('events')
+    .select('id')
+    .where('transactionId', '=', event.transactionId)
+    .where('eventType', '=', event.eventType)
+    .executeTakeFirstOrThrow()
 }
 
 export const createEvent = async (
@@ -111,7 +120,11 @@ export async function createActionInTrx(
   action: NewEventActions,
   trx: Kysely<Schema>
 ) {
-  await trx.insertInto('eventActions').values(action).execute()
+  await trx
+    .insertInto('eventActions')
+    .values(action)
+    .onConflict((oc) => oc.columns(['transactionId', 'actionType']).doNothing())
+    .execute()
 
   return trx
     .selectFrom('eventActions')
@@ -249,23 +262,5 @@ export const getOrCreateEventAndAssign = async (
 
   return db.transaction().execute(async (trx) => {
     return getOrCreateEventAndAssignInTrx(input, trx)
-  })
-}
-
-export const createEventWithActions = async (
-  event: Events,
-  actions: Array<Omit<EventActions, 'eventId'>>
-) => {
-  const db = getClient()
-
-  // Could this be done in one insert?
-  return db.transaction().execute(async (trx) => {
-    const { id: eventId } = await createEventInTrx(event, trx)
-
-    for (const action of actions) {
-      await createActionInTrx({ ...action, eventId }, trx)
-    }
-
-    return getEventByIdInTrx(eventId, trx)
   })
 }

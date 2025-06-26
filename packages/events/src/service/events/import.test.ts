@@ -74,9 +74,10 @@ test('importing the same event twice overwrites the previous one', async () => {
 
   await client.event.import(event)
 
-  await client.event.import(event)
+  await client.event.import({ ...event, trackingId: 'ABCDEF' })
 
   const events = await client.event.list()
   expect(events).toHaveLength(1)
   expect(events[0].id).toEqual(event.id)
+  expect(events[0].trackingId).toEqual('ABCDEF')
 })

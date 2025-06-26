@@ -93,14 +93,14 @@ describe('event.create', () => {
     expect(fetchedEvent.trackingId).toMatch(/^[A-Z0-9]{6}$/)
   })
 
-  test.skip('creating an event is an idempotent operation', async () => {
-    // const { user, generator, eventsDb } = await setupTestCase()
-    // const client = createTestClient(user)
-    // const payload = generator.event.create()
-    // await client.event.create(payload)
-    // await client.event.create(payload)
-    // const events = await eventsDb.selectFrom('events').selectAll().execute()
-    // expect(events).toHaveLength(1)
+  test('creating an event is an idempotent operation', async () => {
+    const { user, generator, eventsDb } = await setupTestCase()
+    const client = createTestClient(user)
+    const payload = generator.event.create()
+    await client.event.create(payload)
+    await client.event.create(payload)
+    const events = await eventsDb.selectFrom('events').selectAll().execute()
+    expect(events).toHaveLength(1)
   })
 
   test('event with unknown type cannot be created', async () => {

@@ -15,6 +15,7 @@ import {
   ActionType,
   createPrng,
   generateRandomSignature,
+  getUUID,
   Scope,
   SCOPES,
   SystemRole,
@@ -47,7 +48,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedAtLocation',
   'updatedBy',
   'acceptedAt',
-  'dateOfEvent'
+  'dateOfEvent',
+  'registrationNumber'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -230,7 +232,10 @@ function actionToClientAction(
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(
-          generator.event.actions.register(eventId, { keepAssignment: true })
+          generator.event.actions.register(eventId, {
+            keepAssignment: true,
+            registrationNumber: getUUID()
+          })
         )
     case ActionType.PRINT_CERTIFICATE:
       return async (eventId: string) =>

@@ -345,6 +345,7 @@ export async function addAction(
       createdBy: user.id,
       createdByRole: user.role,
       createdByUserType: user.type,
+      createdBySignature: user.signature,
       createdAtLocation: user.primaryOfficeId
     })
   }
