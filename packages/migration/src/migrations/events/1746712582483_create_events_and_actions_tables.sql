@@ -1,9 +1,12 @@
 -- Up Migration
 CREATE TABLE locations (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+  id uuid PRIMARY KEY,
   external_id text UNIQUE,
   name text NOT NULL,
-  parent_id uuid REFERENCES locations(id)
+  parent_id uuid REFERENCES locations(id),
+  created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
+  updated_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,
+  deleted_at TIMESTAMPTZ(3)
 );
 
 GRANT SELECT, INSERT, UPDATE, DELETE ON locations TO events_app;
@@ -130,7 +133,7 @@ CREATE TABLE event_action_drafts (
   annotation jsonb,
   created_by text NOT NULL,
   created_by_role text NOT NULL,
-  created_by_user_type text NOT NULL CHECK (created_by_user_type IN ('admin', 'user')),
+  created_by_user_type user_type NOT NULL,
   created_by_signature text,
   created_at_location uuid NOT NULL REFERENCES locations(id),
   created_at TIMESTAMPTZ(3) DEFAULT now() NOT NULL,

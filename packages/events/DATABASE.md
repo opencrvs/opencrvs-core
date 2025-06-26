@@ -37,6 +37,7 @@ See [@opencrvs/migration](/packages/migration/README.md) for more information ar
         drafts.ts
         events.ts
         locations.ts
+        import.ts
       # Database client and type configuration
       events.ts
 # `yarn generate-db-types` configuration

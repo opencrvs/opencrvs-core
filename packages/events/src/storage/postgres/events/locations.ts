@@ -9,15 +9,43 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { sql } from 'kysely'
 import { getClient } from '@events/storage/postgres/events'
-import { Locations, NewLocations } from './schema/app/Locations'
+import { NewLocations } from './schema/app/Locations'
 
-export async function createLocations(locations: NewLocations[]) {
+export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
-  await db.insertInto('locations').values(locations).execute()
+  const locationIds = locations.map(({ id }) => id)
+
+  await db
+    .insertInto('locations')
+    .values(locations.map((loc) => ({ ...loc, deletedAt: null })))
+    .onConflict((oc) =>
+      oc.column('id').doUpdateSet({
+        name: (eb) => eb.ref('excluded.name'),
+        externalId: (eb) => eb.ref('excluded.externalId'),
+        parentId: (eb) => eb.ref('excluded.parentId'),
+        updatedAt: () => sql`now()`,
+        deletedAt: null
+      })
+    )
+    .execute()
+
+  await db
+    .updateTable('locations')
+    .set({ deletedAt: sql`now()` })
+    .where('deletedAt', 'is', null)
+    .where('id', 'not in', locationIds)
+    .execute()
 }
 
 export async function getLocations() {
   const db = getClient()
-  return (await db.selectFrom('locations').selectAll().execute()) as Locations[]
+
+  return db
+    .selectFrom('locations')
+    .selectAll()
+    .where('deletedAt', 'is', null)
+    .$narrowType<{ deletedAt: null }>()
+    .execute()
 }

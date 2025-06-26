@@ -28,7 +28,7 @@ export type Location = z.infer<typeof Location>
  */
 
 export async function setLocations(incomingLocations: Array<Location>) {
-  return locationsRepo.createLocations(
+  return locationsRepo.setLocations(
     incomingLocations.map(({ id, externalId, name, partOf }) => ({
       id,
       externalId,

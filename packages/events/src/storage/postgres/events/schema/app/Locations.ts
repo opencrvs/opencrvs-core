@@ -6,13 +6,19 @@ import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely'
 
 /** Represents the table app.locations */
 export default interface LocationsTable {
-  id: ColumnType<UUID, UUID | undefined, UUID>
+  id: ColumnType<UUID, UUID, UUID>
 
   externalId: ColumnType<string | null, string | null, string | null>
 
   name: ColumnType<string, string, string>
 
   parentId: ColumnType<UUID | null, UUID | null, UUID | null>
+
+  createdAt: ColumnType<string, string | undefined, string>
+
+  updatedAt: ColumnType<string, string | undefined, string>
+
+  deletedAt: ColumnType<string | null, string | null, string | null>
 }
 
 export type Locations = Selectable<LocationsTable>
