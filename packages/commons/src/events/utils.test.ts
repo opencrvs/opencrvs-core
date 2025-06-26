@@ -85,16 +85,14 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
         ...commonAction,
         type: ActionType.UNASSIGN,
         createdByUserType: TokenUserType.Enum.user,
-        createdAt: '2023-01-01T02:00:00Z',
-        assignedTo: null
+        createdAt: '2023-01-01T02:00:00Z'
       }
     ],
     expected: {
       ...commonAction,
       type: ActionType.UNASSIGN,
       createdByUserType: TokenUserType.Enum.user,
-      createdAt: '2023-01-01T02:00:00Z',
-      assignedTo: null
+      createdAt: '2023-01-01T02:00:00Z'
     }
   },
   {
@@ -116,8 +114,7 @@ const testCases: { actions: Action[]; expected: Action | undefined }[] = [
         ...commonAction,
         type: ActionType.UNASSIGN,
         createdByUserType: TokenUserType.Enum.user,
-        createdAt: '2023-01-01T02:00:00Z',
-        assignedTo: null
+        createdAt: '2023-01-01T02:00:00Z'
       },
       {
         ...commonAction,
