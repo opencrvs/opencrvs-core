@@ -40,6 +40,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { Sidebar } from '../sidebar/Sidebar'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -123,6 +124,7 @@ export function EventOverviewLayout({
           )}
         />
       }
+      navigation={<Sidebar />}
       skipToContentText="skip"
     >
       {children}
