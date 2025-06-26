@@ -44,10 +44,12 @@ const SCREEN_LOCK = 'screenLock'
 
 export const Sidebar = ({
   menuCollapse,
-  navigationWidth
+  navigationWidth,
+  isMobileView = false
 }: {
   menuCollapse?: () => void // Only relevant for mobile view
   navigationWidth?: number
+  isMobileView?: boolean
 }) => {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
@@ -138,24 +140,26 @@ export const Sidebar = ({
           />
         ))}
       </NavigationGroup>
-      <NavigationGroup>
-        <NavigationItem
-          icon={() => <SettingsNavigation />}
-          id={`navigation_${WORKQUEUE_TABS.settings}`}
-          isSelected={false}
-          label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.settings])}
-          onClick={() => {
-            navigate(routes.SETTINGS)
-            menuCollapse && menuCollapse()
-          }}
-        />
-        <NavigationItem
-          icon={() => <LogoutNavigation />}
-          id={`navigation_${WORKQUEUE_TABS.logout}`}
-          label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
-          onClick={logout}
-        />
-      </NavigationGroup>
+      {isMobileView && (
+        <NavigationGroup>
+          <NavigationItem
+            icon={() => <SettingsNavigation />}
+            id={`navigation_${WORKQUEUE_TABS.settings}`}
+            isSelected={false}
+            label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.settings])}
+            onClick={() => {
+              navigate(routes.SETTINGS)
+              menuCollapse && menuCollapse()
+            }}
+          />
+          <NavigationItem
+            icon={() => <LogoutNavigation />}
+            id={`navigation_${WORKQUEUE_TABS.logout}`}
+            label={intl.formatMessage(buttonMessages[WORKQUEUE_TABS.logout])}
+            onClick={logout}
+          />
+        </NavigationGroup>
+      )}
     </LeftNavigation>
   )
 }
