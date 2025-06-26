@@ -209,8 +209,7 @@ test('Returns events based on the updatedAt column', async () => {
     ...TEST_USER_DEFAULT_SCOPES
   ])
 
-  // since API returns only necessary milliseconds it is easier to test with explicit milliseconds (and not 0s)
-  const oldEventCreatedAt = new Date(2022, 5, 6, 5, 56, 10, 101).toISOString()
+  const oldEventCreatedAt = new Date(2022, 5, 6).toISOString()
 
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,

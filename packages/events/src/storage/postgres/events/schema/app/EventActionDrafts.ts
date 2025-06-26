@@ -3,6 +3,7 @@
 
 import type { UUID } from '@opencrvs/commons'
 import type { default as ActionType } from './ActionType'
+import type { default as UserType } from './UserType'
 import type { ColumnType, Selectable, Insertable, Updateable } from 'kysely'
 
 /**
@@ -34,7 +35,7 @@ export default interface EventActionDraftsTable {
 
   createdByRole: ColumnType<string, string, string>
 
-  createdByUserType: ColumnType<string, string, string>
+  createdByUserType: ColumnType<UserType, UserType, UserType>
 
   createdBySignature: ColumnType<string | null, string | null, string | null>
 
