@@ -27,6 +27,7 @@ import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { CoreWorkqueues } from '@client/v2-events/utils'
 import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
+import { useOutbox } from '../events/useEvents/outbox'
 import { Outbox } from './Outbox'
 
 const FabContainer = styled.div`
@@ -44,7 +45,10 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const workqueues = useWorkqueueConfigurations()
 
   const { getResult } = useWorkqueue(workqueueSlug)
-  const events = getResult().useSuspenseQuery()
+  const outbox = useOutbox()
+  const events = getResult()
+    .useSuspenseQuery()
+    .filter((event) => !outbox.find(({ id }) => id === event.id))
 
   const intl = useIntl()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
