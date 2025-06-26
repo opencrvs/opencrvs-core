@@ -13,7 +13,6 @@ import format from 'date-fns/format'
 import styled from 'styled-components'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { NavigateFunction, useNavigate } from 'react-router-dom'
-import { stringify } from 'query-string'
 import { useSelector } from 'react-redux'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
@@ -30,6 +29,7 @@ import { formatUrl } from '@client/navigation'
 import { useEventOverviewContext } from '@client/v2-events/features/workqueues/EventOverview/EventOverviewContext'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
+import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
   EventHistoryModal,
   eventHistoryStatusMessage
@@ -219,7 +219,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
             onClick={() => {
               navigate({
                 pathname: routes.TEAM_USER_LIST,
-                search: stringify({
+                search: serializeSearchParams({
                   locationId: action.createdAtLocation
                 })
               })

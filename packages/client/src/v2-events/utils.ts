@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { uniq, isString, get, uniqBy } from 'lodash'
+import { uniq, isString, get, uniqBy, mergeWith } from 'lodash'
 import { v4 as uuid } from 'uuid'
 import {
   ResolvedUser,
@@ -226,6 +226,22 @@ export interface Option<T = string> {
   label: string
 }
 
+export function mergeWithoutNullsOrUndefined<T>(
+  object: T,
+  source: Partial<T>
+): T {
+  return mergeWith({}, object, source, (objValue, srcValue) => {
+    if (srcValue === undefined || srcValue === null) {
+      return objValue
+    }
+    return undefined
+  })
+}
+
+export enum CoreWorkqueues {
+  OUTBOX = 'outbox'
+}
+
 export function hasOutboxWorkqueue(scopes: Scope[]) {
   return scopes.some((scope) => ActionScopes.safeParse(scope).success)
 }
@@ -237,7 +253,7 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     description: 'Title of outbox workqueue'
   },
   actions: [],
-  slug: 'outbox',
+  slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }
 

@@ -40,6 +40,13 @@ export const FieldReference = z
 
 const ParentReference = FieldReference.optional()
 
+export const ValidationConfig = z.object({
+  validator: Conditional,
+  message: TranslationConfig
+})
+
+export type ValidationConfig = z.infer<typeof ValidationConfig>
+
 const BaseField = z.object({
   id: FieldId,
   parent: ParentReference,
@@ -47,15 +54,7 @@ const BaseField = z.object({
   required: z.boolean().default(false).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
-  validation: z
-    .array(
-      z.object({
-        validator: Conditional,
-        message: TranslationConfig
-      })
-    )
-    .default([])
-    .optional(),
+  validation: z.array(ValidationConfig).default([]).optional(),
   label: TranslationConfig,
   helperText: TranslationConfig.optional(),
   hideLabel: z.boolean().default(false).optional()
