@@ -13,7 +13,10 @@ import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { isEqual } from 'lodash'
 import {
   FieldConfig,
@@ -66,6 +69,10 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 
 export function Summary() {
   const { eventId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+  )
+
+  const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
@@ -170,6 +177,7 @@ export function Summary() {
             editable={true}
             event={event}
             form={form}
+            workqueue={workqueue}
           />
         </Content>
       </ActionPageLight>

@@ -14,7 +14,6 @@ import { useIntl } from 'react-intl'
 import { isEqual } from 'lodash'
 
 import { useNavigate } from 'react-router-dom'
-import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -36,21 +35,27 @@ const CorrectionSectionTitle = styled(Text)`
   margin: 20px 0;
 `
 
+/*
+ * Correction details component which is used both on the correction request summary page,
+ * and the event audit history dialog/modal for 'Request correction' actions.
+ *
+ * This component displays a table with the correction 'annotation' details, and then
+ * a table with the corrected fields.
+ */
 export function CorrectionDetails({
   event,
   form,
   annotation,
-  editable = false
+  editable = false,
+  workqueue
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
   editable?: boolean
+  workqueue?: string
 }) {
   const intl = useIntl()
-  const [{ workqueue }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
-  )
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
