@@ -32,6 +32,7 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
+  isTextAreaFieldType,
   isTextFieldType,
   isNameFieldType,
   isIdFieldType,
@@ -74,6 +75,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     isPhoneFieldType(field) ||
     isTextFieldType(field)
   ) {
+    return Text.Output({ value: field.value })
+  }
+
+  if (isTextAreaFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 
@@ -164,7 +169,7 @@ export function Output({
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
-  showPreviouslyMissingValuesAsChanged: boolean
+  showPreviouslyMissingValuesAsChanged?: boolean
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value
   const hasValue = value !== undefined

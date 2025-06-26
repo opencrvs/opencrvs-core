@@ -158,3 +158,26 @@ test(`${ActionType.PRINT_CERTIFICATE} is idempotent`, async () => {
 
   expect(firstResponse).toEqual(secondResponse)
 })
+
+test(`${ActionType.PRINT_CERTIFICATE} is not allowed if the event is waiting for correction`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER,
+    ActionType.REQUEST_CORRECTION
+  ])
+
+  await expect(
+    client.event.actions.printCertificate.request(
+      generator.event.actions.printCertificate(event.id)
+    )
+  ).rejects.toThrow(
+    new TRPCError({
+      code: 'CONFLICT',
+      message: 'Event is waiting for correction'
+    })
+  )
+})

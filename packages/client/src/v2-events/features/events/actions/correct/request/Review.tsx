@@ -12,6 +12,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { isEqual } from 'lodash'
 import {
   useTypedParams,
   useTypedSearchParams
@@ -25,7 +26,6 @@ import { useEventConfiguration } from '@client/v2-events/features/events/useEven
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
-import { useModal } from '@client/v2-events/hooks/useModal'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
@@ -35,10 +35,9 @@ export function Review() {
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.VALIDATE.REVIEW
   )
-  const events = useEvents()
   const intl = useIntl()
-  const [modal, openModal] = useModal()
   const navigate = useNavigate()
+  const events = useEvents()
 
   const event = events.getEvent.getFromCache(eventId)
 
@@ -50,43 +49,13 @@ export function Review() {
   const formConfig = getDeclaration(configuration)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-
   const form = getFormValues()
-
-  async function handleEdit({
-    pageId,
-    fieldId,
-    confirmation
-  }: {
-    pageId: string
-    fieldId?: string
-    confirmation?: boolean
-  }) {
-    const confirmedEdit =
-      confirmation ||
-      (await openModal<boolean | null>((close) => (
-        <ReviewComponent.EditModal close={close} />
-      )))
-
-    if (confirmedEdit) {
-      navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
-          { pageId, eventId },
-          {
-            from: 'review',
-            workqueue: slug
-          },
-          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
-        )
-      )
-    }
-    return
-  }
 
   const previousFormValues = eventIndex.declaration
   const valuesHaveChanged = Object.entries(form).some(
-    ([key, value]) => previousFormValues[key] !== value
+    ([key, value]) => !isEqual(previousFormValues[key], value)
   )
+
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
   const actionConfig = configuration.actions.find(
@@ -109,7 +78,18 @@ export function Review() {
           actionConfig.label,
           previousFormValues
         )}
-        onEdit={handleEdit}
+        onEdit={({ pageId, fieldId }) => {
+          navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+              { pageId, eventId },
+              {
+                from: 'review',
+                workqueue: slug
+              },
+              fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
+            )
+          )
+        }}
       >
         <PrimaryButton
           key="continue_button"
@@ -117,10 +97,8 @@ export function Review() {
           id="continue_button"
           onClick={() => {
             navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath(
-                {
-                  eventId
-                },
+              ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
+                { eventId },
                 { workqueue: slug }
               )
             )
@@ -128,7 +106,6 @@ export function Review() {
         >
           {intl.formatMessage(buttonMessages.continueButton)}
         </PrimaryButton>
-        {modal}
       </ReviewComponent.Body>
     </FormLayout>
   )

@@ -328,33 +328,6 @@ describe('when a correction request exists', () => {
   })
 })
 
-test(`${ActionType.REQUEST_CORRECTION} is idempotent`, async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const event = await createEvent(client, generator, [
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REGISTER
-  ])
-
-  const correctionRequestPayload = generator.event.actions.correction.request(
-    event.id,
-    {
-      keepAssignment: true
-    }
-  )
-  const firstResponse = await client.event.actions.correction.request(
-    correctionRequestPayload
-  )
-
-  const secondResponse = await client.event.actions.correction.request(
-    correctionRequestPayload
-  )
-
-  expect(firstResponse).toEqual(secondResponse)
-})
-
 test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
@@ -428,4 +401,36 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
   )
 
   expect(firstResponse).toEqual(secondResponse)
+})
+
+test('a correction request is not allowed if the event is already waiting for correction', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.correction.request(
+    generator.event.actions.correction.request(event.id)
+  )
+
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  await expect(
+    client.event.actions.correction.request(
+      generator.event.actions.correction.request(event.id)
+    )
+  ).rejects.toThrow(
+    new TRPCError({
+      code: 'CONFLICT',
+      message: 'Event is waiting for correction'
+    })
+  )
 })
