@@ -232,6 +232,59 @@ describe('object combinator', () => {
   })
 })
 
+describe('date comparisons', () => {
+  it("throws an error if validation context doesn't contain $now", () => {
+    expect(() =>
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        $now: undefined as any // $now is not defined ❌
+      })
+    ).toThrowError()
+  })
+
+  it('validates comparisons to where date is expected to be after certain date', () => {
+    expect(
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-01-12' // needs to be after 1990-02-01 ❌
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(false)
+  })
+  it('validates comparisons to where date is expected to be before certain date', () => {
+    expect(
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-02-12' // needs to be before 1990-07-06 ✅
+        }),
+        $now: '1990-06-06'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-09-07' // needs to be before 1990-07-06 ❌
+        }),
+        $now: '1990-06-06'
+      })
+    ).toBe(false)
+  })
+})
+
 describe('"field" conditionals', () => {
   it('validates "field.isAfter" conditional', () => {
     expect(
