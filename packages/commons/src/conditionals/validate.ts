@@ -30,6 +30,24 @@ const ajv = new Ajv({
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
 
+/*
+ * Custom keyword validator for date strings so the dates could be validated dynamically
+ * For example, a validation could be "birth date needs to have happend 30 days before today"
+ * or "death date needs to be after birth date + 30 days"
+ *
+ * Example schema:
+ * {
+ *   "type": "object",
+ *   "properties": {
+ *     "birthDate": {
+ *       "type": "string",
+ *       "daysFromNow": {
+ *         "days": 30,
+ *         "clause": "before"
+ *       }
+ *    }
+ * }
+ */
 ajv.addKeyword({
   keyword: 'daysFromNow',
   type: 'string',
