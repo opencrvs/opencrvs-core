@@ -94,7 +94,7 @@ function normalizeHeaders(
   return headers
 }
 
-export async function resolveUserDetails(
+async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
   let userId: string | undefined
