@@ -200,7 +200,7 @@ test('Throws when one of the date range fields has invalid date', async () => {
   ).rejects.toMatchSnapshot()
 })
 
-test.only('Returns events based on the updatedAt column', async () => {
+test('Returns events based on the updatedAt column', async () => {
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
@@ -209,7 +209,8 @@ test.only('Returns events based on the updatedAt column', async () => {
     ...TEST_USER_DEFAULT_SCOPES
   ])
 
-  const oldEventCreatedAt = new Date(2022, 5, 6).toISOString()
+  // since API returns only necessary milliseconds it is easier to test with explicit milliseconds (and not 0s)
+  const oldEventCreatedAt = new Date(2022, 5, 6, 5, 56, 10, 101).toISOString()
 
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
@@ -277,8 +278,8 @@ test.only('Returns events based on the updatedAt column', async () => {
   const [oldEvent] = oldEvents
 
   // Only accepted action should update updatedAt timestamp
-  expect(oldEvent.createdAt).toEqual('2022-06-05T21:00:00Z')
-  expect(oldEvent.updatedAt).toEqual('2022-06-05T21:00:00Z')
+  expect(oldEvent.createdAt).toEqual(oldEventCreatedAt)
+  expect(oldEvent.updatedAt).toEqual(oldEventCreatedAt)
 
   expect(oldEvent).toEqual(
     getCurrentEventState(
