@@ -9184,11 +9184,6 @@
   resolved "https://registry.yarnpkg.com/@trpc/client/-/client-11.0.0-rc.638.tgz#5e35d861d905a9e1a17d919889cc5744a6993ef6"
   integrity sha512-zKOZZwUMcF4cvm04aawG7dP6M9dCs7FEWHuiBy7xmU+RIonsgpolLMRXm7bFie5EhQOGizhLRGnhneGwjNzWMA==
 
-"@trpc/client@^11.0.0-rc.648":
-  version "11.0.0-rc.648"
-  resolved "https://registry.yarnpkg.com/@trpc/client/-/client-11.0.0-rc.648.tgz#275cc0b36e08850754d0c03ccbd911735d734976"
-  integrity sha512-k4FfLKvJwbosUH8KYyZkC50RJHYtIyJECi5WhRXsvaf9a6lgrTlcA+osq815zYcAHo7wEgR9E9UdSTrpLdAQFQ==
-
 "@trpc/client@^11.2.0":
   version "11.2.0"
   resolved "https://registry.yarnpkg.com/@trpc/client/-/client-11.2.0.tgz#a2178bf376c78dc83d5a2dd862b426fadcefe380"
@@ -9198,11 +9193,6 @@
   version "11.4.2"
   resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.4.2.tgz#ed84146132f915546146a229aa9e3137f8d222b5"
   integrity sha512-THyq/V5bSFDHeWEAk6LqHF0IVTGk6voGwWsFEipzRRKOWWMIZINCsKZ4cISG6kWO2X9jBfMWv/S2o9hnC0zQ0w==
-
-"@trpc/server@^11.0.0-rc.532":
-  version "11.0.0-rc.604"
-  resolved "https://registry.yarnpkg.com/@trpc/server/-/server-11.0.0-rc.604.tgz#99929ca7840fe1d01f0adefe35536d66778f02bd"
-  integrity sha512-JXn6XbheQwj2tWqKnAlWhGnIo6F7cSYWQ3SgPXdq+MCYKJBuSYrurj5NvreNCVAkVZmftjyUlIV+Hs2/se4GNg==
 
 "@trpc/tanstack-react-query@11.4.2":
   version "11.4.2"
