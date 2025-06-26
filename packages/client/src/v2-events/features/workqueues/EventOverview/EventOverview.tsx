@@ -82,7 +82,7 @@ function EventOverviewFull({
     // drafts should not affect the status of the event
     // so the status is taken from the eventIndex
     'event.status': status,
-    assignedTo
+    'event.assignedTo': assignedTo
   }
 
   const { getEventTitle } = useEventTitle()
@@ -139,7 +139,7 @@ function EventOverviewProtected({
     // drafts should not affect the status of the event
     // so the status is taken from the eventIndex
     'event.status': status,
-    assignedTo
+    'event.assignedTo': assignedTo
   }
 
   const { getEventTitle } = useEventTitle()
