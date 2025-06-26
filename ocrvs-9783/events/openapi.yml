@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 67bd9c35-a6e7-4964-97e1-3c85a7134b93
+                transactionId: 1003499d-7c53-462c-945e-1ce0e0fc5ad2
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 00e07468-acbb-44d1-ad15-e1c908ecdee1
+                transactionId: 66e47665-2ba3-48e5-a0f7-32f5a32da599
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9878,9 +9878,7 @@ components:
         trackingId:
           $ref: "#/components/schemas/Exact"
         flags:
-          anyOf:
-            - $ref: "#/components/schemas/AnyOfFlags"
-            - $ref: "#/components/schemas/Not"
+          $ref: "#/components/schemas/ContainsFlags"
         data:
           $ref: "#/components/schemas/QueryInput"
     AnyOfStatus:
@@ -9993,14 +9991,10 @@ components:
       required:
         - type
         - location
-    AnyOfFlags:
+    ContainsFlags:
       type: object
       properties:
-        type:
-          type: string
-          enum:
-            - anyOf
-        terms:
+        anyOf:
           type: array
           items:
             anyOf:
@@ -10008,28 +10002,22 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - certificate-printed
-                  - declaration-incomplete
-                  - declaration-requires-updates
-                  - declaration-pending-external-validation
-                  - registration-certify-new-registration
-                  - registration-re-certify-after-correction
-                  - registration-correction-requested
-      required:
-        - type
-        - terms
-    Not:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - not
-        term:
-          type: string
-      required:
-        - type
-        - term
+                  - printed
+                  - incomplete
+                  - rejected
+                  - correction-requested
+        noneOf:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - printed
+                  - incomplete
+                  - rejected
+                  - correction-requested
     QueryInput:
       anyOf:
         - oneOf:
@@ -10038,7 +10026,6 @@ components:
             - $ref: "#/components/schemas/Range"
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/AnyOf"
-            - $ref: "#/components/schemas/Not"
           discriminator:
             propertyName: type
             mapping:
@@ -10047,7 +10034,6 @@ components:
               range: "#/components/schemas/Range"
               within: "#/components/schemas/Within"
               anyOf: "#/components/schemas/AnyOf"
-              not: "#/components/schemas/Not"
         - type: object
           additionalProperties:
             $ref: "#/components/schemas/QueryInput"
@@ -10235,13 +10221,10 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - certificate-printed
-                  - declaration-incomplete
-                  - declaration-requires-updates
-                  - declaration-pending-external-validation
-                  - registration-certify-new-registration
-                  - registration-re-certify-after-correction
-                  - registration-correction-requested
+                  - printed
+                  - incomplete
+                  - rejected
+                  - correction-requested
         declaration:
           type: object
           additionalProperties:
