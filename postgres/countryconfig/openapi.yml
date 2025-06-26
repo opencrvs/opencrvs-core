@@ -8565,8 +8565,6 @@ components:
         type:
           type: string
           const: UNASSIGN
-        assignedTo:
-          type: "null"
       required:
         - id
         - transactionId
@@ -8577,7 +8575,6 @@ components:
         - declaration
         - status
         - type
-        - assignedTo
     PrintCertificateAction:
       type: object
       properties:
@@ -10829,7 +10826,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 181110ff-70ea-4ff6-b803-5f7fbe272cbe
+        transactionId: 990e7866-0653-41f8-aa1c-79bdc23bccd5
         declaration: {}
         annotation: {}
         type: NOTIFY
