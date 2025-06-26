@@ -529,9 +529,6 @@ async function requestCorrectionHandler(
   await createUserAuditPointFromFHIR('REQUESTED_CORRECTION', request)
   try {
     const points = await Promise.all([
-      generateCorrectionReasonPoint(request.payload as fhir.Bundle, {
-        Authorization: request.headers.authorization
-      }),
       generateEventDurationPoint(
         request.payload as fhir.Bundle,
         ['REGISTERED', 'CERTIFIED'],
