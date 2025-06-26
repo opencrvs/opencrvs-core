@@ -41,6 +41,7 @@ import { formattedDuration } from '@client/utils/date-formatting'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
+import { CoreWorkqueues } from '@client/v2-events/utils'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   useAction,
@@ -154,6 +155,11 @@ const searchResultMessages = {
     defaultMessage: 'No results',
     description: 'The no result text'
   },
+  noResultsOutbox: {
+    defaultMessage: 'No records require processing',
+    description: 'Text to display if there is no items in outbox',
+    id: 'v2.constants.noResultsOutbox'
+  },
   searchResult: {
     defaultMessage: 'Search results',
     description:
@@ -244,6 +250,7 @@ export const SearchResultComponent = ({
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
 }>) => {
+  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
   const navigate = useNavigate()
   const { width: windowWidth } = useWindowSize()
@@ -431,7 +438,11 @@ export const SearchResultComponent = ({
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         noContent={queryData.length === 0}
-        noResultText={intl.formatMessage(messages.noResult)}
+        noResultText={intl.formatMessage(
+          slug === CoreWorkqueues.OUTBOX
+            ? messages.noResultsOutbox
+            : messages.noResult
+        )}
         paginationId={currentPageNumber}
         tabBarContent={tabBarContent}
         title={contentTitle}
