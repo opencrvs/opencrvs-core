@@ -11,7 +11,10 @@
 import * as React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { ActionType, getCurrentEventState } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { buttonMessages } from '@client/i18n/messages'
@@ -32,6 +35,9 @@ const messages = defineMessages({
 
 export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
+  )
+  const [searchParams] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
   const events = useEvents()
@@ -93,7 +99,7 @@ export function Onboarding() {
         formPages={formPages}
         pageId={currentPageId}
         setFormData={(data) => setAnnotation(data)}
-        showReviewButton={false}
+        showReviewButton={searchParams.from === 'summary'}
         validateBeforeNextPage={true}
         onPageChange={(nextPageId: string) => {
           return navigate(

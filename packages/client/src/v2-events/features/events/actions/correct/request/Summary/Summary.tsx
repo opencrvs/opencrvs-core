@@ -167,6 +167,7 @@ export function Summary() {
         >
           <CorrectionDetails
             annotation={annotation}
+            editable={true}
             event={event}
             form={form}
           />

@@ -23,7 +23,8 @@ export const routes = route(
     ONBOARDING: route('onboarding/:pageId', {
       params: { pageId: string() },
       searchParams: {
-        workqueue: string()
+        workqueue: string(),
+        from: string()
       },
       hash: hashValues()
     }),
