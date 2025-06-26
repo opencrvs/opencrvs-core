@@ -10,15 +10,17 @@
  */
 
 import * as React from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { isEqual } from 'lodash'
 import {
   FieldConfig,
   generateTransactionId,
-  Scope,
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
@@ -33,7 +35,6 @@ import { Check } from '@opencrvs/components/lib/icons'
 import { Text } from '@opencrvs/components/lib/Text'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { buttonMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -43,33 +44,13 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { CorrectionDetails } from './CorrectionDetails'
 
-function ContinueButton({
-  onClick,
-  disabled = false,
-  scopes
-}: {
-  disabled?: boolean
-  onClick: () => void
-  scopes: Scope[] | null
-}) {
-  const intl = useIntl()
-
-  return (
-    <Button
-      key="make_correction"
-      disabled={disabled}
-      id="make_correction"
-      size="large"
-      type="positive"
-      onClick={onClick}
-    >
-      <Check />
-      {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
-        ? intl.formatMessage(buttonMessages.makeCorrection)
-        : intl.formatMessage(buttonMessages.sendForApproval)}
-    </Button>
-  )
-}
+const messages = defineMessages({
+  submitCorrectionRequest: {
+    id: 'v2-events.buttons.submitCorrectionRequest',
+    defaultMessage: 'Submit correction request',
+    description: 'Submit correction request button text'
+  }
+})
 
 /**
  * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
@@ -88,6 +69,10 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 
 export function Summary() {
   const { eventId } = useTypedParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+  )
+
+  const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
   )
 
@@ -157,11 +142,17 @@ export function Summary() {
       >
         <Content
           bottomActionButtons={[
-            <ContinueButton
+            <Button
               key="make-correction"
-              scopes={scopes}
+              id="make-correction"
+              size="large"
+              type="primary"
               onClick={togglePrompt}
-            />
+            >
+              <Check />
+              {/* TODO: when direct correction is implemented, we should use different button message for that */}
+              {intl.formatMessage(messages.submitCorrectionRequest)}
+            </Button>
           ]}
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
@@ -183,8 +174,10 @@ export function Summary() {
         >
           <CorrectionDetails
             annotation={annotation}
+            editable={true}
             event={event}
             form={form}
+            workqueue={workqueue}
           />
         </Content>
       </ActionPageLight>

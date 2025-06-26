@@ -34,6 +34,7 @@ export function Onboarding() {
   const { eventId, pageId } = useTypedParams(
     ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING
   )
+
   const events = useEvents()
   const annotation = useActionAnnotation((state) => state.getAnnotation())
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)

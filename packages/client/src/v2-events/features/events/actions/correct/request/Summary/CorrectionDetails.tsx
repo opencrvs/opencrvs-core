@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { useIntl } from 'react-intl'
 import { isEqual } from 'lodash'
 
+import { useNavigate } from 'react-router-dom'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -23,23 +24,36 @@ import {
   getDeclaration,
   isFieldVisible
 } from '@opencrvs/commons/client'
-import { ColumnContentAlignment } from '@opencrvs/components'
+import { ColumnContentAlignment, Link } from '@opencrvs/components'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { messages } from '@client/i18n/messages/views/correction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { ROUTES } from '@client/v2-events/routes'
 
 const CorrectionSectionTitle = styled(Text)`
   margin: 20px 0;
 `
 
+/*
+ * Correction details component which is used both on the correction request summary page,
+ * and the event audit history dialog/modal for 'Request correction' actions.
+ *
+ * This component displays a table with the correction 'annotation' details, and then
+ * a table with the corrected fields.
+ */
 export function CorrectionDetails({
   event,
   form,
-  annotation
+  annotation,
+  editable = false,
+  workqueue
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
+  editable?: boolean
+  workqueue?: string
 }) {
   const intl = useIntl()
   const { eventConfiguration } = useEventConfiguration(event.type)
@@ -47,60 +61,84 @@ export function CorrectionDetails({
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const previousFormValues = eventIndex.declaration
   const formConfig = getDeclaration(eventConfiguration)
+  const navigate = useNavigate()
 
   const correctionFormPages =
     eventConfiguration.actions.find(
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
+  const correctionDetails = correctionFormPages.flatMap((page) => {
+    const pageFields = page.fields
+      .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+      .map((field) => {
+        const valueDisplay = Output({
+          field,
+          value: annotation[field.id],
+          showPreviouslyMissingValuesAsChanged: false
+        })
+
+        return { ...field, valueDisplay, pageId: page.id }
+      })
+      .filter((f) => f.valueDisplay)
+
+    return pageFields
+  })
+
   return (
     <>
-      {correctionFormPages.map((page) => {
-        const pageFields = page.fields
-          .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
-          .map((field) => {
-            const valueDisplay = Output({
-              field,
-              value: annotation[field.id],
-              showPreviouslyMissingValuesAsChanged: false
-            })
-
-            return { ...field, valueDisplay }
-          })
-          .filter((f) => f.valueDisplay)
-
-        return (
-          <Table
-            key={`correction-form-table-${page.id}`}
-            columns={[
-              {
-                label: intl.formatMessage(page.title),
-                width: 34,
-                alignment: ColumnContentAlignment.LEFT,
-                key: 'firstColumn'
-              },
-              {
-                label: '',
-                width: 64,
-                alignment: ColumnContentAlignment.LEFT,
-                key: 'secondColumn'
-              }
-            ]}
-            content={pageFields.map(({ valueDisplay, label }) => {
-              if (label.defaultMessage) {
-                return {
-                  firstColumn: intl.formatMessage(label),
-                  secondColumn: valueDisplay
+      <Table
+        key={'correction-form-table'}
+        columns={[
+          {
+            width: 34,
+            alignment: ColumnContentAlignment.LEFT,
+            key: 'firstColumn'
+          },
+          {
+            width: editable ? 52 : 64,
+            alignment: ColumnContentAlignment.LEFT,
+            key: 'secondColumn'
+          },
+          ...(editable
+            ? [
+                {
+                  width: 12,
+                  key: 'change',
+                  alignment: ColumnContentAlignment.RIGHT
                 }
-              }
-
-              // If no label is defined for the field, we just show the value on the first column
-              return { firstColumn: valueDisplay }
-            })}
-            hideTableBottomBorder={true}
-          ></Table>
-        )
-      })}
+              ]
+            : [])
+        ]}
+        content={correctionDetails.map(
+          ({ valueDisplay, label, pageId, id }) => ({
+            firstColumn: intl.formatMessage(label),
+            secondColumn: valueDisplay,
+            change: (
+              <Link
+                onClick={(e) => {
+                  e.stopPropagation()
+                  navigate(
+                    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+                      {
+                        pageId,
+                        eventId: event.id
+                      },
+                      { workqueue },
+                      id ? makeFormFieldIdFormikCompatible(id) : undefined
+                    )
+                  )
+                }}
+              >
+                {intl.formatMessage(messages.change)}
+              </Link>
+            )
+          })
+        )}
+        hideTableBottomBorder={true}
+        hideTableHeader={true}
+        noPagination={true}
+      ></Table>
 
       <CorrectionSectionTitle element="h3" variant="h3">
         {intl.formatMessage(messages.correctionSectionTitle)}
