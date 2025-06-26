@@ -18,5 +18,15 @@ import { UUID } from '@opencrvs/commons/client'
  * http://localhost:3000/events/overview/"ed3f89c3-2d8c-48a0-9208-f0b000129c4a"
  */
 export function uuid<T>() {
-  return type((value: unknown) => UUID.parse(value), parser('string'))
+  return type((value: unknown) => {
+    if (typeof value !== 'string') {
+      throw new Error(`Expected a string, but received ${typeof value}`)
+    }
+
+    if (value.includes('tmp-')) {
+      return value as UUID
+    }
+
+    return UUID.parse(value)
+  }, parser('string'))
 }
