@@ -9,10 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { defineMessages, IntlShape, useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import styled from 'styled-components'
-import { stringify } from 'query-string'
 import { capitalize } from 'lodash'
 import { Pill, Link as StyledLink } from '@opencrvs/components/lib'
 import {
@@ -25,7 +24,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ValueOutput } from '@client/v2-events/features/events/components/Output'
-import { getSearchParamsFieldConfigs } from './utils'
+import { getSearchParamsFieldConfigs, serializeSearchParams } from './utils'
 
 const messagesToDefine = {
   edit: {
@@ -141,9 +140,9 @@ export function SearchCriteriaPanel({
               ...searchParams,
               eventType: eventConfig.id
             })
-            const serializedParams = stringify(nonEmptyValues)
+            const serializedParams = serializeSearchParams(nonEmptyValues)
             const navigateTo = ROUTES.V2.ADVANCED_SEARCH.buildPath({})
-            navigate(`${navigateTo}?${serializedParams.toString()}`)
+            navigate(`${navigateTo}?${serializedParams}`)
           }}
         >
           {intl.formatMessage(messages.edit)}
