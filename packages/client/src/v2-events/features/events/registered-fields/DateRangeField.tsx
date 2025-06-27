@@ -11,7 +11,6 @@
 
 import format from 'date-fns/format'
 import startOfMonth from 'date-fns/startOfDay'
-import addMonths from 'date-fns/addDays'
 import * as React from 'react'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useState } from 'react'
@@ -138,11 +137,7 @@ function DateRangeInput({
   }
 
   /**
-   * Takes the [inclusive, inclusive) date range and converts it to [inclusive, exclusive).
-   * By adopting the most popular convention of date ranges, we can use dates rather than timestamps going forward.
-   *
    * The current implementation of the date range picker has known bugs: https://github.com/opencrvs/opencrvs-core/issues/7522
-   * We should avoid some of them by this strategy.
    */
   const handleDateRangeChange = ({
     startDate,
@@ -151,26 +146,19 @@ function DateRangeInput({
     startDate?: Date
     endDate?: Date
   }) => {
-    const exlusiveEndDate = endDate
-      ? // One of the known bugs is that by clicking multiple times the end date, it could change from end of month to the beginning of the month.
-        startOfMonth(addMonths(endDate, 1))
-      : undefined
+    const start = startDate && format(startDate, 'yyyy-MM-dd')
+    const end = endDate && format(endDate, 'yyyy-MM-dd')
 
-    const inclusiveStartDate = startDate && startOfMonth(startDate)
-
-    const rangeStart = inclusiveStartDate && format(startDate, 'yyyy-MM-dd')
-    const rangeEnd = exlusiveEndDate && format(exlusiveEndDate, 'yyyy-MM-dd')
-
-    if (rangeStart && rangeEnd) {
+    if (start && end) {
       onChange({
-        start: rangeStart,
-        end: rangeEnd
+        start,
+        end
       })
 
       setDateRange((d) => ({
         ...d,
-        start: rangeStart,
-        end: rangeEnd,
+        start,
+        end,
         isDateRangeActive: true
       }))
     }

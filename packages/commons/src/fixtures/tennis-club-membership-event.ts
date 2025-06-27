@@ -18,10 +18,8 @@ import { event } from '../events/event'
 import { TENNIS_CLUB_MEMBERSHIP } from '../events/Constants'
 import {
   PRINT_CERTIFICATE_FORM,
-  statusOptions,
   TENNIS_CLUB_DECLARATION_FORM,
-  TENNIS_CLUB_DECLARATION_REVIEW,
-  timePeriodOptions
+  TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
 
 export const tennisClubMembershipEvent = defineConfig({

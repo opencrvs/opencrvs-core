@@ -207,7 +207,7 @@ const MatchType = {
 type Condition =
   | { type: 'fuzzy'; term: string }
   | { type: 'exact'; term: string }
-  | { type: 'range'; gte: string; lt: string }
+  | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
 
 /**
@@ -263,8 +263,8 @@ function buildSearchClause(
       case MatchType.anyOf:
         return { type: 'anyOf', terms: value.split(',') }
       case MatchType.range:
-        const [gte, lt] = value.split(',')
-        return { type: 'range', gte, lt }
+        const [gte, lte] = value.split(',')
+        return { type: 'range', gte, lte }
       default:
         return { type: 'exact', term: value } // Fallback to exact match
     }
@@ -274,7 +274,7 @@ function buildSearchClause(
   return {
     type: 'range',
     gte: value.start,
-    lt: value.end
+    lte: value.end
   }
 }
 

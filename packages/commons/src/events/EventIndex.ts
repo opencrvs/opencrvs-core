@@ -80,7 +80,7 @@ export const Range = z
   .object({
     type: z.literal('range'),
     gte: z.string(),
-    lt: z.string()
+    lte: z.string()
   })
   .openapi({
     ref: 'Range'
@@ -98,27 +98,11 @@ export const Within = z
     ref: 'Within'
   })
 
-function isValidIanaTimezone(tz: string): boolean {
-  try {
-    new Intl.DateTimeFormat('en-US', { timeZone: tz })
-    return true
-  } catch {
-    return false
-  }
-}
-
-const IanaTimezone = z.string().refine(isValidIanaTimezone, {
-  message: 'Invalid IANA time zone'
-})
-
 const RangeDate = z
   .object({
     type: z.literal('range'),
-    gte: z.string().date(),
-    lt: z.string().date(),
-    timezone: IanaTimezone.optional().describe(
-      'IANA time zone for date range. If not provided, UTC will be used.'
-    )
+    gte: z.string().date().or(z.string().datetime()),
+    lte: z.string().date().or(z.string().datetime())
   })
   .openapi({ ref: 'RangeDate' })
 
@@ -227,7 +211,7 @@ export const QueryType = z
               updatedAt: {
                 type: 'range',
                 gte: '2025-05-22',
-                lt: '2025-05-29'
+                lte: '2025-05-29'
               },
               data: {}
             }

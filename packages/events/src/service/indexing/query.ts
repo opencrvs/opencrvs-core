@@ -107,7 +107,7 @@ function generateQuery(
         range: {
           [field]: {
             gte: search.gte,
-            lt: search.lt
+            lte: search.lt
           }
         }
       }

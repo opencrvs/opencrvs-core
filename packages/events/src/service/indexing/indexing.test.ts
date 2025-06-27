@@ -92,7 +92,7 @@ const rangeRegisteredAtPayload: QueryType = {
       'legalStatuses.REGISTERED.acceptedAt': {
         type: 'range',
         gte: '2024-01-01',
-        lt: '2024-12-31'
+        lte: '2024-12-31'
       },
       eventType: TENNIS_CLUB_MEMBERSHIP
     }
@@ -128,7 +128,7 @@ const fullAndPayload: QueryType = {
       eventType: TENNIS_CLUB_MEMBERSHIP,
       status: { type: 'exact', term: 'ARCHIVED' },
       trackingId: { type: 'exact', term: 'ABC123' },
-      createdAt: { type: 'range', gte: '2024-01-01', lt: '2024-12-31' },
+      createdAt: { type: 'range', gte: '2024-01-01', lte: '2024-12-31' },
       updatedAt: { type: 'exact', term: '2024-06-01' },
       createdAtLocation: { type: 'exact', term: 'some-location-id' },
       updatedAtLocation: {
