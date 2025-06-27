@@ -176,7 +176,10 @@ export const Outbox: Story = {
         { timeout: OUTBOX_FREEZE_TIME + 1000 } // Allow some buffer for the freeze time
       )
 
-      await expect(outboxButton).toHaveTextContent(/^Outbox$/)
+      const outboxButton2 = await canvas.findByTestId(
+        'navigation_workqueue_outbox'
+      )
+      await expect(outboxButton2).toHaveTextContent(/^Outbox$/)
     })
   }
 }
