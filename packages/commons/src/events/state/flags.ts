@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { joinValues } from 'src/utils'
+import { joinValues } from '../../utils'
 import { getStatusFromActions } from '.'
 import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
