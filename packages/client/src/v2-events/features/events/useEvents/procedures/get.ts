@@ -106,12 +106,12 @@ export function useGetEvent() {
      */
     viewEvent: (id: string) => {
       const eventConfig = useEventConfigurations()
+      const options = trpc.event.get.queryOptions(id)
 
       return [
         useSuspenseQuery({
           // In this case we can use the queryFn as this is a ad-hoc query
-          ...trpc.event.get.queryOptions(id),
-          queryKey: [['view-event', id]],
+          ...options,
           meta: {
             eventConfig
           },
@@ -131,13 +131,6 @@ export function useGetEvent() {
       const eventConfig = useEventConfigurations()
       // Skip the queryFn defined by tRPC and use our own default defined above
       const { queryFn, ...queryOptions } = trpc.event.get.queryOptions(id)
-
-      const eventCachedByViewEvent = queryClient.getQueryData<EventDocument>([
-        ['view-event', id]
-      ])
-      if (eventCachedByViewEvent) {
-        return eventCachedByViewEvent
-      }
 
       if (!queryClient.getQueryData(trpc.event.get.queryKey(id))) {
         throw new Error(

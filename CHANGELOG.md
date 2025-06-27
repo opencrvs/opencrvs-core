@@ -14,6 +14,8 @@
 
   - Use nvm to upgrade your local development environment to use node version `22.x.x.`
 
+- Use unprivileged version of nginx container image [#6501](https://github.com/opencrvs/opencrvs-core/issues/6501)
+
 ## 1.8.0 Release candidate
 
 ### New features

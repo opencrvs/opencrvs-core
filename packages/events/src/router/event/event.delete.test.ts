@@ -41,7 +41,7 @@ test('allows access with required scope', async () => {
   const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
   await expect(
-    client.event.delete({ eventId: 'some event' })
+    client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
@@ -50,7 +50,7 @@ test('should return 404 if event does not exist', async () => {
   const client = createTestClient(user)
 
   await expect(
-    client.event.delete({ eventId: 'some event' })
+    client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 

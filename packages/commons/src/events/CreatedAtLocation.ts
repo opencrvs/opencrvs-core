@@ -8,6 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import { UUID } from '../uuid'
 
-export const CreatedAtLocation = z.string().nullish()
+export const CreatedAtLocation = UUID.nullish()

@@ -12,7 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { ActionType, generateEventDocument, SCOPES } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
-import { createSystemTestClient } from '@events/tests/utils'
+import { createSystemTestClient, setupTestCase } from '@events/tests/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const client = createSystemTestClient('test-system', [])
@@ -28,11 +28,13 @@ test(`prevents forbidden access if missing required scope`, async () => {
 })
 
 test('allows access with import scope', async () => {
+  const { user } = await setupTestCase()
   const client = createSystemTestClient('test-system', [SCOPES.RECORD_IMPORT])
 
   await expect(
     client.event.import(
       generateEventDocument({
+        user,
         configuration: tennisClubMembershipEvent,
         actions: [ActionType.CREATE, ActionType.DECLARE]
       })
@@ -41,11 +43,13 @@ test('allows access with import scope', async () => {
 })
 
 test('importing an event indexes it into Elasticsearch', async () => {
+  const { user } = await setupTestCase()
   const client = createSystemTestClient('test-system', [
     SCOPES.RECORD_IMPORT,
     SCOPES.RECORD_READ
   ])
   const event = generateEventDocument({
+    user,
     configuration: tennisClubMembershipEvent,
     actions: [ActionType.CREATE, ActionType.DECLARE]
   })
@@ -57,18 +61,23 @@ test('importing an event indexes it into Elasticsearch', async () => {
 })
 
 test('importing the same event twice overwrites the previous one', async () => {
+  const { user } = await setupTestCase()
   const client = createSystemTestClient('test-system', [
     SCOPES.RECORD_IMPORT,
     SCOPES.RECORD_READ
   ])
   const event = generateEventDocument({
+    user,
     configuration: tennisClubMembershipEvent,
     actions: [ActionType.CREATE, ActionType.DECLARE]
   })
 
   await client.event.import(event)
-  await client.event.import(event)
+
+  await client.event.import({ ...event, trackingId: 'ABCDEF' })
+
   const events = await client.event.list()
   expect(events).toHaveLength(1)
   expect(events[0].id).toEqual(event.id)
+  expect(events[0].trackingId).toEqual('ABCDEF')
 })
