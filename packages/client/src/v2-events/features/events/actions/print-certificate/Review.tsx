@@ -142,7 +142,7 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
-  const [{ templateId }] = useTypedSearchParams(
+  const [{ templateId, workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
 
@@ -158,7 +158,7 @@ export function Review() {
   const [modal, openModal] = useModal()
 
   const { getEvent, onlineActions } = useEvents()
-  const [fullEvent] = getEvent.useSuspenseQuery(eventId)
+  const fullEvent = getEvent.getFromCache(eventId)
 
   const actions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(actions)
@@ -172,6 +172,7 @@ export function Review() {
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
+
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
 
@@ -199,7 +200,10 @@ export function Review() {
     console.warn('Form is not properly filled. Redirecting to the beginning...')
     return (
       <Navigate
-        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
+        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+          { eventId },
+          { workqueue: slug }
+        )}
       />
     )
   }
@@ -209,7 +213,12 @@ export function Review() {
   }
 
   const handleCorrection = () =>
-    navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
+        { eventId },
+        { workqueue: slug }
+      )
+    )
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
@@ -256,7 +265,10 @@ export function Review() {
         })
 
         await handleCertify(fullEvent)
-        navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+
+        slug
+          ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

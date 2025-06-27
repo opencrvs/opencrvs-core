@@ -27,6 +27,7 @@ import { ActionStatus } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
+import { UUID } from '../uuid'
 
 /*  eslint-disable max-lines */
 
@@ -128,6 +129,104 @@ describe('"universal" conditionals', () => {
         getFieldParams({
           'applicant.name': 'John Doe',
           'informant.name': 'Jane Doe'
+        })
+      )
+    ).toBe(true)
+  })
+})
+
+describe('object combinator', () => {
+  it('can be used for validation composite inputs that produce objects', () => {
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams({
+          'child.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams()
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams({
+          'child.name': {
+            firstname: 'John'
+          }
+        })
+      )
+    ).toBe(false)
+  })
+  it('fully supports global variables like $now even in the nested levels', () => {
+    expect(
+      validate(
+        field('child.details').object({
+          dob: field('dob').isBefore().now()
+        }),
+        getFieldParams({
+          'child.details': {
+            dob: new Date('2125-01-01').toISOString().split('T')[0]
+          }
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.details').object({
+          dob: field('dob').isBefore().now()
+        }),
+        getFieldParams({
+          'child.details': {
+            dob: new Date('2020-01-01').toISOString().split('T')[0]
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('child.details').object({
+          nested: field('nested').isEqualTo(field('random'))
+        }),
+        getFieldParams({
+          random: 'value',
+          'child.details': {
+            nested: 'value1'
+          }
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.details').object({
+          nested: field('nested').isEqualTo(field('random'))
+        }),
+        getFieldParams({
+          random: 'value',
+          'child.details': {
+            nested: 'value'
+          }
         })
       )
     ).toBe(true)
@@ -484,20 +583,21 @@ describe('"event" conditionals', () => {
     const eventParams = {
       $now: now,
       $event: {
-        id: '123',
+        id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
         actions: [
           {
-            id: '1234',
+            id: '1234' as UUID,
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
+            createdByUserType: TokenUserType.Enum.user,
             createdByRole: 'some-role',
             declaration: {},
-            createdAtLocation: '123456',
+            createdAtLocation: '123456' as UUID,
             status: ActionStatus.Accepted,
             transactionId: '123456'
           }

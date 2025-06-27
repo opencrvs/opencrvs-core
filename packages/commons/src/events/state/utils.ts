@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType } from '../ActionType'
+import { ActionType, StatusChangingActions } from '../ActionType'
 import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
@@ -70,6 +70,8 @@ function getDeclarationActionCreationMetadata(
     // When 3rd party API returns 200 OK, we assume that the request was accepted, and persist single 'accepted' action.
     createdAt: requestAction?.createdAt ?? acceptAction.createdAt,
     createdBy: requestAction?.createdBy ?? acceptAction.createdBy,
+    createdByUserType:
+      requestAction?.createdByUserType ?? acceptAction.createdByUserType,
     createdAtLocation:
       requestAction?.createdAtLocation ?? acceptAction.createdAtLocation,
     acceptedAt: acceptAction.createdAt,
@@ -87,13 +89,13 @@ function getDeclarationActionCreationMetadata(
  * @see EventIndex for the description of the returned object.
  *
  * */
-export function getDeclarationActionUpdateMetadata(actions: Action[]) {
+export function getActionUpdateMetadata(actions: Action[]) {
   const createAction = getOrThrow(
     actions.find((action) => action.type === ActionType.CREATE),
     `Event has no ${ActionType.CREATE} action`
   )
 
-  return [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER].reduce(
+  return StatusChangingActions.options.reduce(
     (metadata, actionType) => {
       const { accept, request } = getActionRequests(actionType, actions)
 
@@ -102,6 +104,10 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
           request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
         createdBy:
           request?.createdBy ?? accept?.createdBy ?? metadata.createdBy,
+        createdByUserType:
+          request?.createdByUserType ??
+          accept?.createdByUserType ??
+          metadata.createdByUserType,
         createdAtLocation:
           request?.createdAtLocation ??
           accept?.createdAtLocation ??
@@ -115,6 +121,7 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
     {
       createdAt: createAction.createdAt,
       createdBy: createAction.createdBy,
+      createdByUserType: createAction.createdByUserType,
       createdAtLocation: createAction.createdAtLocation,
       createdByRole: createAction.createdByRole
     }
@@ -127,11 +134,11 @@ export function getDeclarationActionUpdateMetadata(actions: Action[]) {
  */
 export function getLegalStatuses(actions: Action[]) {
   return {
-    [EventStatus.DECLARED]: getDeclarationActionCreationMetadata(
+    [EventStatus.enum.DECLARED]: getDeclarationActionCreationMetadata(
       ActionType.DECLARE,
       actions
     ),
-    [EventStatus.REGISTERED]: getDeclarationActionCreationMetadata(
+    [EventStatus.enum.REGISTERED]: getDeclarationActionCreationMetadata(
       ActionType.REGISTER,
       actions
     )

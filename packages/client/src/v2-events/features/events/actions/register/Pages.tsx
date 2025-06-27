@@ -15,7 +15,10 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import {
+  getCurrentEventState,
+  getDeclarationPages
+} from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
@@ -38,12 +41,12 @@ export function Pages() {
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const { modal, goToHome } = useEventFormNavigation()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const { modal, redirectToOrigin } = useEventFormNavigation()
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-
+  const eventIndex = getCurrentEventState(event, configuration)
   const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =
@@ -71,13 +74,13 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          redirectToOrigin(searchParams.workqueue)
         })
       }
     >
       {modal}
       <PagesComponent
-        declaration={event.declaration}
+        declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={form}
         formPages={declarationPages}
@@ -93,7 +96,12 @@ export function Pages() {
           )
         }
         onSubmit={() =>
-          navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId }))
+          navigate(
+            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
+          )
         }
       />
       {saveAndExitModal}

@@ -18,16 +18,30 @@ import {
   Draft,
   generateWorkqueues,
   getCurrentEventState,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { useEventFormData } from '../../useEventFormData'
 import { Pages } from './index'
 
+// Use an undeclared draft event for tests
+const undeclaredDraftEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: tennisClubMembershipEventDocument.actions.filter(
+    ({ type }) => type === ActionType.CREATE || type === ActionType.ASSIGN
+  )
+}
+
 const meta: Meta<typeof Pages> = {
   title: 'Declare/Interaction',
+  parameters: {
+    offline: {
+      events: [undeclaredDraftEvent]
+    }
+  },
   beforeEach: () => {
     useEventFormData.setState({ formValues: {} })
   }
@@ -45,13 +59,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-// Use an undeclared draft event for tests
-const undeclaredDraftEvent = {
-  ...tennisClubMembershipEventDocument,
-  actions: tennisClubMembershipEventDocument.actions.filter(
-    ({ type }) => type === ActionType.CREATE || type === ActionType.ASSIGN
-  )
-}
 const spy = fn()
 
 function createDraftHandlers() {
@@ -59,16 +66,18 @@ function createDraftHandlers() {
   return [
     tRPCMsw.event.draft.create.mutation((req) => {
       const response: Draft = {
-        id: 'test-draft-id',
-        eventId: req.eventId,
+        id: 'test-draft-id' as UUID,
+        eventId: req.eventId as UUID,
         transactionId: req.transactionId,
         createdAt: new Date().toISOString(),
         action: {
           ...req,
+          originalActionId: req.originalActionId as UUID,
           declaration: req.declaration || {},
           createdBy: 'test-user',
+          createdByUserType: 'user',
           createdByRole: 'test-role',
-          createdAtLocation: 'test-location',
+          createdAtLocation: 'test-location' as UUID,
           createdAt: new Date().toISOString(),
           status: ActionStatus.Accepted
         }
@@ -135,13 +144,10 @@ export const SaveAndExit: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Fill the applicant details', async () => {
-      const applicantFirstNameInput = await canvas.findByTestId(
-        'text__applicant____firstname'
-      )
+      const applicantFirstNameInput =
+        await canvas.findByTestId('text__firstname')
 
-      const applicantSurnameInput = await canvas.findByTestId(
-        'text__applicant____surname'
-      )
+      const applicantSurnameInput = await canvas.findByTestId('text__surname')
 
       await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
       await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
@@ -229,12 +235,9 @@ export const DraftShownInForm: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Fill the applicant details', async () => {
-      const applicantFirstNameInput = await canvas.findByTestId(
-        'text__applicant____firstname'
-      )
-      const applicantSurnameInput = await canvas.findByTestId(
-        'text__applicant____surname'
-      )
+      const applicantFirstNameInput =
+        await canvas.findByTestId('text__firstname')
+      const applicantSurnameInput = await canvas.findByTestId('text__surname')
 
       await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
       await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
@@ -268,12 +271,9 @@ export const FilledPagesVisibleInReview: Story = {
     ).toBeInTheDocument()
 
     await step('Fill the applicant details', async () => {
-      const applicantFirstNameInput = await canvas.findByTestId(
-        'text__applicant____firstname'
-      )
-      const applicantSurnameInput = await canvas.findByTestId(
-        'text__applicant____surname'
-      )
+      const applicantFirstNameInput =
+        await canvas.findByTestId('text__firstname')
+      const applicantSurnameInput = await canvas.findByTestId('text__surname')
 
       await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
       await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
@@ -288,16 +288,9 @@ export const FilledPagesVisibleInReview: Story = {
     })
 
     await step('Verify that filled pages are visible in review', async () => {
-      const applicantFirstNameRow = await canvas.findByText(
-        "Applicant's first name"
-      )
-      await expect(applicantFirstNameRow).toBeInTheDocument()
-      const applicantFirstNameCell = applicantFirstNameRow.nextElementSibling
-      await expect(applicantFirstNameCell).toHaveTextContent('John')
+      await canvas.findByText("Applicant's name")
 
-      const applicantSurnameRow = await canvas.findByText("Applicant's surname")
-      const applicantSurnameCell = applicantSurnameRow.nextElementSibling
-      await expect(applicantSurnameCell).toHaveTextContent('Doe')
+      await canvas.findByText('John Doe')
     })
   },
   parameters: {
@@ -328,12 +321,9 @@ export const CanSubmitValidlyFilledForm: Story = {
     await canvas.findByText(/Who is applying for the membership?/)
 
     await step('Fill the applicant details', async () => {
-      const applicantFirstNameInput = await canvas.findByTestId(
-        'text__applicant____firstname'
-      )
-      const applicantSurnameInput = await canvas.findByTestId(
-        'text__applicant____surname'
-      )
+      const applicantFirstNameInput =
+        await canvas.findByTestId('text__firstname')
+      const applicantSurnameInput = await canvas.findByTestId('text__surname')
 
       await waitFor(async () => expect(applicantFirstNameInput).toBeEnabled())
       await waitFor(async () => expect(applicantSurnameInput).toBeEnabled())
@@ -364,12 +354,9 @@ export const CanSubmitValidlyFilledForm: Story = {
 
     // First fill in the recommenders name, but then click 'No recommender'. This should not cause validation errors on review page.
     await step('Fill the recommenders details', async () => {
-      const recommenderFirstNameInput = await canvas.findByTestId(
-        'text__recommender____firstname'
-      )
-      const recommenderSurnameInput = await canvas.findByTestId(
-        'text__recommender____surname'
-      )
+      const recommenderFirstNameInput =
+        await canvas.findByTestId('text__firstname')
+      const recommenderSurnameInput = await canvas.findByTestId('text__surname')
 
       await waitFor(async () => expect(recommenderFirstNameInput).toBeEnabled())
       await waitFor(async () => expect(recommenderSurnameInput).toBeEnabled())

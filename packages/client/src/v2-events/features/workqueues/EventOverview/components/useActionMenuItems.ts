@@ -9,28 +9,46 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   ActionType,
-  filterUnallowedActions,
-  Scope,
   EventIndex,
   getUUID,
   TranslationConfig,
-  EventStatus,
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  IndexMap
+  WorkqueueActionType,
+  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
+  EventStatus,
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { getScope } from '@client/profile/profileSelectors'
+import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 
-function getAssignmentActions(
+const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
+  EventStatus.enum.NOTIFIED,
+  EventStatus.enum.DECLARED,
+  EventStatus.enum.VALIDATED,
+  EventStatus.enum.REJECTED,
+  EventStatus.enum.REGISTERED,
+  EventStatus.enum.CERTIFIED,
+  EventStatus.enum.ARCHIVED
+]
+
+function getAvailableAssignmentActions(
+  eventStatus: EventStatus,
   assignmentStatus: keyof typeof AssignmentStatus,
   mayUnassignOthers: boolean
 ) {
+  if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {
+    return []
+  }
+
   if (assignmentStatus === AssignmentStatus.UNASSIGNED) {
     return [ActionType.ASSIGN]
   }
@@ -48,61 +66,11 @@ function getAssignmentActions(
 
   return []
 }
-
-/**
- * Actions that can be performed on an event based on its status and user scope.
- */
-
-function getUserActionsByStatus(
-  status: EventStatus,
-  assignmentActions: ActionType[],
-  userScopes: Scope[]
-): ActionType[] {
-  switch (status) {
-    case EventStatus.CREATED: {
-      return [ActionType.READ, ActionType.DECLARE, ActionType.DELETE]
-    }
-    case EventStatus.NOTIFIED:
-    case EventStatus.DECLARED: {
-      return [...assignmentActions, ActionType.READ, ActionType.VALIDATE]
-    }
-    case EventStatus.VALIDATED: {
-      return [...assignmentActions, ActionType.READ, ActionType.REGISTER]
-    }
-    case EventStatus.CERTIFIED:
-    case EventStatus.REGISTERED: {
-      return [
-        ...assignmentActions,
-        ActionType.READ,
-        ActionType.PRINT_CERTIFICATE,
-        ActionType.REQUEST_CORRECTION
-      ]
-    }
-    case EventStatus.REJECTED: {
-      const validateScopes = ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
-      const canValidate = hasAnyOfScopes(userScopes, validateScopes)
-
-      /**
-       * Show 'higher' action when the user has the required scopes.
-       */
-      const declarationAction = canValidate
-        ? ActionType.VALIDATE
-        : ActionType.DECLARE
-
-      return [...assignmentActions, ActionType.READ, declarationAction]
-    }
-
-    case EventStatus.ARCHIVED:
-      return [...assignmentActions, ActionType.READ]
-    default:
-      return [ActionType.READ]
-  }
-}
-
 interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
+  shouldHide?: (actions: ActionType[]) => boolean
 }
 
 export const actionLabels = {
@@ -151,18 +119,18 @@ export const actionLabels = {
   }
 } as const
 
-/**
- * @returns a list of action menu items based on the event state and scopes provided.
- */
-export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
+export function useAction(event: EventIndex) {
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
+  const { findFromCache } = useEvents().getEvent
+  const isDownloaded = Boolean(findFromCache(event.id).data)
+
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
    * This does not immediately execute the query but instead prepares it to be fetched conditionally when needed.
    */
-  const { refetch: refetchEvent } = events.getEvent.useQuery(event.id, false)
+  const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
 
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
 
@@ -173,93 +141,175 @@ export function useActionMenuItems(event: EventIndex, scopes: Scope[]) {
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const eventIsAssignedToSelf =
-    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
+    assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
-  const config = {
-    [ActionType.READ]: {
-      label: actionLabels[ActionType.READ],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
-    },
-    [ActionType.ASSIGN]: {
-      label: actionLabels[ActionType.ASSIGN],
-      onClick: async (eventId: string) => {
-        await events.actions.assignment.assign.mutate({
-          eventId,
-          assignedTo: authentication.sub,
-          refetchEvent
-        })
+  return {
+    config: {
+      [ActionType.READ]: {
+        label: actionLabels[ActionType.READ],
+        onClick: (workqueue?: string) =>
+          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+      },
+      [ActionType.ASSIGN]: {
+        label: actionLabels[ActionType.ASSIGN],
+        onClick: async (workqueue?: string) => {
+          await events.actions.assignment.assign.mutate({
+            eventId: event.id,
+            assignedTo: authentication.sub,
+            refetchEvent
+          })
+        }
+      },
+      [ActionType.UNASSIGN]: {
+        label: actionLabels[ActionType.UNASSIGN],
+        onClick: async (workqueue?: string) => {
+          await events.actions.assignment.unassign.mutateAsync({
+            eventId: event.id,
+            transactionId: getUUID(),
+            assignedTo: null
+          })
+        }
+      },
+      [ActionType.DECLARE]: {
+        label: actionLabels[ActionType.DECLARE],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf,
+        // Action menu should not show DECLARE if the user can perform VALIDATE
+        shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
+      },
+      [ActionType.VALIDATE]: {
+        label: actionLabels[ActionType.VALIDATE],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf
+      },
+      [ActionType.REGISTER]: {
+        label: actionLabels[ActionType.REGISTER],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf
+      },
+      [ActionType.PRINT_CERTIFICATE]: {
+        label: actionLabels[ActionType.PRINT_CERTIFICATE],
+        onClick: (workqueue?: string) =>
+          navigate(
+            ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+              { eventId: event.id },
+              { workqueue }
+            )
+          ),
+        disabled: !eventIsAssignedToSelf
+      },
+      [ActionType.DELETE]: {
+        label: actionLabels[ActionType.DELETE],
+        onClick: (workqueue?: string) => {
+          deleteEvent({
+            eventId: event.id
+          })
+          if (!workqueue) {
+            navigate(ROUTES.V2.buildPath({}))
+          }
+        }
       }
-    },
-    [ActionType.UNASSIGN]: {
-      label: actionLabels[ActionType.UNASSIGN],
-      onClick: async (eventId: string) => {
-        await events.actions.assignment.unassign.mutateAsync({
-          eventId,
-          transactionId: getUUID(),
-          assignedTo: null
-        })
-      }
-    },
-    [ActionType.DECLARE]: {
-      label: actionLabels[ActionType.DECLARE],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.VALIDATE]: {
-      label: actionLabels[ActionType.VALIDATE],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.REGISTER]: {
-      label: actionLabels[ActionType.REGISTER],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.PRINT_CERTIFICATE]: {
-      label: actionLabels[ActionType.PRINT_CERTIFICATE],
-      onClick: (eventId: string) =>
-        navigate(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })),
-      disabled: !eventIsAssignedToSelf
-    },
-    [ActionType.DELETE]: {
-      label: actionLabels[ActionType.DELETE],
-      onClick: (eventId: string) => {
-        deleteEvent({
-          eventId
-        })
-        navigate(ROUTES.V2.buildPath({}))
-      }
-    }
-  } satisfies Partial<Record<ActionType, ActionConfig>>
+    } satisfies Record<WorkqueueActionType, ActionConfig>,
+    authentication
+  }
+}
 
-  const assignmentActions = getAssignmentActions(
+const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
+  [EventStatus.enum.NOTIFIED]: [
+    ActionType.READ,
+    ActionType.VALIDATE,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ],
+  [EventStatus.enum.REJECTED]: [
+    ActionType.READ,
+    ActionType.DECLARE,
+    ActionType.VALIDATE
+  ]
+} satisfies Partial<Record<EventStatus, ActionType[]>>
+
+/**
+ * @returns a list of action menu items based on the event state and scopes provided.
+ */
+export function useActionMenuItems(event: EventIndex) {
+  const scopes = useSelector(getScope) ?? []
+  const { config, authentication } = useAction(event)
+
+  const availableAssignmentActions = getAvailableAssignmentActions(
+    event.status,
     getAssignmentStatus(event, authentication.sub),
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
-  const availableActions = getUserActionsByStatus(
-    event.status,
-    assignmentActions,
-    scopes
+  // Find actions available based on the event status
+  const availableActions =
+    event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+      ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
+          event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+        ]
+      : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+
+  const actions = [...availableAssignmentActions, ...availableActions]
+
+  // Filter out actions which are not configured
+  const supportedActions = actions.filter(
+    (action): action is keyof typeof config =>
+      Object.keys(config).includes(action)
   )
 
-  const allowedActions = filterUnallowedActions(availableActions, scopes)
-  return allowedActions
-    .filter((action): action is keyof typeof config =>
-      Object.keys(config).includes(action)
-    )
-    .map((action) => {
-      return {
-        ...config[action],
-        type: action
+  // Filter out actions which are not allowed based on user scopes
+  const allowedActions = supportedActions.filter((a) => {
+    const requiredScopes = ACTION_ALLOWED_SCOPES[a]
+    return requiredScopes === null
+      ? true
+      : hasAnyOfScopes(scopes, requiredScopes)
+  })
+
+  // Filter out actions which are not visible based on the action config
+  const visibleActions = allowedActions.filter((a) => {
+    const actionConfig = config[a]
+
+    return 'shouldHide' in actionConfig
+      ? !actionConfig.shouldHide(allowedActions)
+      : true
+  })
+
+  // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
+  const hasOtherAllowedActions = visibleActions.some((a) => !isMetaAction(a))
+
+  // If user has no other allowed actions, return only READ.
+  // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
+
+  if (!hasOtherAllowedActions) {
+    return [
+      {
+        ...config[ActionType.READ],
+        type: ActionType.READ
       }
-    })
+    ]
+  }
+
+  return visibleActions.map((a) => ({ ...config[a], type: a }))
 }

@@ -15,7 +15,10 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import {
+  getCurrentEventState,
+  getDeclarationPages
+} from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -34,11 +37,12 @@ export function Pages() {
   const events = useEvents()
   const navigate = useNavigate()
   const drafts = useDrafts()
-  const { modal, goToHome } = useEventFormNavigation()
+  const { modal, redirectToOrigin } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { getFormValues, setFormValues } = useEventFormData()
   const formValues = getFormValues()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
+
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -93,13 +97,13 @@ export function Pages() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          redirectToOrigin(searchParams.workqueue)
         })
       }
     >
       {modal}
       <PagesComponent
-        declaration={event.declaration}
+        declaration={getCurrentEventState(event, configuration).declaration}
         eventConfig={configuration}
         form={formValues}
         formPages={declarationPages}
@@ -118,7 +122,12 @@ export function Pages() {
           )
         }
         onSubmit={() =>
-          navigate(ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({ eventId }))
+          navigate(
+            ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
+          )
         }
       />
       {saveAndExitModal}

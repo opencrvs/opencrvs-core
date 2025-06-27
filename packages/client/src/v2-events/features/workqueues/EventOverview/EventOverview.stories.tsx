@@ -18,13 +18,21 @@ import {
   generateEventDraftDocument,
   ActionStatus,
   getUUID,
-  createPseudoRandomNumberGenerator,
-  getRandomDatetime
+  createPrng,
+  getRandomDatetime,
+  tennisClubMembershipEvent,
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
-import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  trpcOptionsProxy,
+  TRPCProvider
+} from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import { setEventData, addLocalEventConfig } from '../../events/useEvents/api'
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
@@ -51,37 +59,46 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const defaultEvent = {
+  ...tennisClubMembershipEventDocument,
+  actions: tennisClubMembershipEventDocument.actions.filter(
+    (action) => action.type !== ActionType.REGISTER
+  )
+}
+
 export const Overview: Story = {
   parameters: {
+    offline: {
+      events: [defaultEvent]
+    },
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: defaultEvent.id
       })
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return {
-              ...tennisClubMembershipEventDocument,
-              actions: tennisClubMembershipEventDocument.actions.filter(
-                (action) => action.type !== ActionType.REGISTER
-              )
-            }
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return [
+              getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+            ]
           })
         ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+              generateEventDraftDocument({
+                eventId: defaultEvent.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
-              )
+              })
             ]
           })
         ]
@@ -100,22 +117,19 @@ export const WithAcceptedRegisterEvent: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
-              )
+              })
             ]
           })
         ]
@@ -125,6 +139,27 @@ export const WithAcceptedRegisterEvent: Story = {
 }
 
 export const WithRejectedAction: Story = {
+  beforeEach: () => {
+    const event = {
+      ...tennisClubMembershipEventDocument,
+      actions: tennisClubMembershipEventDocument.actions.concat([
+        {
+          type: ActionType.ARCHIVE,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: new Date().toISOString(),
+          createdByUserType: 'user',
+          createdBy: '123',
+          createdAtLocation: '123' as UUID,
+          createdByRole: 'LOCAL_REGISTRAR',
+          declaration: {},
+          reason: { message: 'Archived', isDuplicate: true }
+        }
+      ])
+    }
+    setEventData(event.id, event)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -134,39 +169,9 @@ export const WithRejectedAction: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return {
-              ...tennisClubMembershipEventDocument,
-              actions: tennisClubMembershipEventDocument.actions.concat([
-                {
-                  type: ActionType.ARCHIVE,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: new Date().toISOString(),
-                  createdBy: '123',
-                  createdAtLocation: '123',
-                  createdByRole: 'LOCAL_REGISTRAR',
-                  declaration: {},
-                  reason: { message: 'Archived', isDuplicate: true }
-                }
-              ])
-            }
-          })
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
-                }
-              )
-            ]
+            return []
           })
         ]
       }
@@ -175,6 +180,99 @@ export const WithRejectedAction: Story = {
 }
 
 export const WithSystemUserActions: Story = {
+  beforeEach: () => {
+    const rng = createPrng(1234)
+
+    const event = {
+      ...tennisClubMembershipEventDocument,
+      actions: [
+        {
+          type: ActionType.CREATE,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-01-01'),
+            new Date('2024-02-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: 'system' as const,
+          createdByRole: SystemRole.enum.HEALTH,
+          assignedTo: '010101',
+          declaration: {}
+        },
+        {
+          type: ActionType.ASSIGN,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-02-01'),
+            new Date('2024-03-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: 'system' as const,
+          createdByRole: SystemRole.enum.HEALTH,
+          assignedTo: '010101',
+          declaration: {}
+        },
+        {
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: 'system' as const,
+          createdByRole: SystemRole.enum.HEALTH,
+          declaration: {}
+        },
+        {
+          type: ActionType.UNASSIGN,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-04-01'),
+            new Date('2024-05-01')
+          ),
+          createdBy: '010101',
+          createdAtLocation: undefined,
+          createdByUserType: 'system' as const,
+          createdByRole: SystemRole.enum.HEALTH,
+          assignedTo: null,
+          declaration: {}
+        },
+        {
+          type: ActionType.DECLARE,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-05-01'),
+            new Date('2024-06-01')
+          ),
+          createdBy: '123',
+          createdByUserType: 'user' as const,
+          createdAtLocation: '123' as UUID,
+          createdByRole: 'LOCAL_REGISTRAR',
+          declaration: {}
+        }
+      ]
+    }
+    setEventData(event.id, event)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -184,106 +282,19 @@ export const WithSystemUserActions: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            const rng = createPseudoRandomNumberGenerator(1234)
-
-            return {
-              ...tennisClubMembershipEventDocument,
-              actions: [
-                {
-                  type: ActionType.CREATE,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-01-01'),
-                    new Date('2024-02-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  assignedTo: '010101',
-                  declaration: {}
-                },
-                {
-                  type: ActionType.ASSIGN,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-02-01'),
-                    new Date('2024-03-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  assignedTo: '010101',
-                  declaration: {}
-                },
-                {
-                  type: ActionType.NOTIFY,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-03-01'),
-                    new Date('2024-04-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  declaration: {}
-                },
-                {
-                  type: ActionType.UNASSIGN,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-04-01'),
-                    new Date('2024-05-01')
-                  ),
-                  createdBy: '010101',
-                  createdAtLocation: undefined,
-                  createdByRole: SystemRole.enum.HEALTH,
-                  assignedTo: null,
-                  declaration: {}
-                },
-                {
-                  type: ActionType.DECLARE,
-                  status: ActionStatus.Accepted,
-                  id: getUUID(),
-                  transactionId: getUUID(),
-                  createdAt: getRandomDatetime(
-                    rng,
-                    new Date('2024-05-01'),
-                    new Date('2024-06-01')
-                  ),
-                  createdBy: '123',
-                  createdAtLocation: '123',
-                  createdByRole: 'LOCAL_REGISTRAR',
-                  declaration: {}
-                }
-              ]
-            }
-          })
-        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Riku',
+                    surname: 'This value is from a draft'
+                  }
                 }
-              )
+              })
             ]
           })
         ]

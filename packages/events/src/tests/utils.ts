@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { readFileSync } from 'fs'
 import { join } from 'path'
 import * as jwt from 'jsonwebtoken'
 import {
-  createPseudoRandomNumberGenerator,
+  ActionType,
+  createPrng,
   generateRandomSignature,
+  getUUID,
   Scope,
   SCOPES,
   SystemRole,
@@ -23,9 +24,10 @@ import {
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { SystemContext } from '@events/context'
+import { getClient } from '@events/storage/postgres/events'
+import { getLocations } from '../service/locations/locations'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 /**
@@ -40,8 +42,14 @@ export const UNSTABLE_EVENT_FIELDS = [
   'trackingId',
   'eventId',
   'createdBy',
+  'createdByUserType',
   'createdAtLocation',
-  'assignedTo'
+  'assignedTo',
+  'updatedAtLocation',
+  'updatedBy',
+  'acceptedAt',
+  'dateOfEvent',
+  'registrationNumber'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -155,17 +163,16 @@ export function createTestClient(
 /**
  *  Setup for test cases. Creates a user and locations in the database, and provides relevant client instances and seeders.
  */
-export const setupTestCase = async () => {
-  const generator = payloadGenerator()
-  const eventsDb = await events.getClient()
+export const setupTestCase = async (rngSeed?: number) => {
+  const rng = createPrng(rngSeed ?? 101)
+  const generator = payloadGenerator(rng)
+  const eventsDb = getClient()
   const userMgntDb = await userMgnt.getClient()
 
-  const rng = createPseudoRandomNumberGenerator(101)
-
   const seed = seeder()
-  const locations = generator.locations.set(5)
-  await seed.locations(eventsDb, locations)
+  await seed.locations(generator.locations.set(5))
 
+  const locations = await getLocations()
   const user = await seed.user(
     userMgntDb,
     generator.user.create({
@@ -181,7 +188,105 @@ export const setupTestCase = async () => {
     },
     eventsDb,
     userMgntDb,
+    rng,
     seed,
     generator
   }
+}
+
+/**
+ *
+ * @param client trpc client
+ * @param generator payload generator
+ * @param action action to be performed on the event
+ * @returns corresponding client action method for the given action type, with prefilled payload
+ */
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  action: ActionType
+) {
+  switch (action) {
+    case ActionType.CREATE:
+      return async () => client.event.create(generator.event.create())
+    case ActionType.DECLARE:
+      return async (eventId: string) =>
+        client.event.actions.declare.request(
+          generator.event.actions.declare(eventId, { keepAssignment: true })
+        )
+    case ActionType.VALIDATE:
+      return async (eventId: string) =>
+        client.event.actions.validate.request(
+          generator.event.actions.validate(eventId, { keepAssignment: true })
+        )
+    case ActionType.REJECT:
+      return async (eventId: string) =>
+        client.event.actions.reject.request(
+          generator.event.actions.reject(eventId, { keepAssignment: true })
+        )
+    case ActionType.ARCHIVE:
+      return async (eventId: string) =>
+        client.event.actions.archive.request(
+          generator.event.actions.archive(eventId, { keepAssignment: true })
+        )
+    case ActionType.REGISTER:
+      return async (eventId: string) =>
+        client.event.actions.register.request(
+          generator.event.actions.register(eventId, {
+            keepAssignment: true,
+            registrationNumber: getUUID()
+          })
+        )
+    case ActionType.PRINT_CERTIFICATE:
+      return async (eventId: string) =>
+        client.event.actions.printCertificate.request(
+          generator.event.actions.printCertificate(eventId, {
+            keepAssignment: true
+          })
+        )
+
+    case ActionType.NOTIFY:
+    case ActionType.DETECT_DUPLICATE:
+    case ActionType.REQUEST_CORRECTION:
+    case ActionType.APPROVE_CORRECTION:
+    case ActionType.ASSIGN:
+    case ActionType.UNASSIGN:
+    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.REJECT_CORRECTION:
+    case ActionType.DELETE:
+    case ActionType.READ:
+    default:
+      throw new Error(
+        `Unsupported action type: ${action}. Create a case for it if you need it.`
+      )
+  }
+}
+
+/**
+ * Create event based on actions to be used in tests.
+ * Created through API to make sure it get indexed properly. (To seed directly to database we need: https://github.com/opencrvs/opencrvs-core/issues/8884)
+ */
+export async function createEvent(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  actions: ActionType[]
+): Promise<ReturnType<typeof client.event.create>> {
+  let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+
+  // Always first create the event
+  const createAction = actionToClientAction(
+    client,
+    generator,
+    ActionType.CREATE
+  )
+
+  // @ts-expect-error -- createEvent does not accept any arguments
+  createdEvent = await createAction()
+
+  for (const action of actions) {
+    const clientAction = actionToClientAction(client, generator, action)
+    createdEvent = await clientAction(createdEvent.id)
+  }
+
+  return createdEvent
 }

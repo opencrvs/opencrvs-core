@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -49,7 +49,8 @@ import {
   addAction,
   createEvent,
   deleteEvent,
-  getEventById
+  getEventById,
+  throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
@@ -100,17 +101,17 @@ export const eventRouter = router({
         token: ctx.token,
         eventType: input.type
       })
+
       return createEvent({
         transactionId: input.transactionId,
-        config,
         eventInput: input,
-        user: ctx.user
+        user: ctx.user,
+        config
       })
     }),
-  /**@todo We need another endpoint to get eventIndex by eventId for fetching a “public subset” of a record */
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
-    .input(z.string())
+    .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const updatedEvent = await addAction(
@@ -135,6 +136,7 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
+      await throwConflictIfActionNotAllowed(input.eventId, ActionType.DELETE)
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
@@ -143,6 +145,7 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .output(Draft)
       .mutation(async ({ input, ctx }) => {
         const { eventId } = input
         await getEventById(eventId)
@@ -254,7 +257,8 @@ export const eventRouter = router({
     .output(z.array(EventIndex))
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
-      return getIndexedEvents(userId)
+      const eventConfigs = await getEventConfigurations(ctx.token)
+      return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure
     .meta({
@@ -268,7 +272,10 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
     .input(QueryType)
     .output(z.array(EventIndex))
-    .query(async ({ input }) => getIndex(input)),
+    .query(async ({ input, ctx }) => {
+      const eventConfigs = await getEventConfigurations(ctx.token)
+      return getIndex(input, eventConfigs)
+    }),
   import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
     .meta({

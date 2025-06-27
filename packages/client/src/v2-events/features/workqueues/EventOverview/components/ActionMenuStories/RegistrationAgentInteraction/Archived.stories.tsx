@@ -29,6 +29,7 @@ export default {
 const archivedScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
+    recordDownloaded: false,
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,
@@ -44,6 +45,7 @@ const archivedScenariosForRegistrationAgent: Scenario[] = [
 
   {
     name: 'AssignedToOthers',
+    recordDownloaded: false,
     actions: [
       ActionType.CREATE,
       AssignmentStatus.ASSIGNED_TO_SELF,

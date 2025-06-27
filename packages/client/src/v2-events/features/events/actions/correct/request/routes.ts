@@ -10,34 +10,55 @@
  */
 
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
+import { uuid } from '@client/v2-events/routes/utils'
 
 export const routes = route(
   'request-correction/:eventId',
   {
-    params: { eventId: string().defined() }
+    params: { eventId: uuid().defined() },
+    searchParams: {
+      workqueue: string()
+    }
   },
   {
     ONBOARDING: route('onboarding/:pageId', {
       params: { pageId: string() },
+      searchParams: {
+        workqueue: string()
+      },
       hash: hashValues()
     }),
     PAGES: route('pages/:pageId', {
       params: { pageId: string() },
       searchParams: {
-        from: string()
+        from: string(),
+        workqueue: string()
       },
       hash: hashValues()
     }),
-    REVIEW: route('review'),
+    REVIEW: route('review', {
+      searchParams: {
+        workqueue: string()
+      }
+    }),
     ADDITIONAL_DETAILS_INDEX: route('details', {
       params: { pageId: string() },
+      searchParams: {
+        workqueue: string()
+      },
       hash: hashValues()
     }),
     ADDITIONAL_DETAILS: route('details/:pageId', {
       params: { pageId: string() },
+      searchParams: {
+        workqueue: string()
+      },
       hash: hashValues()
     }),
     SUMMARY: route('summary', {
+      searchParams: {
+        workqueue: string()
+      },
       hash: hashValues()
     })
   }

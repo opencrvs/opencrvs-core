@@ -47,9 +47,8 @@ function AnnotationActionComponent({ children, actionType }: Props) {
 
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
-  const drafts = getRemoteDrafts()
-
-  const [event] = getEvent.useSuspenseQuery(params.eventId)
+  const event = getEvent.getFromCache(params.eventId)
+  const drafts = getRemoteDrafts(event.id)
 
   const activeDraft = findActiveDrafts(event, drafts)[0]
   const localDraft = getLocalDraftOrDefault(

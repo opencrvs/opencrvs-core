@@ -12,11 +12,10 @@
 import { merge, omitBy, isString } from 'lodash'
 import addDays from 'date-fns/addDays'
 import { tennisClubMembershipEvent } from '../fixtures'
-import { getUUID } from '../uuid'
+import { getUUID, UUID } from '../uuid'
 import {
   ActionBase,
   ActionDocument,
-  ActionUpdate,
   ActionStatus,
   EventState
 } from './ActionDocument'
@@ -24,6 +23,7 @@ import {
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
+  NotifyActionInput,
   RegisterActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
@@ -36,7 +36,6 @@ import { EventConfig } from './EventConfig'
 import { EventDocument } from './EventDocument'
 import { EventIndex } from './EventIndex'
 import { EventInput } from './EventInput'
-import { mapFieldTypeToMockValue } from './FieldTypeMapping'
 import {
   findRecordActionPages,
   getActionAnnotationFields,
@@ -49,15 +48,140 @@ import {
 import { TranslationConfig } from './TranslationConfig'
 import { FieldConfig } from './FieldConfig'
 import { ActionConfig } from './ActionConfig'
-import { eventStatuses } from './EventMetadata'
+import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
+import { FieldType } from './FieldType'
+import { AddressType, FileFieldValue } from './CompositeFieldValue'
+import { FieldValue } from './FieldValue'
+import { TokenUserType } from '../authentication'
+import { z } from 'zod'
 
-function fieldConfigsToActionPayload(fields: FieldConfig[]) {
+/**
+ * In real application, the roles are defined in the countryconfig.
+ * These are just for testing purposes to generate realistic mock data.
+ */
+export const TestUserRole = z.enum([
+  'FIELD_AGENT',
+  'LOCAL_REGISTRAR',
+  'LOCAL_SYSTEM_ADMIN',
+  'NATIONAL_REGISTRAR',
+  'REGISTRATION_AGENT'
+])
+
+export type TestUserRole = z.infer<typeof TestUserRole>
+
+function pickRandom<T>(rng: () => number, items: T[]): T {
+  return items[Math.floor(rng() * items.length)]
+}
+
+export function generateRandomName(rng: () => number) {
+  const firstnames = [
+    'Danny',
+    'John',
+    'Jane',
+    'Emily',
+    'Michael',
+    'Sarah',
+    'Chris',
+    'Jessica',
+    'Sara',
+    'Sarachella',
+    'Sarandera',
+    'Zara'
+  ]
+
+  const surnames = [
+    'Doe',
+    'Smith',
+    'Johnson',
+    'Brown',
+    'Williams',
+    'Jones',
+    'Garcia',
+    'Miller',
+    'Saranen',
+    'Sarajanen',
+    'Sarthua',
+    'Tsarakovski',
+    'Salamander',
+    'Zarathustra'
+  ]
+
+  return {
+    firstname: pickRandom(rng, firstnames),
+    surname: pickRandom(rng, surnames)
+  }
+}
+
+/**
+ * Quick-and-dirty mock data generator for event actions.
+ */
+export function mapFieldTypeToMockValue(
+  field: FieldConfig,
+  i: number,
+  rng: () => number
+): FieldValue {
+  switch (field.type) {
+    case FieldType.DIVIDER:
+    case FieldType.TEXT:
+    case FieldType.TEXTAREA:
+    case FieldType.BULLET_LIST:
+    case FieldType.PAGE_HEADER:
+    case FieldType.LOCATION:
+    case FieldType.SELECT:
+    case FieldType.COUNTRY:
+    case FieldType.RADIO_GROUP:
+    case FieldType.PARAGRAPH:
+    case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.PHONE:
+    case FieldType.ID:
+    case FieldType.OFFICE:
+      return `${field.id}-${field.type}-${i}`
+    case FieldType.NAME:
+      return generateRandomName(rng)
+    case FieldType.NUMBER:
+      return 19
+    case FieldType.EMAIL:
+      return 'test@opencrvs.org'
+    case FieldType.ADDRESS:
+      return {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'URBAN',
+        town: 'Example Town',
+        residentialArea: 'Example Residential Area',
+        street: 'Example Street',
+        number: '55',
+        zipCode: '123456'
+      }
+    case FieldType.DATE:
+      return '2021-01-01'
+    case FieldType.DATE_RANGE:
+      return ['2021-01-01', '2021-01-02']
+    case FieldType.CHECKBOX:
+      return true
+    case FieldType.SIGNATURE:
+    case FieldType.FILE:
+      return {
+        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+        originalFilename: 'abcd.png',
+        type: 'image/png'
+      } satisfies FileFieldValue
+    case FieldType.FILE_WITH_OPTIONS:
+    case FieldType.DATA:
+      return undefined
+  }
+}
+
+function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
   return fields.reduce(
     (acc, field, i) => ({
       ...acc,
-      [field.id]: mapFieldTypeToMockValue(field, i)
+      [field.id]: mapFieldTypeToMockValue(field, i, rng)
     }),
     {}
   )
@@ -65,7 +189,8 @@ function fieldConfigsToActionPayload(fields: FieldConfig[]) {
 
 export function generateActionDeclarationInput(
   configuration: EventConfig,
-  action: ActionType
+  action: ActionType,
+  rng: () => number
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
@@ -73,7 +198,7 @@ export function generateActionDeclarationInput(
 
     const declarationConfig = getDeclaration(configuration)
 
-    const declaration = fieldConfigsToActionPayload(fields)
+    const declaration = fieldConfigsToActionPayload(fields, rng)
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
@@ -88,7 +213,8 @@ export function generateActionDeclarationInput(
 
 export function generateActionAnnotationInput(
   configuration: EventConfig,
-  action: ActionType
+  action: ActionType,
+  rng: () => number
 ) {
   const actionConfig: ActionConfig | undefined = configuration.actions.find(
     (ac) => ac.type === action
@@ -98,7 +224,7 @@ export function generateActionAnnotationInput(
     ? getActionAnnotationFields(actionConfig)
     : []
 
-  const annotation = fieldConfigsToActionPayload(annotationFields)
+  const annotation = fieldConfigsToActionPayload(annotationFields, rng)
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
@@ -121,295 +247,347 @@ export function generateActionAnnotationInput(
   }
 }
 
-export const eventPayloadGenerator = {
-  create: (input: Partial<EventInput> = {}) => ({
-    transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? TENNIS_CLUB_MEMBERSHIP
-  }),
-  patch: (id: string, input: Partial<EventInput> = {}) => ({
-    transactionId: input.transactionId ?? getUUID(),
-    type: input.type ?? TENNIS_CLUB_MEMBERSHIP,
-    id
-  }),
-  draft: (
-    { eventId, actionType }: { eventId: string; actionType: ActionType },
-    input: Partial<Draft> = {}
-  ): Draft =>
-    merge(
-      {
-        id: getUUID(),
-        eventId,
-        createdAt: new Date().toISOString(),
-        transactionId: getUUID(),
-        action: {
-          transactionId: getUUID(),
-          type: actionType,
-          status: ActionStatus.Accepted,
-          declaration: {
-            'applicant.firstname': 'Max',
-            'applicant.surname': 'McLaren',
-            'applicant.dob': '2020-01-02',
-            'recommender.none': true
-          },
-          annotation: {
-            'correction.requester.relationship': 'ANOTHER_AGENT',
-            'correction.request.reason': "Child's name was incorrect"
-          },
+export function eventPayloadGenerator(rng: () => number) {
+  return {
+    create: (input: Partial<EventInput> = {}) => ({
+      transactionId: input.transactionId ?? getUUID(),
+      type: input.type ?? TENNIS_CLUB_MEMBERSHIP
+    }),
+    patch: (id: string, input: Partial<EventInput> = {}) => ({
+      transactionId: input.transactionId ?? getUUID(),
+      type: input.type ?? TENNIS_CLUB_MEMBERSHIP,
+      id
+    }),
+    draft: (
+      { eventId, actionType }: { eventId: UUID; actionType: ActionType },
+      input: Partial<Draft> = {}
+    ): Draft =>
+      merge(
+        {
+          id: getUUID(),
+          eventId,
           createdAt: new Date().toISOString(),
-          createdBy: '@todo',
-          createdByRole: '@todo',
-          createdAtLocation: '@todo'
-        }
-      } satisfies Draft,
-      input
-    ),
-  actions: {
-    declare: (
-      eventId: string,
-      input: Partial<
-        Pick<DeclareActionInput, 'transactionId' | 'declaration' | 'annotation'>
-      > = {}
-    ) => ({
-      type: ActionType.DECLARE,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration:
-        input.declaration ??
-        generateActionDeclarationInput(
-          tennisClubMembershipEvent,
-          ActionType.DECLARE
-        ),
-      annotation:
-        input.annotation ??
-        generateActionAnnotationInput(
-          tennisClubMembershipEvent,
-          ActionType.DECLARE
-        ),
-      eventId
-    }),
-    /**
-     * Notify allows sending incomplete data. Think it as 'partial declare' for now.
-     */
-    notify: (
-      eventId: string,
-      input: {
-        transactionId?: string
-        declaration?: Partial<ActionUpdate>
-      } = {}
-    ) => {
-      let declaration = input.declaration
-      if (!declaration) {
-        // Remove some fields to simulate incomplete data
-        const partialDeclaration = omitBy(
-          generateActionDeclarationInput(
-            tennisClubMembershipEvent,
-            ActionType.DECLARE
-          ),
-          isString
-        )
-
-        // Remove some fields to simulate incomplete data
-        declaration = partialDeclaration
-      }
-
-      return {
-        type: ActionType.NOTIFY,
-        transactionId: input.transactionId ?? getUUID(),
-        declaration,
-        eventId
-      }
-    },
-    validate: (
-      eventId: string,
-      input: Partial<
-        Pick<
-          ValidateActionInput,
-          'transactionId' | 'declaration' | 'annotation'
-        >
-      > = {}
-    ) => ({
-      type: ActionType.VALIDATE,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration:
-        input.declaration ??
-        generateActionDeclarationInput(
-          tennisClubMembershipEvent,
-          ActionType.VALIDATE
-        ),
-      annotation:
-        input.annotation ??
-        generateActionAnnotationInput(
-          tennisClubMembershipEvent,
-          ActionType.VALIDATE
-        ),
-      duplicates: [],
-      eventId
-    }),
-    assign: (
-      eventId: string,
-      input: Partial<
-        Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
-      > = {}
-    ) => ({
-      type: ActionType.ASSIGN,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration: {},
-      assignedTo: input.assignedTo ?? getUUID(),
-      eventId
-    }),
-    unassign: (
-      eventId: string,
-      input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
-    ) => ({
-      type: ActionType.UNASSIGN,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration: {},
-      assignedTo: null,
-      eventId
-    }),
-    archive: (
-      eventId: string,
-      input: Partial<
-        Pick<ArchiveActionInput, 'transactionId' | 'declaration'>
-      > = {},
-      isDuplicate?: boolean
-    ) => ({
-      type: ActionType.ARCHIVE,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration: {},
-      // @TODO: Check whether generator is needed?
-      annotation: {},
-      duplicates: [],
-      eventId,
-      reason: {
-        message: `${ActionType.ARCHIVE}`,
-        isDuplicate: isDuplicate ?? false
-      }
-    }),
-    reject: (
-      eventId: string,
-      input: Partial<
-        Pick<RejectDeclarationActionInput, 'transactionId' | 'annotation'>
-      > = {}
-    ) => ({
-      type: ActionType.REJECT,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration: {},
-      annotation:
-        input.annotation ??
-        generateActionAnnotationInput(
-          tennisClubMembershipEvent,
-          ActionType.REJECT
-        ),
-      duplicates: [],
-      eventId,
-      reason: { message: `${ActionType.REJECT}` }
-    }),
-    register: (
-      eventId: string,
-      input: Partial<
-        Pick<
-          RegisterActionInput,
-          'transactionId' | 'declaration' | 'annotation'
-        >
-      > = {}
-    ) => ({
-      type: ActionType.REGISTER,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration:
-        input.declaration ??
-        generateActionDeclarationInput(
-          tennisClubMembershipEvent,
-          ActionType.REGISTER
-        ),
-      annotation:
-        input.annotation ??
-        generateActionAnnotationInput(
-          tennisClubMembershipEvent,
-          ActionType.REGISTER
-        ),
-      eventId
-    }),
-    printCertificate: (
-      eventId: string,
-      input: Partial<
-        Pick<RegisterActionInput, 'transactionId' | 'annotation'>
-      > = {}
-    ) => ({
-      type: ActionType.PRINT_CERTIFICATE,
-      transactionId: input.transactionId ?? getUUID(),
-      declaration: {},
-      annotation:
-        input.annotation ??
-        generateActionAnnotationInput(
-          tennisClubMembershipEvent,
-          ActionType.PRINT_CERTIFICATE
-        ),
-      eventId
-    }),
-    correction: {
-      request: (
+          transactionId: getUUID(),
+          action: {
+            transactionId: getUUID(),
+            type: actionType,
+            status: ActionStatus.Accepted,
+            declaration: {
+              'applicant.name': {
+                firstname: 'Max',
+                surname: 'McLaren'
+              },
+              'applicant.dob': '2020-01-02',
+              'recommender.none': true
+            },
+            annotation: {
+              'correction.requester.relationship': 'ANOTHER_AGENT',
+              'correction.request.reason': "Child's name was incorrect"
+            },
+            createdAt: new Date().toISOString(),
+            createdBy: '@todo',
+            createdByUserType: TokenUserType.Enum.user,
+            createdByRole: '@todo',
+            createdAtLocation: '@todo' as UUID
+          }
+        } satisfies Draft,
+        input
+      ),
+    actions: {
+      declare: (
         eventId: string,
         input: Partial<
           Pick<
-            RequestCorrectionActionInput,
-            'transactionId' | 'declaration' | 'annotation'
+            DeclareActionInput,
+            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
           >
         > = {}
       ) => ({
-        type: ActionType.REQUEST_CORRECTION,
+        type: ActionType.DECLARE,
         transactionId: input.transactionId ?? getUUID(),
         declaration:
           input.declaration ??
           generateActionDeclarationInput(
             tennisClubMembershipEvent,
-            ActionType.REQUEST_CORRECTION
+            ActionType.DECLARE,
+            rng
           ),
         annotation:
           input.annotation ??
           generateActionAnnotationInput(
             tennisClubMembershipEvent,
-            ActionType.REQUEST_CORRECTION
-          ),
-        eventId
-      }),
-      approve: (
-        eventId: string,
-        requestId: string,
-        input: Partial<
-          Pick<RequestCorrectionActionInput, 'transactionId' | 'annotation'>
-        > = {}
-      ) => ({
-        type: ActionType.APPROVE_CORRECTION,
-        transactionId: input.transactionId ?? getUUID(),
-        declaration: {},
-        annotation:
-          input.annotation ??
-          generateActionAnnotationInput(
-            tennisClubMembershipEvent,
-            ActionType.APPROVE_CORRECTION
+            ActionType.DECLARE,
+            rng
           ),
         eventId,
-        requestId
+        ...input
+      }),
+      /**
+       * Notify allows sending incomplete data. Think it as 'partial declare' for now.
+       */
+      notify: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            NotifyActionInput,
+            'transactionId' | 'declaration' | 'keepAssignment'
+          >
+        > = {}
+      ) => {
+        let declaration = input.declaration
+        if (!declaration) {
+          // Remove some fields to simulate incomplete data
+          const partialDeclaration = omitBy(
+            generateActionDeclarationInput(
+              tennisClubMembershipEvent,
+              ActionType.DECLARE,
+              rng
+            ),
+            isString
+          )
+
+          // Remove some fields to simulate incomplete data
+          declaration = partialDeclaration
+        }
+
+        return {
+          type: ActionType.NOTIFY,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration,
+          eventId,
+          keepAssignment: input.keepAssignment
+        }
+      },
+      validate: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            ValidateActionInput,
+            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.VALIDATE,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration:
+          input.declaration ??
+          generateActionDeclarationInput(
+            tennisClubMembershipEvent,
+            ActionType.VALIDATE,
+            rng
+          ),
+        annotation:
+          input.annotation ??
+          generateActionAnnotationInput(
+            tennisClubMembershipEvent,
+            ActionType.VALIDATE,
+            rng
+          ),
+        duplicates: [],
+        eventId,
+        ...input
+      }),
+      assign: (
+        eventId: string,
+        input: Partial<
+          Pick<AssignActionInput, 'transactionId' | 'assignedTo'>
+        > = {}
+      ) => ({
+        type: ActionType.ASSIGN,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        assignedTo: input.assignedTo ?? getUUID(),
+        eventId
+      }),
+      unassign: (
+        eventId: string,
+        input: Partial<Pick<UnassignActionInput, 'transactionId'>> = {}
+      ) => ({
+        type: ActionType.UNASSIGN,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        assignedTo: null,
+        eventId
+      }),
+      archive: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            ArchiveActionInput,
+            'transactionId' | 'declaration' | 'keepAssignment'
+          >
+        > = {},
+        isDuplicate?: boolean
+      ) => ({
+        type: ActionType.ARCHIVE,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        // @TODO: Check whether generator is needed?
+        annotation: {},
+        duplicates: [],
+        eventId,
+        reason: {
+          message: `${ActionType.ARCHIVE}`,
+          isDuplicate: isDuplicate ?? false
+        },
+        ...input
       }),
       reject: (
         eventId: string,
-        requestId: string,
         input: Partial<
-          Pick<RequestCorrectionActionInput, 'transactionId' | 'annotation'>
+          Pick<
+            RejectDeclarationActionInput,
+            'transactionId' | 'annotation' | 'keepAssignment'
+          >
         > = {}
       ) => ({
-        type: ActionType.REJECT_CORRECTION,
+        type: ActionType.REJECT,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
         annotation:
           input.annotation ??
           generateActionAnnotationInput(
             tennisClubMembershipEvent,
-            ActionType.REJECT_CORRECTION
+            ActionType.REJECT,
+            rng
+          ),
+        duplicates: [],
+        eventId,
+        reason: { message: `${ActionType.REJECT}` },
+        ...input
+      }),
+      register: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            RegisterActionInput,
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'registrationNumber'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.REGISTER,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration:
+          input.declaration ??
+          generateActionDeclarationInput(
+            tennisClubMembershipEvent,
+            ActionType.REGISTER,
+            rng
+          ),
+        annotation:
+          input.annotation ??
+          generateActionAnnotationInput(
+            tennisClubMembershipEvent,
+            ActionType.REGISTER,
+            rng
           ),
         eventId,
-        requestId
-      })
+        ...input
+      }),
+      printCertificate: (
+        eventId: string,
+        input: Partial<
+          Pick<
+            RegisterActionInput,
+            'transactionId' | 'annotation' | 'keepAssignment'
+          >
+        > = {}
+      ) => ({
+        type: ActionType.PRINT_CERTIFICATE,
+        transactionId: input.transactionId ?? getUUID(),
+        declaration: {},
+        annotation:
+          input.annotation ??
+          generateActionAnnotationInput(
+            tennisClubMembershipEvent,
+            ActionType.PRINT_CERTIFICATE,
+            rng
+          ),
+        eventId,
+        ...input
+      }),
+      correction: {
+        request: (
+          eventId: string,
+          input: Partial<
+            Pick<
+              RequestCorrectionActionInput,
+              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            >
+          > = {}
+        ) => ({
+          type: ActionType.REQUEST_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration:
+            input.declaration ??
+            generateActionDeclarationInput(
+              tennisClubMembershipEvent,
+              ActionType.REQUEST_CORRECTION,
+              rng
+            ),
+          annotation:
+            input.annotation ??
+            generateActionAnnotationInput(
+              tennisClubMembershipEvent,
+              ActionType.REQUEST_CORRECTION,
+              rng
+            ),
+          eventId,
+          keepAssignment: input.keepAssignment
+        }),
+        approve: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<
+              RequestCorrectionActionInput,
+              'transactionId' | 'annotation' | 'keepAssignment'
+            >
+          > = {}
+        ) => ({
+          type: ActionType.APPROVE_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration: {},
+          annotation:
+            input.annotation ??
+            generateActionAnnotationInput(
+              tennisClubMembershipEvent,
+              ActionType.APPROVE_CORRECTION,
+              rng
+            ),
+          eventId,
+          requestId,
+          keepAssignment: input.keepAssignment
+        }),
+        reject: (
+          eventId: string,
+          requestId: string,
+          input: Partial<
+            Pick<
+              RequestCorrectionActionInput,
+              'transactionId' | 'annotation' | 'keepAssignment'
+            >
+          > = {}
+        ) => ({
+          type: ActionType.REJECT_CORRECTION,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration: {},
+          annotation:
+            input.annotation ??
+            generateActionAnnotationInput(
+              tennisClubMembershipEvent,
+              ActionType.REJECT_CORRECTION,
+              rng
+            ),
+          eventId,
+          requestId,
+          keepAssignment: input.keepAssignment
+        })
+      }
     }
   }
 }
@@ -417,21 +595,32 @@ export const eventPayloadGenerator = {
 export function generateActionDocument({
   configuration,
   action,
-  defaults = {}
+  rng = () => 0.1,
+  defaults = {},
+  user = {}
 }: {
   configuration: EventConfig
   action: ActionType
+  rng?: () => number
   defaults?: Partial<ActionDocument>
+  user?: Partial<{
+    signature: string
+    primaryOfficeId: UUID
+    role: TestUserRole
+    id: string
+  }>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: getUUID(),
-    createdByRole: 'FIELD_AGENT',
+    createdBy: user.id ?? getUUID(),
+    createdByUserType: TokenUserType.Enum.user,
+    createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    declaration: generateActionDeclarationInput(configuration, action),
+    createdAtLocation:
+      user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
+    declaration: generateActionDeclarationInput(configuration, action, rng),
     annotation: {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
@@ -446,7 +635,7 @@ export function generateActionDocument({
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
-      return { ...actionBase, type: action, assignedTo: null }
+      return { ...actionBase, type: action }
     case ActionType.ASSIGN:
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
@@ -486,16 +675,25 @@ export function generateActionDocument({
 
 export function generateEventDocument({
   configuration,
-  actions
+  actions,
+  rng = () => 0.1,
+  user
 }: {
   configuration: EventConfig
   actions: ActionType[]
+  rng?: () => number
+  user?: Partial<{
+    signature: string
+    primaryOfficeId: UUID
+    role: TestUserRole
+    id: string
+  }>
 }): EventDocument {
   return {
     trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
-      generateActionDocument({ configuration, action })
+      generateActionDocument({ configuration, action, rng, user })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
@@ -507,14 +705,21 @@ export function generateEventDocument({
   }
 }
 
-export function generateEventDraftDocument(
-  eventId: string,
-  actionType: ActionType = ActionType.DECLARE,
-  declaration: EventState = {}
-): Draft {
+export function generateEventDraftDocument({
+  eventId,
+  actionType,
+  rng = () => 0.1,
+  declaration = {}
+}: {
+  eventId: UUID
+  actionType: ActionType
+  rng?: () => number
+  declaration?: EventState
+}): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
-    action: actionType
+    action: actionType,
+    rng
   })
   return {
     id: getUUID(),
@@ -531,10 +736,6 @@ export function generateEventDraftDocument(
   }
 }
 
-function pickRandom<T>(rng: () => number, items: T[]): T {
-  return items[Math.floor(rng() * items.length)]
-}
-
 export function getRandomDatetime(
   rng: () => number,
   start: Date,
@@ -546,43 +747,22 @@ export function getRandomDatetime(
   return randomDate.toISOString()
 }
 
-function generateRandomApplicant(
-  rng: () => number
-): Record<string, string | boolean> {
-  const firstNames = [
-    'Danny',
-    'John',
-    'Jane',
-    'Emily',
-    'Michael',
-    'Sarah',
-    'Chris',
-    'Jessica'
-  ]
+export function getRandomDate(rng: () => number, start: string, end: string) {
+  const datetime = getRandomDatetime(rng, new Date(start), new Date(end))
 
-  const surnames = [
-    'Doe',
-    'Smith',
-    'Johnson',
-    'Brown',
-    'Williams',
-    'Jones',
-    'Garcia',
-    'Miller'
-  ]
+  return datetime.split('T')[0] // Return only the date part in YYYY-MM-DD format
+}
 
-  const randomFirstName = pickRandom(rng, firstNames)
-  const randomSurname = pickRandom(rng, surnames)
-  const randomDob = getRandomDatetime(
-    rng,
-    new Date('1990-01-01'),
-    new Date('2010-12-31')
-  ).split('T')[0]
+function generateRandomApplicant(rng: () => number): EventState {
+  const { firstname, surname } = generateRandomName(rng)
+  const randomDob = getRandomDate(rng, '1990-01-01', '2010-12-31')
 
   return {
     'recommender.none': true,
-    'applicant.firstname': randomFirstName,
-    'applicant.surname': randomSurname,
+    'applicant.name': {
+      firstname,
+      surname
+    },
     'applicant.dob': randomDob
   }
 }
@@ -591,9 +771,9 @@ function generateRandomApplicant(
  * Useful for testing when we need deterministic outcome.
  * @param seed - Seed value for the pseudo-random number generator
  *
- * @returns A function that generates pseudo-random numbers between 0 and 1
+ * @returns A function that generates pseudo-random numbers between 0 and 1 [0, 1)
  */
-export function createPseudoRandomNumberGenerator(seed: number) {
+export function createPrng(seed: number) {
   // Parameters are not arbirary. Reference: https://en.wikipedia.org/wiki/Linear_congruential_generator
   const MODULUS = 2 ** 32
   const MULTIPLIER = 1664525
@@ -608,18 +788,24 @@ export function createPseudoRandomNumberGenerator(seed: number) {
   }
 }
 
-function generateUuid(rng: () => number): string {
+export function generateUuid(rng: () => number = () => 0.1) {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.floor(rng() * 16)
     const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
-  })
+  }) as UUID
 }
 
 function generateTrackingId(rng: () => number): string {
   const uuid = generateUuid(rng).replace(/-/g, '')
   const trackingId = uuid.slice(0, 6).toUpperCase()
   return trackingId
+}
+
+export function generateRegistrationNumber(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const registrationNumber = uuid.slice(0, 12).toUpperCase()
+  return registrationNumber
 }
 
 export function generateRandomSignature(rng: () => number): string {
@@ -630,7 +816,7 @@ export const eventQueryDataGenerator = (
   overrides: Partial<EventIndex> = {},
   seed: number = 1
 ): EventIndex => {
-  const rng = createPseudoRandomNumberGenerator(seed)
+  const rng = createPrng(seed)
 
   const createdAt = getRandomDatetime(
     rng,
@@ -641,8 +827,9 @@ export const eventQueryDataGenerator = (
   return {
     id: overrides.id ?? generateUuid(rng),
     type: overrides.type ?? TENNIS_CLUB_MEMBERSHIP,
-    status: overrides.status ?? pickRandom(rng, eventStatuses),
+    status: overrides.status ?? pickRandom(rng, EventStatus.options),
     createdAt: overrides.createdAt ?? createdAt,
+    createdByUserType: overrides.createdByUserType ?? 'user',
     createdBy: overrides.createdBy ?? generateUuid(rng),
     createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),
     updatedAtLocation: overrides.updatedAtLocation ?? generateUuid(rng),
