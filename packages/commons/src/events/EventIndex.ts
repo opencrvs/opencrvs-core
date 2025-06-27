@@ -107,7 +107,7 @@ const RangeDate = z
   .openapi({ ref: 'RangeDate' })
 
 export const ExactDate = Exact.extend({
-  term: z.string().date()
+  term: z.string().date().or(z.string().datetime())
 }).openapi({
   ref: 'ExactDate'
 })
