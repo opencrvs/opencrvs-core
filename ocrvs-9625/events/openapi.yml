@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 170458cb-ff4b-4ffd-ad7d-3028e676b4f0
+                transactionId: 2871e5e5-bb20-4e50-a6f9-a0694ea724aa
                 type: v2.birth
       responses:
         "200":
@@ -113,6 +113,7 @@ paths:
               properties:
                 eventId:
                   type: string
+                  format: uuid
                 transactionId:
                   type: string
                 declaration:
@@ -444,6 +445,7 @@ paths:
                               - type: "null"
                 originalActionId:
                   type: string
+                  format: uuid
                 keepAssignment:
                   type: boolean
                 type:
@@ -456,7 +458,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 22bdfac1-2122-4a5d-99e8-dfddede84562
+                transactionId: 89df4fcc-0b0d-4428-995a-60f5152229ab
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -594,6 +596,7 @@ paths:
               properties:
                 id:
                   type: string
+                  format: uuid
                 type:
                   type: string
                 createdAt:
@@ -611,6 +614,7 @@ paths:
                         properties:
                           id:
                             type: string
+                            format: uuid
                           transactionId:
                             type: string
                           createdByUserType:
@@ -632,12 +636,17 @@ paths:
                           createdAtLocation:
                             type: string
                             nullable: true
+                            format: uuid
                           status:
                             type: string
                             enum:
                               - Rejected
                           originalActionId:
                             type: string
+                            nullable: true
+                            format: uuid
+                            description: Reference to the original action that was asynchronously rejected
+                              or accepted by 3rd party integration.
                           type:
                             type: string
                             enum: &a11
@@ -4206,6 +4215,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         type:
           type: string
         createdAt:
@@ -4223,6 +4233,7 @@ components:
                 properties:
                   id:
                     type: string
+                    format: uuid
                   transactionId:
                     type: string
                   createdByUserType:
@@ -4242,12 +4253,17 @@ components:
                   createdAtLocation:
                     type: string
                     nullable: true
+                    format: uuid
                   status:
                     type: string
                     enum:
                       - Rejected
                   originalActionId:
                     type: string
+                    nullable: true
+                    format: uuid
+                    description: Reference to the original action that was asynchronously rejected
+                      or accepted by 3rd party integration.
                   type:
                     type: string
                     enum: *a11
@@ -4309,6 +4325,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -4328,6 +4345,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4493,6 +4511,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -4662,6 +4681,10 @@ components:
             - Rejected
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -4681,6 +4704,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -4700,6 +4724,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4865,6 +4890,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -5031,6 +5057,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -5050,6 +5080,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -5069,6 +5100,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5234,6 +5266,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -5400,6 +5433,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -5432,6 +5469,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -5451,6 +5489,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5616,6 +5655,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -5782,6 +5822,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -5801,6 +5845,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -5820,6 +5865,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5985,6 +6031,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -6151,6 +6198,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -6183,6 +6234,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -6202,6 +6254,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6367,6 +6420,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -6533,6 +6587,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -6552,6 +6610,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -6571,6 +6630,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6736,6 +6796,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -6902,6 +6963,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -6923,6 +6988,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -6942,6 +7008,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7107,6 +7174,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -7273,6 +7341,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -7292,6 +7364,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -7311,6 +7384,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7476,6 +7550,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -7642,6 +7717,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -7664,6 +7743,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -7683,6 +7763,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7848,6 +7929,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -8014,6 +8096,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -8033,6 +8119,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -8052,6 +8139,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8217,6 +8305,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -8383,6 +8472,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -8405,6 +8498,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -8424,6 +8518,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8589,6 +8684,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -8755,6 +8851,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -8777,6 +8877,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -8796,6 +8897,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8961,6 +9063,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -9127,12 +9230,14 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
             - UNASSIGN
-        assignedTo:
-          type: "null"
       required:
         - id
         - transactionId
@@ -9143,12 +9248,12 @@ components:
         - declaration
         - status
         - type
-        - assignedTo
     PrintCertificateAction:
       type: object
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -9168,6 +9273,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -9333,6 +9439,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -9499,6 +9606,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -9518,6 +9629,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -9537,6 +9649,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -9702,6 +9815,7 @@ components:
                       - type: "null"
         annotation:
           type: object
+          nullable: true
           additionalProperties:
             anyOf:
               - type: string
@@ -9868,6 +9982,10 @@ components:
           enum: *a12
         originalActionId:
           type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           enum:
@@ -10137,6 +10255,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         type:
           type: string
           description: The type of event, such as birth, death, or marriage.
@@ -10160,6 +10279,7 @@ components:
                 createdAtLocation:
                   type: string
                   nullable: true
+                  format: uuid
                   description: Location of the user who created the action request.
                 createdByUserType:
                   type: string
@@ -10199,6 +10319,7 @@ components:
                 createdAtLocation:
                   type: string
                   nullable: true
+                  format: uuid
                   description: Location of the user who created the action request.
                 createdByUserType:
                   type: string
@@ -10256,6 +10377,7 @@ components:
         createdAtLocation:
           type: string
           nullable: true
+          format: uuid
           description: Location of the user who created the event.
         createdBySignature:
           type: string
@@ -10264,6 +10386,7 @@ components:
         updatedAtLocation:
           type: string
           nullable: true
+          format: uuid
           description: Location of the user who last changed the status.
         updatedAt:
           type: string
