@@ -9,14 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FieldConfig, FieldType } from '@opencrvs/commons/client'
+import {
+  areConditionsMet,
+  EventState,
+  FieldConfig,
+  FieldType
+} from '@opencrvs/commons/client'
 import { useAppConfig } from '@client/v2-events/hooks/useAppConfig'
 
 export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
-  eventType: string
+  eventType: string,
+  declaration: EventState
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
+
   return {
     id: CERT_TEMPLATE_ID,
     type: FieldType.SELECT,
@@ -31,6 +38,9 @@ export const useCertificateTemplateSelectorFieldConfig = (
     )?.id,
     options: certificateTemplates
       .filter((x) => x.event === eventType)
+      .filter(
+        (x) => !x.conditionals || areConditionsMet(x.conditionals, declaration)
+      )
       .map((x) => ({ label: x.label, value: x.id }))
   }
 }
