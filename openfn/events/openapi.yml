@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2c4373c9-2894-4490-8f95-1db243f747cf
+                transactionId: ff17d3af-8619-4026-895f-f61eca695077
                 type: v2.birth
       responses:
         "200":
@@ -263,6 +263,21 @@ paths:
                           - addressType
                           - state
                           - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
                   default: {}
                 annotation:
                   type: object
@@ -412,6 +427,21 @@ paths:
                           - addressType
                           - state
                           - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
                 originalActionId:
                   type: string
                 keepAssignment:
@@ -426,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 47628768-8e49-45f2-831e-c47360a4a23d
+                transactionId: 097a1a8e-148a-4d88-b4e3-6a3802eb17af
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -488,11 +518,12 @@ paths:
             type: array
             items:
               $ref: "#/components/schemas/QueryExpression"
+            minItems: 1
             default:
               - eventType: tennis-club-membership
                 status:
                   type: anyOf
-                  terms:
+                  terms: &a13
                     - CREATED
                     - NOTIFIED
                     - DECLARED
@@ -582,6 +613,11 @@ paths:
                             type: string
                           transactionId:
                             type: string
+                          createdByUserType:
+                            type: string
+                            enum: &a10
+                              - user
+                              - system
                           createdAt:
                             type: string
                             format: date-time
@@ -604,7 +640,7 @@ paths:
                             type: string
                           type:
                             type: string
-                            enum: &a9
+                            enum: &a11
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -615,6 +651,7 @@ paths:
                         required:
                           - id
                           - transactionId
+                          - createdByUserType
                           - createdAt
                           - createdBy
                           - createdByRole
@@ -858,7 +895,7 @@ components:
 
                             \    This property determines whether to add a
                             prefix (such as \"Child\" or \"Applicant\") before
-                            the field label\ 
+                            the field label
 
                             \    when rendering search parameter labels — for
                             example, in the search results page to indicate
@@ -866,7 +903,7 @@ components:
 
 
                             \    For example, a field config like { id:
-                            \"child.firstname\", label: { defaultMessage:
+                            \"child.name.firstname\", label: { defaultMessage:
                             \"First Name(s)\" } } would render as \"First
                             Name(s)\" by default.
 
@@ -876,22 +913,21 @@ components:
                             also render as \"First Name(s)\" by default.
 
 
-                            \    So, if both child.firstname and
+                            \    So, if both child.name.firstname and
                             mother.firstname are used in a search, the resulting
                             search criteria labels would be \"First Name(s)\",
-                            \"First Name(s)\",\ 
+                            \"First Name(s)\",
 
                             \    which is ambiguous.
 
 
                             \    Now, if we treat the field ID prefix as a label
                             (e.g., \"applicant.firstname\" → \"Applicant\"), and
-                            the field label is already\ 
+                            the field label is already
 
                             \    descriptive — like { id:
                             \"applicant.firstname\", label: { defaultMessage:
-                            \"Applicant's First Name\" } } — then the
-                            resulting\ 
+                            \"Applicant's First Name\" } } — then the resulting
 
                             \    label would be \"Applicant Applicant's First
                             Name\", which is redundant and awkward.
@@ -899,7 +935,7 @@ components:
 
                             \    By setting searchCriteriaLabelPrefix to a
                             translation config object, we can explicitly define
-                            the desired prefix\ 
+                            the desired prefix
 
                             \    in the country-config > event.advancedSearch
                             configuration. For example: field(\"child.dob\", {
@@ -918,32 +954,45 @@ components:
                             \       In advanced search, we sometimes need to
                             override the default field visibility conditionals.
 
-                            \      \ 
 
                             \       For example, Informant fields in the
-                            declaration form may have conditional logic\ 
+                            declaration form may have conditional logic
 
                             \       that hides them based on other field values.
-                            Since the advanced search form reuses\ 
+                            Since the advanced search form reuses
 
                             \       the declaration form config, those same
                             conditionals would apply by default.
 
-                            \      \ 
 
                             \       However, in advanced search we often want to
                             make all Informant fields searchable,
 
                             \       regardless of their original visibility
-                            logic. To do this, we explicitly set their\ 
+                            logic. To do this, we explicitly set their
 
                             \       'conditionals' to an empty array ('[]') in
-                            the search config. This ensures they\ 
+                            the search config. This ensures they
 
                             \       are always rendered in the advanced search
                             form.
 
                             \      "
+                        validations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              validator:
+                                $ref: "#/components/schemas/Conditional"
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - validator
+                              - message
+                          default: &a4 []
+                          description: In advanced search, we sometimes need to override the default field
+                            validations.
                         fieldId:
                           type: string
                         fieldType:
@@ -985,7 +1034,7 @@ components:
 
                             \    This property determines whether to add a
                             prefix (such as \"Child\" or \"Applicant\") before
-                            the field label\ 
+                            the field label
 
                             \    when rendering search parameter labels — for
                             example, in the search results page to indicate
@@ -993,7 +1042,7 @@ components:
 
 
                             \    For example, a field config like { id:
-                            \"child.firstname\", label: { defaultMessage:
+                            \"child.name.firstname\", label: { defaultMessage:
                             \"First Name(s)\" } } would render as \"First
                             Name(s)\" by default.
 
@@ -1003,22 +1052,21 @@ components:
                             also render as \"First Name(s)\" by default.
 
 
-                            \    So, if both child.firstname and
+                            \    So, if both child.name.firstname and
                             mother.firstname are used in a search, the resulting
                             search criteria labels would be \"First Name(s)\",
-                            \"First Name(s)\",\ 
+                            \"First Name(s)\",
 
                             \    which is ambiguous.
 
 
                             \    Now, if we treat the field ID prefix as a label
                             (e.g., \"applicant.firstname\" → \"Applicant\"), and
-                            the field label is already\ 
+                            the field label is already
 
                             \    descriptive — like { id:
                             \"applicant.firstname\", label: { defaultMessage:
-                            \"Applicant's First Name\" } } — then the
-                            resulting\ 
+                            \"Applicant's First Name\" } } — then the resulting
 
                             \    label would be \"Applicant Applicant's First
                             Name\", which is redundant and awkward.
@@ -1026,7 +1074,7 @@ components:
 
                             \    By setting searchCriteriaLabelPrefix to a
                             translation config object, we can explicitly define
-                            the desired prefix\ 
+                            the desired prefix
 
                             \    in the country-config > event.advancedSearch
                             configuration. For example: field(\"child.dob\", {
@@ -1045,32 +1093,45 @@ components:
                             \       In advanced search, we sometimes need to
                             override the default field visibility conditionals.
 
-                            \      \ 
 
                             \       For example, Informant fields in the
-                            declaration form may have conditional logic\ 
+                            declaration form may have conditional logic
 
                             \       that hides them based on other field values.
-                            Since the advanced search form reuses\ 
+                            Since the advanced search form reuses
 
                             \       the declaration form config, those same
                             conditionals would apply by default.
 
-                            \      \ 
 
                             \       However, in advanced search we often want to
                             make all Informant fields searchable,
 
                             \       regardless of their original visibility
-                            logic. To do this, we explicitly set their\ 
+                            logic. To do this, we explicitly set their
 
                             \       'conditionals' to an empty array ('[]') in
-                            the search config. This ensures they\ 
+                            the search config. This ensures they
 
                             \       are always rendered in the advanced search
                             form.
 
                             \      "
+                        validations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              validator:
+                                $ref: "#/components/schemas/Conditional"
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - validator
+                              - message
+                          default: *a4
+                          description: In advanced search, we sometimes need to override the default field
+                            validations.
                         fieldId:
                           type: string
                           enum:
@@ -1184,7 +1245,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: &a8 []
+          default: &a9 []
         draft:
           type: boolean
         type:
@@ -1232,7 +1293,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a4 []
+              default: &a5 []
             required:
               type: boolean
               default: false
@@ -1250,7 +1311,7 @@ components:
                 required:
                   - validator
                   - message
-              default: &a5 []
+              default: &a6 []
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1371,7 +1432,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1389,7 +1450,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1444,7 +1505,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1462,7 +1523,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1512,7 +1573,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1530,7 +1591,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1586,7 +1647,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1604,7 +1665,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1650,7 +1711,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1668,7 +1729,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1727,7 +1788,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1745,7 +1806,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1768,7 +1829,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a6
+                      enum: &a7
                         - reg12
                         - reg14
                         - reg16
@@ -1802,7 +1863,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1820,7 +1881,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1885,7 +1946,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1903,7 +1964,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1930,7 +1991,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a6
+                      enum: *a7
               default: {}
           required:
             - id
@@ -1957,7 +2018,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1975,7 +2036,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2013,7 +2074,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2031,7 +2092,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2085,7 +2146,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2103,7 +2164,194 @@ components:
                 required:
                   - validator
                   - message
+              default: *a6
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            type:
+              type: string
+              enum:
+                - NAME
+            defaultValue:
+              type: object
+              properties:
+                firstname:
+                  type: string
+                  minLength: 1
+                surname:
+                  type: string
+                  minLength: 1
+              required:
+                - firstname
+                - surname
+            configuration:
+              type: object
+              properties:
+                maxLength:
+                  type: number
+                  description: Maximum length of the text
+                prefix:
+                  $ref: "#/components/schemas/TranslationConfig"
+                postfix:
+                  $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - id
+            - label
+            - type
+          description: Name input field
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
               default: *a5
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a6
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            defaultValue:
+              type: string
+              minLength: 1
+            type:
+              type: string
+              enum:
+                - PHONE
+          required:
+            - id
+            - label
+            - type
+          description: Phone input field
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a5
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a6
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            defaultValue:
+              type: string
+              minLength: 1
+            type:
+              type: string
+              enum:
+                - ID
+          required:
+            - id
+            - label
+            - type
+          description: ID input field
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a5
+            required:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2140,7 +2388,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2158,7 +2406,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2194,7 +2442,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a7
+                    enum: &a8
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -2240,7 +2488,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2258,7 +2506,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2296,7 +2544,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2314,7 +2562,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2373,7 +2621,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2391,7 +2639,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2425,7 +2673,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2443,7 +2691,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2481,7 +2729,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2499,7 +2747,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2537,7 +2785,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2555,7 +2803,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2593,7 +2841,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2611,7 +2859,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2640,7 +2888,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a7
+                    enum: *a8
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2671,7 +2919,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2689,7 +2937,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2734,7 +2982,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2752,7 +3000,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2809,7 +3057,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a7
+                    enum: *a8
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2839,7 +3087,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2857,7 +3105,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2984,7 +3232,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3047,7 +3295,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3110,7 +3358,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3156,7 +3404,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3202,7 +3450,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3248,7 +3496,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3311,7 +3559,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3357,7 +3605,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3497,7 +3745,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3597,7 +3845,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3643,7 +3891,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3899,6 +4147,9 @@ components:
                     type: string
                   transactionId:
                     type: string
+                  createdByUserType:
+                    type: string
+                    enum: *a10
                   createdAt:
                     type: string
                     format: date-time
@@ -3921,10 +4172,11 @@ components:
                     type: string
                   type:
                     type: string
-                    enum: *a9
+                    enum: *a11
                 required:
                   - id
                   - transactionId
+                  - createdByUserType
                   - createdAt
                   - createdBy
                   - createdByRole
@@ -3981,6 +4233,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4143,6 +4398,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -4291,9 +4561,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: &a10
+          enum: &a12
             - Requested
             - Accepted
             - Rejected
@@ -4306,6 +4591,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4319,6 +4605,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4481,6 +4770,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -4629,9 +4933,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -4641,6 +4960,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4654,6 +4974,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4816,6 +5139,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -4964,9 +5302,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -4988,6 +5341,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5002,6 +5356,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5164,6 +5521,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -5312,9 +5684,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -5324,6 +5711,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5337,6 +5725,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5499,6 +5890,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -5647,9 +6053,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -5671,6 +6092,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5685,6 +6107,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5847,6 +6272,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -5995,9 +6435,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -6007,6 +6462,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6020,6 +6476,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6182,6 +6641,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -6330,9 +6804,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -6344,6 +6833,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6357,6 +6847,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6519,6 +7012,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -6667,9 +7175,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -6679,6 +7202,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6692,6 +7216,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6854,6 +7381,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -7002,9 +7544,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -7016,6 +7573,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7030,6 +7588,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7192,6 +7753,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -7340,9 +7916,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -7352,6 +7943,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7365,6 +7957,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7527,6 +8122,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -7675,9 +8285,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -7689,6 +8314,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7703,6 +8329,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7865,6 +8494,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -8013,9 +8657,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -8027,6 +8686,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8041,6 +8701,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8203,6 +8866,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -8351,9 +9029,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -8365,6 +9058,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8379,6 +9073,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8541,6 +9238,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -8689,9 +9401,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -8701,6 +9428,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8714,6 +9442,9 @@ components:
           type: string
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8876,6 +9607,21 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         annotation:
           type: object
           additionalProperties:
@@ -9024,9 +9770,24 @@ components:
                   - addressType
                   - state
                   - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
         status:
           type: string
-          enum: *a10
+          enum: *a12
         originalActionId:
           type: string
         type:
@@ -9036,6 +9797,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -9076,6 +9838,8 @@ components:
     QueryExpression:
       type: object
       properties:
+        id:
+          type: string
         eventType:
           type: string
         status:
@@ -9092,6 +9856,8 @@ components:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
+        legalStatus.REGISTERED.registrationNumber:
+          $ref: "#/components/schemas/Exact"
         createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
@@ -9102,6 +9868,9 @@ components:
             - $ref: "#/components/schemas/Exact"
         assignedTo:
           $ref: "#/components/schemas/Exact"
+        createdByUserType:
+          type: string
+          enum: *a10
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -9127,15 +9896,7 @@ components:
           type: array
           items:
             type: string
-            enum: &a11
-              - CREATED
-              - NOTIFIED
-              - DECLARED
-              - VALIDATED
-              - REGISTERED
-              - CERTIFIED
-              - REJECTED
-              - ARCHIVED
+            enum: *a13
       required:
         - type
         - terms
@@ -9148,14 +9909,14 @@ components:
             - exact
         term:
           type: string
-          enum: *a11
+          enum: *a13
       required:
         - type
         - term
     DateCondition:
       anyOf:
-        - $ref: "#/components/schemas/Exact"
-        - $ref: "#/components/schemas/Range"
+        - $ref: "#/components/schemas/ExactDate"
+        - $ref: "#/components/schemas/RangeDate"
     Exact:
       type: object
       properties:
@@ -9165,6 +9926,22 @@ components:
             - exact
         term:
           type: string
+      required:
+        - type
+        - term
+    ExactDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - term
@@ -9179,6 +9956,29 @@ components:
           type: string
         lte:
           type: string
+      required:
+        - type
+        - gte
+        - lte
+    RangeDate:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - range
+        gte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
+        lte:
+          anyOf:
+            - type: string
+              format: date
+            - type: string
+              format: date-time
       required:
         - type
         - gte
@@ -9264,15 +10064,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum:
-            - CREATED
-            - NOTIFIED
-            - DECLARED
-            - VALIDATED
-            - REGISTERED
-            - CERTIFIED
-            - REJECTED
-            - ARCHIVED
+          enum: *a13
         legalStatuses:
           type: object
           properties:
@@ -9291,6 +10083,14 @@ components:
                   type: string
                   nullable: true
                   description: Location of the user who created the action request.
+                createdByUserType:
+                  type: string
+                  nullable: true
+                  enum:
+                    - user
+                    - system
+                    - null
+                  description: Whether the user is a normal user or a system.
                 acceptedAt:
                   type: string
                   format: date-time
@@ -9322,6 +10122,14 @@ components:
                   type: string
                   nullable: true
                   description: Location of the user who created the action request.
+                createdByUserType:
+                  type: string
+                  nullable: true
+                  enum:
+                    - user
+                    - system
+                    - null
+                  description: Whether the user is a normal user or a system.
                 acceptedAt:
                   type: string
                   format: date-time
@@ -9356,9 +10164,17 @@ components:
         createdBy:
           type: string
           description: ID of the user who created the event.
+        createdByUserType:
+          type: string
+          nullable: true
+          enum:
+            - user
+            - system
+            - null
+          description: Whether the user is a normal user or a system.
         updatedByUserRole:
           type: string
-          description: Role of the user who last updated the declaration.
+          description: Role of the user who last changed the status.
         createdAtLocation:
           type: string
           nullable: true
@@ -9370,11 +10186,12 @@ components:
         updatedAtLocation:
           type: string
           nullable: true
-          description: Location of the user who last updated the declaration.
+          description: Location of the user who last changed the status.
         updatedAt:
           type: string
           format: date-time
-          description: Timestamp of the most recent declaration update.
+          description: Timestamp of the most recent *accepted* status change. Possibly 3rd
+            party update, if action is validation asynchronously.
         assignedTo:
           type: string
           nullable: true
@@ -9382,7 +10199,7 @@ components:
         updatedBy:
           type: string
           nullable: true
-          description: ID of the user who last updated the declaration.
+          description: ID of the user who last changed the status.
         trackingId:
           type: string
           description: System-generated tracking ID used by informants or registrars to
@@ -9533,6 +10350,32 @@ components:
                   - addressType
                   - state
                   - district2
+              - type: object
+                properties:
+                  firstname:
+                    type: string
+                  surname:
+                    type: string
+                  middlename:
+                    type: string
+                required:
+                  - firstname
+                  - surname
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type: string
+                            nullable: true
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
       required:
         - id
         - type
