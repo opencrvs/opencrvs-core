@@ -14,6 +14,7 @@ import { TRPCError } from '@trpc/server'
 import {
   findScope,
   getScopes,
+  SearchScopeAccessLevels,
   WorkqueueConfig,
   WorkqueueCountInput,
   WorkqueueCountOutput
@@ -46,7 +47,10 @@ export const workqueueRouter = router({
       if (!searchScope) {
         throw new TRPCError({ code: 'FORBIDDEN' })
       }
-      const searchScopeOptions = searchScope.options
+      const searchScopeOptions = searchScope.options as Record<
+        string,
+        SearchScopeAccessLevels
+      >
       return getEventCount(
         options.input,
         await getEventConfigurations(options.ctx.token),

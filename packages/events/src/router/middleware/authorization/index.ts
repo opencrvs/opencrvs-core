@@ -25,11 +25,10 @@ import {
   TokenUserType,
   WorkqueueCountInput,
   ConfigurableScopeType,
-  ConfigurableScopes,
   IAuthHeader,
-  EventDocument
+  EventDocument,
+  ConfigurableFlattenedScopes
 } from '@opencrvs/commons'
-import { QueryType } from '@opencrvs/commons/events'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
 
@@ -50,7 +49,9 @@ export function setBearerForToken(token: string) {
  * @param scopes - Array of configurable scopes with options
  * @returns Object containing authorized events
  */
-function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
+function getAuthorizedEntitiesFromScopes(
+  scopes: ConfigurableFlattenedScopes[]
+) {
   const authorizedEvents = scopes
     .flatMap(({ options }) => {
       if ('event' in options) {
@@ -246,26 +247,16 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
 
-  const availableWorkqueues = findScope(scopes, 'workqueue')?.options.id ?? []
+  const workqueueScope = findScope(scopes, 'workqueue')
+
+  if (!workqueueScope) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  const availableWorkqueues = workqueueScope.options.id
 
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
-  return next()
-}
-
-export const requireSearchScope: MiddlewareFunction<
-  TrpcContext,
-  OpenApiMeta,
-  TrpcContext,
-  TrpcContext,
-  QueryType
-> = async ({ next, ctx }) => {
-  const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
-
-  if (!findScope(scopes, 'search')) {
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
   return next()
 }

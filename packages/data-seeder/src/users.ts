@@ -16,9 +16,10 @@ import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { EventConfig, joinURL } from '@opencrvs/commons'
 import {
-  getSearchScopeOptions,
+  rawConfigurableScopeRegex,
+  getScopeOptions,
   parseScope,
-  rawConfigurableScopeRegex
+  SearchScope
 } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 
@@ -289,8 +290,8 @@ async function validateScopes(scopes: string[], token: string) {
         rawScope.match(rawConfigurableScopeRegex) ?? []
 
       if (type === 'search') {
-        const options = getSearchScopeOptions(rawOptions)
-        if (!Object.keys(options).every((id) => eventIds.includes(id))) {
+        const options = getScopeOptions(rawOptions) as SearchScope['options']
+        if (!options.event.every((id) => eventIds.includes(id))) {
           raise(
             `Scope "${rawScope}" is not valid for the events: ${eventIds.join(', ')}`
           )

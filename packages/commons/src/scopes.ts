@@ -298,7 +298,7 @@ const LiteralScopes = z.union([
 // - user.create[role=first-role|second-role]
 // - record.notify[event=v2.birth]
 export const rawConfigurableScopeRegex =
-  /^([a-zA-Z\.]+)\[((?:\w+=[\w:.-]+(?:\|[\w:.-]+)*)(?:,[\w]+=[\w:.-]+(?:\|[\w:.-]+)*)*)\]$/
+  /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
 
@@ -332,8 +332,13 @@ const NotifyRecordScope = z.object({
 
 const SearchScope = z.object({
   type: z.literal('search'),
-  options: z.record(z.enum(['my-jurisdiction', 'all']))
+  options: z.object({
+    event: z.array(z.string()),
+    access: z.array(z.enum(['my-jurisdiction', 'all']))
+  })
 })
+
+export type SearchScope = z.infer<typeof SearchScope>
 
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
@@ -346,34 +351,57 @@ const ConfigurableScopes = z.discriminatedUnion('type', [
 export type ConfigurableScopeType = ConfigurableScopes['type']
 export type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
 
+type FlattenedSearchScope = {
+  type: 'search'
+  options: Record<string, string>
+}
+
+function flattenAndMergeScopes(
+  scopes: Extract<ConfigurableScopes, { type: 'search' }>[]
+): FlattenedSearchScope | null {
+  if (scopes.length === 0) return null
+
+  const type = scopes[0].type // all scopes have same `type`
+  const mergedOptions: Record<string, string> = {}
+
+  for (const scope of scopes) {
+    const entries = Object.entries(scope.options)
+
+    if (entries.length < 2) continue
+
+    // Assumes the first key (e.g., 'event') holds source values like ['birth', 'death']
+    const sourceValues = entries[0][1]
+
+    // Assumes the second key (e.g., 'access') holds corresponding target values like ['my-jurisdiction', 'all']
+    const targetValues = entries[1][1]
+
+    for (let i = 0; i < sourceValues.length; i++) {
+      mergedOptions[sourceValues[i]] = targetValues[i]
+    }
+  }
+
+  return { type, options: mergedOptions }
+}
+
+export type ConfigurableFlattenedScopes =
+  | Exclude<ConfigurableScopes, { type: 'search' }>
+  | FlattenedSearchScope
+
 export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
 ) {
   const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
-  return parsedScopes.find(
-    (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
-      parsedScope?.type === scopeType
+  const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
+  const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
+  const mergedSearchScope = flattenAndMergeScopes(searchScopes) as {
+    type: 'search'
+    options: Record<string, string>
+  }
+  return [...otherScopes, mergedSearchScope].find(
+    (scope): scope is Extract<ConfigurableFlattenedScopes, { type: T }> =>
+      scope?.type === scopeType
   )
-}
-
-/**
- * Parses a raw options string from a search scope into an object.
- * @param {string} rawOptions - The raw options string to parse
- * @returns {Record<string, string>} An object mapping option keys to their values
- * @example
- * getSearchScopeOptions("id=tennis-club-membership:my-jurisdiction|v2-birth:all")
- * // Returns: { 'tennis-club-membership': "my-jurisdiction", 'v2-birth': "all" }
- */
-export function getSearchScopeOptions(rawOptions: string) {
-  return rawOptions
-    .split('=')[1]
-    .split('|')
-    .reduce((acc: Record<string, string>, option) => {
-      const [key, value] = option.split(':')
-      acc[key] = value
-      return acc
-    }, {})
 }
 
 /**
@@ -381,7 +409,7 @@ export function getSearchScopeOptions(rawOptions: string) {
  * @param rawOptions - The raw string, e.g. "event=v2.birth|club-reg,all"
  * @returns An object like: { event: ['v2.birth', 'club-reg'], access: ['all'] }
  */
-function getScopeOptions(rawOptions: string) {
+export function getScopeOptions(rawOptions: string) {
   return rawOptions
     .split(',')
     .reduce((acc: Record<string, string[]>, option) => {
@@ -417,10 +445,7 @@ export function parseScope(scope: string) {
 
   // Different options are separated by commas, and each option value is separated by a pipe e.g.:
   // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
-  const options =
-    type === 'search'
-      ? getSearchScopeOptions(rawOptions)
-      : getScopeOptions(rawOptions)
+  const options = getScopeOptions(rawOptions)
 
   const parsedScope = {
     type,
