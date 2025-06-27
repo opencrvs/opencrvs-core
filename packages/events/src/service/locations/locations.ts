@@ -10,59 +10,41 @@
  */
 
 import { z } from 'zod'
-import * as _ from 'lodash'
-import * as events from '@events/storage/mongodb/events'
+import { UUID } from '@opencrvs/commons'
+import * as locationsRepo from '@events/storage/postgres/events/locations'
 
 export const Location = z.object({
-  id: z.string(),
+  id: UUID,
   externalId: z.string().nullable(),
   name: z.string(),
-  partOf: z.string().nullable()
+  partOf: UUID.nullable()
 })
 
 export type Location = z.infer<typeof Location>
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
- * Clears all existing locations that are not in the incoming locations.
- *
- * @TODO: Consider removing the conditional logic after setting up dev environments for all devs.
- * In production it is run only once, and without transactions it is possible that the locations are not set correctly.
- *
  * @param incomingLocations - Locations to be set
  */
+
 export async function setLocations(incomingLocations: Array<Location>) {
-  const db = await events.getClient()
-  const currentLocations = await db
-    .collection<Location>('locations')
-    .find()
-    .toArray()
-
-  const [locationsToKeep, locationsToRemove] = _.partition(
-    currentLocations,
-    (location) =>
-      incomingLocations.some(
-        (incomingLocation) => incomingLocation.id === location.id
-      )
+  return locationsRepo.setLocations(
+    incomingLocations.map(({ id, externalId, name, partOf }) => ({
+      id,
+      externalId,
+      name,
+      parentId: partOf
+    }))
   )
-
-  const [, newLocations] = _.partition(incomingLocations, (location) =>
-    locationsToKeep.some((l) => l.id === location.id)
-  )
-
-  if (locationsToRemove.length > 0) {
-    await db
-      .collection('locations')
-      .deleteMany({ id: { $in: locationsToRemove.map((l) => l.id) } })
-  }
-
-  if (newLocations.length > 0) {
-    await db.collection('locations').insertMany(newLocations)
-  }
 }
 
 export const getLocations = async () => {
-  const db = await events.getClient()
+  const locations = await locationsRepo.getLocations()
 
-  return db.collection<Location>('locations').find().toArray()
+  return locations.map(({ id, externalId, name, parentId }) => ({
+    id,
+    externalId,
+    name,
+    partOf: parentId
+  }))
 }

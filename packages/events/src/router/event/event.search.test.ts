@@ -32,7 +32,6 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { indexAllEvents } from '@events/service/indexing/indexing'
 
 test('Throws error without proper scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -202,10 +201,11 @@ test('Throws when one of the date range fields has invalid date', async () => {
 })
 
 test('Returns events based on the updatedAt column', async () => {
-  const { user, generator, seed, eventsDb } = await setupTestCase()
+  const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
     SCOPES.SEARCH_BIRTH,
+    SCOPES.RECORD_IMPORT,
     ...TEST_USER_DEFAULT_SCOPES
   ])
 
@@ -214,6 +214,7 @@ test('Returns events based on the updatedAt column', async () => {
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE,
+    user,
     defaults: {
       createdAt: oldEventCreatedAt
     }
@@ -226,6 +227,7 @@ test('Returns events based on the updatedAt column', async () => {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action,
+      user,
       defaults: {
         status: ActionStatus.Requested
       }
@@ -246,8 +248,7 @@ test('Returns events based on the updatedAt column', async () => {
     updatedAt: new Date().toISOString()
   }
 
-  await seed.event(eventsDb, user, oldDocumentWithoutAcceptedDeclaration)
-  await indexAllEvents(tennisClubMembershipEvent)
+  await client.event.import(oldDocumentWithoutAcceptedDeclaration)
 
   const newlyCreatedEvent = await client.event.create(generator.event.create())
   const newlyCreatedEvent2 = await client.event.create(generator.event.create())

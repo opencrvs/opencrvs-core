@@ -13,6 +13,7 @@ import {
   DeduplicationConfig,
   EventIndex,
   getUUID,
+  UUID,
   TokenUserType
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
@@ -186,8 +187,8 @@ async function findDuplicates(
       createdAt: '2025-01-01',
       createdBy: 'test',
       createdByUserType: TokenUserType.Enum.user,
-      createdAtLocation: 'test',
-      updatedAtLocation: 'test',
+      createdAtLocation: 'test' as UUID,
+      updatedAtLocation: 'test' as UUID,
       legalStatuses: {},
       assignedTo: 'test',
       updatedAt: '2025-01-01',
@@ -263,14 +264,14 @@ describe('deduplication tests', () => {
       {
         declaration: {},
         // Random field values that should not affect the search
-        id: '123-123-123-123',
+        id: '123-123-123-123' as UUID,
         type: 'birth',
         status: 'CREATED',
         createdAt: '2025-01-01',
         createdBy: 'test',
         createdByUserType: TokenUserType.Enum.user,
-        createdAtLocation: 'test',
-        updatedAtLocation: 'test',
+        createdAtLocation: 'test' as UUID,
+        updatedAtLocation: 'test' as UUID,
         legalStatuses: {},
         assignedTo: 'test',
         updatedAt: '2025-01-01',

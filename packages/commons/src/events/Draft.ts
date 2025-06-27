@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { ActionBase, ActionStatus } from './ActionDocument'
 import { BaseActionInput } from './ActionInput'
 import { ActionTypes } from './ActionType'
+import { UUID } from '../uuid'
 
 /*
  * A temporary storage for an action.
@@ -20,8 +21,8 @@ import { ActionTypes } from './ActionType'
  * Drafts are deleted when the action is committed.
  */
 export const Draft = z.object({
-  id: z.string(),
-  eventId: z.string(),
+  id: UUID,
+  eventId: UUID,
   transactionId: z.string(),
   createdAt: z.string().datetime(),
   action: ActionBase.extend({

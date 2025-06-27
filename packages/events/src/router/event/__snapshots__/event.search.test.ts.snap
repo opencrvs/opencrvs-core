@@ -231,7 +231,7 @@ exports[`Returns relevant events in right order 2`] = `
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
       "createdByUserType": "[sanitized]",
-      "registrationNumber": "1234567890AB",
+      "registrationNumber": "[sanitized]",
     },
   },
   "status": "REGISTERED",
