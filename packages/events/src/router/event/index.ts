@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
+import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -19,7 +19,6 @@ import {
   ApproveCorrectionActionInput,
   AssignActionInput,
   CONFIG_GET_ALLOWED_SCOPES,
-  CONFIG_SEARCH_ALLOWED_SCOPES,
   DeleteActionInput,
   Draft,
   DraftInput,
@@ -31,7 +30,8 @@ import {
   RequestCorrectionActionInput,
   UnassignActionInput,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  QueryType
+  QueryType,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -269,12 +269,31 @@ export const eventRouter = router({
         path: '/events/search'
       }
     })
-    .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
+    // @todo: remove legacy scopes once all users are configured with new search scopes
+    .use(requiresAnyOfScopes([], ['search']))
     .input(QueryType)
     .output(z.array(EventIndex))
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
-      return getIndex(input, eventConfigs)
+      const scopes = getScopes({ Authorization: ctx.token })
+
+      const searchScope = findScope(scopes, 'search')
+
+      // Only to satisfy type checking, as findScope will return undefined if no scope is found
+      if (!searchScope) {
+        throw new Error('No search scope provided')
+      }
+      const searchScopeOptions = searchScope.options as Record<
+        string,
+        SearchScopeAccessLevels
+      >
+
+      return getIndex(
+        input,
+        eventConfigs,
+        searchScopeOptions,
+        ctx.user.primaryOfficeId
+      )
     }),
   import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))

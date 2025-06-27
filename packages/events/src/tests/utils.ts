@@ -269,7 +269,7 @@ function actionToClientAction(
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions: ActionType[]
+  actions?: Exclude<ActionType, typeof ActionType.CREATE>[]
 ): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
 
@@ -283,7 +283,7 @@ export async function createEvent(
   // @ts-expect-error -- createEvent does not accept any arguments
   createdEvent = await createAction()
 
-  for (const action of actions) {
+  for (const action of actions ?? []) {
     const clientAction = actionToClientAction(client, generator, action)
     createdEvent = await clientAction(createdEvent.id)
   }

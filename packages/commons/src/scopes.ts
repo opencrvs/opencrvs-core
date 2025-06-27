@@ -297,7 +297,7 @@ const LiteralScopes = z.union([
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
 // - record.notify[event=v2.birth]
-const rawConfigurableScopeRegex =
+export const rawConfigurableScopeRegex =
   /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
@@ -330,25 +330,93 @@ const NotifyRecordScope = z.object({
   })
 })
 
+const SearchScope = z.object({
+  type: z.literal('search'),
+  options: z.object({
+    event: z.array(z.string()),
+    access: z.array(z.enum(['my-jurisdiction', 'all']))
+  })
+})
+
+export type SearchScope = z.infer<typeof SearchScope>
+
 const ConfigurableScopes = z.discriminatedUnion('type', [
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  NotifyRecordScope
+  NotifyRecordScope,
+  SearchScope
 ])
 
 export type ConfigurableScopeType = ConfigurableScopes['type']
 export type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
+
+type FlattenedSearchScope = {
+  type: 'search'
+  options: Record<string, string>
+}
+
+function flattenAndMergeScopes(
+  scopes: Extract<ConfigurableScopes, { type: 'search' }>[]
+): FlattenedSearchScope | null {
+  if (scopes.length === 0) return null
+
+  const type = scopes[0].type // all scopes have same `type`
+  const mergedOptions: Record<string, string> = {}
+
+  for (const scope of scopes) {
+    const entries = Object.entries(scope.options)
+
+    if (entries.length < 2) continue
+
+    // Assumes the first key (e.g., 'event') holds source values like ['birth', 'death']
+    const sourceValues = entries[0][1]
+
+    // Assumes the second key (e.g., 'access') holds corresponding target values like ['my-jurisdiction', 'all']
+    const targetValues = entries[1][1]
+
+    for (let i = 0; i < sourceValues.length; i++) {
+      mergedOptions[sourceValues[i]] = targetValues[i]
+    }
+  }
+
+  return { type, options: mergedOptions }
+}
+
+export type ConfigurableFlattenedScopes =
+  | Exclude<ConfigurableScopes, { type: 'search' }>
+  | FlattenedSearchScope
 
 export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
 ) {
   const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
-  return parsedScopes.find(
-    (parsedScope): parsedScope is Extract<ConfigurableScopes, { type: T }> =>
-      parsedScope?.type === scopeType
+  const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
+  const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
+  const mergedSearchScope = flattenAndMergeScopes(searchScopes) as {
+    type: 'search'
+    options: Record<string, string>
+  }
+  return [...otherScopes, mergedSearchScope].find(
+    (scope): scope is Extract<ConfigurableFlattenedScopes, { type: T }> =>
+      scope?.type === scopeType
   )
+}
+
+/**
+ * Parses a raw options string for non-search scopes (e.g., workqueues).
+ * @param rawOptions - The raw string, e.g. "event=v2.birth|club-reg,all"
+ * @returns An object like: { event: ['v2.birth', 'club-reg'], access: ['all'] }
+ */
+export function getScopeOptions(rawOptions: string) {
+  return rawOptions
+    .split(',')
+    .reduce((acc: Record<string, string[]>, option) => {
+      const [key, value] = option.split('=')
+      acc[key] = value.split('|')
+      return acc
+    }, {})
 }
 
 /**
@@ -377,13 +445,7 @@ export function parseScope(scope: string) {
 
   // Different options are separated by commas, and each option value is separated by a pipe e.g.:
   // record.digitise[event=v2.birth|tennis-club-membership, my-jurisdiction]
-  const options = rawOptions
-    .split(',')
-    .reduce((acc: Record<string, string[]>, option) => {
-      const [key, value] = option.split('=')
-      acc[key] = value.split('|')
-      return acc
-    }, {})
+  const options = getScopeOptions(rawOptions)
 
   const parsedScope = {
     type,
@@ -405,7 +467,7 @@ export function parseScope(scope: string) {
  * })
  * // Returns: "record.notify[event=v2.birth|tennis-club-membership]"
  */
-export function stringifyScope(scope: ConfigurableScopes) {
+export function stringifyScope(scope: z.infer<typeof NotifyRecordScope>) {
   const options = Object.entries(scope.options)
     .map(([key, value]) => `${key}=${value.join('|')}`)
     .join(',')

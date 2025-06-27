@@ -14,6 +14,7 @@ import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
 import { parse as parseQuery, stringify } from 'query-string'
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
+import { useSelector } from 'react-redux'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -29,10 +30,12 @@ import {
   QueryExpression,
   NameFieldValue
 } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
 import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { getScope } from '@client/profile/profileSelectors'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -561,6 +564,20 @@ export function buildQuickSearchQuery(
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
 }
 
+/**
+ * @returns a boolean indicating whether the current user has the scope to search for an event
+ */
+export function checkScopeForEventSearch(eventId: string) {
+  const scopes = useSelector(getScope)
+  const searchScopes = findScope(scopes ?? [], 'search')
+
+  const isEventSearchAllowed =
+    searchScopes &&
+    Object.keys(searchScopes.options).some((id) => eventId === id)
+
+  return isEventSearchAllowed
+}
+
 function serializeValue(value: unknown) {
   if (isArray(value)) {
     return value.length > 0
@@ -591,8 +608,6 @@ export function serializeSearchParams(
   )
   return stringify(simplifiedValue, { skipEmptyString: true })
 }
-
-/* eslint-disable max-lines */
 
 function tryParse(value: unknown): unknown {
   if (!isString(value)) {

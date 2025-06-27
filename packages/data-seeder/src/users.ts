@@ -14,8 +14,13 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { joinURL } from '@opencrvs/commons'
-import { parseScope } from '@opencrvs/commons/authentication'
+import { EventConfig, joinURL } from '@opencrvs/commons'
+import {
+  rawConfigurableScopeRegex,
+  getScopeOptions,
+  parseScope,
+  SearchScope
+} from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
@@ -119,6 +124,7 @@ async function getUsers(token: string) {
   }
 
   const allRoles = parsedRoles.data
+  validateScopes([...new Set(allRoles.flatMap((role) => role.scopes))], token)
 
   let isConfigUpdateAllScopeAvailable = false
   const configScope = 'config.update:all' as const
@@ -261,4 +267,36 @@ export async function seedUsers(token: string) {
 
     parseGQLResponse(jsonRes)
   }
+}
+
+async function validateScopes(scopes: string[], token: string) {
+  const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
+  const eventsUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'events')
+  const eventsResponse = await fetch(eventsUrl, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  const eventsConfig = (await eventsResponse.json()) as EventConfig[]
+  const eventIds = eventsConfig.map((event) => event.id)
+
+  scopes.forEach((scope) => {
+    const maybeConfigurableScope = rawConfigurableScope.safeParse(scope)
+    const rawScope = maybeConfigurableScope.data
+
+    if (rawScope) {
+      const [, type, rawOptions] =
+        rawScope.match(rawConfigurableScopeRegex) ?? []
+
+      if (type === 'search') {
+        const options = getScopeOptions(rawOptions) as SearchScope['options']
+        if (!options.event.every((id) => eventIds.includes(id))) {
+          raise(
+            `Scope "${rawScope}" is not valid for the events: ${eventIds.join(', ')}`
+          )
+        }
+      }
+    }
+  })
 }
