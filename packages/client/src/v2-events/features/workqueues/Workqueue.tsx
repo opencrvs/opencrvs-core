@@ -29,6 +29,7 @@ import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useWorkqueueConfigurations } from '../events/useWorkqueueConfiguration'
 import { useOutbox } from '../events/useEvents/outbox'
 import { Outbox } from './Outbox'
+import { Draft } from './Draft'
 
 const FabContainer = styled.div`
   position: fixed;
@@ -60,7 +61,7 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
     <SearchResultComponent
-      key={workqueueSlug}
+      key={`${workqueueSlug}-${outbox.length}`}
       actions={actions}
       columns={workqueueConfig.columns}
       eventConfigs={eventConfigs}
@@ -75,6 +76,9 @@ function WorkqueueContent() {
   const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   if (workqueueSlug === CoreWorkqueues.OUTBOX) {
     return <Outbox />
+  }
+  if (workqueueSlug === CoreWorkqueues.DRAFT) {
+    return <Draft />
   }
   return <ConfigurableWorkqueue workqueueSlug={workqueueSlug} />
 }
