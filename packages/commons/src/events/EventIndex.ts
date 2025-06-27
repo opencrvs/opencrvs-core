@@ -120,16 +120,6 @@ const RangeDate = z
       'IANA time zone for date range. If not provided, UTC will be used.'
     )
   })
-  .or(
-    z.object({
-      type: z.literal('range'),
-      lte: z.string().date(),
-      gt: z.string().date(),
-      timezone: IanaTimezone.optional().describe(
-        'IANA time zone for date range. If not provided, UTC will be used.'
-      )
-    })
-  )
   .openapi({ ref: 'RangeDate' })
 
 export const ExactDate = Exact.extend({

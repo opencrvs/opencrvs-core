@@ -20,7 +20,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { SearchCriteriaPanel } from '@client/v2-events/features/events/Search/SearchCriteriaPanel'
 import { SearchResultComponent } from './SearchResult'
 import {
-  buildDataCondition,
+  buildSearchQuery,
   toAdvancedSearchQueryType,
   parseFieldSearchParams,
   deserializeSearchParams
@@ -37,15 +37,11 @@ export const SearchResultIndex = () => {
     deserializeSearchParams(location.search)
   )
 
-  const filteredSearchParams = parseFieldSearchParams(eventConfig, searchParams)
-
-  const formattedSearchParams = buildDataCondition(
-    filteredSearchParams,
-    eventConfig
-  )
+  const validSearchParams = parseFieldSearchParams(eventConfig, searchParams)
+  const searchQuery = buildSearchQuery(validSearchParams, eventConfig)
 
   const queryData = searchEvent.useSuspenseQuery(
-    toAdvancedSearchQueryType(formattedSearchParams, eventType)
+    toAdvancedSearchQueryType(searchQuery, eventType)
   )
 
   return (

@@ -18,8 +18,8 @@ import { joinValues } from '@client/v2-events/utils'
 import {
   getAdvancedSearchFieldErrors,
   flattenFieldErrors,
-  getDefaultSearchFields,
-  buildDataCondition,
+  getMetadataFieldConfigs,
+  buildSearchQuery,
   serializeSearchParams,
   deserializeSearchParams
 } from './utils'
@@ -92,8 +92,8 @@ describe('flattenFieldErrors', () => {
 
 describe('getDefaultSearchFields', () => {
   it('should generate default search field configurations for known field IDs', () => {
-    const fields = getDefaultSearchFields(
-      tennisClubMembershipEvent.advancedSearch[0]
+    const fields = getMetadataFieldConfigs(
+      tennisClubMembershipEvent.advancedSearch[0].fields
     )
     const ids = fields.map((f) => f.id)
     expect(ids).toContain('event.legalStatuses.REGISTERED.createdAtLocation')
@@ -106,7 +106,7 @@ describe('getDefaultSearchFields', () => {
 describe('buildDataCondition', () => {
   it('should return anyOf condition for status=ALL', () => {
     const state = { 'event.status': 'ALL' }
-    const result = buildDataCondition(state, tennisClubMembershipEvent)
+    const result = buildSearchQuery(state, tennisClubMembershipEvent)
     const eventStatusField = joinValues(
       'event.status'.split('.'),
       FIELD_SEPARATOR
@@ -131,7 +131,7 @@ describe('buildDataCondition', () => {
     const state = {
       'event.legalStatuses.REGISTERED.createdAtLocation': 'ABC123'
     }
-    const result = buildDataCondition(state, tennisClubMembershipEvent)
+    const result = buildSearchQuery(state, tennisClubMembershipEvent)
     const field = joinValues(
       'event.legalStatuses.REGISTERED.createdAtLocation'.split('.'),
       FIELD_SEPARATOR

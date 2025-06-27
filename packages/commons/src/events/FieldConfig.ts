@@ -20,7 +20,8 @@ import {
   NonEmptyTextValue,
   TextValue,
   DateRangeFieldValue,
-  SignatureFieldValue
+  SignatureFieldValue,
+  SelectDateRangeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -170,11 +171,14 @@ const DateField = BaseField.extend({
       ).optional()
     })
     .optional()
-}).describe('A single date input (dd-mm-YYYY)')
+}).describe('A single date input (yyyy-MM-dd)')
 
 export type DateField = z.infer<typeof DateField>
 
-const DateRangeField = BaseField.extend({
+/**
+ * For internal use only. Needed for search functionality.
+ */
+export const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
   defaultValue: DateRangeFieldValue.optional(),
   configuration: z
@@ -184,9 +188,7 @@ const DateRangeField = BaseField.extend({
       ).optional()
     })
     .optional()
-}).describe(
-  'A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY })'
-)
+}).describe('A date range input ({ start: yyyy-MM-dd, end: yyyy-MM-dd })')
 
 export type DateRangeField = z.infer<typeof DateRangeField>
 
@@ -301,6 +303,22 @@ const Select = BaseField.extend({
   defaultValue: TextValue.optional(),
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
+
+export const SelectDateRangeOption = z.object({
+  value: SelectDateRangeValue.describe('The value of the option'),
+  label: TranslationConfig.describe('The label of the option')
+})
+
+/**
+ * For internal use only. Needed for search functionality.
+ */
+export const SelectDateRangeField = BaseField.extend({
+  type: z.literal(FieldType.SELECT_DATE_RANGE),
+  defaultValue: SelectDateRangeOption.optional(),
+  options: z.array(SelectDateRangeOption).describe('A list of options')
+}).describe('Select input with date range options')
+
+export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
@@ -451,6 +469,7 @@ export type AllFields =
   | typeof TextAreaField
   | typeof DateField
   | typeof DateRangeField
+  | typeof SelectDateRangeField
   | typeof Paragraph
   | typeof RadioGroup
   | typeof BulletList
@@ -480,6 +499,7 @@ export type Inferred =
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof DateRangeField>
+  | z.infer<typeof SelectDateRangeField>
   | z.infer<typeof Paragraph>
   | z.infer<typeof RadioGroup>
   | z.infer<typeof BulletList>
@@ -541,6 +561,7 @@ export const FieldConfig = z
     TextAreaField,
     DateField,
     DateRangeField,
+    SelectDateRangeField,
     Paragraph,
     RadioGroup,
     BulletList,

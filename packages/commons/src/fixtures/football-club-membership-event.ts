@@ -407,8 +407,8 @@ export const footballClubMembershipEvent = defineConfig({
       fields: [
         event('legalStatuses.REGISTERED.createdAtLocation').exact(),
         event('legalStatuses.REGISTERED.acceptedAt').range(),
-        event('status').exact(statusOptions),
-        event('updatedAt').range(timePeriodOptions)
+        event('status').exact(),
+        event('updatedAt').range()
       ]
     },
     {

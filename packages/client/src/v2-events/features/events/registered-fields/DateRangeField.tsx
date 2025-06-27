@@ -10,15 +10,14 @@
  */
 
 import format from 'date-fns/format'
+import startOfMonth from 'date-fns/startOfDay'
+import addMonths from 'date-fns/addDays'
 import * as React from 'react'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useState } from 'react'
 import styled from 'styled-components'
-
-import startOfMonth from 'date-fns/startOfMonth'
 import subYears from 'date-fns/subYears'
-import { isDate } from 'lodash'
-import { DateRangeFieldValue, DateValue } from '@opencrvs/commons/client'
+import { DateRangeFieldValue } from '@opencrvs/commons/client'
 import {
   DateField as DateFieldComponent,
   IDateFieldProps as DateFieldProps
@@ -26,20 +25,11 @@ import {
 import { Checkbox, Link } from '@opencrvs/components'
 import { DateRangePicker } from '@client/components/DateRangePicker'
 
-interface IDateRangePickerValue {
+interface DateRangeInternalValue {
   exact?: string
-  rangeStart?: string
-  rangeEnd?: string
+  start?: string
+  end?: string
   isDateRangeActive?: boolean
-}
-interface IDateRange {
-  startDate?: Date
-  endDate?: Date
-}
-
-interface IDateRangeFieldValue {
-  rangeStart?: string
-  rangeEnd?: string
 }
 
 const messages = defineMessages({
@@ -99,24 +89,21 @@ function formatDateRangeLabel(
   })
 }
 
-function extractDateValueFromProps(value?: DateRangeFieldValue) {
+function extractDateValueFromProps(
+  value?: DateRangeFieldValue
+): DateRangeInternalValue {
   const dateValue = DateRangeFieldValue.safeParse(value)
-  if (dateValue.success) {
-    if (Array.isArray(dateValue.data)) {
-      const [rangeStart, rangeEnd] = dateValue.data
-      return { exact: '', rangeStart, rangeEnd, isDateRangeActive: true }
-    }
-    return {
-      exact: dateValue.data,
-      rangeStart: undefined,
-      rangeEnd: undefined,
-      isDateRangeActive: false
-    }
+
+  if (typeof dateValue.data === 'object') {
+    const { start, end } = dateValue.data
+
+    return { exact: '', start, end, isDateRangeActive: true }
   }
+
   return {
-    exact: '',
-    rangeStart: undefined,
-    rangeEnd: undefined,
+    exact: dateValue.data ?? '',
+    start: undefined,
+    end: undefined,
     isDateRangeActive: false
   }
 }
@@ -125,12 +112,12 @@ function DateRangeInput({
   onChange,
   value,
   ...props
-}: DateFieldProps & {
+}: Omit<DateFieldProps, 'value'> & {
   onChange: (newValue: DateRangeFieldValue) => void
   value?: DateRangeFieldValue
 }) {
   const intl = useIntl()
-  const [dateValue, setDateValue] = useState<IDateRangePickerValue>(
+  const [dateRange, setDateRange] = useState<DateRangeInternalValue>(
     extractDateValueFromProps(value)
   )
   /**
@@ -147,18 +134,43 @@ function DateRangeInput({
 
   const handleExactDateChange = (val: string) => {
     cleanOnChange(val)
-    setDateValue({ ...dateValue, exact: val })
+    setDateRange({ ...dateRange, exact: val })
   }
 
-  const handleDateRangeChange = ({ startDate, endDate }: IDateRange) => {
-    const rangeStart = startDate && format(new Date(startDate), 'yyyy-MM-dd')
-    const rangeEnd = endDate && format(new Date(endDate), 'yyyy-MM-dd')
+  /**
+   * Takes the [inclusive, inclusive) date range and converts it to [inclusive, exclusive).
+   * By adopting the most popular convention of date ranges, we can use dates rather than timestamps going forward.
+   *
+   * The current implementation of the date range picker has known bugs: https://github.com/opencrvs/opencrvs-core/issues/7522
+   * We should avoid some of them by this strategy.
+   */
+  const handleDateRangeChange = ({
+    startDate,
+    endDate
+  }: {
+    startDate?: Date
+    endDate?: Date
+  }) => {
+    const exlusiveEndDate = endDate
+      ? // One of the known bugs is that by clicking multiple times the end date, it could change from end of month to the beginning of the month.
+        startOfMonth(addMonths(endDate, 1))
+      : undefined
+
+    const inclusiveStartDate = startDate && startOfMonth(startDate)
+
+    const rangeStart = inclusiveStartDate && format(startDate, 'yyyy-MM-dd')
+    const rangeEnd = exlusiveEndDate && format(exlusiveEndDate, 'yyyy-MM-dd')
+
     if (rangeStart && rangeEnd) {
-      onChange([rangeStart, rangeEnd])
-      setDateValue((d) => ({
+      onChange({
+        start: rangeStart,
+        end: rangeEnd
+      })
+
+      setDateRange((d) => ({
         ...d,
-        rangeStart,
-        rangeEnd,
+        start: rangeStart,
+        end: rangeEnd,
         isDateRangeActive: true
       }))
     }
@@ -170,14 +182,14 @@ function DateRangeInput({
     if (!event.target.checked) {
       onChange('')
     }
-    setDateValue((d) => ({
+    setDateRange((d) => ({
       ...d,
       isDateRangeActive: event.target.checked
     }))
   }
 
   const dateRangeLabel =
-    formatDateRangeLabel(intl, dateValue.rangeStart, dateValue.rangeEnd) ||
+    formatDateRangeLabel(intl, dateRange.start, dateRange.end) ||
     intl.formatMessage(messages.exactDateUnknown)
 
   return (
@@ -185,13 +197,13 @@ function DateRangeInput({
       <DateFieldComponent
         {...props}
         data-testid={`${props.id}`}
-        disabled={dateValue.isDateRangeActive}
-        value={dateValue.exact}
+        disabled={dateRange.isDateRangeActive}
+        value={dateRange.exact}
         onBlur={(e) => {
           const segmentType = String(e.target.id.split('-').pop())
           const val = e.target.value
-          const dateSegmentVals = dateValue.exact
-            ? dateValue.exact.split('-')
+          const dateSegmentVals = dateRange.exact
+            ? dateRange.exact.split('-')
             : val
 
           // Add possibly missing leading 0 for days and months
@@ -209,12 +221,12 @@ function DateRangeInput({
       />
 
       <DateRangeBody>
-        {dateValue.isDateRangeActive && (
+        {dateRange.isDateRangeActive && (
           <Checkbox
             id={props.id + '-date_range_checkbox'}
             label={dateRangeLabel || ''}
             name={props.id + 'date_range_toggle'}
-            selected={dateValue.isDateRangeActive}
+            selected={dateRange.isDateRangeActive}
             value={''}
             onChange={handleDateRangeActiveChange}
           />
@@ -224,7 +236,7 @@ function DateRangeInput({
           id={props.id + '-date_range_button'}
           onClick={handleLinkOnClick}
         >
-          {dateValue.isDateRangeActive
+          {dateRange.isDateRangeActive
             ? intl.formatMessage(messages.edit)
             : intl.formatMessage(messages.exactDateUnknown)}
         </NoShrinkLink>
@@ -234,12 +246,11 @@ function DateRangeInput({
             closeModalFromHOC={() => setModalVisible(false)}
             endDate={
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              (dateValue.rangeEnd && new Date(dateValue.rangeEnd)) ||
-              new Date(Date.now())
+              (dateRange.end && new Date(dateRange.end)) || new Date(Date.now())
             }
             startDate={
               // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-              (dateValue.rangeStart && new Date(dateValue.rangeStart)) ||
+              (dateRange.start && new Date(dateRange.start)) ||
               startOfMonth(subYears(new Date(Date.now()), 1))
             }
             usedInsideHOC={true}
@@ -251,21 +262,20 @@ function DateRangeInput({
   )
 }
 
-function DateRangeOutput({ value }: { value?: string | [string, string] }) {
+function DateRangeOutput({ value }: { value?: DateRangeFieldValue | string }) {
   const intl = useIntl()
   const parsed = DateRangeFieldValue.safeParse(value)
 
-  if (parsed.success) {
-    if (Array.isArray(parsed.data)) {
-      const dateRangeLabel =
-        formatDateRangeLabel(intl, parsed.data[0], parsed.data[1]) ||
-        intl.formatMessage(messages.exactDateUnknown)
+  if (typeof parsed.data === 'object') {
+    const dateRangeLabel =
+      formatDateRangeLabel(intl, parsed.data.start, parsed.data.end) ||
+      intl.formatMessage(messages.exactDateUnknown)
 
-      return dateRangeLabel
-    }
-    if (typeof parsed.data === 'string') {
-      return parsed.data
-    }
+    return dateRangeLabel
+  }
+
+  if (typeof parsed.data === 'string') {
+    return parsed.data
   }
 
   return String(value ?? '')

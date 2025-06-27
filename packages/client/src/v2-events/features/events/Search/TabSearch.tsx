@@ -35,7 +35,7 @@ import { defailtNameFieldValue } from '@client/v2-events/features/events/registe
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields,
+  getMetadataFieldConfigs,
   serializeSearchParams
 } from './utils'
 const MIN_PARAMS_TO_SEARCH = 2
@@ -147,7 +147,7 @@ function buildSearchSections({
   const allUniqueFields = getAllUniqueFields(enhancedEvent)
 
   return enhancedEvent.advancedSearch.map((section) => {
-    const metadataFields = getDefaultSearchFields(section)
+    const metadataFields = getMetadataFieldConfigs(section.fields)
 
     const matchingFields = allUniqueFields.filter((f) =>
       section.fields.some((searchField) => searchField.fieldId === f.id)

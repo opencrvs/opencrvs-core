@@ -187,6 +187,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
         break
 
       case 'flags':
+      case 'id':
       default:
         console.warn('Unsupported query field:', key)
         break

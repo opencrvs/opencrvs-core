@@ -103,7 +103,7 @@ const exactRegisteredAtLocationPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      'legalStatuses.REGISTERED.acceptedAtLocation': {
+      'legalStatuses.REGISTERED.createdAtLocation': {
         type: 'exact',
         term: 'some-location-id'
       },
@@ -199,7 +199,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with exact legalStatuses.REGISTERED.acceptedAtLocation', () => {
+  test('builds query with exact legalStatuses.REGISTERED.createdAtLocation', () => {
     const result = buildElasticQueryFromSearchPayload(
       exactRegisteredAtLocationPayload,
       [tennisClubMembershipEvent]
