@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: b4effe5e-7fbe-498d-8b0e-86382ec9bd19
+                transactionId: 6feac753-35de-45e7-9458-42bbb65fa972
                 type: v2.birth
       responses:
         "200":
@@ -458,7 +458,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 82db4ddf-1034-4390-bc6b-91b0eb6ee73e
+                transactionId: 2d2d0e49-2c95-4758-8dc7-db501a20f4ae
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -9996,11 +9996,7 @@ components:
         trackingId:
           $ref: "#/components/schemas/Exact"
         flags:
-          type: array
-          items:
-            anyOf:
-              - $ref: "#/components/schemas/AnyOf"
-              - $ref: "#/components/schemas/Not"
+          $ref: "#/components/schemas/ContainsFlags"
         data:
           $ref: "#/components/schemas/QueryInput"
     AnyOfStatus:
@@ -10113,32 +10109,33 @@ components:
       required:
         - type
         - location
-    AnyOf:
+    ContainsFlags:
       type: object
       properties:
-        type:
-          type: string
-          enum:
-            - anyOf
-        terms:
+        anyOf:
           type: array
           items:
-            type: string
-      required:
-        - type
-        - terms
-    Not:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - not
-        term:
-          type: string
-      required:
-        - type
-        - term
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - printed
+                  - incomplete
+                  - rejected
+                  - correction-requested
+        noneOf:
+          type: array
+          items:
+            anyOf:
+              - type: string
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+              - type: string
+                enum:
+                  - printed
+                  - incomplete
+                  - rejected
+                  - correction-requested
     QueryInput:
       anyOf:
         - oneOf:
@@ -10147,7 +10144,6 @@ components:
             - $ref: "#/components/schemas/Range"
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/AnyOf"
-            - $ref: "#/components/schemas/Not"
           discriminator:
             propertyName: type
             mapping:
@@ -10156,7 +10152,6 @@ components:
               range: "#/components/schemas/Range"
               within: "#/components/schemas/Within"
               anyOf: "#/components/schemas/AnyOf"
-              not: "#/components/schemas/Not"
         - type: object
           additionalProperties:
             $ref: "#/components/schemas/QueryInput"
@@ -10172,6 +10167,20 @@ components:
       required:
         - type
         - term
+    AnyOf:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - anyOf
+        terms:
+          type: array
+          items:
+            type: string
+      required:
+        - type
+        - terms
     EventIndex:
       type: object
       properties:
@@ -10335,7 +10344,10 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - certificate-printed
+                  - printed
+                  - incomplete
+                  - rejected
+                  - correction-requested
         declaration:
           type: object
           additionalProperties:
