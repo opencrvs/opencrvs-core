@@ -13,12 +13,10 @@ import { Db } from 'mongodb'
 import {
   getUUID,
   eventPayloadGenerator,
-  EventDocument,
-  ActionType,
-  ActionStatus
+  UUID,
+  TestUserRole
 } from '@opencrvs/commons'
-import { Location } from '@events/service/locations/locations'
-import { generateTrackingId } from '../service/events/events'
+import { Location, setLocations } from '@events/service/locations/locations'
 
 interface Name {
   use: string
@@ -27,14 +25,14 @@ interface Name {
 }
 
 export interface CreatedUser {
-  id: string
-  primaryOfficeId: string
+  id: UUID
+  primaryOfficeId: UUID
   role: string
   name: Array<Name>
 }
 
 interface CreateUser {
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   role?: string
   name?: Array<Name>
 }
@@ -45,7 +43,7 @@ interface CreateUser {
 export function payloadGenerator(rng: () => number) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? 'REGISTRATION_AGENT',
+      role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
@@ -86,55 +84,14 @@ export function seeder() {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
-      role: user.role,
-      id: createdUser.insertedId.toString()
+      role: user.role as TestUserRole,
+      id: createdUser.insertedId.toString() as UUID
     }
   }
-
-  const seedLocations = async (db: Db, locations: Location[]) =>
-    db.collection('locations').insertMany(locations)
-
-  const seedEvent = async (
-    db: Db,
-    user: CreatedUser & { signature?: string },
-    event: Partial<EventDocument> = {}
-  ) => {
-    const now = new Date().toISOString()
-    const id = getUUID()
-    const transactionId = getUUID()
-    const trackingId = generateTrackingId()
-
-    const createdByDetails = {
-      createdBy: user.id,
-      createdByRole: user.role,
-      createdAtLocation: user.primaryOfficeId,
-      createdBySignature: user.signature
-    }
-
-    await db.collection('events').insertOne({
-      id,
-      transactionId,
-      createdAt: now,
-      updatedAt: now,
-      trackingId,
-      actions: [
-        {
-          ...createdByDetails,
-          type: ActionType.CREATE,
-          createdAt: now,
-          id: getUUID(),
-          declaration: {},
-          status: ActionStatus.Accepted,
-          transactionId: getUUID()
-        }
-      ],
-      ...event
-    })
-  }
+  const seedLocations = async (locations: Location[]) => setLocations(locations)
 
   return {
     user: seedUser,
-    locations: seedLocations,
-    event: seedEvent
+    locations: seedLocations
   }
 }
