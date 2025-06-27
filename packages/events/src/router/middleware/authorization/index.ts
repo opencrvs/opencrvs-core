@@ -26,6 +26,7 @@ import {
   WorkqueueCountInput,
   ConfigurableScopeType,
   IAuthHeader,
+  UUID,
   EventDocument,
   ConfigurableFlattenedScopes
 } from '@opencrvs/commons'
@@ -165,7 +166,7 @@ export const eventTypeAuthorization: MiddlewareFunction<
   OpenApiMeta,
   CtxWithAuthorizedEntities,
   CtxWithAuthorizedEntities,
-  { eventId: string } | { type: string }
+  { eventId: UUID } | { type: string }
 > = async ({ input, next, ctx }) => {
   let eventType = 'type' in input ? input.type : undefined
 

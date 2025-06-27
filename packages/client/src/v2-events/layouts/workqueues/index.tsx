@@ -67,7 +67,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           )}
         />
       }
-      navigation={<Sidebar />}
+      navigation={<Sidebar key={workqueueSlug} />}
       skipToContentText="skip"
     >
       {children}

@@ -27,6 +27,7 @@ function CheckboxInput({
 
   return (
     <CheckboxComponent
+      id={props.id}
       label={intl.formatMessage(label)}
       name={props.id}
       selected={inputValue === 'true'}

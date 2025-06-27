@@ -19,7 +19,9 @@ import {
   getCurrentEventState,
   getMixedPath,
   getUUID,
-  TENNIS_CLUB_MEMBERSHIP
+  SCOPES,
+  TENNIS_CLUB_MEMBERSHIP,
+  UUID
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -30,7 +32,6 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { indexAllEvents } from '@events/service/indexing/indexing'
 
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
@@ -215,10 +216,11 @@ test('Throws when one of the date range fields has invalid date', async () => {
 })
 
 test('Returns events based on the updatedAt column', async () => {
-  const { user, generator, seed, eventsDb } = await setupTestCase()
+  const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
+    SCOPES.RECORD_IMPORT,
     ...TEST_USER_DEFAULT_SCOPES
   ])
 
@@ -227,6 +229,7 @@ test('Returns events based on the updatedAt column', async () => {
   const oldEventCreateAction = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: ActionType.CREATE,
+    user,
     defaults: {
       createdAt: oldEventCreatedAt
     }
@@ -239,6 +242,7 @@ test('Returns events based on the updatedAt column', async () => {
     generateActionDocument({
       configuration: tennisClubMembershipEvent,
       action,
+      user,
       defaults: {
         status: ActionStatus.Requested
       }
@@ -259,8 +263,7 @@ test('Returns events based on the updatedAt column', async () => {
     updatedAt: new Date().toISOString()
   }
 
-  await seed.event(eventsDb, user, oldDocumentWithoutAcceptedDeclaration)
-  await indexAllEvents(tennisClubMembershipEvent)
+  await client.event.import(oldDocumentWithoutAcceptedDeclaration)
 
   const newlyCreatedEvent = await client.event.create(generator.event.create())
   const newlyCreatedEvent2 = await client.event.create(generator.event.create())
@@ -1075,7 +1078,7 @@ test('User with my-jurisdiction scope only sees events from their primary office
 
   await createEvent(client, generator)
 
-  const OTHER_OFFICE_ID = 'OTHER_OFFICE_ID'
+  const OTHER_OFFICE_ID = 'OTHER_OFFICE_ID' as UUID
   // Create another user from a different office
   const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
   const userFromOtherOffice = {
@@ -1117,7 +1120,7 @@ test('User without an event in the scope should not be able to view events of th
   const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
   const userFromOtherOffice = {
     ...otherUser,
-    primaryOfficeId: 'OTHER_OFFICE_ID'
+    primaryOfficeId: 'OTHER_OFFICE_ID' as UUID
   }
 
   const otherClient = createTestClient(userFromOtherOffice, [
@@ -1148,7 +1151,7 @@ test('User with my-jurisdiction scope can see events from other offices based on
   const { user: userB, generator: generatorB } = await setupTestCase(6004)
   const userBOverride = {
     ...userB,
-    primaryOfficeId: 'OTHER_OFFICE'
+    primaryOfficeId: 'OTHER_OFFICE' as UUID
   }
 
   const clientB = createTestClient(userBOverride, [
@@ -1264,7 +1267,7 @@ test('User only sees tennis club membership events within their jurisdiction', a
   await createEvent(client, generator)
   await createEvent(client, generator)
 
-  const otherOfficeId = 'OTHER_OFFICE'
+  const otherOfficeId = 'OTHER_OFFICE' as UUID
   const userOtherOffice = { ...user, primaryOfficeId: otherOfficeId }
   const clientOtherOffice = createTestClient(userOtherOffice, [
     ...TEST_USER_DEFAULT_SCOPES,

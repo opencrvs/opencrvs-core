@@ -19,7 +19,14 @@ const compat = new FlatCompat({
 })
 
 module.exports = defineConfig([
-  { ignores: ['build/**/*', 'eslint*', 'vitest.config.ts'] },
+  {
+    ignores: [
+      'build/**/*',
+      'src/storage/postgres/events/schema/**/*',
+      'eslint*',
+      'vitest.config.ts'
+    ]
+  },
   ...compat.extends(
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended'

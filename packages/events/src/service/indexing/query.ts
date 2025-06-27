@@ -110,7 +110,6 @@ const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
 
 function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
-
   if (clause.id) {
     must.push({
       term: { id: clause.id }
@@ -266,6 +265,22 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       must.push(...innerMust)
     } else if (innerMust) {
       must.push(innerMust)
+    }
+  }
+
+  if (clause.flags) {
+    if (clause.flags.anyOf) {
+      must.push({ terms: { flags: clause.flags.anyOf } })
+    }
+    if (clause.flags.noneOf) {
+      must.push({
+        bool: {
+          must_not: {
+            terms: { flags: clause.flags.noneOf }
+          },
+          should: undefined
+        }
+      })
     }
   }
 
