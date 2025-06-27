@@ -27,7 +27,8 @@ import {
   Scope,
   ActionScopes,
   WorkqueueConfigWithoutQuery,
-  joinValues
+  joinValues,
+  UUID
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(
@@ -75,7 +76,7 @@ export function isTemporaryId(id: string) {
 }
 
 export function createTemporaryId() {
-  return `tmp-${uuid()}`
+  return `tmp-${uuid()}` as UUID
 }
 
 /**
