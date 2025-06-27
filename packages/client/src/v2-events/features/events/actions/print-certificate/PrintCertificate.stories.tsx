@@ -17,7 +17,8 @@ import {
   ActionType,
   generateActionDocument,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventIndex,
@@ -78,7 +79,7 @@ export const CollectorForm: Story = {
  * Clears and sets the local draft with the event data.
  * Since Action.tsx runs before the component is mounted (and sets up both declaration & annotation form), we need to set the "test case" as draft.
  */
-function SetAnnotationDraft({ eventId }: { eventId: string }) {
+function SetAnnotationDraft({ eventId }: { eventId: UUID }) {
   const generator = testDataGenerator()
   const drafts = useDrafts()
   const draft = generator.event.draft({

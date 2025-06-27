@@ -89,10 +89,13 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              searchParams
+            )
           )
         }
         onSubmit={() =>

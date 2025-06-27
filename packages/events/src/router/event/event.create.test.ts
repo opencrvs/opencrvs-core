@@ -96,13 +96,11 @@ describe('event.create', () => {
   test('creating an event is an idempotent operation', async () => {
     const { user, generator, eventsDb } = await setupTestCase()
     const client = createTestClient(user)
-
     const payload = generator.event.create()
-
     await client.event.create(payload)
     await client.event.create(payload)
-
-    expect(await eventsDb.collection('events').find().toArray()).toHaveLength(1)
+    const events = await eventsDb.selectFrom('events').selectAll().execute()
+    expect(events).toHaveLength(1)
   })
 
   test('event with unknown type cannot be created', async () => {
