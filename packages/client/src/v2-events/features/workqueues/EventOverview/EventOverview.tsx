@@ -14,9 +14,6 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getCurrentEventState,
-  getAcceptedActions,
-  getCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls
@@ -24,27 +21,18 @@ import {
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
-
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import {
-  flattenEventIndex,
-  getUserIdsFromActions,
-  getUsersFullName
-} from '@client/v2-events/utils'
+import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
-
 import { ActionMenu } from './components/ActionMenu'
-import {
-  EventOverviewProvider,
-  useEventOverviewContext
-} from './EventOverviewContext'
+import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
  * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
@@ -113,7 +101,7 @@ function EventOverview({
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />
-      {fullEvent && <EventHistory history={getAcceptedActions(fullEvent)} />}
+      {fullEvent && <EventHistory fullEvent={fullEvent} />}
     </Content>
   )
 }

@@ -99,7 +99,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isNumberFieldType(field)) {
-    return Number.Output({ value: field.value })
+    return Number.Output(field)
   }
 
   if (isFileFieldType(field)) {
