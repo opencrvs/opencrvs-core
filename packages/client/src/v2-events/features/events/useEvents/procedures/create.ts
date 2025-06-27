@@ -21,7 +21,7 @@ import {
   ActionStatus,
   getUUID,
   EventInput,
-  TokenUserType
+  UUID
 } from '@opencrvs/commons/client'
 
 import {
@@ -61,11 +61,11 @@ function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
 
 setMutationDefaults(trpcOptionsProxy.event.create, {
   retry: true,
-  retryDelay: 1000,
+  retryDelay: 3333,
   mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
-      id: newEvent.transactionId,
+      id: newEvent.transactionId as UUID, // not actually an UUID, but as as it's temporary for the optimistic update, we can satisfy the type this way
       type: newEvent.type,
       trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
@@ -77,9 +77,9 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: 'user',
           createdByRole: 'offline',
-          createdAtLocation: 'TODO',
+          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
           declaration: {},
           status: ActionStatus.Accepted,
           transactionId: getUUID()

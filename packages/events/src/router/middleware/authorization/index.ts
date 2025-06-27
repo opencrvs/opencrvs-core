@@ -27,6 +27,7 @@ import {
   ConfigurableScopeType,
   ConfigurableScopes,
   IAuthHeader,
+  UUID,
   EventDocument
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
@@ -163,7 +164,7 @@ export const eventTypeAuthorization: MiddlewareFunction<
   OpenApiMeta,
   CtxWithAuthorizedEntities,
   CtxWithAuthorizedEntities,
-  { eventId: string } | { type: string }
+  { eventId: UUID } | { type: string }
 > = async ({ input, next, ctx }) => {
   let eventType = 'type' in input ? input.type : undefined
 

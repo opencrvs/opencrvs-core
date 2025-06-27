@@ -23,9 +23,9 @@ import {
   EventDocument,
   EventInput,
   getUUID,
-  TokenUserType,
   TENNIS_CLUB_MEMBERSHIP,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -60,19 +60,19 @@ const createHandler = trpcHandler(async ({ request }) => {
 
   return HttpResponse.json({
     type: TENNIS_CLUB_MEMBERSHIP,
-    id: '_REAL_UUID_',
+    id: '_REAL_UUID_' as UUID,
     trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
       {
         type: ActionType.CREATE,
-        id: '_REAL_ACTION_UUID_',
+        id: '_REAL_ACTION_UUID_' as UUID,
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
-        createdByUserType: TokenUserType.Enum.user,
+        createdByUserType: 'user',
         createdBy: '6733309827b97e6483877188',
         createdByRole: 'some-user-role',
-        createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
+        createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176' as UUID,
         declaration: {},
         status: ActionStatus.Accepted,
         transactionId: getUUID()
