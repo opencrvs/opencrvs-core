@@ -26,22 +26,9 @@ import {
   SystemVariables,
   Scope,
   ActionScopes,
-  WorkqueueConfigWithoutQuery
+  WorkqueueConfigWithoutQuery,
+  joinValues
 } from '@opencrvs/commons/client'
-
-/**
- *
- * Joins defined values using a separator and trims the result
- */
-export function joinValues(
-  values: Array<string | undefined | null>,
-  separator = ' '
-) {
-  return values
-    .filter((value) => !!value)
-    .join(separator)
-    .trim()
-}
 
 export function getUsersFullName(
   names: ResolvedUser['name'],

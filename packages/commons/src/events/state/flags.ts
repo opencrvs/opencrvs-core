@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { joinValues } from 'src/utils'
 import { getStatusFromActions } from '.'
 import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
@@ -66,14 +67,14 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
 
   /**
    * Adds two types of flags:
-   *  - `ACTION-requested` : An action sent which is not yet accepted or rejected by country config.
-   *  - `ACTION-rejected`  : An action which was rejected by country config.
+   *  - `ACTION:requested` : An action sent which is not yet accepted or rejected by country config.
+   *  - `ACTION:rejected`  : An action which was rejected by country config.
    */
 
   const flags = Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
-      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
+      const flag = joinValues([type, status], ':').toLowerCase()
       return flag satisfies Flag
     })
 
