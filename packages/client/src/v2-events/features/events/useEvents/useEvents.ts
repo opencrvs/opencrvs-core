@@ -66,10 +66,25 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
+        const options = trpc.event.search.queryOptions(query)
+
         return useQuery({
-          ...trpc.event.search.queryOptions(query),
+          ...options,
           queryKey: trpc.event.search.queryKey(query),
           enabled: !findLocalEventIndex(id),
+          staleTime: 0,
+          refetchOnMount: true,
+          queryFn: async (...args) => {
+            const queryFn = options.queryFn
+            if (!queryFn) {
+              throw new Error('Query function is not defined')
+            }
+            const res = await queryFn(...args)
+            if (res.length === 0) {
+              throw new Error(`No event found with id: ${id}`)
+            }
+            return res
+          },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? [eventIndex] : undefined
@@ -82,9 +97,22 @@ export function useEvents() {
           clauses: [{ id }]
         } satisfies QueryType
 
+        const options = trpc.event.search.queryOptions(query)
+
         return useSuspenseQuery({
-          ...trpc.event.search.queryOptions(query),
+          ...options,
           queryKey: trpc.event.search.queryKey(query),
+          queryFn: async (...args) => {
+            const queryFn = options.queryFn
+            if (!queryFn) {
+              throw new Error('Query function is not defined')
+            }
+            const res = await queryFn(...args)
+            if (res.length === 0) {
+              throw new Error(`No event found with id: ${id}`)
+            }
+            return res
+          },
           initialData: () => {
             const eventIndex = findLocalEventIndex(id)
             return eventIndex ? [eventIndex] : undefined
