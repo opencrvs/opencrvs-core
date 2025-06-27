@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
 import {
   ActionCreationMetadata,
@@ -28,7 +27,6 @@ import {
   getEventConfigById
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
-import * as eventsDb from '@events/storage/mongodb/events'
 import {
   getEventAliasName,
   getEventIndexName,
@@ -266,42 +264,6 @@ type _Combine<
 
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
-
-export async function indexAllEvents(eventConfiguration: EventConfig) {
-  const mongoClient = await eventsDb.getClient()
-  const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
-
-  if (!hasEventsIndex) {
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
-  }
-
-  const stream = mongoClient.collection('events').find().stream()
-
-  const transformedStreamData = new Transform({
-    readableObjectMode: true,
-    writableObjectMode: true,
-    transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record, eventConfiguration))
-    }
-  })
-
-  await esClient.helpers.bulk({
-    retries: 3,
-    wait: 3000,
-    datasource: stream.pipe(transformedStreamData),
-    onDocument: (doc: EventIndex) => ({
-      index: {
-        _index: indexName,
-        _id: doc.id
-      }
-    }),
-    refresh: 'wait_for'
-  })
-}
 
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()

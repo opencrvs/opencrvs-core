@@ -16,32 +16,7 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { indexAllEvents } from './indexing'
 import { buildElasticQueryFromSearchPayload } from './query'
-
-test('indexes all records from MongoDB with one function call', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
-
-  const esClient = getOrCreateClient()
-
-  await indexAllEvents(tennisClubMembershipEvent)
-
-  for (let i = 0; i < 2; i++) {
-    await client.event.create(generator.event.create())
-  }
-
-  const body = await esClient.search({
-    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
-    body: {
-      query: {
-        match_all: {}
-      }
-    }
-  })
-
-  expect(body.hits.hits).toHaveLength(2)
-})
 
 test('records are automatically indexed when they are created', async () => {
   const { user, generator } = await setupTestCase()

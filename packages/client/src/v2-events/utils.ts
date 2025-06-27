@@ -26,7 +26,8 @@ import {
   SystemVariables,
   Scope,
   ActionScopes,
-  WorkqueueConfigWithoutQuery
+  WorkqueueConfigWithoutQuery,
+  UUID
 } from '@opencrvs/commons/client'
 
 /**
@@ -95,7 +96,7 @@ export function isTemporaryId(id: string) {
 }
 
 export function createTemporaryId() {
-  return `tmp-${uuid()}`
+  return `tmp-${uuid()}` as UUID
 }
 
 /**

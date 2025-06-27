@@ -24,6 +24,7 @@ import { Draft } from '../Draft'
 import { deepMerge, findActiveDrafts } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
+import { UUID } from '../../uuid'
 
 export function getStatusFromActions(actions: Array<Action>) {
   // If the event has any rejected action, we consider the event to be rejected.
@@ -172,11 +173,13 @@ function aggregateActionDeclarations(
 
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-  : T extends (infer U)[]
-    ? NonNullableDeep<U>[]
-    : T extends object
-      ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-      : NonNullable<T>
+  : T extends UUID
+    ? T
+    : T extends (infer U)[]
+      ? NonNullableDeep<U>[]
+      : T extends object
+        ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+        : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
@@ -256,6 +259,9 @@ export function getCurrentEventState(
   } else {
     dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
   }
+
+  // @TODO: Typing issue here with branded values (UUID)
+  // @ts-ignore
   return deepDropNulls({
     id: event.id,
     type: event.type,

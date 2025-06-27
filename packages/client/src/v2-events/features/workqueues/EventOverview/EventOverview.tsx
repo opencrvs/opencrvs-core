@@ -37,10 +37,7 @@ import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 
 import { ActionMenu } from './components/ActionMenu'
-import {
-  EventOverviewProvider,
-  useEventOverviewContext
-} from './EventOverviewContext'
+import { EventOverviewProvider } from './EventOverviewContext'
 
 /**
  * File is based on packages/client/src/views/RecordAudit/RecordAudit.tsx
@@ -127,11 +124,14 @@ function EventOverviewProtected({
   const eventWithDrafts = deepDropNulls(
     applyDraftsToEventIndex(eventIndex, drafts)
   )
-  const { getUser } = useEventOverviewContext()
+  const { getUser } = useUsers()
   const intl = useIntl()
 
-  const assignedTo = eventIndex.assignedTo
-    ? getUsersFullName(getUser(eventIndex.assignedTo).name, intl.locale)
+  const assignedToUser = getUser.useQuery(eventWithDrafts.assignedTo || '', {
+    enabled: !!eventWithDrafts.assignedTo
+  })
+  const assignedTo = assignedToUser.data
+    ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
   const { flags, legalStatuses, ...flattenedEventIndex } = {

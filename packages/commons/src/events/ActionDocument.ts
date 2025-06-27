@@ -13,6 +13,7 @@ import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
 import { TokenUserType } from '../authentication'
 
@@ -39,7 +40,7 @@ export const ActionStatus = {
 export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
-  id: z.string(),
+  id: UUID,
   transactionId: z.string(),
   createdByUserType: TokenUserType,
   createdAt: z.string().datetime(),
@@ -47,18 +48,22 @@ export const ActionBase = z.object({
   createdByRole: z.string(),
   createdBySignature: z
     .string()
-    .nullish() // @TODO: Check where the null comes from
+    .nullish()
     .describe('Reference to signature of the user who created the action'),
   createdAtLocation: CreatedAtLocation,
   declaration: ActionUpdate,
-  annotation: ActionUpdate.optional(),
+  annotation: ActionUpdate.optional().nullable(),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
     ActionStatus.Rejected
   ]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
-  originalActionId: z.string().optional()
+  originalActionId: UUID.optional()
+    .nullable()
+    .describe(
+      'Reference to the original action that was asynchronously rejected or accepted by 3rd party integration.'
+    )
 })
 
 export type ActionBase = z.infer<typeof ActionBase>
@@ -72,8 +77,7 @@ const AssignedAction = ActionBase.merge(
 
 const UnassignedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.UNASSIGN),
-    assignedTo: z.literal(null)
+    type: z.literal(ActionType.UNASSIGN)
   })
 )
 
