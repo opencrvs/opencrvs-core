@@ -8,6 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+/* eslint-disable max-lines */
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
@@ -46,7 +48,9 @@ export type ValidationConfig = z.infer<typeof ValidationConfig>
 
 const BaseField = z.object({
   id: FieldId,
-  parent: FieldReference.optional(),
+  parent: FieldReference.optional().describe(
+    'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
+  ),
   conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
@@ -589,6 +593,7 @@ export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
+
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
