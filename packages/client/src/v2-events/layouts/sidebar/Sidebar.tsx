@@ -20,6 +20,7 @@ import { SettingsNavigation } from '@opencrvs/components/lib/icons/SettingsNavig
 import { LeftNavigation } from '@opencrvs/components/lib/SideNavigation/LeftNavigation'
 import { NavigationGroup } from '@opencrvs/components/lib/SideNavigation/NavigationGroup'
 import { NavigationItem } from '@opencrvs/components/lib/SideNavigation/NavigationItem'
+import { joinValues } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { storage } from '@client/storage'
 import { WORKQUEUE_TABS } from '@client/components/interface/WorkQueueTabs'
@@ -36,9 +37,10 @@ import { useWorkqueue } from '@client/v2-events/hooks/useWorkqueue'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { getLanguage } from '@client/i18n/selectors'
 import { Avatar } from '@client/components/Avatar'
-import { joinValues } from '@client/v2-events/utils'
+import { hasDraftWorkqueue, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { hasOutboxWorkqueue, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 const SCREEN_LOCK = 'screenLock'
 
@@ -58,9 +60,13 @@ export const Sidebar = ({
   const { getOutbox } = useEvents()
   const outbox = getOutbox()
 
+  const { getAllRemoteDrafts } = useDrafts()
+  const drafts = getAllRemoteDrafts()
+
   const workqueues = useWorkqueueConfigurations()
 
   const hasOutbox = hasOutboxWorkqueue(scopes ?? [])
+  const hasDraft = hasDraftWorkqueue(scopes ?? [])
 
   const navigate = useNavigate()
   const offlineCountryConfig = useSelector(getOfflineData)
@@ -108,7 +114,7 @@ export const Sidebar = ({
         {hasOutbox && (
           <NavigationItem
             key={WORKQUEUE_OUTBOX.slug}
-            count={outbox.length || 0}
+            count={outbox.length}
             data-testid={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}
             icon={() => <Icon name={WORKQUEUE_OUTBOX.icon} size="small" />}
             id={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}
@@ -118,6 +124,25 @@ export const Sidebar = ({
               navigate(
                 ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
                   slug: WORKQUEUE_OUTBOX.slug
+                })
+              )
+              menuCollapse && menuCollapse()
+            }}
+          />
+        )}
+        {hasDraft && (
+          <NavigationItem
+            key={WORKQUEUE_DRAFT.slug}
+            count={drafts.length}
+            data-testid={`navigation_workqueue_${WORKQUEUE_DRAFT.slug}`}
+            icon={() => <Icon name={WORKQUEUE_DRAFT.icon} size="small" />}
+            id={`navigation_workqueue_${WORKQUEUE_DRAFT.slug}`}
+            isSelected={WORKQUEUE_DRAFT.slug === workqueueSlug}
+            label={intl.formatMessage(WORKQUEUE_DRAFT.name)}
+            onClick={() => {
+              navigate(
+                ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+                  slug: WORKQUEUE_DRAFT.slug
                 })
               )
               menuCollapse && menuCollapse()

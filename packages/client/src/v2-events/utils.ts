@@ -27,22 +27,9 @@ import {
   Scope,
   ActionScopes,
   WorkqueueConfigWithoutQuery,
+  joinValues,
   UUID
 } from '@opencrvs/commons/client'
-
-/**
- *
- * Joins defined values using a separator and trims the result
- */
-export function joinValues(
-  values: Array<string | undefined | null>,
-  separator = ' '
-) {
-  return values
-    .filter((value) => !!value)
-    .join(separator)
-    .trim()
-}
 
 export function getUsersFullName(
   names: ResolvedUser['name'],
@@ -240,22 +227,38 @@ export function mergeWithoutNullsOrUndefined<T>(
 }
 
 export enum CoreWorkqueues {
-  OUTBOX = 'outbox'
+  OUTBOX = 'outbox',
+  DRAFT = 'draft'
 }
 
 export function hasOutboxWorkqueue(scopes: Scope[]) {
   return scopes.some((scope) => ActionScopes.safeParse(scope).success)
 }
 
+export function hasDraftWorkqueue(scopes: Scope[]) {
+  return scopes.some((scope) => scope.startsWith('record.declare'))
+}
+
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
   name: {
-    id: 'workqueues.outbox.title',
+    id: 'v2.workqueues.outbox.title',
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
   actions: [],
   slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
+}
+
+export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
+  name: {
+    id: 'v2.workqueues.draft.title',
+    defaultMessage: 'My drafts',
+    description: 'Title of draft workqueue'
+  },
+  actions: [],
+  slug: CoreWorkqueues.DRAFT,
+  icon: 'FileDotted'
 }
 
 export const emptyMessage = {
