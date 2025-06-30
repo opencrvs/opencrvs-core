@@ -11,7 +11,6 @@
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
-
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
@@ -38,8 +37,6 @@ export const FieldReference = z
   })
   .describe('Reference to a field by its ID')
 
-const ParentReference = FieldReference.optional()
-
 export const ValidationConfig = z.object({
   validator: Conditional,
   message: TranslationConfig
@@ -49,7 +46,7 @@ export type ValidationConfig = z.infer<typeof ValidationConfig>
 
 const BaseField = z.object({
   id: FieldId,
-  parent: ParentReference,
+  parent: FieldReference.optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
