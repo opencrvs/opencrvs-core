@@ -12,19 +12,19 @@
 import React from 'react'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { useSelector } from 'react-redux'
-import { mandatoryColumns } from '@opencrvs/commons/client'
+import { getTokenPayload, mandatoryColumns } from '@opencrvs/commons/client'
 import { QueryType } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { WORKQUEUE_DRAFT } from '@client/v2-events/utils'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import { getToken } from '@client/utils/authUtils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useDrafts } from '../drafts/useDrafts'
 import { useEvents } from '../events/useEvents/useEvents'
 
 export function Draft() {
-  const legacyUser = useSelector(getUserDetails)
+  const { sub: userId } = getTokenPayload(getToken())
+
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
   const intl = useIntl()
@@ -34,7 +34,7 @@ export function Draft() {
 
   const AssignedToMeQuery: QueryType = {
     type: 'and',
-    clauses: [{ assignedTo: { type: 'exact', term: legacyUser?.id ?? '' } }]
+    clauses: [{ assignedTo: { type: 'exact', term: userId } }]
   }
 
   const { searchEvent } = useEvents()
