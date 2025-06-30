@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import startOfDay from 'date-fns/startOfDay'
 import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
@@ -31,6 +32,7 @@ import {
   NameFieldValue
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
+import { EventStatus } from '@opencrvs/commons/client'
 import {
   Errors,
   getValidationErrorsForForm
@@ -170,18 +172,6 @@ export const getDefaultSearchFields = (
   return searchFields
 }
 
-// @TODO: Could we just use EventStatus?
-const RegStatus = {
-  Created: 'CREATED',
-  Notified: 'NOTIFIED',
-  Declared: 'DECLARED',
-  Validated: 'VALIDATED',
-  Registered: 'REGISTERED',
-  Certified: 'CERTIFIED',
-  Rejected: 'REJECTED',
-  Archived: 'ARCHIVED'
-} as const
-
 const MatchType = {
   fuzzy: 'fuzzy',
   exact: 'exact',
@@ -250,7 +240,7 @@ function buildCondition(
 }
 
 function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values(RegStatus) }
+  return { type: 'anyOf', terms: Object.values(EventStatus) }
 }
 /**
  * Converts a date range input string into a UTC-based range string.

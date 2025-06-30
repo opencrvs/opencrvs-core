@@ -24,7 +24,11 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
-import { checkScopeForEventSearch, parseFieldSearchParams, deserializeSearchParams } from './utils'
+import {
+  checkScopeForEventSearch,
+  parseFieldSearchParams,
+  deserializeSearchParams
+} from './utils'
 
 export const advancedSearchMessages = {
   advancedSearch: {
