@@ -56,7 +56,14 @@ const BaseField = z.object({
   validation: z.array(ValidationConfig).default([]).optional(),
   label: TranslationConfig,
   helperText: TranslationConfig.optional(),
-  hideLabel: z.boolean().default(false).optional()
+  hideLabel: z.boolean().default(false).optional(),
+  isCorrectable: z
+    .boolean()
+    .default(true)
+    .optional()
+    .describe(
+      'Indicates if the field can be changed during a record correction.'
+    )
 })
 
 export type BaseField = z.infer<typeof BaseField>
