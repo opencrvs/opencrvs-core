@@ -13,7 +13,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { expect, waitFor, within } from '@storybook/test'
+import { expect, waitFor, within, userEvent } from '@storybook/test'
 import { ActionType } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -38,20 +38,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-
-function FormClear() {
-  const drafts = useDrafts()
-  useEffect(() => {
-    drafts.setLocalDraft(
-      testDataGenerator().event.draft({
-        eventId: tennisClubMembershipEventDocument.id,
-        actionType: ActionType.REQUEST_CORRECTION
-      })
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
-  return <Outlet />
-}
 
 export const ReviewWithoutChanges: Story = {
   parameters: {
@@ -86,12 +72,12 @@ export const ReviewWithoutChanges: Story = {
   }
 }
 
-export const ReviewWithChanges: Story = {
+export const Review: Story = {
   parameters: {
     reactRouter: {
       router: {
         path: '/',
-        element: <FormClear />,
+        element: <Outlet />,
         children: [router]
       },
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
@@ -108,14 +94,74 @@ export const ReviewWithChanges: Story = {
       }
     }
   },
-  play: async ({ canvasElement }) => {
+  play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
+
     await waitFor(async () => {
       await expect(
         canvas.getByRole('button', { name: 'Continue' })
-      ).toBeEnabled()
+      ).toBeDisabled()
+    })
+
+    await step('Change applicant values', async () => {
+      await userEvent.click(
+        canvas.getByTestId('change-button-applicant.address')
+      )
+
+      await userEvent.click(canvas.getByTestId('location__country'))
+      await userEvent.type(canvas.getByTestId('location__country'), 'Far')
+      await userEvent.click(canvas.getByText('Farajaland', { exact: true }))
+
+      await userEvent.type(canvas.getByTestId('text__state'), 'My State')
+      await userEvent.type(canvas.getByTestId('text__district2'), 'My District')
+
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+    })
+
+    await step('Go back to review', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+      await waitFor(async () => {
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeDisabled()
+      })
+    })
+
+    await step('Change recommender values', async () => {
+      await userEvent.click(canvas.getByTestId('change-button-recommender.id'))
+      await userEvent.type(
+        canvas.getByTestId('text__recommender____id'),
+        '1234567890'
+      )
+    })
+
+    await step('Go back to review', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+      await waitFor(async () => {
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeEnabled()
+      })
     })
   }
+}
+
+function FormClear() {
+  const drafts = useDrafts()
+  useEffect(() => {
+    drafts.setLocalDraft(
+      testDataGenerator().event.draft({
+        eventId: tennisClubMembershipEventDocument.id,
+        actionType: ActionType.REQUEST_CORRECTION
+      })
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  return <Outlet />
 }
 
 export const Summary: Story = {

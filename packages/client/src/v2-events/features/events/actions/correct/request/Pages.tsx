@@ -53,14 +53,17 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath({
-          eventId,
-          pageId: currentPageId
-        }),
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+          {
+            eventId,
+            pageId: currentPageId
+          },
+          searchParams
+        ),
         { replace: true }
       )
     }
-  }, [pageId, currentPageId, navigate, eventId])
+  }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
@@ -80,7 +83,7 @@ export function Pages() {
                 eventId,
                 pageId: nextPageId
               },
-              { workqueue: searchParams.workqueue }
+              searchParams
             )
           )
         }

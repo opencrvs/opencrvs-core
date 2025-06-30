@@ -29,6 +29,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -68,6 +69,11 @@ export function Review() {
     )
   }
 
+  const incomplete = validationErrorsInActionFormExist({
+    formConfig,
+    form
+  })
+
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
       <ReviewComponent.Body
@@ -93,7 +99,7 @@ export function Review() {
       >
         <PrimaryButton
           key="continue_button"
-          disabled={!valuesHaveChanged}
+          disabled={!valuesHaveChanged || incomplete}
           id="continue_button"
           onClick={() => {
             navigate(
