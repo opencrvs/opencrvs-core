@@ -24,7 +24,8 @@ import {
   Inferred,
   EventState,
   FieldType,
-  QueryExpression
+  QueryExpression,
+  EventStatus
 } from '@opencrvs/commons/client'
 import {
   Errors,
@@ -146,18 +147,6 @@ export const getDefaultSearchFields = (
   return searchFields
 }
 
-// @TODO: Could we just use EventStatus?
-const RegStatus = {
-  Created: 'CREATED',
-  Notified: 'NOTIFIED',
-  Declared: 'DECLARED',
-  Validated: 'VALIDATED',
-  Registered: 'REGISTERED',
-  Certified: 'CERTIFIED',
-  Rejected: 'REJECTED',
-  Archived: 'ARCHIVED'
-} as const
-
 const MatchType = {
   fuzzy: 'fuzzy',
   exact: 'exact',
@@ -225,8 +214,13 @@ function buildCondition(
   }
 }
 
-function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values(RegStatus) }
+function buildNonCreatedStatusFilter(): Condition {
+  return {
+    type: 'anyOf',
+    terms: EventStatus.options.filter(
+      (status) => status !== EventStatus.enum.CREATED // drafts are not included for advanced search
+    )
+  }
 }
 /**
  * Converts a date range input string into a UTC-based range string.
@@ -297,7 +291,7 @@ function buildDataConditionFromSearchKeys(
       let value = String(rawInput[fieldId])
       if (fieldId === 'event.status' && value === 'ALL') {
         const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
-        result[transformedKey] = buildConditionForStatus()
+        result[transformedKey] = buildNonCreatedStatusFilter()
       } else if (value) {
         let searchType = config?.type
         // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
