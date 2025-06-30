@@ -95,37 +95,26 @@ export function getActionUpdateMetadata(actions: Action[]) {
     `Event has no ${ActionType.CREATE} action`
   )
 
-  return StatusChangingActions.options.reduce(
-    (metadata, actionType) => {
-      const { accept, request } = getActionRequests(actionType, actions)
-
-      return {
-        createdAt:
-          request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
-        createdBy:
-          request?.createdBy ?? accept?.createdBy ?? metadata.createdBy,
-        createdByUserType:
-          request?.createdByUserType ??
-          accept?.createdByUserType ??
-          metadata.createdByUserType,
-        createdAtLocation:
-          request?.createdAtLocation ??
-          accept?.createdAtLocation ??
-          metadata.createdAtLocation,
-        createdByRole:
-          request?.createdByRole ??
-          accept?.createdByRole ??
-          metadata.createdByRole
+  return actions
+    .filter(({ type }) => StatusChangingActions.safeParse(type).success)
+    .reduce(
+      (metadata, action) => {
+        return {
+          createdAt: action.createdAt,
+          createdBy: action.createdBy,
+          createdByUserType: action.createdByUserType,
+          createdAtLocation: action.createdAtLocation,
+          createdByRole: action.createdByRole
+        }
+      },
+      {
+        createdAt: createAction.createdAt,
+        createdBy: createAction.createdBy,
+        createdByUserType: createAction.createdByUserType,
+        createdAtLocation: createAction.createdAtLocation,
+        createdByRole: createAction.createdByRole
       }
-    },
-    {
-      createdAt: createAction.createdAt,
-      createdBy: createAction.createdBy,
-      createdByUserType: createAction.createdByUserType,
-      createdAtLocation: createAction.createdAtLocation,
-      createdByRole: createAction.createdByRole
-    }
-  )
+    )
 }
 
 /**
