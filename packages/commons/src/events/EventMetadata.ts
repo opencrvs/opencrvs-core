@@ -38,7 +38,6 @@ export const InherentFlags = {
   REJECTED: 'rejected',
   CORRECTION_REQUESTED: 'correction-requested'
 } as const
-
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
 export const Flag = z
