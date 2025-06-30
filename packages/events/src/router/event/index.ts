@@ -11,7 +11,7 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -112,7 +112,7 @@ export const eventRouter = router({
     }),
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
-    .input(z.string())
+    .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const updatedEvent = await addAction(
@@ -146,6 +146,7 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .output(Draft)
       .mutation(async ({ input, ctx }) => {
         const { eventId } = input
         await getEventById(eventId)

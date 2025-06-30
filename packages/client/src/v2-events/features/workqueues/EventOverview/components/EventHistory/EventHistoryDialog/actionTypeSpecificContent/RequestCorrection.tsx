@@ -39,7 +39,7 @@ export function RequestCorrection({
     eventConfiguration
   )
 
-  if (action.annotation === undefined) {
+  if (!action.annotation) {
     return
   }
 

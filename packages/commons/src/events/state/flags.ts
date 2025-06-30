@@ -8,58 +8,88 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from '../ActionType'
-import { Action, ActionStatus } from '../ActionDocument'
-import { CustomFlags, Flag } from '../EventMetadata'
 
-const customFlagChecks: Record<
-  CustomFlags,
-  (sortedActions: Action[]) => boolean
-> = {
-  [CustomFlags.CERTIFICATE_PRINTED]: (sortedActions) => {
-    return sortedActions.reduce<boolean>((prev, { type }) => {
-      if (type === ActionType.PRINT_CERTIFICATE) {
-        return true
-      }
-      if (type === ActionType.APPROVE_CORRECTION) {
-        return false
-      }
-      return prev
-    }, false)
-  },
-  [CustomFlags.CORRECTION_REQUESTED]: (sortedActions) => {
-    // @TODO: After the correction approval/rejection is implemented, we need to update this to check if the correction request is finished
-    return sortedActions.some(
-      ({ type }) => type === ActionType.REQUEST_CORRECTION
-    )
-  }
+import { joinValues } from '../../utils'
+import { getStatusFromActions } from '.'
+import { Action, ActionStatus } from '../ActionDocument'
+import { ActionType, isMetaAction } from '../ActionType'
+import { InherentFlags, EventStatus, Flag } from '../EventMetadata'
+
+function isCertificatePrinted(actions: Action[]) {
+  return actions.reduce<boolean>((prev, { type }) => {
+    if (type === ActionType.PRINT_CERTIFICATE) {
+      return true
+    }
+    if (type === ActionType.APPROVE_CORRECTION) {
+      return false
+    }
+    return prev
+  }, false)
+}
+
+function isCorrectionRequested(actions: Action[]) {
+  return actions.reduce<boolean>((prev, { type }) => {
+    if (type === ActionType.REQUEST_CORRECTION) {
+      return true
+    }
+    if (type === ActionType.APPROVE_CORRECTION) {
+      return false
+    }
+    if (type === ActionType.REJECT_CORRECTION) {
+      return false
+    }
+    return prev
+  }, false)
+}
+
+function isDeclarationIncomplete(actions: Action[]): boolean {
+  return getStatusFromActions(actions) === EventStatus.enum.NOTIFIED
+}
+
+function isRejected(actions: Action[]): boolean {
+  return getStatusFromActions(actions) === EventStatus.enum.REJECTED
 }
 
 export function getFlagsFromActions(actions: Action[]): Flag[] {
-  const sortedActions = actions.sort((a, b) =>
-    a.createdAt.localeCompare(b.createdAt)
-  )
+  const sortedActions = actions
+    .filter(({ type }) => !isMetaAction(type))
+    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const actionStatus = sortedActions.reduce(
+  const actionStatus = sortedActions.reduce<
+    Partial<Record<ActionType, ActionStatus>>
+  >(
     (actionStatuses, { type, status }) => ({
       ...actionStatuses,
       [type]: status
     }),
-    {} as Record<ActionType, ActionStatus>
+    {}
   )
+
+  /**
+   * Adds two types of flags:
+   *  - `ACTION:requested` : An action sent which is not yet accepted or rejected by country config.
+   *  - `ACTION:rejected`  : An action which was rejected by country config.
+   */
 
   const flags = Object.entries(actionStatus)
     .filter(([, status]) => status !== ActionStatus.Accepted)
     .map(([type, status]) => {
-      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
+      const flag = joinValues([type, status], ':').toLowerCase()
       return flag satisfies Flag
     })
 
-  Object.entries(customFlagChecks).forEach(([flag, check]) => {
-    if (check(sortedActions)) {
-      flags.push(flag)
-    }
-  })
+  if (isCertificatePrinted(sortedActions)) {
+    flags.push(InherentFlags.PRINTED)
+  }
+  if (isCorrectionRequested(sortedActions)) {
+    flags.push(InherentFlags.CORRECTION_REQUESTED)
+  }
+  if (isDeclarationIncomplete(sortedActions)) {
+    flags.push(InherentFlags.INCOMPLETE)
+  }
+  if (isRejected(sortedActions)) {
+    flags.push(InherentFlags.REJECTED)
+  }
 
   return flags
 }

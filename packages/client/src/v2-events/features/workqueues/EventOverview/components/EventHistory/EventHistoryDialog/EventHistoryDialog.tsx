@@ -18,7 +18,7 @@ import {
   ActionType,
   EventDocument
 } from '@opencrvs/commons/client'
-import { joinValues } from '@client/v2-events/utils'
+import { joinValues } from '@opencrvs/commons/client'
 import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {

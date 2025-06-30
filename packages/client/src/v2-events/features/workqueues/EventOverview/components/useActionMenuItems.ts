@@ -18,7 +18,7 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  CustomFlags,
+  InherentFlags,
   WorkqueueActionType,
   AVAILABLE_ACTIONS_BY_EVENT_STATUS,
   EventStatus,
@@ -153,7 +153,7 @@ export function useAction(event: EventIndex) {
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
   const eventIsWaitingForCorrection = event.flags.includes(
-    CustomFlags.CORRECTION_REQUESTED
+    InherentFlags.CORRECTION_REQUESTED
   )
   const eventId = event.id
 

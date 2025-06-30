@@ -45,7 +45,7 @@ const handlers = [
     (ctx) => {
       const payload =
         ctx.params.action === ActionType.REGISTER
-          ? { registrationNumber: '1234567890AB' }
+          ? { registrationNumber: `ABC${Number(new Date())}` }
           : {}
 
       return HttpResponse.json(payload)

@@ -31,13 +31,20 @@ export const systemProcedure = t.procedure
  * Public procedures are only available to human users
  * and will throw an error if a system user tries to access them
  */
-export const publicProcedure = t.procedure.use(async ({ ctx, next }) => {
-  if (ctx.user.type === TokenUserType.enum.system) {
+export const publicProcedure = t.procedure.use(async (opts) => {
+  const { user } = opts.ctx
+
+  if (user.type === TokenUserType.enum.system) {
     logger.error(
-      `System user tried to access public procedure. User id: '${ctx.user.id}'`
+      `System user tried to access public procedure. User id: '${user.id}'`
     )
     throw new TRPCError({ code: 'FORBIDDEN' })
   }
 
-  return next({ ctx })
+  return opts.next({
+    ctx: {
+      ...opts.ctx,
+      user
+    }
+  })
 })
