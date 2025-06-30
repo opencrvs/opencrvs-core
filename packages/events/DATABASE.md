@@ -13,11 +13,23 @@ The key concepts you need to understand are
 
 To help understand the concepts, visualizing the current schema helps a ton.
 
-Install [PostgreSQL for VSCode](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql) or another tool like [pgAdmin](https://www.pgadmin.org/). After you have started OpenCRVS and migrations have ran successfully, you can connect to `events` using connection string `postgres://events_app:app_password@localhost:5432/events`.
+Install [PostgreSQL for VSCode](https://marketplace.visualstudio.com/items?itemName=ms-ossdata.vscode-pgsql) or another tool like [pgAdmin](https://www.pgadmin.org/). After you have started OpenCRVS and migrations have ran successfully, you can connect the database using the following roles.
+
+## Roles
+
+Login with the connection string `postgres://<user>:<password>@localhost:5432/events`. Always default to the role with the least priviledges - meaning `events_app`. In production the passwords are rotated and the postgres-user password is a random constant.
+
+| User              | Password            | Purpose                      |
+| ----------------- | ------------------- | ---------------------------- |
+| `postgres`        | `postgres`          | superuser                    |
+| `events_migrator` | `migrator_password` | creates tables, edits schema |
+| `events_app`      | `app_password`      | reads and writes to tables   |
 
 ## Migrations
 
 Unlike MongoDB and other NoSQL databases, PostgreSQL **requires** writing migrations to create tables where data is written into. This structure is called a schema.
+
+Before migrations are ran, the database is initialized using an [init script](../migration/src/migrations/postgres/0001_init.sql). This initialization is ran in the root `docker-compose.dev-deps.yml` file.
 
 See [@opencrvs/migration](/packages/migration/README.md) for more information around the migrations. See the first migration to understand the format. If you run migrations, see `## Tests` to update the test migration file.
 
