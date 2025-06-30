@@ -99,13 +99,27 @@ export function getActionUpdateMetadata(actions: Action[]) {
     .filter(({ type }) => StatusChangingActions.safeParse(type).success)
     .reduce(
       (metadata, action) => {
-        return {
-          createdAt: action.createdAt,
-          createdBy: action.createdBy,
-          createdByUserType: action.createdByUserType,
-          createdAtLocation: action.createdAtLocation,
-          createdByRole: action.createdByRole
+        if (action.status === ActionStatus.Accepted) {
+          if (action.originalActionId) {
+            const originalAction =
+              actions.find(({ id }) => id === action.originalActionId) ?? action
+            return {
+              createdAt: originalAction.createdAt,
+              createdBy: originalAction.createdBy,
+              createdByUserType: originalAction.createdByUserType,
+              createdAtLocation: originalAction.createdAtLocation,
+              createdByRole: originalAction.createdByRole
+            }
+          }
+          return {
+            createdAt: action.createdAt,
+            createdBy: action.createdBy,
+            createdByUserType: action.createdByUserType,
+            createdAtLocation: action.createdAtLocation,
+            createdByRole: action.createdByRole
+          }
         }
+        return metadata
       },
       {
         createdAt: createAction.createdAt,
