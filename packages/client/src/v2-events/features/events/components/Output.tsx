@@ -21,6 +21,7 @@ import {
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
+  isTimeFieldType,
   isDateRangeFieldType,
   isDividerFieldType,
   isEmailFieldType,
@@ -54,7 +55,8 @@ import {
   SelectCountry,
   Paragraph,
   Number,
-  Text
+  Text,
+  TimeField
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -86,6 +88,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
 
   if (isDateFieldType(field)) {
     return DateField.Output({ value: field.value })
+  }
+
+  if (isTimeFieldType(field)) {
+    return TimeField.Output({ value: field.value })
   }
 
   if (isDateRangeFieldType(field)) {

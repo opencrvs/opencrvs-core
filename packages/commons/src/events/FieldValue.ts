@@ -44,6 +44,8 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
+export const TimeValue = z.string().time().describe('Time in the format HH-mm')
+
 export const DatetimeValue = z.string().datetime()
 
 export const SelectDateRangeValue = z.enum([
@@ -81,6 +83,7 @@ export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 export const FieldValue = z.union([
   TextValue,
   DateValue,
+  TimeValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,
@@ -100,6 +103,7 @@ export type FieldValue = z.infer<typeof FieldValue>
 export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
+  TimeValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
   CheckboxFieldValue,

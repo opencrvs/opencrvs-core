@@ -22,7 +22,8 @@ import {
   TextValue,
   DateRangeFieldValue,
   SignatureFieldValue,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  TimeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -184,10 +185,21 @@ const DateField = BaseField.extend({
 
 export type DateField = z.infer<typeof DateField>
 
-/**
- * For internal use only. Needed for search functionality.
- */
-export const DateRangeField = BaseField.extend({
+const TimeField = BaseField.extend({
+  type: z.literal(FieldType.TIME),
+  defaultValue: TimeValue.optional(),
+  configuration: z
+    .object({
+      notice: TranslationConfig.describe(
+        'Text to display above the time input'
+      ).optional()
+    })
+    .optional()
+}).describe('A single date input (HH-mm)')
+
+export type TimeField = z.infer<typeof TimeField>
+
+const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
   defaultValue: DateRangeFieldValue.optional(),
   configuration: z
@@ -500,6 +512,35 @@ export type DataField = z.infer<typeof DataField>
  * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
  * errors when compiling
  */
+/** @knipignore */
+export type AllFields =
+  | typeof Address
+  | typeof TextField
+  | typeof NumberField
+  | typeof TextAreaField
+  | typeof DateField
+  | typeof TimeField
+  | typeof DateRangeField
+  | typeof Paragraph
+  | typeof RadioGroup
+  | typeof BulletList
+  | typeof PageHeader
+  | typeof Select
+  | typeof NameField
+  | typeof PhoneField
+  | typeof IdField
+  | typeof Checkbox
+  | typeof File
+  | typeof Country
+  | typeof AdministrativeArea
+  | typeof Divider
+  | typeof Location
+  | typeof Facility
+  | typeof Office
+  | typeof SignatureField
+  | typeof EmailField
+  | typeof FileUploadWithOptions
+  | typeof DataField
 
 /** @knipignore */
 export type Inferred =
@@ -508,6 +549,7 @@ export type Inferred =
   | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
+  | z.infer<typeof TimeField>
   | z.infer<typeof DateRangeField>
   | z.infer<typeof SelectDateRangeField>
   | z.infer<typeof Paragraph>
@@ -541,6 +583,7 @@ export type InferredInput =
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
+  | z.input<typeof TimeField>
   | z.input<typeof DateRangeField>
   | z.input<typeof Paragraph>
   | z.input<typeof RadioGroup>
@@ -570,6 +613,7 @@ export const FieldConfig = z
     NumberField,
     TextAreaField,
     DateField,
+    TimeField,
     DateRangeField,
     SelectDateRangeField,
     Paragraph,
