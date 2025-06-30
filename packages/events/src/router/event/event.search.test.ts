@@ -20,8 +20,7 @@ import {
   getMixedPath,
   getUUID,
   SCOPES,
-  TENNIS_CLUB_MEMBERSHIP,
-  UUID
+  TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -1068,7 +1067,7 @@ test('Returns relevant events in right order', async () => {
 })
 
 test('User with my-jurisdiction scope only sees events from their primary office', async () => {
-  const { user, generator } = await setupTestCase(5541)
+  const { user, generator, locations } = await setupTestCase(5541)
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
     'search[event=tennis-club-membership,access=my-jurisdiction]'
@@ -1078,7 +1077,7 @@ test('User with my-jurisdiction scope only sees events from their primary office
 
   await createEvent(client, generator)
 
-  const OTHER_OFFICE_ID = 'OTHER_OFFICE_ID' as UUID
+  const OTHER_OFFICE_ID = locations[1].id // using different location id for a different user
   // Create another user from a different office
   const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
   const userFromOtherOffice = {
@@ -1108,7 +1107,7 @@ test('User with my-jurisdiction scope only sees events from their primary office
 })
 
 test('User without an event in the scope should not be able to view events of that type', async () => {
-  const { user, generator } = await setupTestCase(5541)
+  const { user, generator, locations } = await setupTestCase(5541)
   const client = createTestClient(user, [
     ...TEST_USER_DEFAULT_SCOPES,
     'search[event=v2.birth,access=my-jurisdiction]'
@@ -1120,7 +1119,7 @@ test('User without an event in the scope should not be able to view events of th
   const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
   const userFromOtherOffice = {
     ...otherUser,
-    primaryOfficeId: 'OTHER_OFFICE_ID' as UUID
+    primaryOfficeId: locations[1].id // using different location id for a different user
   }
 
   const otherClient = createTestClient(userFromOtherOffice, [
@@ -1141,7 +1140,7 @@ test('User without an event in the scope should not be able to view events of th
 })
 
 test('User with my-jurisdiction scope can see events from other offices based on their scopes', async () => {
-  const { user: userA } = await setupTestCase(6003)
+  const { user: userA, locations } = await setupTestCase(6003)
 
   const clientA = createTestClient(userA, [
     ...TEST_USER_DEFAULT_SCOPES,
@@ -1151,7 +1150,7 @@ test('User with my-jurisdiction scope can see events from other offices based on
   const { user: userB, generator: generatorB } = await setupTestCase(6004)
   const userBOverride = {
     ...userB,
-    primaryOfficeId: 'OTHER_OFFICE' as UUID
+    primaryOfficeId: locations[1].id // using different location id for a different user
   }
 
   const clientB = createTestClient(userBOverride, [
@@ -1255,7 +1254,7 @@ test('User with both "all" and "my-jurisdiction" scopes sees all matching events
 })
 
 test('User only sees tennis club membership events within their jurisdiction', async () => {
-  const { user, generator } = await setupTestCase(6011)
+  const { user, generator, locations } = await setupTestCase(6011)
   const ownOfficeId = user.primaryOfficeId
 
   const client = createTestClient(user, [
@@ -1267,7 +1266,7 @@ test('User only sees tennis club membership events within their jurisdiction', a
   await createEvent(client, generator)
   await createEvent(client, generator)
 
-  const otherOfficeId = 'OTHER_OFFICE' as UUID
+  const otherOfficeId = locations[1].id // using different location id for a different user
   const userOtherOffice = { ...user, primaryOfficeId: otherOfficeId }
   const clientOtherOffice = createTestClient(userOtherOffice, [
     ...TEST_USER_DEFAULT_SCOPES,
