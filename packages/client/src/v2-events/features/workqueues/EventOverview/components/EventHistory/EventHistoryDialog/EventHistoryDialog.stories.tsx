@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { ActionType } from '@opencrvs/commons/client'
+import { ActionType, getUUID } from '@opencrvs/commons/client'
 import { EventHistoryDialog } from './EventHistoryDialog'
 
 const meta: Meta<typeof EventHistoryDialog> = {
@@ -22,7 +22,7 @@ export default meta
 type Story = StoryObj<typeof EventHistoryDialog>
 
 const actionBase = {
-  id: '123',
+  id: getUUID(),
   createdAt: '2021-01-01',
   createdBy: 'John Doe',
   createdByRole: 'User',
