@@ -18,7 +18,7 @@ import {
   ActionType,
   ActionUpdate
 } from '@opencrvs/commons/client'
-import { joinValues } from '@client/v2-events/utils'
+import { joinValues } from '@opencrvs/commons/client'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
