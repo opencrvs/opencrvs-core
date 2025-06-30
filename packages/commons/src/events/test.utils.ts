@@ -160,6 +160,8 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.TIME:
+      return '09:33'
     case FieldType.DATE_RANGE:
       return ['2021-01-01', '2021-01-02']
     case FieldType.CHECKBOX:
