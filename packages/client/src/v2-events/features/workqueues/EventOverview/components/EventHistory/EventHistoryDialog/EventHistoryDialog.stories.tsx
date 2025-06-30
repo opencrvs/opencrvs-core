@@ -160,7 +160,7 @@ export const RequestCorrection: Story = {
   args: {
     action: requestCorrectionAction,
     fullEvent: {
-      id: '123',
+      id: getUUID(),
       type: 'tennis-club-membership',
       actions: [
         {
