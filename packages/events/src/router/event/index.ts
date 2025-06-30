@@ -65,7 +65,7 @@ extendZodWithOpenApi(z)
  * thus avoiding "The inferred type of this node exceeds the maximum length the
  * compiler will serialize" error
  */
-const eventConfigProcedure: QueryProcedure<{
+const eventConfigGetProcedure: QueryProcedure<{
   meta: OpenApiMeta
   input: void
   output: EventConfig[]
@@ -88,7 +88,7 @@ const eventConfigProcedure: QueryProcedure<{
 
 export const eventRouter = router({
   config: router({
-    get: eventConfigProcedure
+    get: eventConfigGetProcedure
   }),
   create: systemProcedure
     .meta({
