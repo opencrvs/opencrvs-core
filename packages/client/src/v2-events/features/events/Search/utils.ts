@@ -235,11 +235,15 @@ function buildCondition(
   }
 }
 
+/**
+ * Builds a condition to match all event statuses except 'CREATED' (draft status).
+ * This is used to exclude draft events from advanced search results.
+ */
 function buildNonCreatedStatusFilter(): Condition {
   return {
     type: 'anyOf',
     terms: EventStatus.options.filter(
-      (status) => status !== EventStatus.enum.CREATED // drafts are not included for advanced search
+      (status) => status !== EventStatus.enum.CREATED
     )
   }
 }
