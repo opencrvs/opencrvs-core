@@ -1,3 +1,6 @@
 {
-  "ignore": ["packages/client/src/utils/gateway.ts"]
+  "ignore": [
+    "packages/client/src/utils/gateway.ts",
+    "packages/events//src/storage/postgres/events/schema/**/*.ts"
+  ]
 }

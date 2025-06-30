@@ -15,11 +15,11 @@ import {
   FieldConfig,
   FieldType,
   getValidatorsForField,
+  joinValues,
   NameFieldValue,
   TextField
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { joinValues } from '@client/v2-events/utils'
 
 interface Props {
   id: string

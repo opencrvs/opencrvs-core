@@ -131,8 +131,7 @@ export async function registerOnValidate(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: variables.transactionId,
-      duplicates: []
+      transactionId: variables.transactionId
     }
   )
 

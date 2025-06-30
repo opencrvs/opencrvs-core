@@ -26,22 +26,10 @@ import {
   SystemVariables,
   Scope,
   ActionScopes,
-  WorkqueueConfigWithoutQuery
+  WorkqueueConfigWithoutQuery,
+  joinValues,
+  UUID
 } from '@opencrvs/commons/client'
-
-/**
- *
- * Joins defined values using a separator and trims the result
- */
-export function joinValues(
-  values: Array<string | undefined | null>,
-  separator = ' '
-) {
-  return values
-    .filter((value) => !!value)
-    .join(separator)
-    .trim()
-}
 
 export function getUsersFullName(
   names: ResolvedUser['name'],
@@ -88,7 +76,7 @@ export function isTemporaryId(id: string) {
 }
 
 export function createTemporaryId() {
-  return `tmp-${uuid()}`
+  return `tmp-${uuid()}` as UUID
 }
 
 /**
@@ -231,6 +219,10 @@ export function mergeWithoutNullsOrUndefined<T>(
   })
 }
 
+export enum CoreWorkqueues {
+  OUTBOX = 'outbox'
+}
+
 export function hasOutboxWorkqueue(scopes: Scope[]) {
   return scopes.some((scope) => ActionScopes.safeParse(scope).success)
 }
@@ -242,7 +234,7 @@ export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
     description: 'Title of outbox workqueue'
   },
   actions: [],
-  slug: 'outbox',
+  slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
 }
 
