@@ -18,11 +18,11 @@ import {
   generateEventDraftDocument,
   ActionStatus,
   getUUID,
-  TokenUserType,
   createPrng,
   getRandomDatetime,
   tennisClubMembershipEvent,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
 import { SystemRole } from '@opencrvs/commons/client'
 import {
@@ -79,6 +79,13 @@ export const Overview: Story = {
     },
     msw: {
       handlers: {
+        events: [
+          tRPCMsw.event.search.query(() => {
+            return [
+              getCurrentEventState(defaultEvent, tennisClubMembershipEvent)
+            ]
+          })
+        ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
@@ -142,9 +149,9 @@ export const WithRejectedAction: Story = {
           id: getUUID(),
           transactionId: getUUID(),
           createdAt: new Date().toISOString(),
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: 'user',
           createdBy: '123',
-          createdAtLocation: '123',
+          createdAtLocation: '123' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {},
           reason: { message: 'Archived', isDuplicate: true }
@@ -191,7 +198,7 @@ export const WithSystemUserActions: Story = {
           ),
           createdBy: '010101',
           createdAtLocation: undefined,
-          createdByUserType: TokenUserType.Enum.system,
+          createdByUserType: 'system' as const,
           createdByRole: SystemRole.enum.HEALTH,
           assignedTo: '010101',
           declaration: {}
@@ -208,7 +215,7 @@ export const WithSystemUserActions: Story = {
           ),
           createdBy: '010101',
           createdAtLocation: undefined,
-          createdByUserType: TokenUserType.Enum.system,
+          createdByUserType: 'system' as const,
           createdByRole: SystemRole.enum.HEALTH,
           assignedTo: '010101',
           declaration: {}
@@ -225,7 +232,7 @@ export const WithSystemUserActions: Story = {
           ),
           createdBy: '010101',
           createdAtLocation: undefined,
-          createdByUserType: TokenUserType.Enum.system,
+          createdByUserType: 'system' as const,
           createdByRole: SystemRole.enum.HEALTH,
           declaration: {}
         },
@@ -241,7 +248,7 @@ export const WithSystemUserActions: Story = {
           ),
           createdBy: '010101',
           createdAtLocation: undefined,
-          createdByUserType: TokenUserType.Enum.system,
+          createdByUserType: 'system' as const,
           createdByRole: SystemRole.enum.HEALTH,
           assignedTo: null,
           declaration: {}
@@ -257,8 +264,8 @@ export const WithSystemUserActions: Story = {
             new Date('2024-06-01')
           ),
           createdBy: '123',
-          createdByUserType: TokenUserType.Enum.user,
-          createdAtLocation: '123',
+          createdByUserType: 'user' as const,
+          createdAtLocation: '123' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {}
         }

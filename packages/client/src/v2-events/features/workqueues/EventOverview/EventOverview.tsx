@@ -41,6 +41,7 @@ import { EventOverviewProvider } from './EventOverviewContext'
 /**
  * Renders the event overview page, including the event summary and history.
  */
+
 function EventOverview({
   fullEvent,
   eventIndex,
@@ -58,6 +59,7 @@ function EventOverview({
   const eventWithDrafts = deepDropNulls(
     applyDraftsToEventIndex(eventIndex, drafts)
   )
+
   const { getUser } = useUsers()
   const intl = useIntl()
 

@@ -13,6 +13,7 @@ import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { config } from '@client/config'
 import { routes as correctionRoutes } from '@client/v2-events/features/events/actions/correct/request/routes'
 import { routes as workqueueRoutes } from '@client/v2-events/features/workqueues/routes'
+import { uuid } from './utils'
 
 export const ROUTES = {
   V2: route(
@@ -24,13 +25,13 @@ export const ROUTES = {
         {},
         {
           VIEW: route('view/:eventId', {
-            params: { eventId: string().defined() },
+            params: { eventId: uuid().defined() },
             searchParams: {
               workqueue: string()
             }
           }),
           OVERVIEW: route('overview/:eventId', {
-            params: { eventId: string().defined() },
+            params: { eventId: uuid().defined() },
             searchParams: {
               workqueue: string()
             }
@@ -48,7 +49,7 @@ export const ROUTES = {
           DECLARE: route(
             'declare/:eventId',
             {
-              params: { eventId: string().defined() },
+              params: { eventId: uuid().defined() },
               searchParams: {
                 workqueue: string()
               }
@@ -72,7 +73,7 @@ export const ROUTES = {
           VALIDATE: route(
             'validate/:eventId',
             {
-              params: { eventId: string().defined() },
+              params: { eventId: uuid().defined() },
               searchParams: {
                 workqueue: string()
               }
@@ -96,7 +97,7 @@ export const ROUTES = {
           REGISTER: route(
             'register/:eventId',
             {
-              params: { eventId: string().defined() },
+              params: { eventId: uuid().defined() },
               searchParams: {
                 workqueue: string()
               }
@@ -120,7 +121,7 @@ export const ROUTES = {
           PRINT_CERTIFICATE: route(
             'print-certificate/:eventId',
             {
-              params: { eventId: string().defined() },
+              params: { eventId: uuid().defined() },
               searchParams: {
                 workqueue: string()
               }
