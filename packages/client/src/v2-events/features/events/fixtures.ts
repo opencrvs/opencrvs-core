@@ -8,29 +8,32 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { v4 as uuid } from 'uuid'
+
 import {
   ActionStatus,
   ActionType,
   EventDocument,
   EventIndex,
   EventStatus,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  UUID,
+  getUUID
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
 const localRegistrarId = testDataGenerator().user.id.localRegistrar
 
 export const tennisClubMembershipEventIndex: EventIndex = {
-  id: uuid(),
+  id: getUUID(),
   type: TENNIS_CLUB_MEMBERSHIP,
   trackingId: 'TEST12',
   status: EventStatus.enum.CREATED,
   createdAt: '2023-03-01T00:00:00.000Z',
   legalStatuses: {},
-  createdBy: uuid(),
-  createdAtLocation: uuid(),
-  updatedAtLocation: uuid(),
+  createdBy: getUUID(),
+  createdByUserType: 'user',
+  createdAtLocation: getUUID(),
+  updatedAtLocation: getUUID(),
   updatedAt: '2023-03-01T00:00:00.000Z',
   assignedTo: null,
   updatedBy: 'system',
@@ -47,24 +50,25 @@ export const tennisClubMembershipEventIndex: EventIndex = {
 
 export const tennisClubMembershipEventDocument: EventDocument = {
   type: TENNIS_CLUB_MEMBERSHIP,
-  id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52',
+  id: 'c5d9d901-00bf-4631-89dc-89ca5060cb52' as UUID,
   trackingId: 'TEST12',
   createdAt: '2025-01-23T05:30:02.615Z',
   updatedAt: '2025-01-23T05:35:27.689Z',
   actions: [
     {
-      id: 'ae9618d8-319d-48a7-adfe-7ad6cfbc56b7',
+      id: 'ae9618d8-319d-48a7-adfe-7ad6cfbc56b7' as UUID,
       type: 'CREATE',
       status: ActionStatus.Accepted,
       createdAt: '2025-01-23T05:30:02.615Z',
+      createdByUserType: 'user',
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       declaration: {},
       transactionId: 'a0f1b2c3-d4e5-6f7g-8h9i-j0k1l2m3n4o5'
     },
     {
-      id: '8db635cf-ee30-40ca-8117-a7188256a2b1',
+      id: '8db635cf-ee30-40ca-8117-a7188256a2b1' as UUID,
       status: ActionStatus.Accepted,
       declaration: {
         'applicant.name': {
@@ -86,13 +90,14 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       },
       type: 'DECLARE',
       createdBy: localRegistrarId,
+      createdByUserType: 'user',
       createdByRole: 'some-user-role',
       createdAt: '2025-01-23T05:30:08.847Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       transactionId: 'aasdk342-asdkj3423-kn234k23'
     },
     {
-      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
+      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
       status: ActionStatus.Accepted,
       declaration: {
         'applicant.name': {
@@ -108,12 +113,13 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       type: 'VALIDATE',
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
+      createdByUserType: 'user',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       transactionId: 'aasdk342-asdkj3423-kn234k24'
     },
     {
-      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
+      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
       status: ActionStatus.Accepted,
       declaration: {
         'applicant.name': {
@@ -130,19 +136,21 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      createdByUserType: 'user',
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       registrationNumber: 'TEST12121212',
       transactionId: 'aasdk342-asdkj3423-kn234k25'
     },
     {
-      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374',
+      id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
       status: ActionStatus.Accepted,
       declaration: {},
       type: ActionType.ASSIGN,
       createdBy: localRegistrarId,
       createdByRole: 'some-user-role',
+      createdByUserType: 'user',
       createdAt: '2025-01-23T05:35:27.689Z',
-      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
       assignedTo: testDataGenerator().user.id.localRegistrar,
       transactionId: 'aasdk342-asdkj3423-kn234k26'
     }

@@ -10,10 +10,11 @@
  */
 
 import { z, ZodType } from 'zod'
-import { EventMetadata, EventStatus } from './EventMetadata'
+import { EventMetadata, EventStatus, Flag } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
+import { TokenUserType } from '../authentication'
 extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
@@ -41,18 +42,11 @@ export const Fuzzy = z
   .openapi({
     ref: 'Fuzzy'
   })
+
 export const Exact = z
   .object({ type: z.literal('exact'), term: z.string() })
   .openapi({
     ref: 'Exact'
-  })
-export const AnyOf = z
-  .object({
-    type: z.literal('anyOf'),
-    terms: z.array(z.string())
-  })
-  .openapi({
-    ref: 'AnyOf'
   })
 
 export const ExactStatus = z
@@ -62,6 +56,15 @@ export const ExactStatus = z
   })
   .openapi({
     ref: 'ExactStatus'
+  })
+
+export const AnyOf = z
+  .object({
+    type: z.literal('anyOf'),
+    terms: z.array(z.string())
+  })
+  .openapi({
+    ref: 'AnyOf'
   })
 
 export const AnyOfStatus = z
@@ -82,10 +85,14 @@ export const Range = z
   .openapi({
     ref: 'Range'
   })
-export const Not = z
-  .object({ type: z.literal('not'), term: z.string() })
+
+export const ContainsFlags = z
+  .object({
+    anyOf: z.array(Flag).optional(),
+    noneOf: z.array(Flag).optional()
+  })
   .openapi({
-    ref: 'Not'
+    ref: 'ContainsFlags'
   })
 
 export const Within = z
@@ -94,7 +101,20 @@ export const Within = z
     ref: 'Within'
   })
 
-export const DateCondition = z.union([Exact, Range]).openapi({
+export const RangeDate = Range.extend({
+  gte: z.string().date().or(z.string().datetime()),
+  lte: z.string().date().or(z.string().datetime())
+}).openapi({
+  ref: 'RangeDate'
+})
+
+export const ExactDate = Exact.extend({
+  term: z.string().date().or(z.string().datetime())
+}).openapi({
+  ref: 'ExactDate'
+})
+
+export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
   ref: 'DateCondition'
 })
 
@@ -103,7 +123,7 @@ export const DateCondition = z.union([Exact, Range]).openapi({
 export const QueryInput: ZodType = z
   .lazy(() =>
     z.union([
-      z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf, Not]),
+      z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf]),
       z.record(z.string(), QueryInput)
     ])
   )
@@ -116,7 +136,6 @@ export type BaseInput =
   | z.infer<typeof Range>
   | z.infer<typeof Within>
   | z.infer<typeof AnyOf>
-  | z.infer<typeof Not>
 
 type QueryMap = {
   [key: string]: BaseInput | QueryMap
@@ -128,6 +147,7 @@ export type QueryInputType = BaseInput | QueryMap
 
 export const QueryExpression = z
   .object({
+    id: z.optional(z.string()),
     eventType: z.string(),
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
@@ -140,13 +160,17 @@ export const QueryExpression = z
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
+    createdByUserType: TokenUserType,
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
-    flags: z.optional(z.array(z.union([AnyOf, Not]))),
+    flags: z.optional(ContainsFlags),
     data: QueryInput
   })
   .partial()
+  .refine((obj) => Object.values(obj).some((val) => val !== undefined), {
+    message: 'At least one query field must be specified.'
+  })
   .openapi({
     ref: 'QueryExpression'
   })

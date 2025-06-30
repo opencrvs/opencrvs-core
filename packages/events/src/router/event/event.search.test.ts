@@ -11,18 +11,25 @@
  */
 
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   EventStatus,
+  generateActionDocument,
+  getCurrentEventState,
   getMixedPath,
+  getUUID,
+  SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
+
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
-  getGrowingCombinations,
   sanitizeForSnapshot,
   setupTestCase,
+  TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 
@@ -113,6 +120,201 @@ test('Returns empty list when no events match search criteria', async () => {
   })
 
   expect(fetchedEvents).toEqual([])
+})
+
+test('Throws when searching without payload', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+
+  // @ts-expect-error - Intentionally passing an empty object to trigger the error
+  await expect(client.event.search({})).rejects.toMatchSnapshot()
+})
+
+test('Throws when searching by unrelated properties', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+
+  await expect(
+    client.event.search({
+      type: 'and',
+      clauses: [
+        {
+          completelyUnrelatedProperty: 'cat'
+        }
+      ]
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Throws when searching with empty clauses', async () => {
+  const { user } = await setupTestCase()
+
+  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+
+  await expect(
+    client.event.search({
+      type: 'and',
+      clauses: []
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Throws when date field is invalid', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+
+  await expect(
+    client.event.search({
+      type: 'and',
+      clauses: [
+        {
+          updatedAt: {
+            type: 'exact',
+            term: 'invalid-date'
+          }
+        }
+      ]
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Throws when one of the date range fields has invalid date', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+
+  await expect(
+    client.event.search({
+      type: 'and',
+      clauses: [
+        {
+          updatedAt: {
+            type: 'range',
+            gte: 'invalid-date',
+            lte: '2023-01-01'
+          }
+        }
+      ]
+    })
+  ).rejects.toMatchSnapshot()
+})
+
+test('Returns events based on the updatedAt column', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    SCOPES.SEARCH_BIRTH,
+    SCOPES.RECORD_IMPORT,
+    ...TEST_USER_DEFAULT_SCOPES
+  ])
+
+  const oldEventCreatedAt = new Date(2022, 5, 6).toISOString()
+
+  const oldEventCreateAction = generateActionDocument({
+    configuration: tennisClubMembershipEvent,
+    action: ActionType.CREATE,
+    user,
+    defaults: {
+      createdAt: oldEventCreatedAt
+    }
+  })
+
+  const oldEventDeclarationRequestActions = [
+    ActionType.DECLARE,
+    ActionType.REGISTER
+  ].map((action) =>
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action,
+      user,
+      defaults: {
+        status: ActionStatus.Requested
+      }
+    })
+  )
+
+  const oldEventActions = [
+    oldEventCreateAction,
+    ...oldEventDeclarationRequestActions
+  ]
+
+  const oldDocumentWithoutAcceptedDeclaration = {
+    trackingId: getUUID(),
+    type: tennisClubMembershipEvent.id,
+    actions: oldEventActions,
+    createdAt: oldEventCreatedAt,
+    id: getUUID(),
+    updatedAt: new Date().toISOString()
+  }
+
+  await client.event.import(oldDocumentWithoutAcceptedDeclaration)
+
+  const newlyCreatedEvent = await client.event.create(generator.event.create())
+  const newlyCreatedEvent2 = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(newlyCreatedEvent.id)
+  )
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(newlyCreatedEvent2.id)
+  )
+
+  const oldEvents = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        // updatedAt changes are triggered by certain status changes, in which CREATED is included.  See up-to-date definition for updatedAt in EventMetadata.ts.
+        updatedAt: {
+          type: 'range',
+          gte: '2022-01-01',
+          lte: '2023-01-01'
+        }
+      }
+    ]
+  })
+
+  expect(oldEvents).toHaveLength(1)
+  const [oldEvent] = oldEvents
+
+  // Only accepted action should update updatedAt timestamp
+  expect(oldEvent.createdAt).toEqual(oldEventCreatedAt)
+  expect(oldEvent.updatedAt).toEqual(oldEventCreatedAt)
+
+  expect(oldEvent).toEqual(
+    getCurrentEventState(
+      oldDocumentWithoutAcceptedDeclaration,
+      tennisClubMembershipEvent
+    )
+  )
+
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const today = new Date().toISOString()
+
+  const acceptedTodayResult = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        updatedAt: {
+          type: 'range',
+          gte: yesterday.split('T')[0],
+          lte: today.split('T')[0]
+        }
+      }
+    ]
+  })
+
+  expect(acceptedTodayResult).toHaveLength(2)
+
+  acceptedTodayResult.forEach((event) => {
+    const updatedAtInMillis = +new Date(event.updatedAt)
+    expect(+new Date(event.createdAt)).toBeLessThan(updatedAtInMillis) // DECLARE action was accepted, so updatedAt should be greater than createdAt
+
+    expect(event.updatedAt).toEqual(
+      event.legalStatuses['DECLARED']?.acceptedAt ?? null
+    )
+
+    expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
+  })
 })
 
 test.skip('Returns events that match the name field criteria of applicant', async () => {
@@ -737,17 +939,19 @@ test('Returns relevant events in right order', async () => {
 
   // Until we have a way to reindex from mongodb, we create events through API.
   // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
-  const actions = [
-    ActionType.CREATE,
-    ActionType.DECLARE,
-    ActionType.VALIDATE,
-    ActionType.REJECT,
-    ActionType.ARCHIVE,
-    ActionType.REGISTER,
-    ActionType.PRINT_CERTIFICATE
+  const actionCombinations = [
+    [ActionType.DECLARE],
+    [ActionType.DECLARE, ActionType.VALIDATE],
+    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REJECT],
+    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.ARCHIVE],
+    [ActionType.DECLARE, ActionType.VALIDATE, ActionType.REGISTER],
+    [
+      ActionType.DECLARE,
+      ActionType.VALIDATE,
+      ActionType.REGISTER,
+      ActionType.PRINT_CERTIFICATE
+    ]
   ]
-
-  const actionCombinations = getGrowingCombinations(actions)
 
   // 1. Create events with all combinations of actions
   for (const actionCombination of actionCombinations) {

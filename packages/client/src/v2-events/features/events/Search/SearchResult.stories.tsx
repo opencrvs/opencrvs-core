@@ -17,11 +17,12 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { SearchResultComponent } from './SearchResult'
 
 const meta: Meta<typeof SearchResultComponent> = {
   title: 'Components/SearchResult',
-  component: SearchResultComponent,
+  component: withSuspense(SearchResultComponent),
   parameters: {
     layout: 'centered'
   },

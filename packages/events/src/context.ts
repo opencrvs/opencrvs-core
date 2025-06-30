@@ -21,13 +21,14 @@ import {
   logger,
   SystemRole,
   TokenUserType,
-  TokenWithBearer
+  TokenWithBearer,
+  UUID
 } from '@opencrvs/commons'
 import { env } from './environment'
 
 const UserContext = z.object({
   id: z.string(),
-  primaryOfficeId: z.string(),
+  primaryOfficeId: UUID,
   role: z.string(),
   signature: z
     .string()
@@ -35,7 +36,7 @@ const UserContext = z.object({
     .describe('Storage key for the user signature. e.g. /ocrvs/signature.png'),
   type: TokenUserType.extract(['user'])
 })
-type UserContext = z.infer<typeof UserContext>
+export type UserContext = z.infer<typeof UserContext>
 
 export const SystemContext = z.object({
   id: z.string(),
@@ -93,7 +94,7 @@ function normalizeHeaders(
   return headers
 }
 
-export async function resolveUserDetails(
+async function resolveUserDetails(
   token: TokenWithBearer
 ): Promise<TrpcUserContext> {
   let userId: string | undefined
@@ -157,7 +158,17 @@ export async function resolveUserDetails(
 
 export async function createContext({ req }: { req: IncomingMessage }) {
   const normalizedHeaders = normalizeHeaders(req.headers)
-  const token = TokenWithBearer.parse(normalizedHeaders.authorization)
+  let token: TokenWithBearer
+
+  try {
+    token = TokenWithBearer.parse(normalizedHeaders.authorization)
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (_) {
+    throw new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
+  }
 
   const user = await resolveUserDetails(token)
   return { token, user }

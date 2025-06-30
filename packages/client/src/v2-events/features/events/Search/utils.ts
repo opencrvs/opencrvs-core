@@ -12,6 +12,8 @@ import startOfDay from 'date-fns/startOfDay'
 import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
+import { parse as parseQuery, stringify } from 'query-string'
+import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -25,6 +27,7 @@ import {
   EventState,
   FieldType,
   QueryExpression,
+  NameFieldValue,
   EventStatus
 } from '@opencrvs/commons/client'
 import {
@@ -33,6 +36,7 @@ import {
 } from '@client/v2-events/components/forms/validation'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -46,11 +50,28 @@ export const getAdvancedSearchFieldErrors = (
         advancedSearchFieldIds.includes(field.id)
       )
 
-      const modifiedFields = advancedSearchFields.map((f) => ({
-        ...f,
-        required: false, // advanced search fields need not be required
-        validation: formValues[f.id] ? f.validation : [] // need to validate fields only when they are not empty
-      }))
+      const modifiedFields = advancedSearchFields.map((f) => {
+        const overRiddenValidationFromAdvancedSearch =
+          currentSection.fields.find(
+            (field) => field.fieldId === f.id
+          )?.validations
+        return {
+          ...f,
+          required: false, // advanced search fields need not be required
+          validation: (() => {
+            if (formValues[f.id]) {
+              if (overRiddenValidationFromAdvancedSearch) {
+                return overRiddenValidationFromAdvancedSearch
+              } else {
+                return f.validation
+              }
+            } else {
+              // need to validate fields only when they are not empty
+              return []
+            }
+          })()
+        }
+      })
 
       const err = getValidationErrorsForForm(modifiedFields, formValues)
 
@@ -307,6 +328,12 @@ function buildDataConditionFromSearchKeys(
           searchType = 'range'
           value = getUtcRangeFromInput(value)
         }
+        if (
+          fieldConfig?.type === FieldType.NAME &&
+          NameFieldValue.safeParse(rawInput[fieldId]).success
+        ) {
+          value = Name.stringify(rawInput[fieldId] as NameFieldValue)
+        }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
         // but "2023-01-01" should be treated as an exact match
@@ -526,4 +553,77 @@ export function buildQuickSearchQuery(
 
   // Delegate to the actual query builder
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
+}
+
+function serializeValue(value: unknown) {
+  if (isArray(value)) {
+    return value.length > 0
+      ? value.map((v) => (isPlainObject(v) ? JSON.stringify(v) : v))
+      : undefined
+  }
+  if (isPlainObject(value)) {
+    return JSON.stringify(value)
+  }
+
+  return value
+}
+
+export function serializeSearchParams(
+  eventState: Record<string, unknown>
+): string {
+  const simplifiedValue = Object.entries(eventState).reduce(
+    (acc, [key, value]) => {
+      const serialized = serializeValue(value)
+      // If we don't care about the empty objects, we might be able to keep it as simple as this:
+      if (!isNil(serialized)) {
+        acc[key] = serialized
+      }
+
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+  return stringify(simplifiedValue, { skipEmptyString: true })
+}
+
+/* eslint-disable max-lines */
+
+function tryParse(value: unknown): unknown {
+  if (!isString(value)) {
+    return value
+  }
+
+  try {
+    if (isArray(value)) {
+      return value.map(tryParse)
+    } else {
+      const parsed = JSON.parse(value)
+      // Only return parsed if it's an object or array (i.e., something we stringified before)
+      if (typeof parsed === 'object' && parsed !== null) {
+        return parsed
+      }
+    }
+  } catch {}
+
+  return value
+}
+export function deserializeSearchParams(
+  queryParams: string
+): Record<string, unknown> {
+  const parsedParams = parseQuery(queryParams)
+
+  const deserialized = Object.entries(parsedParams).reduce(
+    (acc, [key, value]) => {
+      if (isArray(value)) {
+        acc[key] = value.map(tryParse)
+      } else {
+        acc[key] = tryParse(value)
+      }
+
+      return acc
+    },
+    {} as Record<string, unknown>
+  )
+
+  return deserialized
 }

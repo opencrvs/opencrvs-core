@@ -10,12 +10,12 @@
  */
 import { readFileSync } from 'fs'
 import { join } from 'path'
-import { times, flatten, constant } from 'lodash'
 import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
   generateRandomSignature,
+  getUUID,
   Scope,
   SCOPES,
   SystemRole,
@@ -24,9 +24,10 @@ import {
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import * as events from '@events/storage/mongodb/__mocks__/events'
 import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { SystemContext } from '@events/context'
+import { getClient } from '@events/storage/postgres/events'
+import { getLocations } from '../service/locations/locations'
 import { CreatedUser, payloadGenerator, seeder } from './generators'
 
 /**
@@ -41,12 +42,14 @@ export const UNSTABLE_EVENT_FIELDS = [
   'trackingId',
   'eventId',
   'createdBy',
+  'createdByUserType',
   'createdAtLocation',
   'assignedTo',
   'updatedAtLocation',
   'updatedBy',
   'acceptedAt',
-  'dateOfEvent'
+  'dateOfEvent',
+  'registrationNumber'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.
@@ -163,13 +166,13 @@ export function createTestClient(
 export const setupTestCase = async (rngSeed?: number) => {
   const rng = createPrng(rngSeed ?? 101)
   const generator = payloadGenerator(rng)
-  const eventsDb = await events.getClient()
+  const eventsDb = getClient()
   const userMgntDb = await userMgnt.getClient()
 
   const seed = seeder()
-  const locations = generator.locations.set(5)
-  await seed.locations(eventsDb, locations)
+  await seed.locations(generator.locations.set(5))
 
+  const locations = await getLocations()
   const user = await seed.user(
     userMgntDb,
     generator.user.create({
@@ -185,6 +188,7 @@ export const setupTestCase = async (rngSeed?: number) => {
     },
     eventsDb,
     userMgntDb,
+    rng,
     seed,
     generator
   }
@@ -202,7 +206,6 @@ function actionToClientAction(
   generator: ReturnType<typeof payloadGenerator>,
   action: ActionType
 ) {
-  //
   switch (action) {
     case ActionType.CREATE:
       return async () => client.event.create(generator.event.create())
@@ -229,7 +232,10 @@ function actionToClientAction(
     case ActionType.REGISTER:
       return async (eventId: string) =>
         client.event.actions.register.request(
-          generator.event.actions.register(eventId, { keepAssignment: true })
+          generator.event.actions.register(eventId, {
+            keepAssignment: true,
+            registrationNumber: getUUID()
+          })
         )
     case ActionType.PRINT_CERTIFICATE:
       return async (eventId: string) =>
@@ -264,38 +270,23 @@ export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
   actions: ActionType[]
-) {
+): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+
+  // Always first create the event
+  const createAction = actionToClientAction(
+    client,
+    generator,
+    ActionType.CREATE
+  )
+
+  // @ts-expect-error -- createEvent does not accept any arguments
+  createdEvent = await createAction()
 
   for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)
-
-    if (action === ActionType.CREATE) {
-      // @ts-expect-error -- createEvent does not accept any arguments
-      createdEvent = await clientAction()
-    } else if (!createdEvent) {
-      throw new Error('Event must be created before performing actions on it')
-    } else {
-      await clientAction(createdEvent.id)
-    }
-  }
-}
-
-/**
- * Returns ordered combinations of actions, starting with single action and growing to the full set.
- * Useful for generating test combinations based on a set of actions.
- *
- * @example getGrowingCombinations(['a', 'b', 'c']) --> [['a'], ['a', 'b'], ['a', 'b', 'c']]
- * @example getGrowingCombinations(['a', 'b', 'c'], 2) --> [['a'], ['a'], ['a', 'b'], ['a', 'b'], ['a', 'b', 'c'], ['a', 'b', 'c']
- *
- */
-export function getGrowingCombinations<T>(arr: T[], count: number = 1): T[][] {
-  if (count < 1) {
-    throw new Error('Count must be a positive integer')
+    createdEvent = await clientAction(createdEvent.id)
   }
 
-  const combination = arr.map((_, i) => arr.slice(0, i + 1))
-
-  // flatten out and duplicate the combinations as many time as needed.
-  return flatten(times(count, constant(combination)))
+  return createdEvent
 }

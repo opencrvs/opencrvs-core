@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
+import { OpenApiMeta } from 'trpc-to-openapi'
 import {
   ActionType,
   ActionUpdate,
@@ -33,11 +35,12 @@ import {
   Inferred,
   isFieldVisible,
   errorMessages,
-  runFieldValidations
+  runFieldValidations,
+  ActionInputWithType
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
-import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
+import { TrpcContext } from '@events/context'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -269,7 +272,13 @@ function validateNotifyAction({
 }
 
 export function validateAction(actionType: ActionType) {
-  return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext,
+    ActionInputWithType
+  > = async ({ input, ctx, next }) => {
     const event = await getEventById(input.eventId)
     const eventConfig = await getEventConfigurationById({
       token: ctx.token,
@@ -321,4 +330,6 @@ export function validateAction(actionType: ActionType) {
 
     throw new Error('Trying to validate unsupported action type')
   }
+
+  return fn
 }

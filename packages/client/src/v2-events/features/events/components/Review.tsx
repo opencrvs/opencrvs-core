@@ -41,6 +41,7 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { getScope } from '@client/profile/profileSelectors'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -852,7 +853,7 @@ function RejectActionModal({
 }
 
 export const Review = {
-  Body: ReviewComponent,
+  Body: withSuspense(ReviewComponent),
   Actions: ReviewActionComponent,
   EditModal: EditModal,
   ActionModal: {

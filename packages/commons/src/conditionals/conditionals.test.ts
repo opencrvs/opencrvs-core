@@ -27,6 +27,7 @@ import { ActionStatus } from '../events/ActionDocument'
 import { field } from '../events/field'
 import { event } from '../events/event'
 import { TokenUserType } from '../authentication'
+import { UUID } from '../uuid'
 
 /*  eslint-disable max-lines */
 
@@ -229,6 +230,59 @@ describe('object combinator', () => {
         })
       )
     ).toBe(true)
+  })
+})
+
+describe('date comparisons', () => {
+  it("throws an error if validation context doesn't contain $now", () => {
+    expect(() =>
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        $now: undefined as any // $now is not defined ❌
+      })
+    ).toThrowError()
+  })
+
+  it('validates comparisons to where date is expected to be after certain date', () => {
+    expect(
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-01-12' // needs to be after 1990-02-01 ❌
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(false)
+  })
+  it('validates comparisons to where date is expected to be before certain date', () => {
+    expect(
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-02-12' // needs to be before 1990-07-06 ✅
+        }),
+        $now: '1990-06-06'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-09-07' // needs to be before 1990-07-06 ❌
+        }),
+        $now: '1990-06-06'
+      })
+    ).toBe(false)
   })
 })
 
@@ -582,20 +636,21 @@ describe('"event" conditionals', () => {
     const eventParams = {
       $now: now,
       $event: {
-        id: '123',
+        id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
         actions: [
           {
-            id: '1234',
+            id: '1234' as UUID,
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
+            createdByUserType: TokenUserType.Enum.user,
             createdByRole: 'some-role',
             declaration: {},
-            createdAtLocation: '123456',
+            createdAtLocation: '123456' as UUID,
             status: ActionStatus.Accepted,
             transactionId: '123456'
           }

@@ -16,10 +16,17 @@ import {
   ActionStatus,
   ActionType,
   AddressType,
+  createPrng,
+  generateRegistrationNumber,
+  getOrThrow,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createEvent,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 import { mswServer } from '@events/tests/msw'
 import { env } from '@events/environment'
 
@@ -43,6 +50,18 @@ test(`allows access if required scope is present`, async () => {
       generator.event.actions.register('event-test-id-12345')
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
+})
+
+test('can not register an event that is not first declared and validated', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await createEvent(client, generator, [])
+
+  await expect(
+    client.event.actions.register.request(
+      generator.event.actions.register(event.id)
+    )
+  ).rejects.matchSnapshot()
 })
 
 test('Validation error message contains all the offending fields', async () => {
@@ -117,7 +136,6 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
 })
 
 const declaration = {
-  'applicant.dob': '2024-02-01',
   'applicant.name': {
     firstname: 'John',
     surname: 'Doe'
@@ -136,20 +154,22 @@ const declaration = {
 test('Skips required field validation when they are conditionally hidden', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
-  const event = await client.event.create(generator.event.create())
+  const { id: eventId } = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE
+  ])
 
-  const data = generator.event.actions.register(event.id, {
-    declaration
-  })
+  const data = generator.event.actions.register(eventId)
 
   const response = await client.event.actions.register.request(data)
+
   const savedAction = response.actions.find(
     (action) => action.type === ActionType.REGISTER
   )
 
   expect(savedAction).toMatchObject({
     status: ActionStatus.Accepted,
-    declaration
+    declaration: data.declaration
   })
 })
 
@@ -188,20 +208,16 @@ test('Prevents adding birth date in future', async () => {
 const MOCK_REGISTRATION_NUMBER = '1MY2TEST3NRO'
 
 describe('Request and confirmation flow', () => {
-  let actionId: string
+  const prng = createPrng(1046)
+  let registrationNumber: string
 
   function mockNotifyApi(status: number) {
     return mswServer.use(
       http.post<never, { actionId: string }>(
         `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/REGISTER`,
-        async ({ request }) => {
-          const body = await request.json()
-          actionId = body.actionId
-
-          const responseBody =
-            status === 200
-              ? { registrationNumber: MOCK_REGISTRATION_NUMBER }
-              : {}
+        () => {
+          registrationNumber = generateRegistrationNumber(prng)
+          const responseBody = status === 200 ? { registrationNumber } : {}
           // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
           return HttpResponse.json(responseBody, { status })
         }
@@ -212,7 +228,11 @@ describe('Request and confirmation flow', () => {
   test('should be able to successfully call action request multiple times, without creating duplicate request actions', async () => {
     const { user, generator } = await setupTestCase()
     const client = createTestClient(user)
-    const originalEvent = await client.event.create(generator.event.create())
+    const originalEvent = await createEvent(client, generator, [
+      ActionType.DECLARE,
+      ActionType.VALIDATE
+    ])
+
     const { id: eventId } = originalEvent
     mockNotifyApi(200)
 
@@ -246,15 +266,14 @@ describe('Request and confirmation flow', () => {
     test('should mark action as accepted if notify API returns HTTP 200', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
-      const { id: eventId } = await client.event.create(
-        generator.event.create()
-      )
+      const { id: eventId } = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
 
       mockNotifyApi(200)
 
-      const data = generator.event.actions.register(eventId, {
-        declaration
-      })
+      const data = generator.event.actions.register(eventId)
 
       const response = await client.event.actions.register.request(data)
       const savedAction = response.actions.find(
@@ -263,17 +282,18 @@ describe('Request and confirmation flow', () => {
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Accepted,
-        declaration,
-        registrationNumber: MOCK_REGISTRATION_NUMBER
+        declaration: data.declaration,
+        registrationNumber: registrationNumber
       })
     })
 
     test('should not save action if notify API returns invalid registration number', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
-      const { id: eventId } = await client.event.create(
-        generator.event.create()
-      )
+      const { id: eventId } = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
 
       mswServer.use(
         http.post(
@@ -288,9 +308,7 @@ describe('Request and confirmation flow', () => {
         )
       )
 
-      const data = generator.event.actions.register(eventId, {
-        declaration
-      })
+      const data = generator.event.actions.register(eventId)
 
       await expect(
         client.event.actions.register.request(data)
@@ -306,11 +324,14 @@ describe('Request and confirmation flow', () => {
     test('should mark action as rejected if notify API returns HTTP 400', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
-      const event = await client.event.create(generator.event.create())
+      const { id: eventId } = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
 
       mockNotifyApi(400)
 
-      const data = generator.event.actions.register(event.id, {
+      const data = generator.event.actions.register(eventId, {
         declaration
       })
 
@@ -328,23 +349,23 @@ describe('Request and confirmation flow', () => {
     test('should not save action if notify API returns HTTP 500', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
-      const { id: eventId } = await client.event.create(
-        generator.event.create()
-      )
+
+      const { id: eventId } = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
 
       mockNotifyApi(500)
 
-      const data = generator.event.actions.register(eventId, {
-        declaration
-      })
-
       await expect(
-        client.event.actions.register.request(data)
+        client.event.actions.register.request(
+          generator.event.actions.register(eventId)
+        )
       ).rejects.matchSnapshot()
 
-      const event = await client.event.get(eventId)
+      const registeredEvent = await client.event.get(eventId)
 
-      const registerActions = event.actions.filter(
+      const registerActions = registeredEvent.actions.filter(
         (action) => action.type === ActionType.REGISTER
       )
       expect(registerActions).toHaveLength(0)
@@ -355,22 +376,26 @@ describe('Request and confirmation flow', () => {
     test('should save action in requested state if notify API returns HTTP 202', async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
-      const event = await client.event.create(generator.event.create())
+
+      const event = await createEvent(client, generator, [
+        ActionType.DECLARE,
+        ActionType.VALIDATE
+      ])
 
       mockNotifyApi(202)
 
-      const data = generator.event.actions.register(event.id, {
-        declaration
-      })
+      const registerInput = generator.event.actions.register(event.id)
 
-      const response = await client.event.actions.register.request(data)
+      const response =
+        await client.event.actions.register.request(registerInput)
+
       const savedAction = response.actions.find(
         (action) => action.type === ActionType.REGISTER
       )
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Requested,
-        declaration
+        declaration: registerInput.declaration
       })
     })
 
@@ -378,7 +403,10 @@ describe('Request and confirmation flow', () => {
       test('should not be able to accept the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
+        const event = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
 
         mockNotifyApi(202)
 
@@ -398,19 +426,26 @@ describe('Request and confirmation flow', () => {
       test('should not be able to accept action if action is already rejected', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const originalEvent = await client.event.create(
-          generator.event.create()
-        )
+
+        const originalEvent = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
 
         const { id: eventId } = originalEvent
-
         mockNotifyApi(202)
 
-        const data = generator.event.actions.register(eventId, {
-          declaration
-        })
+        const data = generator.event.actions.register(eventId)
 
-        await client.event.actions.register.request(data)
+        const registerResponse =
+          await client.event.actions.register.request(data)
+
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
 
         const createAction = originalEvent.actions.filter(
           (action) => action.type === ActionType.CREATE
@@ -427,7 +462,7 @@ describe('Request and confirmation flow', () => {
 
         await client.event.actions.register.reject({
           eventId,
-          actionId,
+          actionId: originalActionId,
           transactionId: getUUID()
         })
 
@@ -435,10 +470,11 @@ describe('Request and confirmation flow', () => {
           ...assignmentInput,
           transactionId: getUUID()
         })
+
         await expect(
           client.event.actions.register.accept({
             ...data,
-            actionId,
+            actionId: originalActionId,
             registrationNumber: MOCK_REGISTRATION_NUMBER
           })
         ).rejects.matchSnapshot()
@@ -447,31 +483,45 @@ describe('Request and confirmation flow', () => {
       test('should successfully accept a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
-        const eventId = event.id
 
+        const originalEvent = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
+
+        const { id: eventId } = originalEvent
         mockNotifyApi(202)
 
-        const data = generator.event.actions.register(eventId, {
-          declaration
-        })
+        const data = generator.event.actions.register(eventId)
 
-        await client.event.actions.register.request(data)
+        const registerResponse =
+          await client.event.actions.register.request(data)
 
-        const createAction = event.actions.filter(
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
+
+        const createAction = originalEvent.actions.filter(
           (action) => action.type === ActionType.CREATE
         )
 
-        const assignmentInput = generator.event.actions.assign(event.id, {
-          assignedTo: createAction[0].createdBy
-        })
-
+        const assignmentInput = generator.event.actions.assign(
+          originalEvent.id,
+          {
+            assignedTo: createAction[0].createdBy
+          }
+        )
         await client.event.actions.assignment.assign(assignmentInput)
+
+        await client.event.actions.register.request(data)
 
         const response = await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
-          actionId,
+          actionId: originalActionId,
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
@@ -485,40 +535,53 @@ describe('Request and confirmation flow', () => {
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
         expect(registerActions[1]).toMatchObject({
           status: ActionStatus.Accepted,
-          declaration,
+          declaration: data.declaration,
           registrationNumber: MOCK_REGISTRATION_NUMBER,
-          originalActionId: actionId
+          originalActionId: originalActionId
         })
       })
 
       test('should be able to call accept multiple times, without creating duplicate accept actions', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
-        const eventId = event.id
+        const originalEvent = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
+
+        const { id: eventId } = originalEvent
 
         mockNotifyApi(202)
 
-        const data = generator.event.actions.register(eventId, {
-          declaration
-        })
+        const data = generator.event.actions.register(eventId)
 
-        await client.event.actions.register.request(data)
+        const registerResponse =
+          await client.event.actions.register.request(data)
 
-        const createAction = event.actions.filter(
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
+
+        const createAction = originalEvent.actions.filter(
           (action) => action.type === ActionType.CREATE
         )
 
-        const assignmentInput = generator.event.actions.assign(event.id, {
-          assignedTo: createAction[0].createdBy
-        })
+        const assignmentInput = generator.event.actions.assign(
+          originalEvent.id,
+          {
+            assignedTo: createAction[0].createdBy
+          }
+        )
 
         await client.event.actions.assignment.assign(assignmentInput)
 
         await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
-          actionId,
+          actionId: originalActionId,
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
@@ -529,7 +592,7 @@ describe('Request and confirmation flow', () => {
         const response = await client.event.actions.register.accept({
           ...data,
           transactionId: getUUID(),
-          actionId,
+          actionId: originalActionId,
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
 
@@ -542,7 +605,7 @@ describe('Request and confirmation flow', () => {
         expect(registerActions.length).toBe(2)
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
         expect(registerActions[1]).toMatchObject({
-          declaration,
+          declaration: data.declaration,
           status: ActionStatus.Accepted
         })
       })
@@ -553,7 +616,10 @@ describe('Request and confirmation flow', () => {
       test('should not be able to reject the action if action is not first requested', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
+        const event = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
 
         mockNotifyApi(202)
 
@@ -572,16 +638,18 @@ describe('Request and confirmation flow', () => {
       test('should not be able to reject the action if action is already accepted', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
+        const event = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
         const eventId = event.id
 
         mockNotifyApi(202)
 
-        const data = generator.event.actions.register(eventId, {
-          declaration
-        })
+        const data = generator.event.actions.register(eventId)
 
-        await client.event.actions.register.request(data)
+        const registerResponse =
+          await client.event.actions.register.request(data)
 
         const createAction = event.actions.filter(
           (action) => action.type === ActionType.CREATE
@@ -591,11 +659,18 @@ describe('Request and confirmation flow', () => {
           assignedTo: createAction[0].createdBy
         })
 
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
+
         await client.event.actions.assignment.assign(assignmentInput)
 
         await client.event.actions.register.accept({
           ...data,
-          actionId,
+          actionId: originalActionId,
           transactionId: getUUID(),
           registrationNumber: MOCK_REGISTRATION_NUMBER
         })
@@ -607,7 +682,7 @@ describe('Request and confirmation flow', () => {
         await expect(
           client.event.actions.register.reject({
             ...data,
-            actionId
+            actionId: originalActionId
           })
         ).rejects.matchSnapshot()
       })
@@ -615,7 +690,10 @@ describe('Request and confirmation flow', () => {
       test('should be able to call reject multiple times, without creating duplicate reject actions', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
+        const event = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
 
         const { id: eventId } = event
 
@@ -625,7 +703,15 @@ describe('Request and confirmation flow', () => {
           declaration
         })
 
-        await client.event.actions.register.request(data)
+        const registerResponse =
+          await client.event.actions.register.request(data)
+
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
 
         const createAction = event.actions.filter(
           (action) => action.type === ActionType.CREATE
@@ -640,7 +726,7 @@ describe('Request and confirmation flow', () => {
         await client.event.actions.register.reject({
           eventId,
           transactionId: getUUID(),
-          actionId
+          actionId: originalActionId
         })
 
         await client.event.actions.assignment.assign({
@@ -650,7 +736,7 @@ describe('Request and confirmation flow', () => {
         const response = await client.event.actions.register.reject({
           eventId,
           transactionId: getUUID(),
-          actionId
+          actionId: originalActionId
         })
 
         const registerActions = response.actions.filter(
@@ -665,16 +751,25 @@ describe('Request and confirmation flow', () => {
       test('should successfully reject a previously requested action', async () => {
         const { user, generator } = await setupTestCase()
         const client = createTestClient(user)
-        const event = await client.event.create(generator.event.create())
+        const event = await createEvent(client, generator, [
+          ActionType.DECLARE,
+          ActionType.VALIDATE
+        ])
 
         const { id: eventId } = event
         mockNotifyApi(202)
 
-        const data = generator.event.actions.register(eventId, {
-          declaration
-        })
+        const data = generator.event.actions.register(eventId)
 
-        await client.event.actions.register.request(data)
+        const registerResponse =
+          await client.event.actions.register.request(data)
+
+        const originalActionId = getOrThrow(
+          registerResponse.actions.find(
+            (action) => action.type === ActionType.REGISTER
+          )?.id,
+          'Could not find register action for id'
+        )
 
         const createAction = event.actions.filter(
           (action) => action.type === ActionType.CREATE
@@ -689,7 +784,7 @@ describe('Request and confirmation flow', () => {
         const response = await client.event.actions.register.reject({
           eventId,
           transactionId: getUUID(),
-          actionId
+          actionId: originalActionId
         })
 
         const registerActions = response.actions.filter(
@@ -700,7 +795,7 @@ describe('Request and confirmation flow', () => {
         expect(registerActions[0].status).toEqual(ActionStatus.Requested)
         expect(registerActions[1]).toMatchObject({
           status: ActionStatus.Rejected,
-          originalActionId: actionId
+          originalActionId
         })
       })
     })

@@ -75,6 +75,7 @@ function deserializeQueryExpression(
       ...expression.assignedTo,
       term: userDeserializer(expression.assignedTo.term, user)
     },
+    createdByUserType: expression.createdByUserType,
     createdBy: expression.createdBy && {
       ...expression.createdBy,
       term: userDeserializer(expression.createdBy.term, user)
