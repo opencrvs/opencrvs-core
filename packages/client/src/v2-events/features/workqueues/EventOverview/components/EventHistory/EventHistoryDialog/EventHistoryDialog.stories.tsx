@@ -223,8 +223,7 @@ export const Unassigned: Story = {
   args: {
     action: {
       ...actionBase,
-      type: ActionType.UNASSIGN,
-      assignedTo: null
+      type: ActionType.UNASSIGN
     }
   }
 }
