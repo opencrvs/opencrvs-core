@@ -13,6 +13,7 @@ import { ActionType, StatusChangingActions } from '../ActionType'
 import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
+import { pick } from 'lodash'
 
 /**
  *
@@ -95,37 +96,28 @@ export function getActionUpdateMetadata(actions: Action[]) {
     `Event has no ${ActionType.CREATE} action`
   )
 
-  return StatusChangingActions.options.reduce(
-    (metadata, actionType) => {
-      const { accept, request } = getActionRequests(actionType, actions)
+  const metadataFields = [
+    'createdAt',
+    'createdBy',
+    'createdByUserType',
+    'createdAtLocation',
+    'createdByRole'
+  ]
 
-      return {
-        createdAt:
-          request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
-        createdBy:
-          request?.createdBy ?? accept?.createdBy ?? metadata.createdBy,
-        createdByUserType:
-          request?.createdByUserType ??
-          accept?.createdByUserType ??
-          metadata.createdByUserType,
-        createdAtLocation:
-          request?.createdAtLocation ??
-          accept?.createdAtLocation ??
-          metadata.createdAtLocation,
-        createdByRole:
-          request?.createdByRole ??
-          accept?.createdByRole ??
-          metadata.createdByRole
-      }
-    },
-    {
-      createdAt: createAction.createdAt,
-      createdBy: createAction.createdBy,
-      createdByUserType: createAction.createdByUserType,
-      createdAtLocation: createAction.createdAtLocation,
-      createdByRole: createAction.createdByRole
-    }
-  )
+  return actions
+    .filter(({ type }) => StatusChangingActions.safeParse(type).success)
+    .filter(({ status }) => status === ActionStatus.Accepted)
+    .reduce(
+      (_, action) => {
+        if (action.originalActionId) {
+          const originalAction =
+            actions.find(({ id }) => id === action.originalActionId) ?? action
+          return pick(originalAction, metadataFields)
+        }
+        return pick(action, metadataFields)
+      },
+      pick(createAction, metadataFields)
+    )
 }
 
 /**
