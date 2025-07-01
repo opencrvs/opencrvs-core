@@ -13,6 +13,7 @@ import { ActionType, StatusChangingActions } from '../ActionType'
 import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
+import { pick } from 'lodash'
 
 /**
  *
@@ -95,38 +96,34 @@ export function getActionUpdateMetadata(actions: Action[]) {
     `Event has no ${ActionType.CREATE} action`
   )
 
+  const metadataFields = [
+    'createdAt',
+    'createdBy',
+    'createdByUserType',
+    'createdAtLocation',
+    'createdByRole'
+  ]
+
   return actions
     .filter(({ type }) => StatusChangingActions.safeParse(type).success)
     .reduce(
       (metadata, action) => {
-        if (action.status === ActionStatus.Accepted) {
-          if (action.originalActionId) {
-            const originalAction =
-              actions.find(({ id }) => id === action.originalActionId) ?? action
-            return {
-              createdAt: originalAction.createdAt,
-              createdBy: originalAction.createdBy,
-              createdByUserType: originalAction.createdByUserType,
-              createdAtLocation: originalAction.createdAtLocation,
-              createdByRole: originalAction.createdByRole
-            }
-          }
+        if (action.status !== ActionStatus.Accepted) {
+          return metadata
+        }
+        if (action.originalActionId) {
+          const originalAction =
+            actions.find(({ id }) => id === action.originalActionId) ?? action
           return {
-            createdAt: action.createdAt,
-            createdBy: action.createdBy,
-            createdByUserType: action.createdByUserType,
-            createdAtLocation: action.createdAtLocation,
-            createdByRole: action.createdByRole
+            ...pick(originalAction, metadataFields)
           }
         }
-        return metadata
+        return {
+          ...pick(action, metadataFields)
+        }
       },
       {
-        createdAt: createAction.createdAt,
-        createdBy: createAction.createdBy,
-        createdByUserType: createAction.createdByUserType,
-        createdAtLocation: createAction.createdAtLocation,
-        createdByRole: createAction.createdByRole
+        ...pick(createAction, metadataFields)
       }
     )
 }
