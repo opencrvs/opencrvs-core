@@ -20,6 +20,7 @@ import {
   ActionType,
   EventDocument,
   EventState,
+  FieldConfig,
   getCurrentEventState,
   getDeclaration,
   isFieldVisible
@@ -34,6 +35,19 @@ import { ROUTES } from '@client/v2-events/routes'
 const CorrectionSectionTitle = styled(Text)`
   margin: 20px 0;
 `
+
+export function hasFieldChanged(
+  f: FieldConfig,
+  form: EventState,
+  previousFormValues: EventState
+) {
+  const wasVisible = isFieldVisible(f, previousFormValues)
+  const isVisible = isFieldVisible(f, form)
+  const visibilityChanged = wasVisible !== isVisible
+  const valueHasChanged = !isEqual(previousFormValues[f.id], form[f.id])
+
+  return isVisible && (valueHasChanged || visibilityChanged)
+}
 
 /*
  * Correction details component which is used both on the correction request summary page,
@@ -146,17 +160,7 @@ export function CorrectionDetails({
 
       {formConfig.pages.map((page) => {
         const changedFields = page.fields
-          .filter((f) => {
-            const wasVisible = isFieldVisible(f, previousFormValues)
-            const isVisible = isFieldVisible(f, form)
-            const visibilityChanged = wasVisible !== isVisible
-            const valueHasChanged = !isEqual(
-              previousFormValues[f.id],
-              form[f.id]
-            )
-
-            return isVisible && (valueHasChanged || visibilityChanged)
-          })
+          .filter((f) => hasFieldChanged(f, form, previousFormValues))
           .map((f) => {
             const originalOutput = Output({
               field: f,
