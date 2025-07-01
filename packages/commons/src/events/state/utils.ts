@@ -106,11 +106,9 @@ export function getActionUpdateMetadata(actions: Action[]) {
 
   return actions
     .filter(({ type }) => StatusChangingActions.safeParse(type).success)
+    .filter(({ status }) => status === ActionStatus.Accepted)
     .reduce(
-      (metadata, action) => {
-        if (action.status !== ActionStatus.Accepted) {
-          return metadata
-        }
+      (_, action) => {
         if (action.originalActionId) {
           const originalAction =
             actions.find(({ id }) => id === action.originalActionId) ?? action
