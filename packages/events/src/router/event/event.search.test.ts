@@ -932,7 +932,7 @@ test('Returns events assigned to a specific user', async () => {
   )
 })
 
-test.only('Returns relevant events in right order', async () => {
+test('Returns relevant events in right order', async () => {
   const { user, generator } = await setupTestCase(4432)
 
   const client = createTestClient(user)
