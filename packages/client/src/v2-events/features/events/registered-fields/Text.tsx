@@ -8,19 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import * as React from 'react'
 import {
   ITextInputProps as ComponentTextInputProps,
   TextInput as TextInputComponent
 } from '@opencrvs/components'
-
 interface TextInputProps
   extends Omit<ComponentTextInputProps, 'onChange' | 'value'> {
   onChange(val: string | undefined): void
   value: string | undefined
 }
-
 function TextInput({
   value,
   maxLength,
@@ -28,6 +25,12 @@ function TextInput({
   type,
   ...props
 }: TextInputProps) {
+  const [inputValue, setInputValue] = React.useState<string>(value ?? '')
+
+  React.useEffect(() => {
+    setInputValue(value ?? '')
+  }, [value])
+
   return (
     <TextInputComponent
       {...props}
@@ -35,9 +38,12 @@ function TextInput({
       isDisabled={disabled}
       maxLength={maxLength}
       type={type ?? 'text'}
-      value={value || ''}
-      onBlur={(e) => props.onBlur && props.onBlur(e)}
-      onChange={(e) => props.onChange(e.target.value)}
+      value={inputValue}
+      onBlur={(e) => {
+        props.onChange(inputValue)
+        props.onBlur?.(e)
+      }}
+      onChange={(e) => setInputValue(e.target.value)}
     />
   )
 }
