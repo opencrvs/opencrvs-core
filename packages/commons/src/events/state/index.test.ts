@@ -213,7 +213,8 @@ describe('getCurrentEventState()', () => {
         createdByUserType: TokenUserType.Enum.user,
         createdAtLocation: 'location2' as UUID,
         createdBySignature: '/ocrvs/signature-2.png',
-        createdByRole: '3RD_PARTY_API'
+        createdByRole: '3RD_PARTY_API',
+        originalActionId: declareRequestAction.id
       }
     })
     // Validate accepted directly by 3rd party API. Single action created.
@@ -256,7 +257,8 @@ describe('getCurrentEventState()', () => {
         createdAtLocation: 'location5' as UUID,
         createdBySignature: '/ocrvs/signature-4.png',
         createdByRole: '3RD_PARTY_API',
-        registrationNumber: '123456789'
+        registrationNumber: '123456789',
+        originalActionId: registerRequestAction.id
       }
     })
 
