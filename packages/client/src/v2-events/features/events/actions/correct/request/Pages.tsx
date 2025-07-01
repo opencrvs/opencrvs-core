@@ -15,7 +15,10 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import {
+  getDeclarationPages,
+  isNonInteractiveFieldType
+} from '@opencrvs/commons/client'
 import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -43,8 +46,19 @@ export function Pages() {
 
   const formPages = getDeclarationPages(configuration)
 
+  const filteredFormPages = formPages
+    .filter(
+      // Filter out pages where all fields have 'isCorrectable' set to false
+      (page) => !page.fields.every((field) => field.isCorrectable === false)
+    )
+    .filter(
+      // Filter out pages that only contain non-interactive fields
+      (page) => !page.fields.every((field) => isNonInteractiveFieldType(field))
+    )
+
   const currentPageId =
-    formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
+    filteredFormPages.find((p) => p.id === pageId)?.id ||
+    filteredFormPages[0]?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
@@ -72,7 +86,8 @@ export function Pages() {
         declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={form}
-        formPages={formPages}
+        formPages={filteredFormPages}
+        isCorrection={true}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}

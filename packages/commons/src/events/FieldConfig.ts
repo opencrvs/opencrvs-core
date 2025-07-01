@@ -48,14 +48,14 @@ export type ValidationConfig = z.infer<typeof ValidationConfig>
 
 const BaseField = z.object({
   id: FieldId,
+  label: TranslationConfig,
   parent: FieldReference.optional().describe(
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
   ),
-  conditionals: z.array(FieldConditional).default([]).optional(),
   required: z.boolean().default(false).optional(),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z.array(ValidationConfig).default([]).optional(),
-  label: TranslationConfig,
   helperText: TranslationConfig.optional(),
   hideLabel: z.boolean().default(false).optional(),
   isCorrectable: z

@@ -37,7 +37,9 @@ export function Pages({
   setFormData,
   eventConfig,
   declaration,
-  validateBeforeNextPage = false
+  validateBeforeNextPage = false,
+  // When isCorrection is true, we should disabled fields with 'isCorrectable' set to false, or skip pages where all fields have 'isCorrectable' set to false
+  isCorrection = false
 }: {
   form: EventState
   setFormData: (dec: EventState) => void
@@ -50,6 +52,7 @@ export function Pages({
   eventConfig?: EventConfig
   declaration?: EventState
   validateBeforeNextPage?: boolean
+  isCorrection?: boolean
 }) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
@@ -115,6 +118,7 @@ export function Pages({
       // As initial values we use both the provided declaration data (previously saved to the event)
       // and the form data (which is currently being edited).
       initialValues={{ ...declaration, ...form }}
+      isCorrection={isCorrection}
       validateAllFields={validateAllFields}
       onAllFieldsValidated={(success) => {
         setValidateAllFields(false)

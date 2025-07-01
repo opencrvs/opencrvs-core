@@ -79,6 +79,7 @@ export function Review() {
       <ReviewComponent.Body
         form={form}
         formConfig={formConfig}
+        isCorrection={true}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,
