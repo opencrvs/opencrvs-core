@@ -380,7 +380,7 @@ const messagesToDefine = {
   },
   correctionApprovalDialogTitle: {
     id: 'v2.correction.correctionForApprovalDialog.title',
-    defaultMessage: 'Send record correction for approval ?',
+    defaultMessage: 'Send record correction for approval?',
     description:
       'The title for the dialog when record correction sent by registration agent for approval'
   }

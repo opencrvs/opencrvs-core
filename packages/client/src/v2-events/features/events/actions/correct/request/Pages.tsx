@@ -47,13 +47,13 @@ export function Pages() {
   const formPages = getDeclarationPages(configuration)
 
   const filteredFormPages = formPages
+    // Filter out pages where all fields have 'isCorrectable' set to false or are non-interactive
     .filter(
-      // Filter out pages where all fields have 'isCorrectable' set to false
-      (page) => !page.fields.every((field) => field.isCorrectable === false)
-    )
-    .filter(
-      // Filter out pages that only contain non-interactive fields
-      (page) => !page.fields.every((field) => isNonInteractiveFieldType(field))
+      (page) =>
+        !page.fields.every(
+          (field) =>
+            field.isCorrectable === false || isNonInteractiveFieldType(field)
+        )
     )
 
   const currentPageId =
