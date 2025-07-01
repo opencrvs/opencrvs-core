@@ -377,6 +377,12 @@ const messagesToDefine = {
     id: 'v2.correction.summary.change',
     defaultMessage: 'Change',
     description: 'Change link label'
+  },
+  correctionApprovalDialogTitle: {
+    id: 'v2.correction.correctionForApprovalDialog.title',
+    defaultMessage: 'Send record correction for approval ?',
+    description:
+      'The title for the dialog when record correction sent by registration agent for approval'
   }
 }
 

@@ -12,16 +12,11 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { isEqual } from 'lodash'
 import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  ActionType,
-  getDeclaration,
-  isFieldVisible
-} from '@opencrvs/commons/client'
+import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getCurrentEventState } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'

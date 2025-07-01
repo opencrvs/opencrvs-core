@@ -211,7 +211,7 @@ export function Summary() {
         title={intl.formatMessage(
           scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
             ? correctionMessages.correctRecordDialogTitle
-            : correctionMessages.correctionForApprovalDialogTitle
+            : correctionMessages.correctionApprovalDialogTitle
         )}
         onClose={togglePrompt}
       >
