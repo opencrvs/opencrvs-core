@@ -185,7 +185,7 @@ function EventOverviewContainer() {
   const fullEvent = getEvent.findFromCache(params.eventId).data
 
   if (!eventIndex) {
-    throw new Error(`Event ${params.eventId} not found`)
+    return
   }
 
   return (
