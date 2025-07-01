@@ -46,7 +46,7 @@ export function Pages() {
 
   const formPages = getDeclarationPages(configuration)
 
-  // Filter out pages where all fields have 'isCorrectable' set to false or are non-interactive
+  // Filter out pages where all fields either have 'isCorrectable' set to false or are non-interactive
   const filteredFormPages = formPages.filter(
     (page) =>
       !page.fields.every(
