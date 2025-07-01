@@ -114,17 +114,11 @@ export function getActionUpdateMetadata(actions: Action[]) {
         if (action.originalActionId) {
           const originalAction =
             actions.find(({ id }) => id === action.originalActionId) ?? action
-          return {
-            ...pick(originalAction, metadataFields)
-          }
+          return pick(originalAction, metadataFields)
         }
-        return {
-          ...pick(action, metadataFields)
-        }
+        return pick(action, metadataFields)
       },
-      {
-        ...pick(createAction, metadataFields)
-      }
+      pick(createAction, metadataFields)
     )
 }
 
