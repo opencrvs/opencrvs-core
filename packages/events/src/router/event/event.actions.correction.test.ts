@@ -258,7 +258,7 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   ).rejects.matchSnapshot()
 })
 
-test('REQUEST_CORRECTION prevents correcting a field which is configured as isCorrectable: false', async () => {
+test('REQUEST_CORRECTION prevents correcting a field which is configured as uncorrectable: true', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 

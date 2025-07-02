@@ -273,7 +273,7 @@ function validateNotifyAction({
 
 /*
  * For request correction, we need to validate that the payload does not contain fields that are configured as not correctable,
- * i.e. configured with the 'isCorrectable' flag set to false.
+ * i.e. configured with the 'uncorrectable' flag set to true.
  */
 function validateCorrectableFields({
   eventConfig,
@@ -284,9 +284,7 @@ function validateCorrectableFields({
 }) {
   const declarationConfig = getDeclaration(eventConfig)
   const formFields = declarationConfig.pages.flatMap(({ fields }) => fields)
-  const nonCorrecrableFields = formFields.filter(
-    (field) => field.isCorrectable === false
-  )
+  const nonCorrecrableFields = formFields.filter((field) => field.uncorrectable)
 
   const errors = Object.entries(declarationUpdate).flatMap(([key, value]) => {
     const field = formFields.find((f) => f.id === key)
