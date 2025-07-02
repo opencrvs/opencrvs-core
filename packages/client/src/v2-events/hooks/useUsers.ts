@@ -32,10 +32,11 @@ setQueryDefaults(trpcOptionsProxy.user.get, {
 
     if (user.signatureFilename) {
       await precacheFile(user.signatureFilename)
-      return {
-        ...user,
-        signatureFilename: getUnsignedFileUrl(user.signatureFilename)
-      }
+      user.signatureFilename = getUnsignedFileUrl(user.signatureFilename)
+    }
+    if (user.avatarURL) {
+      await precacheFile(user.avatarURL)
+      user.avatarURL = getUnsignedFileUrl(user.avatarURL)
     }
 
     return user
@@ -60,6 +61,9 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
       users.map(async (user) => {
         if (user.signatureFilename) {
           return precacheFile(user.signatureFilename)
+        }
+        if (user.avatarURL) {
+          return precacheFile(user.avatarURL)
         }
         return user
       })

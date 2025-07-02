@@ -212,6 +212,7 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
                   }
                 : undefined
             }
+            name={`${user?.name[0].given[0]} ${user?.name[0].family}`}
           />
         ) : (
           <Download isFailed={isFailed} />
