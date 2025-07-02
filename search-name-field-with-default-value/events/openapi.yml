@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f8bc61cc-48dd-4cc9-9b82-eb88cf599ff5
+                transactionId: 5e32653b-b375-4de9-aefd-ea9305a612fc
                 type: v2.birth
       responses:
         "200":
@@ -458,7 +458,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 72b3fd4d-7831-4c49-844f-30218c85b780
+                transactionId: 98cb77c1-8255-4d86-a15f-1ceaf1f4b37e
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2207,6 +2207,9 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                includeMiddlename:
+                  type: boolean
+                  default: false
           required:
             - id
             - label
