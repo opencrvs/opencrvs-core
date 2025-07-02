@@ -2,7 +2,7 @@
 
 exports[`REQUEST_CORRECTION Prevents adding birth date in future 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2040-02-01"}]]`;
 
-exports[`REQUEST_CORRECTION prevents correcting a field which is configured as isCorrectable: false 1`] = `[TRPCError: [{"message":"Correction not allowed for field","id":"applicant.email","value":"john.doe@example.com"}]]`;
+exports[`REQUEST_CORRECTION prevents correcting a field which is configured as uncorrectable: true 1`] = `[TRPCError: [{"message":"Correction not allowed for field","id":"applicant.email","value":"john.doe@example.com"}]]`;
 
 exports[`REQUEST_CORRECTION validation error message contains all the offending fields 1`] = `[TRPCError: [{"message":"Invalid date field","id":"applicant.dob","value":"02-02"},{"message":"Please enter a valid date","id":"applicant.dob","value":"02-02"}]]`;
 
