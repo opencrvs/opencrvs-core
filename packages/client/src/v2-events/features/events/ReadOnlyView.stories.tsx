@@ -19,15 +19,14 @@ import {
   createPrng,
   generateEventDocument,
   generateEventDraftDocument,
+  generateWorkqueues,
+  getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import {
-  tennisClubMembershipEventDocument,
-  tennisClubMembershipEventIndex
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -107,7 +106,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: eventDocument.id
       }),
       chromatic: { disableSnapshot: true }
     },
@@ -115,14 +114,27 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return eventDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return [
+              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+            ]
+          }),
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 7 }
+            }, {})
           })
         ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
             return [
               generateEventDraftDocument({
-                eventId: tennisClubMembershipEventDocument.id,
+                eventId: eventDocument.id,
                 actionType: ActionType.REGISTER,
                 declaration: {
                   'applicant.name': {
@@ -149,7 +161,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
-                signatureFilename: undefined
+                signatureFilename: undefined,
+                avatarURL: undefined
               }
             ]
           }),
@@ -158,7 +171,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined
+              signatureFilename: undefined,
+              avatarURL: undefined
             }
           })
         ]
@@ -201,7 +215,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [
               {
                 id: '67bda93bfc07dee78ae558cf',
@@ -213,16 +227,18 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                   }
                 ],
                 role: 'SOCIAL_WORKER',
-                signatureFilename: undefined
+                signatureFilename: undefined,
+                avatarURL: undefined
               }
             ]
           }),
-          tRPCMsw.user.get.query((id) => {
+          tRPCMsw.user.get.query(() => {
             return {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined
+              signatureFilename: undefined,
+              avatarURL: undefined
             }
           })
         ]

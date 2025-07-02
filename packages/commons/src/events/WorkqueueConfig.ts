@@ -74,6 +74,11 @@ export const WorkqueueConfig = z
   })
   .describe('Configuration for workqueue.')
 
+export const WorkqueueConfigWithoutQuery = WorkqueueConfig.omit({
+  query: true,
+  columns: true
+})
+
 export const WorkqueueConfigInput = z.object({
   slug: z.string().describe('Determines the url of the workqueue.'),
   name: TranslationConfig.describe(
@@ -91,6 +96,9 @@ export const WorkqueueConfigInput = z.object({
 })
 
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
+export type WorkqueueConfigWithoutQuery = z.infer<
+  typeof WorkqueueConfigWithoutQuery
+>
 export type WorkqueueConfigInput = z.input<typeof WorkqueueConfigInput>
 
 export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {

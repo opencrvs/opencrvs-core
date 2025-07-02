@@ -11,7 +11,7 @@
 
 import * as elasticsearch from '@elastic/elasticsearch'
 
-import { subDays, addDays } from 'date-fns'
+import { DateTime } from 'luxon'
 import {
   EventIndex,
   DeduplicationConfig,
@@ -120,14 +120,16 @@ function generateElasticsearchQuery(
         range: {
           [declarationReference(encodedFieldId)]: {
             // @TODO: Improve types for origin field to be sure it returns a string when accessing data
-            gte: subDays(
-              new Date(eventIndex.declaration[origin] as string),
-              configuration.options.days
-            ).toISOString(),
-            lte: addDays(
-              new Date(eventIndex.declaration[origin] as string),
-              configuration.options.days
-            ).toISOString()
+            gte: DateTime.fromJSDate(
+              new Date(eventIndex.declaration[origin] as string)
+            )
+              .minus({ days: configuration.options.days })
+              .toISO(),
+            lte: DateTime.fromJSDate(
+              new Date(eventIndex.declaration[origin] as string)
+            )
+              .plus({ days: configuration.options.days })
+              .toISO()
           }
         }
       }

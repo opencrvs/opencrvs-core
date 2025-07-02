@@ -12,7 +12,7 @@
 import { merge, omitBy, isString } from 'lodash'
 import addDays from 'date-fns/addDays'
 import { tennisClubMembershipEvent } from '../fixtures'
-import { getUUID } from '../uuid'
+import { getUUID, UUID } from '../uuid'
 import {
   ActionBase,
   ActionDocument,
@@ -54,6 +54,7 @@ import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { FieldType } from './FieldType'
 import { AddressType, FileFieldValue } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
+import { TokenUserType } from '../authentication'
 import { z } from 'zod'
 
 /**
@@ -258,7 +259,7 @@ export function eventPayloadGenerator(rng: () => number) {
       id
     }),
     draft: (
-      { eventId, actionType }: { eventId: string; actionType: ActionType },
+      { eventId, actionType }: { eventId: UUID; actionType: ActionType },
       input: Partial<Draft> = {}
     ): Draft =>
       merge(
@@ -285,8 +286,9 @@ export function eventPayloadGenerator(rng: () => number) {
             },
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
+            createdByUserType: TokenUserType.Enum.user,
             createdByRole: '@todo',
-            createdAtLocation: '@todo'
+            createdAtLocation: '@todo' as UUID
           }
         } satisfies Draft,
         input
@@ -459,7 +461,11 @@ export function eventPayloadGenerator(rng: () => number) {
         input: Partial<
           Pick<
             RegisterActionInput,
-            'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            | 'transactionId'
+            | 'declaration'
+            | 'annotation'
+            | 'keepAssignment'
+            | 'registrationNumber'
           >
         > = {}
       ) => ({
@@ -590,7 +596,8 @@ export function generateActionDocument({
   configuration,
   action,
   rng = () => 0.1,
-  defaults = {}
+  defaults = {},
+  user = {}
 }: {
   configuration: EventConfig
   action: ActionType
@@ -598,7 +605,7 @@ export function generateActionDocument({
   defaults?: Partial<ActionDocument>
   user?: Partial<{
     signature: string
-    primaryOfficeId: string
+    primaryOfficeId: UUID
     role: TestUserRole
     id: string
   }>
@@ -607,10 +614,12 @@ export function generateActionDocument({
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
-    createdBy: getUUID(),
+    createdBy: user.id ?? getUUID(),
+    createdByUserType: TokenUserType.Enum.user,
     createdByRole: TestUserRole.Enum.FIELD_AGENT,
     id: getUUID(),
-    createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+    createdAtLocation:
+      user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
     declaration: generateActionDeclarationInput(configuration, action, rng),
     annotation: {},
     status: ActionStatus.Accepted,
@@ -626,7 +635,7 @@ export function generateActionDocument({
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:
-      return { ...actionBase, type: action, assignedTo: null }
+      return { ...actionBase, type: action }
     case ActionType.ASSIGN:
       return { ...actionBase, assignedTo: getUUID(), type: action }
     case ActionType.VALIDATE:
@@ -667,17 +676,24 @@ export function generateActionDocument({
 export function generateEventDocument({
   configuration,
   actions,
-  rng = () => 0.1
+  rng = () => 0.1,
+  user
 }: {
   configuration: EventConfig
   actions: ActionType[]
   rng?: () => number
+  user?: Partial<{
+    signature: string
+    primaryOfficeId: UUID
+    role: TestUserRole
+    id: string
+  }>
 }): EventDocument {
   return {
     trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
-      generateActionDocument({ configuration, action, rng })
+      generateActionDocument({ configuration, action, rng, user })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
@@ -695,7 +711,7 @@ export function generateEventDraftDocument({
   rng = () => 0.1,
   declaration = {}
 }: {
-  eventId: string
+  eventId: UUID
   actionType: ActionType
   rng?: () => number
   declaration?: EventState
@@ -772,18 +788,24 @@ export function createPrng(seed: number) {
   }
 }
 
-function generateUuid(rng: () => number): string {
+export function generateUuid(rng: () => number = () => 0.1) {
   return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, (c) => {
     const r = Math.floor(rng() * 16)
     const v = c === 'x' ? r : (r & 0x3) | 0x8
     return v.toString(16)
-  })
+  }) as UUID
 }
 
 function generateTrackingId(rng: () => number): string {
   const uuid = generateUuid(rng).replace(/-/g, '')
   const trackingId = uuid.slice(0, 6).toUpperCase()
   return trackingId
+}
+
+export function generateRegistrationNumber(rng: () => number): string {
+  const uuid = generateUuid(rng).replace(/-/g, '')
+  const registrationNumber = uuid.slice(0, 12).toUpperCase()
+  return registrationNumber
 }
 
 export function generateRandomSignature(rng: () => number): string {
@@ -807,6 +829,7 @@ export const eventQueryDataGenerator = (
     type: overrides.type ?? TENNIS_CLUB_MEMBERSHIP,
     status: overrides.status ?? pickRandom(rng, EventStatus.options),
     createdAt: overrides.createdAt ?? createdAt,
+    createdByUserType: overrides.createdByUserType ?? 'user',
     createdBy: overrides.createdBy ?? generateUuid(rng),
     createdAtLocation: overrides.createdAtLocation ?? generateUuid(rng),
     updatedAtLocation: overrides.updatedAtLocation ?? generateUuid(rng),

@@ -688,7 +688,7 @@ export const TENNIS_CLUB_DECLARATION_REVIEW = {
   title: {
     id: 'v2.event.tennis-club-membership.action.declare.form.review.title',
     defaultMessage:
-      '{applicant.name.firstname, select, __EMPTY__ {Member declaration} other {{applicant.name.surname, select, __EMPTY__ {Member declaration} other {Member declaration for {applicant.name.firstname} {applicant.name.surname}}}}}',
+      '{applicant.name.firstname, select, __EMPTY__ {Member declaration} other {{applicant.name.surname, select, __EMPTY__ {Member declaration for {applicant.name.firstname}} other {Member declaration for {applicant.name.firstname} {applicant.name.surname}}}}}',
     description: 'Title of the review page'
   },
   fields: [

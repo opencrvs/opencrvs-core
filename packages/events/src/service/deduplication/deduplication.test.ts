@@ -9,7 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { DeduplicationConfig, EventIndex, getUUID } from '@opencrvs/commons'
+import {
+  DeduplicationConfig,
+  EventIndex,
+  getUUID,
+  UUID,
+  TokenUserType
+} from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
@@ -180,8 +186,9 @@ async function findDuplicates(
       status: 'CREATED',
       createdAt: '2025-01-01',
       createdBy: 'test',
-      createdAtLocation: 'test',
-      updatedAtLocation: 'test',
+      createdByUserType: TokenUserType.Enum.user,
+      createdAtLocation: 'test' as UUID,
+      updatedAtLocation: 'test' as UUID,
       legalStatuses: {},
       assignedTo: 'test',
       updatedAt: '2025-01-01',
@@ -257,13 +264,14 @@ describe('deduplication tests', () => {
       {
         declaration: {},
         // Random field values that should not affect the search
-        id: '123-123-123-123',
+        id: '123-123-123-123' as UUID,
         type: 'birth',
         status: 'CREATED',
         createdAt: '2025-01-01',
         createdBy: 'test',
-        createdAtLocation: 'test',
-        updatedAtLocation: 'test',
+        createdByUserType: TokenUserType.Enum.user,
+        createdAtLocation: 'test' as UUID,
+        updatedAtLocation: 'test' as UUID,
         legalStatuses: {},
         assignedTo: 'test',
         updatedAt: '2025-01-01',

@@ -6,6 +6,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -44,6 +45,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
     },
   },
   "status": "DECLARED",
@@ -62,6 +64,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -100,6 +103,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/47f6b2e2-e69e-4401-92d8-35617de8137b.png",
+      "createdByUserType": "[sanitized]",
     },
   },
   "status": "DECLARED",
@@ -119,6 +123,7 @@ exports[`Returns relevant events in right order 1`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -157,6 +162,7 @@ exports[`Returns relevant events in right order 1`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+      "createdByUserType": "[sanitized]",
     },
   },
   "status": "DECLARED",
@@ -176,6 +182,7 @@ exports[`Returns relevant events in right order 2`] = `
   "createdAtLocation": "[sanitized]",
   "createdBy": "[sanitized]",
   "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+  "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
     "applicant.address": {
@@ -214,6 +221,7 @@ exports[`Returns relevant events in right order 2`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
+      "createdByUserType": "[sanitized]",
     },
     "REGISTERED": {
       "acceptedAt": "[sanitized]",
@@ -222,7 +230,8 @@ exports[`Returns relevant events in right order 2`] = `
       "createdBy": "[sanitized]",
       "createdByRole": "REGISTRATION_AGENT",
       "createdBySignature": "/random-bucket/f47b27b0-23bd-415f-b7ab-d6fd15534b09.png",
-      "registrationNumber": "1234567890AB",
+      "createdByUserType": "[sanitized]",
+      "registrationNumber": "[sanitized]",
     },
   },
   "status": "REGISTERED",
@@ -237,12 +246,11 @@ exports[`Returns relevant events in right order 2`] = `
 
 exports[`Returns relevant events in right order 3`] = `
 [
+  "REJECTED",
   "VALIDATED",
   "DECLARED",
-  "REJECTED",
-  "CREATED",
-  "ARCHIVED",
   "REGISTERED",
+  "ARCHIVED",
   "CERTIFIED",
 ]
 `;

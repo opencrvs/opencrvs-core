@@ -50,7 +50,6 @@ export const AvailableIcons = z.enum([
   'Copy',
   'Database',
   'DotsThreeVertical',
-  'DownloadSimple',
   'ArrowCounterClockwise',
   'MagnifyingGlassMinus',
   'MagnifyingGlassPlus',

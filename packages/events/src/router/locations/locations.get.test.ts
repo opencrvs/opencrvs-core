@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { SCOPES } from '@opencrvs/commons'
+import { generateUuid, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('Returns single location in right format', async () => {
@@ -17,7 +17,7 @@ test('Returns single location in right format', async () => {
 
   const setLocationPayload = [
     {
-      id: '123-456-789',
+      id: generateUuid(),
       partOf: null,
       name: 'Location foobar',
       externalId: 'ext-id-123'

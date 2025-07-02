@@ -15,12 +15,14 @@ import { noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
+import {
+  applyDraftsToEventIndex,
+  deepDropNulls
+} from '@opencrvs/commons/client'
 import {
   AppBar,
   Button,
   Frame,
-  Icon,
   INavigationType,
   Stack
 } from '@opencrvs/components'
@@ -38,6 +40,7 @@ import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messa
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { Sidebar } from '../sidebar/Sidebar'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -57,17 +60,23 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvent } = useEvents()
+  const { searchEventById } = useEvents()
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
-  const [event] = getEvent.useSuspenseQuery(eventId)
-
+  const drafts = getRemoteDrafts(eventId)
   const allEvents = useEventConfigurations()
-  const { eventConfiguration } = useEventConfiguration(event.type)
-
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+
+  const eventResults = searchEventById.useSuspenseQuery(eventId)
+
+  if (eventResults.length === 0) {
+    throw new Error(`Event details with id ${eventId} not found`)
+  }
+
+  const eventIndex = eventResults[0]
+
+  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 
   const advancedSearchEvents = allEvents.filter(
     (e) => e.advancedSearch.length > 0
@@ -110,15 +119,12 @@ export function EventOverviewLayout({
           mobileTitle={flattenedIntl.formatMessage(
             eventConfiguration.title,
             flattenEventIndex(
-              getCurrentEventStateWithDrafts({
-                event,
-                drafts,
-                configuration: eventConfiguration
-              })
+              deepDropNulls(applyDraftsToEventIndex(eventIndex, drafts))
             )
           )}
         />
       }
+      navigation={<Sidebar />}
       skipToContentText="skip"
     >
       {children}

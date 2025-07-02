@@ -19,7 +19,11 @@ import {
 } from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createEvent,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -32,12 +36,12 @@ test('prevents forbidden access if missing required scope', async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access with required scope`, async () => {
+test('allows access with required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
   await expect(
-    client.event.delete({ eventId: 'some event' })
+    client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
@@ -46,7 +50,7 @@ test('should return 404 if event does not exist', async () => {
   const client = createTestClient(user)
 
   await expect(
-    client.event.delete({ eventId: 'some event' })
+    client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -72,21 +76,7 @@ test('declared event can not be deleted', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
-
-  const createAction = event.actions.filter(
-    (action) => action.type === ActionType.CREATE
-  )
-
-  const assignmentInput = generator.event.actions.assign(event.id, {
-    assignedTo: createAction[0].createdBy
-  })
-
-  await client.event.actions.assignment.assign(assignmentInput)
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   await expect(
     client.event.delete({ eventId: event.id })

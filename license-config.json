@@ -52,7 +52,10 @@
     "packages/toolkit/.npmignore",
     "packages/toolkit/tsconfig.tsbuildinfo",
     "packages/commons/src/events/EventConfig.mermaid",
-    "packages/commons/src/events/EventUpdateFlow.mermaid"
+    "packages/commons/src/events/EventUpdateFlow.mermaid",
+    "packages/events/src/storage/postgres/events/schema/**/*.ts",
+    "packages/events/.kanelrc.js",
+    "packages/events/src/tests/extract-dump.sh"
   ],
   "license": "license-header.txt",
   "licenseFormats": {

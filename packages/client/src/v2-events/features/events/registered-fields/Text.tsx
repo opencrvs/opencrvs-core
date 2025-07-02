@@ -8,19 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import * as React from 'react'
 import {
   ITextInputProps as ComponentTextInputProps,
   TextInput as TextInputComponent
 } from '@opencrvs/components'
-
 interface TextInputProps
   extends Omit<ComponentTextInputProps, 'onChange' | 'value'> {
   onChange(val: string | undefined): void
   value: string | undefined
 }
-
 function TextInput({
   value,
   maxLength,

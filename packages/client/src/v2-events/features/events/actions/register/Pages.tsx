@@ -15,7 +15,10 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import {
+  getCurrentEventState,
+  getDeclarationPages
+} from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ROUTES } from '@client/v2-events/routes'
@@ -39,11 +42,11 @@ export function Pages() {
   const navigate = useNavigate()
   const drafts = useDrafts()
   const { modal, redirectToOrigin } = useEventFormNavigation()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-
+  const eventIndex = getCurrentEventState(event, configuration)
   const declarationPages = getDeclarationPages(configuration)
 
   const currentPageId =
@@ -77,7 +80,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={event.declaration}
+        declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={form}
         formPages={declarationPages}
@@ -86,10 +89,13 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              searchParams
+            )
           )
         }
         onSubmit={() =>

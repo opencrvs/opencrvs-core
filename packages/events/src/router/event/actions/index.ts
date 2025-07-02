@@ -12,7 +12,7 @@ import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { z } from 'zod'
 import { OpenApiMeta } from 'trpc-to-openapi'
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import {
   ActionType,
   ActionStatus,
@@ -28,6 +28,7 @@ import {
   ACTION_ALLOWED_SCOPES,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
+import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware'
 import { systemProcedure } from '@events/router/trpc'
@@ -35,7 +36,8 @@ import { systemProcedure } from '@events/router/trpc'
 import {
   getEventById,
   addAction,
-  addAsyncRejectAction
+  addAsyncRejectAction,
+  throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
 import {
   ActionConfirmationResponse,
@@ -99,14 +101,17 @@ type ActionProcedure = {
   request: MutationProcedure<{
     input: ActionInput
     output: EventDocument
+    meta: OpenApiMeta
   }>
   accept: MutationProcedure<{
     input: ActionInput & { actionId: string }
     output: EventDocument
+    meta: OpenApiMeta
   }>
   reject: MutationProcedure<{
     input: { eventId: string; actionId: string; transactionId: string }
     output: EventDocument
+    meta: OpenApiMeta
   }>
 }
 
@@ -128,7 +133,7 @@ export function getDefaultActionProcedures(
 
   const { notifyApiPayloadSchema, inputSchema } = actionConfig
 
-  let acceptInputFields = z.object({ actionId: z.string() })
+  let acceptInputFields = z.object({ actionId: UUID })
 
   if (notifyApiPayloadSchema) {
     acceptInputFields = acceptInputFields.merge(notifyApiPayloadSchema)
@@ -158,6 +163,8 @@ export function getDefaultActionProcedures(
         if (ctx.isDuplicateAction) {
           return ctx.event
         }
+
+        await throwConflictIfActionNotAllowed(eventId, actionType)
 
         const event = await getEventById(eventId)
 
@@ -208,8 +215,7 @@ export function getDefaultActionProcedures(
             user,
             token,
             status
-          },
-          actionId
+          }
         )
       }),
 
@@ -262,8 +268,8 @@ export function getDefaultActionProcedures(
       .use(requireScopesMiddleware)
       .input(
         z.object({
-          actionId: z.string(),
-          eventId: z.string(),
+          actionId: UUID,
+          eventId: UUID,
           transactionId: z.string()
         })
       )
@@ -295,6 +301,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
+          createdByUserType: TokenUserType.Enum.user,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,

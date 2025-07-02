@@ -304,38 +304,25 @@ test('valid action is appended to event actions', async () => {
 test(`${ActionType.VALIDATE} is idempotent`, async () => {
   const { user, generator, eventsDb } = await setupTestCase(100)
   const client = createTestClient(user)
-
   const event = await client.event.create(generator.event.create())
-
   const declarePayload = generator.event.actions.declare(event.id)
   await client.event.actions.declare.request(declarePayload)
-
   await client.event.actions.assignment.assign(
     generator.event.actions.assign(event.id, {
       assignedTo: user.id
     })
   )
-
   const validatePayload = generator.event.actions.validate(event.id, {
     keepAssignment: true
   })
-
   const firstResponse =
     await client.event.actions.validate.request(validatePayload)
-
-  const databaseResultAfterFirst = await eventsDb
-    .collection('events')
-    .find()
-    .toArray()
+  const databaseResultAfterFirst = await eventsDb.selectFrom('events').execute()
   const secondResponse =
     await client.event.actions.validate.request(validatePayload)
-
   const databaseResultAfterSecond = await eventsDb
-    .collection('events')
-    .find()
-    .toArray()
-
+    .selectFrom('events')
+    .execute()
   expect(databaseResultAfterFirst).toEqual(databaseResultAfterSecond)
-
   expect(firstResponse).toEqual(secondResponse)
 })

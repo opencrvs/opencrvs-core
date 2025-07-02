@@ -17,7 +17,8 @@ import {
   ActionType,
   generateActionDocument,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import {
   tennisClubMembershipEventIndex,
@@ -28,6 +29,7 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { CERT_TEMPLATE_ID } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import * as PrintCertificate from './index'
 
 const meta: Meta<typeof PrintCertificate.Review> = {
@@ -77,7 +79,7 @@ export const CollectorForm: Story = {
  * Clears and sets the local draft with the event data.
  * Since Action.tsx runs before the component is mounted (and sets up both declaration & annotation form), we need to set the "test case" as draft.
  */
-function SetAnnotationDraft({ eventId }: { eventId: string }) {
+function SetAnnotationDraft({ eventId }: { eventId: UUID }) {
   const generator = testDataGenerator()
   const drafts = useDrafts()
   const draft = generator.event.draft({
@@ -136,6 +138,9 @@ const alreadyPrintedEvent = {
 
 export const FormSetup: Story = {
   name: 'Form is empty when printing second time',
+  beforeEach: () => {
+    setEventData(alreadyPrintedEvent.id, tennisClubMembershipEventDocument)
+  },
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -163,6 +168,9 @@ export const FormSetup: Story = {
 }
 export const FormSetupWithDraft: Story = {
   name: 'Form is filled from draft data',
+  beforeEach: () => {
+    setEventData(alreadyPrintedEvent.id, tennisClubMembershipEventDocument)
+  },
   parameters: {
     reactRouter: {
       router: {

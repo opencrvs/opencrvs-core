@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { TRPCError } from '@trpc/server'
-import { ActionType, getUUID, SCOPES } from '@opencrvs/commons'
+import { ActionType, generateUuid, getUUID, SCOPES } from '@opencrvs/commons'
 import {
   createTestClient,
   setupTestCase,
@@ -20,7 +20,7 @@ test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [])
 
-  await expect(client.event.get('event-test-id-12345')).rejects.toMatchObject(
+  await expect(client.event.get(generateUuid())).rejects.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
   )
 })
@@ -29,7 +29,7 @@ test(`allows access with required scope`, async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.RECORD_READ])
 
-  await expect(client.event.get('some event')).rejects.not.toMatchObject(
+  await expect(client.event.get(generateUuid())).rejects.not.toMatchObject(
     new TRPCError({ code: 'FORBIDDEN' })
   )
 })
@@ -39,7 +39,7 @@ test(`Returns 404 when not found`, async () => {
   const client = createTestClient(user)
 
   await expect(
-    client.event.get('id-not-persisted')
+    client.event.get(generateUuid())
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -104,13 +104,23 @@ test('Returns event with all actions', async () => {
   await client.event.actions.reject.request(
     generator.event.actions.reject(event.id)
   )
+
   await client.event.actions.assignment.assign({
     ...assignmentInput,
     transactionId: getUUID()
   })
 
-  await client.event.actions.archive.request(
-    generator.event.actions.archive(event.id)
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(event.id)
   )
 
   await client.event.actions.assignment.assign({
