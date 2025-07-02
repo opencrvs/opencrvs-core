@@ -358,6 +358,22 @@ components:
                             rendered in the advanced search form.
 
                             \      "
+                        validations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              validator:
+                                $ref: "#/components/schemas/Conditional"
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - validator
+                              - message
+                          default:
+                            &a4 []
+                          description: In advanced search, we sometimes need to override the default field
+                            validations.
                         fieldId:
                           type: string
                         fieldType:
@@ -492,6 +508,21 @@ components:
                             rendered in the advanced search form.
 
                             \      "
+                        validations:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              validator:
+                                $ref: "#/components/schemas/Conditional"
+                              message:
+                                $ref: "#/components/schemas/TranslationConfig"
+                            required:
+                              - validator
+                              - message
+                          default: *a4
+                          description: In advanced search, we sometimes need to override the default field
+                            validations.
                         fieldId:
                           type: string
                           enum:
@@ -603,7 +634,7 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default:
-            &a8 []
+            &a9 []
         draft:
           type: boolean
         type:
@@ -650,7 +681,7 @@ components:
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default:
-                &a4 []
+                &a5 []
             required:
               type: boolean
               default: false
@@ -669,7 +700,7 @@ components:
                   - validator
                   - message
               default:
-                &a5 []
+                &a6 []
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -784,7 +815,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -802,7 +833,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -856,7 +887,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -874,7 +905,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -923,7 +954,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -941,7 +972,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -996,7 +1027,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1014,7 +1045,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1058,7 +1089,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1076,7 +1107,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1132,7 +1163,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1150,7 +1181,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1173,7 +1204,7 @@ components:
                     fontVariant:
                       type: string
                       enum:
-                        &a6
+                        &a7
                         - reg12
                         - reg14
                         - reg16
@@ -1207,7 +1238,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1225,7 +1256,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1288,7 +1319,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1306,7 +1337,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1332,7 +1363,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a6
+                      enum: *a7
               default: {}
           required:
             - id
@@ -1359,7 +1390,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1377,7 +1408,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1414,7 +1445,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1432,7 +1463,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1484,7 +1515,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1502,7 +1533,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1558,7 +1589,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1576,7 +1607,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1613,7 +1644,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1631,7 +1662,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1668,7 +1699,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1686,7 +1717,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1722,7 +1753,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1740,7 +1771,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1776,7 +1807,7 @@ components:
                   items:
                     type: string
                     enum:
-                      &a7
+                      &a8
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -1822,7 +1853,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1840,7 +1871,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1877,7 +1908,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1895,7 +1926,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1953,7 +1984,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -1971,7 +2002,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2004,7 +2035,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2022,7 +2053,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2059,7 +2090,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2077,7 +2108,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2114,7 +2145,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2132,7 +2163,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2169,7 +2200,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2187,7 +2218,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2214,7 +2245,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a7
+                    enum: *a8
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2245,7 +2276,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2263,7 +2294,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2307,7 +2338,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2325,7 +2356,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2380,7 +2411,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a7
+                    enum: *a8
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2410,7 +2441,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a4
+              default: *a5
             required:
               type: boolean
               default: false
@@ -2428,7 +2459,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a5
+              default: *a6
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2549,7 +2580,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2608,7 +2639,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2667,7 +2698,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2710,7 +2741,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2753,7 +2784,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2796,7 +2827,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2855,7 +2886,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -2898,7 +2929,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3030,7 +3061,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3123,7 +3154,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3166,7 +3197,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a8
+          default: *a9
         draft:
           type: boolean
         type:
@@ -3303,6 +3334,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         type:
           type: string
         createdAt:
@@ -3320,8 +3352,15 @@ components:
                 properties:
                   id:
                     type: string
+                    format: uuid
                   transactionId:
                     type: string
+                  createdByUserType:
+                    type: string
+                    enum:
+                      &a10
+                      - user
+                      - system
                   createdAt:
                     type: string
                     format: date-time
@@ -3338,11 +3377,17 @@ components:
                     type:
                       - string
                       - "null"
+                    format: uuid
                   status:
                     type: string
                     const: Rejected
                   originalActionId:
-                    type: string
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                    description: Reference to the original action that was asynchronously rejected
+                      or accepted by 3rd party integration.
                   type:
                     type: string
                     enum:
@@ -3356,6 +3401,7 @@ components:
                 required:
                   - id
                   - transactionId
+                  - createdByUserType
                   - createdAt
                   - createdBy
                   - createdByRole
@@ -3410,8 +3456,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -3428,6 +3478,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -3598,7 +3649,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -3769,18 +3822,24 @@ components:
         status:
           type: string
           enum:
-            &a9
+            &a11
             - Requested
             - Accepted
             - Rejected
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: CREATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -3792,8 +3851,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -3810,6 +3873,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -3980,7 +4044,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -4150,15 +4216,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: VALIDATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4170,8 +4242,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4188,6 +4264,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4358,7 +4435,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -4528,9 +4607,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT
@@ -4549,6 +4633,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4561,8 +4646,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4579,6 +4668,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4749,7 +4839,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -4919,15 +5011,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: MARKED_AS_DUPLICATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -4939,8 +5037,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -4957,6 +5059,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5127,7 +5230,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -5297,9 +5402,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ARCHIVE
@@ -5318,6 +5428,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5330,8 +5441,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5348,6 +5463,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5518,7 +5634,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -5688,15 +5806,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: NOTIFY
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -5708,8 +5832,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -5726,6 +5854,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5896,7 +6025,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -6066,9 +6197,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REGISTER
@@ -6077,6 +6213,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6088,8 +6225,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6106,6 +6247,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6276,7 +6418,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -6446,15 +6590,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: DECLARE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6466,8 +6616,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6484,6 +6638,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6654,7 +6809,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -6824,9 +6981,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ASSIGN
@@ -6835,6 +6997,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -6847,8 +7010,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -6865,6 +7032,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7035,7 +7203,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -7205,15 +7375,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REQUEST_CORRECTION
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7225,8 +7401,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7243,6 +7423,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7413,7 +7594,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -7583,9 +7766,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: APPROVE_CORRECTION
@@ -7594,6 +7782,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7606,8 +7795,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -7624,6 +7817,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7794,7 +7988,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -7964,9 +8160,14 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT_CORRECTION
@@ -7975,6 +8176,7 @@ components:
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -7987,8 +8189,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8005,6 +8211,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8175,7 +8382,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -8345,31 +8554,38 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: UNASSIGN
-        assignedTo:
-          type: "null"
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
         - declaration
         - status
         - type
-        - assignedTo
     PrintCertificateAction:
       type: object
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8386,6 +8602,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8556,7 +8773,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -8726,15 +8945,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: PRINT_CERTIFICATE
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -8746,8 +8971,12 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
+        createdByUserType:
+          type: string
+          enum: *a10
         createdAt:
           type: string
           format: date-time
@@ -8764,6 +8993,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8934,7 +9164,9 @@ components:
                           - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -9104,15 +9336,21 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a9
+          enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: READ
       required:
         - id
         - transactionId
+        - createdByUserType
         - createdAt
         - createdBy
         - createdByRole
@@ -9141,6 +9379,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -9313,7 +9552,7 @@ components:
                           - surname
                       - type: "null"
           default:
-            &a10 {}
+            &a12 {}
         annotation:
           type: object
           additionalProperties:
@@ -9485,6 +9724,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -9495,6 +9735,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
       required:
         - eventId
         - transactionId
@@ -9503,6 +9744,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -9674,7 +9916,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -9846,6 +10088,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -9865,6 +10108,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -10036,7 +10280,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -10208,6 +10452,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -10219,11 +10464,13 @@ components:
       required:
         - eventId
         - transactionId
+      additionalProperties: false
     NotifyActionInput:
       type: object
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -10395,7 +10642,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -10567,6 +10814,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -10578,7 +10826,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 256d2535-682e-41d3-a470-748c8578461f
+        transactionId: 7ac06e75-f092-4db5-95f3-9871dba450c5
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10587,6 +10835,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -10758,7 +11007,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -10930,6 +11179,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -10944,6 +11194,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -11115,7 +11366,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -11287,6 +11538,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -11314,6 +11566,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -11485,7 +11738,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -11657,6 +11910,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -11671,6 +11925,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -11842,7 +12097,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -12014,6 +12269,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -12041,6 +12297,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -12212,7 +12469,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -12384,6 +12641,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -12401,6 +12659,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -12572,7 +12831,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -12744,6 +13003,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -12761,6 +13021,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -12932,7 +13193,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -13104,6 +13365,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -13118,6 +13380,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -13289,7 +13552,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -13461,6 +13724,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -13475,6 +13739,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -13646,7 +13911,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -13818,6 +14083,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         requestId:
@@ -13835,6 +14101,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -14006,7 +14273,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -14178,6 +14445,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         requestId:
@@ -14195,6 +14463,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -14366,7 +14635,7 @@ components:
                           - firstname
                           - surname
                       - type: "null"
-          default: *a10
+          default: *a12
         annotation:
           type: object
           additionalProperties:
@@ -14538,6 +14807,7 @@ components:
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
