@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: c51c9724-62cb-4428-bd92-9cc1bd7f64ce
+                transactionId: 7e59fbc9-fbca-4a95-90ab-6088f7087bbb
                 type: v2.birth
       responses:
         "200":
@@ -458,7 +458,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 407591bd-dc53-4bdb-ac6e-8e2b31853fce
+                transactionId: af1a3d41-6683-44e0-aefd-1098a84bb19b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1306,6 +1306,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1445,6 +1448,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1518,6 +1524,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1584,6 +1593,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1660,6 +1672,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1722,6 +1737,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1801,6 +1819,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1874,6 +1895,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1959,6 +1983,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2031,6 +2058,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2085,6 +2115,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2157,6 +2190,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2234,6 +2270,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2288,6 +2327,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2346,6 +2388,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2399,6 +2444,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2501,6 +2549,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2555,6 +2606,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2634,6 +2688,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2684,6 +2741,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2742,6 +2802,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2798,6 +2861,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2852,6 +2918,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2932,6 +3001,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2993,6 +3065,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -3098,6 +3173,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
