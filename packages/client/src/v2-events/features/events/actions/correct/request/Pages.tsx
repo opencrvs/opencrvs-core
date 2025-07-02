@@ -29,7 +29,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 
-  // Filter out pages where all fields either have 'uncorrectable' set to true or are non-interactive
+// Filter out pages where all fields either have 'uncorrectable' set to true or are non-interactive
 function getCorrectablePages(formPages: PageConfig[]) {
   return formPages.filter(
     (page) =>
@@ -37,6 +37,7 @@ function getCorrectablePages(formPages: PageConfig[]) {
         (field) => field.uncorrectable || isNonInteractiveFieldType(field)
       )
   )
+}
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
@@ -58,8 +59,7 @@ export function Pages() {
   const correctablePages = getCorrectablePages(formPages)
 
   const currentPageId =
-    correctablePages.find((p) => p.id === pageId)?.id ||
-    correctablePages[0]?.id
+    correctablePages.find((p) => p.id === pageId)?.id || correctablePages[0]?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
