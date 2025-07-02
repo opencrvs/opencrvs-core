@@ -8,10 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
-import { IntlShape } from 'react-intl'
+import React, { useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
-  field,
   FieldConfig,
   FieldType,
   getValidatorsForField,
@@ -29,10 +28,84 @@ interface Props {
   validation: FieldConfig['validation']
   value?: NameFieldValue
 }
+
 export const defailtNameFieldValue: NameFieldValue = {
   firstname: '',
   middlename: '',
   surname: ''
+}
+
+function FocusNameInputsOnHash({
+  id,
+  value
+}: {
+  id: string
+  value?: { firstname?: string; middlename?: string; surname?: string }
+}) {
+  const location = useLocation()
+
+  useEffect(() => {
+    if (location.hash !== `#${id}`) {
+      return
+    }
+
+    const containerId = `${id}-form-input`
+    const container = document.getElementById(containerId)
+    if (!container) {
+      return
+    }
+
+    const tryFocus = () => {
+      const firstNameInput = container.querySelector<HTMLInputElement>(
+        'input[id$="firstname"]'
+      )
+      const middleNameInput = container.querySelector<HTMLInputElement>(
+        'input[id$="middlename"]'
+      )
+      const surnameInput = container.querySelector<HTMLInputElement>(
+        'input[id$="surname"]'
+      )
+
+      if (firstNameInput && !value?.firstname) {
+        firstNameInput.focus()
+        return true
+      } else if (middleNameInput && !value?.middlename) {
+        middleNameInput.focus()
+        return true
+      } else if (surnameInput && !value?.surname) {
+        surnameInput.focus()
+        return true
+      } else if (firstNameInput) {
+        firstNameInput.focus()
+        return true
+      }
+
+      return false
+    }
+
+    // First try without waiting
+    const focused = tryFocus()
+    if (focused) {
+      return
+    }
+
+    // If not focused, observe DOM changes
+    const observer = new MutationObserver(() => {
+      if (tryFocus()) {
+        observer.disconnect()
+      }
+    })
+
+    observer.observe(container, {
+      childList: true,
+      subtree: true
+    })
+
+    return () => observer.disconnect()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location.hash, id])
+
+  return null
 }
 
 function NameInput(props: Props) {
@@ -71,12 +144,15 @@ function NameInput(props: Props) {
   ] satisfies TextField[]
 
   return (
-    <FormFieldGenerator
-      fields={fields}
-      id={id}
-      initialValues={{ ...value }}
-      onChange={(values) => onChange(values as NameFieldValue)}
-    />
+    <>
+      <FormFieldGenerator
+        fields={fields}
+        id={id}
+        initialValues={{ ...value }}
+        onChange={(values) => onChange(values as NameFieldValue)}
+      />
+      <FocusNameInputsOnHash id={id} value={value} />
+    </>
   )
 }
 

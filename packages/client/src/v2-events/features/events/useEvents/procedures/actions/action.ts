@@ -224,7 +224,7 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
   meta: {
-    actionType: ActionType.VALIDATE
+    actionType: ActionType.DECLARE
   }
 })
 
@@ -235,7 +235,7 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
   meta: {
-    actionType: ActionType.REGISTER
+    actionType: ActionType.DECLARE
   }
 })
 
