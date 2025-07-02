@@ -709,9 +709,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -847,9 +847,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -924,9 +924,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -996,9 +996,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1074,9 +1074,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1141,9 +1141,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1220,9 +1220,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1304,9 +1304,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1390,9 +1390,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1466,9 +1466,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1526,9 +1526,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1601,9 +1601,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1680,9 +1680,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             defaultValue:
               type: string
@@ -1740,9 +1740,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             defaultValue:
               type: string
@@ -1800,9 +1800,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1859,9 +1859,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -1964,9 +1964,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2024,9 +2024,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2105,9 +2105,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2161,9 +2161,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2221,9 +2221,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2281,9 +2281,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2341,9 +2341,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2422,9 +2422,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2489,9 +2489,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -2597,9 +2597,9 @@ components:
             hideLabel:
               type: boolean
               default: false
-            isCorrectable:
+            uncorrectable:
               type: boolean
-              default: true
+              default: false
               description: Indicates if the field can be changed during a record correction.
             type:
               type: string
@@ -10944,7 +10944,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: b19ec8d5-14b9-4939-8720-e676771d74a7
+        transactionId: 298247bb-c6f4-45e3-9539-d06098b04236
         declaration: {}
         annotation: {}
         type: NOTIFY
