@@ -10,6 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { omit } from 'lodash'
 import {
   ActionType,
   AddressType,
@@ -164,7 +165,7 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
 
   const data = generator.event.actions.correction.request(event.id, {
     declaration: {
-      'applicant.dob': '02-1-2024',
+      'applicant.dob': '02-1-2024', // Invalid date
       'applicant.dobUnknown': false,
       'applicant.name': {
         firstname: 'John',
@@ -257,6 +258,25 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   ).rejects.matchSnapshot()
 })
 
+test('REQUEST_CORRECTION prevents correcting a field which is configured as uncorrectable: true', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
+
+  const payload = generator.event.actions.correction.request(event.id, {
+    declaration: { 'applicant.email': 'john.doe@example.com' }
+  })
+
+  await expect(
+    client.event.actions.correction.request(payload)
+  ).rejects.matchSnapshot()
+})
+
 describe('when a correction request exists', () => {
   let withCorrectionRequest: EventDocument
   let client: ReturnType<typeof createTestClient>
@@ -273,20 +293,26 @@ describe('when a correction request exists', () => {
       ActionType.REGISTER
     ])
 
+    const declarationPayload = omit(
+      {
+        ...generateActionDeclarationInput(
+          tennisClubMembershipEvent,
+          ActionType.DECLARE,
+          rng
+        ),
+        'applicant.name': {
+          firstname: 'Johnny',
+          surname: 'Doe'
+        }
+      },
+      // Omit applicant.email, since it is configured as not correctable
+      ['applicant.email']
+    )
+
     withCorrectionRequest = await client.event.actions.correction.request(
       generator.event.actions.correction.request(event.id, {
         keepAssignment: true,
-        declaration: {
-          ...generateActionDeclarationInput(
-            tennisClubMembershipEvent,
-            ActionType.DECLARE,
-            rng
-          ),
-          'applicant.name': {
-            firstname: 'Johnny',
-            surname: 'Doe'
-          }
-        }
+        declaration: declarationPayload
       })
     )
   })
@@ -304,6 +330,7 @@ describe('when a correction request exists', () => {
           requestId
         )
       )
+
     expect(withApprovedCorrectionRequest.actions.slice(-2)).toEqual([
       expect.objectContaining({
         type: ActionType.APPROVE_CORRECTION,

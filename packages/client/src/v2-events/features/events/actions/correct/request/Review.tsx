@@ -12,7 +12,6 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { isEqual } from 'lodash'
 import {
   useTypedParams,
   useTypedSearchParams
@@ -30,6 +29,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { hasFieldChanged } from './Summary/CorrectionDetails'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -53,9 +53,12 @@ export function Review() {
   const form = getFormValues()
 
   const previousFormValues = eventIndex.declaration
-  const valuesHaveChanged = Object.entries(form).some(
-    ([key, value]) => !isEqual(previousFormValues[key], value)
+
+  const formFields = formConfig.pages.flatMap((page) => page.fields)
+  const changedFields = formFields.filter((f) =>
+    hasFieldChanged(f, form, previousFormValues)
   )
+  const anyValuesHaveChanged = changedFields.length > 0
 
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
@@ -79,6 +82,7 @@ export function Review() {
       <ReviewComponent.Body
         form={form}
         formConfig={formConfig}
+        isCorrection={true}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,
@@ -99,7 +103,7 @@ export function Review() {
       >
         <PrimaryButton
           key="continue_button"
-          disabled={!valuesHaveChanged || incomplete}
+          disabled={!anyValuesHaveChanged || incomplete}
           id="continue_button"
           onClick={() => {
             navigate(

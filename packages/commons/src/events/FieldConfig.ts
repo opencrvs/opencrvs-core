@@ -8,10 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
+/* eslint-disable max-lines */
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
-
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
@@ -38,8 +39,6 @@ export const FieldReference = z
   })
   .describe('Reference to a field by its ID')
 
-const ParentReference = FieldReference.optional()
-
 export const ValidationConfig = z.object({
   validator: Conditional,
   message: TranslationConfig
@@ -49,14 +48,23 @@ export type ValidationConfig = z.infer<typeof ValidationConfig>
 
 const BaseField = z.object({
   id: FieldId,
-  parent: ParentReference,
-  conditionals: z.array(FieldConditional).default([]).optional(),
+  label: TranslationConfig,
+  parent: FieldReference.optional().describe(
+    'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
+  ),
   required: z.boolean().default(false).optional(),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z.array(ValidationConfig).default([]).optional(),
-  label: TranslationConfig,
   helperText: TranslationConfig.optional(),
-  hideLabel: z.boolean().default(false).optional()
+  hideLabel: z.boolean().default(false).optional(),
+  uncorrectable: z
+    .boolean()
+    .default(false)
+    .optional()
+    .describe(
+      'Indicates if the field can be changed during a record correction.'
+    )
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -585,6 +593,7 @@ export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
+
 export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
