@@ -297,7 +297,7 @@ const LiteralScopes = z.union([
 // Configurable scopes are for example:
 // - user.create[role=first-role|second-role]
 // - record.notify[event=v2.birth]
-export const rawConfigurableScopeRegex =
+const rawConfigurableScopeRegex =
   /^([a-zA-Z\.]+)\[((?:\w+=[\w.-]+(?:\|[\w.-]+)*)(?:,[\w]+=[\w.-]+(?:\|[\w.-]+)*)*)\]$/
 
 const rawConfigurableScope = z.string().regex(rawConfigurableScopeRegex)
@@ -333,31 +333,35 @@ const NotifyRecordScope = z.object({
 const SearchScope = z.object({
   type: z.literal('search'),
   options: z.object({
-    event: z.array(z.string()),
-    access: z.array(z.enum(['my-jurisdiction', 'all']))
+    event: z.array(z.string()).length(1),
+    access: z.array(z.enum(['my-jurisdiction', 'all'])).length(1)
   })
 })
 
 export type SearchScope = z.infer<typeof SearchScope>
 
-const ConfigurableScopes = z.discriminatedUnion('type', [
+const ConfigurableRawScopes = z.discriminatedUnion('type', [
+  SearchScope,
   CreateUserScope,
   EditUserScope,
   WorkqueueScope,
-  NotifyRecordScope,
-  SearchScope
+  NotifyRecordScope
 ])
 
-export type ConfigurableScopeType = ConfigurableScopes['type']
-export type ConfigurableScopes = z.infer<typeof ConfigurableScopes>
+type ConfigurableRawScopes = z.infer<typeof ConfigurableRawScopes>
+export type ConfigurableScopeType = ConfigurableRawScopes['type']
 
 type FlattenedSearchScope = {
   type: 'search'
   options: Record<string, string>
 }
 
+export type ConfigurableScopes =
+  | Exclude<ConfigurableRawScopes, { type: 'search' }>
+  | FlattenedSearchScope
+
 function flattenAndMergeScopes(
-  scopes: Extract<ConfigurableScopes, { type: 'search' }>[]
+  scopes: Extract<ConfigurableRawScopes, { type: 'search' }>[]
 ): FlattenedSearchScope | null {
   if (scopes.length === 0) return null
 
@@ -383,10 +387,6 @@ function flattenAndMergeScopes(
   return { type, options: mergedOptions }
 }
 
-export type ConfigurableFlattenedScopes =
-  | Exclude<ConfigurableScopes, { type: 'search' }>
-  | FlattenedSearchScope
-
 export function findScope<T extends ConfigurableScopeType>(
   scopes: string[],
   scopeType: T
@@ -399,7 +399,7 @@ export function findScope<T extends ConfigurableScopeType>(
     options: Record<string, string>
   }
   return [...otherScopes, mergedSearchScope].find(
-    (scope): scope is Extract<ConfigurableFlattenedScopes, { type: T }> =>
+    (scope): scope is Extract<ConfigurableScopes, { type: T }> =>
       scope?.type === scopeType
   )
 }
@@ -409,7 +409,7 @@ export function findScope<T extends ConfigurableScopeType>(
  * @param rawOptions - The raw string, e.g. "event=v2.birth|club-reg,all"
  * @returns An object like: { event: ['v2.birth', 'club-reg'], access: ['all'] }
  */
-export function getScopeOptions(rawOptions: string) {
+function getScopeOptions(rawOptions: string) {
   return rawOptions
     .split(',')
     .reduce((acc: Record<string, string[]>, option) => {
@@ -420,9 +420,9 @@ export function getScopeOptions(rawOptions: string) {
 }
 
 /**
- * Parses a configurable scope string into a ConfigurableScopes object.
+ * Parses a configurable scope string into a ConfigurableRawScopes object.
  * @param {string} scope - The scope string to parse
- * @returns {ConfigurableScopes | undefined} The parsed scope object if valid, undefined otherwise
+ * @returns {ConfigurableRawScopes | undefined} The parsed scope object if valid, undefined otherwise
  * @example
  * parseScope("user.create[role=field-agent|registration-agent]")
  * // Returns: { type: "user.create", options: { role: ["field-agent", "registration-agent"] } }
@@ -452,7 +452,7 @@ export function parseScope(scope: string) {
     options
   }
 
-  const result = ConfigurableScopes.safeParse(parsedScope)
+  const result = ConfigurableRawScopes.safeParse(parsedScope)
   return result.success ? result.data : undefined
 }
 

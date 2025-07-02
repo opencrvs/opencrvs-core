@@ -28,7 +28,7 @@ import {
   IAuthHeader,
   UUID,
   EventDocument,
-  ConfigurableFlattenedScopes
+  ConfigurableScopes
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -50,9 +50,7 @@ export function setBearerForToken(token: string) {
  * @param scopes - Array of configurable scopes with options
  * @returns Object containing authorized events
  */
-function getAuthorizedEntitiesFromScopes(
-  scopes: ConfigurableFlattenedScopes[]
-) {
+function getAuthorizedEntitiesFromScopes(scopes: ConfigurableScopes[]) {
   const authorizedEvents = scopes
     .flatMap(({ options }) => {
       if ('event' in options) {

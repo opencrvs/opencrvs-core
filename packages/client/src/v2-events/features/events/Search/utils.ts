@@ -240,7 +240,7 @@ function buildCondition(
 }
 
 function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values(EventStatus) }
+  return { type: 'anyOf', terms: Object.values([...EventStatus.options]) }
 }
 /**
  * Converts a date range input string into a UTC-based range string.
