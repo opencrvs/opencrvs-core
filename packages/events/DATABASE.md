@@ -65,4 +65,4 @@ The schema directory is generated with `yarn generate-db-types`, but runs automa
 
 ## Tests
 
-Tests use a migration file that is essentially a dump of the database schema. You can find it from `src/tests/postgres-migrations.sql`. The tests spin up a testcontainer for Postgres and create a new database for each test.
+Tests use a migration file that is essentially a dump of the database schema. You can create it with `yarn generate-db-schema`, requires a running Postgres instance. The tests spin up a testcontainer for Postgres and create a new database for each test.
