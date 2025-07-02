@@ -36,7 +36,8 @@ import {
   DataField,
   NameField,
   PhoneField,
-  IdField
+  IdField,
+  TimeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -49,7 +50,8 @@ import {
   NonEmptyTextValue,
   TextValue,
   DataFieldValue,
-  DateRangeFieldValue
+  DateRangeFieldValue,
+  TimeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -81,10 +83,13 @@ type NullishFieldValueSchema = z.ZodOptional<
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
-  let schema: FieldUpdateValueSchema | NullishFieldValueSchema
+  let schema!: FieldUpdateValueSchema | NullishFieldValueSchema
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
+      break
+    case FieldType.TIME:
+      schema = TimeValue
       break
     case FieldType.EMAIL:
       schema = EmailValue
@@ -170,6 +175,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NUMBER:
     case FieldType.EMAIL:
     case FieldType.DATE:
+    case FieldType.TIME:
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
     case FieldType.DATA:
@@ -214,6 +220,13 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isTimeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: TimeField } => {
+  return field.config.type === FieldType.TIME
 }
 
 export const isDateRangeFieldType = (field: {
