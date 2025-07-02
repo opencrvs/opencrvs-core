@@ -27,6 +27,7 @@ interface Props {
   maxLength?: number
   validation: FieldConfig['validation']
   value?: NameFieldValue
+  includeMiddlename?: boolean
 }
 
 export const defailtNameFieldValue: NameFieldValue = {
@@ -109,7 +110,14 @@ function FocusNameInputsOnHash({
 }
 
 function NameInput(props: Props) {
-  const { id, onChange, required = true, value = {}, maxLength } = props
+  const {
+    id,
+    onChange,
+    required = true,
+    value = {},
+    maxLength,
+    includeMiddlename
+  } = props
   const validators = props.validation || []
 
   const fields: TextField[] = [
@@ -127,6 +135,23 @@ function NameInput(props: Props) {
       },
       validation: getValidatorsForField('firstname', validators)
     },
+    ...(includeMiddlename
+      ? [
+          {
+            id: 'middlename',
+            type: FieldType.TEXT,
+            configuration: {
+              maxLength
+            },
+            label: {
+              defaultMessage: 'Middle name',
+              description: 'This is the label for the middlename field',
+              id: 'v2.field.name.middlename.label'
+            },
+            validation: getValidatorsForField('middlename', validators)
+          }
+        ]
+      : []),
     {
       id: 'surname',
       type: FieldType.TEXT,
