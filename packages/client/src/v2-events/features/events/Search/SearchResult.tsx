@@ -174,12 +174,12 @@ const searchResultMessages = {
   waitingForAction: {
     id: `v2.events.outbox.waitingForAction`,
     defaultMessage:
-      'Waiting to {action, select, DECLARE {declare} REGISTER {register} VALIDATE {validate} other {action}}'
+      'Waiting to {action, select, DECLARE {send} REGISTER {register} VALIDATE {send for approval} NOTIFY {send} REJECT {send for updates} ARCHIVE {archive} PRINT_CERTIFICATE {certify} REQUEST_CORRECTION {request correction} APPROVE_CORRECTION {approve correction} REJECT_CORRECTION {reject correction} ASSIGN {assign} UNASSIGN {unassign} other {action}}'
   },
-  waitingToRetry: {
-    defaultMessage: 'Waiting to retry',
-    description: 'Label for declaration status waiting for connection',
-    id: 'v2.events.outbox.waitingForAction.waitingToRetry'
+  processingAction: {
+    id: `v2.events.outbox.processingAction`,
+    defaultMessage:
+      '{action, select, DECLARE {Sending} REGISTER {Registering} VALIDATE {Sending for approval} NOTIFY {Sending} REJECT {Sending for updates} ARCHIVE {Archiving} PRINT_CERTIFICATE {Certifying} REQUEST_CORRECTION {Requesting correction} APPROVE_CORRECTION {Approving correction} REJECT_CORRECTION {Rejecting correction} ASSIGN {Assigning} UNASSIGN {Unassigning} other {processing action}}'
   }
 }
 
@@ -271,14 +271,23 @@ export const SearchResultComponent = ({
     (typeof SORT_ORDER)[keyof typeof SORT_ORDER]
   >(SORT_ORDER.DESCENDING)
 
-  const onColumnClick = (columnName: string) => {
-    const { newSortedCol, newSortOrder } = changeSortedColumn(
-      columnName,
-      sortedCol,
-      sortOrder
-    )
-    setSortedCol(newSortedCol)
-    setSortOrder(newSortOrder)
+  const getSortFunction = (column: string) => {
+    if (
+      !Object.values(COLUMNS).includes(
+        column as (typeof COLUMNS)[keyof typeof COLUMNS]
+      )
+    ) {
+      return undefined
+    }
+    return (columnName: string) => {
+      const { newSortedCol, newSortOrder } = changeSortedColumn(
+        columnName,
+        sortedCol,
+        sortOrder
+      )
+      setSortedCol(newSortedCol)
+      setSortOrder(newSortOrder)
+    }
   }
 
   const mapEventsToWorkqueueRows = (
@@ -348,12 +357,12 @@ export const SearchResultComponent = ({
             <IconWithName name={event.title} status={status} />
           </TextButton>
         ),
-        outbox: isOnline
-          ? intl.formatMessage(messages.waitingForAction, {
-              action:
-                typeof meta?.actionType === 'string' ? meta.actionType : ''
-            })
-          : intl.formatMessage(messages.waitingToRetry)
+        outbox: intl.formatMessage(
+          isOnline ? messages.processingAction : messages.waitingForAction,
+          {
+            action: typeof meta?.actionType === 'string' ? meta.actionType : ''
+          }
+        )
       }
     })
   }
@@ -364,7 +373,7 @@ export const SearchResultComponent = ({
         label: intl.formatMessage(label),
         width: value.$event === 'title' ? 35 : 15,
         key: value.$event,
-        sortFunction: onColumnClick,
+        sortFunction: getSortFunction(value.$event),
         isSorted: sortedCol === value.$event
       })
     )
@@ -376,9 +385,9 @@ export const SearchResultComponent = ({
     if (windowWidth > theme.grid.breakpoints.lg) {
       return columns.map(({ label, value }) => ({
         label: intl.formatMessage(label),
-        width: 15,
+        width: value.$event === 'outbox' ? 35 : 15,
         key: value.$event,
-        sortFunction: onColumnClick,
+        sortFunction: getSortFunction(value.$event),
         isSorted: sortedCol === value.$event
       }))
     } else {
@@ -387,7 +396,7 @@ export const SearchResultComponent = ({
           label: intl.formatMessage(label),
           width: 15,
           key: value.$event,
-          sortFunction: onColumnClick,
+          sortFunction: getSortFunction(value.$event),
           isSorted: sortedCol === value.$event
         }))
         .slice(0, 2)
