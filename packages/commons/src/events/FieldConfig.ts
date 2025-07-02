@@ -58,9 +58,9 @@ const BaseField = z.object({
   validation: z.array(ValidationConfig).default([]).optional(),
   helperText: TranslationConfig.optional(),
   hideLabel: z.boolean().default(false).optional(),
-  isCorrectable: z
+  uncorrectable: z
     .boolean()
-    .default(true)
+    .default(false)
     .optional()
     .describe(
       'Indicates if the field can be changed during a record correction.'

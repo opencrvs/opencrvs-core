@@ -38,7 +38,7 @@ export function Pages({
   eventConfig,
   declaration,
   validateBeforeNextPage = false,
-  // When isCorrection is true, we should disabled fields with 'isCorrectable' set to false, or skip pages where all fields have 'isCorrectable' set to false
+  // When isCorrection is true, we should disabled fields with 'uncorrectable' set to true, or skip pages where all fields have 'uncorrectable' set to true
   isCorrection = false
 }: {
   form: EventState

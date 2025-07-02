@@ -17,7 +17,8 @@ import {
 } from 'react-router-typesafe-routes/dom'
 import {
   getDeclarationPages,
-  isNonInteractiveFieldType
+  isNonInteractiveFieldType,
+  PageConfig
 } from '@opencrvs/commons/client'
 import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
@@ -27,6 +28,15 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+
+  // Filter out pages where all fields either have 'uncorrectable' set to true or are non-interactive
+function getCorrectablePages(formPages: PageConfig[]) {
+  return formPages.filter(
+    (page) =>
+      !page.fields.every(
+        (field) => field.uncorrectable || isNonInteractiveFieldType(field)
+      )
+  )
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
@@ -45,19 +55,11 @@ export function Pages() {
   const eventIndex = getCurrentEventState(event, configuration)
 
   const formPages = getDeclarationPages(configuration)
-
-  // Filter out pages where all fields either have 'isCorrectable' set to false or are non-interactive
-  const filteredFormPages = formPages.filter(
-    (page) =>
-      !page.fields.every(
-        (field) =>
-          field.isCorrectable === false || isNonInteractiveFieldType(field)
-      )
-  )
+  const correctablePages = getCorrectablePages(formPages)
 
   const currentPageId =
-    filteredFormPages.find((p) => p.id === pageId)?.id ||
-    filteredFormPages[0]?.id
+    correctablePages.find((p) => p.id === pageId)?.id ||
+    correctablePages[0]?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
@@ -85,7 +87,7 @@ export function Pages() {
         declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={form}
-        formPages={filteredFormPages}
+        formPages={correctablePages}
         isCorrection={true}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}

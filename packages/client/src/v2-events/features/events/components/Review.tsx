@@ -355,13 +355,13 @@ function FormReview({
             }
           )
 
-          const anyFieldsAreCorrectable = displayedFields.some(
-            (field) => field.isCorrectable !== false
+          const hasCorrectableFields = displayedFields.some(
+            (field) => !field.uncorrectable
           )
 
           // If the page has any correctable fields, show the change all link
           const showChangeAllLink =
-            !readonlyMode && (!isCorrection || anyFieldsAreCorrectable)
+            !readonlyMode && (!isCorrection || hasCorrectableFields)
 
           return (
             <DeclarationDataContainer
@@ -393,11 +393,10 @@ function FormReview({
                       label,
                       errorDisplay,
                       valueDisplay,
-                      isCorrectable
+                      uncorrectable
                     }) => {
                       const shouldHideEditLink =
-                        readonlyMode ||
-                        (isCorrection && isCorrectable === false)
+                        readonlyMode || (isCorrection && uncorrectable)
 
                       return (
                         <ListReview.Row
