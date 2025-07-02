@@ -40,7 +40,6 @@ async function resetPostgresServer() {
   const targetDb = `events_${Date.now()}_${Math.random()}`
 
   const EVENTS_APP_POSTGRES_URI = `postgres://events_app:app_password@${inject('POSTGRES_URI')}/${targetDb}`
-  const EVENTS_MIGRATOR_POSTGRES_URI = `postgres://events_migrator:migrator_password@${inject('POSTGRES_URI')}/${targetDb}`
 
   const clusterInitializer = new Client({
     connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/postgres`
@@ -53,15 +52,9 @@ async function resetPostgresServer() {
     connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/${targetDb}`
   })
   await databaseInitializer.connect()
+  await migrate(databaseInitializer)
   await initializeSchemaAccess(databaseInitializer)
   await databaseInitializer.end()
-
-  const migrator = new Client({
-    connectionString: EVENTS_MIGRATOR_POSTGRES_URI
-  })
-  await migrator.connect()
-  await migrate(migrator)
-  await migrator.end()
 
   resetEventsPostgresServer()
   getPool(EVENTS_APP_POSTGRES_URI)
