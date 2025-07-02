@@ -14,7 +14,6 @@ import {
   Action,
   ActionDocument,
   ActionStatus,
-  ActionUpdate,
   EventState
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
@@ -91,7 +90,7 @@ export function getAssignedUserSignatureFromActions(
 
 function aggregateActionDeclarations(
   actions: Array<ActionDocument>
-): ActionUpdate {
+): EventState {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
@@ -174,6 +173,18 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =
   'createdAt' satisfies keyof EventDocument
 
+export function resolveDateOfEvent(
+  event: EventDocument,
+  declaration: EventState,
+  config: Partial<EventConfig>
+) {
+  if (!config.dateOfEvent) {
+    return event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+  }
+  const parsedDate = ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
+  return parsedDate.success ? parsedDate.data : undefined
+}
+
 /**
  * @returns the current state of the event based on the actions taken.
  * @see EventIndex for the description of the returned object.
@@ -202,19 +213,6 @@ export function getCurrentEventState(
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  let dateOfEvent
-
-  if (config.dateOfEvent) {
-    const parsedDate = ZodDate.safeParse(
-      declaration[config.dateOfEvent.$$field]
-    )
-    if (parsedDate.success) {
-      dateOfEvent = parsedDate.data
-    }
-  } else {
-    dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
-  }
-
   // @TODO: Typing issue here with branded values (UUID)
   // @ts-ignore
   return deepDropNulls({
@@ -235,7 +233,7 @@ export function getCurrentEventState(
     declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
-    dateOfEvent,
+    dateOfEvent: resolveDateOfEvent(event, declaration, config),
     flags: getFlagsFromActions(event.actions)
   })
 }
