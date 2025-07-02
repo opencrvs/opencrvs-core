@@ -11,6 +11,8 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
+import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
+import { OpenApiMeta } from 'trpc-to-openapi'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
@@ -58,24 +60,35 @@ import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
 
+/*
+ * Explicitely type the procedure to reduce the inference
+ * thus avoiding "The inferred type of this node exceeds the maximum length the
+ * compiler will serialize" error
+ */
+const eventConfigGetProcedure: QueryProcedure<{
+  meta: OpenApiMeta
+  input: void
+  output: EventConfig[]
+}> = publicProcedure
+  .meta({
+    openapi: {
+      summary: 'List event configurations',
+      method: 'GET',
+      path: '/config',
+      tags: ['events'],
+      protect: true
+    }
+  })
+  .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+  .input(z.void())
+  .output(z.array(EventConfig))
+  .query(async (options) => {
+    return getEventConfigurations(options.ctx.token)
+  })
+
 export const eventRouter = router({
   config: router({
-    get: publicProcedure
-      .meta({
-        openapi: {
-          summary: 'List event configurations',
-          method: 'GET',
-          path: '/config',
-          tags: ['events'],
-          protect: true
-        }
-      })
-      .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
-      .input(z.void())
-      .output(z.array(EventConfig))
-      .query(async (options) => {
-        return getEventConfigurations(options.ctx.token)
-      })
+    get: eventConfigGetProcedure
   }),
   create: systemProcedure
     .meta({
