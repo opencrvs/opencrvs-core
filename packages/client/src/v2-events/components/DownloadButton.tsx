@@ -204,6 +204,7 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
       >
         {isAssignedToSomeoneElse || isDownloadedToMe ? (
           <AvatarSmall
+            key={user?.avatarURL || 'default'}
             avatar={
               user?.avatarURL
                 ? {

@@ -33,6 +33,7 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { Button, Link as TextButton } from '@opencrvs/components'
+import { Downloaded } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -305,9 +306,15 @@ export const SearchResultComponent = ({
           )
         }))
         .concat({
-          actionComponent: (
-            <DownloadButton key={`DownloadButton-${event.id}`} event={event} />
-          )
+          actionComponent:
+            slug === CoreWorkqueues.DRAFT ? (
+              <Downloaded />
+            ) : (
+              <DownloadButton
+                key={`DownloadButton-${event.id}`}
+                event={event}
+              />
+            )
         })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
