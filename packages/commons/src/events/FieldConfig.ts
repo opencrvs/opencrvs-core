@@ -314,7 +314,8 @@ const NameField = BaseField.extend({
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
-      postfix: TranslationConfig.optional()
+      postfix: TranslationConfig.optional(),
+      includeMiddlename: z.boolean().default(false).optional()
     })
     .optional()
 }).describe('Name input field')
