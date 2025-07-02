@@ -395,15 +395,15 @@ function FormReview({
                       valueDisplay,
                       isCorrectable
                     }) => {
-                      const shouldShowEditLink =
-                        !readonlyMode &&
-                        (!isCorrection || isCorrectable !== false)
+                      const shouldHideEditLink =
+                        readonlyMode ||
+                        (isCorrection && isCorrectable === false)
 
                       return (
                         <ListReview.Row
                           key={id}
                           actions={
-                            shouldShowEditLink && (
+                            !shouldHideEditLink && (
                               <Link
                                 data-testid={`change-button-${id}`}
                                 onClick={(e) => {
