@@ -271,6 +271,40 @@ function validateNotifyAction({
   return [...annotationErrors, ...declarationErrors]
 }
 
+/*
+ * For request correction, we need to validate that the payload does not contain fields that are configured as not correctable,
+ * i.e. configured with the 'isCorrectable' flag set to false.
+ */
+function validateCorrectableFields({
+  eventConfig,
+  declarationUpdate
+}: {
+  eventConfig: EventConfig
+  declarationUpdate: ActionUpdate
+}) {
+  const declarationConfig = getDeclaration(eventConfig)
+  const formFields = declarationConfig.pages.flatMap(({ fields }) => fields)
+  const nonCorrecrableFields = formFields.filter(
+    (field) => field.isCorrectable === false
+  )
+
+  const errors = Object.entries(declarationUpdate).flatMap(([key, value]) => {
+    const field = formFields.find((f) => f.id === key)
+
+    if (field && nonCorrecrableFields.includes(field)) {
+      return {
+        message: errorMessages.correctionNotAllowed.defaultMessage,
+        id: key,
+        value
+      }
+    }
+
+    return []
+  })
+
+  return errors
+}
+
 export function validateAction(actionType: ActionType) {
   const fn: MiddlewareFunction<
     TrpcContext,
@@ -296,6 +330,15 @@ export function validateAction(actionType: ActionType) {
 
       throwWhenNotEmpty(errors)
       return next()
+    }
+
+    if (actionType === ActionType.REQUEST_CORRECTION) {
+      const errors = validateCorrectableFields({
+        eventConfig,
+        declarationUpdate: input.declaration
+      })
+
+      throwWhenNotEmpty(errors)
     }
 
     const declarationUpdateAction =
