@@ -108,18 +108,6 @@ export const writeActions = ActionTypes.exclude([
   ActionType.UNASSIGN
 ])
 
-/** Actions which change the status of the event */
-export const StatusChangingActions = ActionTypes.extract([
-  ActionType.CREATE,
-  ActionType.NOTIFY,
-  ActionType.DECLARE,
-  ActionType.VALIDATE,
-  ActionType.REGISTER,
-  ActionType.REJECT,
-  ActionType.ARCHIVE,
-  ActionType.PRINT_CERTIFICATE
-])
-
 /** Actions which are visible in action menu and workqueue */
 export const workqueueActions = ActionTypes.exclude([
   ActionType.CREATE,

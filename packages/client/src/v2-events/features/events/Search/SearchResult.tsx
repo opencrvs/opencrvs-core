@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect, PropsWithChildren } from 'react'
+import React, { useState, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -22,7 +22,6 @@ import {
   WorkqueueColumn,
   deepDropNulls,
   applyDraftsToEventIndex,
-  EventState,
   WorkqueueActionsWithDefault,
   isMetaAction
 } from '@opencrvs/commons/client'
@@ -33,6 +32,7 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { Button, Link as TextButton } from '@opencrvs/components'
+import { Downloaded } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -185,13 +185,6 @@ const searchResultMessages = {
 
 const messages = defineMessages(searchResultMessages)
 
-interface Props {
-  columns: WorkqueueColumn[]
-  eventConfigs: EventConfig[]
-  searchParams?: EventState
-  queryData: EventIndex[]
-}
-
 const ExtendedEventStatuses = {
   OUTBOX: 'OUTBOX',
   DRAFT: 'DRAFT'
@@ -305,9 +298,15 @@ export const SearchResultComponent = ({
           )
         }))
         .concat({
-          actionComponent: (
-            <DownloadButton key={`DownloadButton-${event.id}`} event={event} />
-          )
+          actionComponent:
+            slug === CoreWorkqueues.DRAFT ? (
+              <Downloaded />
+            ) : (
+              <DownloadButton
+                key={`DownloadButton-${event.id}`}
+                event={event}
+              />
+            )
         })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
@@ -318,15 +317,18 @@ export const SearchResultComponent = ({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
+
       const isInDrafts = drafts.some((draft) => draft.id === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
           return ExtendedEventStatuses.OUTBOX
         }
+
         if (isInDrafts) {
           return ExtendedEventStatuses.DRAFT
         }
+
         return event.status
       }
 
@@ -342,7 +344,11 @@ export const SearchResultComponent = ({
           status
         }),
         title: isInOutbox ? (
-          <IconWithName name={event.title} status={status} />
+          <IconWithName
+            flags={event.flags}
+            name={event.title}
+            status={status}
+          />
         ) : (
           <TextButton
             color={event.useFallbackTitle ? 'red' : 'primary'}
@@ -354,7 +360,11 @@ export const SearchResultComponent = ({
               )
             }}
           >
-            <IconWithName name={event.title} status={status} />
+            <IconWithName
+              flags={event.flags}
+              name={event.title}
+              status={status}
+            />
           </TextButton>
         ),
         outbox: intl.formatMessage(
