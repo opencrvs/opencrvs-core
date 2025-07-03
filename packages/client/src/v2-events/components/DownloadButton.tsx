@@ -136,8 +136,6 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
     )
   }
   const isFailed = eventDocument.isError
-  console.log({ eventDocument })
-  console.log({ isFailed })
 
   if (!isOnline) {
     return (
