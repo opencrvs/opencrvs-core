@@ -213,8 +213,6 @@ export function getCurrentEventState(
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  // @TODO: Typing issue here with branded values (UUID)
-  // @ts-ignore
   return deepDropNulls({
     id: event.id,
     type: event.type,
