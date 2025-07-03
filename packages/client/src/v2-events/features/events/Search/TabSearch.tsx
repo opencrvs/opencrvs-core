@@ -25,7 +25,8 @@ import {
   SearchField,
   TranslationConfig,
   EventState,
-  NameFieldValue
+  NameFieldValue,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
@@ -233,8 +234,11 @@ export function TabSearch({
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
+        if (!field || !isFieldVisible(field, formValues)) {
+          return { ...result }
+        }
 
-        if (field && fieldTypesWithDefaults.includes(field.type)) {
+        if (fieldTypesWithDefaults.includes(field.type)) {
           // If the field is a NAME type, we want to merge the default value with the current value
           // This is to ensure that the NAME field always has a default structure
           // even if the user has not filled it yet. Otherwise, it will throw invalid field error
