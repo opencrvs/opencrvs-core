@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect, PropsWithChildren } from 'react'
+import React, { useState, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -22,7 +22,6 @@ import {
   WorkqueueColumn,
   deepDropNulls,
   applyDraftsToEventIndex,
-  EventState,
   WorkqueueActionsWithDefault,
   isMetaAction
 } from '@opencrvs/commons/client'
@@ -186,13 +185,6 @@ const searchResultMessages = {
 
 const messages = defineMessages(searchResultMessages)
 
-interface Props {
-  columns: WorkqueueColumn[]
-  eventConfigs: EventConfig[]
-  searchParams?: EventState
-  queryData: EventIndex[]
-}
-
 const ExtendedEventStatuses = {
   OUTBOX: 'OUTBOX',
   DRAFT: 'DRAFT'
@@ -325,15 +317,18 @@ export const SearchResultComponent = ({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
+
       const isInDrafts = drafts.some((draft) => draft.id === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
           return ExtendedEventStatuses.OUTBOX
         }
+
         if (isInDrafts) {
           return ExtendedEventStatuses.DRAFT
         }
+
         return event.status
       }
 
@@ -349,7 +344,11 @@ export const SearchResultComponent = ({
           status
         }),
         title: isInOutbox ? (
-          <IconWithName name={event.title} status={status} />
+          <IconWithName
+            flags={event.flags}
+            name={event.title}
+            status={status}
+          />
         ) : (
           <TextButton
             color={event.useFallbackTitle ? 'red' : 'primary'}
@@ -361,7 +360,11 @@ export const SearchResultComponent = ({
               )
             }}
           >
-            <IconWithName name={event.title} status={status} />
+            <IconWithName
+              flags={event.flags}
+              name={event.title}
+              status={status}
+            />
           </TextButton>
         ),
         outbox: intl.formatMessage(
