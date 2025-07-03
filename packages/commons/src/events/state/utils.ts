@@ -9,7 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType, StatusChangingActions } from '../ActionType'
+import {
+  ActionType,
+  ActionTypes,
+  ActionTypes,
+  StatusChangingActions
+} from '../ActionType'
 import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
@@ -83,6 +88,19 @@ function getDeclarationActionCreationMetadata(
   }
 }
 
+/** Actions which are considered event updates, i.e. actions which should update the 'updatedAt' fields */
+const updateActions = ActionTypes.extract([
+  ActionType.CREATE,
+  ActionType.NOTIFY,
+  ActionType.DECLARE,
+  ActionType.VALIDATE,
+  ActionType.REGISTER,
+  ActionType.REJECT,
+  ActionType.ARCHIVE,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION
+])
+
 /**
  * Given action type and actions, returns the action creation metadata for the event.
  * Since we do not consistently store the request action, we need to check if it exists.
@@ -105,7 +123,7 @@ export function getActionUpdateMetadata(actions: Action[]) {
   ]
 
   return actions
-    .filter(({ type }) => StatusChangingActions.safeParse(type).success)
+    .filter(({ type }) => updateActions.safeParse(type).success)
     .filter(({ status }) => status === ActionStatus.Accepted)
     .reduce(
       (_, action) => {
