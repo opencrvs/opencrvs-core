@@ -373,9 +373,7 @@ export const CanSubmitValidlyFilledForm: Story = {
     await step(
       'Verify that register button is enabled and that no validation errors are shown',
       async () => {
-        await expect(
-          canvas.queryByText('Required for registration')
-        ).not.toBeInTheDocument()
+        await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
         await expect(await canvas.findByText('Register')).toBeEnabled()
       }
     )
