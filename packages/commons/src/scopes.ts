@@ -10,6 +10,7 @@
  */
 
 import { z } from 'zod'
+import { SearchScopeAccessLevels } from './events'
 
 export const SCOPES = {
   // TODO v1.8 legacy scopes
@@ -353,7 +354,7 @@ export type ConfigurableScopeType = ConfigurableRawScopes['type']
 
 type FlattenedSearchScope = {
   type: 'search'
-  options: Record<string, string>
+  options: Record<string, SearchScopeAccessLevels>
 }
 
 export type ConfigurableScopes =
@@ -366,7 +367,7 @@ function flattenAndMergeScopes(
   if (scopes.length === 0) return null
 
   const type = scopes[0].type // all scopes have same `type`
-  const mergedOptions: Record<string, string> = {}
+  const mergedOptions: Record<string, SearchScopeAccessLevels> = {}
 
   for (const scope of scopes) {
     const entries = Object.entries(scope.options)
@@ -380,7 +381,9 @@ function flattenAndMergeScopes(
     const targetValues = entries[1][1]
 
     for (let i = 0; i < sourceValues.length; i++) {
-      mergedOptions[sourceValues[i]] = targetValues[i]
+      mergedOptions[sourceValues[i]] = targetValues[
+        i
+      ] as SearchScopeAccessLevels
     }
   }
 
@@ -394,10 +397,8 @@ export function findScope<T extends ConfigurableScopeType>(
   const parsedScopes = scopes.map((rawScope) => parseScope(rawScope))
   const searchScopes = parsedScopes.filter((scope) => scope?.type === 'search')
   const otherScopes = parsedScopes.filter((scope) => scope?.type !== 'search')
-  const mergedSearchScope = flattenAndMergeScopes(searchScopes) as {
-    type: 'search'
-    options: Record<string, string>
-  }
+  const mergedSearchScope = flattenAndMergeScopes(searchScopes)
+
   return [...otherScopes, mergedSearchScope].find(
     (scope): scope is Extract<ConfigurableScopes, { type: T }> =>
       scope?.type === scopeType

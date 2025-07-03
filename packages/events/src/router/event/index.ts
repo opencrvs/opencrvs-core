@@ -32,8 +32,7 @@ import {
   RequestCorrectionActionInput,
   UnassignActionInput,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  QueryType,
-  SearchScopeAccessLevels
+  QueryType
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -296,11 +295,7 @@ export const eventRouter = router({
       if (!searchScope) {
         throw new Error('No search scope provided')
       }
-      const searchScopeOptions = searchScope.options as Record<
-        string,
-        SearchScopeAccessLevels
-      >
-
+      const searchScopeOptions = searchScope.options
       return getIndex(
         input,
         eventConfigs,

@@ -15,7 +15,7 @@ import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
 import { EventConfig, joinURL } from '@opencrvs/commons'
-import { parseScope, SearchScope } from '@opencrvs/commons/authentication'
+import { parseScope } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 
 const MAX_RETRY = 5
@@ -43,7 +43,7 @@ const RoleSchema = (eventIds: string[]) =>
           }
 
           if (parsed.type === 'search') {
-            const options = parsed.options as SearchScope['options']
+            const options = parsed.options
             const invalidEventIds = options.event.filter(
               (id) => !eventIds.includes(id)
             )
