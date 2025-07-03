@@ -53,12 +53,14 @@ export function Pages() {
   const annotation = getAnnotation()
   const events = useEvents()
   const event = events.getEventState.useSuspenseQuery(eventId)
+  const [fullEvent] = events.getEvent.useSuspenseQuery(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
-    event.declaration
+    event.declaration,
+    fullEvent
   )
 
   const formPages = getPrintCertificatePages(configuration)
