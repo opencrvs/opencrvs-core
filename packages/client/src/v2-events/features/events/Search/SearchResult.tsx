@@ -22,7 +22,6 @@ import {
   WorkqueueColumn,
   deepDropNulls,
   applyDraftsToEventIndex,
-  EventState,
   WorkqueueActionsWithDefault,
   isMetaAction
 } from '@opencrvs/commons/client'
@@ -185,13 +184,6 @@ const searchResultMessages = {
 
 const messages = defineMessages(searchResultMessages)
 
-interface Props {
-  columns: WorkqueueColumn[]
-  eventConfigs: EventConfig[]
-  searchParams?: EventState
-  queryData: EventIndex[]
-}
-
 const ExtendedEventStatuses = {
   OUTBOX: 'OUTBOX',
   DRAFT: 'DRAFT'
@@ -318,15 +310,18 @@ export const SearchResultComponent = ({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
+
       const isInDrafts = drafts.some((draft) => draft.id === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
           return ExtendedEventStatuses.OUTBOX
         }
+
         if (isInDrafts) {
           return ExtendedEventStatuses.DRAFT
         }
+
         return event.status
       }
 
