@@ -82,7 +82,8 @@ export type SearchQueryParams = z.infer<typeof SearchQueryParams>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),
-  fieldType: z.literal('field')
+  fieldType: z.literal('field'),
+  alternateFieldIds: z.array(z.string()).optional()
 })
 
 export const EventFieldId = z.enum([
