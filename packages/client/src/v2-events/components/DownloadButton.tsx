@@ -136,6 +136,8 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
     )
   }
   const isFailed = eventDocument.isError
+  console.log({ eventDocument })
+  console.log({ isFailed })
 
   if (!isOnline) {
     return (
@@ -198,7 +200,8 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
         disabled={
           !(
             actionMenuItems.find(({ type }) => type === ActionType.UNASSIGN) ||
-            actionMenuItems.find(({ type }) => type === ActionType.ASSIGN)
+            actionMenuItems.find(({ type }) => type === ActionType.ASSIGN) ||
+            assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF
           )
         }
         id={`${id}-icon${isFailed ? `-failed` : ``}`}
