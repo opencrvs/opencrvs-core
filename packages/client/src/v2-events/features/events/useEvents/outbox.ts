@@ -14,7 +14,7 @@ import * as z from 'zod'
 import {
   deepMerge,
   getCurrentEventState,
-  resolveDateOfEvent
+  applyDeclarationToEventIndex
 } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
@@ -44,7 +44,7 @@ export function useOutbox() {
         return null
       }
 
-      const { eventId, declaration: updatedDeclaration } = parsedVariables.data
+      const { eventId, declaration } = parsedVariables.data
 
       const event = queryClient.getQueryData(trpc.event.get.queryKey(eventId))
 
@@ -61,16 +61,13 @@ export function useOutbox() {
 
       const eventState = getCurrentEventState(event, eventConfiguration)
 
-      // Merge the declaration from mutation to get optimistic declaration
-      const declaration = deepMerge(
-        eventState.declaration,
-        updatedDeclaration || {}
-      )
-
       return {
-        ...eventState,
-        dateOfEvent: resolveDateOfEvent(event, declaration, eventConfiguration),
-        declaration,
+        // Merge the declaration from mutation to get optimistic declaration
+        ...applyDeclarationToEventIndex(
+          eventState,
+          declaration ?? {},
+          eventConfiguration
+        ),
         meta: mutation.options.meta
       }
     })

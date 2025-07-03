@@ -14,6 +14,7 @@ import {
   Action,
   ActionDocument,
   ActionStatus,
+  ActionUpdate,
   EventState
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
@@ -174,12 +175,12 @@ export const DEFAULT_DATE_OF_EVENT_PROPERTY =
   'createdAt' satisfies keyof EventDocument
 
 export function resolveDateOfEvent(
-  event: EventDocument,
+  eventMetadata: { createdAt: string },
   declaration: EventState,
-  config: Partial<EventConfig>
+  config: EventConfig
 ) {
   if (!config.dateOfEvent) {
-    return event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+    return eventMetadata[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
   }
   const parsedDate = ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
   return parsedDate.success ? parsedDate.data : undefined
@@ -191,7 +192,7 @@ export function resolveDateOfEvent(
  */
 export function getCurrentEventState(
   event: EventDocument,
-  config: Partial<EventConfig>
+  config: EventConfig
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -280,9 +281,27 @@ export function getCurrentEventStateWithDrafts({
   return getCurrentEventState(withDrafts, configuration)
 }
 
+export function applyDeclarationToEventIndex(
+  eventIndex: EventIndex,
+  declaration: EventState | ActionUpdate,
+  eventConfiguration: EventConfig
+): EventIndex {
+  const updatedDeclaration = deepMerge(eventIndex.declaration, declaration)
+  return {
+    ...eventIndex,
+    dateOfEvent: resolveDateOfEvent(
+      eventIndex,
+      updatedDeclaration,
+      eventConfiguration
+    ),
+    declaration: updatedDeclaration
+  }
+}
+
 export function applyDraftsToEventIndex(
   eventIndex: EventIndex,
-  drafts: Draft[]
+  drafts: Draft[],
+  eventConfiguration: EventConfig
 ) {
   const indexedAt = eventIndex.updatedAt
 
@@ -295,13 +314,11 @@ export function applyDraftsToEventIndex(
     return eventIndex
   }
 
-  return {
-    ...eventIndex,
-    declaration: {
-      ...eventIndex.declaration,
-      ...activeDrafts[activeDrafts.length - 1].declaration
-    }
-  }
+  return applyDeclarationToEventIndex(
+    eventIndex,
+    activeDrafts[activeDrafts.length - 1].declaration,
+    eventConfiguration
+  )
 }
 
 /**
