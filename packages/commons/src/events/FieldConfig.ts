@@ -54,6 +54,7 @@ const BaseField = z.object({
   ),
   required: z.boolean().default(false).optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
+  secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z.array(ValidationConfig).default([]).optional(),
   helperText: TranslationConfig.optional(),

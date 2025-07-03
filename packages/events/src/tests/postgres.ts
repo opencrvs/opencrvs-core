@@ -16,10 +16,7 @@ const MIGRATION_SQL = fs
   .readFileSync(path.resolve(__dirname, './postgres-migrations.sql'))
   .toString()
 
-export const migrate = async (client: Client) => {
-  await client.query('SET search_path TO app')
-  await client.query(MIGRATION_SQL)
-}
+export const migrate = async (client: Client) => client.query(MIGRATION_SQL)
 
 export const createDatabase = async (client: Client, databaseName: string) => {
   await client.query(`CREATE DATABASE "${databaseName}"`)
@@ -31,7 +28,5 @@ export const createDatabase = async (client: Client, databaseName: string) => {
 export const initializeSchemaAccess = async (client: Client) => {
   await client.query(`REVOKE CREATE ON SCHEMA public FROM PUBLIC`)
   await client.query(`REVOKE CREATE ON SCHEMA public FROM events_migrator`)
-
-  await client.query(`CREATE SCHEMA app AUTHORIZATION events_migrator`)
   await client.query(`GRANT USAGE ON SCHEMA app TO events_app`)
 }

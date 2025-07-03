@@ -16,7 +16,9 @@ import {
   EventDocument,
   EventIndex,
   applyDraftsToEventIndex,
-  deepDropNulls
+  deepDropNulls,
+  getCurrentEventState,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -29,7 +31,7 @@ import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { useDrafts } from '../../drafts/useDrafts'
-import { EventHistory } from './components/EventHistory'
+import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
@@ -41,25 +43,23 @@ import { EventOverviewProvider } from './EventOverviewContext'
 /**
  * Renders the event overview page, including the event summary and history.
  */
-
-function EventOverview({
-  fullEvent,
-  eventIndex,
+function EventOverviewFull({
+  event,
   onAction
 }: {
-  fullEvent?: EventDocument
-  eventIndex: EventIndex
+  event: EventDocument
   onAction: () => void
 }) {
-  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
-  const { trackingId, status } = eventIndex
+  const { eventConfiguration } = useEventConfiguration(event.type)
+  const eventIndex = getCurrentEventState(event, eventConfiguration)
+  const { status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts(eventIndex.id)
-
-  const eventWithDrafts = deepDropNulls(
-    applyDraftsToEventIndex(eventIndex, drafts)
-  )
-
+  const eventWithDrafts = getCurrentEventStateWithDrafts({
+    event,
+    drafts,
+    configuration: eventConfiguration
+  })
   const { getUser } = useUsers()
   const intl = useIntl()
 
@@ -73,12 +73,67 @@ function EventOverview({
 
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
-    // @TODO: Ask why these are defined outside of flatten index?
-    'event.trackingId': trackingId,
+    // drafts should not affect the status of the event
+    // so the status is taken from the eventIndex
     'event.status': status,
-    // @TODO: Go through different interfaces and ensure this is unified. (e.g. does print certificate and event overview use the same interface?)
-    'event.registrationNumber':
-      eventIndex.legalStatuses.REGISTERED?.registrationNumber, // This should never be overridden by the draft.
+    'event.assignedTo': assignedTo
+  }
+
+  const { getEventTitle } = useEventTitle()
+  const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
+
+  return (
+    <Content
+      icon={() => <IconWithName name={''} status={status} />}
+      size={ContentSize.LARGE}
+      title={title}
+      titleColor={event.id ? 'copy' : 'grey600'}
+      topActionButtons={[
+        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />
+      ]}
+    >
+      <EventSummary
+        event={flattenedEventIndex}
+        eventConfiguration={eventConfiguration}
+      />
+      <EventHistory fullEvent={event} />
+    </Content>
+  )
+}
+
+/**
+ * Renders the protected event overview page with PII hidden in the event summary
+ */
+function EventOverviewProtected({
+  eventIndex,
+  onAction
+}: {
+  eventIndex: EventIndex
+  onAction: () => void
+}) {
+  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
+  const { status } = eventIndex
+  const { getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts(eventIndex.id)
+
+  const eventWithDrafts = deepDropNulls(
+    applyDraftsToEventIndex(eventIndex, drafts)
+  )
+  const { getUser } = useUsers()
+  const intl = useIntl()
+
+  const assignedToUser = getUser.useQuery(eventWithDrafts.assignedTo || '', {
+    enabled: !!eventWithDrafts.assignedTo
+  })
+  const assignedTo = assignedToUser.data
+    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    : null
+
+  const { flags, legalStatuses, ...flattenedEventIndex } = {
+    ...flattenEventIndex(eventWithDrafts),
+    // drafts should not affect the status of the event
+    // so the status is taken from the eventIndex
+    'event.status': status,
     'event.assignedTo': assignedTo
   }
 
@@ -100,10 +155,11 @@ function EventOverview({
       ]}
     >
       <EventSummary
+        hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />
-      {fullEvent && <EventHistory fullEvent={fullEvent} />}
+      <EventHistorySkeleton />
     </Content>
   )
 }
@@ -119,24 +175,24 @@ function EventOverviewContainer() {
 
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data
+  const eventIndex = getEventQuery.data?.[0]
 
   const fullEvent = getEvent.findFromCache(params.eventId).data
 
   if (!eventIndex) {
     return
   }
-  if (eventIndex.length === 0) {
-    throw new Error(`Event ${params.eventId} not found`)
-  }
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
-      <EventOverview
-        eventIndex={eventIndex[0]}
-        fullEvent={fullEvent}
-        onAction={getEventQuery.refetch}
-      />
+      {fullEvent ? (
+        <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
+      ) : (
+        <EventOverviewProtected
+          eventIndex={eventIndex}
+          onAction={getEventQuery.refetch}
+        />
+      )}
     </EventOverviewProvider>
   )
 }

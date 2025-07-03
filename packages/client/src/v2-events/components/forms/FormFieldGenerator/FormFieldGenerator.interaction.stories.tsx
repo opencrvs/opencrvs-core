@@ -315,7 +315,7 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
       )
       await userEvent.click(await canvas.findByText('first name'))
 
-      await canvas.findByText('Required for registration')
+      await canvas.findByText('Required')
     })
 
     await step('Empties error when selecting a different style', async () => {
@@ -326,9 +326,7 @@ export const RemovesErrorOnParentChange: StoryObj<typeof FormFieldGenerator> = {
       await canvas.findByText('allrounder')
       await expect(canvas.queryByText('defensive')).not.toBeInTheDocument()
 
-      await expect(
-        canvas.queryByText('Required for registration')
-      ).not.toBeInTheDocument()
+      await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
     })
   }
 }
