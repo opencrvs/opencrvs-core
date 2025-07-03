@@ -196,17 +196,6 @@ exports[`Returns relevant events in right order 2`] = `
 }
 `;
 
-exports[`Returns relevant events in right order 3`] = `
-[
-  "REJECTED",
-  "VALIDATED",
-  "DECLARED",
-  "REGISTERED",
-  "ARCHIVED",
-  "CERTIFIED",
-]
-`;
-
 exports[`Throws when date field is invalid 1`] = `
 [TRPCError: [
   {
