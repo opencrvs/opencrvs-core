@@ -77,9 +77,7 @@ export const ContinuingAndGoingBack: Story = {
         name: 'Continue'
       })
       await userEvent.click(continueButton)
-      const requiredErrors = await canvas.findAllByText(
-        'Required for registration'
-      )
+      const requiredErrors = await canvas.findAllByText('Required')
 
       await expect(requiredErrors.length).toBe(2)
     })
@@ -101,9 +99,7 @@ export const ContinuingAndGoingBack: Story = {
           name: 'Continue'
         })
         await userEvent.click(continueButton)
-        const requiredErrors = await canvas.findAllByText(
-          'Required for registration'
-        )
+        const requiredErrors = await canvas.findAllByText('Required')
 
         await expect(requiredErrors.length).toBe(1)
       }
@@ -135,9 +131,7 @@ export const ContinuingAndGoingBack: Story = {
     await step('Go back to the previous page', async () => {
       await userEvent.click(await canvas.findByRole('button', { name: 'Back' }))
 
-      await expect(
-        canvas.queryByText('Required for registration')
-      ).not.toBeInTheDocument()
+      await expect(canvas.queryByText('Required')).not.toBeInTheDocument()
     })
 
     await step('Fill in other requester details and continue', async () => {
@@ -154,9 +148,7 @@ export const ContinuingAndGoingBack: Story = {
       })
 
       await userEvent.click(continueButton)
-      const requiredErrorsAfter = await canvas.findAllByText(
-        'Required for registration'
-      )
+      const requiredErrorsAfter = await canvas.findAllByText('Required')
 
       await expect(requiredErrorsAfter.length).toBe(4)
 
