@@ -115,6 +115,21 @@ export function decodeEventIndex(
   }
 }
 
+export function removeSecuredFields(
+  eventConfig: EventConfig,
+  event: EventIndex
+): EventIndex {
+  return {
+    ...event,
+    declaration: Object.fromEntries(
+      Object.entries(event.declaration).filter(
+        ([fieldId]) =>
+          getDeclarationFieldById(eventConfig, fieldId).secured !== true
+      )
+    )
+  }
+}
+
 export function declarationReference(fieldName: string) {
   return `declaration.${fieldName}`
 }
