@@ -9,18 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import Ajv from 'ajv'
+import Ajv, { stringify } from 'ajv'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO } from 'date-fns'
+import { CertificateConfig } from 'src/events'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { EventState, ActionUpdate } from '../events/ActionDocument'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
+import { EventDocument } from '../events/EventDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType, FieldConditional } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true,
@@ -62,6 +64,35 @@ export function areConditionsMet(
   return conditions.every((condition) =>
     isConditionMet(condition.conditional, values)
   )
+}
+
+/**
+ * Checks if all meta conditions are met for the given event.
+ * Meta conditions are evaluated against the event document.
+ * @param conditions - Array of meta conditions to check
+ * @param event - The event document to evaluate against
+ * @returns true if all conditions are met, false otherwise
+ */
+export function areMetaConditionsMet(
+  conditions: CertificateConfig['metaBasedConditionals'],
+  event: EventDocument
+): boolean {
+  if (!conditions) {
+    return true
+  }
+  return conditions.every((condition) => {
+    const result = isConditionMet(condition.conditional, event)
+    console.log('*************************************')
+    console.log('*************************************')
+    console.log('*************************************')
+    console.log(
+      `Meta conditions for event ${event.id} are met: ${result}`,
+      JSON.stringify(event, null, 2)
+    )
+    console.log('COnditional:', JSON.stringify(condition.conditional, null, 2))
+
+    return result
+  })
 }
 
 function isFieldConditionMet(
