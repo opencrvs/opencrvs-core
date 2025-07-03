@@ -19,6 +19,7 @@ import { createSearchConfig } from '../searchConfigs'
 export function createFieldConfig(
   fieldId: string,
   options: {
+    alternateFieldIds?: string[]
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig
