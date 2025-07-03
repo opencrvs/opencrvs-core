@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect, PropsWithChildren } from 'react'
+import React, { useState, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -342,7 +342,11 @@ export const SearchResultComponent = ({
           status
         }),
         title: isInOutbox ? (
-          <IconWithName name={event.title} status={status} />
+          <IconWithName
+            flags={event.flags}
+            name={event.title}
+            status={status}
+          />
         ) : (
           <TextButton
             color={event.useFallbackTitle ? 'red' : 'primary'}
@@ -354,7 +358,11 @@ export const SearchResultComponent = ({
               )
             }}
           >
-            <IconWithName name={event.title} status={status} />
+            <IconWithName
+              flags={event.flags}
+              name={event.title}
+              status={status}
+            />
           </TextButton>
         ),
         outbox: intl.formatMessage(
