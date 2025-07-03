@@ -45,6 +45,6 @@ export const getUsersById = async (ids: string[]) => {
     name: user.name,
     role: user.role,
     signatureFilename: user.signatureFilename,
-    avatarURL: user.avatar?.data
+    avatarURL: user.avatar?.data.split('/').at(-1)
   }))
 }
