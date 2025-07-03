@@ -9,12 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  ActionType,
-  ActionTypes,
-  ActionTypes,
-  StatusChangingActions
-} from '../ActionType'
+import { ActionType, ActionTypes } from '../ActionType'
 import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
