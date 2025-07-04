@@ -27,7 +27,6 @@
   },
   "dependencies": {
     "@elastic/elasticsearch": "8.13.1",
-    "@hapi/shot": "^5.0.5",
     "@opencrvs/commons": "^1.7.0",
     "@types/bcryptjs": "^2.4.2",
     "@types/lodash-es": "^4.17.0",
@@ -46,6 +45,7 @@
   },
   "devDependencies": {
     "@types/fhir": "0.0.30",
+    "@types/hapi__shot": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",
