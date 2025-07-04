@@ -35,7 +35,8 @@ import {
   Icon,
   ResponsiveModal,
   Spinner,
-  Stack
+  Stack,
+  Toast
 } from '@opencrvs/components'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -272,7 +273,18 @@ export function Review() {
 
         await handleCertify(fullEvent)
 
-        toast.success(intl.formatMessage(messages.toastMessage))
+        toast.custom(
+          <Toast
+            duration={null}
+            type={'success'}
+            onClose={() => toast.remove(`print-successful${eventId}`)}
+          >
+            {intl.formatMessage(messages.toastMessage)}
+          </Toast>,
+          {
+            id: `print-successful${eventId}`
+          }
+        )
 
         slug
           ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
