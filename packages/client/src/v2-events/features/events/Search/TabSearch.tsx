@@ -235,7 +235,7 @@ export function TabSearch({
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
         if (!field || !isFieldVisible(field, formValues)) {
-          return { ...result }
+          return result
         }
 
         if (fieldTypesWithDefaults.includes(field.type)) {

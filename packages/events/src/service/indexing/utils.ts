@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import _ from 'lodash'
+import { estypes } from '@elastic/elasticsearch'
 import {
+  AddressFieldValue,
   EventConfig,
   EventIndex,
   FieldValue,
@@ -132,4 +134,66 @@ export function removeSecuredFields(
 
 export function declarationReference(fieldName: string) {
   return `declaration.${fieldName}`
+}
+
+// Build map of fieldId -> alternateFieldIds[]
+export function getAlternateFieldMap(
+  eventConfigs: EventConfig[]
+): Record<string, string[]> {
+  const alternateFieldMap: Record<string, string[]> = {}
+  eventConfigs.forEach((eventConfig) => {
+    eventConfig.advancedSearch.forEach((section) => {
+      section.fields.forEach((field) => {
+        if (
+          'alternateFieldIds' in field &&
+          Array.isArray(field.alternateFieldIds) &&
+          field.alternateFieldIds.length > 0
+        ) {
+          alternateFieldMap[field.fieldId] = field.alternateFieldIds
+        }
+      })
+    })
+  })
+  return alternateFieldMap
+}
+
+export function generateQueryForAddressField(
+  fieldId: string,
+  value: AddressFieldValue
+) {
+  const { country, addressType } = value
+  const mustMatches = []
+
+  if (country) {
+    mustMatches.push({ match: { [`${fieldId}.country`]: country } })
+  }
+  if (addressType === 'DOMESTIC') {
+    if (value.province) {
+      mustMatches.push({
+        match: { [`${fieldId}.province`]: value.province }
+      })
+    }
+    if (value.district) {
+      mustMatches.push({
+        match: { [`${fieldId}.district`]: value.district }
+      })
+    }
+  } else {
+    if (value.state) {
+      mustMatches.push({
+        match: { [`${fieldId}.state`]: value.state }
+      })
+    }
+    if (value.district2) {
+      mustMatches.push({
+        match: { [`${fieldId}.district2`]: value.district2 }
+      })
+    }
+  }
+
+  return {
+    bool: {
+      must: mustMatches
+    }
+  } as estypes.QueryDslQueryContainer
 }
