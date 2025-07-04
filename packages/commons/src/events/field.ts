@@ -23,6 +23,7 @@ import { ValidationConfig } from './FieldConfig'
 export function field(
   fieldId: string,
   options: {
+    excludeInSearchQuery?: boolean
     alternateFieldIds?: string[]
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
