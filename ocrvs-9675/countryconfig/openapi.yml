@@ -383,6 +383,22 @@ components:
                           type: array
                           items:
                             type: string
+                          description: >-
+                            Sometimes there might be need to search a value
+                            against multiple field of same FormField type. For
+                            example
+                                  search Country, Province, District against child.address.private and child.address.other. In such case, we 
+                                  add a one field as fieldId, and accomodate others in alternateFieldIds
+                        excludeInSearchQuery:
+                          type: boolean
+                          default: false
+                          description: >-
+                            Sometimes there will be search fields which are used
+                            to 
+                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth 
+                                is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
+                                related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
+                                In such case, populate this field (excludeInSearchQuery) with boolean true
                       required:
                         - config
                         - fieldId
@@ -10908,7 +10924,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 6eca2d4c-305d-46d9-ae86-9b41cab83155
+        transactionId: eea85b1d-4e8a-4518-bc86-6e6acc6896e1
         declaration: {}
         annotation: {}
         type: NOTIFY
