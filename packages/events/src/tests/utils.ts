@@ -208,7 +208,8 @@ function actionToClientAction(
 ) {
   switch (action) {
     case ActionType.CREATE:
-      return async () => client.event.create(generator.event.create())
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return async (_: string) => client.event.create(generator.event.create())
     case ActionType.DECLARE:
       return async (eventId: string) =>
         client.event.actions.declare.request(
@@ -244,10 +245,16 @@ function actionToClientAction(
             keepAssignment: true
           })
         )
+    case ActionType.REQUEST_CORRECTION:
+      return async (eventId: string) =>
+        client.event.actions.correction.request(
+          generator.event.actions.correction.request(eventId, {
+            keepAssignment: true
+          })
+        )
 
     case ActionType.NOTIFY:
     case ActionType.DETECT_DUPLICATE:
-    case ActionType.REQUEST_CORRECTION:
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:
@@ -280,8 +287,7 @@ export async function createEvent(
     ActionType.CREATE
   )
 
-  // @ts-expect-error -- createEvent does not accept any arguments
-  createdEvent = await createAction()
+  createdEvent = await createAction('')
 
   for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)

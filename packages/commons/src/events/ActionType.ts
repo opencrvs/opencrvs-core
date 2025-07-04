@@ -116,10 +116,10 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.REJECT,
   ActionType.MARKED_AS_DUPLICATE,
   ActionType.ARCHIVE,
-  ActionType.REQUEST_CORRECTION,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION
 ])
+
 export type WorkqueueActionType = z.infer<typeof workqueueActions>
 
 const META_ACTIONS: ActionType[] = [

@@ -14,17 +14,15 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getCurrentEventState,
-  getAcceptedActions,
-  getCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftsToEventIndex,
-  deepDropNulls
+  deepDropNulls,
+  getCurrentEventState,
+  getCurrentEventStateWithDrafts
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
-
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -35,7 +33,6 @@ import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEv
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
-
 import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
@@ -85,8 +82,6 @@ function EventOverviewFull({
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
-  const actions = getAcceptedActions(event)
-
   return (
     <Content
       icon={() => <IconWithName flags={flags} name={''} status={status} />}
@@ -101,7 +96,7 @@ function EventOverviewFull({
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />
-      <EventHistory history={actions} />
+      <EventHistory fullEvent={event} />
     </Content>
   )
 }
