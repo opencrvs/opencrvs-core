@@ -21,7 +21,8 @@ import {
   getDefaultSearchFields,
   buildDataCondition,
   serializeSearchParams,
-  deserializeSearchParams
+  deserializeSearchParams,
+  buildQuickSearchQuery
 } from './utils'
 
 describe('getAdvancedSearchFieldErrors', () => {
@@ -195,5 +196,56 @@ describe('serializeSearchParams and deserializeSearchParams (full roundtrip)', (
     const roundtrip = deserializeSearchParams(serialized)
 
     expect(roundtrip).toEqual(expectedDeserialized)
+  })
+})
+
+describe('buildQuickSearchQuery', () => {
+  it.only('sdadasd', () => {
+    const searchParams = { key: 'abc@gmail.com' }
+    const resultQuery = buildQuickSearchQuery(searchParams, [
+      tennisClubMembershipEvent
+    ])
+
+    expect(resultQuery).toEqual({
+      type: 'or',
+      clauses: [
+        {
+          data: {
+            'applicant.name': {
+              type: 'fuzzy',
+              term: 'abc@gmail.com'
+            }
+          }
+        },
+        {
+          data: {
+            'applicant.email': {
+              type: 'exact',
+              term: 'abc@gmail.com'
+            }
+          }
+        },
+        {
+          data: {
+            'recommender.name': {
+              type: 'fuzzy',
+              term: 'abc@gmail.com'
+            }
+          }
+        },
+        {
+          trackingId: {
+            term: 'abc@gmail.com',
+            type: 'exact'
+          }
+        },
+        {
+          'legalStatus.REGISTERED.registrationNumber': {
+            term: 'abc@gmail.com',
+            type: 'exact'
+          }
+        }
+      ]
+    })
   })
 })

@@ -470,8 +470,7 @@ function metadataFieldTypeMapping(value: string) {
         term: value,
         type: 'exact' as const
       },
-      // @TODO: Registration number should be read from legalStatuses
-      registrationNumber: {
+      'legalStatus.REGISTERED.registrationNumber': {
         term: value,
         type: 'exact' as const
       }
