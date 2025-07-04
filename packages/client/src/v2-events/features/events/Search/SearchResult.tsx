@@ -250,8 +250,19 @@ export const SearchResultComponent = ({
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
   const isOnline = useOnlineStatus()
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
+  const setOffset = (newOffset: number) => {
+    const params = new URLSearchParams(location.search)
+    params.set('offset', String(newOffset))
+
+    navigate(
+      {
+        pathname: location.pathname,
+        search: `?${params.toString()}`
+      },
+      { replace: true }
+    )
+  }
   const { getOutbox } = useEvents()
   const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
@@ -439,6 +450,8 @@ export const SearchResultComponent = ({
 
   const allResults = mapEventsToWorkqueueRows(sortedResult)
 
+  const currentPageNumber = Math.floor(offset / limit) + 1
+
   const paginatedData = allResults.slice(
     limit * (currentPageNumber - 1),
     limit * currentPageNumber
@@ -464,7 +477,7 @@ export const SearchResultComponent = ({
         tabBarContent={tabBarContent}
         title={contentTitle}
         totalPages={totalPages}
-        onPageChange={(page) => setCurrentPageNumber(page)}
+        onPageChange={(page) => setOffset((page - 1) * limit)}
       >
         <Workqueue
           columns={[
