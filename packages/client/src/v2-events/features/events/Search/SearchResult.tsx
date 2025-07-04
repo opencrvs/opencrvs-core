@@ -298,15 +298,13 @@ export const SearchResultComponent = ({
           )
         }))
         .concat({
-          actionComponent:
-            slug === CoreWorkqueues.DRAFT ? (
-              <Downloaded />
-            ) : (
-              <DownloadButton
-                key={`DownloadButton-${event.id}`}
-                event={event}
-              />
-            )
+          actionComponent: (
+            <DownloadButton
+              key={`DownloadButton-${event.id}`}
+              event={event}
+              isDraft={slug === CoreWorkqueues.DRAFT}
+            />
+          )
         })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
