@@ -19,6 +19,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
+import toast from 'react-hot-toast'
 import {
   ActionType,
   EventConfig,
@@ -34,7 +35,8 @@ import {
   Icon,
   ResponsiveModal,
   Spinner,
-  Stack
+  Stack,
+  Toast
 } from '@opencrvs/components'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -126,6 +128,11 @@ const messages = defineMessages({
     defaultMessage:
       'Print certificate is an online only action. Please go online to print the certificate',
     description: 'Print certificate online only message'
+  },
+  toastMessage: {
+    id: 'v2.print.certificate.toast.message',
+    defaultMessage: 'Certificate is ready to print',
+    description: 'Floating Toast message upon certificate ready to print'
   }
 })
 
@@ -265,6 +272,19 @@ export function Review() {
         })
 
         await handleCertify(fullEvent)
+
+        toast.custom(
+          <Toast
+            duration={null}
+            type={'success'}
+            onClose={() => toast.remove(`print-successful${eventId}`)}
+          >
+            {intl.formatMessage(messages.toastMessage)}
+          </Toast>,
+          {
+            id: `print-successful${eventId}`
+          }
+        )
 
         slug
           ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
