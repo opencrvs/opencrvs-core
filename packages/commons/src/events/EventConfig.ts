@@ -86,6 +86,34 @@ export const EventConfig = z
       })
     }
 
+    // Additional check: alternateFieldIds must exist in allFields
+    event.advancedSearch.forEach((section, sectionIndex) => {
+      section.fields.forEach((field, fieldIndex) => {
+        if (
+          'alternateFieldIds' in field &&
+          Array.isArray(field.alternateFieldIds)
+        ) {
+          const invalidAltIds = field.alternateFieldIds.filter(
+            (id) => !fieldIds.includes(id)
+          )
+
+          if (invalidAltIds.length > 0) {
+            ctx.addIssue({
+              code: 'custom',
+              message: `Invalid alternateFieldIds: ${invalidAltIds.join(', ')}`,
+              path: [
+                'advancedSearch',
+                sectionIndex,
+                'fields',
+                fieldIndex,
+                'alternateFieldIds'
+              ]
+            })
+          }
+        }
+      })
+    })
+
     if (event.dateOfEvent) {
       const eventDateFieldId = getDeclarationFields(event).find(
         ({ id }) => id === event.dateOfEvent?.$$field
