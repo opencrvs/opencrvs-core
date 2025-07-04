@@ -51,7 +51,7 @@ export function AdvancedSearch() {
     deserializeSearchParams(location.search)
   )
 
-  const advancedSearchEvents = allEvents.filter(
+  const eventConfigsWithAdvancedSearch = allEvents.filter(
     (event) => event.advancedSearch.length > 0
   )
 
@@ -59,23 +59,22 @@ export function AdvancedSearch() {
     Record<string, EventState>
   >(() => {
     const initialState: Record<string, EventState> = {}
-    const currentEvent = advancedSearchEvents.find(
+    const currentEvent = eventConfigsWithAdvancedSearch.find(
       (e) => e.id === searchParams.eventType
     )
-    for (const event of advancedSearchEvents) {
-      if (currentEvent && currentEvent.id === event.id) {
-        const parsedParams = parseFieldSearchParams(event, searchParams)
-        initialState[event.id] = parsedParams
-      } else {
-        initialState[event.id] = {}
-      }
+    if (!currentEvent) {
+      return initialState
     }
+    initialState[currentEvent.id] = parseFieldSearchParams(
+      currentEvent,
+      searchParams
+    )
     return initialState
   })
 
-  const formTabSections = advancedSearchEvents.map((a) => ({
-    id: a.id,
-    title: intl.formatMessage(a.label)
+  const formTabSections = eventConfigsWithAdvancedSearch.map((config) => ({
+    id: config.id,
+    title: intl.formatMessage(config.label)
   })) satisfies IFormTabProps['sections']
 
   const selectedTabId =
@@ -124,7 +123,7 @@ export function AdvancedSearch() {
         <TabSearch
           key={currentEvent.id}
           currentEvent={currentEvent}
-          fieldValues={currentFormValues}
+          formValues={currentFormValues}
           onChange={handleFormChange}
         />
       )}

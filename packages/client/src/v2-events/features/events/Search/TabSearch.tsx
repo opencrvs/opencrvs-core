@@ -80,6 +80,7 @@ function enhanceFieldWithSearchFieldConfig(
 }
 
 function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
+  const searchFields = event.advancedSearch.flatMap((section) => section.fields)
   return {
     ...event,
     declaration: {
@@ -87,9 +88,7 @@ function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
       pages: event.declaration.pages.map((page) => ({
         ...page,
         fields: page.fields.map((field) => {
-          const searchField = event.advancedSearch
-            .flatMap((x) => x.fields)
-            .find((f) => f.fieldId === field.id)
+          const searchField = searchFields.find((f) => f.fieldId === field.id)
           return searchField
             ? enhanceFieldWithSearchFieldConfig(field, searchField)
             : field
@@ -139,10 +138,10 @@ function SearchSectionForm({
 
 function buildSearchSections({
   enhancedEvent,
-  fieldValues
+  formValues
 }: {
   enhancedEvent: EventConfig
-  fieldValues?: EventState
+  formValues?: EventState
 }) {
   const allUniqueFields = getAllUniqueFields(enhancedEvent)
 
@@ -166,8 +165,7 @@ function buildSearchSections({
     })
 
     const isExpanded =
-      modifiedFields.find((f) => fieldValues?.hasOwnProperty(f.id)) !==
-      undefined
+      modifiedFields.find((f) => formValues?.hasOwnProperty(f.id)) !== undefined
 
     return {
       title: section.title,
@@ -179,43 +177,28 @@ function buildSearchSections({
 
 export function TabSearch({
   currentEvent,
-  fieldValues,
+  formValues,
   onChange
 }: {
   currentEvent: EventConfig
-  fieldValues: EventState
+  formValues: EventState
   onChange: (updatedForm: EventState) => void
 }) {
   const intl = useIntl()
   const navigate = useNavigate()
 
-  const [formValues, setFormValues] = useState<EventState>(fieldValues)
-
-  const prevEventId = useRef(currentEvent.id)
-
-  useEffect(() => {
-    if (prevEventId.current !== currentEvent.id) {
-      setFormValues(fieldValues)
-      prevEventId.current = currentEvent.id
-    }
-  }, [currentEvent, fieldValues])
-
-  useEffect(() => {
-    onChange(formValues)
-  }, [formValues, onChange])
-
   const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(currentEvent)
 
   const sections = buildSearchSections({
     enhancedEvent,
-    fieldValues
+    formValues
   })
 
   const handleFieldChange = (fieldId: string, value: FieldValue) =>
-    setFormValues((prev) => ({
-      ...prev,
+    onChange({
+      ...formValues,
       [fieldId]: value
-    }))
+    })
 
   const errors = flattenFieldErrors(
     getAdvancedSearchFieldErrors(enhancedEvent, formValues)

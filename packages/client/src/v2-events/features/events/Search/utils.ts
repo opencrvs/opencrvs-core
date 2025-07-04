@@ -105,7 +105,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.registeredAtLocation.helperText'
     }
   }),
-  [EventFieldId.enum['legalStatuses.REGISTERED.acceptedAt']]: (_) => ({
+  'legalStatuses.REGISTERED.acceptedAt': (_) => ({
     id: 'event.legalStatuses.REGISTERED.acceptedAt',
     type: FieldType.DATE_RANGE,
     label: {
