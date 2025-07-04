@@ -786,8 +786,7 @@ export const mapFieldsToValues = (
     )
 
     if (field.type === SELECT_WITH_OPTIONS && !field.initialValue) {
-      fieldInitialValue =
-        field.options.find((x) => x.isDefault === true)?.value ?? ''
+      fieldInitialValue = field.options.find((x) => x.isDefault)?.value ?? ''
     }
 
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
