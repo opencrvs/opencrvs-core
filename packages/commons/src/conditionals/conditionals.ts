@@ -152,11 +152,6 @@ export const user = Object.assign(userSerializer, {
     })
 })
 
-function getDateFromNow(days: number) {
-  return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split('T')[0]
-}
 /**
  * This function will output JSONSchema which looks for example like this:
  * @example
@@ -212,8 +207,23 @@ function isFieldReference(value: unknown): value is FieldReference {
  */
 
 export function createFieldConditionals(fieldId: string) {
+  const getDayRange = (days: number, clause: 'before' | 'after') => ({
+    type: 'object',
+    properties: {
+      [fieldId]: {
+        type: 'string',
+        format: 'date',
+        daysFromNow: {
+          days,
+          clause
+        }
+      }
+    },
+    required: [fieldId]
+  })
+
   const getDateRange = (
-    date: string,
+    date: string | FieldReference | { $data: '/$now' },
     clause: 'formatMinimum' | 'formatMaximum'
   ) => ({
     type: 'object',
@@ -234,14 +244,8 @@ export function createFieldConditionals(fieldId: string) {
     $$field: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
-        inPast: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(days), 'formatMinimum')
-          ),
-        inFuture: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(-days), 'formatMinimum')
-          )
+        inPast: () => defineFormConditional(getDayRange(-days, 'after')),
+        inFuture: () => defineFormConditional(getDayRange(days, 'after'))
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
@@ -258,18 +262,12 @@ export function createFieldConditionals(fieldId: string) {
         return defineFormConditional(getDateRange(date, 'formatMinimum'))
       },
       now: () =>
-        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
+        defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMinimum'))
     }),
     isBefore: () => ({
       days: (days: number) => ({
-        inPast: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(days), 'formatMaximum')
-          ),
-        inFuture: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(-days), 'formatMaximum')
-          )
+        inPast: () => defineFormConditional(getDayRange(days, 'before')),
+        inFuture: () => defineFormConditional(getDayRange(-days, 'before'))
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
@@ -286,7 +284,7 @@ export function createFieldConditionals(fieldId: string) {
         return defineFormConditional(getDateRange(date, 'formatMaximum'))
       },
       now: () =>
-        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
+        defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMaximum'))
     }),
     isEqualTo: (value: string | boolean | FieldReference) => {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to

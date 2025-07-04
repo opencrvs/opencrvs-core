@@ -17,6 +17,7 @@ import { useSelector } from 'react-redux'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
 import { ActionDocument, ActionType } from '@opencrvs/commons/client'
@@ -38,6 +39,13 @@ import { UserAvatar } from './UserAvatar'
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
  */
+
+const LargeGreyedInfo = styled.div`
+  height: 231px;
+  background-color: ${({ theme }) => theme.colors.grey200};
+  max-width: 100%;
+  border-radius: 4px;
+`
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -124,6 +132,21 @@ function getSystemAvatar(name: string) {
       </div>
       {name}
     </SystemName>
+  )
+}
+
+export function EventHistorySkeleton() {
+  const intl = useIntl()
+  return (
+    <>
+      <Divider />
+      <Stack alignItems="stretch" direction="column" gap={16}>
+        <Text color="copy" element="h3" variant="h3">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
+        <LargeGreyedInfo />
+      </Stack>
+    </>
   )
 }
 

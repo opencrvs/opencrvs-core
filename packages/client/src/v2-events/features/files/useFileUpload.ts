@@ -11,9 +11,9 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
+import { joinValues } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
-import { joinValues } from '@client/v2-events/utils'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 

@@ -32,6 +32,7 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
+  isTextAreaFieldType,
   isTextFieldType,
   isNameFieldType,
   isIdFieldType,
@@ -74,6 +75,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     isPhoneFieldType(field) ||
     isTextFieldType(field)
   ) {
+    return Text.Output({ value: field.value })
+  }
+
+  if (isTextAreaFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 

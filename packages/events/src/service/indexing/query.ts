@@ -134,6 +134,12 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     }
 
     switch (key) {
+      case 'id':
+        must.push({
+          term: { id: clause.id }
+        })
+        break
+
       case 'eventType':
         must.push({ term: { type: value } })
         break
@@ -187,10 +193,25 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
         break
 
       case 'flags':
-      case 'id':
       default:
         console.warn('Unsupported query field:', key)
         break
+    }
+  }
+
+  if (clause.flags) {
+    if (clause.flags.anyOf) {
+      must.push({ terms: { flags: clause.flags.anyOf } })
+    }
+    if (clause.flags.noneOf) {
+      must.push({
+        bool: {
+          must_not: {
+            terms: { flags: clause.flags.noneOf }
+          },
+          should: undefined
+        }
+      })
     }
   }
 

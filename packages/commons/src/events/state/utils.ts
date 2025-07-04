@@ -9,10 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { ActionType, StatusChangingActions } from '../ActionType'
+import { ActionType, ActionTypes } from '../ActionType'
 import { Action, ActionStatus, RegisterAction } from '../ActionDocument'
 import { EventStatus } from '../EventMetadata'
 import { getOrThrow } from '../../utils'
+import { pick } from 'lodash'
 
 /**
  *
@@ -82,6 +83,19 @@ function getDeclarationActionCreationMetadata(
   }
 }
 
+/** Actions which are considered event updates, i.e. actions which should update the 'updatedAt' fields */
+const updateActions = ActionTypes.extract([
+  ActionType.CREATE,
+  ActionType.NOTIFY,
+  ActionType.DECLARE,
+  ActionType.VALIDATE,
+  ActionType.REGISTER,
+  ActionType.REJECT,
+  ActionType.ARCHIVE,
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION
+])
+
 /**
  * Given action type and actions, returns the action creation metadata for the event.
  * Since we do not consistently store the request action, we need to check if it exists.
@@ -95,37 +109,28 @@ export function getActionUpdateMetadata(actions: Action[]) {
     `Event has no ${ActionType.CREATE} action`
   )
 
-  return StatusChangingActions.options.reduce(
-    (metadata, actionType) => {
-      const { accept, request } = getActionRequests(actionType, actions)
+  const metadataFields = [
+    'createdAt',
+    'createdBy',
+    'createdByUserType',
+    'createdAtLocation',
+    'createdByRole'
+  ]
 
-      return {
-        createdAt:
-          request?.createdAt ?? accept?.createdAt ?? metadata.createdAt,
-        createdBy:
-          request?.createdBy ?? accept?.createdBy ?? metadata.createdBy,
-        createdByUserType:
-          request?.createdByUserType ??
-          accept?.createdByUserType ??
-          metadata.createdByUserType,
-        createdAtLocation:
-          request?.createdAtLocation ??
-          accept?.createdAtLocation ??
-          metadata.createdAtLocation,
-        createdByRole:
-          request?.createdByRole ??
-          accept?.createdByRole ??
-          metadata.createdByRole
-      }
-    },
-    {
-      createdAt: createAction.createdAt,
-      createdBy: createAction.createdBy,
-      createdByUserType: createAction.createdByUserType,
-      createdAtLocation: createAction.createdAtLocation,
-      createdByRole: createAction.createdByRole
-    }
-  )
+  return actions
+    .filter(({ type }) => updateActions.safeParse(type).success)
+    .filter(({ status }) => status === ActionStatus.Accepted)
+    .reduce(
+      (_, action) => {
+        if (action.originalActionId) {
+          const originalAction =
+            actions.find(({ id }) => id === action.originalActionId) ?? action
+          return pick(originalAction, metadataFields)
+        }
+        return pick(action, metadataFields)
+      },
+      pick(createAction, metadataFields)
+    )
 }
 
 /**

@@ -13,7 +13,7 @@ import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 
-import { formatISO } from 'date-fns'
+import { formatISO, isAfter, isBefore } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
 import { EventState, ActionUpdate } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
@@ -29,6 +29,68 @@ const ajv = new Ajv({
 
 // https://ajv.js.org/packages/ajv-formats.html
 addFormats(ajv)
+
+/*
+ * Custom keyword validator for date strings so the dates could be validated dynamically
+ * For example, a validation could be "birth date needs to have happend 30 days before today"
+ * or "death date needs to be after birth date + 30 days"
+ *
+ * Example schema:
+ * {
+ *   "type": "object",
+ *   "properties": {
+ *     "birthDate": {
+ *       "type": "string",
+ *       "daysFromNow": {
+ *         "days": 30,
+ *         "clause": "before"
+ *       }
+ *    }
+ * }
+ */
+ajv.addKeyword({
+  keyword: 'daysFromNow',
+  type: 'string',
+  schemaType: 'object',
+  $data: true,
+  errors: true,
+  validate(
+    schema: { days: number; clause: 'after' | 'before' },
+    data: string,
+    _: unknown,
+    dataContext?: { rootData: unknown }
+  ) {
+    if (
+      !(
+        dataContext &&
+        dataContext.rootData &&
+        typeof dataContext.rootData === 'object' &&
+        '$now' in dataContext.rootData &&
+        typeof dataContext.rootData.$now === 'string'
+      )
+    ) {
+      throw new Error('Validation context must contain $now')
+    }
+
+    const { days, clause } = schema
+    if (typeof data !== 'string') {
+      return false
+    }
+
+    const date = new Date(data)
+    if (isNaN(date.getTime())) {
+      return false
+    }
+
+    const now = new Date(dataContext.rootData.$now)
+    const offsetDate = new Date(now.getTime() + days * 24 * 60 * 60 * 1000)
+
+    return clause === 'after'
+      ? isAfter(date, offsetDate)
+      : isBefore(date, offsetDate)
+  }
+})
+
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return ajv.validate(schema, data)
 }
@@ -135,7 +197,7 @@ export const errorMessages = {
     id: 'v2.error.invalidEmail'
   },
   requiredField: {
-    defaultMessage: 'Required for registration',
+    defaultMessage: 'Required',
     description: 'Error message when required field is missing',
     id: 'v2.error.required'
   },

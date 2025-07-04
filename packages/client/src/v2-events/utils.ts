@@ -26,22 +26,10 @@ import {
   SystemVariables,
   Scope,
   ActionScopes,
-  WorkqueueConfigWithoutQuery
+  WorkqueueConfigWithoutQuery,
+  joinValues,
+  UUID
 } from '@opencrvs/commons/client'
-
-/**
- *
- * Joins defined values using a separator and trims the result
- */
-export function joinValues(
-  values: Array<string | undefined | null>,
-  separator = ' '
-) {
-  return values
-    .filter((value) => !!value)
-    .join(separator)
-    .trim()
-}
 
 export function getUsersFullName(
   names: ResolvedUser['name'],
@@ -76,9 +64,16 @@ export const getAllUniqueFields = (eventConfig: EventConfig) => {
   return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
-export function flattenEventIndex(event: NonNullable<EventIndex>) {
-  const { declaration, ...rest } = event
-  return { ...rest, ...declaration }
+export function flattenEventIndex(event: EventIndex) {
+  const { declaration, trackingId, status, ...rest } = event
+  return {
+    ...rest,
+    ...declaration,
+    'event.trackingId': trackingId,
+    'event.status': status,
+    'event.registrationNumber':
+      rest.legalStatuses.REGISTERED?.registrationNumber
+  }
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -88,7 +83,7 @@ export function isTemporaryId(id: string) {
 }
 
 export function createTemporaryId() {
-  return `tmp-${uuid()}`
+  return `tmp-${uuid()}` as UUID
 }
 
 /**
@@ -231,19 +226,39 @@ export function mergeWithoutNullsOrUndefined<T>(
   })
 }
 
+export enum CoreWorkqueues {
+  OUTBOX = 'outbox',
+  DRAFT = 'draft'
+}
+
 export function hasOutboxWorkqueue(scopes: Scope[]) {
   return scopes.some((scope) => ActionScopes.safeParse(scope).success)
 }
 
+export function hasDraftWorkqueue(scopes: Scope[]) {
+  return scopes.some((scope) => scope.startsWith('record.declare'))
+}
+
 export const WORKQUEUE_OUTBOX: WorkqueueConfigWithoutQuery = {
   name: {
-    id: 'workqueues.outbox.title',
+    id: 'v2.workqueues.outbox.title',
     defaultMessage: 'Outbox',
     description: 'Title of outbox workqueue'
   },
   actions: [],
-  slug: 'outbox',
+  slug: CoreWorkqueues.OUTBOX,
   icon: 'PaperPlaneTilt'
+}
+
+export const WORKQUEUE_DRAFT: WorkqueueConfigWithoutQuery = {
+  name: {
+    id: 'v2.workqueues.draft.title',
+    defaultMessage: 'My drafts',
+    description: 'Title of draft workqueue'
+  },
+  actions: [],
+  slug: CoreWorkqueues.DRAFT,
+  icon: 'FileDotted'
 }
 
 export const emptyMessage = {

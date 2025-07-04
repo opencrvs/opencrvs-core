@@ -11,7 +11,9 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, SCOPES } from '@opencrvs/commons'
+import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
+import { OpenApiMeta } from 'trpc-to-openapi'
+import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -58,24 +60,35 @@ import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
 
+/*
+ * Explicitely type the procedure to reduce the inference
+ * thus avoiding "The inferred type of this node exceeds the maximum length the
+ * compiler will serialize" error
+ */
+const eventConfigGetProcedure: QueryProcedure<{
+  meta: OpenApiMeta
+  input: void
+  output: EventConfig[]
+}> = publicProcedure
+  .meta({
+    openapi: {
+      summary: 'List event configurations',
+      method: 'GET',
+      path: '/config',
+      tags: ['events'],
+      protect: true
+    }
+  })
+  .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+  .input(z.void())
+  .output(z.array(EventConfig))
+  .query(async (options) => {
+    return getEventConfigurations(options.ctx.token)
+  })
+
 export const eventRouter = router({
   config: router({
-    get: publicProcedure
-      .meta({
-        openapi: {
-          summary: 'List event configurations',
-          method: 'GET',
-          path: '/config',
-          tags: ['events'],
-          protect: true
-        }
-      })
-      .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
-      .input(z.void())
-      .output(z.array(EventConfig))
-      .query(async (options) => {
-        return getEventConfigurations(options.ctx.token)
-      })
+    get: eventConfigGetProcedure
   }),
   create: systemProcedure
     .meta({
@@ -111,7 +124,7 @@ export const eventRouter = router({
     }),
   get: publicProcedure
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
-    .input(z.string())
+    .input(UUID)
     .query(async ({ input, ctx }) => {
       const event = await getEventById(input)
       const updatedEvent = await addAction(
@@ -145,6 +158,7 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .output(Draft)
       .mutation(async ({ input, ctx }) => {
         const { eventId } = input
         await getEventById(eventId)

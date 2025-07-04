@@ -330,7 +330,7 @@ export function compileSvg({
         return ''
       }
 
-      const id = idParts.join('.')
+      const id = idParts.map((part) => part?.toString().toLowerCase()).join('.')
 
       return intl.formatMessage({
         id,
