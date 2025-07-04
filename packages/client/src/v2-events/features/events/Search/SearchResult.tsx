@@ -252,8 +252,6 @@ export const SearchResultComponent = ({
   const isOnline = useOnlineStatus()
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
-  const { findFromCache } = useEvents().getEvent
-
   const { getOutbox } = useEvents()
   const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
@@ -293,8 +291,6 @@ export const SearchResultComponent = ({
     })[]
   ) => {
     return eventData.map(({ meta, ...event }) => {
-      const isDownloaded = Boolean(findFromCache(event.id).data)
-
       const actionConfigs = actions
         .map((actionType) => ({
           actionComponent: (
@@ -302,15 +298,13 @@ export const SearchResultComponent = ({
           )
         }))
         .concat({
-          actionComponent:
-            slug === CoreWorkqueues.DRAFT && isDownloaded ? (
-              <Downloaded />
-            ) : (
-              <DownloadButton
-                key={`DownloadButton-${event.id}`}
-                event={event}
-              />
-            )
+          actionComponent: (
+            <DownloadButton
+              key={`DownloadButton-${event.id}`}
+              event={event}
+              isDraft={slug === CoreWorkqueues.DRAFT}
+            />
+          )
         })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)

@@ -16,7 +16,7 @@ import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { useOnlineStatus } from '@client/utils'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
-import { Download } from '@opencrvs/components/lib/icons'
+import { Download, Downloaded } from '@opencrvs/components/lib/icons'
 import { ConnectionError } from '@opencrvs/components/lib/icons/ConnectionError'
 import React from 'react'
 import { useIntl } from 'react-intl'
@@ -38,6 +38,7 @@ interface DownloadButtonProps {
   id?: string
   className?: string
   event: EventIndex
+  isDraft?: boolean
 }
 
 const StatusIndicator = styled.div<{
@@ -106,7 +107,12 @@ function AssignModal({ close }: { close: (result: boolean) => void }) {
   )
 }
 
-export function DownloadButton({ id, className, event }: DownloadButtonProps) {
+export function DownloadButton({
+  id,
+  className,
+  event,
+  isDraft = false
+}: DownloadButtonProps) {
   const intl = useIntl()
 
   const isOnline = useOnlineStatus()
@@ -160,6 +166,10 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
   const isDownloadedToMe =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF &&
     eventDocument.isFetched
+
+  if (isDraft && isDownloadedToMe) {
+    return <Downloaded />
+  }
 
   const isAssignedToSomeoneElse =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_OTHERS
