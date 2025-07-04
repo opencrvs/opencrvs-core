@@ -14,7 +14,7 @@ exports[`getFieldErrors() > should return an error if a required field is not pr
 [
   {
     "id": "test.checkbox",
-    "message": "Required for registration",
+    "message": "Required",
     "value": undefined,
   },
 ]
