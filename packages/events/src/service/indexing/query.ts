@@ -121,55 +121,63 @@ function generateQuery(
 
 const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
 
-function typedEntries<T extends object>(obj: T): [keyof T, T[keyof T]][] {
-  return Object.entries(obj) as [keyof T, T[keyof T]][]
+function typedKeys<T extends object>(obj: T): (keyof T)[] {
+  return Object.keys(obj) as (keyof T)[]
 }
 
 function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
 
-  for (const [key, value] of typedEntries(clause)) {
-    if (!value) {
+  for (const key of typedKeys(clause)) {
+    if (!clause[key]) {
       continue
     }
-
     switch (key) {
-      case 'id':
+      case 'id': {
         must.push({
           term: { id: clause.id }
         })
         break
+      }
 
-      case 'eventType':
+      case 'eventType': {
+        const value = clause[key]
         must.push({ term: { type: value } })
         break
+      }
 
-      case 'status':
+      case 'status': {
+        const value = clause[key]
         if (value.type === 'anyOf') {
           must.push({ terms: { status: value.terms } })
         } else {
           must.push({ term: { status: value.term } })
         }
         break
+      }
 
-      case 'createdByUserType':
       case 'trackingId':
       case 'assignedTo':
       case 'createdBy':
       case 'updatedBy':
-      case 'legalStatuses.REGISTERED.registrationNumber':
+      case 'legalStatuses.REGISTERED.registrationNumber': {
+        const value = clause[key]
         must.push({ term: { [key]: value.term } })
         break
+      }
 
       case 'createdAt':
       case 'updatedAt':
-      case 'legalStatuses.REGISTERED.acceptedAt':
+      case 'legalStatuses.REGISTERED.acceptedAt': {
+        const value = clause[key]
         must.push(dateClauseToElasticQuery(value, key))
         break
+      }
 
       case 'createdAtLocation':
       case 'updatedAtLocation':
-      case 'legalStatuses.REGISTERED.createdAtLocation':
+      case 'legalStatuses.REGISTERED.createdAtLocation': {
+        const value = clause[key]
         if (value.type === 'exact') {
           must.push({ term: { [key]: value.term } })
         } else {
@@ -181,8 +189,11 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
           })
         }
         break
+      }
 
-      case 'data':
+      case 'data': {
+        // @todo: The type for this comes out as "any"
+        const value = clause[key]
         const dataQuery = generateQuery(value, eventConfigs)
         const innerMust = dataQuery.bool?.must
         if (Array.isArray(innerMust)) {
@@ -191,27 +202,28 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
           must.push(innerMust)
         }
         break
+      }
 
-      case 'flags':
+      case 'flags': {
+        const value = clause[key]
+        if (value.anyOf) {
+          must.push({ terms: { flags: value.anyOf } })
+        }
+        if (value.noneOf) {
+          must.push({
+            bool: {
+              must_not: {
+                terms: { flags: value.noneOf }
+              },
+              should: undefined
+            }
+          })
+        }
+      }
+      case 'createdByUserType':
       default:
         console.warn('Unsupported query field:', key)
         break
-    }
-  }
-
-  if (clause.flags) {
-    if (clause.flags.anyOf) {
-      must.push({ terms: { flags: clause.flags.anyOf } })
-    }
-    if (clause.flags.noneOf) {
-      must.push({
-        bool: {
-          must_not: {
-            terms: { flags: clause.flags.noneOf }
-          },
-          should: undefined
-        }
-      })
     }
   }
 

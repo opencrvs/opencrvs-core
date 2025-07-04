@@ -167,6 +167,7 @@ export const QueryExpression = z
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
     flags: z.optional(ContainsFlags),
+    // @todo: The type for this comes out as "any"
     data: QueryInput
   })
   .partial()
