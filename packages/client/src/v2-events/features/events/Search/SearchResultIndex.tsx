@@ -10,7 +10,10 @@
  */
 
 import React from 'react'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
 import { SearchQueryParams, mandatoryColumns } from '@opencrvs/commons/client'
@@ -28,6 +31,7 @@ import {
 
 export const SearchResultIndex = () => {
   const intl = useIntl()
+  const [typedSearchParams] = useTypedSearchParams(ROUTES.V2.SEARCH_RESULT)
   const { searchEvent } = useEvents()
   const { eventType } = useTypedParams(ROUTES.V2.SEARCH_RESULT)
   const location = useLocation()
@@ -69,6 +73,7 @@ export const SearchResultIndex = () => {
           count: queryData.length
         }
       )}
+      {...typedSearchParams}
     />
   )
 }

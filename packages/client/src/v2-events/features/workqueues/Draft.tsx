@@ -15,12 +15,13 @@ import { useIntl } from 'react-intl'
 import { getTokenPayload, mandatoryColumns } from '@opencrvs/commons/client'
 import { QueryType } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
-import { WORKQUEUE_DRAFT } from '@client/v2-events/utils'
+import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { getToken } from '@client/utils/authUtils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
 import { SearchResultComponent } from '../events/Search/SearchResult'
 import { useDrafts } from '../drafts/useDrafts'
 import { useEvents } from '../events/useEvents/useEvents'
+import { useOutbox } from '../events/useEvents/outbox'
 
 export function Draft() {
   const { sub: userId } = getTokenPayload(getToken())
@@ -28,6 +29,8 @@ export function Draft() {
   const [searchParams] = useTypedSearchParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const eventConfigs = useEventConfigurations()
   const intl = useIntl()
+
+  const outboxIds = useOutbox().map(({ id }) => id)
 
   const { getAllRemoteDrafts } = useDrafts()
   const draftIds = getAllRemoteDrafts().map(({ eventId }) => eventId)
@@ -41,9 +44,11 @@ export function Draft() {
   const eventsWithDrafts = searchEvent
     .useSuspenseQuery(AssignedToMeQuery)
     .filter(({ id }) => draftIds.includes(id))
+    .filter(({ id }) => !outboxIds.includes(id))
 
   return (
     <SearchResultComponent
+      key={`${CoreWorkqueues.DRAFT}-${outboxIds.length}`}
       actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={eventConfigs}

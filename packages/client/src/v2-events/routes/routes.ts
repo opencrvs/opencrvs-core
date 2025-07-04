@@ -10,6 +10,8 @@
  */
 
 import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
+import { zod } from 'react-router-typesafe-routes/zod'
+import * as z from 'zod'
 import { config } from '@client/config'
 import { routes as correctionRoutes } from '@client/v2-events/features/events/actions/correct/request/routes'
 import { routes as workqueueRoutes } from '@client/v2-events/features/workqueues/routes'
@@ -149,9 +151,18 @@ export const ROUTES = {
       WORKQUEUES: workqueueRoutes,
       ADVANCED_SEARCH: route('advanced-search'),
       SEARCH_RESULT: route('search-result/:eventType', {
-        params: { eventType: string().defined() }
+        params: { eventType: string().defined() },
+        searchParams: {
+          limit: zod(z.number().min(1).max(100)).default(10),
+          offset: zod(z.number().min(0)).default(0)
+        }
       }),
-      SEARCH: route('search')
+      SEARCH: route('search', {
+        searchParams: {
+          limit: zod(z.number().min(1).max(100)).default(10),
+          offset: zod(z.number().min(0)).default(0)
+        }
+      })
     }
   )
 }
