@@ -162,7 +162,11 @@ function buildSearchSections({
         ...f,
         required: false as const,
         conditionals: fieldSearchConfig?.conditionals ?? f.conditionals,
-        validation: fieldSearchConfig?.validations ?? f.validation
+        validation: fieldSearchConfig?.validations ?? f.validation,
+        ...('options' in f &&
+          f.options.length > 0 && {
+            options: fieldSearchConfig?.options ?? f.options
+          })
       }
     })
 
