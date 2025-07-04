@@ -133,7 +133,8 @@ const serializedParams = serializeSearchParams({
     firstname: 'Nina',
     surname: 'Roy'
   },
-  ['event.legalStatus.REGISTERED.createdAt']: ['2024-06-01', '2025-06-30'],
+  // @TODO: Update tests
+  ['event.legalStatus.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
   ['event.legalStatus.REGISTERED.createdAtLocation']:
     '028d2c85-ca31-426d-b5d1-2cef545a4902',
   'event.status': 'ALL',
@@ -266,7 +267,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
 }
 
 const serializedParams2 = serializeSearchParams({
-  ['event.legalStatus.REGISTERED.createdAt']: ['2024-06-01', '2025-06-30'],
+  ['event.legalStatus.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
   ['event.legalStatus.REGISTERED.createdAtLocation']:
     '028d2c85-ca31-426d-b5d1-2cef545a4902',
   'recommender.name': {
@@ -305,7 +306,7 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
         const dateToggle = (await canvas.findAllByRole('checkbox')).find(
           (el) =>
             el.id ===
-            'event____legalStatus____REGISTERED____createdAt-date_range_checkbox'
+            'event____legalStatus____REGISTERED____acceptedAt-date_range_checkbox'
         )
 
         if (dateToggle) {

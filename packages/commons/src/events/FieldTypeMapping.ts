@@ -36,7 +36,9 @@ import {
   DataField,
   NameField,
   PhoneField,
-  IdField
+  IdField,
+  DateRangeField,
+  SelectDateRangeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -49,7 +51,8 @@ import {
   NonEmptyTextValue,
   TextValue,
   DataFieldValue,
-  DateRangeFieldValue
+  DateRangeFieldValue,
+  SelectDateRangeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -91,6 +94,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
       break
     case FieldType.DATE_RANGE:
       schema = DateRangeFieldValue
+      break
+    case FieldType.SELECT_DATE_RANGE:
+      schema = SelectDateRangeValue
       break
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
@@ -172,6 +178,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.DATE:
     case FieldType.CHECKBOX:
     case FieldType.DATE_RANGE:
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATA:
     case FieldType.NAME:
     case FieldType.PHONE:
@@ -219,8 +226,18 @@ export const isDateFieldType = (field: {
 export const isDateRangeFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: DateField } => {
+}): field is {
+  value: DateRangeFieldValue
+  config: DateRangeField
+} => {
   return field.config.type === FieldType.DATE_RANGE
+}
+
+export const isSelectDateRangeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: SelectDateRangeValue; config: SelectDateRangeField } => {
+  return field.config.type === FieldType.SELECT_DATE_RANGE
 }
 
 export const isPageHeaderFieldType = (field: {

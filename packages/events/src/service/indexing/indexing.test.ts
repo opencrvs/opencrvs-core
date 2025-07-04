@@ -51,7 +51,10 @@ const exactRegisteredAtPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      'legalStatus.REGISTERED.createdAt': { type: 'exact', term: '2024-01-01' },
+      'legalStatuses.REGISTERED.acceptedAt': {
+        type: 'exact',
+        term: '2024-01-01'
+      },
       eventType: TENNIS_CLUB_MEMBERSHIP
     }
   ]
@@ -61,7 +64,7 @@ const rangeRegisteredAtPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      'legalStatus.REGISTERED.createdAt': {
+      'legalStatuses.REGISTERED.acceptedAt': {
         type: 'range',
         gte: '2024-01-01',
         lte: '2024-12-31'
@@ -75,7 +78,7 @@ const exactRegisteredAtLocationPayload: QueryType = {
   type: 'and',
   clauses: [
     {
-      'legalStatus.REGISTERED.createdAtLocation': {
+      'legalStatuses.REGISTERED.createdAtLocation': {
         type: 'exact',
         term: 'some-location-id'
       },
@@ -134,7 +137,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with exact legalStatus.REGISTERED.createdAt', () => {
+  test('builds query with exact legalStatuses.REGISTERED.acceptedAt', () => {
     const result = buildElasticQueryFromSearchPayload(
       exactRegisteredAtPayload,
       [tennisClubMembershipEvent]
@@ -149,7 +152,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with range legalStatus.REGISTERED.createdAt', () => {
+  test('builds query with range legalStatuses.REGISTERED.acceptedAt', () => {
     const result = buildElasticQueryFromSearchPayload(
       rangeRegisteredAtPayload,
       [tennisClubMembershipEvent]
@@ -171,7 +174,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     })
   })
 
-  test('builds query with exact legalStatus.REGISTERED.createdAtLocation', () => {
+  test('builds query with exact legalStatuses.REGISTERED.createdAtLocation', () => {
     const result = buildElasticQueryFromSearchPayload(
       exactRegisteredAtLocationPayload,
       [tennisClubMembershipEvent]

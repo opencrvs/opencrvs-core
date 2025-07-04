@@ -287,8 +287,8 @@ test('Returns events based on the updatedAt column', async () => {
     )
   )
 
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const today = new Date().toISOString()
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
   const acceptedTodayResult = await client.event.search({
     type: 'and',
@@ -316,6 +316,10 @@ test('Returns events based on the updatedAt column', async () => {
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
 })
+
+test.todo(
+  'Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column and requsted timezone'
+)
 
 test.skip('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
