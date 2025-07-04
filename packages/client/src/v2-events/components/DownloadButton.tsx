@@ -12,7 +12,6 @@
 import { Button } from '@opencrvs/components/lib/Button'
 import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { AvatarSmall } from '@client/components/Avatar'
-import { DOWNLOAD_STATUS } from '@client/declarations'
 import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
 import { useOnlineStatus } from '@client/utils'
@@ -25,7 +24,11 @@ import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
 import styled from 'styled-components'
 import { ActionType, EventIndex } from '@opencrvs/commons/client'
-import { AssignmentStatus, getAssignmentStatus } from '../utils'
+import {
+  AssignmentStatus,
+  getAssignmentStatus,
+  getUsersFullName
+} from '../utils'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
@@ -204,6 +207,7 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
       >
         {isAssignedToSomeoneElse || isDownloadedToMe ? (
           <AvatarSmall
+            key={user?.avatarURL || 'default'}
             avatar={
               user?.avatarURL
                 ? {
@@ -212,6 +216,7 @@ export function DownloadButton({ id, className, event }: DownloadButtonProps) {
                   }
                 : undefined
             }
+            name={user && getUsersFullName(user.name, intl.locale)}
           />
         ) : (
           <Download isFailed={isFailed} />
