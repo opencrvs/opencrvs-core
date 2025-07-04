@@ -8,9 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { join } from 'path'
-import * as fetchMock from 'jest-fetch-mock'
+import '@hapi/hapi'
 
-process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
-//@ts-ignore
-globalThis.fetch = fetchMock
+declare module '@hapi/hapi' {
+  interface ServerInjectOptions {
+    method: string
+    url: string
+    headers?: Record<string, string>
+    payload?: any
+  }
+  interface ServerInjectResponse {
+    statusCode: number
+    payload: any
+  }
+}

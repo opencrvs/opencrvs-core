@@ -20,7 +20,6 @@ import { logger } from '@opencrvs/commons'
 import Webhook, { IWebhookModel, TRIGGERS } from '@webhooks/model/webhook'
 import { getQueue } from '@webhooks/queue'
 import { Queue } from 'bullmq'
-import fetch from 'node-fetch'
 import * as ShortUIDGen from 'short-uid'
 import { RegisteredRecord } from '@opencrvs/commons/types'
 
@@ -245,7 +244,7 @@ const fetchSystemPermissions = async (
         ...authHeader
       }
     })
-    const fetchSystem: ISystem = await response.json()
+    const fetchSystem: ISystem = (await response.json()) as ISystem
     logger.info(` Fetching system integration : fetchSystem ${fetchSystem}`)
 
     return (

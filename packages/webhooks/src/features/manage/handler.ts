@@ -21,7 +21,6 @@ import { internal } from '@hapi/boom'
 import Webhook, { TRIGGERS } from '@webhooks/model/webhook'
 import { logger } from '@opencrvs/commons'
 import { v4 as uuid } from 'uuid'
-import fetch from 'node-fetch'
 import { resolve } from 'url'
 
 interface IHub {
@@ -130,7 +129,9 @@ export async function subscribeWebhooksHandler(
           }
         )
           .then((response) => {
-            return response.json()
+            return response.json() as Promise<{
+              challenge: string
+            }>
           })
           .catch((error) => {
             return Promise.reject(

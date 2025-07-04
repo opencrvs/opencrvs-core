@@ -57,12 +57,14 @@ export function initQueue(): Queue {
     `Initialising queue on REDIS_HOST: ${REDIS_HOST} with connection: ${connection}`
   )
   const newQueue = new Queue(QUEUE_NAME, {
+    // @ts-ignore
     connection
   })
 
   EventEmitter.defaultMaxListeners = 50
 
   const queueEvents = new QueueEvents(QUEUE_NAME, {
+    // @ts-ignore
     connection
   })
 
