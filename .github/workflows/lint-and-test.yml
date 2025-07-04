@@ -323,7 +323,10 @@ jobs:
           ref: ${{ github.head_ref }}
           path: pr
 
-      - uses: actions/setup-node@v4
+      - name: Use Node.js from .nvmrc
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
 
       - name: Install base dependencies
         run: yarn install --ignore-scripts
