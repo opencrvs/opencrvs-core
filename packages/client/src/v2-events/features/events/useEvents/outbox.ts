@@ -11,7 +11,11 @@
 
 import { useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
-import { deepMerge, getCurrentEventState } from '@opencrvs/commons/client'
+import {
+  deepMerge,
+  getCurrentEventState,
+  applyDeclarationToEventIndex
+} from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { useEventConfigurations } from '../useEventConfiguration'
@@ -56,10 +60,14 @@ export function useOutbox() {
       }
 
       const eventState = getCurrentEventState(event, eventConfiguration)
+
       return {
-        ...eventState,
         // Merge the declaration from mutation to get optimistic declaration
-        declaration: deepMerge(eventState.declaration, declaration || {}),
+        ...applyDeclarationToEventIndex(
+          eventState,
+          declaration ?? {},
+          eventConfiguration
+        ),
         meta: mutation.options.meta
       }
     })

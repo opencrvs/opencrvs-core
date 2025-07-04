@@ -122,7 +122,7 @@ function EventOverviewProtected({
   const drafts = getRemoteDrafts(eventIndex.id)
 
   const eventWithDrafts = deepDropNulls(
-    applyDraftsToEventIndex(eventIndex, drafts)
+    applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
   )
   const { getUser } = useUsers()
   const intl = useIntl()
