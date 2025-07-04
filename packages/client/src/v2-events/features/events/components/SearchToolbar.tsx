@@ -8,10 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import styled from 'styled-components'
 import { useIntl } from 'react-intl'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { ClearText } from '@opencrvs/components/src/icons'
 import { Button } from '@opencrvs/components/src/Button'
 import { Icon } from '@opencrvs/components/src/Icon'
@@ -113,6 +113,7 @@ export const SearchToolbar = () => {
   const intl = useIntl()
   const [searchTerm, setSearchTerm] = useState<string | undefined>(undefined)
   const navigate = useNavigate()
+  const location = useLocation()
 
   const onChangeHandler = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(event.target.value)
@@ -135,6 +136,13 @@ export const SearchToolbar = () => {
     navigate(`${searchUrl}?${serializedParams}`)
   }
 
+  useEffect(() => {
+    // Clear the search term when navigating away from the search results page
+    if (location.pathname !== ROUTES.V2.SEARCH.buildPath({})) {
+      setSearchTerm(undefined)
+    }
+  }, [location.pathname])
+
   return (
     <SearchBox className={'search-tool'}>
       <Wrapper onSubmit={onSearch}>
@@ -153,7 +161,7 @@ export const SearchToolbar = () => {
           maxLength={200}
           placeholder={intl.formatMessage(messages.placeHolderText)}
           type={'text'}
-          value={searchTerm}
+          value={searchTerm ?? ''}
           onChange={onChangeHandler}
         />
         {searchTerm && <ClearTextIcon onClick={clearSearchTerm} />}
