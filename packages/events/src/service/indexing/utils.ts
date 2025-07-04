@@ -181,12 +181,19 @@ export function generateQueryForAddressField(
   } else {
     if (value.state) {
       mustMatches.push({
-        match: { [`${fieldId}.state`]: value.state }
+        match: {
+          [`${fieldId}.state`]: { query: value.state, fuzziness: 'AUTO' }
+        }
       })
     }
     if (value.district2) {
       mustMatches.push({
-        match: { [`${fieldId}.district2`]: value.district2 }
+        match: {
+          [`${fieldId}.district2`]: {
+            query: value.district2,
+            fuzziness: 'AUTO'
+          }
+        }
       })
     }
   }
