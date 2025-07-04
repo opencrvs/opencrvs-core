@@ -10,6 +10,7 @@
  */
 import { estypes } from '@elastic/elasticsearch'
 import {
+  AddressFieldValue,
   EventConfig,
   FieldType,
   getAllUniqueFields,
@@ -17,7 +18,11 @@ import {
   QueryExpression,
   QueryType
 } from '@opencrvs/commons/events'
-import { encodeFieldId } from './utils'
+import {
+  encodeFieldId,
+  generateQueryForAddressField,
+  getAlternateFieldMap
+} from './utils'
 
 /**
  * Generates an Elasticsearch query to search within `document.declaration`
@@ -41,10 +46,45 @@ function generateQuery(
     .filter((field) => field.type === FieldType.NAME)
     .map((f) => f.id)
 
+  const addressFieldIds = allEventFields
+    .filter((field) => field.type === FieldType.ADDRESS)
+    .map((f) => f.id)
+
+  const alternateFieldMap = getAlternateFieldMap(eventConfigs)
+
   const must = Object.entries(event).map(([fieldId, search]) => {
     const field = `declaration.${encodeFieldId(fieldId)}`
 
     if (search.type === 'exact') {
+      const allIds = [fieldId, ...(alternateFieldMap[fieldId] ?? [])]
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (alternateFieldMap[fieldId] && alternateFieldMap[fieldId].length > 0) {
+        const queries: estypes.QueryDslQueryContainer[] = allIds.map((id) => {
+          if (addressFieldIds.includes(id)) {
+            const parsed = AddressFieldValue.safeParse(JSON.parse(search.term))
+            if (parsed.success) {
+              return generateQueryForAddressField(
+                `declaration.${encodeFieldId(id)}`,
+                parsed.data
+              )
+            }
+          }
+
+          // For non-address or failed parse, return simple match
+          return {
+            match: {
+              [id]: search.term
+            }
+          }
+        })
+
+        return {
+          bool: { should: queries, minimum_should_match: 1 }
+        } as estypes.QueryDslQueryContainer
+      }
+
+      // default exact match
       return {
         match: {
           [field]: search.term
@@ -52,6 +92,7 @@ function generateQuery(
       }
     }
 
+    // Step 3: Fuzzy
     if (search.type === 'fuzzy') {
       /**
        * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
@@ -102,6 +143,7 @@ function generateQuery(
     throw new Error(`Unsupported query type: ${search.type}`)
   }) satisfies estypes.QueryDslQueryContainer[]
 
+  console.log(JSON.stringify({ bool: { must } }))
   return { bool: { must } } as estypes.QueryDslQueryContainer
 }
 

@@ -27,7 +27,8 @@ import {
   EventState,
   FieldType,
   QueryExpression,
-  NameFieldValue
+  NameFieldValue,
+  AddressFieldValue
 } from '@opencrvs/commons/client'
 import {
   Errors,
@@ -340,6 +341,12 @@ function buildDataConditionFromSearchKeys(
         ) {
           value = Name.stringify(rawInput[fieldId] as NameFieldValue)
         }
+        if (
+          fieldConfig?.type === FieldType.ADDRESS &&
+          AddressFieldValue.safeParse(rawInput[fieldId]).success
+        ) {
+          value = JSON.stringify(rawInput[fieldId])
+        }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
         // but "2023-01-01" should be treated as an exact match
@@ -591,8 +598,6 @@ export function serializeSearchParams(
   )
   return stringify(simplifiedValue, { skipEmptyString: true })
 }
-
-/* eslint-disable max-lines */
 
 function tryParse(value: unknown): unknown {
   if (!isString(value)) {
