@@ -685,6 +685,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -819,6 +822,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -891,6 +897,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -956,6 +965,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1031,6 +1043,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1091,6 +1106,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1167,6 +1185,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1240,6 +1261,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1323,6 +1347,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1394,6 +1421,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1447,6 +1477,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1519,6 +1552,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1566,6 +1602,10 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                includeMiddlename:
+                  type: boolean
+                  default: false
+                  description: To make middle name visible in Name form field
           required:
             - id
             - label
@@ -1591,6 +1631,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1648,6 +1691,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1703,6 +1749,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1755,6 +1804,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1857,6 +1909,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1910,6 +1965,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1988,6 +2046,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2037,6 +2098,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2094,6 +2158,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2149,6 +2216,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2202,6 +2272,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2280,6 +2353,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2340,6 +2416,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2443,6 +2522,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -3334,6 +3416,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         type:
           type: string
         createdAt:
@@ -3351,6 +3434,7 @@ components:
                 properties:
                   id:
                     type: string
+                    format: uuid
                   transactionId:
                     type: string
                   createdByUserType:
@@ -3375,11 +3459,17 @@ components:
                     type:
                       - string
                       - "null"
+                    format: uuid
                   status:
                     type: string
                     const: Rejected
                   originalActionId:
-                    type: string
+                    type:
+                      - string
+                      - "null"
+                    format: uuid
+                    description: Reference to the original action that was asynchronously rejected
+                      or accepted by 3rd party integration.
                   type:
                     type: string
                     enum:
@@ -3448,6 +3538,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -3469,6 +3560,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -3627,19 +3719,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -3796,16 +3891,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -3815,7 +3911,12 @@ components:
             - Accepted
             - Rejected
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: CREATE
@@ -3834,6 +3935,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -3855,6 +3957,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4013,19 +4116,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -4182,22 +4288,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: VALIDATE
@@ -4216,6 +4328,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -4237,6 +4350,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4395,19 +4509,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -4564,22 +4681,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT
@@ -4611,6 +4734,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -4632,6 +4756,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -4790,19 +4915,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -4959,22 +5087,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: MARKED_AS_DUPLICATE
@@ -4993,6 +5127,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -5014,6 +5149,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5172,19 +5308,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -5341,22 +5480,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ARCHIVE
@@ -5388,6 +5533,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -5409,6 +5555,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5567,19 +5714,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -5736,22 +5886,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: NOTIFY
@@ -5770,6 +5926,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -5791,6 +5948,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -5949,19 +6107,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -6118,22 +6279,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REGISTER
@@ -6154,6 +6321,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -6175,6 +6343,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6333,19 +6502,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -6502,22 +6674,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: DECLARE
@@ -6536,6 +6714,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -6557,6 +6736,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -6715,19 +6895,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -6884,22 +7067,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: ASSIGN
@@ -6921,6 +7110,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -6942,6 +7132,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7100,19 +7291,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -7269,22 +7463,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REQUEST_CORRECTION
@@ -7303,6 +7503,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -7324,6 +7525,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7482,19 +7684,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -7651,22 +7856,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: APPROVE_CORRECTION
@@ -7688,6 +7899,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -7709,6 +7921,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -7867,19 +8080,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -8036,22 +8252,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: REJECT_CORRECTION
@@ -8073,6 +8295,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -8094,6 +8317,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8252,19 +8476,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -8421,27 +8648,31 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: UNASSIGN
-        assignedTo:
-          type: "null"
       required:
         - id
         - transactionId
@@ -8452,12 +8683,12 @@ components:
         - declaration
         - status
         - type
-        - assignedTo
     PrintCertificateAction:
       type: object
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -8479,6 +8710,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -8637,19 +8869,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -8806,22 +9041,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: PRINT_CERTIFICATE
@@ -8840,6 +9081,7 @@ components:
       properties:
         id:
           type: string
+          format: uuid
         transactionId:
           type: string
         createdByUserType:
@@ -8861,6 +9103,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
         declaration:
           type: object
           additionalProperties:
@@ -9019,19 +9262,22 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
-          type: object
+          type:
+            - object
+            - "null"
           additionalProperties:
             anyOf:
               - type: string
@@ -9188,22 +9434,28 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
           enum: *a11
         originalActionId:
-          type: string
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
         type:
           type: string
           const: READ
@@ -9239,6 +9491,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -9399,16 +9652,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default:
             &a12 {}
@@ -9570,19 +9824,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -9593,6 +9849,7 @@ components:
           type:
             - string
             - "null"
+          format: uuid
       required:
         - eventId
         - transactionId
@@ -9601,6 +9858,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -9761,16 +10019,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -9931,19 +10190,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -9963,6 +10224,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -10123,16 +10385,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -10293,19 +10556,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -10317,11 +10582,13 @@ components:
       required:
         - eventId
         - transactionId
+      additionalProperties: false
     NotifyActionInput:
       type: object
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -10482,16 +10749,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -10652,19 +10920,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -10676,7 +10946,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 1da66936-1629-40b4-b7df-79d578abc009
+        transactionId: 80e62212-8e9a-4a76-bef7-8fd02a66b144
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -10685,6 +10955,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -10845,16 +11116,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -11015,19 +11287,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -11042,6 +11316,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -11202,16 +11477,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -11372,19 +11648,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -11412,6 +11690,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -11572,16 +11851,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -11742,19 +12022,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -11769,6 +12051,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -11929,16 +12212,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -12099,19 +12383,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -12139,6 +12425,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -12299,16 +12586,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -12469,19 +12757,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -12499,6 +12789,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -12659,16 +12950,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -12829,19 +13121,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -12859,6 +13153,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -13019,16 +13314,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -13189,19 +13485,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -13216,6 +13514,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -13376,16 +13675,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -13546,19 +13846,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
@@ -13573,6 +13875,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -13733,16 +14036,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -13903,19 +14207,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         requestId:
@@ -13933,6 +14239,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -14093,16 +14400,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -14263,19 +14571,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         requestId:
@@ -14293,6 +14603,7 @@ components:
       properties:
         eventId:
           type: string
+          format: uuid
         transactionId:
           type: string
         declaration:
@@ -14453,16 +14764,17 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
           default: *a12
         annotation:
@@ -14623,19 +14935,21 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           surname:
-                            type: string
+                            type:
+                              - string
+                              - "null"
                           middlename:
                             type:
                               - string
                               - "null"
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         originalActionId:
           type: string
+          format: uuid
         keepAssignment:
           type: boolean
         type:
