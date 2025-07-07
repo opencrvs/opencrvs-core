@@ -47,6 +47,7 @@ import {
   useAction,
   useActionMenuItems
 } from '../../workqueues/EventOverview/components/useActionMenuItems'
+import { deserializeSearchParams, serializeSearchParams } from './utils'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -252,13 +253,13 @@ export const SearchResultComponent = ({
   const isOnline = useOnlineStatus()
 
   const setOffset = (newOffset: number) => {
-    const params = new URLSearchParams(location.search)
-    params.set('offset', String(newOffset))
+    const params = deserializeSearchParams(location.search)
+    params.offset = String(newOffset)
 
     navigate(
       {
         pathname: location.pathname,
-        search: `?${params.toString()}`
+        search: serializeSearchParams(params)
       },
       { replace: true }
     )
