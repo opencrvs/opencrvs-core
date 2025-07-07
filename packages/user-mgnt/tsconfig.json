@@ -8,6 +8,7 @@
     "module": "node16",
     "rootDir": ".",
     "sourceMap": true,
+    "skipLibCheck": true,
     "moduleResolution": "node16",
     "outDir": "build/dist",
     "lib": ["esnext.asynciterable", "es6", "es2017", "dom"],

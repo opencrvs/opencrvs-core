@@ -15,7 +15,6 @@ import User, { IUserModel } from '@user-mgnt/model/user'
 import { logger } from '@opencrvs/commons'
 import { statuses } from '@user-mgnt/utils/userUtils'
 import { resolve } from 'url'
-import fetch from 'node-fetch'
 import { METRICS_URL } from '@user-mgnt/constants'
 
 interface IChangePasswordPayload {

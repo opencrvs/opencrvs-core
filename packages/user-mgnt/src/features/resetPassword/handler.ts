@@ -20,7 +20,6 @@ import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { NOTIFICATION_SERVICE_URL } from '@user-mgnt/constants'
 import { logger } from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
-import fetch from 'node-fetch'
 
 interface IResendPasswordInvitePayload {
   userId: string

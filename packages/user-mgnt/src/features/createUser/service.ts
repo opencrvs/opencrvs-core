@@ -25,7 +25,6 @@ import User, {
   IUser,
   IUserName
 } from '@user-mgnt/model/user'
-import fetch from 'node-fetch'
 
 export const createFhirPractitioner = (
   user: IUser,
