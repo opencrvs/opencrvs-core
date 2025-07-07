@@ -17,7 +17,6 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { isEqual } from 'lodash'
 import {
   FieldConfig,
   generateTransactionId,
@@ -42,6 +41,7 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { hasFieldChanged } from '../../utils'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -98,9 +98,14 @@ export function Summary() {
 
   const submitCorrection = React.useCallback(() => {
     const formWithOnlyChangedValues = Object.fromEntries(
-      Object.entries(form).filter(
-        ([key, value]) => !isEqual(value, previousFormValues[key])
-      )
+      Object.entries(form).filter(([key, value]) => {
+        const field = fields.find((f) => f.id === key)
+        if (!field) {
+          return false
+        }
+
+        return hasFieldChanged(field, form, previousFormValues)
+      })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
@@ -120,15 +125,16 @@ export function Summary() {
       transactionId: generateTransactionId(),
       annotation
     })
-    goToHome()
+
+    navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
   }, [
     form,
     fields,
     events.actions.correction.request,
     eventId,
     annotation,
-    goToHome,
-    previousFormValues
+    previousFormValues,
+    navigate
   ])
 
   return (
