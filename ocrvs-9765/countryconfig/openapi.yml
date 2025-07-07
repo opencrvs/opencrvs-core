@@ -1606,6 +1606,8 @@ components:
                   type: boolean
                   default: false
                   description: To make middle name visible in Name form field
+                searchMode:
+                  type: boolean
           required:
             - id
             - label
@@ -10946,7 +10948,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 3bcfdeb8-9bb5-4fbd-8b75-4f495279f528
+        transactionId: 89e4da03-6d08-48ed-8767-2dec8a3b1849
         declaration: {}
         annotation: {}
         type: NOTIFY
