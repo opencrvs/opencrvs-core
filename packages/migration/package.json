@@ -45,7 +45,6 @@
   },
   "devDependencies": {
     "@types/fhir": "0.0.30",
-    "@types/hapi__shot": "^6.0.0",
     "@typescript-eslint/eslint-plugin": "^8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",
