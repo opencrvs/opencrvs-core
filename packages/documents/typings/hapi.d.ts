@@ -8,16 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { join } from 'path'
-import * as fetch from 'jest-fetch-mock'
+import '@hapi/hapi'
 
-// @ts-ignore
-globalThis.fetch = fetch
-jest.mock('@documents/minio/client', () => ({
-  __esModule: true,
-  defaultMinioBucketExists: jest.fn(),
-  createDefaultMinioBucket: jest.fn()
-}))
-
-process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')
-process.env.NODE_ENV = 'TEST'
+declare module '@hapi/hapi' {
+  interface ServerInjectOptions {
+    method: string
+    url: string
+    headers?: Record<string, string>
+    payload?: any
+  }
+  interface ServerInjectResponse {
+    statusCode: number
+    payload: any
+  }
+}
