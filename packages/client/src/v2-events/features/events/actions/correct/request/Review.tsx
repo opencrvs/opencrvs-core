@@ -29,7 +29,7 @@ import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { hasFieldChanged } from './Summary/CorrectionDetails'
+import { hasFieldChanged } from '../utils'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
