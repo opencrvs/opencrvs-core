@@ -815,6 +815,11 @@ components:
                     - addressType
                     - state
                     - district2
+            configuration:
+              type: object
+              properties:
+                searchMode:
+                  type: boolean
           required:
             - id
             - label
@@ -10962,7 +10967,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 531a3b58-51a9-41e1-8a04-ca2461600483
+        transactionId: 7a37a229-717e-4bb0-a7c5-cd52f4f291eb
         declaration: {}
         annotation: {}
         type: NOTIFY

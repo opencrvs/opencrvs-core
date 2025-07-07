@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: afb50a84-e859-4345-9b31-eabfd686e90e
+                transactionId: 4535817c-d0d0-453b-8dba-5f325bad49e3
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e4b2e3f9-07f3-4921-8b48-f11509455402
+                transactionId: 38a9b2e6-9ef5-453d-bc52-f26c5bd5d131
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1439,6 +1439,11 @@ components:
                     - addressType
                     - state
                     - district2
+            configuration:
+              type: object
+              properties:
+                searchMode:
+                  type: boolean
           required:
             - id
             - label
