@@ -17,7 +17,6 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { isEqual } from 'lodash'
 import {
   FieldConfig,
   generateTransactionId,
@@ -127,16 +126,15 @@ export function Summary() {
       annotation
     })
 
-    // TODO CIHAN: this should take to event overview
-    goToHome()
+    navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
   }, [
     form,
     fields,
     events.actions.correction.request,
     eventId,
     annotation,
-    goToHome,
-    previousFormValues
+    previousFormValues,
+    navigate
   ])
 
   return (
