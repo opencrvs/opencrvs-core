@@ -20,7 +20,7 @@
     "noUnusedLocals": true,
     "types": ["fhir", "jest"]
   },
-  "include": ["src/**/*.ts", "typings", "__mocks__/elasticsearch.ts"],
+  "include": ["src/**/*.ts", "typings", "test/setupJest.ts", "__mocks__/elasticsearch.ts"],
   "exclude": [
     "node_modules",
     "build",
