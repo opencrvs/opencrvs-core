@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { getDeclarationPages } from '@opencrvs/commons/client'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -33,11 +34,12 @@ export function Pages() {
   const events = useEvents()
   const { modal } = useEventFormNavigation()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const formPages = getDeclarationPages(configuration)
 
@@ -64,7 +66,7 @@ export function Pages() {
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
       {modal}
       <PagesComponent
-        declaration={event.declaration}
+        declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={form}
         formPages={formPages}
@@ -73,15 +75,21 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath({
-              eventId,
-              pageId: nextPageId
-            })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+              {
+                eventId,
+                pageId: nextPageId
+              },
+              { workqueue: searchParams.workqueue }
+            )
           )
         }
         onSubmit={() =>
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
           )
         }
       />

@@ -23,6 +23,6 @@
     "types": ["fhir"],
     "resolveJsonModule": true
   },
-  "include": ["src/**/*.ts", "src/**/*.js"],
+  "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.json"],
   "exclude": ["**/node_modules/**"]
 }

@@ -19,6 +19,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
+import toast from 'react-hot-toast'
 import {
   ActionType,
   EventConfig,
@@ -34,7 +35,8 @@ import {
   Icon,
   ResponsiveModal,
   Spinner,
-  Stack
+  Stack,
+  Toast
 } from '@opencrvs/components'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -126,6 +128,11 @@ const messages = defineMessages({
     defaultMessage:
       'Print certificate is an online only action. Please go online to print the certificate',
     description: 'Print certificate online only message'
+  },
+  toastMessage: {
+    id: 'v2.print.certificate.toast.message',
+    defaultMessage: 'Certificate is ready to print',
+    description: 'Floating Toast message upon certificate ready to print'
   }
 })
 
@@ -142,7 +149,7 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
-  const [{ templateId }] = useTypedSearchParams(
+  const [{ templateId, workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
 
@@ -158,7 +165,7 @@ export function Review() {
   const [modal, openModal] = useModal()
 
   const { getEvent, onlineActions } = useEvents()
-  const [fullEvent] = getEvent.useSuspenseQuery(eventId)
+  const fullEvent = getEvent.getFromCache(eventId)
 
   const actions = getAcceptedActions(fullEvent)
   const userIds = getUserIdsFromActions(actions)
@@ -172,6 +179,7 @@ export function Review() {
   const certificateConfig = certificateTemplates.find(
     (template) => template.id === templateId
   )
+
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
 
@@ -199,7 +207,10 @@ export function Review() {
     console.warn('Form is not properly filled. Redirecting to the beginning...')
     return (
       <Navigate
-        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
+        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+          { eventId },
+          { workqueue: slug }
+        )}
       />
     )
   }
@@ -209,7 +220,12 @@ export function Review() {
   }
 
   const handleCorrection = () =>
-    navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
+        { eventId },
+        { workqueue: slug }
+      )
+    )
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
@@ -256,7 +272,23 @@ export function Review() {
         })
 
         await handleCertify(fullEvent)
-        navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
+
+        toast.custom(
+          <Toast
+            duration={null}
+            type={'success'}
+            onClose={() => toast.remove(`print-successful${eventId}`)}
+          >
+            {intl.formatMessage(messages.toastMessage)}
+          </Toast>,
+          {
+            id: `print-successful${eventId}`
+          }
+        )
+
+        slug
+          ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

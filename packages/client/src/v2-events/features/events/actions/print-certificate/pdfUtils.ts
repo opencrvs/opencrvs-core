@@ -101,7 +101,7 @@ export const stringifyEventMetadata = ({
     id: metadata.id,
     type: metadata.type,
     trackingId: metadata.trackingId,
-    status: EventStatus.REGISTERED,
+    status: EventStatus.enum.REGISTERED,
     updatedByUserRole: metadata.updatedByUserRole,
     updatedAtLocation: LocationSearch.stringify(
       intl,
@@ -110,7 +110,7 @@ export const stringifyEventMetadata = ({
     ),
     flags: [],
     legalStatuses: {
-      [EventStatus.DECLARED]: metadata.legalStatuses.DECLARED
+      [EventStatus.enum.DECLARED]: metadata.legalStatuses.DECLARED
         ? {
             createdAt: DateField.stringify(
               intl,
@@ -134,7 +134,7 @@ export const stringifyEventMetadata = ({
               metadata.legalStatuses.DECLARED.createdBySignature
           }
         : null,
-      [EventStatus.REGISTERED]: metadata.legalStatuses.REGISTERED
+      [EventStatus.enum.REGISTERED]: metadata.legalStatuses.REGISTERED
         ? {
             createdAt: DateField.stringify(
               intl,
@@ -210,7 +210,6 @@ function formatAllNonStringValues(
           isMessageDescriptor(item) ? intl.formatMessage(item) : item
         )
         .join(', ')
-      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     } else if (typeof value === 'object' && value !== null) {
       formattedData[key] = formatAllNonStringValues(
         value satisfies EventState,
@@ -331,7 +330,7 @@ export function compileSvg({
         return ''
       }
 
-      const id = idParts.join('.')
+      const id = idParts.map((part) => part?.toString().toLowerCase()).join('.')
 
       return intl.formatMessage({
         id,

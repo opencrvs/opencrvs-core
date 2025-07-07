@@ -53,14 +53,18 @@ export function useEventFormNavigation() {
   const navigate = useNavigate()
 
   const events = useEvents()
-  const { getRemoteDrafts } = useDrafts()
-  const remoteDrafts = getRemoteDrafts()
+  const { getAllRemoteDrafts } = useDrafts()
+  const remoteDrafts = getAllRemoteDrafts()
   const deleteEvent = events.deleteEvent.useMutation()
 
   const [modal, openModal] = useModal()
 
   function goToHome() {
     navigate(ROUTES.V2.path)
+  }
+
+  function goToWorkqueue(slug: string) {
+    navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
   }
 
   async function exit(event: EventIndex) {
@@ -158,5 +162,15 @@ export function useEventFormNavigation() {
     }
   }
 
-  return { exit, modal, goToHome, deleteDeclaration }
+  function redirectToOrigin(slug?: string) {
+    slug ? goToWorkqueue(slug) : goToHome()
+  }
+
+  return {
+    exit,
+    modal,
+    goToHome,
+    deleteDeclaration,
+    redirectToOrigin
+  }
 }

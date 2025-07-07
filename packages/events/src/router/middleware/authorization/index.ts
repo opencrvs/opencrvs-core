@@ -27,6 +27,7 @@ import {
   ConfigurableScopeType,
   ConfigurableScopes,
   IAuthHeader,
+  UUID,
   EventDocument
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
@@ -163,7 +164,7 @@ export const eventTypeAuthorization: MiddlewareFunction<
   OpenApiMeta,
   CtxWithAuthorizedEntities,
   CtxWithAuthorizedEntities,
-  { eventId: string } | { type: string }
+  { eventId: UUID } | { type: string }
 > = async ({ input, next, ctx }) => {
   let eventType = 'type' in input ? input.type : undefined
 
@@ -193,18 +194,6 @@ export const requireAssignment: MiddlewareFunction<
   ActionInputWithType | DeleteActionInput
 > = async ({ input, next, ctx }) => {
   const event = await getEventById(input.eventId)
-
-  // First check if the action is a duplicate
-  if (
-    'transactionId' in input &&
-    event.actions.some((action) => action.transactionId === input.transactionId)
-  ) {
-    return next({
-      ctx: { ...ctx, isDuplicateAction: true, event },
-      input
-    })
-  }
-
   const { user } = ctx
 
   const assignedTo = getAssignedUserFromActions(
@@ -214,22 +203,34 @@ export const requireAssignment: MiddlewareFunction<
     )
   )
 
-  if (ctx.user.type === TokenUserType.Enum.system) {
-    // System users don't require assignment
-    if (assignedTo) {
-      throw new TRPCError({
-        code: 'CONFLICT',
-        cause: 'System user can not perform action on assigned event'
-      })
-    }
-
-    return next()
-  }
-
-  if (user.id !== assignedTo) {
+  // System users can not perform action on assigned events
+  if (user.type === TokenUserType.Enum.system && assignedTo) {
     throw new TRPCError({
       code: 'CONFLICT',
-      message: JSON.stringify('You are not assigned to this event')
+      cause: 'System user can not perform action on assigned event'
+    })
+  }
+
+  // Normal users require assignment
+  if (user.type === TokenUserType.Enum.user && user.id !== assignedTo) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: 'You are not assigned to this event'
+    })
+  }
+
+  // Check for duplicate only when we know the user is assigned to the event. Otherwise we will effectively leak the event (allow reading it) to users who are not assigned to it.
+  if (
+    'transactionId' in input &&
+    event.actions.some(
+      (action) =>
+        action.transactionId === input.transactionId &&
+        action.type === input.type
+    )
+  ) {
+    return next({
+      ctx: { ...ctx, isDuplicateAction: true, event },
+      input
     })
   }
 

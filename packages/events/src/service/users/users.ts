@@ -26,6 +26,10 @@ export const getUsersById = async (ids: string[]) => {
       name: ResolvedUser['name']
       role: string
       signatureFilename?: string
+      avatar?: {
+        type: string
+        data: string
+      }
     }>('users')
     .find({
       _id: {
@@ -40,6 +44,7 @@ export const getUsersById = async (ids: string[]) => {
     id: user._id.toString(),
     name: user.name,
     role: user.role,
-    signatureFilename: user.signatureFilename
+    signatureFilename: user.signatureFilename,
+    avatarURL: user.avatar?.data.split('/').at(-1)
   }))
 }

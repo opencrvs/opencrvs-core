@@ -11,7 +11,7 @@
 set -e # fail if any of the commands fails
 
 HEARTH_CONFIG=./build/dist/src/migrate-mongo-config-hearth.js
-EVENTS_CONFIG=./build/dist/src/migrate-mongo-config-events.js
+: "${EVENTS_POSTGRES_URL:=postgres://events_migrator:migrator_password@localhost:5432/events}"
 OPENHIM_CONFIG=./build/dist/src/migrate-mongo-config-openhim.js
 APP_CONFIG=./build/dist/src/migrate-mongo-config-application-config.js
 USER_MGNT_CONFIG=./build/dist/src/migrate-mongo-config-user-mgnt.js
@@ -26,8 +26,7 @@ pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $HEARTH_CONFIG
 pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $HEARTH_CONFIG
 
 # events migrations
-pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $EVENTS_CONFIG
-pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $EVENTS_CONFIG
+DATABASE_URL=${EVENTS_POSTGRES_URL} pnpm --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
 
 #openhim migrations
 pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $OPENHIM_CONFIG

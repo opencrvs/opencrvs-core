@@ -12,9 +12,13 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { ActionType, getDeclaration } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -28,15 +32,22 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const intl = useIntl()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
 
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
 
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const formConfig = getDeclaration(config)
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+  const eventIndex = getCurrentEventState(event, configuration)
+
+  const formConfig = getDeclaration(configuration)
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
@@ -62,7 +73,8 @@ export function Review() {
         ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
           fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
@@ -71,13 +83,13 @@ export function Review() {
     return
   }
 
-  const previousFormValues = event.declaration
+  const previousFormValues = eventIndex.declaration
   const valuesHaveChanged = Object.entries(form).some(
     ([key, value]) => previousFormValues[key] !== value
   )
   const intlWithData = useIntlFormatMessageWithFlattenedParams()
 
-  const actionConfig = config.actions.find(
+  const actionConfig = configuration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )
 
@@ -108,7 +120,8 @@ export function Review() {
               ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath(
                 {
                   eventId
-                }
+                },
+                { workqueue: slug }
               )
             )
           }}

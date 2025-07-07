@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { UUID } from '../uuid'
+
 interface IUserName {
   use: string
   family: string
@@ -26,7 +28,7 @@ type User = {
   email: string
   role: ObjectId
   practitionerId: string
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   scope: string[]
   status: string
   creationDate: number

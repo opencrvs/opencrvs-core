@@ -20,12 +20,13 @@ import {
   getTokenPayload,
   getUUID,
   TENNIS_CLUB_MEMBERSHIP,
-  UserRole
+  TestUserRole
 } from '@opencrvs/commons'
 import { AppRouter } from './router'
 import { server } from './server'
 import { mswServer } from './tests/msw'
 import { env } from './environment'
+import { setupTestCase } from './tests/utils'
 
 /**
  * This test suite verifies that the server starts up correctly and handles basic dependencies.
@@ -87,12 +88,13 @@ async function createEvent(token: string) {
 }
 
 test('Server starts up and returns an event based on context dependency values', async () => {
+  const { locations } = await setupTestCase()
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
   const mockUserResponse = {
-    primaryOfficeId: getUUID(),
-    role: UserRole.enum.LOCAL_REGISTRAR,
+    primaryOfficeId: locations[0].id,
+    role: TestUserRole.enum.LOCAL_REGISTRAR,
     signature: '/ocrvs/my-signature.png'
   }
 
@@ -133,6 +135,8 @@ test('Server starts up and returns an event based on context dependency values',
 })
 
 test('Server will accept requests after error', async () => {
+  const { locations } = await setupTestCase()
+
   expect(serverInstance).toBeDefined()
   expect(url).toBeDefined()
 
@@ -152,8 +156,8 @@ test('Server will accept requests after error', async () => {
   mswServer.use(
     http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
       return HttpResponse.json({
-        primaryOfficeId: getUUID(),
-        role: UserRole.enum.LOCAL_REGISTRAR,
+        primaryOfficeId: locations[0].id,
+        role: TestUserRole.enum.LOCAL_REGISTRAR,
         signature: '/ocrvs/my-signature.png'
       })
     })
@@ -185,5 +189,29 @@ test('Throws with malformed token', async () => {
 
   await expect(createEvent('bad-token')).rejects.toMatchObject(
     new TRPCError({ code: 'UNAUTHORIZED' })
+  )
+})
+
+test('UNAUTHORIZED error is thrown when authorization header is missing', async () => {
+  expect(serverInstance).toBeDefined()
+  expect(url).toBeDefined()
+
+  await expect(
+    customClient.event.create.mutate(
+      {
+        transactionId: getUUID(),
+        type: TENNIS_CLUB_MEMBERSHIP
+      },
+      {
+        context: {
+          headers: {}
+        }
+      }
+    )
+  ).rejects.toThrow(
+    new TRPCError({
+      code: 'UNAUTHORIZED',
+      message: 'Authorization token is missing'
+    })
   )
 })

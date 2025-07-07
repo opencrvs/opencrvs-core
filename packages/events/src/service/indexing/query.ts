@@ -9,7 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { estypes } from '@elastic/elasticsearch'
-import { QueryExpression, QueryType } from '@opencrvs/commons/events'
+import {
+  EventConfig,
+  FieldType,
+  getAllUniqueFields,
+  Inferred,
+  QueryExpression,
+  QueryType
+} from '@opencrvs/commons/events'
 import { encodeFieldId } from './utils'
 
 /**
@@ -22,57 +29,91 @@ function generateQuery(
     | { type: 'exact' | 'fuzzy'; term: string }
     | { type: 'anyOf'; terms: string[] }
     | { type: 'range'; gte: string; lte: string }
-  >
+  >,
+  eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
-  const must = Object.entries(event).map(([key, value]) => {
-    const field = `declaration.${encodeFieldId(key)}`
+  const allEventFields = eventConfigs.reduce<Inferred[]>((acc, eventConfig) => {
+    const fields = getAllUniqueFields(eventConfig)
+    return acc.concat(fields)
+  }, [])
 
-    if (value.type === 'exact') {
+  const nameFieldIds = allEventFields
+    .filter((field) => field.type === FieldType.NAME)
+    .map((f) => f.id)
+
+  const must = Object.entries(event).map(([fieldId, search]) => {
+    const field = `declaration.${encodeFieldId(fieldId)}`
+
+    if (search.type === 'exact') {
       return {
         match: {
-          [field]: value.term
+          [field]: search.term
         }
       }
     }
 
-    if (value.type === 'fuzzy') {
+    if (search.type === 'fuzzy') {
+      /**
+       * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
+       * return a match query on the `${field}.__fullname` subfield. This allows Elasticsearch to perform
+       * a fuzzy search on the full name, improving matching for name-related fields (e.g., handling typos or variations).
+       */
+      if (nameFieldIds.includes(fieldId)) {
+        return {
+          match: {
+            [`${field}.__fullname`]: {
+              query: search.term,
+              fuzziness: 'AUTO'
+            }
+          }
+        }
+      }
+
       return {
-        fuzzy: {
+        match: {
           [field]: {
-            value: value.term
+            query: search.term,
+            fuzziness: 'AUTO'
           }
         }
       }
     }
 
-    if (value.type === 'anyOf') {
+    if (search.type === 'anyOf') {
       return {
         terms: {
-          [field]: value.terms
+          [field]: search.terms
         }
       }
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (value.type === 'range') {
+    if (search.type === 'range') {
       return {
         range: {
           [field]: {
-            gte: value.gte,
-            lte: value.lte
+            gte: search.gte,
+            lte: search.lte
           }
         }
       }
     }
 
-    throw new Error(`Unsupported query type: ${value.type}`)
+    throw new Error(`Unsupported query type: ${search.type}`)
   }) satisfies estypes.QueryDslQueryContainer[]
 
   return { bool: { must } } as estypes.QueryDslQueryContainer
 }
 
-function buildClause(clause: QueryExpression) {
+const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
+
+function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   const must: estypes.QueryDslQueryContainer[] = []
+  if (clause.id) {
+    must.push({
+      term: { id: clause.id }
+    })
+  }
 
   if (clause.eventType) {
     must.push({
@@ -103,6 +144,12 @@ function buildClause(clause: QueryExpression) {
   if (clause.createdBy) {
     must.push({
       term: { createdBy: clause.createdBy.term }
+    })
+  }
+
+  if (clause.createdByUserType) {
+    must.push({
+      term: { createdByUserType: clause.createdByUserType }
     })
   }
 
@@ -142,6 +189,15 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
+  if (clause['legalStatus.REGISTERED.registrationNumber']) {
+    must.push({
+      term: {
+        'legalStatuses.REGISTERED.registrationNumber':
+          clause['legalStatus.REGISTERED.registrationNumber'].term
+      }
+    })
+  }
+
   if (clause.createdAt) {
     if (clause.createdAt.type === 'exact') {
       must.push({ term: { createdAt: clause.createdAt.term } })
@@ -178,7 +234,7 @@ function buildClause(clause: QueryExpression) {
     } else {
       must.push({
         geo_distance: {
-          distance: '10km',
+          distance: EXACT_SEARCH_LOCATION_DISTANCE,
           location: clause.createdAtLocation.location
         }
       })
@@ -193,7 +249,7 @@ function buildClause(clause: QueryExpression) {
     } else {
       must.push({
         geo_distance: {
-          distance: '10km',
+          distance: EXACT_SEARCH_LOCATION_DISTANCE,
           location: clause.updatedAtLocation.location
         }
       })
@@ -201,7 +257,7 @@ function buildClause(clause: QueryExpression) {
   }
 
   if (clause.data) {
-    const dataQuery = generateQuery(clause.data)
+    const dataQuery = generateQuery(clause.data, eventConfigs)
     const innerMust = dataQuery.bool?.must
 
     if (Array.isArray(innerMust)) {
@@ -211,13 +267,32 @@ function buildClause(clause: QueryExpression) {
     }
   }
 
+  if (clause.flags) {
+    if (clause.flags.anyOf) {
+      must.push({ terms: { flags: clause.flags.anyOf } })
+    }
+    if (clause.flags.noneOf) {
+      must.push({
+        bool: {
+          must_not: {
+            terms: { flags: clause.flags.noneOf }
+          },
+          should: undefined
+        }
+      })
+    }
+  }
+
   return must
 }
 
 export function buildElasticQueryFromSearchPayload(
-  input: QueryType
+  input: QueryType,
+  eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
-  const must = input.clauses.flatMap((clause) => buildClause(clause))
+  const must = input.clauses.flatMap((clause) =>
+    buildClause(clause, eventConfigs)
+  )
   switch (input.type) {
     case 'and': {
       return {
@@ -232,14 +307,18 @@ export function buildElasticQueryFromSearchPayload(
     case 'or': {
       const should = input.clauses.flatMap((clause) => ({
         bool: {
-          must: buildClause(clause)
+          must: buildClause(clause, eventConfigs),
+          // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
+          // when no `should` clauses are provided.
+          should: undefined
         }
       }))
+
       return {
         bool: {
           should
         }
-      } as estypes.QueryDslQueryContainer
+      }
     }
     // default fallback (shouldn't happen if input is validated correctly)
     default:

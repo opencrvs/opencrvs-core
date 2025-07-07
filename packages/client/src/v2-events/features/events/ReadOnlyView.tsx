@@ -30,21 +30,23 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const [event] = events.getEvent.viewEvent(eventId)
 
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
-  const { eventConfiguration: config } = useEventConfiguration(event.type)
-  const eventStateWithDrafts = useMemo(
-    () =>
-      getCurrentEventStateWithDrafts({ event, drafts, configuration: config }),
-    [drafts, event, config]
+  const drafts = getRemoteDrafts(event.id)
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
   )
 
-  const { title, fields } = getActionReview(config, ActionType.READ)
+  const eventStateWithDrafts = useMemo(
+    () => getCurrentEventStateWithDrafts({ event, drafts, configuration }),
+    [drafts, event, configuration]
+  )
+
+  const { title, fields } = getActionReview(configuration, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
-  const formConfig = getDeclaration(config)
+  const formConfig = getDeclaration(configuration)
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>

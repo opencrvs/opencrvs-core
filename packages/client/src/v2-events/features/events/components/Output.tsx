@@ -32,7 +32,11 @@ import {
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
-  isTextFieldType
+  isTextAreaFieldType,
+  isTextFieldType,
+  isNameFieldType,
+  isIdFieldType,
+  isPhoneFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -51,7 +55,8 @@ import {
   Text
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
-import { DateRangeField } from '../registered-fields/DateRangeField'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -64,7 +69,16 @@ const Deleted = styled.del`
  *  @returns sensible default value for the field type given the field configuration.
  */
 export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
-  if (isEmailFieldType(field) || isTextFieldType(field)) {
+  if (
+    isEmailFieldType(field) ||
+    isIdFieldType(field) ||
+    isPhoneFieldType(field) ||
+    isTextFieldType(field)
+  ) {
+    return Text.Output({ value: field.value })
+  }
+
+  if (isTextAreaFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 
@@ -123,6 +137,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
       options: field.config.options,
       value: field.value
     })
+  }
+
+  if (isNameFieldType(field)) {
+    return Name.Output({ value: field.value })
   }
 
   if (isAdministrativeAreaFieldType(field)) {

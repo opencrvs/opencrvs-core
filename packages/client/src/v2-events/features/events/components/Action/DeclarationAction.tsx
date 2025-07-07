@@ -11,6 +11,7 @@
 
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useNavigate } from 'react-router-dom'
 import {
   createEmptyDraft,
   findActiveDrafts,
@@ -80,24 +81,37 @@ function getPreviousDeclarationActionType(
  * This differs from AnnotationAction, which modify the annotation, and can be triggered multiple times.
  */
 function DeclarationActionComponent({ children, actionType }: Props) {
-  const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
-  const { getEvent } = useEvents()
-
+  const events = useEvents()
+  const navigate = useNavigate()
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
-  const [event] = getEvent.useSuspenseQuery(params.eventId)
+  const event = events.getEvent.findFromCache(eventId).data
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
 
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
 
-  const drafts = getRemoteDrafts()
+  const drafts = getRemoteDrafts(event.id)
   const activeDraft = findActiveDrafts(event, drafts)[0]
   const localDraft = getLocalDraftOrDefault(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft ||
-      createEmptyDraft(params.eventId, createTemporaryId(), actionType)
+    activeDraft || createEmptyDraft(eventId, createTemporaryId(), actionType)
   )
 
   /*

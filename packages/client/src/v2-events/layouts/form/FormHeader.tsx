@@ -14,8 +14,10 @@ import { defineMessages, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { isUndeclaredDraft, TranslationConfig } from '@opencrvs/commons/client'
 import { AppBar, Button, Icon, ToggleMenu } from '@opencrvs/components'
+import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { useEventFormNavigation } from '@client/v2-events//features/events/useEventFormNavigation'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { AllowedRouteWithEventId } from './utils'
 
 const messages = defineMessages({
@@ -51,17 +53,21 @@ export function FormHeader({
     throw new Error('Event id is required')
   }
   const events = useEvents()
-  const event = events.getEventState.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
+  const { eventConfiguration: configuration } = useEventConfiguration(
+    event.type
+  )
+  const eventIndex = getCurrentEventState(event, configuration)
 
   const onExit = useCallback(async () => {
-    await exit(event)
-  }, [event, exit])
+    await exit(eventIndex)
+  }, [eventIndex, exit])
 
   const onDelete = useCallback(async () => {
     await deleteDeclaration(eventId)
   }, [eventId, deleteDeclaration])
 
-  const menuItems = isUndeclaredDraft(event.status)
+  const menuItems = isUndeclaredDraft(eventIndex.status)
     ? [
         {
           label: 'Delete declaration',
@@ -85,7 +91,7 @@ export function FormHeader({
                 type="primary"
                 onClick={onSaveAndExit}
               >
-                <Icon name="DownloadSimple" />
+                <Icon name="FloppyDisk" />
                 {intl.formatMessage(messages.saveExitButton)}
               </Button>
 
@@ -138,7 +144,7 @@ export function FormHeader({
                 type="icon"
                 onClick={onSaveAndExit}
               >
-                <Icon name="DownloadSimple" />
+                <Icon name="FloppyDisk" />
               </Button>
               <Button size="small" type="icon" onClick={onExit}>
                 <Icon name="X" />

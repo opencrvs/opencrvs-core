@@ -75,6 +75,7 @@ function deserializeQueryExpression(
       ...expression.assignedTo,
       term: userDeserializer(expression.assignedTo.term, user)
     },
+    createdByUserType: expression.createdByUserType,
     createdBy: expression.createdBy && {
       ...expression.createdBy,
       term: userDeserializer(expression.createdBy.term, user)
@@ -120,8 +121,10 @@ export function deserializeQuery(
 ): QueryType {
   return {
     ...query,
-    clauses: query.clauses.map((clause) =>
-      deserializeQueryExpression(clause, user)
-    )
+    clauses: query.clauses.map(
+      (clause) => deserializeQueryExpression(clause, user)
+      // SAFETY: This cast should be safe because `query.clauses` has already been validated as non-empty by the Zod schema.
+      // Without the cast, TypeScript cannot infer the tuple type required by the target interface.
+    ) as [QueryExpression, ...QueryExpression[]]
   }
 }

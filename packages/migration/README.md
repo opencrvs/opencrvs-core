@@ -1,23 +1,31 @@
-#### `yarn create:hearth migration-name`
-This will create a new migration named `migration-name` prepended with the current
-timestamp in the migrations/hearth folder.
+# Migrations
 
-#### `yarn create:openhim migration-name`
-This will create a new migration named `migration-name` prepended with the current
-timestamp in the migrations/openhim folder.
+This package migrates data and database schemas between versions.
 
-The created scripts will have 2 functions exported, `up` and
-`down`. We need to write the new migration procedure in the `up` function and a 
-procedure to revert those changes in `down`.
+> [!NOTE]
+> Requires `mongodb` and `postgres` dependencies to be running.
 
-#### `yarn start`
+## Usage
+
+- #### `yarn start`
+
 This will run all the pending migrations.
 
-#### `yarn status:hearth`
-This will show status for the migration scripts defined in the migrations/hearth folder.
+- #### `yarn create:<package> migration-name`
 
-#### `yarn status:openhim`
-This will show status for the migration scripts defined in the migrations/openhim folder.
+e.g. `yarn create:user-mgnt migration-name`
 
-Note: This package requires `mongodb` to be running
+This will create a new migration named `migration-name` prepended with the current
+timestamp in the migrations/<package> folder.
 
+With **Mongo**, the created scripts will have 2 functions exported, `up` and
+`down`. We need to write the new migration procedure in the `up` function and a
+procedure to revert those changes in `down`.
+
+With **Postgres**, it's similar but the migrations are written in SQL instead of TypeScript and they are separated with `-- Up Migration` and `-- Down Migration`.
+
+- #### `yarn status:<package>`
+
+e.g. `yarn status:user-mgnt`
+
+This will show status for the migration scripts defined in the migrations/<package> folder.

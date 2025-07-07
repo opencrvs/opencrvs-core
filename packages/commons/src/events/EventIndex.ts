@@ -10,10 +10,11 @@
  */
 
 import { z, ZodType } from 'zod'
-import { EventMetadata, EventStatusEnum } from './EventMetadata'
+import { EventMetadata, EventStatus, Flag } from './EventMetadata'
 import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
+import { TokenUserType } from '../authentication'
 extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
@@ -41,11 +42,22 @@ export const Fuzzy = z
   .openapi({
     ref: 'Fuzzy'
   })
+
 export const Exact = z
   .object({ type: z.literal('exact'), term: z.string() })
   .openapi({
     ref: 'Exact'
   })
+
+export const ExactStatus = z
+  .object({
+    type: z.literal('exact'),
+    term: EventStatus
+  })
+  .openapi({
+    ref: 'ExactStatus'
+  })
+
 export const AnyOf = z
   .object({
     type: z.literal('anyOf'),
@@ -55,19 +67,10 @@ export const AnyOf = z
     ref: 'AnyOf'
   })
 
-export const ExactStatus = z
-  .object({
-    type: z.literal('exact'),
-    term: EventStatusEnum
-  })
-  .openapi({
-    ref: 'ExactStatus'
-  })
-
 export const AnyOfStatus = z
   .object({
     type: z.literal('anyOf'),
-    terms: z.array(EventStatusEnum)
+    terms: z.array(EventStatus)
   })
   .openapi({
     ref: 'AnyOfStatus'
@@ -82,10 +85,14 @@ export const Range = z
   .openapi({
     ref: 'Range'
   })
-export const Not = z
-  .object({ type: z.literal('not'), term: z.string() })
+
+export const ContainsFlags = z
+  .object({
+    anyOf: z.array(Flag).optional(),
+    noneOf: z.array(Flag).optional()
+  })
   .openapi({
-    ref: 'Not'
+    ref: 'ContainsFlags'
   })
 
 export const Within = z
@@ -94,7 +101,20 @@ export const Within = z
     ref: 'Within'
   })
 
-export const DateCondition = z.union([Exact, Range]).openapi({
+export const RangeDate = Range.extend({
+  gte: z.string().date().or(z.string().datetime()),
+  lte: z.string().date().or(z.string().datetime())
+}).openapi({
+  ref: 'RangeDate'
+})
+
+export const ExactDate = Exact.extend({
+  term: z.string().date().or(z.string().datetime())
+}).openapi({
+  ref: 'ExactDate'
+})
+
+export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
   ref: 'DateCondition'
 })
 
@@ -103,7 +123,7 @@ export const DateCondition = z.union([Exact, Range]).openapi({
 export const QueryInput: ZodType = z
   .lazy(() =>
     z.union([
-      z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf, Not]),
+      z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf]),
       z.record(z.string(), QueryInput)
     ])
   )
@@ -116,7 +136,6 @@ export type BaseInput =
   | z.infer<typeof Range>
   | z.infer<typeof Within>
   | z.infer<typeof AnyOf>
-  | z.infer<typeof Not>
 
 type QueryMap = {
   [key: string]: BaseInput | QueryMap
@@ -128,6 +147,7 @@ export type QueryInputType = BaseInput | QueryMap
 
 export const QueryExpression = z
   .object({
+    id: z.optional(z.string()),
     eventType: z.string(),
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
@@ -136,16 +156,21 @@ export const QueryExpression = z
     'legalStatus.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
+    'legalStatus.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
+    createdByUserType: TokenUserType,
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
-    flags: z.optional(z.array(z.union([AnyOf, Not]))),
+    flags: z.optional(ContainsFlags),
     data: QueryInput
   })
   .partial()
+  .refine((obj) => Object.values(obj).some((val) => val !== undefined), {
+    message: 'At least one query field must be specified.'
+  })
   .openapi({
     ref: 'QueryExpression'
   })
@@ -172,32 +197,26 @@ export const QueryType = z
 
         // This preprocessing ensures consistent handling of `clauses` regardless of how the client submits the data.
       },
-      z.array(QueryExpression).openapi({
-        default: [
-          {
-            eventType: TENNIS_CLUB_MEMBERSHIP,
-            status: {
-              type: 'anyOf',
-              terms: [
-                'CREATED',
-                'NOTIFIED',
-                'DECLARED',
-                'VALIDATED',
-                'REGISTERED',
-                'CERTIFIED',
-                'REJECTED',
-                'ARCHIVED'
-              ]
-            },
-            updatedAt: {
-              type: 'range',
-              gte: '2025-05-22',
-              lte: '2025-05-29'
-            },
-            data: {}
-          }
-        ]
-      })
+      z
+        .array(QueryExpression)
+        .nonempty('At least one clause is required.')
+        .openapi({
+          default: [
+            {
+              eventType: TENNIS_CLUB_MEMBERSHIP,
+              status: {
+                type: 'anyOf',
+                terms: EventStatus.options
+              },
+              updatedAt: {
+                type: 'range',
+                gte: '2025-05-22',
+                lte: '2025-05-29'
+              },
+              data: {}
+            }
+          ]
+        })
     )
   })
   .openapi({

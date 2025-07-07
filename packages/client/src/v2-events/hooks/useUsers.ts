@@ -10,7 +10,8 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
+import { User } from '@opencrvs/commons/client'
+import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
@@ -31,10 +32,11 @@ setQueryDefaults(trpcOptionsProxy.user.get, {
 
     if (user.signatureFilename) {
       await precacheFile(user.signatureFilename)
-      return {
-        ...user,
-        signatureFilename: getUnsignedFileUrl(user.signatureFilename)
-      }
+      user.signatureFilename = getUnsignedFileUrl(user.signatureFilename)
+    }
+    if (user.avatarURL) {
+      await precacheFile(user.avatarURL)
+      user.avatarURL = getUnsignedFileUrl(user.avatarURL)
     }
 
     return user
@@ -60,6 +62,9 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
         if (user.signatureFilename) {
           return precacheFile(user.signatureFilename)
         }
+        if (user.avatarURL) {
+          return precacheFile(user.avatarURL)
+        }
         return user
       })
     )
@@ -77,9 +82,15 @@ export function useUsers() {
   const trpc = useTRPC()
   return {
     getUser: {
-      useQuery: (id: string) => {
-        const { queryFn, ...options } = trpc.user.get.queryOptions(id)
+      useQuery: (
+        id: string,
+        options?: {
+          enabled?: boolean
+        }
+      ) => {
+        const { queryFn, ...queryOptions } = trpc.user.get.queryOptions(id)
         return useQuery({
+          ...queryOptions,
           ...options,
           queryKey: trpc.user.get.queryKey(id)
         })
@@ -92,6 +103,14 @@ export function useUsers() {
             queryKey: trpc.user.get.queryKey(id)
           }).data
         ]
+      },
+      getAllCached: () => {
+        return queryClient
+          .getQueriesData<User>({
+            queryKey: trpc.user.get.queryKey()
+          })
+          .flatMap(([, data]) => data)
+          .filter((user): user is User => Boolean(user))
       }
     },
     getUsers: {

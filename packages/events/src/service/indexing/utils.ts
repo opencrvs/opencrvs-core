@@ -8,7 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventIndex } from '@opencrvs/commons/events'
+import _ from 'lodash'
+import {
+  EventConfig,
+  EventIndex,
+  FieldValue,
+  getDeclarationFieldById,
+  isNameFieldType,
+  NameFieldValue
+} from '@opencrvs/commons/events'
 
 export type EncodedEventIndex = EventIndex
 export const FIELD_ID_SEPARATOR = '____'
@@ -21,30 +29,103 @@ function decodeFieldId(fieldId: string) {
   return fieldId.replaceAll(FIELD_ID_SEPARATOR, '.')
 }
 
+type IndexedNameFieldValue = BaseNameFieldValue & {
+  __fullname?: string
+}
+
+type BaseNameFieldValue = Exclude<NameFieldValue, undefined>
+
 export const DEFAULT_SIZE = 10000
 
-export function encodeEventIndex(event: EventIndex): EncodedEventIndex {
+function addIndexFieldsToValue(
+  eventConfig: EventConfig,
+  fieldId: string,
+  value: FieldValue
+) {
+  const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
+
+  if (isNameFieldType(field)) {
+    return {
+      ...field.value,
+      __fullname: Object.values(field.value).join(' ')
+    } satisfies IndexedNameFieldValue
+  }
+
+  return value
+}
+
+export function encodeEventIndex(
+  event: EventIndex,
+  eventConfig: EventConfig
+): EncodedEventIndex {
   return {
     ...event,
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [encodeFieldId(key)]: value
+        [encodeFieldId(key)]: addIndexFieldsToValue(eventConfig, key, value)
       }),
       {}
     )
   }
 }
 
-export function decodeEventIndex(event: EncodedEventIndex): EventIndex {
+function isIndexedNameFieldValue(
+  value: FieldValue
+): value is IndexedNameFieldValue {
+  return (
+    typeof value === 'object' &&
+    value !== null &&
+    '__fullname' in value &&
+    typeof (value as IndexedNameFieldValue).__fullname === 'string'
+  )
+}
+
+function stripIndexFieldsFromValue(
+  eventConfig: EventConfig,
+  fieldId: string,
+  value: FieldValue
+) {
+  const field = { config: getDeclarationFieldById(eventConfig, fieldId), value }
+
+  if (isIndexedNameFieldValue(field.value)) {
+    return _.omit(field.value, ['__fullname'])
+  }
+
+  return value
+}
+
+export function decodeEventIndex(
+  eventConfig: EventConfig,
+  event: EncodedEventIndex
+): EventIndex {
   return {
     ...event,
     declaration: Object.entries(event.declaration).reduce(
       (acc, [key, value]) => ({
         ...acc,
-        [decodeFieldId(key)]: value
+        [decodeFieldId(key)]: stripIndexFieldsFromValue(
+          eventConfig,
+          decodeFieldId(key),
+          value
+        )
       }),
       {}
+    )
+  }
+}
+
+export function removeSecuredFields(
+  eventConfig: EventConfig,
+  event: EventIndex
+): EventIndex {
+  return {
+    ...event,
+    declaration: Object.fromEntries(
+      Object.entries(event.declaration).filter(
+        ([fieldId]) =>
+          getDeclarationFieldById(eventConfig, fieldId).secured !== true
+      )
     )
   }
 }

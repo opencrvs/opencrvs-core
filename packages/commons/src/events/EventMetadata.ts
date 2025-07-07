@@ -13,40 +13,33 @@ import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { ActionStatus } from './ActionDocument'
+import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
 
 /**
  * Event statuses recognized by the system
  */
-export const EventStatus = {
-  CREATED: 'CREATED',
-  NOTIFIED: 'NOTIFIED',
-  DECLARED: 'DECLARED',
-  VALIDATED: 'VALIDATED',
-  REGISTERED: 'REGISTERED',
-  CERTIFIED: 'CERTIFIED',
-  REJECTED: 'REJECTED',
-  ARCHIVED: 'ARCHIVED'
+export const EventStatus = z.enum([
+  'CREATED',
+  'NOTIFIED',
+  'DECLARED',
+  'VALIDATED',
+  'REGISTERED',
+  'CERTIFIED',
+  'REJECTED',
+  'ARCHIVED'
+])
+
+export type EventStatus = z.infer<typeof EventStatus>
+
+export const InherentFlags = {
+  PRINTED: 'printed',
+  INCOMPLETE: 'incomplete',
+  REJECTED: 'rejected',
+  CORRECTION_REQUESTED: 'correction-requested'
 } as const
-export type EventStatus = (typeof EventStatus)[keyof typeof EventStatus]
 
-const eventStatusValues = [
-  EventStatus.CREATED,
-  EventStatus.NOTIFIED,
-  EventStatus.DECLARED,
-  EventStatus.VALIDATED,
-  EventStatus.REGISTERED,
-  EventStatus.CERTIFIED,
-  EventStatus.REJECTED,
-  EventStatus.ARCHIVED
-] as const
-
-export const EventStatusEnum = z.enum(eventStatusValues)
-
-export const CustomFlags = {
-  CERTIFICATE_PRINTED: 'certificate-printed'
-} as const
-export type CustomFlags = (typeof CustomFlags)[keyof typeof CustomFlags]
+export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
 export const Flag = z
   .string()
@@ -60,12 +53,9 @@ export const Flag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-  .or(z.nativeEnum(CustomFlags))
+  .or(z.nativeEnum(InherentFlags))
 
 export type Flag = z.infer<typeof Flag>
-
-export const eventStatuses = Object.values(EventStatus)
-export const EventStatuses = z.nativeEnum(EventStatus)
 
 export const ZodDate = z.string().date()
 
@@ -80,6 +70,10 @@ export const ActionCreationMetadata = z.object({
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the action request.'
   ),
+  createdByUserType: z
+    .enum(['user', 'system'])
+    .nullish()
+    .describe('Whether the user is a normal user or a system.'),
   acceptedAt: z
     .string()
     .datetime()
@@ -109,8 +103,8 @@ export type RegistrationCreationMetadata = z.infer<
 
 // @TODO: In the future REVOKE should be added to the list of statuses
 export const LegalStatuses = z.object({
-  [EventStatus.DECLARED]: ActionCreationMetadata.nullish(),
-  [EventStatus.REGISTERED]: RegistrationCreationMetadata.nullish()
+  [EventStatus.enum.DECLARED]: ActionCreationMetadata.nullish(),
+  [EventStatus.enum.REGISTERED]: RegistrationCreationMetadata.nullish()
 })
 
 /**
@@ -119,11 +113,11 @@ export const LegalStatuses = z.object({
  * Accessed through `event.` in configuration.
  */
 export const EventMetadata = z.object({
-  id: z.string(),
+  id: UUID,
   type: z
     .string()
     .describe('The type of event, such as birth, death, or marriage.'),
-  status: EventStatuses,
+  status: EventStatus,
   legalStatuses: LegalStatuses.describe(
     'Metadata related to the legal registration of the event, such as who registered it and when.'
   ),
@@ -133,9 +127,13 @@ export const EventMetadata = z.object({
     .describe('The timestamp when the event was first created and saved.'),
   dateOfEvent: ZodDate.nullish(),
   createdBy: z.string().describe('ID of the user who created the event.'),
+  createdByUserType: z
+    .enum(['user', 'system'])
+    .nullish()
+    .describe('Whether the user is a normal user or a system.'),
   updatedByUserRole: z
     .string()
-    .describe('Role of the user who last updated the declaration.'),
+    .describe('Role of the user who last changed the status.'),
   createdAtLocation: CreatedAtLocation.describe(
     'Location of the user who created the event.'
   ),
@@ -143,14 +141,15 @@ export const EventMetadata = z.object({
     .string()
     .nullish()
     .describe('Signature of the user who created the event.'),
-  updatedAtLocation: z
-    .string()
-    .nullish()
-    .describe('Location of the user who last updated the declaration.'),
+  updatedAtLocation: UUID.nullish().describe(
+    'Location of the user who last changed the status.'
+  ),
   updatedAt: z
     .string()
     .datetime()
-    .describe('Timestamp of the most recent declaration update.'),
+    .describe(
+      'Timestamp of the most recent *accepted* status change. Possibly 3rd party update, if action is validation asynchronously.'
+    ),
   assignedTo: z
     .string()
     .nullish()
@@ -158,7 +157,7 @@ export const EventMetadata = z.object({
   updatedBy: z
     .string()
     .nullish()
-    .describe('ID of the user who last updated the declaration.'),
+    .describe('ID of the user who last changed the status.'),
   trackingId: z
     .string()
     .describe(
@@ -176,6 +175,7 @@ export const EventMetadataKeysArray = [
   'createdAt',
   'dateOfEvent',
   'createdBy',
+  'createdByUserType',
   'updatedByUserRole',
   'createdAtLocation',
   'updatedAtLocation',
@@ -208,6 +208,11 @@ export const eventMetadataLabelMap: Record<
     id: 'event.createdAt.label',
     defaultMessage: 'Created',
     description: 'Created At'
+  },
+  'event.createdByUserType': {
+    id: 'event.createdByUserType.label',
+    defaultMessage: 'createdByUserType',
+    description: 'createdByUserType:user or system'
   },
   'event.dateOfEvent': {
     id: 'event.dateOfEvent.label',

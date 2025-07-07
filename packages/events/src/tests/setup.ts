@@ -9,17 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { inject, vi } from 'vitest'
+import { Client } from 'pg'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { getDeclarationFields } from '@opencrvs/commons/events'
-import { resetServer as resetEventsMongoServer } from '@events/storage/mongodb/__mocks__/events'
+import {
+  resetServer as resetEventsPostgresServer,
+  getPool
+} from '@events/storage/postgres/events'
 import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
 
 import { createIndex } from '@events/service/indexing/indexing'
 import { mswServer } from './msw'
+import { createDatabase, initializeSchemaAccess, migrate } from './postgres'
 
-vi.mock('@events/storage/mongodb/events')
 vi.mock('@events/storage/mongodb/user-mgnt')
-
 vi.mock('@events/storage/elasticsearch')
 
 async function resetESServer() {
@@ -33,9 +36,33 @@ async function resetESServer() {
   await createIndex(index, getDeclarationFields(tennisClubMembershipEvent))
 }
 
+async function resetPostgresServer() {
+  const targetDb = `events_${Date.now()}_${Math.random()}`
+
+  const EVENTS_APP_POSTGRES_URI = `postgres://events_app:app_password@${inject('POSTGRES_URI')}/${targetDb}`
+
+  const clusterInitializer = new Client({
+    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/postgres`
+  })
+  await clusterInitializer.connect()
+  await createDatabase(clusterInitializer, targetDb)
+  await clusterInitializer.end()
+
+  const databaseInitializer = new Client({
+    connectionString: `postgres://postgres:postgres@${inject('POSTGRES_URI')}/${targetDb}`
+  })
+  await databaseInitializer.connect()
+  await migrate(databaseInitializer)
+  await initializeSchemaAccess(databaseInitializer)
+  await databaseInitializer.end()
+
+  resetEventsPostgresServer()
+  getPool(EVENTS_APP_POSTGRES_URI)
+}
+
 beforeEach(async () =>
   Promise.all([
-    resetEventsMongoServer(),
+    resetPostgresServer(),
     resetUserMgntMongoServer(),
     resetESServer()
   ])
@@ -54,5 +81,7 @@ beforeAll(() =>
     }
   })
 )
-afterEach(() => mswServer.resetHandlers())
+afterEach(() => {
+  mswServer.resetHandlers()
+})
 afterAll(() => mswServer.close())

@@ -19,90 +19,46 @@ import {
 } from '../ActionDocument'
 import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
-import { CustomFlags, EventStatus, Flag, ZodDate } from '../EventMetadata'
+import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
 import { deepMerge, findActiveDrafts } from '../utils'
-import { getDeclarationActionUpdateMetadata, getLegalStatuses } from './utils'
+import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
+import { getFlagsFromActions } from './flags'
+import { UUID } from '../../uuid'
 
 export function getStatusFromActions(actions: Array<Action>) {
-  // If the event has any rejected action, we consider the event to be rejected.
-  const hasRejectedAction = actions.some(
-    (a) => a.status === ActionStatus.Rejected
-  )
-
-  if (hasRejectedAction) {
-    return EventStatus.REJECTED
-  }
-
-  return actions.reduce<EventStatus>((status, action) => {
-    switch (action.type) {
-      case ActionType.CREATE:
-        return EventStatus.CREATED
-      case ActionType.DECLARE:
-        return EventStatus.DECLARED
-      case ActionType.VALIDATE:
-        return EventStatus.VALIDATED
-      case ActionType.REGISTER:
-        return EventStatus.REGISTERED
-      case ActionType.REJECT:
-        return EventStatus.REJECTED
-      case ActionType.ARCHIVE:
-        return EventStatus.ARCHIVED
-      case ActionType.NOTIFY:
-        return EventStatus.NOTIFIED
-      case ActionType.PRINT_CERTIFICATE:
-        return EventStatus.CERTIFIED
-      case ActionType.ASSIGN:
-      case ActionType.UNASSIGN:
-      case ActionType.REQUEST_CORRECTION:
-      case ActionType.APPROVE_CORRECTION:
-      case ActionType.MARKED_AS_DUPLICATE:
-      case ActionType.REJECT_CORRECTION:
-      case ActionType.READ:
-      default:
-        return status
-    }
-  }, EventStatus.CREATED)
-}
-
-function getFlagsFromActions(actions: Action[]): Flag[] {
-  const sortedactions = actions.sort((a, b) =>
-    a.createdAt.localeCompare(b.createdAt)
-  )
-  const actionStatus = sortedactions.reduce(
-    (actionStatuses, { type, status }) => ({
-      ...actionStatuses,
-      [type]: status
-    }),
-    {} as Record<ActionType, ActionStatus>
-  )
-
-  const flags = Object.entries(actionStatus)
-    .filter(([, status]) => status !== ActionStatus.Accepted)
-    .map(([type, status]) => {
-      const flag = `${type.toLowerCase()}:${status.toLowerCase()}`
-      return flag satisfies Flag
-    })
-
-  const isCertificatePrinted = sortedactions.reduce<boolean>(
-    (prev, { type }) => {
-      if (type === ActionType.PRINT_CERTIFICATE) {
-        return true
+  return actions
+    .filter(({ status }) => status === ActionStatus.Accepted)
+    .reduce<EventStatus>((status, action) => {
+      switch (action.type) {
+        case ActionType.CREATE:
+          return EventStatus.enum.CREATED
+        case ActionType.DECLARE:
+          return EventStatus.enum.DECLARED
+        case ActionType.VALIDATE:
+          return EventStatus.enum.VALIDATED
+        case ActionType.REGISTER:
+          return EventStatus.enum.REGISTERED
+        case ActionType.REJECT:
+          return EventStatus.enum.REJECTED
+        case ActionType.ARCHIVE:
+          return EventStatus.enum.ARCHIVED
+        case ActionType.NOTIFY:
+          return EventStatus.enum.NOTIFIED
+        case ActionType.PRINT_CERTIFICATE:
+          return EventStatus.enum.CERTIFIED
+        case ActionType.ASSIGN:
+        case ActionType.UNASSIGN:
+        case ActionType.REQUEST_CORRECTION:
+        case ActionType.APPROVE_CORRECTION:
+        case ActionType.MARKED_AS_DUPLICATE:
+        case ActionType.REJECT_CORRECTION:
+        case ActionType.READ:
+        default:
+          return status
       }
-      if (type === ActionType.APPROVE_CORRECTION) {
-        return false
-      }
-      return prev
-    },
-    false
-  )
-
-  if (isCertificatePrinted) {
-    flags.push(CustomFlags.CERTIFICATE_PRINTED)
-  }
-
-  return flags
+    }, EventStatus.enum.CREATED)
 }
 
 export function getAssignedUserFromActions(actions: Array<ActionDocument>) {
@@ -172,11 +128,13 @@ function aggregateActionDeclarations(
 
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-  : T extends (infer U)[]
-    ? NonNullableDeep<U>[]
-    : T extends object
-      ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-      : NonNullable<T>
+  : T extends UUID
+    ? T
+    : T extends (infer U)[]
+      ? NonNullableDeep<U>[]
+      : T extends object
+        ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+        : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values
@@ -205,7 +163,7 @@ export function deepDropNulls<T>(obj: T): NonNullableDeep<T> {
 }
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
-  return status === EventStatus.CREATED
+  return status === EventStatus.enum.CREATED
 }
 export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(
@@ -232,11 +190,15 @@ export function getCurrentEventState(
     throw new Error(`Event ${event.id} has no creation action`)
   }
 
-  const acceptedActions = getAcceptedActions(event)
-
-  const declarationUpdateMetadata = getDeclarationActionUpdateMetadata(
-    event.actions
+  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
   )
+
+  // Includes the metadata of the last action. Whether it was a 'request' by user or 'accept' by user or 3rd party.
+  const requestActionMetadata = getActionUpdateMetadata(event.actions)
+
+  // Includes only accepted actions metadata. Sometimes (e.g. on updatedAt) we want to show the accepted timestamp rather than the request timestamp.
+  const acceptedActionMetadata = getActionUpdateMetadata(acceptedActions)
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
@@ -252,6 +214,7 @@ export function getCurrentEventState(
   } else {
     dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
   }
+
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -259,16 +222,17 @@ export function getCurrentEventState(
     legalStatuses: getLegalStatuses(event.actions),
     createdAt: creationAction.createdAt,
     createdBy: creationAction.createdBy,
+    createdByUserType: creationAction.createdByUserType,
     createdAtLocation: creationAction.createdAtLocation,
     createdBySignature: creationAction.createdBySignature,
-    updatedAt: declarationUpdateMetadata.createdAt,
+    updatedAt: acceptedActionMetadata.createdAt,
     assignedTo: getAssignedUserFromActions(acceptedActions),
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
-    updatedBy: declarationUpdateMetadata.createdBy,
-    updatedAtLocation: declarationUpdateMetadata.createdAtLocation,
+    updatedBy: requestActionMetadata.createdBy,
+    updatedAtLocation: requestActionMetadata.createdAtLocation,
     declaration,
     trackingId: event.trackingId,
-    updatedByUserRole: declarationUpdateMetadata.createdByRole,
+    updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent,
     flags: getFlagsFromActions(event.actions)
   })

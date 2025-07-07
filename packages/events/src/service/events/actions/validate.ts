@@ -16,7 +16,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 
-import { getUUID } from '@opencrvs/commons'
+import { getUUID, UUID } from '@opencrvs/commons'
 import { getEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
@@ -29,7 +29,7 @@ export async function validate(
     user,
     token
   }: {
-    eventId: string
+    eventId: UUID
     user: TrpcUserContext
     token: string
   }
@@ -46,10 +46,13 @@ export async function validate(
 
   let duplicates: EventIndex[] = []
 
-  const createdBy = user.id
-  const createdByRole = user.role
-  const createdAtLocation = user.primaryOfficeId
-  const createdBySignature = user.signature
+  const createdByDetails = {
+    createdBy: user.id,
+    createdByUserType: user.type,
+    createdByRole: user.role,
+    createdAtLocation: user.primaryOfficeId,
+    createdBySignature: user.signature
+  }
 
   const futureEventState = getCurrentEventState(
     {
@@ -58,12 +61,9 @@ export async function validate(
         ...storedEvent.actions,
         {
           ...input,
+          ...createdByDetails,
           createdAt: new Date().toISOString(),
-          createdBy,
-          createdByRole,
-          createdBySignature,
           id: getUUID(),
-          createdAtLocation,
           status: ActionStatus.Accepted
         }
       ]
@@ -73,7 +73,11 @@ export async function validate(
 
   const resultsFromAllRules = await Promise.all(
     config.deduplication.map(async (deduplication) => {
-      const matches = await searchForDuplicates(futureEventState, deduplication)
+      const matches = await searchForDuplicates(
+        futureEventState,
+        deduplication,
+        config
+      )
       return matches
     })
   )

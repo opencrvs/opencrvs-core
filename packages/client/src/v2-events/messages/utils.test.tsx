@@ -21,7 +21,7 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
       'test.nested': 'Your order {order.id} is confirmed.',
       'test.missing': 'This should not be missing.',
       'test.select':
-        '{applicant.firstname, select, __EMPTY__ {Hello} other {{applicant.surname, select, __EMPTY__ {Hello} other {Hello to {applicant.firstname} {applicant.surname}}}}}'
+        '{applicant.name.firstname, select, __EMPTY__ {Hello} other {{applicant.name.surname, select, __EMPTY__ {Hello} other {Hello to {applicant.name.firstname} {applicant.name.surname}}}}}'
     }
 
     function renderUseIntlHook() {
@@ -89,8 +89,10 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
         const { result } = renderUseIntlHook()
 
         const formattedMessage = result.current.formatMessage(message, {
-          'applicant.firstname': null,
-          'applicant.surname': null
+          'applicant.name': {
+            firstname: null,
+            surname: null
+          }
         })
 
         expect(formattedMessage).toBe('Hello')
@@ -106,8 +108,10 @@ describe('useIntlFormatMessageWithFlattenedParams', () => {
         const { result } = renderUseIntlHook()
 
         const formattedMessage = result.current.formatMessage(message, {
-          'applicant.firstname': 'John',
-          'applicant.surname': 'Doe'
+          'applicant.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          }
         })
 
         expect(formattedMessage).toBe('Hello to John Doe')

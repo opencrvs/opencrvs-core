@@ -12,14 +12,15 @@
 import { z } from 'zod'
 import { SerializedUserField } from './serializers/user/serializer'
 import {
-  AnyOf,
   AnyOfStatus,
+  ContainsFlags,
   DateCondition,
   Exact,
   ExactStatus,
-  Not,
-  QueryInput
+  QueryInput,
+  Within
 } from './EventIndex'
+import { TokenUserType } from '../authentication'
 
 const SerializableExact = z.object({
   type: z.literal('exact'),
@@ -37,6 +38,11 @@ export const SerializedQueryExpression = z
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
+    'legalStatus.REGISTERED.createdAt': z.optional(DateCondition),
+    'legalStatus.REGISTERED.createdAtLocation': z.optional(
+      z.union([Within, Exact])
+    ),
+    'legalStatus.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(
       z.union([SerializableWithin, SerializableExact])
     ),
@@ -45,9 +51,10 @@ export const SerializedQueryExpression = z
     ),
     assignedTo: z.optional(SerializableExact),
     createdBy: z.optional(SerializableExact),
+    createdByUserType: TokenUserType,
     updatedBy: z.optional(SerializableExact),
     trackingId: z.optional(Exact),
-    flags: z.optional(z.array(z.union([AnyOf, Not]))),
+    flags: z.optional(ContainsFlags),
     data: QueryInput
   })
   .partial()
