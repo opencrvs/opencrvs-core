@@ -178,6 +178,26 @@ export function generateQueryForAddressField(
         match: { [`${fieldId}.district`]: value.district }
       })
     }
+    if (value.urbanOrRural === 'URBAN' && value.town) {
+      mustMatches.push({
+        match: {
+          [`${fieldId}.town`]: {
+            query: value.town,
+            fuzziness: 'AUTO'
+          }
+        }
+      })
+    }
+    if (value.urbanOrRural === 'RURAL' && value.village) {
+      mustMatches.push({
+        match: {
+          [`${fieldId}.village`]: {
+            query: value.village,
+            fuzziness: 'AUTO'
+          }
+        }
+      })
+    }
   } else {
     if (value.state) {
       mustMatches.push({

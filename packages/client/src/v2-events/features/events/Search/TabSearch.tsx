@@ -77,6 +77,14 @@ function enhanceFieldWithSearchFieldConfig(
       defaultValue: undefined
     }
   }
+  if (field.type === FieldType.ADDRESS) {
+    return {
+      ...field,
+      configuration: {
+        searchMode: true
+      }
+    }
+  }
   return field
 }
 

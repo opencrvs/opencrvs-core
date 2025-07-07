@@ -414,7 +414,12 @@ export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
-  defaultValue: AddressFieldValue.optional()
+  defaultValue: AddressFieldValue.optional(),
+  configuration: z
+    .object({
+      searchMode: z.boolean().optional()
+    })
+    .optional()
 }).describe('Address input field – a combination of location and text fields')
 
 export const DataEntry = z.union([

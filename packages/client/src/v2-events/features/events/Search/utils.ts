@@ -426,7 +426,12 @@ export function getSearchParamsFieldConfigs(
   const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
     ([, value]) => getDefaultSearchFields(value)
   )
-  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig).map((x) => {
+    if (x.type === FieldType.ADDRESS) {
+      return { ...x, configuration: { searchMode: true } }
+    }
+    return x
+  })
   const searchFieldConfigs = [
     ...eventFieldConfigs,
     ...declarationFieldConfigs
