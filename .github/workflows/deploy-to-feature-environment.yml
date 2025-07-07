@@ -139,7 +139,7 @@ jobs:
                 .trim()
                 .replace(/\s+/g, '-')
                 .replace(/-+/g, '-')
-                .substr(0, 35)
+                .substr(0, 30)
                 .replace(/[^a-zA-Z0-9]+$/g, '');
             }
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
