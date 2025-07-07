@@ -20,7 +20,6 @@ import {
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { getTaskEventType } from '@workflow/features/task/fhir/utils'
-import fetch from 'node-fetch'
 import * as ShortUIDGen from 'short-uid'
 
 export async function generateTrackingIdForEvents(

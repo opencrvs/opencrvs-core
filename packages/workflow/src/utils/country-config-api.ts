@@ -11,7 +11,6 @@
 import { logger } from '@opencrvs/commons'
 import { Bundle, EVENT_TYPE, Saved, ValidRecord } from '@opencrvs/commons/types'
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 
 const ACTION_NOTIFY_URL = (event: EVENT_TYPE, action: string) =>
   new URL(`events/${event}/actions/${action}`, COUNTRY_CONFIG_URL)
