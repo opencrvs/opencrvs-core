@@ -11,8 +11,9 @@
  */
 
 import { parse as parseQuery, stringify } from 'query-string'
-
 import { isArray, isNil, isPlainObject, isString, partition } from 'lodash'
+import addDays from 'date-fns/addDays'
+import format from 'date-fns/format'
 import {
   EventConfig,
   FieldConfig,
@@ -105,7 +106,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.registeredAtLocation.helperText'
     }
   }),
-  [EventFieldId.enum['legalStatuses.REGISTERED.acceptedAt']]: (_) => ({
+  'legalStatuses.REGISTERED.acceptedAt': (_) => ({
     id: 'event.legalStatuses.REGISTERED.acceptedAt',
     type: FieldType.DATE_RANGE,
     label: {
@@ -245,37 +246,38 @@ export function toAdvancedSearchQueryType(
   }
 }
 
-// @TODO: Previously this assumed that the value is always a string.
-// Since it is not the case anymore, we need to make sure rest of the cases are handled.
-// Might be that we could do everything in the function that calls this.
 function buildSearchClause(
-  value: string | DateRangeFieldValue,
-  config: { type: keyof typeof MatchType } = {
-    type: 'exact'
-  }
+  value: string,
+  type: keyof typeof MatchType = 'exact'
 ): Condition {
-  if (typeof value === 'string') {
-    switch (config.type) {
-      case MatchType.fuzzy:
-        return { type: 'fuzzy', term: value }
-      case MatchType.exact:
-        return { type: 'exact', term: value }
-      case MatchType.anyOf:
-        return { type: 'anyOf', terms: value.split(',') }
-      case MatchType.range:
-        const [gte, lte] = value.split(',')
-        return { type: 'range', gte, lte }
-      default:
-        return { type: 'exact', term: value } // Fallback to exact match
-    }
+  switch (type) {
+    case MatchType.fuzzy:
+      return { type: 'fuzzy', term: value }
+    case MatchType.exact:
+      return { type: 'exact', term: value }
+    case MatchType.anyOf:
+      return { type: 'anyOf', terms: value.split(',') }
+    case MatchType.range:
+      const [gte, lte] = value.split(',')
+      return { type: 'range', gte, lte }
+    default:
+      return { type: 'exact', term: value } // Fallback to exact match
   }
+}
 
-  // @TODO: Write better check
-  return {
-    type: 'range',
-    gte: value.start,
-    lte: value.end
+function toRangeDateString(value: DateRangeFieldValue): string {
+  const parsedValue = DateRangeFieldValue.parse(value)
+  if (typeof parsedValue === 'string') {
+    const [year, month, day] = parsedValue.split('-')
+    const date = new Date(
+      Date.UTC(Number(year), Number(month) - 1, Number(day))
+    )
+    const nextDate = addDays(date, 1)
+    const dateString = format(date, 'yyyy-MM-dd')
+    const nextDateString = format(nextDate, 'yyyy-MM-dd')
+    return `${dateString},${nextDateString}`
   }
+  return `${parsedValue.start},${parsedValue.end}`
 }
 
 function buildConditionForStatus(): Condition {
@@ -334,8 +336,8 @@ function buildSearchQueryFields(
         return {
           ...result,
           [transformedKey]: buildSearchClause(
-            DateRangeFieldValue.parse(value),
-            config.config
+            toRangeDateString(DateRangeFieldValue.parse(value)),
+            'range'
           )
         }
       }
@@ -348,7 +350,7 @@ function buildSearchQueryFields(
             ...result,
             [transformedKey]: buildSearchClause(
               Name.stringify(parsedName.data),
-              config.config
+              config.config?.type
             )
           }
         }
@@ -367,8 +369,8 @@ function buildSearchQueryFields(
         return {
           ...result,
           [transformedKey]: buildSearchClause(
-            DateRangeFieldValue.parse(value),
-            { ...config.config, type: 'range' }
+            toRangeDateString(DateRangeFieldValue.parse(value)),
+            'range'
           )
         }
       }
@@ -377,7 +379,10 @@ function buildSearchQueryFields(
         ...result,
         // @TODO: Previously an issue was fixed by turning all the values into string. Ask Tareq about it so we can make sure the case is still handled.
 
-        [transformedKey]: buildSearchClause(value.toString(), config.config)
+        [transformedKey]: buildSearchClause(
+          value.toString(),
+          config.config?.type
+        )
       }
     },
     {}
@@ -470,7 +475,6 @@ export function buildSearchQuery(
 }
 
 /**
- * @TODO: check if this is needed at the end. This seems to be duplicated.
  * @returns field configurations for advanced search fields (@see EventFieldId) and declaration fields that are in the search parameters.
  */
 export function getSearchParamsFieldConfigs(
@@ -508,7 +512,7 @@ export function parseFieldSearchParams(
     searchParams
   )
 
-  // I'm quite sure this is redundant, but let's keep it for now.
+  // filter out any unrelated search parameters
   const filteredSearchParams = Object.fromEntries(
     Object.entries(searchParams).filter(([key]) =>
       searchFieldConfigs.some((config) => config.id === key)

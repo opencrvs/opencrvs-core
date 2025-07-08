@@ -26,13 +26,13 @@ function dateClauseToElasticQuery(clause: DateCondition, propertyName: string) {
   if (clause.type === 'exact') {
     return { term: { [propertyName]: clause.term } }
   } else {
+    // @todo supply timezone from here
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { timezone, type, ...rest } = clause
+    const { type, ...rest } = clause
     return {
       range: {
         [propertyName]: {
-          ...rest,
-          time_zone: timezone
+          ...rest
         }
       }
     }
