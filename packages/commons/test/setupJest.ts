@@ -9,4 +9,5 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as fetch from 'jest-fetch-mock'
-jest.setMock('node-fetch', { default: fetch })
+//@ts-ignore
+globalThis.fetch = fetch

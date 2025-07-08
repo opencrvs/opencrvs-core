@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { SEARCH_URL } from '@gateway/constants'
-import fetch from '@gateway/fetch'
 import { Bundle, Saved } from '@opencrvs/commons/types'
 
 export async function getRecordById(
@@ -32,5 +31,5 @@ export async function getRecordById(
     throw new Error(`Failed to fetch record ${recordId}`)
   }
 
-  return res.json()
+  return res.json() as Promise<Saved<Bundle>>
 }

@@ -26,7 +26,7 @@ interface IUserRole {
   labels: Label[]
 }
 
-interface IUserModelData {
+export interface IUserModelData {
   _id: string
   username: string
   name: {
@@ -51,7 +51,7 @@ interface IUserModelData {
   device: string
 }
 
-interface ISystemModelData {
+export interface ISystemModelData {
   scope?: Scope[]
   name: string
   createdBy: string

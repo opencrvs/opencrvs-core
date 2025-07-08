@@ -5,8 +5,8 @@ USER node
 
 WORKDIR /app/packages/events
 COPY --chown=node:node packages/events/*.json /app/packages/events/
-RUN NODE_ENV=production yarn install --frozen-lockfile
+RUN NODE_ENV=production pnpm install --frozen-lockfile
 COPY --chown=node:node packages/events /app/packages/events
-RUN yarn build
+RUN pnpm build
 
-CMD [ "yarn", "start:prod" ]
+CMD [ "pnpm", "start:prod" ]

@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { USER_MANAGEMENT_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 import { getTokenPayload } from '@workflow/utils/auth-utils'
 import { getFromFhir } from '@workflow/features/registration/fhir/fhir-utils'
 import {
@@ -19,6 +18,7 @@ import {
   SavedPractitioner
 } from '@opencrvs/commons/types'
 import { UUID } from '@opencrvs/commons'
+import { ISystemModelData, IUserModelData } from '@workflow/records/user'
 
 type UserSearchCriteria = 'userId' | 'practitionerId' | 'mobile' | 'email'
 export type SearchCriteria = {
@@ -28,7 +28,7 @@ export type SearchCriteria = {
 export async function getUser(
   userId: string,
   authHeader: { Authorization: string }
-) {
+): Promise<IUserModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getUser`, {
     method: 'POST',
     body: JSON.stringify({ userId }),
@@ -44,7 +44,7 @@ export async function getUser(
     )
   }
 
-  const body = await res.json()
+  const body = (await res.json()) as IUserModelData
 
   return body
 }
@@ -52,7 +52,7 @@ export async function getUser(
 export async function getSystem(
   systemId: string,
   authHeader: { Authorization: string }
-) {
+): Promise<ISystemModelData> {
   const res = await fetch(`${USER_MANAGEMENT_URL}getSystem`, {
     method: 'POST',
     body: JSON.stringify({ systemId }),
@@ -68,7 +68,7 @@ export async function getSystem(
     )
   }
 
-  const body = await res.json()
+  const body = (await res.json()) as ISystemModelData
 
   return body
 }

@@ -1,8 +1,8 @@
-diff --git a/node_modules/pdfmake/build/pdfmake.js b/node_modules/pdfmake/build/pdfmake.js
-index 7547d87..0d90240 100644
---- a/node_modules/pdfmake/build/pdfmake.js
-+++ b/node_modules/pdfmake/build/pdfmake.js
-@@ -20345,7 +20345,7 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
+diff --git a/build/pdfmake.js b/build/pdfmake.js
+index 7b00f1c4679073c50d0d17f25973443d0b1d0835..ef9ad9f8ab62c6785b34f9bb69292f50ec79beba 100644
+--- a/build/pdfmake.js
++++ b/build/pdfmake.js
+@@ -47099,7 +47099,7 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
      doc.addContent('ET');
    }
    function docFillColor(color) {
@@ -11,7 +11,7 @@ index 7547d87..0d90240 100644
        doc.fillOpacity(color[1]);
        docUsePattern(color[0], false);
      } else {
-@@ -20353,7 +20353,7 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
+@@ -47107,7 +47107,7 @@ var SVGtoPDF = function SVGtoPDF(doc, svg, x, y, options) {
      }
    }
    function docStrokeColor(color) {

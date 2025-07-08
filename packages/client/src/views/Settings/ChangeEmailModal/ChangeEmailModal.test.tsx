@@ -11,7 +11,7 @@
 import * as React from 'react'
 import { createTestComponent, userDetails } from '@client/tests/util'
 import { createStore } from '@client/store'
-import { getStorageUserDetailsSuccess } from '@opencrvs/client/src/profile/profileActions'
+import { getStorageUserDetailsSuccess } from '@client/profile/profileActions'
 import { ReactWrapper } from 'enzyme'
 import { changeEmailMutation } from '@client/views/Settings/mutations'
 import { GET_USER_BY_EMAIL } from '@client/views/Settings/queries'

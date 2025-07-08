@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { redis } from '@auth/database'
 import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'

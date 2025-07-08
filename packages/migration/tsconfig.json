@@ -9,6 +9,7 @@
     "target": "esnext",
     "module": "node16",
     "esModuleInterop": true,
+    "skipLibCheck": true,
     "rootDir": ".",
     "outDir": "build/dist",
     "strict": true,

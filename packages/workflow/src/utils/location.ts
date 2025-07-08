@@ -12,7 +12,6 @@
 import { UUID } from '@opencrvs/commons'
 import { SavedLocation } from '@opencrvs/commons/types'
 import { APPLICATION_CONFIG_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 
 const FETCH_ALL_LOCATION_HIERARCHY = (id: UUID) =>
   new URL(`/locations/${id}/hierarchy`, APPLICATION_CONFIG_URL)

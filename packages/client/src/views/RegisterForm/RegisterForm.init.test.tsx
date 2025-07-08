@@ -24,7 +24,7 @@ import {
   deleteDeclarationByUser,
   IDeclaration
 } from '@client/declarations'
-import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
+import { DRAFT_BIRTH_PARENT_FORM_PAGE } from '@client/navigation/routes'
 import { vi } from 'vitest'
 
 import { EventType, Status } from '@client/utils/gateway'

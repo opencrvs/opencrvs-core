@@ -10,11 +10,11 @@ ENV COUNTRY_CONFIG_URL_INTERNAL="{{COUNTRY_CONFIG_URL_INTERNAL}}"
 
 WORKDIR /app/packages/components
 COPY --chown=node:node packages/components /app/packages/components
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
 WORKDIR /app/packages/login
 COPY --chown=node:node packages/login /app/packages/login
-RUN yarn install --frozen-lockfile && yarn build
+RUN pnpm install --frozen-lockfile && pnpm build
 
 # Step 2. Build the actual image
 FROM nginxinc/nginx-unprivileged:1.28-alpine

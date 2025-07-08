@@ -10,7 +10,6 @@
  */
 import decode from 'jwt-decode'
 import { USER_MANAGEMENT_URL } from '@webhooks/constants'
-import fetch from 'node-fetch'
 import * as crypto from 'crypto'
 import { CompositionSectionCode } from '@opencrvs/commons/types'
 
@@ -86,7 +85,7 @@ export async function getSystem(
       Authorization: authHeader
     }
   })
-  return await res.json()
+  return (await res.json()) as Promise<ISystem>
 }
 
 export function generateChallenge() {

@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { OPENCRVS_SPECIFICATION_URL } from './constants'
 import { env } from './environment'
 import { TypeOf, z } from 'zod'
@@ -258,7 +257,7 @@ export async function seedLocations(token: string) {
     raise(await res.json())
   }
 
-  const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
+  const response = (await res.json()) as fhir3.Bundle<fhir3.BundleEntryResponse>
   response.entry?.forEach((res, index) => {
     if (res.response?.status !== '201') {
       // eslint-disable-next-line no-console

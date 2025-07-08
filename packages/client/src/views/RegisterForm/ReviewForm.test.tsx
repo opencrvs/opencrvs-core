@@ -14,13 +14,13 @@ import {
   getStorageDeclarationsSuccess,
   IDeclaration,
   storeDeclaration
-} from '@opencrvs/client/src/declarations'
-import { IForm, IFormSectionData } from '@opencrvs/client/src/forms'
+} from '@client/declarations'
+import { IForm, IFormSectionData } from '@client/forms'
 import { SCOPES } from '@opencrvs/commons/client'
 import { EventType, RegStatus } from '@client/utils/gateway'
-import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@opencrvs/client/src/navigation/routes'
-import { checkAuth } from '@opencrvs/client/src/profile/profileActions'
-import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import { REVIEW_EVENT_PARENT_FORM_PAGE } from '@client/navigation/routes'
+import { checkAuth } from '@client/profile/profileActions'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import * as React from 'react'
 import { queries } from '@client/profile/queries'
 import { AppStore } from '@client/store'

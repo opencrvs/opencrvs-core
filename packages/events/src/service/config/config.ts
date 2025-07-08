@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import fetch from 'node-fetch'
 import { array } from 'zod'
 import { EventConfig, getOrThrow, WorkqueueConfig } from '@opencrvs/commons'
 import { env } from '@events/environment'
