@@ -429,14 +429,19 @@ export const SearchResultComponent = ({
      * Apply pending drafts to the event index.
      * This is necessary to show the most up to date information in the workqueue.
      */
-    .map((event) =>
-      deepDropNulls(
+    .map((event) => {
+      const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+      if (!eventConfig) {
+        throw new Error('Event configuration not found for event:' + event.type)
+      }
+      return deepDropNulls(
         applyDraftsToEventIndex(
           event,
-          drafts.filter((d) => d.eventId === event.id)
+          drafts.filter((d) => d.eventId === event.id),
+          eventConfig
         )
       )
-    )
+    })
 
   const dataWithTitle = dataWithDraft.map((event) => {
     const eventConfig = eventConfigs.find(({ id }) => id === event.type)
