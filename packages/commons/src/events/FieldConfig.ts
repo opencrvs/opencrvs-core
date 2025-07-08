@@ -320,7 +320,8 @@ const NameField = BaseField.extend({
         .boolean()
         .default(false)
         .optional()
-        .describe('To make middle name visible in Name form field')
+        .describe('To make middle name visible in Name form field'),
+      searchMode: z.boolean().optional()
     })
     .optional()
 }).describe('Name input field')

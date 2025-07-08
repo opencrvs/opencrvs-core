@@ -214,18 +214,6 @@ export interface Option<T = string> {
   label: string
 }
 
-export function mergeWithoutNullsOrUndefined<T>(
-  object: T,
-  source: Partial<T>
-): T {
-  return mergeWith({}, object, source, (objValue, srcValue) => {
-    if (srcValue === undefined || srcValue === null) {
-      return objValue
-    }
-    return undefined
-  })
-}
-
 export enum CoreWorkqueues {
   OUTBOX = 'outbox',
   DRAFT = 'draft'

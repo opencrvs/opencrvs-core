@@ -28,9 +28,10 @@ interface Props {
   validation: FieldConfig['validation']
   value?: NameFieldValue
   includeMiddlename?: boolean
+  searchMode?: boolean
 }
 
-export const defailtNameFieldValue: NameFieldValue = {
+const defailtNameFieldValue: NameFieldValue = {
   firstname: '',
   middlename: '',
   surname: ''
@@ -116,7 +117,8 @@ function NameInput(props: Props) {
     required = true,
     value = {},
     maxLength,
-    includeMiddlename
+    includeMiddlename,
+    searchMode = false
   } = props
   const validators = props.validation || []
 
@@ -174,7 +176,14 @@ function NameInput(props: Props) {
         fields={fields}
         id={id}
         initialValues={{ ...value }}
-        onChange={(values) => onChange(values as NameFieldValue)}
+        onChange={(values) => {
+          if (searchMode) {
+            // when in search mode, we initialize empty name fields with empty string
+            // to avoid name field validation
+            values = { ...defailtNameFieldValue, ...values }
+          }
+          onChange(values as NameFieldValue)
+        }}
       />
       <FocusNameInputsOnHash id={id} value={value} />
     </>
