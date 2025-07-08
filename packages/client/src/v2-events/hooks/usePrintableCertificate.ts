@@ -143,7 +143,11 @@ export const usePrintableCertificate = ({
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
-    const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
+    const pdfTemplate = await svgToPdfTemplate(
+      compiledSvgWithFonts,
+      certificateFonts
+    )
+
     printAndDownloadPdf(pdfTemplate, event.id)
   }
 

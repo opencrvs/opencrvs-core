@@ -8,18 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './url'
-export * from './logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/service'
-export * from './users/systemRole'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
-export * from './icons'
+
+export function joinURL(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return new URL(path, baseWithSlash)
+}
+
+export function joinURLPaths(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return baseWithSlash + path.replace(/^\//, '')
+}

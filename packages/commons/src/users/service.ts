@@ -11,6 +11,8 @@
 
 import fetch from 'node-fetch'
 import { UUID } from '../uuid'
+import { FullDocumentPath } from '../documents'
+import { joinURL } from '../url'
 
 interface IUserName {
   use: string
@@ -24,6 +26,12 @@ type ObjectId = string
  * Let's add more fields as they are needed
  */
 type User = {
+  id: string
+  avatar?: {
+    data: FullDocumentPath
+    type: string
+  }
+  signature?: FullDocumentPath
   name: IUserName[]
   username: string
   email: string
@@ -33,7 +41,6 @@ type User = {
   scope: string[]
   status: string
   creationDate: number
-  signature?: string
 }
 type System = {
   name: string
@@ -51,11 +58,7 @@ export async function getUser(
   userId: string,
   token: string
 ) {
-  const hostWithTrailingSlash = userManagementHost.endsWith('/')
-    ? userManagementHost
-    : userManagementHost + '/'
-
-  const res = await fetch(new URL('getUser', hostWithTrailingSlash).href, {
+  const res = await fetch(joinURL(userManagementHost, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {
