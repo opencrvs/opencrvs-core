@@ -102,7 +102,7 @@ function generateQuery(
 
           return {
             bool: { should: queries, minimum_should_match: 1 }
-          } as estypes.QueryDslQueryContainer
+          }
         }
 
         // default exact match
@@ -162,9 +162,11 @@ function generateQuery(
       }
 
       throw new Error(`Unsupported query type: ${search.type}`)
-    }) satisfies estypes.QueryDslQueryContainer[]
+    })
 
-  return { bool: { must } } as estypes.QueryDslQueryContainer
+  return {
+    bool: { must, should: undefined }
+  } satisfies estypes.QueryDslQueryContainer
 }
 
 const EXACT_SEARCH_LOCATION_DISTANCE = '10km'

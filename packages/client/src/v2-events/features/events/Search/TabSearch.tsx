@@ -168,13 +168,13 @@ function buildSearchSections({
       const fieldSearchConfig = section.fields.find((a) => a.fieldId === f.id)
       return {
         ...f,
+        ...(fieldSearchConfig?.options &&
+          fieldSearchConfig.options.length > 0 && {
+            options: fieldSearchConfig.options
+          }),
         required: false as const,
         conditionals: fieldSearchConfig?.conditionals ?? f.conditionals,
-        validation: fieldSearchConfig?.validations ?? f.validation,
-        ...('options' in f &&
-          f.options.length > 0 && {
-            options: fieldSearchConfig?.options ?? f.options
-          })
+        validation: fieldSearchConfig?.validations ?? f.validation
       }
     })
 

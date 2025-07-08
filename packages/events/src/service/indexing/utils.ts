@@ -220,7 +220,8 @@ export function generateQueryForAddressField(
 
   return {
     bool: {
-      must: mustMatches
+      must: mustMatches,
+      should: undefined
     }
-  } as estypes.QueryDslQueryContainer
+  } satisfies estypes.QueryDslQueryContainer
 }
