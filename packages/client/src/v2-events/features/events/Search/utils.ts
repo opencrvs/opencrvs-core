@@ -268,14 +268,7 @@ function buildSearchClause(
 function toRangeDateString(value: DateRangeFieldValue): string {
   const parsedValue = DateRangeFieldValue.parse(value)
   if (typeof parsedValue === 'string') {
-    const [year, month, day] = parsedValue.split('-')
-    const date = new Date(
-      Date.UTC(Number(year), Number(month) - 1, Number(day))
-    )
-    const nextDate = addDays(date, 1)
-    const dateString = format(date, 'yyyy-MM-dd')
-    const nextDateString = format(nextDate, 'yyyy-MM-dd')
-    return `${dateString},${nextDateString}`
+    return `${parsedValue},${parsedValue}`
   }
   return `${parsedValue.start},${parsedValue.end}`
 }
