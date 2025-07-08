@@ -14,7 +14,7 @@ import { UUID } from '../uuid'
 import { FullDocumentPath } from '../documents'
 import { joinURL } from '../url'
 
-interface IUserName {
+export interface IUserName {
   use: string
   family: string
   given: string[]
