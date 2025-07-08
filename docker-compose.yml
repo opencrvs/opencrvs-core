@@ -74,10 +74,10 @@ services:
       - NOTIFICATION_URL=http://notification:2020/
       - WORKFLOW_URL=http://workflow:5050/
       - WEBHOOKS_URL=http://webhooks:2525/
+      - APPLICATION_CONFIG_URL=http://config:2021/
       - CHECK_INVALID_TOKEN=true
       - MINIO_BUCKET=ocrvs
       - DOCUMENTS_URL=http://documents:9050
-
   events:
     image: ghcr.io/opencrvs/ocrvs-events:${VERSION}
     #platform: linux/amd64
@@ -95,7 +95,6 @@ services:
       - DOCUMENTS_URL=http://documents:9050
       - USER_MANAGEMENT_URL=http://user-mgnt:3030
       - AUTH_URL=http://auth:4040
-      - APPLICATION_CONFIG_URL=http://config:2021/
   # User facing services
   workflow:
     image: ghcr.io/opencrvs/ocrvs-workflow:${VERSION}
@@ -293,7 +292,6 @@ services:
     environment:
       - NODE_ENV=development
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
-
   data-seeder:
     image: ghcr.io/opencrvs/ocrvs-data-seeder:${VERSION}
     #platform: linux/amd64
