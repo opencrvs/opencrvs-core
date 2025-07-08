@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { UUID } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/events/locations'
 

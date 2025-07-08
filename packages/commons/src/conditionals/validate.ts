@@ -241,7 +241,7 @@ function zodToIntlErrorMap(issue: z.core.$ZodIssue, value: unknown) {
     }
 
     case 'invalid_type': {
-      if (issue.expected !== issue.input && issue.input === 'undefined') {
+      if (issue.expected !== issue.input && issue.input === undefined) {
         return createIntlError(errorMessages.requiredField)
       }
 

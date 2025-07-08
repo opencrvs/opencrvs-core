@@ -12,6 +12,7 @@
 import {
   ActionInputWithType,
   ActionStatus,
+  DeduplicationConfig,
   EventIndex,
   getCurrentEventState
 } from '@opencrvs/commons/events'
@@ -72,12 +73,13 @@ export async function validate(
   )
 
   const resultsFromAllRules = await Promise.all(
-    config.deduplication.map(async (deduplication) => {
+    config.deduplication.map(async (deduplication: DeduplicationConfig) => {
       const matches = await searchForDuplicates(
         futureEventState,
         deduplication,
         config
       )
+
       return matches
     })
   )

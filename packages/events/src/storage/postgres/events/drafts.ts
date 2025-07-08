@@ -10,7 +10,7 @@
  */
 
 import { sql } from 'kysely'
-import z from 'zod'
+import * as z from 'zod/v4'
 import { ActionStatus, Draft, TokenUserType, UUID } from '@opencrvs/commons'
 import { getClient } from '@events/storage/postgres/events'
 import {
@@ -56,7 +56,6 @@ export async function createDraft(draft: NewEventActionDrafts) {
     // .where('transactionId', '=', input.transactionId)
     // .where('eventType', '=', input.eventType)
     // .executeTakeFirstOrThrow()
-
     .onConflict((oc) =>
       oc.columns(['transactionId', 'actionType']).doUpdateSet({
         declaration: sql`EXCLUDED.declaration`,

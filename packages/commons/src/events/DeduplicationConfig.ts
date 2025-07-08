@@ -39,6 +39,7 @@ const FuzzyMatcher = Matcher.extend({
       boost: z.number().optional().default(1)
     })
     .optional()
+    .default(() => ({ fuzziness: 'AUTO:4,7', boost: 1 }))
 })
 
 const StrictMatcher = Matcher.extend({
