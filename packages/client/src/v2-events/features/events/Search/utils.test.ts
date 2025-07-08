@@ -200,7 +200,7 @@ describe('serializeSearchParams and deserializeSearchParams (full roundtrip)', (
 })
 
 describe('buildQuickSearchQuery', () => {
-  it.only('sdadasd', () => {
+  it('should build a quick search query', () => {
     const searchParams = { key: 'abc@gmail.com' }
     const resultQuery = buildQuickSearchQuery(searchParams, [
       tennisClubMembershipEvent
