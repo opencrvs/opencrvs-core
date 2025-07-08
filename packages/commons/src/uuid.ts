@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { v4 as uuidv4 } from 'uuid'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 export const UUID = z.string().uuid().brand('UUID')
 export type UUID = z.infer<typeof UUID>

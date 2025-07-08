@@ -9,11 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { Action } from './ActionDocument'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { UUID } from '../uuid'
-extendZodWithOpenApi(z)
 
 export const EventDocument = z
   .object({
@@ -24,6 +23,6 @@ export const EventDocument = z
     actions: z.array(Action),
     trackingId: z.string()
   })
-  .openapi({ ref: 'EventDocument' })
+  .meta({ id: 'EventDocument' })
 
 export type EventDocument = z.infer<typeof EventDocument>

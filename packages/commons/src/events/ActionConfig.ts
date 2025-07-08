@@ -9,16 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { EnableConditional, ShowConditional } from './Conditional'
 import { PageConfig } from './PageConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
-
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
 
 /**
  * By default, when conditionals are not defined, action is visible and enabled to the user.
@@ -168,25 +165,22 @@ export const ActionConfig = z
      * OpenAPI references are defined here so our generated OpenAPI spec knows to reuse the models
      * and treat them as "models" instead of duplicating the data structure in each endpoint.
      */
-    ReadActionConfig.openapi({ ref: 'ReadActionConfig' }),
-    DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
-    ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
-    RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
-    MarkedAsDuplicateConfig.openapi({ ref: 'MarkedAsDuplicateActionConfig' }),
-    ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
-    RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
-    DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),
-    PrintCertificateActionConfig.openapi({
-      ref: 'PrintCertificateActionConfig'
+    ReadActionConfig.meta({ id: 'ReadActionConfig' }),
+    DeclareConfig.meta({ id: 'DeclareActionConfig' }),
+    ValidateConfig.meta({ id: 'ValidateActionConfig' }),
+    RejectDeclarationConfig.meta({ id: 'RejectDeclarationActionConfig' }),
+    MarkedAsDuplicateConfig.meta({ id: 'MarkedAsDuplicateActionConfig' }),
+    ArchiveConfig.meta({ id: 'ArchiveActionConfig' }),
+    RegisterConfig.meta({ id: 'RegisterActionConfig' }),
+    DeleteConfig.meta({ id: 'DeleteActionConfig' }),
+    PrintCertificateActionConfig.meta({
+      id: 'PrintCertificateActionConfig'
     }),
-    RequestCorrectionConfig.openapi({ ref: 'RequestCorrectionActionConfig' }),
-    RejectCorrectionConfig.openapi({ ref: 'RejectCorrectionActionConfig' }),
-    ApproveCorrectionConfig.openapi({ ref: 'ApproveCorrectionActionConfig' })
+    RequestCorrectionConfig.meta({ id: 'RequestCorrectionActionConfig' }),
+    RejectCorrectionConfig.meta({ id: 'RejectCorrectionActionConfig' }),
+    ApproveCorrectionConfig.meta({ id: 'ApproveCorrectionActionConfig' })
   ])
-  .openapi({ ref: 'ActionConfig' }) as unknown as z.ZodDiscriminatedUnion<
-  'type',
-  AllActionConfigFields[]
->
+  .meta({ id: 'ActionConfig' })
 
 export type ActionConfig = InferredActionConfig
 

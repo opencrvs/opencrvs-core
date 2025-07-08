@@ -14,7 +14,7 @@ import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 
 import { formatISO, isAfter, isBefore } from 'date-fns'
-import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import * as z from 'zod/v4'
 import { EventState, ActionUpdate } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
@@ -214,30 +214,26 @@ export const errorMessages = {
 }
 
 function createIntlError(message: TranslationConfig) {
-  return {
-    message: {
-      message
-    }
-  }
+  return { message: { message } }
 }
 
 /**
  * Form error message definitions for Zod validation errors.
  * Overrides zod internal type error messages (string) to match the OpenCRVS error messages (TranslationConfig).
  */
-function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
+function zodToIntlErrorMap(issue: z.core.$ZodIssue, value: unknown) {
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
   switch (issue.code) {
-    case 'invalid_string': {
-      if (_ctx.data === '') {
+    case 'invalid_format': {
+      if (value === '') {
         return createIntlError(errorMessages.requiredField)
       }
 
-      if (issue.validation === 'date') {
+      if (issue.format === 'date') {
         return createIntlError(errorMessages.invalidDate)
       }
 
-      if (issue.validation === 'email') {
+      if (issue.format === 'email') {
         return createIntlError(errorMessages.invalidEmail)
       }
 
@@ -245,24 +241,24 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
     }
 
     case 'invalid_type': {
-      if (issue.expected !== issue.received && issue.received === 'undefined') {
+      if (issue.expected !== issue.input && issue.input === 'undefined') {
         return createIntlError(errorMessages.requiredField)
       }
 
       break
     }
     case 'too_small': {
-      if (issue.message === undefined) {
+      if (value === '') {
         return createIntlError(errorMessages.requiredField)
       }
 
       break
     }
     case 'invalid_union': {
-      for (const { issues } of issue.unionErrors) {
-        for (const e of issues) {
+      for (const es of issue.errors) {
+        for (const e of es) {
           if (
-            zodToIntlErrorMap(e, _ctx).message.message.id !==
+            zodToIntlErrorMap(e, value).message.message.id !==
             'v2.error.required'
           ) {
             return createIntlError(errorMessages.invalidInput)
@@ -324,7 +320,7 @@ export function validateFieldInput({
     value,
     {
       // @ts-expect-error
-      errorMap: zodToIntlErrorMap
+      error: (issue) => zodToIntlErrorMap(issue, value)
     }
   )
 

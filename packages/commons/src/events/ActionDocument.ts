@@ -9,15 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { UUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
 import { TokenUserType } from '../authentication'
-
-extendZodWithOpenApi(z)
 
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
@@ -176,24 +174,24 @@ const ReadAction = ActionBase.merge(
 
 export const ActionDocument = z
   .discriminatedUnion('type', [
-    CreatedAction.openapi({ ref: 'CreatedAction' }),
-    ValidateAction.openapi({ ref: 'ValidateAction' }),
-    RejectAction.openapi({ ref: 'RejectAction' }),
-    MarkAsDuplicateAction.openapi({ ref: 'MarkAsDuplicateAction' }),
-    ArchiveAction.openapi({ ref: 'ArchiveAction' }),
-    NotifiedAction.openapi({ ref: 'NotifiedAction' }),
-    RegisterAction.openapi({ ref: 'RegisterAction' }),
-    DeclareAction.openapi({ ref: 'DeclareAction' }),
-    AssignedAction.openapi({ ref: 'AssignedAction' }),
-    RequestedCorrectionAction.openapi({ ref: 'RequestedCorrectionAction' }),
-    ApprovedCorrectionAction.openapi({ ref: 'ApprovedCorrectionAction' }),
-    RejectedCorrectionAction.openapi({ ref: 'RejectedCorrectionAction' }),
-    UnassignedAction.openapi({ ref: 'UnassignedAction' }),
-    PrintCertificateAction.openapi({ ref: 'PrintCertificateAction' }),
-    ReadAction.openapi({ ref: 'ReadAction' })
+    CreatedAction.meta({ id: 'CreatedAction' }),
+    ValidateAction.meta({ id: 'ValidateAction' }),
+    RejectAction.meta({ id: 'RejectAction' }),
+    MarkAsDuplicateAction.meta({ id: 'MarkAsDuplicateAction' }),
+    ArchiveAction.meta({ id: 'ArchiveAction' }),
+    NotifiedAction.meta({ id: 'NotifiedAction' }),
+    RegisterAction.meta({ id: 'RegisterAction' }),
+    DeclareAction.meta({ id: 'DeclareAction' }),
+    AssignedAction.meta({ id: 'AssignedAction' }),
+    RequestedCorrectionAction.meta({ id: 'RequestedCorrectionAction' }),
+    ApprovedCorrectionAction.meta({ id: 'ApprovedCorrectionAction' }),
+    RejectedCorrectionAction.meta({ id: 'RejectedCorrectionAction' }),
+    UnassignedAction.meta({ id: 'UnassignedAction' }),
+    PrintCertificateAction.meta({ id: 'PrintCertificateAction' }),
+    ReadAction.meta({ id: 'ReadAction' })
   ])
-  .openapi({
-    ref: 'ActionDocument'
+  .meta({
+    id: 'ActionDocument'
   })
 
 export type ActionDocument = z.infer<typeof ActionDocument>

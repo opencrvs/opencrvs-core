@@ -9,13 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { ActionType } from './ActionType'
 import { ActionUpdate, RejectionReason } from './ActionDocument'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { UUID, getUUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
-extendZodWithOpenApi(z)
 
 export const BaseActionInput = z.object({
   eventId: UUID,
@@ -55,7 +54,7 @@ export const NotifyActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.NOTIFY).default(ActionType.NOTIFY)
   })
-).openapi({
+).meta({
   default: {
     eventId: '<event-id-here>',
     transactionId: getUUID(),
@@ -189,32 +188,32 @@ export type DeleteActionInput = z.infer<typeof DeleteActionInput>
  */
 export const ActionInput = z
   .discriminatedUnion('type', [
-    CreateActionInput.openapi({ ref: 'CreateActionInput' }),
-    ValidateActionInput.openapi({ ref: 'ValidateActionInput' }),
-    RegisterActionInput.openapi({ ref: 'RegisterActionInput' }),
-    NotifyActionInput.openapi({ ref: 'NotifyActionInput' }),
-    DeclareActionInput.openapi({ ref: 'DeclareActionInput' }),
-    RejectDeclarationActionInput.openapi({
-      ref: 'RejectDeclarationActionInput'
+    CreateActionInput.meta({ id: 'CreateActionInput' }),
+    ValidateActionInput.meta({ id: 'ValidateActionInput' }),
+    RegisterActionInput.meta({ id: 'RegisterActionInput' }),
+    NotifyActionInput.meta({ id: 'NotifyActionInput' }),
+    DeclareActionInput.meta({ id: 'DeclareActionInput' }),
+    RejectDeclarationActionInput.meta({
+      id: 'RejectDeclarationActionInput'
     }),
-    MarkedAsDuplicateActionInput.openapi({
-      ref: 'MarkedAsDuplicateActionInput'
+    MarkedAsDuplicateActionInput.meta({
+      id: 'MarkedAsDuplicateActionInput'
     }),
-    ArchiveActionInput.openapi({ ref: 'ArchiveActionInput' }),
-    AssignActionInput.openapi({ ref: 'AssignActionInput' }),
-    UnassignActionInput.openapi({ ref: 'UnassignActionInput' }),
-    PrintCertificateActionInput.openapi({ ref: 'PrintCertificateActionInput' }),
-    RequestCorrectionActionInput.openapi({
-      ref: 'RequestCorrectionActionInput'
+    ArchiveActionInput.meta({ id: 'ArchiveActionInput' }),
+    AssignActionInput.meta({ id: 'AssignActionInput' }),
+    UnassignActionInput.meta({ id: 'UnassignActionInput' }),
+    PrintCertificateActionInput.meta({ id: 'PrintCertificateActionInput' }),
+    RequestCorrectionActionInput.meta({
+      id: 'RequestCorrectionActionInput'
     }),
-    RejectCorrectionActionInput.openapi({ ref: 'RejectCorrectionActionInput' }),
-    ApproveCorrectionActionInput.openapi({
-      ref: 'ApproveCorrectionActionInput'
+    RejectCorrectionActionInput.meta({ id: 'RejectCorrectionActionInput' }),
+    ApproveCorrectionActionInput.meta({
+      id: 'ApproveCorrectionActionInput'
     }),
-    ReadActionInput.openapi({ ref: 'ReadActionInput' })
+    ReadActionInput.meta({ id: 'ReadActionInput' })
   ])
-  .openapi({
-    ref: 'ActionInput'
+  .meta({
+    id: 'ActionInput'
   })
 
 export type ActionInput = z.input<typeof ActionInput>
