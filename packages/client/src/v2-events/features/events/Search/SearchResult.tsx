@@ -47,6 +47,7 @@ import {
   useAction,
   useActionMenuItems
 } from '../../workqueues/EventOverview/components/useActionMenuItems'
+import { deserializeSearchParams, serializeSearchParams } from './utils'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -250,8 +251,20 @@ export const SearchResultComponent = ({
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
   const isOnline = useOnlineStatus()
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
+  const setOffset = (newOffset: number) => {
+    const params = deserializeSearchParams(location.search)
+    params.offset = String(newOffset)
+    navigate(
+      {
+        pathname: slug
+          ? ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug })
+          : location.pathname,
+        search: serializeSearchParams(params)
+      },
+      { replace: true }
+    )
+  }
   const { getOutbox } = useEvents()
   const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
@@ -439,6 +452,8 @@ export const SearchResultComponent = ({
 
   const allResults = mapEventsToWorkqueueRows(sortedResult)
 
+  const currentPageNumber = Math.floor(offset / limit) + 1
+
   const paginatedData = allResults.slice(
     limit * (currentPageNumber - 1),
     limit * currentPageNumber
@@ -464,7 +479,7 @@ export const SearchResultComponent = ({
         tabBarContent={tabBarContent}
         title={contentTitle}
         totalPages={totalPages}
-        onPageChange={(page) => setCurrentPageNumber(page)}
+        onPageChange={(page) => setOffset((page - 1) * limit)}
       >
         <Workqueue
           columns={[
