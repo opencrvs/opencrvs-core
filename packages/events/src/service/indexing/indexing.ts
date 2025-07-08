@@ -24,7 +24,8 @@ import {
   getDeclarationFields,
   QueryType,
   WorkqueueCountInput,
-  getEventConfigById
+  getEventConfigById,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -40,7 +41,10 @@ import {
   encodeFieldId,
   removeSecuredFields
 } from './utils'
-import { buildElasticQueryFromSearchPayload } from './query'
+import {
+  buildElasticQueryFromSearchPayload,
+  withJurisdictionFilters
+} from './query'
 
 function eventToEventIndex(
   event: EventDocument,
@@ -349,10 +353,16 @@ export async function getIndexedEvents(
 
 export async function getIndex(
   eventParams: QueryType,
-  eventConfigs: EventConfig[]
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
-  const query = buildElasticQueryFromSearchPayload(eventParams, eventConfigs)
+  const query = withJurisdictionFilters(
+    buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+    options,
+    userOfficeId
+  )
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -380,14 +390,18 @@ export async function getIndex(
 
 export async function getEventCount(
   queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[]
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
 ) {
   return (
     //  @TODO: write a query that does everything in one go.
     (
       await Promise.all(
         queries.map(async ({ slug, query }) => {
-          const count = (await getIndex(query, eventConfigs)).length
+          const count = (
+            await getIndex(query, eventConfigs, options, userOfficeId)
+          ).length
           return { slug, count }
         })
       )
