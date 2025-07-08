@@ -14,6 +14,7 @@ import { graphql, http, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
+  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
   tennisClubMembershipEvent
@@ -73,8 +74,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png',
-  avatarURL: undefined
+  signature: 'signature.png' as FullDocumentPath,
+  avatar: undefined
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {

@@ -88,8 +88,6 @@ services:
     depends_on:
       - base
     environment:
-      - EVENTS_MONGO_URL=mongodb://mongo1/events
-      - USER_MGNT_MONGO_URL=mongodb://mongo1/user-mgnt
       - ES_URL=http://elasticsearch:9200
       - COUNTRY_CONFIG_URL=http://countryconfig:3040
       - DOCUMENTS_URL=http://documents:9050
