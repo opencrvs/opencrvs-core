@@ -25,10 +25,10 @@ import {
   TokenUserType,
   WorkqueueCountInput,
   ConfigurableScopeType,
-  ConfigurableScopes,
   IAuthHeader,
   UUID,
-  EventDocument
+  EventDocument,
+  ConfigurableScopes
 } from '@opencrvs/commons'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
@@ -246,7 +246,13 @@ export const requireScopeForWorkqueues: MiddlewareFunction<
 > = async ({ next, ctx, input }) => {
   const scopes = getScopes({ Authorization: setBearerForToken(ctx.token) })
 
-  const availableWorkqueues = findScope(scopes, 'workqueue')?.options.id ?? []
+  const workqueueScope = findScope(scopes, 'workqueue')
+
+  if (!workqueueScope) {
+    throw new TRPCError({ code: 'FORBIDDEN' })
+  }
+
+  const availableWorkqueues = workqueueScope.options.id
 
   if (input.some(({ slug }) => !availableWorkqueues.includes(slug))) {
     throw new TRPCError({ code: 'FORBIDDEN' })
