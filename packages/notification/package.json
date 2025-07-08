@@ -67,7 +67,7 @@
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write",
-      "eslint -c .eslintrc.js --fix",
+      "eslint --fix",
       "yarn extract:translations"
     ]
   },

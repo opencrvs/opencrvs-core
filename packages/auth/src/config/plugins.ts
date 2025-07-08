@@ -10,14 +10,14 @@
  */
 import { env } from '@auth/environment'
 import { ServerRegisterPluginObject } from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
+import { logger, ErrorLoggerPlugin } from '@opencrvs/commons'
 import * as Pino from 'hapi-pino'
 import * as Sentry from 'hapi-sentry'
 
 type IHapiPlugin<T = any> = ServerRegisterPluginObject<T>
 
 export default function getPlugins() {
-  const plugins: IHapiPlugin[] = []
+  const plugins: IHapiPlugin[] = [{ plugin: ErrorLoggerPlugin }]
 
   if (process.env.NODE_ENV === 'production') {
     plugins.push({

@@ -13,7 +13,7 @@ import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
 import * as Sentry from 'hapi-sentry'
 import { SENTRY_DSN } from '@gateway/constants'
-import { logger } from '@opencrvs/commons'
+import { logger, ErrorLoggerPlugin } from '@opencrvs/commons'
 import * as HapiSwagger from 'hapi-swagger'
 import { ServerRegisterPluginObject } from '@hapi/hapi'
 import * as H2o2 from '@hapi/h2o2'
@@ -37,7 +37,8 @@ export const getPlugins = () => {
       plugin: HapiSwagger,
       options: swaggerOptions
     },
-    H2o2
+    H2o2,
+    ErrorLoggerPlugin
   ] as Array<ServerRegisterPluginObject<any>>
 
   if (process.env.NODE_ENV === 'production') {
