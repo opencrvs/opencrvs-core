@@ -255,10 +255,11 @@ export const SearchResultComponent = ({
   const setOffset = (newOffset: number) => {
     const params = deserializeSearchParams(location.search)
     params.offset = String(newOffset)
-
     navigate(
       {
-        pathname: location.pathname,
+        pathname: slug
+          ? ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug })
+          : location.pathname,
         search: serializeSearchParams(params)
       },
       { replace: true }
