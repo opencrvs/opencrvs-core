@@ -451,9 +451,7 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
-export async function downloadAndEmbedImages(
-  svgString: string
-): Promise<string> {
+async function downloadAndEmbedImages(svgString: string): Promise<string> {
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgString, 'image/svg+xml')
   const svg = doc.documentElement
@@ -576,7 +574,7 @@ interface PdfTemplate {
   fonts: Record<string, TFontFamilyTypes>
 }
 
-export function createPDF(template: PdfTemplate): pdfMake.TCreatedPdf {
+function createPDF(template: PdfTemplate): pdfMake.TCreatedPdf {
   return pdfMake.createPdf(template.definition, undefined, template.fonts)
 }
 
