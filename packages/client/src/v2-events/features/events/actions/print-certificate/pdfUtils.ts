@@ -412,6 +412,7 @@ export function compileSvg({
 
   const template = Handlebars.compile(templateString)
   $declaration = formatAllNonStringValues($declaration, intl)
+
   const data = {
     $declaration,
     $metadata,
@@ -420,6 +421,7 @@ export function compileSvg({
       users
     }
   }
+
   const output = template(data)
   return output
 }

@@ -9,19 +9,31 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { toDocumentPath, getUser } from '@opencrvs/commons'
+import { getUser, UserNotFoundError } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
+type DatabaseUser = Awaited<ReturnType<typeof getUser>>
 export const getUsersById = async (ids: string[], token: string) => {
   const users = await Promise.all(
-    ids.map(async (id) => getUser(env.USER_MANAGEMENT_URL, id, token))
+    ids.map(async (id) => {
+      try {
+        return await getUser(env.USER_MANAGEMENT_URL, id, token)
+      } catch (error) {
+        if (error instanceof UserNotFoundError) {
+          return undefined
+        }
+        throw error
+      }
+    })
   )
 
-  return users.map((user) => ({
-    id: user.id,
-    name: user.name,
-    role: user.role,
-    signature: user.signature ? toDocumentPath(user.signature) : undefined,
-    avatar: user.avatar?.data ? toDocumentPath(user.avatar.data) : undefined
-  }))
+  return users
+    .filter((user): user is DatabaseUser => user !== undefined)
+    .map((user) => ({
+      id: user.id,
+      name: user.name,
+      role: user.role,
+      signature: user.signature ? user.signature : undefined,
+      avatar: user.avatar?.data ? user.avatar.data : undefined
+    }))
 }

@@ -53,6 +53,13 @@ type System = {
   type: string
 }
 
+export class UserNotFoundError extends Error {
+  constructor(userId: string) {
+    super(`User with id ${userId} not found`)
+    this.name = 'UserNotFoundError'
+  }
+}
+
 export async function getUser(
   userManagementHost: string,
   userId: string,
@@ -66,6 +73,10 @@ export async function getUser(
       Authorization: token
     }
   })
+
+  if (res.status === 404) {
+    throw new UserNotFoundError(userId)
+  }
 
   if (!res.ok) {
     throw new Error(
