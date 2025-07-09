@@ -73,7 +73,7 @@ export const Sidebar = ({
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
 
-  const { getCount } = useWorkqueue(workqueueSlug)
+  const { getCount } = useWorkqueue(workqueueSlug ?? '')
   const counts = getCount.useSuspenseQuery()
 
   let name = ''
