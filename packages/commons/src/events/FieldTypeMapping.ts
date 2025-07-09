@@ -49,7 +49,8 @@ import {
   NonEmptyTextValue,
   TextValue,
   DataFieldValue,
-  DateRangeFieldValue
+  DateRangeFieldValue,
+  TimeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -85,6 +86,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
+      break
+    case FieldType.TIME:
+      schema = TimeValue
       break
     case FieldType.EMAIL:
       schema = EmailValue
@@ -176,6 +180,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.NAME:
     case FieldType.PHONE:
     case FieldType.ID:
+    case FieldType.TIME:
       return null
     case FieldType.ADDRESS:
       return {

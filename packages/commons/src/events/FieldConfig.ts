@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -20,7 +21,8 @@ import {
   NonEmptyTextValue,
   TextValue,
   DateRangeFieldValue,
-  SignatureFieldValue
+  SignatureFieldValue,
+  TimeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -174,6 +176,20 @@ const DateField = BaseField.extend({
 }).describe('A single date input (dd-mm-YYYY)')
 
 export type DateField = z.infer<typeof DateField>
+
+const TimeField = BaseField.extend({
+  type: z.literal(FieldType.TIME),
+  defaultValue: TimeValue.optional(),
+  configuration: z
+    .object({
+      notice: TranslationConfig.describe(
+        'Text to display above the time input'
+      ).optional()
+    })
+    .optional()
+}).describe('A single time input (HH-mm)')
+
+export type TimeField = z.infer<typeof TimeField>
 
 const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
@@ -451,6 +467,7 @@ export type AllFields =
   | typeof NumberField
   | typeof TextAreaField
   | typeof DateField
+  | typeof TimeField
   | typeof DateRangeField
   | typeof Paragraph
   | typeof RadioGroup
@@ -480,6 +497,7 @@ export type Inferred =
   | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
+  | z.infer<typeof TimeField>
   | z.infer<typeof DateRangeField>
   | z.infer<typeof Paragraph>
   | z.infer<typeof RadioGroup>
@@ -512,6 +530,7 @@ export type InferredInput =
   | z.input<typeof NumberField>
   | z.input<typeof TextAreaField>
   | z.input<typeof DateField>
+  | z.input<typeof TimeField>
   | z.input<typeof DateRangeField>
   | z.input<typeof Paragraph>
   | z.input<typeof RadioGroup>
@@ -541,6 +560,7 @@ export const FieldConfig = z
     NumberField,
     TextAreaField,
     DateField,
+    TimeField,
     DateRangeField,
     Paragraph,
     RadioGroup,

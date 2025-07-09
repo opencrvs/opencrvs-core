@@ -85,6 +85,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
     case FieldType.EMAIL:
+    case FieldType.TIME:
       return { type: 'text' }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
