@@ -9,7 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { http, HttpResponse, HttpResponseInit } from 'msw'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { mswServer } from '../../tests/msw'
 
 test('Returns empty list when no ids provided', async () => {
   const { user } = await setupTestCase()
@@ -21,8 +23,14 @@ test('Returns empty list when no ids provided', async () => {
 })
 
 test('Returns empty list when no ids match', async () => {
+  // console.log(mswServer.listHandlers().map((x) => x))
   const { user } = await setupTestCase()
   const client = createTestClient(user)
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, () => {
+      return HttpResponse.json({}, { status: 404 } as HttpResponseInit)
+    })
+  )
 
   const fetchedEvents = await client.user.list(['123-123-123'])
 
@@ -33,19 +41,25 @@ test('Returns user in correct format', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
 
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, () => {
+      return HttpResponse.json(user)
+    })
+  )
   const fetchedUser = await client.user.list([user.id])
 
   expect(fetchedUser).toEqual([
     {
       id: user.id,
       name: user.name,
-      role: user.role
+      role: user.role,
+      signature: user.signature
     }
   ])
 })
 
 test('Returns multiple users', async () => {
-  const { user, generator, locations, seed, userMgntDb } = await setupTestCase()
+  const { user, generator, locations, seed } = await setupTestCase()
   const client = createTestClient(user)
 
   const usersToCreate = locations.map((location) =>
@@ -53,12 +67,23 @@ test('Returns multiple users', async () => {
   )
 
   const userIds = []
+  const users: Array<ReturnType<typeof seed.user>> = []
   for (const userToCreate of usersToCreate) {
-    const userId = (await seed.user(userMgntDb, userToCreate)).id
+    const createdUser = seed.user(userToCreate)
+    const userId = createdUser.id
     userIds.push(userId)
+    users.push(createdUser)
   }
 
-  const users = await client.user.list(userIds)
+  mswServer.use(
+    http.post(`http://localhost:3030/getUser`, async ({ request }) => {
+      const body = (await request.clone().json()) as { userId: string }
+      const userId = body.userId
+      return HttpResponse.json(users.find((u) => u.id === userId))
+    })
+  )
 
-  expect(users).toHaveLength(locations.length)
+  const fetchedUsers = await client.user.list(userIds)
+
+  expect(fetchedUsers).toHaveLength(locations.length)
 })

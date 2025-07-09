@@ -18,7 +18,8 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  FullDocumentPath
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -75,8 +76,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png',
-  avatarURL: undefined
+  signature: 'signature.png' as FullDocumentPath,
+  avatar: undefined
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {

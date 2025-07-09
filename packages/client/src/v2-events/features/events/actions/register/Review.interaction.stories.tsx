@@ -17,7 +17,8 @@ import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  FullDocumentPath
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -85,8 +86,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png',
-  avatarURL: undefined
+  signature: 'signature.png' as FullDocumentPath,
+  avatar: undefined
 }
 
 const validateEventDocument = generateEventDocument({

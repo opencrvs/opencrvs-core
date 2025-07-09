@@ -17,6 +17,7 @@ import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
+  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
@@ -161,8 +162,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
-                signatureFilename: undefined,
-                avatarURL: undefined
+                signature: undefined,
+                avatar: undefined
               }
             ]
           }),
@@ -171,8 +172,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined,
-              avatarURL: undefined
+              signature: undefined,
+              avatar: undefined
             }
           })
         ]
@@ -227,8 +228,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                   }
                 ],
                 role: 'SOCIAL_WORKER',
-                signatureFilename: undefined,
-                avatarURL: undefined
+                signature: undefined,
+                avatar: undefined
               }
             ]
           }),
@@ -237,8 +238,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined,
-              avatarURL: undefined
+              signature: undefined,
+              avatar: undefined
             }
           })
         ]

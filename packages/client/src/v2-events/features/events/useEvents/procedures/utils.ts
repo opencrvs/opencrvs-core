@@ -97,7 +97,8 @@ export function setMutationDefaults<
  */
 export function setQueryDefaults<
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  P extends DecorateQueryProcedure<any>
+  P extends DecorateQueryProcedure<any>,
+  QueryOutput = inferOutput<P> | Promise<inferOutput<P>>
 >(
   query: P,
   options: Omit<
@@ -106,7 +107,7 @@ export function setQueryDefaults<
   > & {
     queryFn: (
       input: QueryFunctionContext<TRPCQueryKey<inferInput<P>>>
-    ) => inferOutput<P> | Promise<inferOutput<P>>
+    ) => QueryOutput
   }
 ) {
   queryClient.setQueryDefaults(
