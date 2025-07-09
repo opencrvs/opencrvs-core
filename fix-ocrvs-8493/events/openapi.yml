@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: df6d018b-15c7-4ff7-8e11-5bc08c1ad565
+                transactionId: 6b56c2c6-a03f-4520-a791-5a12f7090311
                 type: v2.birth
       responses:
         "200":
@@ -143,19 +143,12 @@ paths:
                             description: Date in the format YYYY-MM-DD
                         description: Date range with start and end dates in the format YYYY-MM-DD.
                           Inclusive start, exclusive end.
-                      - type: object
-                        properties:
-                          start:
-                            type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
-                          end:
-                            type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
-                        required:
-                          - start
-                          - end
+                      - type: string
+                        enum: &a1
+                          - last7Days
+                          - last30Days
+                          - last90Days
+                          - last365Days
                       - type: boolean
                       - type: number
                       - type: object
@@ -324,19 +317,8 @@ paths:
                             description: Date in the format YYYY-MM-DD
                         description: Date range with start and end dates in the format YYYY-MM-DD.
                           Inclusive start, exclusive end.
-                      - type: object
-                        properties:
-                          start:
-                            type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
-                          end:
-                            type: string
-                            format: date
-                            description: Date in the format YYYY-MM-DD
-                        required:
-                          - start
-                          - end
+                      - type: string
+                        enum: *a1
                       - type: boolean
                       - type: number
                       - type: object
@@ -492,7 +474,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 2600a4b1-16cf-45d2-a2c7-af24a1397b3b
+                transactionId: e3341cc6-d81c-48eb-b2be-b80d1cd487b3
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -559,7 +541,7 @@ paths:
               - eventType: tennis-club-membership
                 status:
                   type: anyOf
-                  terms: &a13
+                  terms: &a14
                     - CREATED
                     - NOTIFIED
                     - DECLARED
@@ -653,7 +635,7 @@ paths:
                             type: string
                           createdByUserType:
                             type: string
-                            enum: &a10
+                            enum: &a11
                               - user
                               - system
                           createdAt:
@@ -683,7 +665,7 @@ paths:
                               or accepted by 3rd party integration.
                           type:
                             type: string
-                            enum: &a11
+                            enum: &a12
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -794,7 +776,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: &a1 []
+                        default: &a2 []
                       id:
                         type: string
                         description: Id of summary field
@@ -830,7 +812,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: *a1
+                        default: *a2
                       fieldId:
                         type: string
                       label:
@@ -911,7 +893,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: &a2
+                              enum: &a3
                                 - fuzzy
                                 - exact
                                 - range
@@ -991,7 +973,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: &a3 []
+                          default: &a4 []
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -1033,7 +1015,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: &a4 []
+                          default: &a5 []
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -1053,7 +1035,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: *a2
+                              enum: *a3
                               description: Determines the type of field
                           required:
                             - type
@@ -1130,7 +1112,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a3
+                          default: *a4
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -1172,7 +1154,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a4
+                          default: *a5
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -1288,7 +1270,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: &a9 []
+          default: &a10 []
         draft:
           type: boolean
         type:
@@ -1336,7 +1318,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a5 []
+              default: &a6 []
             required:
               type: boolean
               default: false
@@ -1357,7 +1339,7 @@ components:
                 required:
                   - validator
                   - message
-              default: &a6 []
+              default: &a7 []
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1478,7 +1460,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -1499,7 +1481,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1554,7 +1536,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -1575,7 +1557,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1625,7 +1607,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -1646,7 +1628,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1702,7 +1684,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -1723,7 +1705,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1769,7 +1751,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -1790,7 +1772,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1852,7 +1834,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -1873,7 +1855,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1889,19 +1871,8 @@ components:
               type: object
               properties:
                 value:
-                  type: object
-                  properties:
-                    start:
-                      type: string
-                      format: date
-                      description: Date in the format YYYY-MM-DD
-                    end:
-                      type: string
-                      format: date
-                      description: Date in the format YYYY-MM-DD
-                  required:
-                    - start
-                    - end
+                  type: string
+                  enum: *a1
                   description: The value of the option
                 label:
                   description: The label of the option
@@ -1916,19 +1887,8 @@ components:
                 type: object
                 properties:
                   value:
-                    type: object
-                    properties:
-                      start:
-                        type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
-                      end:
-                        type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
-                    required:
-                      - start
-                      - end
+                    type: string
+                    enum: *a1
                     description: The value of the option
                   label:
                     description: The label of the option
@@ -1962,7 +1922,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -1983,7 +1943,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2006,7 +1966,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a7
+                      enum: &a8
                         - reg12
                         - reg14
                         - reg16
@@ -2040,7 +2000,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2061,7 +2021,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2126,7 +2086,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2147,7 +2107,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2174,7 +2134,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a7
+                      enum: *a8
               default: {}
           required:
             - id
@@ -2201,7 +2161,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2222,7 +2182,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2260,7 +2220,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2281,7 +2241,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2335,7 +2295,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2356,7 +2316,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2413,7 +2373,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2434,7 +2394,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2472,7 +2432,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2493,7 +2453,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2531,7 +2491,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2552,7 +2512,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2589,7 +2549,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2610,7 +2570,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2646,7 +2606,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a8
+                    enum: &a9
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -2692,7 +2652,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2713,7 +2673,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2751,7 +2711,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2772,7 +2732,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2831,7 +2791,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2852,7 +2812,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2886,7 +2846,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2907,7 +2867,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2945,7 +2905,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -2966,7 +2926,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3004,7 +2964,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -3025,7 +2985,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3063,7 +3023,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -3084,7 +3044,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3113,7 +3073,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a8
+                    enum: *a9
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -3144,7 +3104,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -3165,7 +3125,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3210,7 +3170,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -3231,7 +3191,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3288,7 +3248,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a8
+                    enum: *a9
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -3318,7 +3278,7 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
               type: boolean
               default: false
@@ -3339,7 +3299,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3466,7 +3426,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3529,7 +3489,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3592,7 +3552,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3638,7 +3598,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3684,7 +3644,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3730,7 +3690,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3793,7 +3753,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3839,7 +3799,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3979,7 +3939,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4079,7 +4039,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4125,7 +4085,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4385,7 +4345,7 @@ components:
                     type: string
                   createdByUserType:
                     type: string
-                    enum: *a10
+                    enum: *a11
                   createdAt:
                     type: string
                     format: date-time
@@ -4413,7 +4373,7 @@ components:
                       or accepted by 3rd party integration.
                   type:
                     type: string
-                    enum: *a11
+                    enum: *a12
                 required:
                   - id
                   - transactionId
@@ -4477,7 +4437,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -4520,19 +4480,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -4701,19 +4650,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -4856,7 +4794,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: &a12
+          enum: &a13
             - Requested
             - Accepted
             - Rejected
@@ -4890,7 +4828,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -4933,19 +4871,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -5114,19 +5041,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -5269,7 +5185,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -5300,7 +5216,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -5343,19 +5259,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -5524,19 +5429,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -5679,7 +5573,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -5723,7 +5617,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -5766,19 +5660,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -5947,19 +5830,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -6102,7 +5974,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -6133,7 +6005,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6176,19 +6048,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -6357,19 +6218,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -6512,7 +6362,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -6556,7 +6406,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6599,19 +6449,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -6780,19 +6619,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -6935,7 +6763,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -6966,7 +6794,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7009,19 +6837,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -7190,19 +7007,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -7345,7 +7151,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -7378,7 +7184,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7421,19 +7227,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -7602,19 +7397,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -7757,7 +7541,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -7788,7 +7572,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7831,19 +7615,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -8012,19 +7785,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -8167,7 +7929,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -8201,7 +7963,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8244,19 +8006,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -8425,19 +8176,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -8580,7 +8320,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -8611,7 +8351,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8654,19 +8394,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -8835,19 +8564,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -8990,7 +8708,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -9024,7 +8742,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9067,19 +8785,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -9248,19 +8955,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -9403,7 +9099,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -9437,7 +9133,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9480,19 +9176,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -9661,19 +9346,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -9816,7 +9490,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -9847,7 +9521,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9890,19 +9564,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -10071,19 +9734,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -10226,7 +9878,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -10257,7 +9909,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -10300,19 +9952,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -10481,19 +10122,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
@@ -10636,7 +10266,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -10723,7 +10353,7 @@ components:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -10745,7 +10375,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a13
+            enum: *a14
       required:
         - type
         - terms
@@ -10758,7 +10388,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a13
+          enum: *a14
       required:
         - type
         - term
@@ -10927,7 +10557,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a13
+          enum: *a14
         legalStatuses:
           type: object
           properties:
@@ -11110,19 +10740,8 @@ components:
                     description: Date in the format YYYY-MM-DD
                 description: Date range with start and end dates in the format YYYY-MM-DD.
                   Inclusive start, exclusive end.
-              - type: object
-                properties:
-                  start:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                  end:
-                    type: string
-                    format: date
-                    description: Date in the format YYYY-MM-DD
-                required:
-                  - start
-                  - end
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
