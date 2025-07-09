@@ -5,7 +5,7 @@
 ### New features
 
 - **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
-- Use conditionals set on `country-config` to filter certificates. [#9684](https://github.com/opencrvs/opencrvs-core/issues/9684)
+- **Certificate Template Conditionals**: Implementing countries can now filter certificate templates based on optional conditionals. This feature allows dynamic filtering based on both declaration form values (e.g., child gender, birth date) and event metadata (e.g., registration status, action history). The conditionals use JSON Schema validation and all event metadata is accessed through the `event` property within the declaration object. This provides implementing countries with greater flexibility in showing context-appropriate certificate templates. See [Certificate Template Conditionals documentation](packages/client/src/v2-events/features/events/CERTIFICATE_TEMPLATE_CONDITIONALS.md) for detailed implementation guidance. [#7585](https://github.com/opencrvs/opencrvs-core/issues/7585)
 - Expose number of copies printed for a certificate template so it can be printed on the certificate. [#7586](https://github.com/opencrvs/opencrvs-core/issues/7586)
 
 ### Improvements

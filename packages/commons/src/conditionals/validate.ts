@@ -11,16 +11,15 @@
 
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
-import { ConditionalParameters, JSONSchema } from './conditionals'
-
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { EventState, ActionUpdate } from '../events/ActionDocument'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType, FieldConditional } from '../events/Conditional'
+import { ConditionalParameters, JSONSchema } from './conditionals'
 
 const ajv = new Ajv({
   $data: true,
@@ -59,9 +58,9 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, unknown>
 ) {
-  return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values)
-  )
+  return conditions.every((condition) => {
+    return ajv.validate(condition.conditional, values)
+  })
 }
 
 function isFieldConditionMet(
