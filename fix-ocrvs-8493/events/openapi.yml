@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f8947c08-e4af-4f4a-aebe-ed78800db1c1
+                transactionId: dda9e9b4-696b-41a2-a0c5-fb8bab7cb0fe
                 type: v2.birth
       responses:
         "200":
@@ -472,7 +472,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5d3f98ad-e93d-425f-9374-74f46cf06a6c
+                transactionId: 19256dcd-f155-4520-bbc4-50b82587d925
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1866,19 +1866,8 @@ components:
               enum:
                 - SELECT_DATE_RANGE
             defaultValue:
-              type: object
-              properties:
-                value:
-                  type: string
-                  enum: *a1
-                  description: The value of the option
-                label:
-                  description: The label of the option
-                  allOf:
-                    - $ref: "#/components/schemas/TranslationConfig"
-              required:
-                - value
-                - label
+              type: string
+              enum: *a1
             options:
               type: array
               items:

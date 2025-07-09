@@ -1218,23 +1218,13 @@ components:
               type: string
               const: SELECT_DATE_RANGE
             defaultValue:
-              type: object
-              properties:
-                value:
-                  type: string
-                  enum:
-                    &a7
-                    - last7Days
-                    - last30Days
-                    - last90Days
-                    - last365Days
-                  description: The value of the option
-                label:
-                  $ref: "#/components/schemas/TranslationConfig"
-                  description: The label of the option
-              required:
-                - value
-                - label
+              type: string
+              enum:
+                &a7
+                - last7Days
+                - last30Days
+                - last90Days
+                - last365Days
             options:
               type: array
               items:
@@ -11302,7 +11292,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 6ec9174c-6507-4938-986d-28a601ff3809
+        transactionId: 7a9b8799-3568-4f27-99d2-26f78b19a607
         declaration: {}
         annotation: {}
         type: NOTIFY
