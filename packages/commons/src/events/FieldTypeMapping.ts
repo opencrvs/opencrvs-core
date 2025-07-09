@@ -36,7 +36,8 @@ import {
   DataField,
   NameField,
   PhoneField,
-  IdField
+  IdField,
+  TimeField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -219,6 +220,13 @@ export const isDateFieldType = (field: {
   value: FieldValue
 }): field is { value: string; config: DateField } => {
   return field.config.type === FieldType.DATE
+}
+
+export const isTimeFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: string; config: TimeField } => {
+  return field.config.type === FieldType.TIME
 }
 
 export const isDateRangeFieldType = (field: {
