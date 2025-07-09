@@ -42,6 +42,7 @@ export const workqueueRouter = router({
     .output(WorkqueueCountOutput)
     .query(async (options) => {
       const scopes = getScopes({ Authorization: options.ctx.token })
+
       const searchScope = findScope(scopes, 'search')
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
       if (!searchScope) {

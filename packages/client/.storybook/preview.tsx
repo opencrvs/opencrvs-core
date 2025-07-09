@@ -171,7 +171,7 @@ const preview: Preview = {
         id: generator.user.id.localRegistrar,
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: 'LOCAL_REGISTRAR',
-        signatureFilename: undefined
+        signature: undefined
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline

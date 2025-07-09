@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { joinValues } from '@opencrvs/commons/client'
+import { FullDocumentURL, joinValues } from '@opencrvs/commons/client'
 
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
@@ -18,12 +18,12 @@ export const CACHE_NAME = 'workbox-runtime'
  * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
  * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
  */
-export function getUnsignedFileUrl(filename: string) {
+export function getUnsignedFileUrl(filename: string): FullDocumentURL {
   try {
     return new URL(
       joinValues([window.config.MINIO_BUCKET, filename], '/'),
       window.config.MINIO_BASE_URL
-    ).toString()
+    ).toString() as FullDocumentURL
   } catch (error) {
     throw new Error(
       `Failed to build file url from: MINIO_BUCKET: ${window.config.MINIO_BUCKET}, MINIO_BASE_URL: ${window.config.MINIO_BASE_URL}`

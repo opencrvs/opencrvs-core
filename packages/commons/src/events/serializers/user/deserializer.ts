@@ -56,7 +56,7 @@ function userDeserializer(
   }
   if (
     serializedUserField.$userField === 'name' ||
-    serializedUserField.$userField === 'signatureFilename'
+    serializedUserField.$userField === 'signature'
   ) {
     throw new Error(
       `Deserializer for ${serializedUserField.$userField} is not implemented yet`
