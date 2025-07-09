@@ -11,7 +11,6 @@
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
-
 import { FieldType } from './FieldType'
 import {
   CheckboxFieldValue,
@@ -317,7 +316,7 @@ export type SelectDateRangeOption = z.infer<typeof SelectDateRangeOption>
  */
 export const SelectDateRangeField = BaseField.extend({
   type: z.literal(FieldType.SELECT_DATE_RANGE),
-  defaultValue: SelectDateRangeOption.optional(),
+  defaultValue: SelectDateRangeValue.optional(),
   options: z.array(SelectDateRangeOption).describe('A list of options')
 }).describe('Select input with date range options')
 
@@ -464,35 +463,6 @@ export type DataField = z.infer<typeof DataField>
  * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
  * errors when compiling
  */
-/** @knipignore */
-export type AllFields =
-  | typeof Address
-  | typeof TextField
-  | typeof NumberField
-  | typeof TextAreaField
-  | typeof DateField
-  | typeof DateRangeField
-  | typeof SelectDateRangeField
-  | typeof Paragraph
-  | typeof RadioGroup
-  | typeof BulletList
-  | typeof PageHeader
-  | typeof Select
-  | typeof NameField
-  | typeof PhoneField
-  | typeof IdField
-  | typeof Checkbox
-  | typeof File
-  | typeof Country
-  | typeof AdministrativeArea
-  | typeof Divider
-  | typeof Location
-  | typeof Facility
-  | typeof Office
-  | typeof SignatureField
-  | typeof EmailField
-  | typeof FileUploadWithOptions
-  | typeof DataField
 
 /** @knipignore */
 export type Inferred =
