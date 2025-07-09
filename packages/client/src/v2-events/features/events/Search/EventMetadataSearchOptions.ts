@@ -8,11 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import addDays from 'date-fns/addDays'
-import format from 'date-fns/format'
-import subDays from 'date-fns/subDays'
-import subYears from 'date-fns/subYears'
-import { EventStatus } from '@opencrvs/commons/client'
+import { EventStatus, SelectDateRangeOption } from '@opencrvs/commons/client'
 
 export const statusOptions = [
   {
@@ -89,9 +85,6 @@ export const statusOptions = [
   }
 ]
 
-const DATE_FORMAT = 'yyyy-MM-dd'
-
-// Wrapping this into a function would allow for timely evaluation of the current date
 export const timePeriodOptions = [
   {
     label: {
@@ -99,10 +92,7 @@ export const timePeriodOptions = [
       description: 'Label for option of time period select: last 7 days',
       id: 'form.section.label.timePeriodLast7Days'
     },
-    value: {
-      start: format(subDays(new Date(), 6), DATE_FORMAT), // inclusive start
-      end: format(addDays(new Date(), 1), DATE_FORMAT) // exclusive end
-    }
+    value: 'last7Days'
   },
   {
     label: {
@@ -110,10 +100,7 @@ export const timePeriodOptions = [
       description: 'Label for option of time period select: last 30 days',
       id: 'form.section.label.timePeriodLast30Days'
     },
-    value: {
-      start: format(subDays(new Date(), 29), DATE_FORMAT),
-      end: format(addDays(new Date(), 1), DATE_FORMAT)
-    }
+    value: 'last30Days'
   },
   {
     label: {
@@ -121,10 +108,7 @@ export const timePeriodOptions = [
       description: 'Label for option of time period select: last 90 days',
       id: 'form.section.label.timePeriodLast90Days'
     },
-    value: {
-      start: format(subDays(new Date(), 89), DATE_FORMAT), // 89 days ago (inclusive)
-      end: format(addDays(new Date(), 1), DATE_FORMAT) // tomorrow (exclusive)
-    }
+    value: 'last90Days'
   },
   {
     label: {
@@ -132,9 +116,6 @@ export const timePeriodOptions = [
       description: 'Label for option of time period select: last year',
       id: 'form.section.label.timePeriodLastYear'
     },
-    value: {
-      start: format(subYears(new Date(), 1), DATE_FORMAT),
-      end: format(addDays(new Date(), 1), DATE_FORMAT) // exclusive end
-    }
+    value: 'last365Days'
   }
-]
+] satisfies SelectDateRangeOption[]

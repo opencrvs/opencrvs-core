@@ -22,7 +22,6 @@ type SelectDateRangeInputProps = Omit<
   onChange: (newValue: SelectDateRangeValue) => void
   value?: SelectDateRangeValue
   options: { value: SelectDateRangeValue; label: TranslationConfig }[]
-  label?: TranslationConfig
 
   error?: boolean
   touched?: boolean
@@ -35,32 +34,17 @@ type SelectDateRangeInputProps = Omit<
  * @returns Select with date range value as options.
  */
 function SelectDateRangeFieldInput(props: SelectDateRangeInputProps) {
-  const { onChange, value, options, defaultValue, ...rest } = props
+  const { onChange, ...rest } = props
 
-  const stringifiedOptions = options.map((option) => ({
-    ...option,
-    value: JSON.stringify(option.value)
-  }))
-
-  const selectValue = JSON.stringify(value) || ''
   return (
     <Select.Input
       {...rest}
-      defaultValue={defaultValue ? JSON.stringify(defaultValue) : undefined}
-      options={stringifiedOptions}
       type="SELECT"
-      value={selectValue}
-      onChange={(val: string) => onChange(JSON.parse(val))}
+      onChange={(val) => onChange(SelectDateRangeValue.parse(val))}
     />
   )
 }
 
-function stringify(value?: SelectDateRangeValue) {
-  return value?.toString() ?? ''
-}
-
 export const SelectDateRangeField = {
-  Input: SelectDateRangeFieldInput,
-  Output: ({ value }: { value?: SelectDateRangeValue }) => stringify(value),
-  stringify
+  Input: SelectDateRangeFieldInput
 }

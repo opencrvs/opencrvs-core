@@ -310,6 +310,8 @@ export const SelectDateRangeOption = z.object({
   label: TranslationConfig.describe('The label of the option')
 })
 
+export type SelectDateRangeOption = z.infer<typeof SelectDateRangeOption>
+
 /**
  * For internal use only. Needed for search functionality.
  */

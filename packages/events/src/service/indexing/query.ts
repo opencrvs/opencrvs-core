@@ -22,7 +22,10 @@ import {
 import { encodeFieldId } from './utils'
 
 /** Convert API date clause format to elastic syntax */
-function dateClauseToElasticQuery(clause: DateCondition, propertyName: string) {
+function dateClauseToElasticQuery(
+  clause: DateCondition,
+  propertyName: string
+): estypes.QueryDslQueryContainer {
   if (clause.type === 'exact') {
     return { term: { [propertyName]: clause.term } }
   } else {
@@ -32,6 +35,7 @@ function dateClauseToElasticQuery(clause: DateCondition, propertyName: string) {
     return {
       range: {
         [propertyName]: {
+          time_zone: 'Asia/Dhaka',
           ...rest
         }
       }

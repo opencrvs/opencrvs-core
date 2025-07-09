@@ -46,10 +46,12 @@ export const DateValue = z
 
 export const DatetimeValue = z.string().datetime()
 
-export const SelectDateRangeValue = z.object({
-  start: DateValue,
-  end: DateValue
-})
+export const SelectDateRangeValue = z.enum([
+  'last7Days',
+  'last30Days',
+  'last90Days',
+  'last365Days'
+])
 
 export const DateRangeFieldValue = z
   .object({

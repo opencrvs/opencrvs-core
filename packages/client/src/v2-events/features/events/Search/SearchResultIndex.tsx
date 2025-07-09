@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
 import { useLocation } from 'react-router-dom'
@@ -33,16 +33,26 @@ export const SearchResultIndex = () => {
   const location = useLocation()
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
-  const searchParams = SearchQueryParams.parse(
-    deserializeSearchParams(location.search)
+  /*
+   * SelectDateRangeValue's are converted to DateTime values which would
+   * return a new value on every render, hence we need to memoize.
+   */
+  const searchParams = useMemo(
+    () => SearchQueryParams.parse(deserializeSearchParams(location.search)),
+    [location.search]
   )
+  const searchQuery = useMemo(() => {
+    const validSearchParams = parseFieldSearchParams(eventConfig, searchParams)
+    return buildSearchQuery(validSearchParams, eventConfig)
+  }, [searchParams, eventConfig])
 
-  const validSearchParams = parseFieldSearchParams(eventConfig, searchParams)
-  const searchQuery = buildSearchQuery(validSearchParams, eventConfig)
-
-  const queryData = searchEvent.useSuspenseQuery(
-    toAdvancedSearchQueryType(searchQuery, eventType)
-  )
+  /*
+   * useSuspenseQuery unmounts the component causing the searchQuery to be
+   * re-evaluated, which leads to an infinite loop.
+   */
+  const queryData =
+    searchEvent.useQuery(toAdvancedSearchQueryType(searchQuery, eventType))
+      .data ?? []
 
   return (
     <SearchResultComponent

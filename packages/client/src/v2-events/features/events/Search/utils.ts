@@ -9,11 +9,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { parse as parseQuery, stringify } from 'query-string'
-import { isArray, isNil, isPlainObject, isString, partition } from 'lodash'
 import addDays from 'date-fns/addDays'
 import format from 'date-fns/format'
+import subDays from 'date-fns/subDays'
+import subYears from 'date-fns/subYears'
+import { parse as parseQuery, stringify } from 'query-string'
+import { isArray, isNil, isPlainObject, isString, partition } from 'lodash'
 import {
   EventConfig,
   FieldConfig,
@@ -28,7 +29,8 @@ import {
   QueryExpression,
   NameFieldValue,
   getDeclarationFields,
-  DateRangeFieldValue
+  DateRangeFieldValue,
+  SelectDateRangeValue
 } from '@opencrvs/commons/client'
 import {
   Errors,
@@ -273,6 +275,25 @@ function toRangeDateString(value: DateRangeFieldValue): string {
   return `${parsedValue.start},${parsedValue.end}`
 }
 
+function timePeriodToRangeString(value: SelectDateRangeValue): string {
+  let startDate: Date
+  switch (value) {
+    case 'last7Days':
+      startDate = subDays(new Date(), 6)
+      break
+    case 'last30Days':
+      startDate = subDays(new Date(), 29)
+      break
+    case 'last90Days':
+      startDate = subDays(new Date(), 89)
+      break
+    case 'last365Days':
+      startDate = subDays(new Date(), 364)
+      break
+  }
+  return `${startDate.toISOString()},${new Date().toISOString()}`
+}
+
 function buildConditionForStatus(): Condition {
   return { type: 'anyOf', terms: Object.values(RegStatus) }
 }
@@ -329,7 +350,7 @@ function buildSearchQueryFields(
         return {
           ...result,
           [transformedKey]: buildSearchClause(
-            toRangeDateString(DateRangeFieldValue.parse(value)),
+            timePeriodToRangeString(SelectDateRangeValue.parse(value)),
             'range'
           )
         }
