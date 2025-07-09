@@ -30,7 +30,6 @@ import * as changeLanguageActions from '@client/i18n/actions'
 import { EMPTY_STRING } from '@client/utils/constants'
 import { serviceApi } from '@client/profile/serviceApi'
 import { IStoreState } from '@client/store'
-import { queryClient } from '@client/v2-events/trpc'
 
 export type ProfileState = {
   authenticated: boolean
@@ -70,13 +69,6 @@ export const profileReducer: LoopReducer<
         },
         Cmd.list(
           [
-            Cmd.run(async () => {
-              /*
-               * Clears Events v2 query and mutation cache
-               */
-              queryClient.clear()
-              queryClient.getMutationCache().clear()
-            }),
             Cmd.run(() => removeToken()),
             Cmd.run(() => removeUserDetails()),
             Cmd.run(
