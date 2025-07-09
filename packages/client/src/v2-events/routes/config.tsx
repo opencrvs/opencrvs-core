@@ -12,6 +12,7 @@
 import React, { useEffect } from 'react'
 import { Outlet, RouteObject, Routes } from 'react-router-dom'
 
+import { useSelector } from 'react-redux'
 import { ActionType } from '@opencrvs/commons/client'
 import { Debug } from '@client/v2-events/features/debug/debug'
 import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
@@ -39,6 +40,7 @@ import { NavigationHistoryProvider } from '@client/v2-events/components/Navigati
 import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
 import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
+import { getUserDetails } from '@client/profile/profileSelectors'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
@@ -61,18 +63,27 @@ function PrefetchQueries() {
 
 export const routesConfig = {
   path: ROUTES.V2.path,
-  element: (
-    <NavigationHistoryProvider>
-      <TRPCErrorBoundary>
-        <TRPCProvider>
-          <Outlet />
-          <Debug />
-          <Toaster />
-          <PrefetchQueries />
-        </TRPCProvider>
-      </TRPCErrorBoundary>
-    </NavigationHistoryProvider>
-  ),
+  Component: () => {
+    const currentUser = useSelector(getUserDetails)
+
+    if (!currentUser) {
+      throw new Error(
+        'V2 routes cannot be initialised without user details. Make sure user details are fetched before the routes are rendered'
+      )
+    }
+    return (
+      <NavigationHistoryProvider>
+        <TRPCErrorBoundary>
+          <TRPCProvider storeIdentifier={currentUser.id}>
+            <Outlet />
+            <Debug />
+            <Toaster />
+            <PrefetchQueries />
+          </TRPCProvider>
+        </TRPCErrorBoundary>
+      </NavigationHistoryProvider>
+    )
+  },
   children: [
     {
       element: <RedirectToWorkqueue />,
