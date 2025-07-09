@@ -74,4 +74,95 @@ describe('parseScope()', () => {
     const result = parseScope(scope)
     expect(result).toEqual(undefined)
   })
+
+  it('should return undefined for an invalid scope with search', () => {
+    const scope = 'search[event=]'
+    const result = parseScope(scope)
+    expect(result).toEqual(undefined)
+  })
+
+  it('should return scope for a valid scope with search', () => {
+    const tennisScope = 'search[event=tennis-club-membership,access=all]'
+    const birthScope = 'search[event=birth,access=all]'
+
+    expect(parseScope(tennisScope)).toEqual({
+      type: 'search',
+      options: {
+        event: ['tennis-club-membership'],
+        access: ['all']
+      }
+    })
+
+    expect(parseScope(birthScope)).toEqual({
+      type: 'search',
+      options: {
+        event: ['birth'],
+        access: ['all']
+      }
+    })
+
+    const mergedScopes = findScope([tennisScope, birthScope], 'search')
+    expect(mergedScopes).toEqual({
+      type: 'search',
+      options: { 'tennis-club-membership': 'all', birth: 'all' }
+    })
+  })
+
+  it('should return scope for a valid scope with search for different jurisdiction', () => {
+    const tennisScope =
+      'search[event=tennis-club-membership,access=my-jurisdiction]'
+    const birthScope = 'search[event=birth,access=all]'
+
+    expect(parseScope(tennisScope)).toEqual({
+      type: 'search',
+      options: {
+        event: ['tennis-club-membership'],
+        access: ['my-jurisdiction']
+      }
+    })
+
+    expect(parseScope(birthScope)).toEqual({
+      type: 'search',
+      options: {
+        event: ['birth'],
+        access: ['all']
+      }
+    })
+    const mergedScopes = findScope([tennisScope, birthScope], 'search')
+    expect(mergedScopes).toEqual({
+      type: 'search',
+      options: { 'tennis-club-membership': 'my-jurisdiction', birth: 'all' }
+    })
+  })
+
+  it('should return scope for a valid scope with search for a single event', () => {
+    const scope = 'search[event=tennis-club-membership,access=all]'
+    expect(parseScope(scope)).toEqual({
+      type: 'search',
+      options: {
+        event: ['tennis-club-membership'],
+        access: ['all']
+      }
+    })
+    const foundScopes = findScope([scope], 'search')
+    expect(foundScopes).toEqual({
+      type: 'search',
+      options: { 'tennis-club-membership': 'all' }
+    })
+  })
+
+  it('should return undefined for odd jurisdiction id', () => {
+    const scope1 = 'search[event=tennis-club-membership,access=random]'
+    expect(parseScope(scope1)).toEqual(undefined)
+
+    const scope2 = 'search[event=tennis-club-membership,access=alls]'
+    expect(parseScope(scope2)).toEqual(undefined)
+
+    const scope3 =
+      'search[event=tennis-club-membership,access=my-jurisdictions]'
+    expect(parseScope(scope3)).toEqual(undefined)
+
+    const mergedScopes = findScope([scope1, scope2, scope3], 'search')
+    expect(mergedScopes).toEqual(undefined)
+  })
 })

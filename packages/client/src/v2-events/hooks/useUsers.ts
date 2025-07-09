@@ -10,13 +10,21 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { User } from '@opencrvs/commons/client'
+import { FullDocumentURL, User } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
 import { precacheFile } from '../features/files/useFileUpload'
 
-setQueryDefaults(trpcOptionsProxy.user.get, {
+type UserWithFullUrlFiles = Omit<User, 'signature' | 'avatar'> & {
+  signature?: FullDocumentURL
+  avatar?: FullDocumentURL
+}
+
+setQueryDefaults<
+  typeof trpcOptionsProxy.user.get,
+  Promise<UserWithFullUrlFiles>
+>(trpcOptionsProxy.user.get, {
   queryFn: async (...params) => {
     const {
       queryKey: [, input]
@@ -30,15 +38,20 @@ setQueryDefaults(trpcOptionsProxy.user.get, {
 
     const user = await queryOptions.queryFn(...params)
 
-    if (user.signatureFilename) {
-      await precacheFile(user.signatureFilename)
-      return {
-        ...user,
-        signatureFilename: getUnsignedFileUrl(user.signatureFilename)
-      }
+    if (user.signature) {
+      await precacheFile(user.signature)
+    }
+    if (user.avatar) {
+      await precacheFile(user.avatar)
     }
 
-    return user
+    return {
+      ...user,
+      signature: user.signature
+        ? getUnsignedFileUrl(user.signature)
+        : undefined,
+      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
+    }
   }
 })
 
@@ -58,8 +71,11 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
     await Promise.allSettled(
       users.map(async (user) => {
-        if (user.signatureFilename) {
-          return precacheFile(user.signatureFilename)
+        if (user.signature) {
+          return precacheFile(user.signature)
+        }
+        if (user.avatar) {
+          return precacheFile(user.avatar)
         }
         return user
       })
@@ -67,9 +83,7 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
     return users.map((user) => ({
       ...user,
-      signatureFilename: user.signatureFilename
-        ? getUnsignedFileUrl(user.signatureFilename)
-        : undefined
+      signature: user.signature ? getUnsignedFileUrl(user.signature) : undefined
     }))
   }
 })

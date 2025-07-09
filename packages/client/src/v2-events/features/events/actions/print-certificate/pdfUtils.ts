@@ -65,7 +65,7 @@ function findUserById(userId: string, users: User[]) {
 
   return {
     name: getUsersFullName(user.name, 'en'),
-    signature: user.signatureFilename ?? ''
+    signature: user.signature ?? ''
   }
 }
 
@@ -412,6 +412,7 @@ export function compileSvg({
 
   const template = Handlebars.compile(templateString)
   $declaration = formatAllNonStringValues($declaration, intl)
+
   const data = {
     $declaration,
     $metadata,
@@ -420,6 +421,7 @@ export function compileSvg({
       users
     }
   }
+
   const output = template(data)
   return output
 }
@@ -449,7 +451,47 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
-export function svgToPdfTemplate(
+async function downloadAndEmbedImages(svgString: string): Promise<string> {
+  const parser = new DOMParser()
+  const doc = parser.parseFromString(svgString, 'image/svg+xml')
+  const svg = doc.documentElement
+  const imageElements = svg.getElementsByTagName('image')
+
+  const imagePromises: Promise<void>[] = Array.from(imageElements).map(
+    async (imageElement) => {
+      const href =
+        imageElement.getAttribute('href') ||
+        imageElement.getAttribute('xlink:href')
+
+      if (href && (href.startsWith('http://') || href.startsWith('https://'))) {
+        const response = await fetch(href)
+        const blob = await response.blob()
+
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader()
+          reader.onload = () => resolve(reader.result as string)
+          reader.onerror = reject
+          reader.readAsDataURL(blob)
+        })
+
+        if (imageElement.hasAttribute('href')) {
+          imageElement.setAttribute('href', base64)
+        }
+
+        if (imageElement.hasAttribute('xlink:href')) {
+          imageElement.setAttribute('xlink:href', base64)
+        }
+      }
+    }
+  )
+
+  await Promise.all(imagePromises)
+
+  const serializer = new XMLSerializer()
+  return serializer.serializeToString(svg)
+}
+
+export async function svgToPdfTemplate(
   svg: string,
   certificateFonts: CertificateConfiguration
 ) {
@@ -468,10 +510,16 @@ export function svgToPdfTemplate(
       ...certificateFonts
     }
   }
+  /*
+   * Download and inline all image files before creating a PDF.
+   * If this is not done, the PDF will not render images correctly.
+   * Images should always already be cached in the browser, so this also works offline
+   */
+  const svgWithInlineImages = await downloadAndEmbedImages(svg)
 
   const parser = new DOMParser()
   const svgElement = parser.parseFromString(
-    svg,
+    svgWithInlineImages,
     'image/svg+xml'
   ).documentElement
 
@@ -513,7 +561,7 @@ export function svgToPdfTemplate(
 
   pdfTemplate.definition.content = [
     {
-      svg
+      svg: svgWithInlineImages
     },
     ...absolutelyPositionedHTMLs
   ]
@@ -526,11 +574,15 @@ interface PdfTemplate {
   fonts: Record<string, TFontFamilyTypes>
 }
 
+function createPDF(template: PdfTemplate): pdfMake.TCreatedPdf {
+  return pdfMake.createPdf(template.definition, undefined, template.fonts)
+}
+
 export function printAndDownloadPdf(
   template: PdfTemplate,
   declarationId: string
 ) {
-  const pdf = pdfMake.createPdf(template.definition, undefined, template.fonts)
+  const pdf = createPDF(template)
   if (isMobileDevice()) {
     pdf.download(`${declarationId}`)
   } else {

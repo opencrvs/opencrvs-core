@@ -11,8 +11,10 @@
 
 import fetch from 'node-fetch'
 import { UUID } from '../uuid'
+import { FullDocumentPath } from '../documents'
+import { joinURL } from '../url'
 
-interface IUserName {
+export interface IUserName {
   use: string
   family: string
   given: string[]
@@ -24,6 +26,12 @@ type ObjectId = string
  * Let's add more fields as they are needed
  */
 type User = {
+  id: string
+  avatar?: {
+    data: FullDocumentPath
+    type: string
+  }
+  signature?: FullDocumentPath
   name: IUserName[]
   username: string
   email: string
@@ -33,7 +41,6 @@ type User = {
   scope: string[]
   status: string
   creationDate: number
-  signature?: string
 }
 type System = {
   name: string
@@ -46,16 +53,19 @@ type System = {
   type: string
 }
 
+export class UserNotFoundError extends Error {
+  constructor(userId: string) {
+    super(`User with id ${userId} not found`)
+    this.name = 'UserNotFoundError'
+  }
+}
+
 export async function getUser(
   userManagementHost: string,
   userId: string,
   token: string
 ) {
-  const hostWithTrailingSlash = userManagementHost.endsWith('/')
-    ? userManagementHost
-    : userManagementHost + '/'
-
-  const res = await fetch(new URL('getUser', hostWithTrailingSlash).href, {
+  const res = await fetch(joinURL(userManagementHost, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {
@@ -63,6 +73,10 @@ export async function getUser(
       Authorization: token
     }
   })
+
+  if (res.status === 404) {
+    throw new UserNotFoundError(userId)
+  }
 
   if (!res.ok) {
     throw new Error(

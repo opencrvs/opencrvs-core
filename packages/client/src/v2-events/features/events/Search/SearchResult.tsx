@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React, { useState, useEffect, PropsWithChildren } from 'react'
+import React, { useState, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
@@ -22,7 +22,6 @@ import {
   WorkqueueColumn,
   deepDropNulls,
   applyDraftsToEventIndex,
-  EventState,
   WorkqueueActionsWithDefault,
   isMetaAction
 } from '@opencrvs/commons/client'
@@ -33,6 +32,7 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { Button, Link as TextButton } from '@opencrvs/components'
+import { Downloaded } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -47,6 +47,7 @@ import {
   useAction,
   useActionMenuItems
 } from '../../workqueues/EventOverview/components/useActionMenuItems'
+import { deserializeSearchParams, serializeSearchParams } from './utils'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -185,13 +186,6 @@ const searchResultMessages = {
 
 const messages = defineMessages(searchResultMessages)
 
-interface Props {
-  columns: WorkqueueColumn[]
-  eventConfigs: EventConfig[]
-  searchParams?: EventState
-  queryData: EventIndex[]
-}
-
 const ExtendedEventStatuses = {
   OUTBOX: 'OUTBOX',
   DRAFT: 'DRAFT'
@@ -257,8 +251,20 @@ export const SearchResultComponent = ({
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
   const isOnline = useOnlineStatus()
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
+  const setOffset = (newOffset: number) => {
+    const params = deserializeSearchParams(location.search)
+    params.offset = String(newOffset)
+    navigate(
+      {
+        pathname: slug
+          ? ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug })
+          : location.pathname,
+        search: serializeSearchParams(params)
+      },
+      { replace: true }
+    )
+  }
   const { getOutbox } = useEvents()
   const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
@@ -306,7 +312,11 @@ export const SearchResultComponent = ({
         }))
         .concat({
           actionComponent: (
-            <DownloadButton key={`DownloadButton-${event.id}`} event={event} />
+            <DownloadButton
+              key={`DownloadButton-${event.id}`}
+              event={event}
+              isDraft={slug === CoreWorkqueues.DRAFT}
+            />
           )
         })
 
@@ -318,15 +328,18 @@ export const SearchResultComponent = ({
       const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
+
       const isInDrafts = drafts.some((draft) => draft.id === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
           return ExtendedEventStatuses.OUTBOX
         }
+
         if (isInDrafts) {
           return ExtendedEventStatuses.DRAFT
         }
+
         return event.status
       }
 
@@ -342,7 +355,11 @@ export const SearchResultComponent = ({
           status
         }),
         title: isInOutbox ? (
-          <IconWithName name={event.title} status={status} />
+          <IconWithName
+            flags={event.flags}
+            name={event.title}
+            status={status}
+          />
         ) : (
           <TextButton
             color={event.useFallbackTitle ? 'red' : 'primary'}
@@ -354,7 +371,11 @@ export const SearchResultComponent = ({
               )
             }}
           >
-            <IconWithName name={event.title} status={status} />
+            <IconWithName
+              flags={event.flags}
+              name={event.title}
+              status={status}
+            />
           </TextButton>
         ),
         outbox: intl.formatMessage(
@@ -408,14 +429,19 @@ export const SearchResultComponent = ({
      * Apply pending drafts to the event index.
      * This is necessary to show the most up to date information in the workqueue.
      */
-    .map((event) =>
-      deepDropNulls(
+    .map((event) => {
+      const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+      if (!eventConfig) {
+        throw new Error('Event configuration not found for event:' + event.type)
+      }
+      return deepDropNulls(
         applyDraftsToEventIndex(
           event,
-          drafts.filter((d) => d.eventId === event.id)
+          drafts.filter((d) => d.eventId === event.id),
+          eventConfig
         )
       )
-    )
+    })
 
   const dataWithTitle = dataWithDraft.map((event) => {
     const eventConfig = eventConfigs.find(({ id }) => id === event.type)
@@ -430,6 +456,8 @@ export const SearchResultComponent = ({
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
   const allResults = mapEventsToWorkqueueRows(sortedResult)
+
+  const currentPageNumber = Math.floor(offset / limit) + 1
 
   const paginatedData = allResults.slice(
     limit * (currentPageNumber - 1),
@@ -456,7 +484,7 @@ export const SearchResultComponent = ({
         tabBarContent={tabBarContent}
         title={contentTitle}
         totalPages={totalPages}
-        onPageChange={(page) => setCurrentPageNumber(page)}
+        onPageChange={(page) => setOffset((page - 1) * limit)}
       >
         <Workqueue
           columns={[

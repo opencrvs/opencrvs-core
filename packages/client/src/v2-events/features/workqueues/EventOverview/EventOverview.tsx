@@ -89,7 +89,7 @@ function EventOverviewFull({
 
   return (
     <Content
-      icon={() => <IconWithName name={''} status={status} />}
+      icon={() => <IconWithName flags={flags} name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
@@ -122,7 +122,7 @@ function EventOverviewProtected({
   const drafts = getRemoteDrafts(eventIndex.id)
 
   const eventWithDrafts = deepDropNulls(
-    applyDraftsToEventIndex(eventIndex, drafts)
+    applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
   )
   const { getUser } = useUsers()
   const intl = useIntl()
@@ -147,7 +147,7 @@ function EventOverviewProtected({
 
   return (
     <Content
-      icon={() => <IconWithName name={''} status={status} />}
+      icon={() => <IconWithName flags={flags} name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}

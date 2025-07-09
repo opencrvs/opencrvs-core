@@ -197,7 +197,7 @@ export const errorMessages = {
     id: 'v2.error.invalidEmail'
   },
   requiredField: {
-    defaultMessage: 'Required for registration',
+    defaultMessage: 'Required',
     description: 'Error message when required field is missing',
     id: 'v2.error.required'
   },

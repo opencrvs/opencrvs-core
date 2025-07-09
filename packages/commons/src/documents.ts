@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { z } from 'zod'
+
 export const MINIO_REGEX =
   /^https?:\/\/[^\/]+(.*)?\/[^\/?]+\.(jpg|png|jpeg|svg)(\?.*)?$/i
 
@@ -20,4 +22,36 @@ export function isBase64FileString(str: string) {
   return strSplit.length > 0 && strSplit[0] === 'data'
 }
 
-export const isMinioUrl = (url: string) => MINIO_REGEX.test(url)
+export const isMinioUrl = (url: string): url is FullDocumentURL =>
+  MINIO_REGEX.test(url)
+
+export const FullDocumentURL = z
+  .string()
+  .brand('FullDocumentURL')
+  .describe(
+    'A full url with protocol, host, bucket name, starting from the root of the S3 server, https://minio/bucket-name/document-id.jpg'
+  )
+
+export type FullDocumentURL = z.infer<typeof FullDocumentURL>
+
+export const FullDocumentPath = z
+  .string()
+  .brand('FullDocumentPath')
+  .describe(
+    'A full path with bucket name, starting from the root of the S3 server, /bucket-name/document-id.jpg'
+  )
+
+export type FullDocumentPath = z.infer<typeof FullDocumentPath>
+
+export const DocumentPath = z
+  .string()
+  .brand('DocumentPath')
+  .describe(
+    'A full identifier starting from the root of the S3 bucket, e.g. /document-id.jpg or /directory/document-id.jpg but never /bucket-name/document-id.jpg'
+  )
+
+export type DocumentPath = z.infer<typeof DocumentPath>
+
+export const toDocumentPath = (path: FullDocumentPath): DocumentPath => {
+  return path.split('/').slice(2).join('/') as DocumentPath
+}

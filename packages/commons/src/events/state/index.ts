@@ -91,7 +91,7 @@ export function getAssignedUserSignatureFromActions(
 
 function aggregateActionDeclarations(
   actions: Array<ActionDocument>
-): ActionUpdate {
+): EventState {
   /** Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
@@ -174,13 +174,25 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =
   'createdAt' satisfies keyof EventDocument
 
+export function resolveDateOfEvent(
+  eventMetadata: { createdAt: string },
+  declaration: EventState,
+  config: EventConfig
+) {
+  if (!config.dateOfEvent) {
+    return eventMetadata[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
+  }
+  const parsedDate = ZodDate.safeParse(declaration[config.dateOfEvent.$$field])
+  return parsedDate.success ? parsedDate.data : undefined
+}
+
 /**
  * @returns the current state of the event based on the actions taken.
  * @see EventIndex for the description of the returned object.
  */
 export function getCurrentEventState(
   event: EventDocument,
-  config: Partial<EventConfig>
+  config: EventConfig
 ): EventIndex {
   const creationAction = event.actions.find(
     (action) => action.type === ActionType.CREATE
@@ -202,21 +214,6 @@ export function getCurrentEventState(
 
   const declaration = aggregateActionDeclarations(acceptedActions)
 
-  let dateOfEvent
-
-  if (config.dateOfEvent) {
-    const parsedDate = ZodDate.safeParse(
-      declaration[config.dateOfEvent.$$field]
-    )
-    if (parsedDate.success) {
-      dateOfEvent = parsedDate.data
-    }
-  } else {
-    dateOfEvent = event[DEFAULT_DATE_OF_EVENT_PROPERTY].split('T')[0]
-  }
-
-  // @TODO: Typing issue here with branded values (UUID)
-  // @ts-ignore
   return deepDropNulls({
     id: event.id,
     type: event.type,
@@ -235,7 +232,7 @@ export function getCurrentEventState(
     declaration,
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
-    dateOfEvent,
+    dateOfEvent: resolveDateOfEvent(event, declaration, config),
     flags: getFlagsFromActions(event.actions)
   })
 }
@@ -284,9 +281,27 @@ export function getCurrentEventStateWithDrafts({
   return getCurrentEventState(withDrafts, configuration)
 }
 
+export function applyDeclarationToEventIndex(
+  eventIndex: EventIndex,
+  declaration: EventState | ActionUpdate,
+  eventConfiguration: EventConfig
+): EventIndex {
+  const updatedDeclaration = deepMerge(eventIndex.declaration, declaration)
+  return {
+    ...eventIndex,
+    dateOfEvent: resolveDateOfEvent(
+      eventIndex,
+      updatedDeclaration,
+      eventConfiguration
+    ),
+    declaration: updatedDeclaration
+  }
+}
+
 export function applyDraftsToEventIndex(
   eventIndex: EventIndex,
-  drafts: Draft[]
+  drafts: Draft[],
+  eventConfiguration: EventConfig
 ) {
   const indexedAt = eventIndex.updatedAt
 
@@ -299,13 +314,11 @@ export function applyDraftsToEventIndex(
     return eventIndex
   }
 
-  return {
-    ...eventIndex,
-    declaration: {
-      ...eventIndex.declaration,
-      ...activeDrafts[activeDrafts.length - 1].declaration
-    }
-  }
+  return applyDeclarationToEventIndex(
+    eventIndex,
+    activeDrafts[activeDrafts.length - 1].declaration,
+    eventConfiguration
+  )
 }
 
 /**
