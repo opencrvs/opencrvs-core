@@ -33,7 +33,6 @@ import {
   EventStatus
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
-import { EventStatus } from '@opencrvs/commons/client'
 import {
   Errors,
   getValidationErrorsForForm
