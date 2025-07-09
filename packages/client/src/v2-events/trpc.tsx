@@ -97,20 +97,18 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
   client: trpcClient
 })
 
-export function TRPCProvider({ children }: { children: React.ReactNode }) {
-  const currentUser = useSelector(getUserDetails)
-
-  if (!currentUser) {
-    throw new Error(
-      'TRPCProvider cannot be initialised without user details. Make sure user details are fetched before the provider is rendered'
-    )
-  }
-
+export function TRPCProvider({
+  children,
+  storeIdentifier = 'DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK'
+}: {
+  children: React.ReactNode
+  storeIdentifier?: string
+}) {
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
-        persister: createIDBPersister(currentUser.id),
+        persister: createIDBPersister(storeIdentifier),
         buster: 'persisted-indexed-db',
         maxAge: undefined,
         dehydrateOptions: {
