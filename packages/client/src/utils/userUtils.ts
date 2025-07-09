@@ -32,7 +32,7 @@ export async function storeUserDetails(userDetails: UserDetails) {
   storage.setItem(USER_DETAILS, JSON.stringify(userDetails))
 }
 export async function removeUserDetails() {
-  storage.removeItem(USER_DETAILS)
+  return storage.removeItem(USER_DETAILS)
 }
 
 export function getIndividualNameObj(
