@@ -44,7 +44,7 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
-export const TimeValue = z.string().time().describe('Time in the format HH-mm')
+export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
 
 export const DatetimeValue = z.string().datetime()
 

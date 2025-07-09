@@ -41,7 +41,6 @@ function TimeInput({
   onChange: (newValue: string) => void
   value: string
 }) {
-  console.log('TimeInput value >>>>>>> ', value)
   const cleanEmpty = React.useCallback(
     (val: string) => (val === EMPTY_TIME ? '' : val),
     []
@@ -70,27 +69,27 @@ function TimeInput({
 function parseAndFormatTime(intl: IntlShape, value?: string) {
   const parsed = TimeValue.safeParse(value)
 
-  if (parsed.success) {
-    const dummyDate = new Date()
-    const [timePart, meridiem] = parsed.data.split(' ')
-    const [hourStr, minuteStr] = timePart.split(':')
-
-    let hours = parseInt(hourStr, 10)
-    const minutes = parseInt(minuteStr, 10)
-
-    if (meridiem === 'PM' && hours < 12) {
-      hours += 12
-    } else if (meridiem === 'AM' && hours === 12) {
-      hours = 0
-    }
-
-    dummyDate.setHours(hours)
-    dummyDate.setMinutes(minutes)
-
-    return format(dummyDate, intl.formatMessage(messages.timeFormat))
+  if (!parsed.success) {
+    return String(value ?? '')
   }
 
-  return String(value ?? '')
+  const dummyDate = new Date()
+  const [timePart, meridiem] = parsed.data.split(' ')
+  const [hourStr, minuteStr] = timePart.split(':')
+
+  let hours = parseInt(hourStr, 10)
+  const minutes = parseInt(minuteStr, 10)
+
+  if (meridiem === 'PM' && hours < 12) {
+    hours += 12
+  } else if (meridiem === 'AM' && hours === 12) {
+    hours = 0
+  }
+
+  dummyDate.setHours(hours)
+  dummyDate.setMinutes(minutes)
+
+  return format(dummyDate, intl.formatMessage(messages.timeFormat))
 }
 
 function TimeOutput({ value }: { value?: string }) {
