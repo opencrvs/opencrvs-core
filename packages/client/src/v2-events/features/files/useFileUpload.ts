@@ -11,7 +11,7 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { joinValues } from '@opencrvs/commons/client'
+import { joinURLPaths } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
 import { cacheFile, removeCached } from '@client/v2-events/cache'
@@ -63,7 +63,7 @@ const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(fileUri: string) {
-  const url = joinValues(['/api/presigned-url', fileUri], '/')
+  const url = joinURLPaths('/api/presigned-url', fileUri)
 
   const response = await fetch(url, {
     method: 'GET',

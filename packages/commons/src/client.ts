@@ -19,5 +19,6 @@ export { DEFAULT_ROLES_DEFINITION } from './authentication'
 export * from './fixtures'
 export * from './users/systemRole'
 export * from './authentication'
+export * from './url'
 
 export type PartialBy<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>
