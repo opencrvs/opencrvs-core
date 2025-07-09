@@ -45,7 +45,8 @@ import {
   isNameFieldType,
   isPhoneFieldType,
   isIdFieldType,
-  getValidatorsForField
+  getValidatorsForField,
+  isTimeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -62,7 +63,8 @@ import {
   AdministrativeArea,
   Divider,
   PageHeader,
-  Paragraph
+  Paragraph,
+  Time
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -215,6 +217,20 @@ export const GeneratedInputField = React.memo(
       return (
         <InputField {...field.inputFieldProps}>
           <DateField.Input
+            {...inputProps}
+            value={field.value}
+            onChange={(val: string) =>
+              onFieldValueChange(fieldDefinition.id, val)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isTimeFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Time.Input
             {...inputProps}
             value={field.value}
             onChange={(val: string) =>
