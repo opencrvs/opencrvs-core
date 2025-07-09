@@ -16,7 +16,7 @@ import React, { PropsWithChildren } from 'react'
 
 import { Page } from '@client/components/Page'
 import { I18nContainer } from '@client/i18n/components/I18nContainer'
-import { createStore } from '@client/store'
+import { createStore, IStoreState } from '@client/store'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
@@ -67,22 +67,11 @@ initialize({
   }
 })
 
-const { store } = createStore()
-
 type WrapperProps = PropsWithChildren<{
   store: ReturnType<typeof createStore>['store']
   initialPath: string
   router?: RouteObject
 }>
-
-function WaitForUserDetails({ children }: PropsWithChildren<{}>) {
-  const currentUser = useSelector(getUserDetails)
-
-  if (!currentUser) {
-    return null
-  }
-  return children
-}
 
 function Wrapper({ store, router, initialPath, children }: WrapperProps) {
   const { client } = useApolloClient(store)
@@ -101,9 +90,7 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
                       element: (
                         <Page>
                           <NavigationHistoryProvider>
-                            <WaitForUserDetails>
-                              <Outlet />
-                            </WaitForUserDetails>
+                            <Outlet />
                           </NavigationHistoryProvider>
                         </Page>
                       ),
@@ -200,6 +187,8 @@ const preview: Preview = {
   ],
   decorators: [
     (Story, context) => {
+      const { store } = createStore()
+
       return (
         <Wrapper
           store={store}
