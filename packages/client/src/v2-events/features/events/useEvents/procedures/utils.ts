@@ -145,3 +145,8 @@ export function createEventActionMutationFn<
     }
   )
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type QueryOptions<P extends DecorateQueryProcedure<any>> = Partial<
+  Omit<ReturnType<P['queryOptions']>, 'queryFn'>
+>

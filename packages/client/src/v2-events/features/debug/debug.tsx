@@ -10,9 +10,29 @@
  */
 /* stylelint-disable */
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
-import React from 'react'
+import { onlineManager } from '@tanstack/react-query'
+
+import React, { useEffect } from 'react'
+
+const wasOffline = localStorage.getItem('offline') === 'true'
+
+onlineManager.setOnline(!wasOffline)
 
 export function Debug() {
+  useEffect(() => {
+    onlineManager.subscribe(() => {
+      localStorage.setItem('offline', (!onlineManager.isOnline()).toString())
+    })
+
+    setTimeout(() => {
+      /*
+       * This just forces rerender of the the DevTools
+       */
+      onlineManager.setOnline(wasOffline)
+      onlineManager.setOnline(!wasOffline)
+    }, 100)
+  }, [])
+
   return (
     <>
       <ReactQueryDevtools initialIsOpen={false} />

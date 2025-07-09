@@ -25,6 +25,7 @@ import {
 import { useGetEvents } from './procedures/list'
 import { useGetEventCounts } from './procedures/count'
 import { findLocalEventIndex } from './api'
+import { QueryOptions } from './procedures/utils'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -50,12 +51,16 @@ export function useEvents() {
           staleTime: 0
         })
       },
-      useSuspenseQuery: (query: QueryType) => {
+      useSuspenseQuery: (
+        query: QueryType,
+        options: QueryOptions<typeof trpc.event.search> = {}
+      ) => {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
           refetchOnMount: true,
-          staleTime: 0
+          staleTime: 0,
+          ...options
         }).data
       }
     },

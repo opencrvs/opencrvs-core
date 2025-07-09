@@ -57,14 +57,17 @@ export const useWorkqueue = (workqueueSlug: string) => {
 
   return {
     getResult: () => {
-      const deSerializedQuery = getDeserializedQuery(
+      const deserializedQuery = getDeserializedQuery(
         workqueueConfig,
         user,
         legacyUser?.primaryOffice.id
       )
       return {
-        useSuspenseQuery: () => searchEvent.useSuspenseQuery(deSerializedQuery),
-        useQuery: () => searchEvent.useQuery(deSerializedQuery)
+        useSuspenseQuery: () =>
+          searchEvent.useSuspenseQuery(deserializedQuery, {
+            networkMode: 'offlineFirst'
+          }),
+        useQuery: () => searchEvent.useQuery(deserializedQuery)
       }
     },
     getCount: {
