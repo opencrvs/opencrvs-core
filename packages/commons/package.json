@@ -55,6 +55,7 @@
     "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "@types/jsonwebtoken": "^9.0.9",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
@@ -66,36 +67,12 @@
     "jest-fetch-mock": "^2.1.2",
     "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^11.0.0",
-    "ts-jest": "29.2.5"
+    "ts-jest": "^29.4.0"
   },
   "lint-staged": {
     "src/**/*.ts": [
       "prettier --write",
       "eslint --fix"
     ]
-  },
-  "jest": {
-    "transform": {
-      "^.+\\.tsx?$": "ts-jest"
-    },
-    "coverageReporters": [
-      "json",
-      "lcov",
-      "text",
-      "html"
-    ],
-    "testRegex": "(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$",
-    "setupFiles": [
-      "./test/setupJest.ts"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx",
-      "json",
-      "node"
-    ],
-    "testEnvironment": "node"
   }
 }
