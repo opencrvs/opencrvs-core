@@ -218,11 +218,11 @@ export function DownloadButton({
       >
         {isAssignedToSomeoneElse || isDownloadedToMe ? (
           <AvatarSmall
-            key={user?.avatarURL || 'default'}
+            key={user?.avatar || 'default'}
             avatar={
-              user?.avatarURL
+              user?.avatar
                 ? {
-                    data: user.avatarURL,
+                    data: user.avatar,
                     type: 'image/jpeg' // This is never used internally
                   }
                 : undefined

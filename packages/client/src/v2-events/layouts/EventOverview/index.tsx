@@ -119,7 +119,9 @@ export function EventOverviewLayout({
           mobileTitle={flattenedIntl.formatMessage(
             eventConfiguration.title,
             flattenEventIndex(
-              deepDropNulls(applyDraftsToEventIndex(eventIndex, drafts))
+              deepDropNulls(
+                applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
+              )
             )
           )}
         />

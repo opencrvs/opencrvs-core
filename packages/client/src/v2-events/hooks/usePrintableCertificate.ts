@@ -114,13 +114,11 @@ export const usePrintableCertificate = ({
 
     const base64ReplacedUsersWithSignature = await Promise.all(
       users.map(async (user) => {
-        if (user.signatureFilename && isMinioUrl(user.signatureFilename)) {
-          const base64Signature = await fetchImageAsBase64(
-            user.signatureFilename
-          )
+        if (user.signature && isMinioUrl(user.signature)) {
+          const base64Signature = await fetchImageAsBase64(user.signature)
           return {
             ...user,
-            signatureFilename: base64Signature
+            signature: base64Signature
           }
         }
         return user
@@ -143,7 +141,11 @@ export const usePrintableCertificate = ({
     })
 
     const compiledSvgWithFonts = addFontsToSvg(compiledSvg, certificateFonts)
-    const pdfTemplate = svgToPdfTemplate(compiledSvgWithFonts, certificateFonts)
+    const pdfTemplate = await svgToPdfTemplate(
+      compiledSvgWithFonts,
+      certificateFonts
+    )
+
     printAndDownloadPdf(pdfTemplate, event.id)
   }
 

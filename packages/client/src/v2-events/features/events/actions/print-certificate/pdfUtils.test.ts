@@ -10,8 +10,13 @@
  */
 
 import { createIntl } from 'react-intl'
+import createFetchMock from 'vitest-fetch-mock'
+import { ContentSvg } from 'pdfmake/interfaces'
 import { eventQueryDataGenerator, User, UUID } from '@opencrvs/commons/client'
-import { stringifyEventMetadata } from './pdfUtils'
+import { svgToPdfTemplate, stringifyEventMetadata } from './pdfUtils'
+
+const fetch = createFetchMock(vi)
+fetch.enableMocks()
 
 const locations = [
   {
@@ -71,5 +76,56 @@ describe('stringifyEventMetadata', () => {
       intl: createIntl({ locale: 'en' })
     })
     expect(stringified).toMatchSnapshot()
+  })
+})
+describe('svgToPdfTemplate', () => {
+  test('replaces image URL with base64 data', async () => {
+    fetch.mockResolvedValue({
+      blob: async () =>
+        Promise.resolve(new Blob(['fake-image-data'], { type: 'image/png' }))
+    } as Response)
+
+    const mockFiles = [
+      'data:image/png;base64,FIRST_FILE_DATA',
+      'data:image/png;base64,SECOND_FILE_DATA'
+    ]
+
+    global.FileReader = vi.fn(() => {
+      const mockFileReader = {
+        readAsDataURL: vi.fn(),
+        result: mockFiles.shift(),
+        onload: null as null | (() => void),
+        onerror: null
+      }
+      // Trigger the FileReader onload manually
+      setTimeout(() => {
+        if (mockFileReader.onload) {
+          mockFileReader.onload()
+        }
+      }, 0)
+      return mockFileReader
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    }) as any
+
+    const svgString = `
+      <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <image href="https://example.com/image.png" x="0" y="0" width="50" height="50"/>
+        <image xlink:href="https://example.com/image2.png" x="0" y="0" width="50" height="50"/>
+      </svg>
+    `
+
+    const result = await svgToPdfTemplate(svgString, {})
+    const [content] = result.definition.content as [ContentSvg]
+
+    expect(content).toHaveProperty('svg')
+    expect(fetch).toHaveBeenCalledTimes(2)
+    expect(content.svg).toBe(
+      `
+      <svg width="100" height="100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <image href="data:image/png;base64,FIRST_FILE_DATA" x="0" y="0" width="50" height="50"/>
+        <image xlink:href="data:image/png;base64,SECOND_FILE_DATA" x="0" y="0" width="50" height="50"/>
+      </svg>
+      `.trim()
+    )
   })
 })

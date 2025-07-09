@@ -24,7 +24,11 @@ import {
 } from '@opencrvs/commons/client'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { TabSearch } from './TabSearch'
-import { parseFieldSearchParams, deserializeSearchParams } from './utils'
+import {
+  checkScopeForEventSearch,
+  parseFieldSearchParams,
+  deserializeSearchParams
+} from './utils'
 
 export const advancedSearchMessages = {
   advancedSearch: {
@@ -52,7 +56,8 @@ export function AdvancedSearch() {
   )
 
   const advancedSearchEvents = allEvents.filter(
-    (event) => event.advancedSearch.length > 0
+    (event) =>
+      event.advancedSearch.length > 0 && checkScopeForEventSearch(event.id)
   )
 
   const [formValuesByTabId, setFormValuesByTabId] = useState<
