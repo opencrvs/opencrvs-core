@@ -9,16 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MongoClient } from 'mongodb'
-import { env } from '@events/environment'
+export function joinURL(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return new URL(path, baseWithSlash)
+}
 
-const url = env.USER_MGNT_MONGO_URL
-const client = new MongoClient(url)
-
-export async function getClient() {
-  await client.connect()
-
-  // Providing the database name is not necessary, it will read it from the connection string.
-  // e2e-environment uses different name from deployment to deployment, so we can't hardcode it.
-  return client.db()
+export function joinURLPaths(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return baseWithSlash + path.replace(/^\//, '')
 }
