@@ -228,3 +228,11 @@ export const QueryType = z
 
 export type QueryType = z.infer<typeof QueryType>
 export type QueryExpression = z.infer<typeof QueryExpression>
+
+export const SearchScopeAccessLevels = {
+  MY_JURISDICTION: 'my-jurisdiction',
+  ALL: 'all'
+} as const
+
+export type SearchScopeAccessLevels =
+  (typeof SearchScopeAccessLevels)[keyof typeof SearchScopeAccessLevels]

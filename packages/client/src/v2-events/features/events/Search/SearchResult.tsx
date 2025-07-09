@@ -47,6 +47,7 @@ import {
   useAction,
   useActionMenuItems
 } from '../../workqueues/EventOverview/components/useActionMenuItems'
+import { deserializeSearchParams, serializeSearchParams } from './utils'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -250,8 +251,20 @@ export const SearchResultComponent = ({
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
   const isOnline = useOnlineStatus()
-  const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
 
+  const setOffset = (newOffset: number) => {
+    const params = deserializeSearchParams(location.search)
+    params.offset = String(newOffset)
+    navigate(
+      {
+        pathname: slug
+          ? ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug })
+          : location.pathname,
+        search: serializeSearchParams(params)
+      },
+      { replace: true }
+    )
+  }
   const { getOutbox } = useEvents()
   const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
@@ -298,15 +311,13 @@ export const SearchResultComponent = ({
           )
         }))
         .concat({
-          actionComponent:
-            slug === CoreWorkqueues.DRAFT ? (
-              <Downloaded />
-            ) : (
-              <DownloadButton
-                key={`DownloadButton-${event.id}`}
-                event={event}
-              />
-            )
+          actionComponent: (
+            <DownloadButton
+              key={`DownloadButton-${event.id}`}
+              event={event}
+              isDraft={slug === CoreWorkqueues.DRAFT}
+            />
+          )
         })
 
       const eventConfig = eventConfigs.find(({ id }) => id === event.type)
@@ -418,14 +429,19 @@ export const SearchResultComponent = ({
      * Apply pending drafts to the event index.
      * This is necessary to show the most up to date information in the workqueue.
      */
-    .map((event) =>
-      deepDropNulls(
+    .map((event) => {
+      const eventConfig = eventConfigs.find(({ id }) => id === event.type)
+      if (!eventConfig) {
+        throw new Error('Event configuration not found for event:' + event.type)
+      }
+      return deepDropNulls(
         applyDraftsToEventIndex(
           event,
-          drafts.filter((d) => d.eventId === event.id)
+          drafts.filter((d) => d.eventId === event.id),
+          eventConfig
         )
       )
-    )
+    })
 
   const dataWithTitle = dataWithDraft.map((event) => {
     const eventConfig = eventConfigs.find(({ id }) => id === event.type)
@@ -440,6 +456,8 @@ export const SearchResultComponent = ({
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
   const allResults = mapEventsToWorkqueueRows(sortedResult)
+
+  const currentPageNumber = Math.floor(offset / limit) + 1
 
   const paginatedData = allResults.slice(
     limit * (currentPageNumber - 1),
@@ -466,7 +484,7 @@ export const SearchResultComponent = ({
         tabBarContent={tabBarContent}
         title={contentTitle}
         totalPages={totalPages}
-        onPageChange={(page) => setCurrentPageNumber(page)}
+        onPageChange={(page) => setOffset((page - 1) * limit)}
       >
         <Workqueue
           columns={[

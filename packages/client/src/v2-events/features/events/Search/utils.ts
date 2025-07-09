@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -9,12 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import addDays from 'date-fns/addDays'
-import format from 'date-fns/format'
+/* eslint-disable max-lines */
 import subDays from 'date-fns/subDays'
-import subYears from 'date-fns/subYears'
-import { parse as parseQuery, stringify } from 'query-string'
 import { isArray, isNil, isPlainObject, isString, partition } from 'lodash'
+import { parse as parseQuery, stringify } from 'query-string'
+import { useSelector } from 'react-redux'
 import {
   EventConfig,
   FieldConfig,
@@ -32,10 +30,13 @@ import {
   DateRangeFieldValue,
   SelectDateRangeValue
 } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
+import { EventStatus } from '@opencrvs/commons/client'
 import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { getScope } from '@client/profile/profileSelectors'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -188,18 +189,6 @@ export const getMetadataFieldConfigs = (
   return searchFields
 }
 
-// @TODO: Could we just use EventStatus?
-const RegStatus = {
-  Created: 'CREATED',
-  Notified: 'NOTIFIED',
-  Declared: 'DECLARED',
-  Validated: 'VALIDATED',
-  Registered: 'REGISTERED',
-  Certified: 'CERTIFIED',
-  Rejected: 'REJECTED',
-  Archived: 'ARCHIVED'
-} as const
-
 const MatchType = {
   fuzzy: 'fuzzy',
   exact: 'exact',
@@ -295,7 +284,7 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
 }
 
 function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values(RegStatus) }
+  return { type: 'anyOf', terms: Object.values([...EventStatus.options]) }
 }
 
 /**
@@ -643,6 +632,20 @@ export function buildQuickSearchQuery(
 
   // Delegate to the actual query builder
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
+}
+
+/**
+ * @returns a boolean indicating whether the current user has the scope to search for an event
+ */
+export function checkScopeForEventSearch(eventId: string) {
+  const scopes = useSelector(getScope)
+  const searchScopes = findScope(scopes ?? [], 'search')
+
+  const isEventSearchAllowed =
+    searchScopes &&
+    Object.keys(searchScopes.options).some((id) => eventId === id)
+
+  return isEventSearchAllowed
 }
 
 function serializeValue(value: unknown) {

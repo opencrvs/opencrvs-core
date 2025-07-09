@@ -16,7 +16,10 @@ import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-import { buildElasticQueryFromSearchPayload } from './query'
+import {
+  buildElasticQueryFromSearchPayload,
+  withJurisdictionFilters
+} from './query'
 
 test('records are automatically indexed when they are created', async () => {
   const { user, generator } = await setupTestCase()
@@ -287,6 +290,181 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     )
     expect(result).toEqual({
       bool: { must_not: { match_all: {} } }
+    })
+  })
+})
+
+describe('withJurisdictionFilters', () => {
+  const baseQuery = {
+    term: { someField: 'someValue' }
+  }
+
+  test('returns original query if no my-jurisdiction and no userOfficeId', () => {
+    const options = { 'v2.birth': 'all' as const }
+
+    const result = withJurisdictionFilters(baseQuery, options, undefined)
+
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    {
+                      term: {
+                        type: 'v2.birth'
+                      }
+                    }
+                  ],
+                  should: undefined
+                }
+              }
+            ]
+          }
+        },
+        should: undefined
+      }
+    })
+  })
+
+  test('returns original query if no my-jurisdiction scopes are available for multiple events', () => {
+    const options = { 'v2.birth': 'all' as const, 'v2.death': 'all' as const }
+
+    const result = withJurisdictionFilters(baseQuery, options, undefined)
+
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.birth' } }]
+                }
+              },
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.death' } }]
+                }
+              }
+            ]
+          }
+        }
+      }
+    })
+  })
+
+  test('adds filters for my-jurisdiction eventTypes only', () => {
+    const options = {
+      'v2.birth': 'my-jurisdiction' as const,
+      'v2.death': 'all' as const
+    }
+
+    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
+
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.birth' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.death' } }]
+                }
+              }
+            ]
+          }
+        }
+      }
+    })
+  })
+
+  test('returns filtered query if multiple events are marked as my-jurisdiction', () => {
+    const options = {
+      'v2.birth': 'my-jurisdiction' as const,
+      'v2.death': 'my-jurisdiction' as const
+    }
+
+    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
+
+    expect(result).toEqual({
+      bool: {
+        must: [baseQuery],
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.birth' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.death' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              }
+            ]
+          }
+        }
+      }
+    })
+  })
+
+  test('returns filtered query if multiple events are marked with different jurisdiction access', () => {
+    const options = {
+      'v2.birth': 'my-jurisdiction' as const,
+      'v2.death': 'all' as const
+    }
+
+    const result = withJurisdictionFilters(baseQuery, options, 'office-123')
+
+    expect(result).toEqual({
+      bool: {
+        filter: {
+          bool: {
+            minimum_should_match: 1,
+            should: [
+              {
+                bool: {
+                  must: [
+                    { term: { type: 'v2.birth' } },
+                    { term: { updatedAtLocation: 'office-123' } }
+                  ]
+                }
+              },
+              {
+                bool: {
+                  must: [{ term: { type: 'v2.death' } }]
+                }
+              }
+            ]
+          }
+        },
+        must: [baseQuery]
+      }
     })
   })
 })

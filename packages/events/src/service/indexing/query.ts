@@ -17,7 +17,8 @@ import {
   QueryExpression,
   QueryType,
   DateCondition,
-  QueryInputType
+  QueryInputType,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
 import { encodeFieldId } from './utils'
 
@@ -273,5 +274,57 @@ export function buildElasticQueryFromSearchPayload(
       return {
         bool: { must_not: { match_all: {} }, should: undefined }
       }
+  }
+}
+
+/**
+ * Adds jurisdiction filters to the query based on user office ID and options.
+ * @param query The original query to modify.
+ * @param options The options indicating which event jurisdictions to include.
+ * @param userOfficeId The ID of the user's office.
+ * @returns The modified query with jurisdiction filters.
+ */
+export function withJurisdictionFilters(
+  query: estypes.QueryDslQueryContainer,
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
+): estypes.QueryDslQueryContainer {
+  const filteredQueries = Object.entries(options).map(
+    ([eventType, accessLevel]) => {
+      const must: estypes.QueryDslQueryContainer[] = [
+        { term: { type: eventType } }
+      ]
+
+      if (
+        accessLevel === SearchScopeAccessLevels.MY_JURISDICTION &&
+        userOfficeId
+      ) {
+        must.push({ term: { updatedAtLocation: userOfficeId } })
+      }
+
+      return {
+        bool: {
+          must,
+          should: undefined
+        }
+      }
+    }
+  )
+
+  if (filteredQueries.length === 0) {
+    throw new Error('Proper scope access levels are required for filtering')
+  }
+
+  return {
+    bool: {
+      must: [query],
+      should: undefined,
+      filter: {
+        bool: {
+          should: filteredQueries,
+          minimum_should_match: 1
+        }
+      }
+    }
   }
 }
