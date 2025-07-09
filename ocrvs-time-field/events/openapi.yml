@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: c60a322a-278e-45e6-a77d-cbbc7dcd1c9b
+                transactionId: 5e309e1b-4565-4379-81d4-8d2990a9b8d5
                 type: v2.birth
       responses:
         "200":
@@ -125,8 +125,7 @@ paths:
                         format: date
                         description: Date in the format YYYY-MM-DD
                       - type: string
-                        format: time
-                        description: Time in the format HH-mm
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: string
                             format: date
@@ -273,14 +272,13 @@ paths:
                                 properties:
                                   firstname:
                                     type: string
+                                    nullable: true
                                   surname:
                                     type: string
+                                    nullable: true
                                   middlename:
                                     type: string
                                     nullable: true
-                                required:
-                                  - firstname
-                                  - surname
                               - type: "null"
                   default: {}
                 annotation:
@@ -292,8 +290,7 @@ paths:
                         format: date
                         description: Date in the format YYYY-MM-DD
                       - type: string
-                        format: time
-                        description: Time in the format HH-mm
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: string
                             format: date
@@ -440,14 +437,13 @@ paths:
                                 properties:
                                   firstname:
                                     type: string
+                                    nullable: true
                                   surname:
                                     type: string
+                                    nullable: true
                                   middlename:
                                     type: string
                                     nullable: true
-                                required:
-                                  - firstname
-                                  - surname
                               - type: "null"
                 originalActionId:
                   type: string
@@ -464,7 +460,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 697decd0-d30c-4842-825b-2e5830724d9c
+                transactionId: a9449f1d-2184-4262-92bc-c05a65bea80e
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1312,6 +1308,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1451,6 +1450,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1524,6 +1526,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1590,6 +1595,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1666,6 +1674,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1730,6 +1741,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1758,8 +1772,7 @@ components:
                 - TIME
             defaultValue:
               type: string
-              format: time
-              description: Time in the format HH-mm
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
             configuration:
               type: object
               properties:
@@ -1792,6 +1805,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1871,6 +1887,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -1944,6 +1963,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2029,6 +2051,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2101,6 +2126,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2155,6 +2183,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2227,6 +2258,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2304,6 +2338,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2358,6 +2395,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2416,6 +2456,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2469,6 +2512,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2571,6 +2617,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2625,6 +2674,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2704,6 +2756,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2754,6 +2809,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2812,6 +2870,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2868,6 +2929,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -2922,6 +2986,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -3002,6 +3069,9 @@ components:
             required:
               type: boolean
               default: false
+            secured:
+              type: boolean
+              default: false
             placeholder:
               $ref: "#/components/schemas/TranslationConfig"
             validation:
@@ -3063,6 +3133,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -3168,6 +3241,9 @@ components:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a5
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -4347,8 +4423,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -4495,14 +4570,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -4514,8 +4588,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -4662,14 +4735,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -4732,8 +4804,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -4880,14 +4951,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -4899,8 +4969,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -5047,14 +5116,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -5114,8 +5182,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -5262,14 +5329,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -5281,8 +5347,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -5429,14 +5494,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -5509,8 +5573,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -5657,14 +5720,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -5676,8 +5738,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -5824,14 +5885,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -5891,8 +5951,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -6039,14 +6098,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6058,8 +6116,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -6206,14 +6263,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -6286,8 +6342,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -6434,14 +6489,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6453,8 +6507,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -6601,14 +6654,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -6668,8 +6720,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -6816,14 +6867,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6835,8 +6885,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -6983,14 +7032,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -7052,8 +7100,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -7200,14 +7247,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7219,8 +7265,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -7367,14 +7412,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -7434,8 +7478,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -7582,14 +7625,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7601,8 +7643,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -7749,14 +7790,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -7819,8 +7859,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -7967,14 +8006,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7986,8 +8024,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -8134,14 +8171,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -8201,8 +8237,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -8349,14 +8384,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8368,8 +8402,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -8516,14 +8549,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -8586,8 +8618,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -8734,14 +8765,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8753,8 +8783,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -8901,14 +8930,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -8971,8 +8999,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -9119,14 +9146,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -9138,8 +9164,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -9286,14 +9311,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -9353,8 +9377,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -9501,14 +9524,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -9520,8 +9542,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -9668,14 +9689,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -9735,8 +9755,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -9883,14 +9902,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -9902,8 +9920,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -10050,14 +10067,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
@@ -10517,8 +10533,7 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - type: string
-                format: time
-                description: Time in the format HH-mm
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: string
                     format: date
@@ -10665,14 +10680,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
       required:
         - id
