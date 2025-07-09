@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: ab4319e4-c0fc-4a30-bbc3-d1cf2c514599
+                transactionId: 3217f0e7-1399-4a5b-ba22-bd08612256cc
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 6197b62e-be99-4b11-8278-95e7905a14a7
+                transactionId: fedc316a-88e4-4a2f-b2ac-54925ac5cf37
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
