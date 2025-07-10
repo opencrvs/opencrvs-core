@@ -11,13 +11,18 @@
 import React from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
+import { ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
-import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  ActionType,
+  EventDocument
+} from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
+import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {
-  id: 'v2.events.history.status',
+  id: `v2.events.history.status`,
   defaultMessage:
     '{status, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
 }
@@ -32,10 +37,6 @@ const messages = defineMessages({
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
     id: 'v2.constants.comment'
-  },
-  markAsDuplicate: {
-    id: 'v2.event.history.markAsDuplicate',
-    defaultMessage: 'Marked as a duplicate'
   }
 })
 
@@ -54,32 +55,24 @@ function prepareComments(history: ActionDocument) {
 
 /**
  * Detailed view of single Action, showing the history of the event.
- *
- * @TODO: Add more details to the modal and ability to diff changes when more events are specified.
  */
-export function EventHistoryModal({
-  history,
+export function EventHistoryDialog({
+  action,
   userName,
-  close
+  close,
+  fullEvent
 }: {
-  history: ActionDocument
+  action: ActionDocument
   userName: string
   close: () => void
+  fullEvent: EventDocument
 }) {
   const intl = useIntl()
   const title = intl.formatMessage(eventHistoryStatusMessage, {
-    status: history.type
+    status: action.type
   })
 
-  const commentsColumn = [
-    {
-      key: 'comment',
-      label: intl.formatMessage(messages.comment),
-      width: 100
-    }
-  ]
-
-  const content = prepareComments(history)
+  const comments = prepareComments(action)
 
   return (
     <ResponsiveModal
@@ -98,7 +91,7 @@ export function EventHistoryModal({
             [
               userName,
               format(
-                new Date(history.createdAt),
+                new Date(action.createdAt),
                 intl.formatMessage(messages['event.history.modal.timeFormat'])
               )
             ],
@@ -106,18 +99,20 @@ export function EventHistoryModal({
           )}
         </Text>
       </Stack>
-      {content.length > 0 && (
-        <Table columns={commentsColumn} content={content} noResultText=" " />
+      {comments.length > 0 && (
+        <Table
+          columns={[
+            {
+              key: 'comment',
+              label: intl.formatMessage(messages.comment),
+              width: 100
+            }
+          ]}
+          content={comments}
+          noResultText=" "
+        />
       )}
-      {history.type === ActionType.ARCHIVE && history.reason.isDuplicate && (
-        <p>
-          <Pill
-            label={intl.formatMessage(messages.markAsDuplicate)}
-            size="small"
-            type="inactive"
-          />
-        </p>
-      )}
+      {getActionTypeSpecificContent(action, fullEvent)}
     </ResponsiveModal>
   )
 }
