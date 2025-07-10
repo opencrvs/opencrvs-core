@@ -58,6 +58,15 @@ export const ExactStatus = z
     ref: 'ExactStatus'
   })
 
+export const ExactUserType = z
+  .object({
+    type: z.literal('exact'),
+    term: TokenUserType
+  })
+  .openapi({
+    ref: 'ExactUserType'
+  })
+
 export const AnyOf = z
   .object({
     type: z.literal('anyOf'),
@@ -162,7 +171,7 @@ export const QueryExpression = z
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
-    createdByUserType: TokenUserType,
+    createdByUserType: z.optional(ExactUserType),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),

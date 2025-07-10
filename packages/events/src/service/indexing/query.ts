@@ -165,6 +165,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'assignedTo':
       case 'createdBy':
       case 'updatedBy':
+      case 'createdByUserType':
       case 'legalStatuses.REGISTERED.registrationNumber': {
         const value = clause[key]
         must.push({ term: { [key]: value.term } })
@@ -224,11 +225,10 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
             }
           })
         }
-      }
-      case 'createdByUserType':
-      default:
-        console.warn('Unsupported query field:', key)
         break
+      }
+      default:
+        throw new Error(`Unsupported query field: ${key}`)
     }
   }
 
