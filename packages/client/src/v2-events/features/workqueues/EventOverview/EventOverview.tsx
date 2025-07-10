@@ -1,4 +1,4 @@
-/*
+/*erify
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
@@ -17,12 +17,9 @@ import {
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls,
-<<<<<<< HEAD
   getCurrentEventState,
-  getCurrentEventStateWithDrafts
-=======
+  getCurrentEventStateWithDrafts,
   EventStatus
->>>>>>> origin/develop
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
