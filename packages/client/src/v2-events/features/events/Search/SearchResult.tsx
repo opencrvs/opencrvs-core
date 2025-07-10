@@ -32,7 +32,6 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { Button, Link as TextButton } from '@opencrvs/components'
-import { Downloaded } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -150,7 +149,7 @@ function changeSortedColumn(
   }
 }
 
-const searchResultMessages = {
+const messages = defineMessages({
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
@@ -182,9 +181,7 @@ const searchResultMessages = {
     defaultMessage:
       '{action, select, DECLARE {Sending} REGISTER {Registering} VALIDATE {Sending for approval} NOTIFY {Sending} REJECT {Sending for updates} ARCHIVE {Archiving} PRINT_CERTIFICATE {Certifying} REQUEST_CORRECTION {Requesting correction} APPROVE_CORRECTION {Approving correction} REJECT_CORRECTION {Rejecting correction} ASSIGN {Assigning} UNASSIGN {Unassigning} other {processing action}}'
   }
-}
-
-const messages = defineMessages(searchResultMessages)
+})
 
 const ExtendedEventStatuses = {
   OUTBOX: 'OUTBOX',

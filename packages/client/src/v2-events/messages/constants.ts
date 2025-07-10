@@ -343,11 +343,6 @@ export const constantsMessages = defineMessages({
     description: 'ID Label',
     id: 'v2.constants.id'
   },
-  incompleteStatus: {
-    defaultMessage: 'Incomplete',
-    description: 'A label for Incomplete',
-    id: 'v2.constants.incomplete.status'
-  },
   informantContactNumber: {
     defaultMessage: 'Informant contact number',
     description: 'The title of contact number label',

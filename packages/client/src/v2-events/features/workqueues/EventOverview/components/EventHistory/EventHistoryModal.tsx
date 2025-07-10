@@ -13,16 +13,13 @@ import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
 import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
-import {
-  ActionDocument,
-  ActionType,
-  ActionUpdate
-} from '@opencrvs/commons/client'
+import { ActionDocument, ActionType } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
+
 export const eventHistoryStatusMessage = {
-  id: `v2.events.history.status`,
+  id: 'v2.events.history.status',
   defaultMessage:
-    '{status, select, CREATE {Draft} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
+    '{status, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
 }
 
 const messages = defineMessages({
