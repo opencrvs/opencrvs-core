@@ -10,7 +10,11 @@
  */
 
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
 import {
+  findScope,
+  getScopes,
+  SearchScopeAccessLevels,
   WorkqueueConfig,
   WorkqueueCountInput,
   WorkqueueCountOutput
@@ -37,9 +41,22 @@ export const workqueueRouter = router({
     .use(requireScopeForWorkqueues)
     .output(WorkqueueCountOutput)
     .query(async (options) => {
+      const scopes = getScopes({ Authorization: options.ctx.token })
+
+      const searchScope = findScope(scopes, 'search')
+      // Only to satisfy type checking, as findScope will return undefined if no scope is found
+      if (!searchScope) {
+        throw new TRPCError({ code: 'FORBIDDEN' })
+      }
+      const searchScopeOptions = searchScope.options as Record<
+        string,
+        SearchScopeAccessLevels
+      >
       return getEventCount(
         options.input,
-        await getEventConfigurations(options.ctx.token)
+        await getEventConfigurations(options.ctx.token),
+        searchScopeOptions,
+        options.ctx.user.primaryOfficeId
       )
     })
 })

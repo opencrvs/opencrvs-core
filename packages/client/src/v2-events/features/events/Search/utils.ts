@@ -8,12 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import startOfDay from 'date-fns/startOfDay'
 import addMinutes from 'date-fns/addMinutes'
 import endOfDay from 'date-fns/endOfDay'
 import parse from 'date-fns/parse'
 import { parse as parseQuery, stringify } from 'query-string'
 import { isArray, isNil, isPlainObject, isString } from 'lodash'
+import { useSelector } from 'react-redux'
 import {
   AdvancedSearchConfig,
   EventConfig,
@@ -29,10 +31,13 @@ import {
   QueryExpression,
   NameFieldValue
 } from '@opencrvs/commons/client'
+import { findScope } from '@opencrvs/commons/client'
+import { EventStatus } from '@opencrvs/commons/client'
 import {
   Errors,
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
+import { getScope } from '@client/profile/profileSelectors'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -167,18 +172,6 @@ export const getDefaultSearchFields = (
   return searchFields
 }
 
-// @TODO: Could we just use EventStatus?
-const RegStatus = {
-  Created: 'CREATED',
-  Notified: 'NOTIFIED',
-  Declared: 'DECLARED',
-  Validated: 'VALIDATED',
-  Registered: 'REGISTERED',
-  Certified: 'CERTIFIED',
-  Rejected: 'REJECTED',
-  Archived: 'ARCHIVED'
-} as const
-
 const MatchType = {
   fuzzy: 'fuzzy',
   exact: 'exact',
@@ -247,7 +240,7 @@ function buildCondition(
 }
 
 function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values(RegStatus) }
+  return { type: 'anyOf', terms: Object.values([...EventStatus.options]) }
 }
 /**
  * Converts a date range input string into a UTC-based range string.
@@ -470,8 +463,7 @@ function metadataFieldTypeMapping(value: string) {
         term: value,
         type: 'exact' as const
       },
-      // @TODO: Registration number should be read from legalStatuses
-      registrationNumber: {
+      'legalStatus.REGISTERED.registrationNumber': {
         term: value,
         type: 'exact' as const
       }
@@ -561,6 +553,20 @@ export function buildQuickSearchQuery(
   return buildQueryFromQuickSearchFields(fieldsToSearch, terms)
 }
 
+/**
+ * @returns a boolean indicating whether the current user has the scope to search for an event
+ */
+export function checkScopeForEventSearch(eventId: string) {
+  const scopes = useSelector(getScope)
+  const searchScopes = findScope(scopes ?? [], 'search')
+
+  const isEventSearchAllowed =
+    searchScopes &&
+    Object.keys(searchScopes.options).some((id) => eventId === id)
+
+  return isEventSearchAllowed
+}
+
 function serializeValue(value: unknown) {
   if (isArray(value)) {
     return value.length > 0
@@ -591,8 +597,6 @@ export function serializeSearchParams(
   )
   return stringify(simplifiedValue, { skipEmptyString: true })
 }
-
-/* eslint-disable max-lines */
 
 function tryParse(value: unknown): unknown {
   if (!isString(value)) {

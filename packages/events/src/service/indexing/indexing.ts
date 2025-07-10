@@ -24,7 +24,8 @@ import {
   getDeclarationFields,
   QueryType,
   WorkqueueCountInput,
-  getEventConfigById
+  getEventConfigById,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -40,7 +41,10 @@ import {
   encodeFieldId,
   removeSecuredFields
 } from './utils'
-import { buildElasticQueryFromSearchPayload } from './query'
+import {
+  buildElasticQueryFromSearchPayload,
+  withJurisdictionFilters
+} from './query'
 
 function eventToEventIndex(
   event: EventDocument,
@@ -80,8 +84,13 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
       return { type: 'text' }
+    case FieldType.EMAIL:
+      return {
+        type: 'keyword',
+        // apply custom normalyzer
+        normalizer: 'lowercase_normalizer'
+      }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
     case FieldType.SELECT:
@@ -177,6 +186,17 @@ export async function createIndex(
   await client.indices.create({
     index: indexName,
     body: {
+      // Define a custom normalizer to make keyword fields case-insensitive by applying a lowercase filter
+      settings: {
+        analysis: {
+          normalizer: {
+            lowercase_normalizer: {
+              type: 'custom',
+              filter: ['lowercase']
+            }
+          }
+        }
+      },
       mappings: {
         properties: {
           id: { type: 'keyword' },
@@ -349,10 +369,16 @@ export async function getIndexedEvents(
 
 export async function getIndex(
   eventParams: QueryType,
-  eventConfigs: EventConfig[]
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
-  const query = buildElasticQueryFromSearchPayload(eventParams, eventConfigs)
+  const query = withJurisdictionFilters(
+    buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+    options,
+    userOfficeId
+  )
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -380,14 +406,18 @@ export async function getIndex(
 
 export async function getEventCount(
   queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[]
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
 ) {
   return (
     //  @TODO: write a query that does everything in one go.
     (
       await Promise.all(
         queries.map(async ({ slug, query }) => {
-          const count = (await getIndex(query, eventConfigs)).length
+          const count = (
+            await getIndex(query, eventConfigs, options, userOfficeId)
+          ).length
           return { slug, count }
         })
       )

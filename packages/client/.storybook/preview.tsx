@@ -21,7 +21,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import {
   createMemoryRouter,
   Outlet,
@@ -43,6 +43,7 @@ import {
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
+import { getUserDetails } from '@client/profile/profileSelectors'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -74,6 +75,15 @@ type WrapperProps = PropsWithChildren<{
   router?: RouteObject
 }>
 
+function WaitForUserDetails({ children }: PropsWithChildren<{}>) {
+  const currentUser = useSelector(getUserDetails)
+
+  if (!currentUser) {
+    return null
+  }
+  return children
+}
+
 function Wrapper({ store, router, initialPath, children }: WrapperProps) {
   const { client } = useApolloClient(store)
 
@@ -91,7 +101,9 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
                       element: (
                         <Page>
                           <NavigationHistoryProvider>
-                            <Outlet />
+                            <WaitForUserDetails>
+                              <Outlet />
+                            </WaitForUserDetails>
                           </NavigationHistoryProvider>
                         </Page>
                       ),
@@ -171,7 +183,7 @@ const preview: Preview = {
         id: generator.user.id.localRegistrar,
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: 'LOCAL_REGISTRAR',
-        signatureFilename: undefined
+        signature: undefined
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline

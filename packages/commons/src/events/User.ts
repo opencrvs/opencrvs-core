@@ -21,7 +21,7 @@ export const User = z.object({
     })
   ),
   role: z.string(),
-  signatureFilename: z.string().optional()
+  signature: z.string().optional()
 })
 
 export type User = z.infer<typeof User>

@@ -17,8 +17,12 @@ import {
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls,
+<<<<<<< HEAD
   getCurrentEventState,
   getCurrentEventStateWithDrafts
+=======
+  EventStatus
+>>>>>>> origin/develop
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -30,6 +34,7 @@ import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
@@ -89,7 +94,12 @@ function EventOverviewFull({
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[
-        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />
+        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />,
+        <DownloadButton
+          key={`DownloadButton-${eventIndex.id}`}
+          event={eventIndex}
+          isDraft={eventIndex.status === EventStatus.Values.CREATED}
+        />
       ]}
     >
       <EventSummary
@@ -117,7 +127,7 @@ function EventOverviewProtected({
   const drafts = getRemoteDrafts(eventIndex.id)
 
   const eventWithDrafts = deepDropNulls(
-    applyDraftsToEventIndex(eventIndex, drafts)
+    applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
   )
   const { getUser } = useUsers()
   const intl = useIntl()
@@ -151,6 +161,11 @@ function EventOverviewProtected({
           key={eventIndex.id}
           eventId={eventIndex.id}
           onAction={onAction}
+        />,
+        <DownloadButton
+          key={`DownloadButton-${eventIndex.id}`}
+          event={eventIndex}
+          isDraft={eventIndex.status === EventStatus.Values.CREATED}
         />
       ]}
     >
