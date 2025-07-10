@@ -19,7 +19,7 @@ export const routes = route(
   {
     WORKQUEUE: route('workqueue/:slug', {
       params: {
-        slug: zod(z.string()).default('all')
+        slug: zod(z.string())
       },
       searchParams: {
         limit: zod(z.number().min(1).max(100)).default(10),
