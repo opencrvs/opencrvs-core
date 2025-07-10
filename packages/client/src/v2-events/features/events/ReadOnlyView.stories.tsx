@@ -197,7 +197,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [draft]
+            return []
           })
         ],
         events: [
