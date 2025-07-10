@@ -180,8 +180,8 @@ export function clearPendingDraftCreationRequests(eventId: string) {
 
 export async function setEventData(id: string, data: EventDocument) {
   updateLocalEventIndex(id, data)
-  await updateDraftsWithEvent(id, data)
-  return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
+  queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
+  return updateDraftsWithEvent(id, data)
 }
 
 export async function refetchEventsList() {
