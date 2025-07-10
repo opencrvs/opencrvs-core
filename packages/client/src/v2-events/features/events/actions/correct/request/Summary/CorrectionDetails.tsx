@@ -190,16 +190,14 @@ export function CorrectionDetails({
             columns={[
               {
                 label: (
-                  <TableHeader element="span" variant="bold12">
-                    {intl.formatMessage(page.title)}
-                  </TableHeader>
+                  <TableHeader>{intl.formatMessage(page.title)}</TableHeader>
                 ),
                 width: 34,
                 key: 'fieldLabel'
               },
               {
                 label: (
-                  <TableHeader element="span" variant="bold12">
+                  <TableHeader>
                     {intl.formatMessage(messages.correctionSummaryOriginal)}
                   </TableHeader>
                 ),
@@ -208,7 +206,7 @@ export function CorrectionDetails({
               },
               {
                 label: (
-                  <TableHeader element="span" variant="bold12">
+                  <TableHeader>
                     {intl.formatMessage(messages.correctionSummaryCorrection)}
                   </TableHeader>
                 ),
