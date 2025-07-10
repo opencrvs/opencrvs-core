@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 
@@ -27,8 +27,6 @@ import {
   FileFieldValue,
   FileFieldWithOptionValue
 } from './CompositeFieldValue'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
 
 const FieldId = z.string().describe('Unique identifier for the field')
 
@@ -563,9 +561,9 @@ export const FieldConfig = z
     FileUploadWithOptions,
     DataField
   ])
-  .openapi({
+  .meta({
     description: 'Form field configuration',
-    ref: 'FieldConfig'
+    id: 'FieldConfig'
   })
 
 export type SelectField = z.infer<typeof Select>

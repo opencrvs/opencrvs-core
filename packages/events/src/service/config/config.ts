@@ -10,7 +10,7 @@
  */
 
 import fetch from 'node-fetch'
-import { array } from 'zod'
+import * as z from 'zod/v4'
 import { EventConfig, getOrThrow, WorkqueueConfig } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
@@ -26,7 +26,7 @@ export async function getEventConfigurations(token: string) {
     throw new Error('Failed to fetch events config')
   }
 
-  return array(EventConfig).parse(await res.json())
+  return z.array(EventConfig).parse(await res.json())
 }
 
 async function findEventConfigurationById({
@@ -68,5 +68,5 @@ export async function getWorkqueueConfigurations(token: string) {
     throw new Error('Failed to fetch workqueue config')
   }
 
-  return array(WorkqueueConfig).parse(await res.json())
+  return z.array(WorkqueueConfig).parse(await res.json())
 }

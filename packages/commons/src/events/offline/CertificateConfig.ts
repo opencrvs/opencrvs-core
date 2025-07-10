@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { TranslationConfig } from '../TranslationConfig'
 
 const FontFamily = z.object({
@@ -32,7 +32,7 @@ export const CertificateConfig = z.object({
     delayed: z.number()
   }),
   svgUrl: z.string(),
-  fonts: z.record(FontFamily).optional()
+  fonts: z.record(z.string(), FontFamily).optional()
 })
 
 /**

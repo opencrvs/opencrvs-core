@@ -258,7 +258,9 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   }
 
   if (clause.data) {
-    const dataQuery = generateQuery(clause.data, eventConfigs)
+    // @TODO: fix this typing
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const dataQuery = generateQuery(clause.data as any, eventConfigs)
     const innerMust = dataQuery.bool?.must
 
     if (Array.isArray(innerMust)) {

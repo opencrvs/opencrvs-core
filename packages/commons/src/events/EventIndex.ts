@@ -9,18 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z, ZodType } from 'zod'
+import * as z from 'zod/v4'
 import { EventMetadata, EventStatus, Flag } from './EventMetadata'
 import { EventState } from './ActionDocument'
-import { extendZodWithOpenApi } from 'zod-openapi'
+
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { TokenUserType } from '../authentication'
-extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
   declaration: EventState
-}).openapi({
-  ref: 'EventIndex'
+}).meta({
+  id: 'EventIndex'
 })
 
 export const EventSearchIndex = z
@@ -30,8 +29,8 @@ export const EventSearchIndex = z
       type: z.string() // Ensures "type" (event-id) exists and is a string
     })
   )
-  .openapi({
-    ref: 'EventSearchIndex'
+  .meta({
+    id: 'EventSearchIndex'
   })
 
 export type EventSearchIndex = z.infer<typeof EventSearchIndex>
@@ -39,14 +38,14 @@ export type EventIndex = z.infer<typeof EventIndex>
 
 export const Fuzzy = z
   .object({ type: z.literal('fuzzy'), term: z.string() })
-  .openapi({
-    ref: 'Fuzzy'
+  .meta({
+    id: 'Fuzzy'
   })
 
 export const Exact = z
   .object({ type: z.literal('exact'), term: z.string() })
-  .openapi({
-    ref: 'Exact'
+  .meta({
+    id: 'Exact'
   })
 
 export const ExactStatus = z
@@ -54,8 +53,8 @@ export const ExactStatus = z
     type: z.literal('exact'),
     term: EventStatus
   })
-  .openapi({
-    ref: 'ExactStatus'
+  .meta({
+    id: 'ExactStatus'
   })
 
 export const AnyOf = z
@@ -63,8 +62,8 @@ export const AnyOf = z
     type: z.literal('anyOf'),
     terms: z.array(z.string())
   })
-  .openapi({
-    ref: 'AnyOf'
+  .meta({
+    id: 'AnyOf'
   })
 
 export const AnyOfStatus = z
@@ -72,8 +71,8 @@ export const AnyOfStatus = z
     type: z.literal('anyOf'),
     terms: z.array(EventStatus)
   })
-  .openapi({
-    ref: 'AnyOfStatus'
+  .meta({
+    id: 'AnyOfStatus'
   })
 
 export const Range = z
@@ -82,8 +81,8 @@ export const Range = z
     gte: z.string(),
     lte: z.string()
   })
-  .openapi({
-    ref: 'Range'
+  .meta({
+    id: 'Range'
   })
 
 export const ContainsFlags = z
@@ -91,45 +90,46 @@ export const ContainsFlags = z
     anyOf: z.array(Flag).optional(),
     noneOf: z.array(Flag).optional()
   })
-  .openapi({
-    ref: 'ContainsFlags'
+  .meta({
+    id: 'ContainsFlags'
   })
 
 export const Within = z
   .object({ type: z.literal('within'), location: z.string() })
-  .openapi({
-    ref: 'Within'
+  .meta({
+    id: 'Within'
   })
 
 export const RangeDate = Range.extend({
   gte: z.string().date().or(z.string().datetime()),
   lte: z.string().date().or(z.string().datetime())
-}).openapi({
-  ref: 'RangeDate'
+}).meta({
+  id: 'RangeDate'
 })
 
 export const ExactDate = Exact.extend({
   term: z.string().date().or(z.string().datetime())
-}).openapi({
-  ref: 'ExactDate'
+}).meta({
+  id: 'ExactDate'
 })
 
-export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
-  ref: 'DateCondition'
+export const DateCondition = z.union([ExactDate, RangeDate]).meta({
+  id: 'DateCondition'
 })
 
 // Use `ZodType` here to avoid locking the output type prematurely —
 // this keeps recursive inference intact and allows `z.infer<typeof QueryInput>` to work correctly.
-export const QueryInput: ZodType = z
+export const QueryInput: z.ZodType = z
   .lazy(() =>
     z.union([
       z.discriminatedUnion('type', [Fuzzy, Exact, Range, Within, AnyOf]),
       z.record(z.string(), QueryInput)
     ])
   )
-  .openapi({
-    ref: 'QueryInput'
+  .meta({
+    id: 'QueryInput'
   })
+
 export type BaseInput =
   | z.infer<typeof Fuzzy>
   | z.infer<typeof Exact>
@@ -171,13 +171,13 @@ export const QueryExpression = z
   .refine((obj) => Object.values(obj).some((val) => val !== undefined), {
     message: 'At least one query field must be specified.'
   })
-  .openapi({
-    ref: 'QueryExpression'
+  .meta({
+    id: 'QueryExpression'
   })
 
 export const QueryType = z
   .object({
-    type: z.literal('and').or(z.literal('or')).openapi({ default: 'and' }),
+    type: z.literal('and').or(z.literal('or')).meta({ default: 'and' }),
     clauses: z.preprocess(
       (val) => {
         // When `QueryType` is used as a query parameter in a REST API:
@@ -200,7 +200,7 @@ export const QueryType = z
       z
         .array(QueryExpression)
         .nonempty('At least one clause is required.')
-        .openapi({
+        .meta({
           default: [
             {
               eventType: TENNIS_CLUB_MEMBERSHIP,
@@ -219,8 +219,8 @@ export const QueryType = z
         })
     )
   })
-  .openapi({
-    ref: 'QueryType'
+  .meta({
+    id: 'QueryType'
   })
 
 export type QueryType = z.infer<typeof QueryType>

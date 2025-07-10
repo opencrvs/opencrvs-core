@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { NoResultError } from 'kysely'
 import {
   ActionInputWithType,

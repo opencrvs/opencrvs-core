@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
+import * as z from 'zod/v4'
+
 import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
@@ -56,8 +56,6 @@ import {
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { getDefaultActionProcedures } from './actions'
-
-extendZodWithOpenApi(z)
 
 /*
  * Explicitely type the procedure to reduce the inference
@@ -125,7 +123,7 @@ export const eventRouter = router({
     .use(requiresAnyOfScopes(ACTION_ALLOWED_SCOPES[ActionType.READ]))
     .input(UUID)
     .query(async ({ input, ctx }) => {
-      const event = await getEventById(input)
+      const event = await getEventById(input as UUID)
       const updatedEvent = await addAction(
         {
           type: ActionType.READ,

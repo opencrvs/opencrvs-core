@@ -55,7 +55,7 @@ import { FieldType } from './FieldType'
 import { AddressType, FileFieldValue } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 /**
  * In real application, the roles are defined in the countryconfig.
@@ -286,7 +286,7 @@ export function eventPayloadGenerator(rng: () => number) {
             },
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
-            createdByUserType: TokenUserType.Enum.user,
+            createdByUserType: TokenUserType.enum.user,
             createdByRole: '@todo',
             createdAtLocation: '@todo' as UUID
           }
@@ -615,8 +615,8 @@ export function generateActionDocument({
     // @TODO: This should be fixed in the future.
     createdAt: new Date(Date.now() - 500).toISOString(),
     createdBy: user.id ?? getUUID(),
-    createdByUserType: TokenUserType.Enum.user,
-    createdByRole: TestUserRole.Enum.FIELD_AGENT,
+    createdByUserType: TokenUserType.enum.user,
+    createdByRole: TestUserRole.enum.FIELD_AGENT,
     id: getUUID(),
     createdAtLocation:
       user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),

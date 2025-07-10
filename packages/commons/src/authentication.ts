@@ -12,7 +12,7 @@
 import { IAuthHeader } from './http'
 import decode from 'jwt-decode'
 import { Nominal } from './nominal'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 
 import { RawScopes, Scope, SCOPES } from './scopes'
 export * from './scopes'

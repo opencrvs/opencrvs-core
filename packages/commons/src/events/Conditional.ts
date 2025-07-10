@@ -10,9 +10,7 @@
  */
 
 import { JSONSchema } from '../conditionals/conditionals'
-import { z } from 'zod'
-import { extendZodWithOpenApi } from 'zod-openapi'
-extendZodWithOpenApi(z)
+import * as z from 'zod/v4'
 
 /*
  * Using JSONSchema directly here would cause a
@@ -21,9 +19,9 @@ extendZodWithOpenApi(z)
  */
 export const Conditional = z
   .custom<JSONSchema>((val) => typeof val === 'object' && val !== null)
-  .openapi({
+  .meta({
     description: 'JSON schema conditional configuration',
-    ref: 'Conditional'
+    id: 'Conditional'
   })
 
 /**
@@ -77,7 +75,7 @@ export const ActionConditional = z.discriminatedUnion('type', [
   ShowConditional,
   // Action can be shown to the user in the list but as disabled
   EnableConditional
-]) as unknown as z.ZodDiscriminatedUnion<'type', ActionConditionalType[]>
+])
 
 export type ActionConditional = InferredActionConditional
 
@@ -117,9 +115,9 @@ export const FieldConditional = z
     // Field output can be shown / hidden on the review page
     DisplayOnReviewConditional
   ])
-  .openapi({
+  .meta({
     description: 'Field conditional configuration',
-    ref: 'FieldConditional'
-  }) as unknown as z.ZodDiscriminatedUnion<'type', FieldConditionalType[]>
+    id: 'FieldConditional'
+  })
 
 export type FieldConditional = z.infer<typeof FieldConditional>

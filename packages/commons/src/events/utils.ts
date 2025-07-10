@@ -215,7 +215,7 @@ export function createEmptyDraft(
       declaration: {},
       annotation: {},
       createdAt: new Date().toISOString(),
-      createdByUserType: TokenUserType.Enum.user,
+      createdByUserType: TokenUserType.enum.user,
       createdBy: '@todo',
       createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
       status: ActionStatus.Accepted,

@@ -10,7 +10,7 @@
  */
 import { TRPCError } from '@trpc/server'
 import { MutationProcedure } from '@trpc/server/unstable-core-do-not-import'
-import { z } from 'zod'
+import * as z from 'zod/v4'
 import { OpenApiMeta } from 'trpc-to-openapi'
 import { getUUID, UUID } from '@opencrvs/commons'
 import {
@@ -301,7 +301,7 @@ export function getDefaultActionProcedures(
           originalActionId: actionId,
           type: actionType,
           createdBy: ctx.user.id,
-          createdByUserType: TokenUserType.Enum.user,
+          createdByUserType: TokenUserType.enum.user,
           createdByRole: ctx.user.role,
           createdAtLocation: ctx.user.primaryOfficeId ?? undefined,
           token: ctx.token,
