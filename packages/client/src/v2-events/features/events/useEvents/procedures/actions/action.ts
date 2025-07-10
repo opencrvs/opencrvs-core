@@ -212,9 +212,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
 })
 
 export const customMutationKeys = {
-  validateOnDeclare: ['validateOnDeclare'],
-  registerOnDeclare: ['registerOnDeclare'],
-  registerOnValidate: ['registerOnValidate']
+  validateOnDeclare: [['validateOnDeclare']],
+  registerOnDeclare: [['registerOnDeclare']],
+  registerOnValidate: [['registerOnValidate']]
 } as const
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
