@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { MutationKey, useMutation } from '@tanstack/react-query'
+import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
 import { toast } from 'react-hot-toast'
 import { TRPCClientError } from '@trpc/client'
+import { useSyncExternalStore } from 'react'
 import {
   ActionType,
   EventDocument,
@@ -35,6 +36,7 @@ import {
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
+  MutationType,
   setMutationDefaults,
   waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
@@ -377,4 +379,25 @@ export function useEventCustomAction(mutationKey: MutationKey) {
       })
     }
   }
+}
+
+export function useIsMutating<P extends DecorateMutationProcedure<any>>(
+  eventId: string,
+  procedure: P
+) {
+  const cache = useQueryClient().getMutationCache()
+
+  return useSyncExternalStore(
+    (onStoreChange) => cache.subscribe(onStoreChange),
+    () => {
+      return (
+        cache.findAll({
+          mutationKey: procedure.mutationKey(),
+          status: 'pending',
+          predicate: (mutation) =>
+            (mutation as MutationType<P>).state.variables?.eventId === eventId
+        }).length > 0
+      )
+    }
+  )
 }

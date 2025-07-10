@@ -9,9 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import {
+  useQuery,
+  useQueryClient,
+  useSuspenseQuery
+} from '@tanstack/react-query'
 
-import { EventIndex, QueryType, getUUID } from '@opencrvs/commons/client'
+import { useSyncExternalStore } from 'react'
+import { EventIndex, QueryType, UUID, getUUID } from '@opencrvs/commons/client'
 import { queryClient, useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
@@ -20,12 +25,13 @@ import { useDeleteEvent } from './procedures/delete'
 import {
   customMutationKeys,
   useEventAction,
-  useEventCustomAction
+  useEventCustomAction,
+  useIsMutating
 } from './procedures/actions/action'
 import { useGetEvents } from './procedures/list'
 import { useGetEventCounts } from './procedures/count'
 import { findLocalEventIndex } from './api'
-import { QueryOptions } from './procedures/utils'
+import { MutationType, QueryOptions } from './procedures/utils'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -139,6 +145,9 @@ export function useEvents() {
       },
       assignment: {
         assign: {
+          isAssigning: (eventId: UUID) => {
+            return useIsMutating(eventId, trpc.event.actions.assignment.assign)
+          },
           mutate: async ({
             eventId,
             assignedTo,
