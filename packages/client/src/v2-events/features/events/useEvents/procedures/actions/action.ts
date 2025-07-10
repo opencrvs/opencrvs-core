@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation } from '@tanstack/react-query'
+import { MutationKey, useMutation } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
   inferInput
@@ -349,10 +349,10 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 }
 
-export function useEventCustomAction(mutationKey: string[]) {
+export function useEventCustomAction(mutationKey: MutationKey) {
   const eventConfigurations = useEventConfigurations()
   const mutation = useMutation({
-    mutationKey: [mutationKey],
+    mutationKey: mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
 
