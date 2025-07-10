@@ -19,7 +19,8 @@ import type {
   DecorateMutationProcedure,
   DecorateQueryProcedure,
   inferInput,
-  inferOutput
+  inferOutput,
+  TRPCQueryOptions
 } from '@trpc/tanstack-react-query'
 import { findLocalEventIndex } from '@client/v2-events/features/events/useEvents/api'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
@@ -146,8 +147,14 @@ export function createEventActionMutationFn<
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type QueryOptions<P extends DecorateQueryProcedure<any>> = Partial<
-  Omit<ReturnType<P['queryOptions']>, 'queryFn'>
+  TRPCQueryOptions<{
+    input: P['~types']['input']
+    output: P['~types']['output']
+    transformer: boolean
+    errorShape: P['~types']['errorShape']
+  }>
 >
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type MutationType<P extends DecorateMutationProcedure<any>> = Mutation<
   inferOutput<P>,
