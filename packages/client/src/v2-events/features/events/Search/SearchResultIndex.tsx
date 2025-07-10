@@ -54,6 +54,7 @@ export const SearchResultIndex = () => {
 
   return (
     <SearchResultComponent
+      actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={[eventConfig]}
       queryData={queryData}

@@ -28,7 +28,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
-import { findLocalEventDocument } from '@client/v2-events/features/events/useEvents/api'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,

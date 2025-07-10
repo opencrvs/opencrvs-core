@@ -73,7 +73,7 @@ export const Sidebar = ({
   const userDetails = useSelector(getUserDetails)
   const language = useSelector(getLanguage)
 
-  const { getCount } = useWorkqueue(workqueueSlug)
+  const { getCount } = useWorkqueue(workqueueSlug ?? '')
   const counts = getCount.useSuspenseQuery()
 
   let name = ''
@@ -94,7 +94,7 @@ export const Sidebar = ({
 
   const logout = async () => {
     await storage.removeItem(SCREEN_LOCK)
-    removeToken()
+    await removeToken()
     await removeUserDetails()
     window.location.assign(
       `${window.config.LOGIN_URL}?lang=${await storage.getItem('language')}&redirectTo=${window.location.origin}${ROUTES.V2.buildPath({})}`

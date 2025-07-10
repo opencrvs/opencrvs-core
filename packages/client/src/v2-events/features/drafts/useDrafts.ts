@@ -15,6 +15,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
+  findLocalEventDocument,
   invalidateDraftsList,
   invalidateEventsList,
   setDraftData
@@ -49,7 +50,20 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const filenames = drafts.flatMap((draft) =>
       getFilenamesFromActionDocument([draft.action])
     )
+
     await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
+
+    const missingEventsToDownload = drafts
+      .filter((event) => !findLocalEventDocument(event.eventId))
+      .map(async (draft) =>
+        queryClient.prefetchQuery({
+          queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId),
+          queryFn: trpcOptionsProxy.event.get.queryOptions(draft.eventId)
+            .queryFn
+        })
+      )
+
+    await Promise.all(missingEventsToDownload)
 
     return drafts
   }
