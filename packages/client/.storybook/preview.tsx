@@ -194,10 +194,10 @@ const preview: Preview = {
         setEventData(event.id, event)
       })
 
-      const offlineDrafts: Array<Draft> =
-        options.parameters?.offline?.drafts ?? []
-
-      setDraftData(() => offlineDrafts)
+      if (options.parameters?.offline?.drafts) {
+        const offlineDrafts: Array<Draft> = options.parameters.offline.drafts
+        setDraftData(() => offlineDrafts)
+      }
 
       //  Intermittent failures starts to happen when global state gets out of whack.
       // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.

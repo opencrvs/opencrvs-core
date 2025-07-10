@@ -86,6 +86,9 @@ export const ReviewForLocalRegistrarComplete: Story = {
         eventId
       })
     },
+    offline: {
+      drafts: [draft]
+    },
     msw: {
       handlers: {
         drafts: [
@@ -180,6 +183,9 @@ export const ReviewForRegistrationAgentComplete: Story = {
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId
       })
+    },
+    offline: {
+      drafts: [draft]
     },
     msw: {
       handlers: {
@@ -286,6 +292,9 @@ export const ReviewForFieldAgentComplete: Story = {
         eventId
       })
     },
+    offline: {
+      drafts: [draft]
+    },
     msw: {
       handlers: {
         drafts: [
@@ -384,7 +393,8 @@ export const ReviewShowsFilesFromDraft: Story = {
       })
     },
     offline: {
-      events: [createdEvent]
+      events: [createdEvent],
+      drafts: [draft]
     },
     msw: {
       handlers: {
