@@ -34,6 +34,18 @@ const CorrectionSectionTitle = styled(Text)`
   margin: 20px 0;
 `
 
+const Label = styled.label`
+  margin: 0;
+  padding: 0;
+  ${({ theme }) => theme.fonts.bold14}
+`
+
+const TableHeader = styled.th`
+  text-transform: uppercase;
+  ${({ theme }) => theme.fonts.bold12}
+  display: inline-block;
+`
+
 /*
  * Correction details component which is used both on the correction request summary page,
  * and the event audit history dialog/modal for 'Request correction' actions.
@@ -111,10 +123,12 @@ export function CorrectionDetails({
         ]}
         content={correctionDetails.map(
           ({ valueDisplay, label, pageId, id }) => ({
-            firstColumn: intl.formatMessage(label),
+            firstColumn: <Label>{intl.formatMessage(label)}</Label>,
             secondColumn: valueDisplay,
             change: (
               <Link
+                data-testid={`change-${id}`}
+                font="reg14"
                 onClick={(e) => {
                   e.stopPropagation()
                   navigate(
@@ -175,17 +189,27 @@ export function CorrectionDetails({
             key={`corrections-table-${page.id}`}
             columns={[
               {
-                label: intl.formatMessage(page.title),
+                label: (
+                  <TableHeader>{intl.formatMessage(page.title)}</TableHeader>
+                ),
                 width: 34,
                 key: 'fieldLabel'
               },
               {
-                label: intl.formatMessage(messages.correctionSummaryOriginal),
+                label: (
+                  <TableHeader>
+                    {intl.formatMessage(messages.correctionSummaryOriginal)}
+                  </TableHeader>
+                ),
                 width: 33,
                 key: 'original'
               },
               {
-                label: intl.formatMessage(messages.correctionSummaryCorrection),
+                label: (
+                  <TableHeader>
+                    {intl.formatMessage(messages.correctionSummaryCorrection)}
+                  </TableHeader>
+                ),
                 width: 33,
                 key: 'correction'
               }
