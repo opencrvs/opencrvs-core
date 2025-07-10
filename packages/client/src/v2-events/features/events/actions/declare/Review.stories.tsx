@@ -383,7 +383,10 @@ const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE]
 })
-
+const declareDraft = generateEventDraftDocument({
+  eventId: createdEvent.id,
+  actionType: ActionType.DECLARE
+})
 export const ReviewShowsFilesFromDraft: Story = {
   parameters: {
     reactRouter: {
@@ -394,18 +397,13 @@ export const ReviewShowsFilesFromDraft: Story = {
     },
     offline: {
       events: [createdEvent],
-      drafts: [draft]
+      drafts: [declareDraft]
     },
     msw: {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument({
-                eventId: createdEvent.id,
-                actionType: ActionType.DECLARE
-              })
-            ]
+            return [declareDraft]
           })
         ],
         event: [

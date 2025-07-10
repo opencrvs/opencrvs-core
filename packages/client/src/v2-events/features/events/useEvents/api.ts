@@ -145,12 +145,15 @@ export function findLocalEventDocument(eventId: string) {
  * get updated properly when event is submitted to the server
  * and a new id is generated.
  */
-function updateDraftsWithEvent(id: string, data: EventDocument) {
+async function updateDraftsWithEvent(id: string, data: EventDocument) {
   setDraftData((drafts) =>
     drafts.map((draft) =>
       draft.eventId === id ? { ...draft, eventId: data.id } : draft
     )
   )
+  return queryClient.invalidateQueries({
+    queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+  })
 }
 
 export function clearPendingDraftCreationRequests(eventId: string) {
@@ -175,9 +178,9 @@ export function clearPendingDraftCreationRequests(eventId: string) {
     })
 }
 
-export function setEventData(id: string, data: EventDocument) {
+export async function setEventData(id: string, data: EventDocument) {
   updateLocalEventIndex(id, data)
-  updateDraftsWithEvent(id, data)
+  await updateDraftsWithEvent(id, data)
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
 }
 
@@ -203,12 +206,12 @@ export async function refetchEventsList() {
 }
 
 export async function updateLocalEvent(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
+  await setEventData(updatedEvent.id, updatedEvent)
   return refetchEventsList()
 }
 
-export function onAssign(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
+export async function onAssign(updatedEvent: EventDocument) {
+  await setEventData(updatedEvent.id, updatedEvent)
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
 
