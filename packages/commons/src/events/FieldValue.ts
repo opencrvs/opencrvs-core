@@ -44,6 +44,8 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
+export const TimeValue = z.string().regex(/^([01][0-9]|2[0-3]):[0-5][0-9]$/)
+
 export const DatetimeValue = z.string().datetime()
 
 export const DateRangeFieldValue = DateValue.or(z.tuple([DateValue, DateValue]))
@@ -64,6 +66,7 @@ export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 export const FieldValue = z.union([
   TextValue,
   DateValue,
+  TimeValue,
   DateRangeFieldValue,
   CheckboxFieldValue,
   NumberFieldValue,
@@ -82,6 +85,7 @@ export type FieldValue = z.infer<typeof FieldValue>
 export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
+  TimeValue,
   DateRangeFieldValue,
   CheckboxFieldValue,
   NumberFieldValue,
