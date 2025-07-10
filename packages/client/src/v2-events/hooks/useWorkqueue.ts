@@ -65,7 +65,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
       return {
         useSuspenseQuery: () =>
           searchEvent.useSuspenseQuery(deserializedQuery, {
-            networkMode: 'offlineFirst'
+            networkMode: 'always'
           }),
         useQuery: () => searchEvent.useQuery(deserializedQuery)
       }

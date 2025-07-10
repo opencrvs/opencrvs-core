@@ -128,11 +128,11 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
       },
       createdAt: new Date().toISOString()
     }
-    setDraftData((drafts) =>
-      drafts
+    setDraftData((drafts) => {
+      return drafts
         .filter((draft) => draft.eventId !== optimisticDraft.eventId)
         .concat(optimisticDraft)
-    )
+    })
     clearPendingDraftCreationRequests(variables.eventId)
     return optimisticDraft
   },
@@ -173,7 +173,7 @@ export function useDrafts() {
     const drafts = useSuspenseQuery({
       ...options,
       queryKey: trpc.event.draft.list.queryKey(),
-      networkMode: 'offlineFirst'
+      networkMode: 'always'
     })
 
     return drafts.data

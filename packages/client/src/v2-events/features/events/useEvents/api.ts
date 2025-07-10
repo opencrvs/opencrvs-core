@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { matchMutation } from '@tanstack/react-query'
+import { matchMutation, partialMatchKey } from '@tanstack/react-query'
 import {
   ActionType,
   Draft,
@@ -49,7 +49,7 @@ export function addLocalEventConfig(config: EventConfig) {
 }
 
 export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
-  return queryClient.setQueryData(
+  queryClient.setQueryData(
     trpcOptionsProxy.event.draft.list.queryKey(),
     (drafts) => updater(drafts || [])
   )

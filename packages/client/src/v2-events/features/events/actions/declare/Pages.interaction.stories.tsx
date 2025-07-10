@@ -173,7 +173,18 @@ export const SaveAndExit: Story = {
       await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
     })
 
+    await step('Navigate to My drafts workqueue', async () => {
+      await waitFor(async () =>
+        userEvent.click(canvas.getByRole('button', { name: /My drafts/ }))
+      )
+    })
+
     await waitFor(async () => expect(spy).toHaveBeenCalled())
+    await waitFor(
+      async () =>
+        expect(await canvas.findByText('Clearly Draft')).toBeInTheDocument(),
+      { timeout: 5000 }
+    )
     await waitFor(async () => canvas.findByText('Clearly Draft'))
 
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
@@ -252,6 +263,9 @@ export const DraftShownInForm: Story = {
     const modal = within(await canvas.findByRole('dialog'))
     await userEvent.click(await modal.findByRole('button', { name: /Confirm/ }))
 
+    await waitFor(async () =>
+      userEvent.click(await canvas.findByRole('button', { name: /My drafts/ }))
+    )
     await userEvent.click(await canvas.findByText('Clearly Draft'))
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))
