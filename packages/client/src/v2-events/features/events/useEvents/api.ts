@@ -31,6 +31,12 @@ export function addUserToQueryData(user: User) {
   )
 }
 
+export async function invalidateWorkqueues() {
+  await queryClient.invalidateQueries({
+    queryKey: trpcOptionsProxy.workqueue.count.queryKey()
+  })
+}
+
 export function findLocalEventConfig(eventType: string) {
   return queryClient
     .getQueryData(trpcOptionsProxy.event.config.get.queryKey())
@@ -212,6 +218,7 @@ export async function updateLocalEvent(updatedEvent: EventDocument) {
 
 export async function onAssign(updatedEvent: EventDocument) {
   await setEventData(updatedEvent.id, updatedEvent)
+  await invalidateWorkqueues()
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
 
@@ -248,4 +255,5 @@ export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
   deleteEventData(id)
   await removeCachedFiles(updatedEvent)
+  await invalidateWorkqueues()
 }
