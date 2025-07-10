@@ -83,8 +83,13 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
       return { type: 'text' }
+    case FieldType.EMAIL:
+      return {
+        type: 'keyword',
+        // apply custom normalyzer
+        normalizer: 'lowercase_normalizer'
+      }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
     case FieldType.SELECT:
@@ -190,6 +195,17 @@ export async function createIndex(
   await client.indices.create({
     index: indexName,
     body: {
+      // Define a custom normalizer to make keyword fields case-insensitive by applying a lowercase filter
+      settings: {
+        analysis: {
+          normalizer: {
+            lowercase_normalizer: {
+              type: 'custom',
+              filter: ['lowercase']
+            }
+          }
+        }
+      },
       mappings: {
         properties: {
           id: { type: 'keyword' },
