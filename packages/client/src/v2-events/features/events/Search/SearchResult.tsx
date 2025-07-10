@@ -329,7 +329,7 @@ export const SearchResultComponent = ({
         (outboxEvent) => outboxEvent.id === event.id
       )
 
-      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+      const isInDrafts = drafts.some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
@@ -354,30 +354,31 @@ export const SearchResultComponent = ({
         status: intl.formatMessage(messages.eventStatus, {
           status
         }),
-        title: isInOutbox ? (
-          <IconWithName
-            flags={event.flags}
-            name={event.title}
-            status={status}
-          />
-        ) : (
-          <TextButton
-            color={event.useFallbackTitle ? 'red' : 'primary'}
-            onClick={() => {
-              return navigate(
-                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                  eventId: event.id
-                })
-              )
-            }}
-          >
+        title:
+          isInOutbox && !isInDrafts ? (
             <IconWithName
               flags={event.flags}
               name={event.title}
               status={status}
             />
-          </TextButton>
-        ),
+          ) : (
+            <TextButton
+              color={event.useFallbackTitle ? 'red' : 'primary'}
+              onClick={() => {
+                return navigate(
+                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                    eventId: event.id
+                  })
+                )
+              }}
+            >
+              <IconWithName
+                flags={event.flags}
+                name={event.title}
+                status={status}
+              />
+            </TextButton>
+          ),
         outbox: intl.formatMessage(
           isOnline ? messages.processingAction : messages.waitingForAction,
           {

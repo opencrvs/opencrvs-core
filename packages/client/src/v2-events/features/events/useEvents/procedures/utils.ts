@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  Mutation,
   MutationObserverOptions,
   OmitKeyof,
   QueryFunctionContext
@@ -20,10 +21,7 @@ import type {
   inferInput,
   inferOutput
 } from '@trpc/tanstack-react-query'
-import {
-  findLocalEventDocument,
-  findLocalEventIndex
-} from '@client/v2-events/features/events/useEvents/api'
+import { findLocalEventIndex } from '@client/v2-events/features/events/useEvents/api'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
 
@@ -149,4 +147,11 @@ export function createEventActionMutationFn<
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type QueryOptions<P extends DecorateQueryProcedure<any>> = Partial<
   Omit<ReturnType<P['queryOptions']>, 'queryFn'>
+>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type MutationType<P extends DecorateMutationProcedure<any>> = Mutation<
+  inferOutput<P>,
+  unknown,
+  inferInput<P>,
+  inferInput<P>
 >

@@ -13,29 +13,43 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 import { onlineManager } from '@tanstack/react-query'
 
 import React, { useEffect } from 'react'
+import styled from 'styled-components'
 
-const wasOffline = localStorage.getItem('offline') === 'true'
+const wasOffline = localStorage.getItem('debugger-offline') === 'true'
 
 onlineManager.setOnline(!wasOffline)
 
+/*
+ * React query Devtool assumes offline mode is never set from outside
+ * thus the button's state always first defaults to online.
+ * As we're setting the mode offline even before the component mounts,
+ * we need to override the default styles to indicate that the app is offline.
+ * This is a workaround for the issue.
+ */
+const Container = styled.div<{ isOnline: boolean }>`
+  ${({ isOnline }) =>
+    !isOnline &&
+    `
+    .tsqd-action-mock-offline-behavior svg {
+      fill: #f79009;
+      stroke: #f79009;
+    }
+  `}
+`
+
 export function Debug() {
+  const [isOnline, setOnline] = React.useState(onlineManager.isOnline())
   useEffect(() => {
     onlineManager.subscribe(() => {
-      localStorage.setItem('offline', (!onlineManager.isOnline()).toString())
+      const online = onlineManager.isOnline()
+      setOnline(online)
+      localStorage.setItem('debugger-offline', (!online).toString())
     })
-
-    setTimeout(() => {
-      /*
-       * This just forces rerender of the the DevTools
-       */
-      onlineManager.setOnline(wasOffline)
-      onlineManager.setOnline(!wasOffline)
-    }, 100)
-  }, [])
+  }, [isOnline])
 
   return (
-    <>
+    <Container isOnline={isOnline}>
       <ReactQueryDevtools initialIsOpen={false} />
-    </>
+    </Container>
   )
 }

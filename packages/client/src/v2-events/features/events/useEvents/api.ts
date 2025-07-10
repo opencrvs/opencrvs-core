@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { matchMutation, partialMatchKey } from '@tanstack/react-query'
 import {
   ActionType,
   Draft,
@@ -21,6 +22,7 @@ import {
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
+import { MutationType } from './procedures/utils'
 
 export function addUserToQueryData(user: User) {
   return queryClient.setQueryData(
@@ -138,12 +140,48 @@ export function findLocalEventDocument(eventId: string) {
   ) as EventDocument | undefined
 }
 
+/*
+ * This function makes sure temporary id references to events
+ * get updated properly when event is submitted to the server
+ * and a new id is generated.
+ */
+function updateDraftsWithEvent(id: string, data: EventDocument) {
+  setDraftData((drafts) =>
+    drafts.map((draft) =>
+      draft.eventId === id ? { ...draft, eventId: data.id } : draft
+    )
+  )
+}
+
+export function clearPendingDraftCreationRequests(eventId: string) {
+  queryClient
+    .getMutationCache()
+    .getAll()
+    .filter((mutation) =>
+      matchMutation(
+        {
+          mutationKey: trpcOptionsProxy.event.draft.create.mutationKey()
+        },
+        mutation
+      )
+    )
+    .map(
+      (mutation) =>
+        mutation as MutationType<typeof trpcOptionsProxy.event.draft.create>
+    )
+    .filter((mutation) => mutation.state.context?.eventId === eventId)
+    .forEach((mutation) => {
+      queryClient.getMutationCache().remove(mutation)
+    })
+}
+
 export function setEventData(id: string, data: EventDocument) {
   updateLocalEventIndex(id, data)
+  updateDraftsWithEvent(id, data)
   return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
 }
 
-export async function invalidateEventsList() {
+export async function refetchEventsList() {
   /*
    * Invalidate search queries
    */
@@ -152,21 +190,21 @@ export async function invalidateEventsList() {
       .getQueriesData<EventIndex[]>({
         queryKey: trpcOptionsProxy.event.search.queryKey()
       })
-      .map(async ([queryKey, eventIndices]) =>
-        queryClient.invalidateQueries({
+      .map(async ([queryKey, eventIndices]) => {
+        return queryClient.refetchQueries({
           queryKey
         })
-      )
+      })
   )
 
-  return queryClient.invalidateQueries({
+  return queryClient.refetchQueries({
     queryKey: trpcOptionsProxy.event.list.queryKey()
   })
 }
 
 export async function updateLocalEvent(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
-  return invalidateEventsList()
+  return refetchEventsList()
 }
 
 export function onAssign(updatedEvent: EventDocument) {
@@ -190,8 +228,8 @@ export function onAssign(updatedEvent: EventDocument) {
   }
 }
 
-export async function invalidateDraftsList() {
-  return queryClient.invalidateQueries({
+export async function refetchDraftsList() {
+  return queryClient.refetchQueries({
     queryKey: trpcOptionsProxy.event.draft.list.queryKey()
   })
 }
