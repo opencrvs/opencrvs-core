@@ -117,6 +117,7 @@ export const createDeclarationTrpcMsw = (
 ) => {
   return {
     eventDocument,
+    draft,
     events: wrapHandlersWithSpies([
       {
         name: 'event.config.get',

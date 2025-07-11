@@ -66,6 +66,17 @@ const draft = generateEventDraftDocument({
   actionType: ActionType.DECLARE,
   rng
 })
+const modifiedDraft = generateEventDraftDocument({
+  eventId: eventDocument.id,
+  actionType: ActionType.REGISTER,
+  declaration: {
+    'applicant.name': {
+      firstname: 'Riku',
+      surname: 'This value is from a draft'
+    }
+  },
+  rng
+})
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
   loaders: [
@@ -111,6 +122,10 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       }),
       chromatic: { disableSnapshot: true }
     },
+    offline: {
+      events: [eventDocument],
+      drafts: [modifiedDraft]
+    },
     msw: {
       handlers: {
         event: [
@@ -133,19 +148,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
         ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument({
-                eventId: eventDocument.id,
-                actionType: ActionType.REGISTER,
-                declaration: {
-                  'applicant.name': {
-                    firstname: 'Riku',
-                    surname: 'This value is from a draft'
-                  }
-                },
-                rng
-              })
-            ]
+            return [modifiedDraft]
           })
         ],
         user: [
@@ -194,7 +197,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [draft]
+            return []
           })
         ],
         events: [

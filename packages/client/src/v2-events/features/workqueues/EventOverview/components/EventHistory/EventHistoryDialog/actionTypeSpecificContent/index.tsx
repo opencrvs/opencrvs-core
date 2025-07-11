@@ -16,6 +16,7 @@ import {
 } from '@opencrvs/commons/client'
 import { Archive } from './Archive'
 import { RequestCorrection } from './RequestCorrection'
+import { PrintCertificate } from './PrintCertificate'
 
 export function getActionTypeSpecificContent(
   action: ActionDocument,
@@ -29,6 +30,10 @@ export function getActionTypeSpecificContent(
 
   if (type === ActionType.REQUEST_CORRECTION) {
     return <RequestCorrection action={action} fullEvent={fullEvent} />
+  }
+
+  if (type === ActionType.PRINT_CERTIFICATE) {
+    return <PrintCertificate action={action} event={fullEvent} />
   }
 
   return null

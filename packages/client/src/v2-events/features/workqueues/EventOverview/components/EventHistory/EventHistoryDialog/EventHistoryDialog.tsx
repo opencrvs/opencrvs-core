@@ -24,7 +24,7 @@ import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Draft} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
+    '{status, select, CREATE {Declaration started} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -55,8 +55,6 @@ function prepareComments(history: ActionDocument) {
 
 /**
  * Detailed view of single Action, showing the history of the event.
- *
- * @TODO: Add more details to the modal and ability to diff changes when more events are specified.
  */
 export function EventHistoryDialog({
   action,

@@ -65,6 +65,17 @@ export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
 }
 
+export function getPrintCertificatePages(configuration: EventConfig) {
+  const action = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  return getOrThrow(
+    action?.printForm.pages,
+    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
+  )
+}
+
 export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
     return actionConfig.correctionForm.pages.flatMap(({ fields }) => fields)

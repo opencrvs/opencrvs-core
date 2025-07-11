@@ -342,7 +342,7 @@ function FormReview({
           )
 
           if (!shouldDisplayPage) {
-            return <></>
+            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
           }
 
           // Only display fields that have a non-undefined/null value or have an validation error
