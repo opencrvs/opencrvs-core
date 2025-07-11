@@ -331,9 +331,67 @@ test('Returns events based on the updatedAt column', async () => {
   })
 })
 
-test.todo(
-  'Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column and requsted timezone'
-)
+test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column and requsted timezone', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    SCOPES.RECORD_IMPORT,
+    ...TEST_USER_DEFAULT_SCOPES
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request({
+    ...generator.event.actions.declare(event.id),
+    keepAssignment: true
+  })
+  await client.event.actions.validate.request({
+    ...generator.event.actions.validate(event.id),
+    keepAssignment: true
+  })
+  await client.event.actions.register.request(
+    generator.event.actions.register(event.id)
+  )
+
+  const timeZone1 = 'Etc/GMT+12' // UTC-12
+  const timeZone2 = 'Etc/GMT-12' // UTC+12
+
+  const date1 = new Date().toLocaleString('sv-SE', { timeZone: timeZone1 })
+  const date2 = new Date().toLocaleString('sv-SE', { timeZone: timeZone2 })
+
+  const resultForTimezone1 = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: date1.split(' ')[0]
+        }
+      }
+    ]
+  })
+  const resultForTimezone2 = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: date2.split(' ')[0]
+        }
+      }
+    ]
+  })
+
+  const utcHour = new Date().getUTCHours()
+
+  if (utcHour < 12) {
+    expect(resultForTimezone1).toHaveLength(0)
+    expect(resultForTimezone2).toHaveLength(1)
+  } else {
+    expect(resultForTimezone1).toHaveLength(1)
+    expect(resultForTimezone2).toHaveLength(0)
+  }
+})
 
 test.skip('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
