@@ -110,7 +110,8 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [declarationTrpcMsw.eventDocument]
+      events: [declarationTrpcMsw.eventDocument],
+      drafts: [declarationTrpcMsw.draft]
     },
     msw: {
       handlers: {
@@ -379,12 +380,6 @@ const eventId = eventDocument.id
 
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
-    /*
-     * Ensure record is "downloaded offline" in the user's browser
-     */
-    addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventId, eventDocument)
-
     // For this test, we want to have empty form values in zustand state
     useEventFormData.setState({ formValues: {} })
   },
@@ -406,6 +401,12 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId: eventId
       })
+    },
+    offline: {
+      /*
+       * Ensure record is "downloaded offline" in the user's browser
+       */
+      events: [eventDocument]
     },
     chromatic: { disableSnapshot: true },
     msw: {
