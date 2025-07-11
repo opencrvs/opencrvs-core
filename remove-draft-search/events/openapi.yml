@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 1e283728-9ebc-48d5-9de5-c1e01ea6d662
+                transactionId: 74c41ecf-1246-4a80-8033-fff8e98bb1e8
                 type: v2.birth
       responses:
         "200":
@@ -456,7 +456,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 2b3bd3bf-f719-40ca-aa08-c788702c80eb
+                transactionId: 90a7b250-3dbe-445d-8007-33e814d85d6d
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2241,6 +2241,12 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                includeMiddlename:
+                  type: boolean
+                  default: false
+                  description: To make middle name visible in Name form field
+                searchMode:
+                  type: boolean
           required:
             - id
             - label
