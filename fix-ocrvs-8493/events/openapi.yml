@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: ec85e050-d720-4deb-81ad-205855f8cc7c
+                transactionId: addcdc61-5197-43dd-ba81-0ad2038184a6
                 type: v2.birth
       responses:
         "200":
@@ -472,7 +472,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: fe1890ad-5fab-4df9-a79e-817de9d17caa
+                transactionId: 9ae3b07c-6fc3-41a7-a2b2-459520ec3bab
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -10309,8 +10309,7 @@ components:
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
-          type: string
-          enum: *a11
+          $ref: "#/components/schemas/ExactUserType"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -10353,6 +10352,7 @@ components:
       anyOf:
         - $ref: "#/components/schemas/ExactDate"
         - $ref: "#/components/schemas/RangeDate"
+        - $ref: "#/components/schemas/TimePeriod"
     Exact:
       type: object
       properties:
@@ -10404,6 +10404,19 @@ components:
         - type
         - gte
         - lte
+    TimePeriod:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - timePeriod
+        term:
+          type: string
+          enum: *a1
+      required:
+        - type
+        - term
     Within:
       type: object
       properties:
@@ -10416,6 +10429,19 @@ components:
       required:
         - type
         - location
+    ExactUserType:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          type: string
+          enum: *a11
+      required:
+        - type
+        - term
     ContainsFlags:
       type: object
       properties:
