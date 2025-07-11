@@ -1602,6 +1602,12 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                includeMiddlename:
+                  type: boolean
+                  default: false
+                  description: To make middle name visible in Name form field
+                searchMode:
+                  type: boolean
           required:
             - id
             - label
@@ -10942,7 +10948,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 9a57f047-faa0-4929-92df-98d95e625473
+        transactionId: 0e8fd59a-78b1-41a9-893a-292e28961019
         declaration: {}
         annotation: {}
         type: NOTIFY
