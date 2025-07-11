@@ -73,7 +73,9 @@ function createDraftHandlers() {
         action: {
           ...req,
           originalActionId: req.originalActionId as UUID,
-          declaration: req.declaration || {},
+          declaration: (req.declaration ||
+            {}) as Draft['action']['declaration'],
+          annotation: (req.annotation || {}) as Draft['action']['annotation'],
           createdBy: 'test-user',
           createdByUserType: 'user',
           createdByRole: 'test-role',

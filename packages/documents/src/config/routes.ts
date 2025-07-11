@@ -19,7 +19,6 @@ import {
   createPresignedUrlsInBulk
 } from '@documents/features/getDocument/handler'
 import { svgUploadHandler } from '@documents/features/uploadSvg/handler'
-import { MINIO_BUCKET } from '@documents/minio/constants'
 import { deleteDocument } from '@documents/features/deleteDocument/handler'
 
 export const getRoutes = () => {
@@ -27,7 +26,7 @@ export const getRoutes = () => {
     // get presigned URL
     {
       method: 'GET',
-      path: `/presigned-url/${MINIO_BUCKET}/{fileUri*}`,
+      path: `/presigned-url/{fileUri*}`,
       handler: createPreSignedUrl,
       config: {
         tags: ['api']
@@ -53,7 +52,7 @@ export const getRoutes = () => {
     // check if file exists
     {
       method: 'GET',
-      path: '/files/{filename}',
+      path: '/files/{fileUri*}',
       handler: fileExistsHandler,
       config: {
         tags: ['api']
