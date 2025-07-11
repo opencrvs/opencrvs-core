@@ -154,7 +154,7 @@ export function DocumentPreview({
         <PanViewer
           key={Math.random()}
           id="document_image"
-          image={getUnsignedFileUrl(previewImage.filename)}
+          image={getUnsignedFileUrl(previewImage.path)}
           rotation={rotation}
           zoom={zoom}
         />

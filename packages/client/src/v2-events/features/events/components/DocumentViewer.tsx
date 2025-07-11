@@ -68,8 +68,8 @@ function getFileOptions(
         ...options,
         {
           value: {
-            filename: field.value.filename,
-            url: getUnsignedFileUrl(field.value.filename),
+            filename: field.value.path,
+            url: getUnsignedFileUrl(field.value.path),
             id: field.config.id
           },
           label
@@ -92,8 +92,8 @@ function getFileOptions(
 
           return {
             value: {
-              filename: formVal.filename,
-              url: getUnsignedFileUrl(formVal.filename),
+              filename: formVal.path,
+              url: getUnsignedFileUrl(formVal.path),
               id: `${field.config.id}-${formVal.option}`
             },
             label: `${fieldLabel} (${optionLabel})`

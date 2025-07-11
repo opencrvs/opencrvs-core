@@ -28,7 +28,7 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
-import { getFilenamesFromActionDocument } from '../files/cache'
+import { getFilepathsFromActionDocument } from '../files/cache'
 import { precacheFile } from '../files/useFileUpload'
 
 /*
@@ -50,7 +50,7 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const drafts = response.map((draft) => Draft.parse(draft))
 
     const filenames = drafts.flatMap((draft) =>
-      getFilenamesFromActionDocument([draft.action])
+      getFilepathsFromActionDocument([draft.action])
     )
 
     await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
@@ -124,7 +124,16 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
         createdAtLocation: '@todo' as UUID,
         ...variables,
         originalActionId: variables.originalActionId as UUID,
-        declaration: variables.declaration || {}
+        /*
+         * Annoyingly these need to be casted or otherwise branded
+         * types like FullDocumentPath causes an error here.
+         * inferInput of trpc types causes branded types to lose the branding and
+         * just show as plain types
+         */
+        declaration: (variables.declaration ||
+          {}) as Draft['action']['declaration'],
+        annotation: (variables.annotation ||
+          {}) as Draft['action']['annotation']
       },
       createdAt: new Date().toISOString()
     }

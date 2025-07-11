@@ -9,39 +9,35 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { FullDocumentURL, joinValues } from '@opencrvs/commons/client'
+import {
+  FullDocumentPath,
+  FullDocumentURL,
+  joinValues
+} from '@opencrvs/commons/client'
 
 /* Must match the one defined src-sw.ts */
 export const CACHE_NAME = 'workbox-runtime'
 
+export function getFullDocumentPath(filename: string): FullDocumentPath {
+  return ('/' +
+    joinValues([window.config.MINIO_BUCKET, filename], '/')) as FullDocumentPath
+}
 /**
  * Files are stored in MinIO. Files should be accessed via unsigned URLs, utilizing browser cache and aggressively precaching them.
  * @returns unsigned URL to the file in MinIO. Assumes file has been cached.
  */
-export function getUnsignedFileUrl(filename: string): FullDocumentURL {
-  try {
-    return new URL(
-      joinValues([window.config.MINIO_BUCKET, filename], '/'),
-      window.config.MINIO_BASE_URL
-    ).toString() as FullDocumentURL
-  } catch (error) {
-    throw new Error(
-      `Failed to build file url from: MINIO_BUCKET: ${window.config.MINIO_BUCKET}, MINIO_BASE_URL: ${window.config.MINIO_BASE_URL}`
-    )
-  }
+export function getUnsignedFileUrl(path: FullDocumentPath): FullDocumentURL {
+  return new URL(
+    path,
+    window.config.MINIO_BASE_URL
+  ).toString() as FullDocumentURL
 }
 
 /**
  * Sets file to **BROWSER** cache with given filename
  * @see CACHE_NAME
  */
-export async function cacheFile({
-  filename,
-  file
-}: {
-  filename: string
-  file: File
-}) {
+export async function cacheFile({ url, file }: { url: string; file: File }) {
   const temporaryBlob = new Blob([file], { type: file.type })
   const cacheKeys = await caches.keys()
 
@@ -58,7 +54,7 @@ export async function cacheFile({
   const cache = await caches.open(cacheKey)
 
   return cache.put(
-    getUnsignedFileUrl(filename),
+    url,
     new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
   )
 }
@@ -80,7 +76,7 @@ export async function removeCached(filename: string) {
   }
 
   const cache = await caches.open(cacheKey)
-  return cache.delete(getUnsignedFileUrl(filename))
+  return cache.delete(getUnsignedFileUrl(getFullDocumentPath(filename)))
 }
 
 export async function ensureCacheExists(cacheName: string) {

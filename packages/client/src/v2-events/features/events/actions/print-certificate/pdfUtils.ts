@@ -451,7 +451,9 @@ src: url("${url}") format("truetype");
   return serializer.serializeToString(svg)
 }
 
-async function downloadAndEmbedImages(svgString: string): Promise<string> {
+export async function downloadAndEmbedImages(
+  svgString: string
+): Promise<string> {
   const parser = new DOMParser()
   const doc = parser.parseFromString(svgString, 'image/svg+xml')
   const svg = doc.documentElement

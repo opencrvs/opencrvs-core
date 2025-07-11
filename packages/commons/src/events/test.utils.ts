@@ -56,6 +56,7 @@ import { AddressType, FileFieldValue } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
+import { FullDocumentPath } from '../documents'
 
 /**
  * In real application, the roles are defined in the countryconfig.
@@ -167,7 +168,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as FullDocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
