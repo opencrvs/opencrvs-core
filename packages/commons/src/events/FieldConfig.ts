@@ -315,7 +315,13 @@ const NameField = BaseField.extend({
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
-      postfix: TranslationConfig.optional()
+      postfix: TranslationConfig.optional(),
+      includeMiddlename: z
+        .boolean()
+        .default(false)
+        .optional()
+        .describe('To make middle name visible in Name form field'),
+      searchMode: z.boolean().optional()
     })
     .optional()
 }).describe('Name input field')
