@@ -23,6 +23,7 @@ import {
   EventStatus,
   isMetaAction
 } from '@opencrvs/commons/client'
+import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -67,6 +68,7 @@ function getAvailableAssignmentActions(
 }
 interface ActionConfig {
   label: TranslationConfig
+  icon?: IconProps['name']
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
   shouldHide?: (actions: ActionType[]) => boolean
@@ -150,11 +152,13 @@ export function useAction(event: EventIndex) {
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
+        icon: 'Eye',
         onClick: (workqueue?: string) =>
           navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
       },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
+        icon: 'PushPin',
         onClick: async (workqueue?: string) => {
           await events.actions.assignment.assign.mutate({
             eventId: event.id,
@@ -165,6 +169,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
+        icon: 'ArrowCircleDown',
         onClick: async (workqueue?: string) => {
           await events.actions.assignment.unassign.mutateAsync({
             eventId: event.id,
@@ -175,6 +180,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
+        icon: 'SpeakerSimpleHigh',
         onClick: (workqueue?: string) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
@@ -188,6 +194,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
+        icon: 'CircleWavyCheck',
         onClick: (workqueue?: string) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
@@ -199,6 +206,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
+        icon: 'Plus',
         onClick: (workqueue?: string) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
@@ -210,6 +218,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
+        icon: 'Printer',
         onClick: (workqueue?: string) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
@@ -221,6 +230,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
+        icon: 'Trash',
         onClick: (workqueue?: string) => {
           deleteEvent({
             eventId: event.id
