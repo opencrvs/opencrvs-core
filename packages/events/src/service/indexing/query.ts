@@ -18,7 +18,8 @@ import {
   QueryType,
   DateCondition,
   QueryInputType,
-  SearchScopeAccessLevels
+  SearchScopeAccessLevels,
+  timePeriodToDateRange
 } from '@opencrvs/commons/events'
 import { encodeFieldId } from './utils'
 
@@ -29,7 +30,7 @@ function dateClauseToElasticQuery(
 ): estypes.QueryDslQueryContainer {
   if (clause.type === 'exact') {
     return { term: { [propertyName]: clause.term } }
-  } else {
+  } else if (clause.type === 'range') {
     // @todo supply timezone from here
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { type, ...rest } = clause
@@ -38,6 +39,16 @@ function dateClauseToElasticQuery(
         [propertyName]: {
           time_zone: 'Asia/Dhaka',
           ...rest
+        }
+      }
+    }
+  } else {
+    const { startDate, endDate } = timePeriodToDateRange(clause.term)
+    return {
+      range: {
+        [propertyName]: {
+          gte: startDate,
+          lte: endDate
         }
       }
     }

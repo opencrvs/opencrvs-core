@@ -28,7 +28,8 @@ import {
   NameFieldValue,
   getDeclarationFields,
   DateRangeFieldValue,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  timePeriodToDateRange
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
 import { EventStatus } from '@opencrvs/commons/client'
@@ -265,22 +266,8 @@ function toRangeDateString(value: DateRangeFieldValue): string {
 }
 
 function timePeriodToRangeString(value: SelectDateRangeValue): string {
-  let startDate: Date
-  switch (value) {
-    case 'last7Days':
-      startDate = subDays(new Date(), 6)
-      break
-    case 'last30Days':
-      startDate = subDays(new Date(), 29)
-      break
-    case 'last90Days':
-      startDate = subDays(new Date(), 89)
-      break
-    case 'last365Days':
-      startDate = subDays(new Date(), 364)
-      break
-  }
-  return `${startDate.toISOString()},${new Date().toISOString()}`
+  const { startDate, endDate } = timePeriodToDateRange(value)
+  return `${startDate},${endDate}`
 }
 
 function buildConditionForStatus(): Condition {
