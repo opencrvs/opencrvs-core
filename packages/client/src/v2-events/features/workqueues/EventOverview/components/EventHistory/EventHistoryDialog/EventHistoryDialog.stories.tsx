@@ -124,20 +124,52 @@ export const MarkedAsDuplicate: Story = {
   }
 }
 
-export const PrintCertificate: Story = {
-  args: {
-    action: {
-      ...actionBase,
-      type: ActionType.PRINT_CERTIFICATE
-    }
-  }
-}
-
-const originalDeclaration = {
+const declaration = {
   'applicant.email': 'foo@bar.fi',
   'recommender.name': {
     firstname: 'John',
     surname: 'Doe'
+  }
+}
+
+export const PrintCertificate: Story = {
+  args: {
+    action: {
+      ...actionBase,
+      type: ActionType.PRINT_CERTIFICATE,
+      annotation: {
+        'collector.identity.verify': true,
+        'collector.requesterId': 'INFORMANT'
+      }
+    },
+    fullEvent: {
+      id: getUUID(),
+      type: 'tennis-club-membership',
+      actions: [
+        {
+          ...actionBase,
+          type: ActionType.CREATE
+        },
+        {
+          ...actionBase,
+          type: ActionType.DECLARE,
+          declaration
+        },
+        {
+          ...actionBase,
+          type: ActionType.VALIDATE,
+          declaration
+        },
+        {
+          ...actionBase,
+          type: ActionType.REGISTER,
+          declaration
+        }
+      ],
+      trackingId: 'ABCD123',
+      updatedAt: '2021-01-01',
+      createdAt: '2021-01-01'
+    }
   }
 }
 
@@ -170,17 +202,17 @@ export const RequestCorrection: Story = {
         {
           ...actionBase,
           type: ActionType.DECLARE,
-          declaration: originalDeclaration
+          declaration
         },
         {
           ...actionBase,
           type: ActionType.VALIDATE,
-          declaration: originalDeclaration
+          declaration
         },
         {
           ...actionBase,
           type: ActionType.REGISTER,
-          declaration: originalDeclaration
+          declaration
         },
         requestCorrectionAction
       ],
