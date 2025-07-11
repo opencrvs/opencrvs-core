@@ -129,8 +129,11 @@ export function DownloadButton({
   const assignmentStatus = getAssignmentStatus(event, authentication?.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
+  const isAssignMutationFetching = actions.assignment.assign.isAssigning(
+    event.id
+  )
 
-  if (eventDocument.isFetching) {
+  if (eventDocument.isFetching || isAssignMutationFetching) {
     return (
       <StatusIndicator
         className={className}

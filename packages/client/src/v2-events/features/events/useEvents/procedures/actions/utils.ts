@@ -13,9 +13,10 @@ import {
   ActionStatus,
   ActionType,
   EventDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
-import { EventConfig } from '@opencrvs/commons/client'
+
 import {
   findLocalEventConfig,
   setEventListData
@@ -46,12 +47,14 @@ export function updateEventOptimistically<T extends ActionInput>(
         {
           id: createTemporaryId(),
           type: actionType,
-          declaration: variables.declaration,
+          declaration: variables.declaration || {},
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
           createdBy: '@todo',
-          createdAtLocation: '@todo',
-          status: ActionStatus.Requested
+          createdAtLocation: '@todo' as UUID,
+          status: ActionStatus.Requested,
+          transactionId: variables.transactionId,
+          createdByRole: '@todo'
         }
       ]
     }
