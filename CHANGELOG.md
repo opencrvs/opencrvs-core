@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.7.3](https://github.com/opencrvs/opencrvs-core/compare/v1.7.2...v1.7.3)
+
+### New features
+
+### Bug fixes
+
+- Allow booleanTransformer to be used as a certificate handlebar template transformer [#9631](https://github.com/opencrvs/opencrvs-core/issues/9631)
+- Fix international to local number conversion from failing if the number was already local [#9634](https://github.com/opencrvs/opencrvs-core/issues/9634)
+- Pre-select default certificate option in print certificate collector form [#9935](https://github.com/opencrvs/opencrvs-core/issues/9935)
+
+
 ## [1.7.2](https://github.com/opencrvs/opencrvs-core/compare/v1.7.1...v1.7.2)
 
 ### New features

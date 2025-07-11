@@ -32,7 +32,11 @@ import { get } from 'lodash'
 import { MessageDescriptor } from 'react-intl'
 import QRCode from 'qrcode'
 import { getAddressName } from '@client/views/SysAdmin/Team/utils'
-import { PhoneNumberFormat, PhoneNumberUtil } from 'google-libphonenumber'
+import {
+  PhoneNumber,
+  PhoneNumberFormat,
+  PhoneNumberUtil
+} from 'google-libphonenumber'
 import {
   countryAlpha3toAlpha2,
   getLocationHierarchy
@@ -91,6 +95,15 @@ export const certificateDateTransformer =
     window.__localeId__ = prevLocale
   }
 
+const getParseableCountryCode = (alpha3CountryCode?: string): string => {
+  if (!alpha3CountryCode) {
+    return ''
+  }
+  alpha3CountryCode = alpha3CountryCode === 'FAR' ? 'ZMB' : alpha3CountryCode
+
+  return countryAlpha3toAlpha2(alpha3CountryCode) || ''
+}
+
 export const convertToLocal = (
   mobileWithCountryCode: string,
   alpha3CountryCode?: string
@@ -98,21 +111,18 @@ export const convertToLocal = (
   /*
    *  If country is the fictional demo country (Farajaland), use Zambian number format
    */
-  alpha3CountryCode = alpha3CountryCode === 'FAR' ? 'ZMB' : alpha3CountryCode
-
   const phoneUtil = PhoneNumberUtil.getInstance()
-  const number = phoneUtil.parse(mobileWithCountryCode)
-  const countryCode = alpha3CountryCode
-    ? countryAlpha3toAlpha2(alpha3CountryCode)
-    : phoneUtil.getRegionCodeForNumber(number)
 
-  if (!countryCode) {
+  const alpha2Code = getParseableCountryCode(alpha3CountryCode)
+
+  if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, alpha2Code)) {
     return
   }
 
-  if (!phoneUtil.isPossibleNumberString(mobileWithCountryCode, countryCode)) {
-    return
-  }
+  const number = phoneUtil.parse(mobileWithCountryCode, alpha2Code)
+
+  const countryCode = alpha2Code || phoneUtil.getRegionCodeForNumber(number)
+
   let nationalFormat = phoneUtil
     .format(number, PhoneNumberFormat.NATIONAL)
     .replace(/[^A-Z0-9]+/gi, '')
@@ -161,9 +171,7 @@ const getUserRole = (history: History): MessageDescriptor => {
 }
 
 const getUserFullHonorificName = (history: History): string => {
-  return (
-    history?.user?.fullHonorificName || ''
-  )
+  return history?.user?.fullHonorificName || ''
 }
 
 const getUserSignature = (history: History): string => {
