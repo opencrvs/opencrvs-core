@@ -15,6 +15,7 @@ import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { TokenUserType } from '../authentication'
+import { SelectDateRangeValue } from './FieldValue'
 extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
@@ -124,9 +125,21 @@ export const ExactDate = Exact.extend({
   ref: 'ExactDate'
 })
 
-export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
-  ref: 'DateCondition'
-})
+const TimePeriod = z
+  .object({
+    type: z.literal('timePeriod'),
+    term: SelectDateRangeValue
+  })
+  .openapi({
+    ref: 'TimePeriod'
+  })
+
+export const DateCondition = z
+  .union([ExactDate, RangeDate, TimePeriod])
+  .openapi({
+    ref: 'DateCondition'
+  })
+
 export type DateCondition = z.infer<typeof DateCondition>
 
 // Use `ZodType` here to avoid locking the output type prematurely —
