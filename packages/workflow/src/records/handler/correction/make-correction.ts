@@ -16,6 +16,7 @@ import {
   MarriageRegistration,
   RegisteredRecord,
   changeState,
+  getComposition,
   updateFHIRBundle
 } from '@opencrvs/commons/types'
 import { uploadBase64AttachmentsToDocumentsStore } from '@workflow/documents'
@@ -34,6 +35,8 @@ import { getToken } from '@workflow/utils/auth-utils'
 import { validateRequest } from '@workflow/utils/index'
 import { findActiveCorrectionRequest, updateFullUrl } from './utils'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { getRecordSpecificToken } from '@workflow/records/token-exchange'
+import { notifyForAction } from '@workflow/utils/country-config-api'
 
 export const makeCorrectionRoute = createRoute({
   method: 'POST',
@@ -132,6 +135,21 @@ export const makeCorrectionRoute = createRoute({
 
     await indexBundleToRoute(unassignedRecord, token, '/events/unassigned')
     await auditEvent('unassigned', unassignedRecord, token)
+
+    const recordSpecificToken = await getRecordSpecificToken(
+      token,
+      request.headers,
+      getComposition(unassignedRecord).id
+    )
+    await notifyForAction({
+      event: getEventType(unassignedRecord),
+      action: 'make-correction',
+      record,
+      headers: {
+        ...request.headers,
+        authorization: `Bearer ${recordSpecificToken.access_token}`
+      }
+    })
 
     return unassignedRecord
   }

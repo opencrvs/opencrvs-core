@@ -9,60 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-// eslint-disable-next-line import/no-unassigned-import
+import { logger } from '@opencrvs/commons'
 import '@opencrvs/commons/monitoring'
-
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-require('app-module-path').addPath(require('path').join(__dirname, '../'))
-
-import { appRouter } from './router/router'
-import { createHTTPServer } from '@trpc/server/adapters/standalone'
-import { getUserId, TokenWithBearer } from '@opencrvs/commons/authentication'
-import { TRPCError } from '@trpc/server'
-import { getUser, logger } from '@opencrvs/commons'
 import { env } from './environment'
+import { getAnonymousToken } from './service/auth'
 import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
-import { getAnonymousToken } from './service/auth'
+import { server } from './server'
 
-const server = createHTTPServer({
-  router: appRouter,
-  createContext: async function createContext(opts) {
-    const parseResult = TokenWithBearer.safeParse(
-      opts.req.headers.authorization
-    )
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const path = require('path')
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const appModulePath = require('app-module-path')
 
-    if (!parseResult.success) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED'
-      })
-    }
-
-    const token = parseResult.data
-
-    const userId = getUserId(token)
-
-    if (!userId) {
-      throw new TRPCError({
-        code: 'UNAUTHORIZED'
-      })
-    }
-
-    const { primaryOfficeId } = await getUser(
-      env.USER_MANAGEMENT_URL,
-      userId,
-      token
-    )
-
-    return {
-      user: {
-        id: userId,
-        primaryOfficeId
-      },
-      token: token
-    }
-  }
-})
+appModulePath.addPath(path.join(__dirname, '../'))
 
 export async function main() {
   try {
@@ -79,13 +39,15 @@ export async function main() {
       process.exit(1)
     }
     /*
-     * SIGUSR2 tells nodemon to restart the process with waiting for new file changes
+     * SIGUSR2 tells nodemon to restart the process without waiting for new file changes
      */
     setTimeout(() => process.kill(process.pid, 'SIGUSR2'), 3000)
     return
   }
-
-  server.listen(5555)
+  server().listen(5555)
 }
 
-void main()
+// Execute when the file is run directly e.g. (ts-node -r tsconfig-paths/register src/index.ts)
+if (require.main === module) {
+  void main()
+}

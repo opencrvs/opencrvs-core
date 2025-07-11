@@ -9,12 +9,27 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { router, publicProcedure } from '@events/router/trpc'
 import { z } from 'zod'
+import { TRPCError } from '@trpc/server'
+import { User } from '@opencrvs/commons'
+import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 
 export const userRouter = router({
+  get: publicProcedure
+    .input(z.string())
+    .output(User)
+    .query(async (options) => {
+      const [user] = await getUsersById([options.input], options.ctx.token)
+
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!user) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
+
+      return user
+    }),
   list: publicProcedure
     .input(z.array(z.string()))
-    .query(async ({ input }) => getUsersById(input))
+    .query(async (options) => getUsersById(options.input, options.ctx.token))
 })

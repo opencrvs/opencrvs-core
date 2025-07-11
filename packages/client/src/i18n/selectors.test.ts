@@ -12,6 +12,7 @@ import { getLanguage } from '@client/i18n/selectors'
 import { getInitialState } from '@client/tests/util'
 
 describe('intl selectors', () => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   let mockState: any
 
   beforeEach(async () => {

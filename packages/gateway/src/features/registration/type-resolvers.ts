@@ -1140,9 +1140,8 @@ export const typeResolvers: GQLResolver = {
         duplicateCompositionIds &&
         (await Promise.all(
           duplicateCompositionIds.map(async (compositionId: string) => {
-            const taskData = await fetchTaskByCompositionIdFromHearth(
-              compositionId
-            )
+            const taskData =
+              await fetchTaskByCompositionIdFromHearth(compositionId)
             return {
               compositionId: compositionId,
               trackingId: taskData.entry?.[0].resource?.identifier?.find(
@@ -1230,9 +1229,8 @@ export const typeResolvers: GQLResolver = {
     timeLogged: async (task, _, { dataSources }) => {
       const compositionId =
         (task.focus.reference && task.focus.reference.split('/')[1]) || ''
-      const timeLoggedResponse = await dataSources.metricsAPI.getTimeLogged(
-        compositionId
-      )
+      const timeLoggedResponse =
+        await dataSources.metricsAPI.getTimeLogged(compositionId)
       return (timeLoggedResponse && timeLoggedResponse.timeSpentEditing) || 0
     }
   },
@@ -1369,18 +1367,10 @@ export const typeResolvers: GQLResolver = {
         await context.dataSources.fhirAPI.getPractionerRoleHistory(
           practitionerRoleId
         )
-      const result = practitionerRoleHistory.find(
-        (it) =>
-          it?.meta?.lastUpdated &&
-          task.lastModified &&
-          it?.meta?.lastUpdated <= task.lastModified!
+      const roleId = getUserRoleFromHistory(
+        practitionerRoleHistory,
+        task.lastModified
       )
-
-      const targetCode = result?.code?.find((element) => {
-        return element.coding?.[0].system === 'http://opencrvs.org/specs/roles'
-      })
-
-      const roleId = targetCode?.coding?.[0].code
       const userResponse =
         await context.dataSources.usersAPI.getUserByPractitionerId(
           practitionerId

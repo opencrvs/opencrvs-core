@@ -309,6 +309,7 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         ...item,
         notificationSent:
           item.notificationSent &&
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           formattedDuration(item.notificationSent as any),
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date)
@@ -453,10 +454,10 @@ function InProgressComponent(props: IRegistrarHomeProps) {
         ? true
         : false
       : props.queryData.notificationData &&
-        props.queryData.notificationData.totalItems &&
-        props.queryData.notificationData.totalItems > props.pageSize
-      ? true
-      : false
+          props.queryData.notificationData.totalItems &&
+          props.queryData.notificationData.totalItems > props.pageSize
+        ? true
+        : false
 
   const { inProgressData, notificationData } = queryData
   const paginationId =

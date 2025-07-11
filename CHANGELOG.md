@@ -1,5 +1,40 @@
 # Changelog
 
+
+## 1.9.0 Release candidate
+
+### New features
+
+- **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
+
+### Improvements
+
+- **Upgrade node version to 22**
+
+  This version enforces environment to have Node 22 installed (supported until 30 April 2027) and removes support for Node 18 for better performance and using [new features](https://github.com/nodejs/node/releases/tag/v22.0.0) offered by NodeJS
+
+  - Use nvm to upgrade your local development environment to use node version `22.x.x.`
+
+- **UI enhancements**
+
+  - Replaced the `Download` icon with a `FloppyDisk` save icon when saving an event as draft.
+
+- Use unprivileged version of nginx container image [#6501](https://github.com/opencrvs/opencrvs-core/issues/6501)
+
+## 1.8.0 Release candidate
+
+### New features
+
+- **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
+- Build OpenCRVS release images for arm devices [#9455](https://github.com/opencrvs/opencrvs-core/issues/9455)
+
+### Improvements
+
+- Improved text color for disabled text inputs and dropdowns
+- **Github runners upgraded** to latest Ubuntu LTS release 24.04 [#7045](https://github.com/opencrvs/opencrvs-core/issues/7045)
+- **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
+- **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
+
 ## [1.7.3](https://github.com/opencrvs/opencrvs-core/compare/v1.7.2...v1.7.3)
 
 ### New features
@@ -9,7 +44,6 @@
 - Allow booleanTransformer to be used as a certificate handlebar template transformer [#9631](https://github.com/opencrvs/opencrvs-core/issues/9631)
 - Fix international to local number conversion from failing if the number was already local [#9634](https://github.com/opencrvs/opencrvs-core/issues/9634)
 - Pre-select default certificate option in print certificate collector form [#9935](https://github.com/opencrvs/opencrvs-core/issues/9935)
-
 
 ## [1.7.2](https://github.com/opencrvs/opencrvs-core/compare/v1.7.1...v1.7.2)
 
@@ -25,6 +59,9 @@
 - Improve quick search results when searching by name [#9272](https://github.com/opencrvs/opencrvs-core/issues/9272)
 - Fix practitioner role history entries from being created with every view and download [#9462](https://github.com/opencrvs/opencrvs-core/issues/9462)
 - Fix a child's NID form field cannot be added eithe rmanually or via ESignet. A father section cannot be placed before a mother section if you wish to use a radio button to control mapping addresses from one individual to aother to make data entry easier [#9582](https://github.com/opencrvs/opencrvs-core/issues/9582)
+- Fix the role of the certifier unable to get resolved for new users which in turn caused the download of the declaration to fail [#9643](https://github.com/opencrvs/opencrvs-core/issues/9643)
+- Fix one failing unassign blocking all other unassign actions from continuing [#9651](https://github.com/opencrvs/opencrvs-core/issues/9651)
+- Fix record not getting unassigned when validating an already validated record again [#9648](https://github.com/opencrvs/opencrvs-core/issues/9648)
 
 ## [1.7.1](https://github.com/opencrvs/opencrvs-core/compare/v1.7.0...v1.7.1)
 
@@ -59,8 +96,10 @@
 - Introduced a new customisable UI component: Banner [#8276](https://github.com/opencrvs/opencrvs-core/issues/8276)
 - Auth now allows exchanging user's token for a new record-specific token [#7728](https://github.com/opencrvs/opencrvs-core/issues/7728)
 - A new GraphQL mutation `upsertRegistrationIdentifier` is added to allow updating the patient identifiers of a registration record such as NID [#8034](https://github.com/opencrvs/opencrvs-core/pull/8034)
+- A new GraphQL mutation `updateField` is added to allow updating any field in a record [#8291](https://github.com/opencrvs/opencrvs-core/pull/8291)
 - Updated GraphQL mutation `confirmRegistration` to allow adding a `comment` for record audit [#8197](https://github.com/opencrvs/opencrvs-core/pull/8197)
 - Add `isAgeInYearsBetween` validator to enable validation that will constraint a date to be only valid if it falls within a specified date range. The `isInformantOfLegalAge` validator is now deprecated and removed in favor of `isAgeInYearsBetween` validator [#7636](https://github.com/opencrvs/opencrvs-core/issues/7636)
+- Allow countries to customise the format of the full name in the sytem for `sytem users` and `citizens` e.g `{LastName} {MiddleName} {Firstname}`, in any case where one of the name is not provided e.g no `MiddleName`, we'll simply render e.g `{LastName} {FirstName}` without any extra spaces if that's the order set in `country-config`. [#6830](https://github.com/opencrvs/opencrvs-core/issues/6830)
 
 ### Improvements
 
@@ -87,13 +126,13 @@
 
 ## [1.6.5](https://github.com/opencrvs/opencrvs-core/compare/v1.6.4...v1.6.5)
 
-- Fix migration issue discovered when restoring an OpenCRVS instance with a large number of records. `$push used too much memory and cannot spill to disk. Memory limit: 104857600 bytes` [#9116](https://github.com/opencrvs/opencrvs-core/issues/9116)
-
 ### Breaking changes
 
 - Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
 ## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.3...v1.6.4)
+
+### Bug fixes
 
 - Fix migration issue discovered when restoring an OpenCRVS instance with a large number of records. `$push used too much memory and cannot spill to disk. Memory limit: 104857600 bytes` [#9116](https://github.com/opencrvs/opencrvs-core/issues/9116)
 
@@ -113,10 +152,6 @@
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - Fix stale validations showing for document uploader with options form field
 - Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations, the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
-
-### Improvements
-
-- Support for 6th administrative level
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 

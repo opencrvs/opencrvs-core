@@ -34,6 +34,7 @@ const config = {
   LOGIN_URL: 'http://localhost:3020',
   AUTH_URL: 'http://localhost:4040',
   MINIO_BUCKET: 'ocrvs',
+  MINIO_BASE_URL: 'http://localhost:3535',
   COUNTRY_CONFIG_URL: 'http://localhost:3040',
   APPLICATION_NAME: 'Farajaland CRVS',
   BIRTH: {
@@ -69,13 +70,11 @@ vi.stubGlobal('config', config)
 /*
  * GraphQL Queries
  */
-/* eslint-disable import/first */
 import { queries } from './profile/queries'
 
 /*
  * Country configuration
  */
-/* eslint-disable import/first */
 import {
   mockUserResponse,
   mockConfigResponse,
@@ -86,7 +85,7 @@ import {
 } from './tests/util'
 
 vi.doMock('@client/forms/user/fieldDefinitions/createUser', () => ({
-  createUserForm: mockOfflineData.forms.userForm
+  createUserForm: mockOfflineData.userForms
 }))
 
 vi.mock('@client/forms/handlebarHelpers', async () => {
@@ -97,6 +96,7 @@ vi.mock('@client/forms/handlebarHelpers', async () => {
 })
 
 vi.mock('@client/forms/conditionals', async () => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const actual = (await vi.importActual('@client/forms/conditionals')) as any
   return {
     ...actual,
@@ -106,6 +106,7 @@ vi.mock('@client/forms/conditionals', async () => {
 })
 
 vi.mock('@client/forms/validators', async () => {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   const actual = (await vi.importActual('@client/forms/validators')) as any
   return {
     ...actual,
@@ -117,6 +118,7 @@ vi.mock('@client/forms/validators', async () => {
 vi.mock('@client/forms/handlebarHelpers', async () => {
   const actual = (await vi.importActual(
     '@client/forms/handlebarHelpers'
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   )) as any
   return {
     ...actual,
@@ -193,7 +195,7 @@ vi.doMock(
         }),
       loadConfig: () => Promise.resolve(mockConfigResponse),
       loadConfigAnonymousUser: () => Promise.resolve(mockConfigResponse),
-      loadForms: () => Promise.resolve(mockOfflineData.forms.forms),
+      loadForms: () => Promise.resolve({ forms: mockOfflineData.forms }),
       importConditionals: () => Promise.resolve({}),
       importValidators: () => Promise.resolve({}),
       importHandlebarHelpers: () => Promise.resolve({})

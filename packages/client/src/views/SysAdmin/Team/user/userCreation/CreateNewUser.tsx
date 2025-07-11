@@ -106,6 +106,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
         clearUserFormData()
       }
       if (userId) {
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         fetchAndStoreUserData(client as ApolloClient<any>, {
           userId
         })
@@ -156,6 +157,7 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
   }
 
   if (section.viewType === 'preview') {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     return <UserReviewForm client={client as ApolloClient<any>} {...props} />
   }
   return null

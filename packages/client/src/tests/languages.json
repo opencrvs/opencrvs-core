@@ -2,7 +2,6 @@
   "data": [
     {
       "lang": "en",
-      "displayName": "English",
       "messages": {
         "form.section.child.name": "Child",
         "form.section.child.title": "Child's details",
@@ -1152,7 +1151,6 @@
     },
     {
       "lang": "bn",
-      "displayName": "বাংলা",
       "messages": {
         "form.section.child.name": "শিশু",
         "form.section.child.title": "শিশুর বিবরণ",

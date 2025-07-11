@@ -199,28 +199,25 @@ class UnlockView extends React.Component<IFullProps, IFullState> {
             <Icon name="SignOut" />
           </LogoutButton>
 
-          <Content direction="column" gap={0} justifyContent="flex-start">
+          <Content direction="column" gap={16} justifyContent="flex-start">
             <AvatarLarge
               name={getUserName(userDetails)}
               avatar={userDetails?.avatar}
             />
             <EnterPinLabel />
-            <Stack direction="column" gap={16} justifyContent="flex-start">
-              <PINKeypad
-                onComplete={this.onPinProvided}
-                pin={this.state.pin}
-                key={this.state.resetKey}
-              />
-
-              <Button
-                size="small"
-                type="tertiary"
-                id="forgotten_pin"
-                onClick={this.props.onForgetPin}
-              >
-                {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
-              </Button>
-            </Stack>
+            <PINKeypad
+              onComplete={this.onPinProvided}
+              pin={this.state.pin}
+              key={this.state.resetKey}
+            />
+            <Button
+              size="small"
+              type="tertiary"
+              id="forgotten_pin"
+              onClick={this.props.onForgetPin}
+            >
+              {this.props.intl.formatMessage(buttonMessages.forgottenPIN)}
+            </Button>
           </Content>
 
           {this.showErrorMessage()}

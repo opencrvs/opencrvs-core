@@ -10,14 +10,12 @@
  */
 
 import {
-  DeclareActionInput,
-  EventInput,
   getUUID,
-  ActionType,
-  ValidateActionInput
+  eventPayloadGenerator,
+  UUID,
+  TestUserRole
 } from '@opencrvs/commons'
-import { Location } from '@events/service/locations/locations'
-import { Db } from 'mongodb'
+import { Location, setLocations } from '@events/service/locations/locations'
 
 interface Name {
   use: string
@@ -26,57 +24,25 @@ interface Name {
 }
 
 export interface CreatedUser {
-  id: string
-  primaryOfficeId: string
-  systemRole: string
+  id: UUID
+  primaryOfficeId: UUID
+  role: string
   name: Array<Name>
 }
 
 interface CreateUser {
-  primaryOfficeId: string
-  systemRole?: string
+  primaryOfficeId: UUID
+  role?: string
   name?: Array<Name>
 }
+
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
-export function payloadGenerator() {
-  const event = {
-    create: (input: Partial<EventInput> = {}) => ({
-      transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP'
-    }),
-    patch: (id: string, input: Partial<EventInput> = {}) => ({
-      transactionId: input.transactionId ?? getUUID(),
-      type: input.type ?? 'TENNIS_CLUB_MEMBERSHIP',
-      id
-    }),
-    actions: {
-      declare: (
-        eventId: string,
-        input: Partial<Pick<DeclareActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.DECLARE,
-        transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
-        eventId
-      }),
-      validate: (
-        eventId: string,
-        input: Partial<Pick<ValidateActionInput, 'transactionId' | 'data'>> = {}
-      ) => ({
-        type: ActionType.VALIDATE,
-        transactionId: input.transactionId ?? getUUID(),
-        data: input.data ?? {},
-        duplicates: [],
-        eventId
-      })
-    }
-  }
-
+export function payloadGenerator(rng: () => number) {
   const user = {
     create: (input: CreateUser) => ({
-      systemRole: input.systemRole ?? 'REGISTRATION_AGENT',
+      role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
@@ -103,7 +69,7 @@ export function payloadGenerator() {
     }
   }
 
-  return { event, locations, user }
+  return { event: eventPayloadGenerator(rng), locations, user }
 }
 
 /**
@@ -111,18 +77,15 @@ export function payloadGenerator() {
  * Use with payloadGenerator for creating test data.
  */
 export function seeder() {
-  const seedUser = async (db: Db, user: Omit<CreatedUser, 'id'>) => {
-    const createdUser = await db.collection('users').insertOne(user)
-
+  const seedUser = (user: Omit<CreatedUser, 'id'>) => {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
-      systemRole: user.systemRole,
-      id: createdUser.insertedId.toString()
+      role: user.role as TestUserRole,
+      id: getUUID()
     }
   }
-  const seedLocations = async (db: Db, locations: Location[]) =>
-    db.collection('locations').insertMany(locations)
+  const seedLocations = async (locations: Location[]) => setLocations(locations)
 
   return {
     user: seedUser,

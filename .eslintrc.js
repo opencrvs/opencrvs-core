@@ -25,6 +25,7 @@ module.exports = {
   },
   rules: {
     'import/namespace': 'off',
+    'no-debugger': 'error',
     'prettier/prettier': [
       'error',
       {

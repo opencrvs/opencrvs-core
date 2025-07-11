@@ -11,48 +11,206 @@
 
 import React from 'react'
 import { Summary } from '@opencrvs/components/lib/Summary'
-import { SummaryConfig } from '@opencrvs/commons/events'
-import { EventIndex, FieldValue } from '@opencrvs/commons/client'
-import { useTransformer } from '@client/v2-events/hooks/useTransformer'
-import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/features/workqueues/utils'
-
+import {
+  EventConfig,
+  getDeclarationFields,
+  areConditionsMet,
+  getMixedPath
+} from '@opencrvs/commons/client'
+import { FieldValue } from '@opencrvs/commons/client'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { Output } from '@client/v2-events/features/events/components/Output'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
 
+const messages = {
+  assignedTo: {
+    label: {
+      id: 'v2.event.summary.assignedTo.label',
+      defaultMessage: 'Assigned to',
+      description: 'Assigned to label'
+    },
+    value: {
+      id: 'v2.event.summary.assignedTo.value',
+      defaultMessage: '{event.assignedTo}',
+      description: 'Assigned to value'
+    },
+    emptyValueMessage: {
+      id: 'v2.event.summary.assignedTo.empty',
+      defaultMessage: 'Not assigned',
+      description: 'Not assigned message'
+    }
+  },
+  status: {
+    label: {
+      id: 'v2.event.summary.status.label',
+      defaultMessage: 'Status',
+      description: 'Status of the event'
+    },
+    value: {
+      id: 'v2.event.summary.status.value',
+      defaultMessage:
+        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+      description: 'Status of the event'
+    }
+  },
+  event: {
+    label: {
+      id: 'v2.event.summary.event.label',
+      defaultMessage: 'Event',
+      description: 'Event label'
+    }
+  },
+  trackingId: {
+    label: {
+      id: 'v2.event.summary.trackingId.label',
+      defaultMessage: 'Tracking ID',
+      description: 'Tracking id label'
+    },
+    emptyValueMessage: {
+      id: 'v2.event.summary.trackingId.empty',
+      defaultMessage: 'No tracking ID',
+      description: 'No tracking ID message'
+    },
+    value: {
+      id: 'v2.event.summary.trackingId.value',
+      defaultMessage: '{event.trackingId}',
+      description: 'Tracking id value'
+    }
+  },
+  registrationNumber: {
+    label: {
+      id: 'v2.event.summary.registrationNumber.label',
+      defaultMessage: 'Registration Number',
+      description: 'Registration Number label'
+    },
+    emptyValueMessage: {
+      id: 'v2.event.summary.registrationNumber.empty',
+      defaultMessage: 'No registration number',
+      description: 'No registration number message'
+    },
+    value: {
+      id: 'v2.event.summary.registrationNumber.value',
+      defaultMessage: '{event.registrationNumber}',
+      description: 'Registration number value'
+    }
+  }
+}
+
 export function EventSummary({
   event,
-  summary,
-  defaultValues
+  eventConfiguration,
+  hideSecuredFields = false
 }: {
-  event: EventIndex
-  summary: SummaryConfig
-  defaultValues: Record<string, FieldValue>
+  event: Record<string, FieldValue | null>
+  eventConfiguration: EventConfig
+  hideSecuredFields?: boolean
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
-  const { toString } = useTransformer(event.type)
-  const data = toString(event.data)
+  const { summary, label: eventLabelMessage } = eventConfiguration
+  const declarationFields = getDeclarationFields(eventConfiguration)
+  const securedFields = declarationFields
+    .filter(({ secured }) => secured)
+    .map(({ id }) => id)
+
+  const configuredFields = summary.fields.map((field) => {
+    if (field.conditionals && !areConditionsMet(field.conditionals, event)) {
+      return null
+    }
+
+    if ('fieldId' in field) {
+      const config = declarationFields.find((f) => f.id === field.fieldId)
+      const value = getMixedPath(event, field.fieldId, '')
+
+      if (!config) {
+        return null
+      }
+
+      return {
+        id: field.fieldId,
+        // If a custom label is configured, use it. Otherwise, by default, use the label from the original form field.
+        label: field.label ?? config.label,
+        emptyValueMessage: field.emptyValueMessage,
+        secured: config.secured ?? false,
+        value: Output({
+          field: config,
+          showPreviouslyMissingValuesAsChanged: false,
+          value
+        })
+      }
+    }
+
+    const accessedFields = intl.variablesUsed(field.value)
+
+    return {
+      id: field.id,
+      label: field.label,
+      secured: accessedFields.some((fieldId) =>
+        securedFields.includes(fieldId)
+      ),
+      emptyValueMessage: field.emptyValueMessage,
+      value: intl.formatMessage(field.value, event)
+    }
+  })
 
   return (
     <>
       <Summary id="summary">
-        {summary.fields.map((field) => {
-          return (
+        <Summary.Row
+          key="assignedTo"
+          data-testid="assignedTo"
+          label={intl.formatMessage(messages.assignedTo.label)}
+          placeholder={intl.formatMessage(
+            messages.assignedTo.emptyValueMessage
+          )}
+          value={intl.formatMessage(messages.assignedTo.value, event)}
+        />
+        <Summary.Row
+          key="status"
+          data-testid="status"
+          label={intl.formatMessage(messages.status.label)}
+          value={intl.formatMessage(messages.status.value, event)}
+        />
+        <Summary.Row
+          key="event"
+          data-testid="event"
+          label={intl.formatMessage(messages.event.label)}
+          value={intl.formatMessage(eventLabelMessage)}
+        />
+        <Summary.Row
+          key="tracking-id"
+          data-testid="tracking-id"
+          label={intl.formatMessage(messages.trackingId.label)}
+          placeholder={intl.formatMessage(
+            messages.trackingId.emptyValueMessage
+          )}
+          value={intl.formatMessage(messages.trackingId.value, event)}
+        />
+        <Summary.Row
+          key="registrationNumber"
+          data-testid="registrationNumber"
+          label={intl.formatMessage(messages.registrationNumber.label)}
+          placeholder={intl.formatMessage(
+            messages.registrationNumber.emptyValueMessage
+          )}
+          value={intl.formatMessage(messages.registrationNumber.value, event)}
+        />
+        {configuredFields
+          .filter((f): f is NonNullable<typeof f> => f !== null)
+          .map((field) => (
             <Summary.Row
               key={field.id}
               data-testid={field.id}
               label={intl.formatMessage(field.label)}
+              locked={field.secured && hideSecuredFields}
               placeholder={
                 field.emptyValueMessage &&
                 intl.formatMessage(field.emptyValueMessage)
               }
-              value={intl.formatMessage(field.value, {
-                ...defaultValues,
-                ...data
-              })}
+              value={field.value}
             />
-          )
-        })}
+          ))}
       </Summary>
     </>
   )

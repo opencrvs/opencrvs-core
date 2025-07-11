@@ -22,6 +22,7 @@ import {
   ValidRecord
 } from '@opencrvs/commons/types'
 import { SCOPES } from '@opencrvs/commons/authentication'
+import { VALIDATED_BIRTH_RECORD } from '@test/mocks/records/validated'
 
 describe('Validate record endpoint', () => {
   let server: Awaited<ReturnType<typeof createServer>>
@@ -46,12 +47,18 @@ describe('Validate record endpoint', () => {
       }
     )
 
+    let calledOnce = false
+
     // Gets record by id via getRecordById endpoint
     mswServer.use(
       rest.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
         (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+          if (!calledOnce) {
+            calledOnce = true
+            return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+          }
+          return res(ctx.json(VALIDATED_BIRTH_RECORD))
         }
       )
     )
@@ -74,6 +81,30 @@ describe('Validate record endpoint', () => {
         }
         return res(ctx.json(responseBundle))
       })
+    )
+
+    // Token exchange mock call
+    mswServer.use(
+      // The actual more verbose query below, but for simplicity we can keep simpler one unless this causes issues:
+
+      // ?grant_type=urn:opencrvs:oauth:grant-type:token-exchange&subject_token=${token}&subject_token_type=urn:ietf:params:oauth:token-type:access_token
+      // &requested_token_type=urn:opencrvs:oauth:token-type:single_record_token&record_id=${recordId}
+
+      rest.post(`http://localhost:4040/token`, (_, res, ctx) => {
+        return res(
+          ctx.json({
+            access_token: 'some-token'
+          })
+        )
+      })
+    )
+
+    // mock country config event action hook returning a basic 200
+    mswServer.use(
+      rest.post(
+        'http://localhost:3040/events/BIRTH/actions/sent-for-approval',
+        (_, res, ctx) => res(ctx.status(200))
+      )
     )
 
     const response = await server.server.inject({

@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Area } from 'react-easy-crop'
-
+import type { Area } from 'react-easy-crop'
 import {
   ALLOWED_IMAGE_TYPE,
   ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE
@@ -137,3 +136,13 @@ export async function fetchImageAsBase64(url: string): Promise<string> {
 
 export const bytesToMB = (bytes: number) =>
   Number(Number(bytes / (1024 * 1024)).toFixed(2))
+
+export async function fetchFileFromUrl(
+  externalUrl: string,
+  filename: string
+): Promise<File> {
+  const res = await fetch(externalUrl)
+  const blob = await res.blob()
+
+  return new File([blob], filename, { type: blob.type })
+}

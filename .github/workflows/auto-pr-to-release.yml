@@ -27,7 +27,7 @@ on:
 jobs:
   resolve-releases:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.resolve-applicable-versions.outputs.matrix }}
     steps:
@@ -105,7 +105,7 @@ jobs:
 
   create-pr:
     needs: resolve-releases
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: ${{ always() && needs.resolve-releases.result == 'success' }}
 
     strategy:

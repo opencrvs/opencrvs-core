@@ -11,37 +11,111 @@
 
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { EventStatuses } from './EventMetadata'
+import { Conditional } from './Conditional'
+import { event } from './event'
+import {
+  defineWorkqueuesColumns,
+  WorkqueueColumn
+} from './WorkqueueColumnConfig'
+import {
+  CountryConfigQueryInputType,
+  CountryConfigQueryType
+} from './CountryConfigQueryInput'
+import { AvailableIcons } from '../icons'
+import { QueryType } from './EventIndex'
+import { workqueueActions } from './ActionType'
+
+export const mandatoryColumns = defineWorkqueuesColumns([
+  {
+    label: {
+      id: 'workqueues.dateOfEvent',
+      defaultMessage: 'Date of Event',
+      description: 'Label for workqueue column: dateOfEvent'
+    },
+    value: event.field('dateOfEvent')
+  },
+  {
+    label: {
+      defaultMessage: 'Last updated',
+      description: 'This is the label for the workqueue column',
+      id: 'workqueue.default.column.modifiedAt'
+    },
+    value: event.field('updatedAt')
+  }
+])
+
+export const WorkqueueActionsWithDefault = z.enum([
+  ...workqueueActions.options,
+  'DEFAULT'
+] as const)
+
+export type WorkqueueActionsWithDefault = z.infer<
+  typeof WorkqueueActionsWithDefault
+>
 
 /**
  * Configuration for workqueue. Workqueues are used to display a list of events.
  */
 export const WorkqueueConfig = z
   .object({
-    id: z.string().describe('Unique identifier for workqueue.'),
-    title: TranslationConfig.describe(
-      'Title for workqueue, used in navigation and header.'
+    slug: z.string().describe('Determines the url of the workqueue.'),
+    name: TranslationConfig.describe(
+      'Title of the workflow (both in navigation and on the page)'
     ),
-    fields: z.array(
+    query: CountryConfigQueryType,
+    actions: z.array(
       z.object({
-        // @TODO: Improve typing by enforcing EventMetadataKeys and form page fields as possible values
-        id: z
-          .string()
-          .describe('Id of a field defined under form pages or system field.'),
-        label: TranslationConfig.optional()
+        type: WorkqueueActionsWithDefault,
+        conditionals: z.array(Conditional).optional()
       })
     ),
-    filters: z
-      .array(
-        z.object({
-          status: z
-            .array(EventStatuses)
-            .describe('Defines which statusese are included in the workqueue.')
-        })
-      )
-      .describe('Filters to be applied to workqueue.')
+    columns: z.array(WorkqueueColumn).default(mandatoryColumns),
+    icon: AvailableIcons
   })
   .describe('Configuration for workqueue.')
 
+export const WorkqueueConfigWithoutQuery = WorkqueueConfig.omit({
+  query: true,
+  columns: true
+})
+
+export const WorkqueueConfigInput = z.object({
+  slug: z.string().describe('Determines the url of the workqueue.'),
+  name: TranslationConfig.describe(
+    'Title of the workflow (both in navigation and on the page)'
+  ),
+  query: CountryConfigQueryInputType,
+  actions: z.array(
+    z.object({
+      type: WorkqueueActionsWithDefault,
+      conditionals: z.array(Conditional).optional()
+    })
+  ),
+  columns: z.array(WorkqueueColumn).default(mandatoryColumns),
+  icon: AvailableIcons
+})
+
 export type WorkqueueConfig = z.infer<typeof WorkqueueConfig>
-export type WorkqueueConfigInput = z.input<typeof WorkqueueConfig>
+export type WorkqueueConfigWithoutQuery = z.infer<
+  typeof WorkqueueConfigWithoutQuery
+>
+export type WorkqueueConfigInput = z.input<typeof WorkqueueConfigInput>
+
+export function defineWorkqueue(workqueueInput: WorkqueueConfigInput) {
+  const queryInput = workqueueInput.query
+  const query: CountryConfigQueryType =
+    'type' in queryInput ? queryInput : { type: 'and', clauses: [queryInput] }
+  return WorkqueueConfig.parse({ ...workqueueInput, query })
+}
+
+export function defineWorkqueues(workqueues: WorkqueueConfigInput[]) {
+  return workqueues.map((workqueue) => defineWorkqueue(workqueue))
+}
+
+export const WorkqueueCountInput = z.array(
+  z.object({ slug: z.string(), query: QueryType })
+)
+export type WorkqueueCountInput = z.infer<typeof WorkqueueCountInput>
+
+export const WorkqueueCountOutput = z.record(z.string(), z.number())
+export type WorkqueueCountOutput = z.infer<typeof WorkqueueCountOutput>

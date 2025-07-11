@@ -102,7 +102,6 @@ interface IProps {
   searchHandler?: (location: ISearchLocation) => void
   searchButtonHandler?: () => void
   id?: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   onBlur?: (e: React.FocusEvent<any>) => void
   errorMessage?: string
   error?: boolean
@@ -268,6 +267,9 @@ export class LocationSearch extends React.Component<IProps, IState> {
             <Icon name="MapPin" size="medium" />
             <SearchTextInput
               id={this.props.id ? this.props.id : 'locationSearchInput'}
+              data-testid={
+                this.props.id ? this.props.id : 'locationSearchInput'
+              }
               type="text"
               autoComplete="off"
               onFocus={this.onFocus}
