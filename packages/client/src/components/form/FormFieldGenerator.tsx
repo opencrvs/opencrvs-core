@@ -1161,6 +1161,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1223,6 +1224,7 @@ class FormSectionComponent extends React.Component<Props> {
                       ignoreBottomMargin={field.ignoreBottomMargin}
                     >
                       <FastField name={nestedFieldName}>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                         {(formikFieldProps: FieldProps<any>) => (
                           <GeneratedInputField
                             fieldDefinition={internationaliseFieldObject(intl, {
@@ -1260,6 +1262,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={`${field.name}.value`}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => (
                     <GeneratedInputField
                       fieldDefinition={internationaliseFieldObject(
@@ -1292,6 +1295,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <MemoizedLocationList field={field}>
@@ -1332,6 +1336,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <GeneratedInputField
