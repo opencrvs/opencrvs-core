@@ -148,8 +148,8 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
-          { term: { 'legalStatuses.REGISTERED.createdAt': '2024-01-01' } }
+          { term: { 'legalStatuses.REGISTERED.acceptedAt': '2024-01-01' } },
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } }
         ]
       }
     })
@@ -163,15 +163,16 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
           {
             range: {
-              'legalStatuses.REGISTERED.createdAt': {
+              'legalStatuses.REGISTERED.acceptedAt': {
                 gte: '2024-01-01',
-                lte: '2024-12-31'
+                lte: '2024-12-31',
+                time_zone: 'Asia/Dhaka'
               }
             }
-          }
+          },
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } }
         ]
       }
     })
@@ -185,12 +186,12 @@ describe('test buildElasticQueryFromSearchPayload', () => {
     expect(result).toEqual({
       bool: {
         must: [
-          { term: { type: TENNIS_CLUB_MEMBERSHIP } },
           {
             term: {
               'legalStatuses.REGISTERED.createdAtLocation': 'some-location-id'
             }
-          }
+          },
+          { term: { type: TENNIS_CLUB_MEMBERSHIP } }
         ]
       }
     })
@@ -216,7 +217,15 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         must: expect.arrayContaining([
           { term: { status: 'ARCHIVED' } },
           { term: { trackingId: 'ABC123' } },
-          { range: { createdAt: { gte: '2024-01-01', lte: '2024-12-31' } } },
+          {
+            range: {
+              createdAt: {
+                gte: '2024-01-01',
+                lte: '2024-12-31',
+                time_zone: 'Asia/Dhaka'
+              }
+            }
+          },
           { term: { updatedAt: '2024-06-01' } },
           { term: { createdAtLocation: 'some-location-id' } },
           {
