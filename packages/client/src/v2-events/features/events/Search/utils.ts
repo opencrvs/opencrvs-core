@@ -530,7 +530,7 @@ function metadataFieldTypeMapping(value: string) {
         term: value,
         type: 'exact' as const
       },
-      'legalStatus.REGISTERED.registrationNumber': {
+      'legalStatuses.REGISTERED.registrationNumber': {
         term: value,
         type: 'exact' as const
       }
