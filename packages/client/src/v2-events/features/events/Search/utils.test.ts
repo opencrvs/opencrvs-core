@@ -242,7 +242,7 @@ describe('buildQuickSearchQuery', () => {
           }
         },
         {
-          'legalStatus.REGISTERED.registrationNumber': {
+          'legalStatuses.REGISTERED.registrationNumber': {
             term: 'abc@gmail.com',
             type: 'exact'
           }
