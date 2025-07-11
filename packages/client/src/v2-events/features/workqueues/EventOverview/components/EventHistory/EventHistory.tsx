@@ -20,7 +20,12 @@ import { Divider } from '@opencrvs/components/lib/Divider'
 import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  ActionType,
+  EventDocument,
+  getAcceptedActions
+} from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
@@ -153,7 +158,7 @@ export function EventHistorySkeleton() {
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({ history }: { history: ActionDocument[] }) {
+export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const { systems } = useSelector(getOfflineData)
 
@@ -164,9 +169,16 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
-      <EventHistoryDialog action={item} close={close} userName={userName} />
+      <EventHistoryDialog
+        action={item}
+        close={close}
+        fullEvent={fullEvent}
+        userName={userName}
+      />
     ))
   }
+
+  const history = getAcceptedActions(fullEvent)
 
   const visibleHistory = history.filter(
     ({ type }) => type !== ActionType.CREATE

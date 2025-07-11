@@ -15,6 +15,7 @@ import {
   EventDocument
 } from '@opencrvs/commons/client'
 import { Archive } from './Archive'
+import { PrintCertificate } from './PrintCertificate'
 
 export function getActionTypeSpecificContent(
   action: ActionDocument,
@@ -24,6 +25,10 @@ export function getActionTypeSpecificContent(
 
   if (type === ActionType.ARCHIVE && action.reason.isDuplicate) {
     return <Archive />
+  }
+
+  if (type === ActionType.PRINT_CERTIFICATE) {
+    return <PrintCertificate action={action} event={fullEvent} />
   }
 
   return null
