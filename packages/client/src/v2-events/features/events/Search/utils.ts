@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable max-lines */
-import subDays from 'date-fns/subDays'
 import { isArray, isNil, isPlainObject, isString, partition } from 'lodash'
 import { parse as parseQuery, stringify } from 'query-string'
 import { useSelector } from 'react-redux'

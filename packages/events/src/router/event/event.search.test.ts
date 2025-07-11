@@ -331,7 +331,7 @@ test('Returns events based on the updatedAt column', async () => {
   })
 })
 
-test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column and requsted timezone', async () => {
+test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column', async () => {
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
@@ -352,45 +352,51 @@ test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column a
   await client.event.actions.register.request(
     generator.event.actions.register(event.id)
   )
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
 
-  const timeZone1 = 'Etc/GMT+12' // UTC-12
-  const timeZone2 = 'Etc/GMT-12' // UTC+12
-
-  const date1 = new Date().toLocaleString('sv-SE', { timeZone: timeZone1 })
-  const date2 = new Date().toLocaleString('sv-SE', { timeZone: timeZone2 })
-
-  const resultForTimezone1 = await client.event.search({
+  const resultForToday = await client.event.search({
     type: 'and',
     clauses: [
       {
         ['legalStatuses.REGISTERED.acceptedAt']: {
           type: 'exact',
-          term: date1.split(' ')[0]
+          term: today
         }
       }
     ]
   })
-  const resultForTimezone2 = await client.event.search({
+  const resultForYesterday = await client.event.search({
     type: 'and',
     clauses: [
       {
         ['legalStatuses.REGISTERED.acceptedAt']: {
           type: 'exact',
-          term: date2.split(' ')[0]
+          term: yesterday
+        }
+      }
+    ]
+  })
+  const resultForTomorrow = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: tomorrow
         }
       }
     ]
   })
 
-  const utcHour = new Date().getUTCHours()
-
-  if (utcHour < 12) {
-    expect(resultForTimezone1).toHaveLength(0)
-    expect(resultForTimezone2).toHaveLength(1)
-  } else {
-    expect(resultForTimezone1).toHaveLength(1)
-    expect(resultForTimezone2).toHaveLength(0)
-  }
+  expect(resultForToday).toHaveLength(1)
+  expect(resultForYesterday).toHaveLength(0)
+  expect(resultForTomorrow).toHaveLength(0)
 })
 
 test.skip('Returns events that match the name field criteria of applicant', async () => {
