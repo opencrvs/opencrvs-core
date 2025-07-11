@@ -339,6 +339,8 @@ const GET_DEATH_REGISTRATION_FOR_REVIEW = gql`
         }
         system {
           name
+          id
+          officeId
           type
         }
         user {
