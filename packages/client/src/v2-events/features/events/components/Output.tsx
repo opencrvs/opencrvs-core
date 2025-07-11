@@ -129,7 +129,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isAddressFieldType(field)) {
-    return Address.Output({ value: field.value })
+    return Address.Output({
+      value: field.value,
+      searchMode: field.config.configuration?.searchMode
+    })
   }
 
   if (isRadioGroupFieldType(field)) {

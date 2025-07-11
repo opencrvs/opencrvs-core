@@ -29,7 +29,8 @@ import {
   EventState,
   FieldType,
   QueryExpression,
-  NameFieldValue
+  NameFieldValue,
+  AddressFieldValue
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
 import { EventStatus } from '@opencrvs/commons/client'
@@ -333,6 +334,12 @@ function buildDataConditionFromSearchKeys(
         ) {
           value = Name.stringify(rawInput[fieldId] as NameFieldValue)
         }
+        if (
+          fieldConfig?.type === FieldType.ADDRESS &&
+          AddressFieldValue.safeParse(rawInput[fieldId]).success
+        ) {
+          value = JSON.stringify(rawInput[fieldId])
+        }
         // Handle the case where we want to search by range but the value is not a comma-separated string
         // e.g. "2023-01-01,2023-12-31" should be treated as a range
         // but "2023-01-01" should be treated as an exact match
@@ -419,7 +426,12 @@ export function getSearchParamsFieldConfigs(
   const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
     ([, value]) => getDefaultSearchFields(value)
   )
-  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig).map((x) => {
+    if (x.type === FieldType.ADDRESS) {
+      return { ...x, configuration: { searchMode: true } }
+    }
+    return x
+  })
   const searchFieldConfigs = [
     ...eventFieldConfigs,
     ...declarationFieldConfigs
