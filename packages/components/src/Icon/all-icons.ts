@@ -78,7 +78,6 @@ export {
   PushPin,
   QrCode,
   SignOut,
-  SpeakerSimpleHigh,
   Star,
   Sun,
   Target,
