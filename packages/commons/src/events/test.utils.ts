@@ -269,7 +269,16 @@ export function eventPayloadGenerator(rng: () => number) {
       id
     }),
     draft: (
-      { eventId, actionType }: { eventId: UUID; actionType: ActionType },
+      {
+        eventId,
+        actionType,
+        annotation
+      }: {
+        eventId: UUID
+        actionType: ActionType
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        annotation?: Record<string, any>
+      },
       input: Partial<Draft> = {}
     ): Draft =>
       merge(
@@ -292,7 +301,8 @@ export function eventPayloadGenerator(rng: () => number) {
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
-              'correction.request.reason': "Child's name was incorrect"
+              'correction.request.reason': "Child's name was incorrect",
+              ...annotation
             },
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
