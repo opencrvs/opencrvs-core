@@ -343,3 +343,45 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
     )
   }
 }
+export const AdvancedSearchPartialNameSearchSupport: Story = {
+  parameters: {
+    ...storyParams,
+    reactRouter: {
+      ...storyParams.reactRouter,
+      initialPath: `${ROUTES.V2.ADVANCED_SEARCH.buildPath({})}`
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step(
+      'Search button should be enabled event with partial name field along with another field',
+      async () => {
+        const searchButton = (
+          await canvas.findAllByRole('button', { name: 'Search' })
+        ).find((btn) => btn.id === 'search')
+
+        await expect(searchButton).toBeDisabled()
+
+        const accordion = await canvas.findByTestId(
+          'accordion-v2.event.tennis-club-membership.search.applicants'
+        )
+        await userEvent.click(
+          within(accordion).getByRole('button', { name: 'Show' })
+        )
+        const firstName =
+          await within(accordion).findByTestId('text__firstname')
+        await userEvent.type(firstName, 'Tareq')
+
+        const email = await within(accordion).findByTestId(
+          'text__applicant____email'
+        )
+        await userEvent.type(email, 'tareq@gmail.com')
+
+        await userEvent.click(accordion)
+
+        await expect(searchButton).toBeEnabled()
+      }
+    )
+  }
+}
