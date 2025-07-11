@@ -9,15 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
+  clearPendingDraftCreationRequests,
   findLocalEventDocument,
-  invalidateDraftsList,
-  invalidateEventsList,
+  refetchDraftsList,
+  refetchEventsList,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
@@ -37,6 +38,7 @@ import { precacheFile } from '../files/useFileUpload'
  * This ensures the full record can be browsed even when the user goes offline
  */
 setQueryDefaults(trpcOptionsProxy.event.draft.list, {
+  staleTime: Infinity,
   queryFn: async (...params) => {
     const queryOptions = trpcOptionsProxy.event.draft.list.queryOptions()
 
@@ -126,12 +128,17 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
       },
       createdAt: new Date().toISOString()
     }
-    setDraftData((drafts) => drafts.concat(optimisticDraft))
+    setDraftData((drafts) => {
+      return drafts
+        .filter((draft) => draft.eventId !== optimisticDraft.eventId)
+        .concat(optimisticDraft)
+    })
+    clearPendingDraftCreationRequests(variables.eventId)
     return optimisticDraft
   },
   onSuccess: async () => {
-    await invalidateEventsList()
-    await invalidateDraftsList()
+    await refetchEventsList()
+    await refetchDraftsList()
   },
   retryDelay: 10000
 })
@@ -165,7 +172,8 @@ export function useDrafts() {
 
     const drafts = useSuspenseQuery({
       ...options,
-      queryKey: trpc.event.draft.list.queryKey()
+      queryKey: trpc.event.draft.list.queryKey(),
+      networkMode: 'always'
     })
 
     return drafts.data

@@ -9,13 +9,14 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation } from '@tanstack/react-query'
+import { MutationKey, useMutation, useQueryClient } from '@tanstack/react-query'
 import type {
   DecorateMutationProcedure,
   inferInput
 } from '@trpc/tanstack-react-query'
 import { toast } from 'react-hot-toast'
 import { TRPCClientError } from '@trpc/client'
+import { useSyncExternalStore } from 'react'
 import {
   ActionType,
   EventDocument,
@@ -35,6 +36,7 @@ import {
 import { updateEventOptimistically } from '@client/v2-events/features/events/useEvents/procedures/actions/utils'
 import {
   createEventActionMutationFn,
+  MutationType,
   setMutationDefaults,
   waitUntilEventIsCreated
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
@@ -212,9 +214,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
 })
 
 export const customMutationKeys = {
-  validateOnDeclare: ['validateOnDeclare'],
-  registerOnDeclare: ['registerOnDeclare'],
-  registerOnValidate: ['registerOnValidate']
+  validateOnDeclare: [['validateOnDeclare']],
+  registerOnDeclare: [['registerOnDeclare']],
+  registerOnValidate: [['registerOnValidate']]
 } as const
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
@@ -349,10 +351,10 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
   }
 }
 
-export function useEventCustomAction(mutationKey: string[]) {
+export function useEventCustomAction(mutationKey: MutationKey) {
   const eventConfigurations = useEventConfigurations()
   const mutation = useMutation({
-    mutationKey: [mutationKey],
+    mutationKey: mutationKey,
     ...queryClient.getMutationDefaults(mutationKey)
   })
 
@@ -377,4 +379,26 @@ export function useEventCustomAction(mutationKey: string[]) {
       })
     }
   }
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function useIsMutating<P extends DecorateMutationProcedure<any>>(
+  eventId: string,
+  procedure: P
+) {
+  const cache = useQueryClient().getMutationCache()
+
+  return useSyncExternalStore(
+    (onStoreChange) => cache.subscribe(onStoreChange),
+    () => {
+      return (
+        cache.findAll({
+          mutationKey: procedure.mutationKey(),
+          status: 'pending',
+          predicate: (mutation) =>
+            (mutation as MutationType<P>).state.variables?.eventId === eventId
+        }).length > 0
+      )
+    }
+  )
 }

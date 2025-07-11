@@ -26,7 +26,7 @@ import {
 
 import {
   findLocalEventConfig,
-  invalidateEventsList,
+  refetchEventsList,
   setEventData,
   setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -101,7 +101,7 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
   onSuccess: async (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    await invalidateEventsList()
+    await refetchEventsList()
   }
 })
 
