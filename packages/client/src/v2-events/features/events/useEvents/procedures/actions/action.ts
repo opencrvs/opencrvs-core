@@ -381,6 +381,7 @@ export function useEventCustomAction(mutationKey: MutationKey) {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function useIsMutating<P extends DecorateMutationProcedure<any>>(
   eventId: string,
   procedure: P

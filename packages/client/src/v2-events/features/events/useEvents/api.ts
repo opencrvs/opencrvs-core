@@ -31,7 +31,7 @@ export function addUserToQueryData(user: User) {
   )
 }
 
-export async function invalidateWorkqueues() {
+async function invalidateWorkqueues() {
   await queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.workqueue.count.queryKey()
   })
@@ -151,13 +151,14 @@ export function findLocalEventDocument(eventId: string) {
  * get updated properly when event is submitted to the server
  * and a new id is generated.
  */
-async function updateDraftsWithEvent(id: string, data: EventDocument) {
+function updateDraftsWithEvent(id: string, data: EventDocument) {
   setDraftData((drafts) =>
     drafts.map((draft) =>
       draft.eventId === id ? { ...draft, eventId: data.id } : draft
     )
   )
-  return queryClient.invalidateQueries({
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  queryClient.invalidateQueries({
     queryKey: trpcOptionsProxy.event.draft.list.queryKey()
   })
 }
@@ -184,10 +185,10 @@ export function clearPendingDraftCreationRequests(eventId: string) {
     })
 }
 
-export async function setEventData(id: string, data: EventDocument) {
+export function setEventData(id: string, data: EventDocument) {
   updateLocalEventIndex(id, data)
   queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
-  return updateDraftsWithEvent(id, data)
+  updateDraftsWithEvent(id, data)
 }
 
 export async function refetchEventsList() {
@@ -212,12 +213,12 @@ export async function refetchEventsList() {
 }
 
 export async function updateLocalEvent(updatedEvent: EventDocument) {
-  await setEventData(updatedEvent.id, updatedEvent)
+  setEventData(updatedEvent.id, updatedEvent)
   return refetchEventsList()
 }
 
 export async function onAssign(updatedEvent: EventDocument) {
-  await setEventData(updatedEvent.id, updatedEvent)
+  setEventData(updatedEvent.id, updatedEvent)
   await invalidateWorkqueues()
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
