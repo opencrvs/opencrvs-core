@@ -32,7 +32,6 @@ import {
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
 import { Button, Link as TextButton } from '@opencrvs/components'
-import { Downloaded } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -150,7 +149,7 @@ function changeSortedColumn(
   }
 }
 
-const searchResultMessages = {
+const messages = defineMessages({
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
@@ -180,11 +179,9 @@ const searchResultMessages = {
   processingAction: {
     id: `v2.events.outbox.processingAction`,
     defaultMessage:
-      '{action, select, DECLARE {Sending} REGISTER {Registering} VALIDATE {Sending for approval} NOTIFY {Sending} REJECT {Sending for updates} ARCHIVE {Archiving} PRINT_CERTIFICATE {Certifying} REQUEST_CORRECTION {Requesting correction} APPROVE_CORRECTION {Approving correction} REJECT_CORRECTION {Rejecting correction} ASSIGN {Assigning} UNASSIGN {Unassigning} other {processing action}}'
+      '{action, select, DECLARE {Sending} REGISTER {Registering} VALIDATE {Sending for approval} NOTIFY {Sending} REJECT {Sending for updates} ARCHIVE {Archiving} PRINT_CERTIFICATE {Certifying} REQUEST_CORRECTION {Requesting correction} APPROVE_CORRECTION {Approving correction} REJECT_CORRECTION {Rejecting correction} ASSIGN {Assigning} UNASSIGN {Unassigning} other {Processing action}}'
   }
-}
-
-const messages = defineMessages(searchResultMessages)
+})
 
 const ExtendedEventStatuses = {
   OUTBOX: 'OUTBOX',
@@ -329,7 +326,7 @@ export const SearchResultComponent = ({
         (outboxEvent) => outboxEvent.id === event.id
       )
 
-      const isInDrafts = drafts.some((draft) => draft.id === event.id)
+      const isInDrafts = drafts.some((draft) => draft.eventId === event.id)
 
       const getEventStatus = () => {
         if (isInOutbox) {
@@ -354,30 +351,31 @@ export const SearchResultComponent = ({
         status: intl.formatMessage(messages.eventStatus, {
           status
         }),
-        title: isInOutbox ? (
-          <IconWithName
-            flags={event.flags}
-            name={event.title}
-            status={status}
-          />
-        ) : (
-          <TextButton
-            color={event.useFallbackTitle ? 'red' : 'primary'}
-            onClick={() => {
-              return navigate(
-                ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-                  eventId: event.id
-                })
-              )
-            }}
-          >
+        title:
+          isInOutbox && !isInDrafts ? (
             <IconWithName
               flags={event.flags}
               name={event.title}
               status={status}
             />
-          </TextButton>
-        ),
+          ) : (
+            <TextButton
+              color={event.useFallbackTitle ? 'red' : 'primary'}
+              onClick={() => {
+                return navigate(
+                  ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+                    eventId: event.id
+                  })
+                )
+              }}
+            >
+              <IconWithName
+                flags={event.flags}
+                name={event.title}
+                status={status}
+              />
+            </TextButton>
+          ),
         outbox: intl.formatMessage(
           isOnline ? messages.processingAction : messages.waitingForAction,
           {

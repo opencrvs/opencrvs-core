@@ -22,7 +22,12 @@ import {
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { TestImage } from '@client/v2-events/features/events/fixtures'
-import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
+import {
+  AppRouter,
+  queryClient,
+  trpcOptionsProxy,
+  TRPCProvider
+} from '@client/v2-events/trpc'
 import {
   ensureCacheExists,
   CACHE_NAME,
@@ -61,9 +66,15 @@ const router = {
         React.useEffect(() => {
           void event.refetch()
         }, [event, event.refetch])
+
         /*
          * Explicitly call the hook to trigger draft fetching
          */
+
+        // eslint-disable-next-line @typescript-eslint/no-floating-promises
+        queryClient.invalidateQueries({
+          queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+        })
         useDrafts().getRemoteDrafts(createdEvent.id)
 
         return (
@@ -185,19 +196,35 @@ export const GetEventHook: Story = {
       )
     })
 
-    await step('Retrieves presigned urls for draft files', async () => {
+    await step('Retrieves draft list', async () => {
       await waitFor(async () => {
         await expect(spies.draftList).toBe(1)
+      })
+    })
+
+    await step('Retrieves event data', async () => {
+      await waitFor(async () => {
         await expect(spies.eventGet).toBe(1)
+      })
+    })
+
+    await step('Gets presigned URL for file', async () => {
+      await waitFor(async () => {
         await expect(spies.presignFile).toBe(1)
+      })
+    })
+
+    await step('Fetches file content', async () => {
+      await waitFor(async () => {
         await expect(spies.fetchFile).toBe(1)
       })
     })
 
     await step('Caches the files', async () => {
       const cache = await getCache(CACHE_NAME)
-
-      await expect(cache.matchAll()).resolves.toHaveLength(1)
+      await waitFor(async () => {
+        await expect(cache.matchAll()).resolves.toHaveLength(1)
+      })
     })
   }
 }

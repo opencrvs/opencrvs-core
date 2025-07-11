@@ -8,27 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { Pill } from '@opencrvs/components'
 
-import { z } from 'zod'
-import { UserWithPrimaryOffice } from './deserializer'
+export function Archive() {
+  const intl = useIntl()
 
-export const SerializedUserField = z.object({
-  $userField: z.enum([
-    'id',
-    'name',
-    'role',
-    'signature',
-    'avatar',
-    'primaryOfficeId'
-  ])
-})
-
-export type SerializedUserField = z.infer<typeof SerializedUserField>
-
-export function userSerializer(
-  userField: keyof UserWithPrimaryOffice
-): SerializedUserField {
-  return {
-    $userField: userField
-  }
+  return (
+    <p>
+      <Pill
+        label={intl.formatMessage({
+          id: 'v2.event.history.markAsDuplicate',
+          defaultMessage: 'Marked as a duplicate'
+        })}
+        size="small"
+        type="inactive"
+      />
+    </p>
+  )
 }

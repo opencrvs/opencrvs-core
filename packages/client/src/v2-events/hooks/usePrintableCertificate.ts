@@ -112,19 +112,6 @@ export const usePrintableCertificate = ({
       config
     )
 
-    const base64ReplacedUsersWithSignature = await Promise.all(
-      users.map(async (user) => {
-        if (user.signature && isMinioUrl(user.signature)) {
-          const base64Signature = await fetchImageAsBase64(user.signature)
-          return {
-            ...user,
-            signature: base64Signature
-          }
-        }
-        return user
-      })
-    )
-
     const compiledSvg = compileSvg({
       templateString: certificateConfig.svg,
       $metadata: {
@@ -135,7 +122,7 @@ export const usePrintableCertificate = ({
       },
       $declaration: declarationWithResolvedImages,
       locations,
-      users: base64ReplacedUsersWithSignature,
+      users,
       language,
       config
     })

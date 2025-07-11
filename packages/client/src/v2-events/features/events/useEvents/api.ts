@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { matchMutation, partialMatchKey } from '@tanstack/react-query'
 import {
   ActionType,
   Draft,
@@ -21,12 +22,19 @@ import {
 } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
+import { MutationType } from './procedures/utils'
 
 export function addUserToQueryData(user: User) {
   return queryClient.setQueryData(
     trpcOptionsProxy.user.get.queryKey(user.id),
     user
   )
+}
+
+async function invalidateWorkqueues() {
+  await queryClient.invalidateQueries({
+    queryKey: trpcOptionsProxy.workqueue.count.queryKey()
+  })
 }
 
 export function findLocalEventConfig(eventType: string) {
@@ -47,7 +55,7 @@ export function addLocalEventConfig(config: EventConfig) {
 }
 
 export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
-  return queryClient.setQueryData(
+  queryClient.setQueryData(
     trpcOptionsProxy.event.draft.list.queryKey(),
     (drafts) => updater(drafts || [])
   )
@@ -138,12 +146,52 @@ export function findLocalEventDocument(eventId: string) {
   ) as EventDocument | undefined
 }
 
-export function setEventData(id: string, data: EventDocument) {
-  updateLocalEventIndex(id, data)
-  return queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
+/*
+ * This function makes sure temporary id references to events
+ * get updated properly when event is submitted to the server
+ * and a new id is generated.
+ */
+function updateDraftsWithEvent(id: string, data: EventDocument) {
+  setDraftData((drafts) =>
+    drafts.map((draft) =>
+      draft.eventId === id ? { ...draft, eventId: data.id } : draft
+    )
+  )
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
+  queryClient.invalidateQueries({
+    queryKey: trpcOptionsProxy.event.draft.list.queryKey()
+  })
 }
 
-export async function invalidateEventsList() {
+export function clearPendingDraftCreationRequests(eventId: string) {
+  queryClient
+    .getMutationCache()
+    .getAll()
+    .filter((mutation) =>
+      matchMutation(
+        {
+          mutationKey: trpcOptionsProxy.event.draft.create.mutationKey()
+        },
+        mutation
+      )
+    )
+    .map(
+      (mutation) =>
+        mutation as MutationType<typeof trpcOptionsProxy.event.draft.create>
+    )
+    .filter((mutation) => mutation.state.context?.eventId === eventId)
+    .forEach((mutation) => {
+      queryClient.getMutationCache().remove(mutation)
+    })
+}
+
+export function setEventData(id: string, data: EventDocument) {
+  updateLocalEventIndex(id, data)
+  queryClient.setQueryData(trpcOptionsProxy.event.get.queryKey(id), data)
+  updateDraftsWithEvent(id, data)
+}
+
+export async function refetchEventsList() {
   /*
    * Invalidate search queries
    */
@@ -152,25 +200,27 @@ export async function invalidateEventsList() {
       .getQueriesData<EventIndex[]>({
         queryKey: trpcOptionsProxy.event.search.queryKey()
       })
-      .map(async ([queryKey, eventIndices]) =>
-        queryClient.invalidateQueries({
+      .map(async ([queryKey, eventIndices]) => {
+        return queryClient.refetchQueries({
           queryKey
         })
-      )
+      })
   )
 
-  return queryClient.invalidateQueries({
+  return queryClient.refetchQueries({
     queryKey: trpcOptionsProxy.event.list.queryKey()
   })
 }
 
 export async function updateLocalEvent(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
-  return invalidateEventsList()
+  await invalidateWorkqueues()
+  return refetchEventsList()
 }
 
-export function onAssign(updatedEvent: EventDocument) {
+export async function onAssign(updatedEvent: EventDocument) {
   setEventData(updatedEvent.id, updatedEvent)
+  await invalidateWorkqueues()
 
   const lastAssignment = findLastAssignmentAction(updatedEvent.actions)
 
@@ -190,8 +240,8 @@ export function onAssign(updatedEvent: EventDocument) {
   }
 }
 
-export async function invalidateDraftsList() {
-  return queryClient.invalidateQueries({
+export async function refetchDraftsList() {
+  return queryClient.refetchQueries({
     queryKey: trpcOptionsProxy.event.draft.list.queryKey()
   })
 }
@@ -207,4 +257,5 @@ export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
   deleteEventData(id)
   await removeCachedFiles(updatedEvent)
+  await invalidateWorkqueues()
 }
