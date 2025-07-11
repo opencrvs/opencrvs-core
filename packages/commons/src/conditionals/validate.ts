@@ -210,6 +210,11 @@ export const errorMessages = {
     defaultMessage: 'Unexpected field',
     description: 'Error message when field is not expected',
     id: 'v2.error.unexpectedField'
+  },
+  correctionNotAllowed: {
+    defaultMessage: 'Correction not allowed for field',
+    description: 'Error message when correction is not allowed for field',
+    id: 'v2.error.correctionNotAllowed'
   }
 }
 

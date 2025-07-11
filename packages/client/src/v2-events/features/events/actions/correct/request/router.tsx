@@ -41,14 +41,6 @@ export const router = {
       element: <RequestCorrection.Review />
     },
     {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.path,
-      element: <RequestCorrection.AdditionalDetails />
-    },
-    {
-      path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS.path,
-      element: <RequestCorrection.AdditionalDetails />
-    },
-    {
       path: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.path,
       element: <RequestCorrection.Summary />
     }

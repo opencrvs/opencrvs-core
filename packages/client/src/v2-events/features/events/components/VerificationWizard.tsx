@@ -111,16 +111,6 @@ export const VerificationWizard = ({
             <Button
               role="button"
               size="large"
-              type="negative"
-              onClick={onCancelButtonClick}
-            >
-              <Cross color="white" />
-              {intl.formatMessage(pageConfig.actions.cancel.label)}
-            </Button>
-
-            <Button
-              role="button"
-              size="large"
               type="positive"
               onClick={() => {
                 onVerifyAction(true)
@@ -129,6 +119,16 @@ export const VerificationWizard = ({
             >
               <Check color="white" />
               {intl.formatMessage(pageConfig.actions.verify.label)}
+            </Button>
+
+            <Button
+              role="button"
+              size="large"
+              type="negative"
+              onClick={onCancelButtonClick}
+            >
+              <Cross color="white" />
+              {intl.formatMessage(pageConfig.actions.cancel.label)}
             </Button>
 
             {showReviewButton && (

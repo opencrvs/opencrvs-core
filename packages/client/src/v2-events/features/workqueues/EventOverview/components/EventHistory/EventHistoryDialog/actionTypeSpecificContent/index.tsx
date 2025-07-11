@@ -15,6 +15,7 @@ import {
   EventDocument
 } from '@opencrvs/commons/client'
 import { Archive } from './Archive'
+import { RequestCorrection } from './RequestCorrection'
 import { PrintCertificate } from './PrintCertificate'
 
 export function getActionTypeSpecificContent(
@@ -25,6 +26,10 @@ export function getActionTypeSpecificContent(
 
   if (type === ActionType.ARCHIVE && action.reason.isDuplicate) {
     return <Archive />
+  }
+
+  if (type === ActionType.REQUEST_CORRECTION) {
+    return <RequestCorrection action={action} fullEvent={fullEvent} />
   }
 
   if (type === ActionType.PRINT_CERTIFICATE) {
