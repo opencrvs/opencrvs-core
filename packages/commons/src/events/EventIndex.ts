@@ -15,6 +15,7 @@ import { EventState } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { TokenUserType } from '../authentication'
+import { SelectDateRangeValue } from './FieldValue'
 extendZodWithOpenApi(z)
 
 export const EventIndex = EventMetadata.extend({
@@ -56,6 +57,15 @@ export const ExactStatus = z
   })
   .openapi({
     ref: 'ExactStatus'
+  })
+
+export const ExactUserType = z
+  .object({
+    type: z.literal('exact'),
+    term: TokenUserType
+  })
+  .openapi({
+    ref: 'ExactUserType'
   })
 
 export const AnyOf = z
@@ -101,12 +111,13 @@ export const Within = z
     ref: 'Within'
   })
 
-export const RangeDate = Range.extend({
-  gte: z.string().date().or(z.string().datetime()),
-  lte: z.string().date().or(z.string().datetime())
-}).openapi({
-  ref: 'RangeDate'
-})
+const RangeDate = z
+  .object({
+    type: z.literal('range'),
+    gte: z.string().date().or(z.string().datetime()),
+    lte: z.string().date().or(z.string().datetime())
+  })
+  .openapi({ ref: 'RangeDate' })
 
 export const ExactDate = Exact.extend({
   term: z.string().date().or(z.string().datetime())
@@ -114,9 +125,22 @@ export const ExactDate = Exact.extend({
   ref: 'ExactDate'
 })
 
-export const DateCondition = z.union([ExactDate, RangeDate]).openapi({
-  ref: 'DateCondition'
-})
+const TimePeriod = z
+  .object({
+    type: z.literal('timePeriod'),
+    term: SelectDateRangeValue
+  })
+  .openapi({
+    ref: 'TimePeriod'
+  })
+
+export const DateCondition = z
+  .union([ExactDate, RangeDate, TimePeriod])
+  .openapi({
+    ref: 'DateCondition'
+  })
+
+export type DateCondition = z.infer<typeof DateCondition>
 
 // Use `ZodType` here to avoid locking the output type prematurely —
 // this keeps recursive inference intact and allows `z.infer<typeof QueryInput>` to work correctly.
@@ -152,19 +176,20 @@ export const QueryExpression = z
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
-    'legalStatus.REGISTERED.createdAt': z.optional(DateCondition),
-    'legalStatus.REGISTERED.createdAtLocation': z.optional(
+    'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
+    'legalStatuses.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
-    'legalStatus.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),
-    createdByUserType: TokenUserType,
+    createdByUserType: z.optional(ExactUserType),
     createdBy: z.optional(Exact),
     updatedBy: z.optional(Exact),
     trackingId: z.optional(Exact),
     flags: z.optional(ContainsFlags),
+    // @todo: The type for this comes out as "any"
     data: QueryInput
   })
   .partial()
