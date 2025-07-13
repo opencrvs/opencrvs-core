@@ -59,6 +59,12 @@ import { z } from 'zod'
 import { FullDocumentPath } from '../documents'
 
 /**
+ * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
+ * Since we query by range, providing UTC offset will result to different results when DST changes during the range.
+ */
+export const TEST_SYSTEM_IANA_TIMEZONE = 'Asia/Dhaka'
+
+/**
  * In real application, the roles are defined in the countryconfig.
  * These are just for testing purposes to generate realistic mock data.
  */
@@ -161,8 +167,12 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATE_RANGE:
-      return ['2021-01-01', '2021-01-02']
+      return {
+        start: '2021-01-01',
+        end: '2021-01-31'
+      }
     case FieldType.CHECKBOX:
       return true
     case FieldType.SIGNATURE:
