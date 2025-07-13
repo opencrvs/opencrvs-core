@@ -105,7 +105,7 @@ export const AdvancedSearchStory: Story = {
       )
 
       const locationInput = await canvas.findByTestId(
-        'event____legalStatus____REGISTERED____createdAtLocation'
+        'event____legalStatuses____REGISTERED____createdAtLocation'
       )
       await userEvent.type(locationInput, 'Ibombo', { delay: 100 })
       const locationOption = await canvas.findAllByText(
@@ -134,8 +134,8 @@ const serializedParams = serializeSearchParams({
     surname: 'Roy'
   },
   // @TODO: Update tests
-  ['event.legalStatus.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
-  ['event.legalStatus.REGISTERED.createdAtLocation']:
+  ['event.legalStatuses.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
+  ['event.legalStatuses.REGISTERED.createdAtLocation']:
     '028d2c85-ca31-426d-b5d1-2cef545a4902',
   'event.status': 'ALL',
   'event.updatedAt': ['2025-05-03', '2025-06-03'],
@@ -165,7 +165,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
       await within(accordion).findByRole('button', { name: 'Hide' })
       await expect(
         await canvas.findByTestId(
-          'event____legalStatus____REGISTERED____createdAtLocation'
+          'event____legalStatuses____REGISTERED____createdAtLocation'
         )
       ).toHaveValue('Ibombo District Office')
       await within(accordion).findByText('June 2024 to June 2025')
@@ -248,7 +248,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
         within(footballAccordion).getByRole('button', { name: 'Show' })
       )
       const input = await canvas.findByTestId(
-        'event____legalStatus____REGISTERED____createdAtLocation'
+        'event____legalStatuses____REGISTERED____createdAtLocation'
       )
       await userEvent.type(input, 'Ibombo', { delay: 100 })
       const option = await canvas.findAllByText('Ibombo District Office')
@@ -259,7 +259,7 @@ export const AdvancedSearchTabsBehaviour: Story = {
       await userEvent.click(footballTab)
       await expect(
         await canvas.findByTestId(
-          'event____legalStatus____REGISTERED____createdAtLocation'
+          'event____legalStatuses____REGISTERED____createdAtLocation'
         )
       ).toHaveValue('Ibombo District Office')
     })
@@ -267,8 +267,8 @@ export const AdvancedSearchTabsBehaviour: Story = {
 }
 
 const serializedParams2 = serializeSearchParams({
-  ['event.legalStatus.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
-  ['event.legalStatus.REGISTERED.createdAtLocation']:
+  ['event.legalStatuses.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
+  ['event.legalStatuses.REGISTERED.createdAtLocation']:
     '028d2c85-ca31-426d-b5d1-2cef545a4902',
   'recommender.name': {
     firstname: 'Annina',
@@ -292,7 +292,7 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
       'Clear Place and Date of Registration, perform search',
       async () => {
         const locationInput = await canvas.findByTestId(
-          'event____legalStatus____REGISTERED____createdAtLocation',
+          'event____legalStatuses____REGISTERED____createdAtLocation',
           {},
           {
             timeout: 5000
@@ -306,7 +306,7 @@ export const AdvancedSearchTabsLocationAndDateFieldReset: Story = {
         const dateToggle = (await canvas.findAllByRole('checkbox')).find(
           (el) =>
             el.id ===
-            'event____legalStatus____REGISTERED____acceptedAt-date_range_checkbox'
+            'event____legalStatuses____REGISTERED____acceptedAt-date_range_checkbox'
         )
 
         if (dateToggle) {
