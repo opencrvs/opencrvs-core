@@ -79,10 +79,10 @@ export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const fileUri = FullDocumentPath.parse(request.params.fileUri)
+  const filePath = FullDocumentPath.parse(request.params.filePath)
   const exists = await minioClient.statObject(
     MINIO_BUCKET,
-    toDocumentPath(fileUri)
+    toDocumentPath(filePath)
   )
   if (!exists) {
     return notFound('File not found')

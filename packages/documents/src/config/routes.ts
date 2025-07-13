@@ -26,7 +26,7 @@ export const getRoutes = () => {
     // get presigned URL
     {
       method: 'GET',
-      path: `/presigned-url/{fileUri*}`,
+      path: `/presigned-url/{filePath*}`,
       handler: createPreSignedUrl,
       config: {
         tags: ['api']
@@ -52,7 +52,7 @@ export const getRoutes = () => {
     // check if file exists
     {
       method: 'GET',
-      path: '/files/{fileUri*}',
+      path: '/files/{filePath*}',
       handler: fileExistsHandler,
       config: {
         tags: ['api']
@@ -106,7 +106,7 @@ export const getRoutes = () => {
     // delete a document
     {
       method: 'DELETE',
-      path: '/files/{fileUri*}',
+      path: '/files/{filePath*}',
       handler: deleteDocument,
       config: {
         tags: ['api']

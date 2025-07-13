@@ -67,8 +67,8 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(fileUri: string) {
-  const url = joinURLPaths('/api/presigned-url', fileUri)
+async function getPresignedUrl(filePath: FullDocumentPath) {
+  const url = joinURLPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {
     method: 'GET',

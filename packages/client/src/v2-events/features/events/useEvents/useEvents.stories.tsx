@@ -126,10 +126,10 @@ const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/:fileUri*', (req) => {
+    http.get('/api/presigned-url/:filePath*', (req) => {
       spies.presignFile++
       return HttpResponse.json({
-        presignedURL: `http://localhost:3535/ocrvs/${req.params.fileUri}`
+        presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
       })
     }),
     http.get('http://localhost:3535/ocrvs/:id', () => {
