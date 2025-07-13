@@ -8,19 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './Address'
-export * from './BulletList'
-export * from './Checkbox'
-export * from './DateField'
-export * from './AdministrativeArea'
-export * from './LocationSearch'
-export * from './RadioGroup'
-export * from './Select'
-export * from './SelectCountry'
-export * from './Text'
-export * from './Number'
-export * from './Divider'
-export * from './PageHeader'
-export * from './Paragraph'
-export * from './Name'
-export * from './SelectDateRangeField'
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { Pill } from '@opencrvs/components'
+
+export function Archive() {
+  const intl = useIntl()
+
+  return (
+    <p>
+      <Pill
+        label={intl.formatMessage({
+          id: 'v2.event.history.markAsDuplicate',
+          defaultMessage: 'Marked as a duplicate'
+        })}
+        size="small"
+        type="inactive"
+      />
+    </p>
+  )
+}
