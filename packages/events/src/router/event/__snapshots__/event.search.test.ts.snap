@@ -13,7 +13,7 @@ exports[`Returns events based on the updatedAt column 1`] = `
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
       "type": "image/png",
     },
@@ -59,7 +59,7 @@ exports[`Returns events based on the updatedAt column 2`] = `
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
       "type": "image/png",
     },
@@ -106,7 +106,7 @@ exports[`Returns relevant events in right order 1`] = `
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
       "type": "image/png",
     },
@@ -153,7 +153,7 @@ exports[`Returns relevant events in right order 2`] = `
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
       "type": "image/png",
     },

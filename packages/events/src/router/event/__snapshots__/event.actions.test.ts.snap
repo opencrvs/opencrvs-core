@@ -34,7 +34,7 @@ exports[`Event document contains all created actions 1`] = `
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
         "review.signature": {
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
@@ -62,7 +62,7 @@ exports[`Event document contains all created actions 1`] = `
         "applicant.dobUnknown": true,
         "applicant.email": "test@opencrvs.org",
         "applicant.image": {
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
@@ -108,7 +108,7 @@ exports[`Event document contains all created actions 1`] = `
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
         "review.signature": {
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
@@ -136,7 +136,7 @@ exports[`Event document contains all created actions 1`] = `
         "applicant.dobUnknown": true,
         "applicant.email": "test@opencrvs.org",
         "applicant.image": {
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
@@ -182,7 +182,7 @@ exports[`Event document contains all created actions 1`] = `
       "annotation": {
         "review.comment": "review.comment-TEXTAREA-0",
         "review.signature": {
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
@@ -210,7 +210,7 @@ exports[`Event document contains all created actions 1`] = `
         "applicant.dobUnknown": true,
         "applicant.email": "test@opencrvs.org",
         "applicant.image": {
-          "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+          "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
           "originalFilename": "abcd.png",
           "type": "image/png",
         },
@@ -279,7 +279,7 @@ exports[`partial declaration update accounts for conditional field values not in
   "applicant.dobUnknown": true,
   "applicant.email": "test@opencrvs.org",
   "applicant.image": {
-    "path": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
+    "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
     "originalFilename": "abcd.png",
     "type": "image/png",
   },
