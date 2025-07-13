@@ -476,7 +476,7 @@ export const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/:filename', async (req) => {
+    http.get('/api/presigned-url/:fileUri*', async (req) => {
       return HttpResponse.json({
         presignedURL: `http://localhost:3535/ocrvs/tree.svg`
       })
@@ -486,7 +486,7 @@ export const handlers = {
 
       return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
     }),
-    http.delete('/api/files/:filename', async (request) => {
+    http.delete('/api/files/:fileUri*', async (request) => {
       return HttpResponse.text('OK')
     }),
     http.get('http://localhost:3535/ocrvs/:id', async (request) => {

@@ -125,9 +125,9 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/:filename', (req) => {
+          http.get('/api/presigned-url/:fileUri*', (req) => {
             return HttpResponse.json({
-              presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
+              presignedURL: `http://localhost:3535/ocrvs/${req.params.fileUri}`
             })
           }),
           http.get('http://localhost:3535/ocrvs/:id', () => {
@@ -237,9 +237,9 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             })
           ],
           files: [
-            http.get('/api/presigned-url/:filename', (req) => {
+            http.get('/api/presigned-url/:fileUri*', (req) => {
               return HttpResponse.json({
-                presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
+                presignedURL: `http://localhost:3535/ocrvs/${req.params.fileUri}`
               })
             }),
             http.post('/api/upload', () => {
