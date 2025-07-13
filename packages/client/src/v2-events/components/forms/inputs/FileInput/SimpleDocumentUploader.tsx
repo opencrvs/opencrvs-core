@@ -77,7 +77,6 @@ export function SimpleDocumentUploader({
     onUploadingStateChanged,
     maxFileSize
   })
-  console.log({ previewImage })
 
   function selectForPreview(selectedPreviewImage: FieldValue) {
     if (previewTransformer) {
@@ -98,7 +97,6 @@ export function SimpleDocumentUploader({
   }
 
   const errorMessage = error || errorProps || ''
-  console.log({ file })
 
   return (
     <>

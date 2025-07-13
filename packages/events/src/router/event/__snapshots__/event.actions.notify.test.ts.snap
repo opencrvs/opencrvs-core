@@ -150,7 +150,7 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
             "path": [
               "declaration",
               "applicant.name",
-              "filename"
+              "path"
             ],
             "message": "Required"
           },
