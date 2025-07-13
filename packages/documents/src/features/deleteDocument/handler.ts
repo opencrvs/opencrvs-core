@@ -12,13 +12,13 @@
 import { minioClient } from '@documents/minio/client'
 import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
-import { getUserId } from '@opencrvs/commons'
+import { getUserId, toDocumentPath } from '@opencrvs/commons'
 
 export async function deleteDocument(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const filename = request.params.filename
+  const fileUri = request.params.fileUri
 
   const userId = getUserId(request.headers.authorization)
 
@@ -29,7 +29,10 @@ export async function deleteDocument(
       )
     )
 
-  const stat = await minioClient.statObject(MINIO_BUCKET, filename)
+  const stat = await minioClient.statObject(
+    MINIO_BUCKET,
+    toDocumentPath(fileUri)
+  )
   const createdBy = stat.metaData['created-by']
 
   if (createdBy !== userId)
@@ -38,7 +41,7 @@ export async function deleteDocument(
         `request failed: user with id ${userId} does not have permission to delete this document`
       )
       .code(403)
-  await minioClient.removeObject(MINIO_BUCKET, filename)
+  await minioClient.removeObject(MINIO_BUCKET, toDocumentPath(fileUri))
 
   return h.response().code(204)
 }

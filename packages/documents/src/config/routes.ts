@@ -106,7 +106,7 @@ export const getRoutes = () => {
     // delete a document
     {
       method: 'DELETE',
-      path: `/files/{filename}`,
+      path: '/files/{fileUri*}',
       handler: deleteDocument,
       config: {
         tags: ['api']
