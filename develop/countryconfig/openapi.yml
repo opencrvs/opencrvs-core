@@ -1923,14 +1923,16 @@ components:
             defaultValue:
               type: object
               properties:
-                filename:
+                path:
                   type: string
+                  description: A full path with bucket name, starting from the root of the S3
+                    server, /bucket-name/document-id.jpg
                 originalFilename:
                   type: string
                 type:
                   type: string
               required:
-                - filename
+                - path
                 - originalFilename
                 - type
             configuration:
@@ -2552,8 +2554,10 @@ components:
               items:
                 type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -2561,7 +2565,7 @@ components:
                   option:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
                   - option
@@ -3680,22 +3684,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -3703,7 +3711,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -3859,22 +3867,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -3882,7 +3894,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4091,22 +4103,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4114,7 +4130,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4270,22 +4286,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4293,7 +4313,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4498,22 +4518,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4521,7 +4545,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4677,22 +4701,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4700,7 +4728,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4918,22 +4946,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4941,7 +4973,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5097,22 +5129,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5120,7 +5156,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5325,22 +5361,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5348,7 +5388,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5504,22 +5544,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5527,7 +5571,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5745,22 +5789,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5768,7 +5816,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5924,22 +5972,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5947,7 +5999,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6152,22 +6204,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6175,7 +6231,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6331,22 +6387,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6354,7 +6414,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6561,22 +6621,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6584,7 +6648,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6740,22 +6804,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6763,7 +6831,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6968,22 +7036,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6991,7 +7063,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7147,22 +7219,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7170,7 +7246,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7378,22 +7454,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7401,7 +7481,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7557,22 +7637,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7580,7 +7664,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7785,22 +7869,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7808,7 +7896,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7964,22 +8052,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7987,7 +8079,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8195,22 +8287,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8218,7 +8314,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8374,22 +8470,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8397,7 +8497,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8605,22 +8705,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8628,7 +8732,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8784,22 +8888,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8807,7 +8915,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9012,22 +9120,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9035,7 +9147,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9191,22 +9303,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9214,7 +9330,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9419,22 +9535,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9442,7 +9562,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9598,22 +9718,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9621,7 +9745,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9823,22 +9947,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9846,7 +9974,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -10002,22 +10130,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10025,7 +10157,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -10204,22 +10336,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10227,7 +10363,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -10382,22 +10518,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10405,7 +10545,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -10584,22 +10724,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10607,7 +10751,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -10762,22 +10906,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10785,7 +10933,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -10962,22 +11110,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10985,7 +11137,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -11140,22 +11292,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11163,7 +11319,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -11298,7 +11454,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 9d89474a-de41-404f-a8b9-8ff5b339f2b3
+        transactionId: 566bd889-9d36-457b-ae41-41c214bded67
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -11343,22 +11499,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11366,7 +11526,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -11521,22 +11681,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11544,7 +11708,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -11718,22 +11882,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11741,7 +11909,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -11896,22 +12064,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11919,7 +12091,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -12106,22 +12278,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12129,7 +12305,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -12284,22 +12460,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12307,7 +12487,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -12481,22 +12661,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12504,7 +12688,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -12659,22 +12843,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12682,7 +12870,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -12869,22 +13057,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12892,7 +13084,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -13047,22 +13239,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13070,7 +13266,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -13247,22 +13443,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13270,7 +13470,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -13425,22 +13625,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13448,7 +13652,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -13625,22 +13829,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13648,7 +13856,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -13803,22 +14011,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13826,7 +14038,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -14000,22 +14212,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14023,7 +14239,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -14178,22 +14394,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14201,7 +14421,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -14375,22 +14595,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14398,7 +14622,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -14553,22 +14777,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14576,7 +14804,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -14753,22 +14981,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14776,7 +15008,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -14931,22 +15163,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14954,7 +15190,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -15131,22 +15367,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -15154,7 +15394,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -15309,22 +15549,26 @@ components:
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full path with bucket name, starting from the root of the S3
+                      server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full path with bucket name, starting from the root of the S3
+                        server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -15332,7 +15576,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
