@@ -23,7 +23,8 @@ describe('resend handler receives a request', () => {
 
   describe('resend sms service says nonce is invalid', () => {
     it('returns a 401 response to client', async () => {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      /* eslint-disable @typescript-eslint/no-var-requires */
       const authService = require('../authenticate/service')
       jest
         .spyOn(authService, 'getStoredUserInformation')
@@ -48,9 +49,9 @@ describe('resend handler receives a request', () => {
   describe('resend notification service says nonce is valid, generates a mobile verification code and sends it to notification gateway', () => {
     it('returns a nonce to the client', async () => {
       server = await createProductionEnvironmentServer()
-      // eslint-disable-next-line
+
       const codeService = require('../verifyCode/service')
-      // eslint-disable-next-line
+
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
         id: '1',
@@ -73,9 +74,9 @@ describe('resend handler receives a request', () => {
 
     it('does not generate new verification code for a demo user', async () => {
       server = await createServerWithEnvironment({ NODE_ENV: 'development' })
-      // eslint-disable-next-line
+
       const codeService = require('../verifyCode/service')
-      // eslint-disable-next-line
+
       const authService = require('../authenticate/service')
       jest.spyOn(authService, 'getStoredUserInformation').mockReturnValue({
         userId: '2',

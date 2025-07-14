@@ -96,7 +96,9 @@ interface IUserFormDataSubmitAction {
   type: typeof SUBMIT_USER_FORM_DATA
   payload: {
     client: ApolloClient<unknown>
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     mutation: any
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     variables: { [key: string]: any }
     isUpdate: boolean
     officeLocationId: string
@@ -106,7 +108,9 @@ interface IUserFormDataSubmitAction {
 
 export function submitUserFormData(
   client: ApolloClient<unknown>,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   mutation: any,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   variables: { [key: string]: any },
   officeLocationId: string,
   isUpdate = false,

@@ -248,8 +248,8 @@ export function addTaskToRecord<T extends Bundle>(
   ) as any as T extends RecordWithoutTasks<infer S>
     ? S
     : T extends ValidRecord
-    ? RecordWithPreviousTask<T>
-    : void
+      ? RecordWithPreviousTask<T>
+      : void
 }
 
 export function getRecordWithoutTasks<T extends Bundle>(record: T) {
@@ -259,8 +259,8 @@ export function getRecordWithoutTasks<T extends Bundle>(record: T) {
   } as any as T extends RecordWithPreviousTask<infer S>
     ? RecordWithoutTasks<S>
     : T extends ValidRecord
-    ? RecordWithoutTasks<T>
-    : void
+      ? RecordWithoutTasks<T>
+      : void
 }
 export function getTasksInAscendingOrder<
   T extends RecordWithPreviousTask<ValidRecord>

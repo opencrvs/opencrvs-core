@@ -100,24 +100,24 @@ export type WithUUID<T extends Resource> = Omit<T, 'id'> & {
 type SavedResource<T extends Resource> = T extends Encounter
   ? SavedEncounter
   : T extends RelatedPerson
-  ? SavedRelatedPerson
-  : T extends Composition
-  ? SavedComposition
-  : T extends SavedCompositionHistory
-  ? SavedCompositionHistory
-  : T extends Reference
-  ? SavedReference
-  : T extends Office
-  ? SavedOffice
-  : T extends Location
-  ? SavedLocation
-  : T extends Task
-  ? SavedTask
-  : T extends Practitioner
-  ? SavedPractitioner
-  : T extends QuestionnaireResponse
-  ? SavedQuestionnaireResponse
-  : WithUUID<T>
+    ? SavedRelatedPerson
+    : T extends Composition
+      ? SavedComposition
+      : T extends SavedCompositionHistory
+        ? SavedCompositionHistory
+        : T extends Reference
+          ? SavedReference
+          : T extends Office
+            ? SavedOffice
+            : T extends Location
+              ? SavedLocation
+              : T extends Task
+                ? SavedTask
+                : T extends Practitioner
+                  ? SavedPractitioner
+                  : T extends QuestionnaireResponse
+                    ? SavedQuestionnaireResponse
+                    : WithUUID<T>
 
 export type SavedBundle<T extends Resource = Resource> = Omit<
   fhir3.Bundle,
@@ -130,10 +130,10 @@ export type Saved<T extends Resource | BundleEntry | Bundle> =
   T extends BundleEntry<infer R>
     ? SavedBundleEntry<R>
     : T extends Bundle<infer R>
-    ? SavedBundle<R>
-    : T extends Resource
-    ? SavedResource<T>
-    : never
+      ? SavedBundle<R>
+      : T extends Resource
+        ? SavedResource<T>
+        : never
 
 export type BundleEntry<T extends Resource = Resource> = Omit<
   fhir3.BundleEntry<T>,
@@ -258,8 +258,8 @@ export function getComposition<T extends Bundle>(bundle: T) {
   return composition as T extends Saved<ValidRecord>
     ? SavedComposition
     : T extends SavedComposition
-    ? SavedComposition
-    : Composition
+      ? SavedComposition
+      : Composition
 }
 
 export function isRelatedPerson(resource: Resource): resource is RelatedPerson {
@@ -274,7 +274,14 @@ export type FhirResourceType =
 export type Identifier = fhir3.Identifier
 
 export type Coding = fhir3.Coding
-export type QuestionnaireResponse = fhir3.QuestionnaireResponse
+
+type QuestionnaireResponseItem = fhir3.QuestionnaireResponseItem & {
+  text: string
+}
+
+export type QuestionnaireResponse = fhir3.QuestionnaireResponse & {
+  item?: QuestionnaireResponseItem[]
+}
 export type CompositionRelatesTo = fhir3.CompositionRelatesTo
 
 export type EncounterParticipant = Omit<
@@ -391,8 +398,8 @@ export function toHistoryResource<T extends Saved<Resource>>(resource: T) {
   } as T extends Task
     ? TaskHistory
     : T extends Composition
-    ? CompositionHistory
-    : never
+      ? CompositionHistory
+      : never
 }
 export { updateFHIRBundle, buildFHIRBundle } from './transformers'
 

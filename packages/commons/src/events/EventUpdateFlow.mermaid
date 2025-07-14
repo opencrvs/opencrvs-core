@@ -1,0 +1,81 @@
+flowchart TD
+ subgraph subGraph0["Events service"]
+    direction TB
+        A["event.get()"]
+        B["event.list()"]
+        C["event.actions[action]"]
+  end
+    D["Client"] -- ActionInput --> C
+
+    N["ActionInput (simplified)"] -- Contains --- O["
+     eventId: string,
+     transactionId: string,
+     declaration: ActionUpdate,
+     annotation?: ActionUpdate,
+     originalActionId?: string
+    "]
+
+
+    X["EventIndex"] -- Contains --- Y["
+      id: string,
+      type: string,
+      status: EventStatuses,
+      createdAt: datetime,
+      createdBy: string,
+      createdAtLocation: string,
+      modifiedAt: datetime,
+      assignedTo?: string | null
+      updatedBy: string,
+      trackingId: string,
+      registrationNumber?: string | null
+      declaration: EventState
+    "]
+
+    A -- EventDocument --> D
+    B -- EventIndex --> D
+    E["EventDocument"] -- Contains --- F["
+        id: string,
+        type: string,
+        createdAt: datetime,
+        updatedAt: datetime,
+        actions: Action[],
+        trackingId: string
+    "]
+
+
+    Z["AsyncRejectActionDocument"] -- Contains --- ZZ["
+      id: string,
+      createdAt: datetime,
+      type: ConfirmableAction,
+      status: ActionStatus.Rejected
+    "]
+
+    U["Action (ActionDocument | AsyncRejectActionDocument)"]
+
+    G["ActionDocument"] -- Contains --- H["
+      id: string,
+      createdAt: datetime,
+      createdBy: string,
+      createdAtLocation: string,
+      declaration: ActionUpdate,
+      annotation: ActionUpdate,
+      status:  ActionStatus.Requested | ActionStatus.Accepted | ActionStatus.Rejected
+    "
+    ]
+
+    G --> U
+    Z --> U
+
+
+    J["ActionUpdate"] -- Contains --- I["
+        \[key\]: FieldUpdateValue
+    "]
+
+    K["EventState"] -- Contains --- L["
+        \[key\]: FieldValue
+    "]
+
+
+    M["FieldValue"]
+    V["FieldUpdateValue"] --"same as FieldValue but allows nulls for optional fields"---M
+

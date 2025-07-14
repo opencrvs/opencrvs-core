@@ -268,6 +268,7 @@ const ReadyForReviewComponent = ({
         dateOfEvent:
           item.dateOfEvent && formattedDuration(item.dateOfEvent as Date),
         sentForReview:
+          /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
           item.sentForReview && formattedDuration(item.sentForReview as any)
       }
     })

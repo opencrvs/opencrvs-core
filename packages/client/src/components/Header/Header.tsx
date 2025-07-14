@@ -356,19 +356,19 @@ const HeaderComponent = (props: IFullProps) => {
       activeMenuItem === ACTIVE_MENU_ITEM.PERFORMANCE
         ? constantsMessages.performanceTitle
         : activeMenuItem === ACTIVE_MENU_ITEM.TEAM ||
-          activeMenuItem === ACTIVE_MENU_ITEM.USERS
-        ? messages.teamTitle
-        : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
-        ? constantsMessages.certificateTitle
-        : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
-        ? constantsMessages.applicationTitle
-        : activeMenuItem === ACTIVE_MENU_ITEM.FORM
-        ? constantsMessages.formDeclarationTitle
-        : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
-        ? constantsMessages.integrationTitle
-        : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
-        ? constantsMessages.vsExportTitle
-        : constantsMessages.declarationTitle
+            activeMenuItem === ACTIVE_MENU_ITEM.USERS
+          ? messages.teamTitle
+          : activeMenuItem === ACTIVE_MENU_ITEM.CERTIFICATE
+            ? constantsMessages.certificateTitle
+            : activeMenuItem === ACTIVE_MENU_ITEM.APPLICATION
+              ? constantsMessages.applicationTitle
+              : activeMenuItem === ACTIVE_MENU_ITEM.FORM
+                ? constantsMessages.formDeclarationTitle
+                : activeMenuItem === ACTIVE_MENU_ITEM.INTEGRATION
+                  ? constantsMessages.integrationTitle
+                  : activeMenuItem === ACTIVE_MENU_ITEM.VSEXPORTS
+                    ? constantsMessages.vsExportTitle
+                    : constantsMessages.declarationTitle
     )
 
   let rightMenu = [
@@ -437,20 +437,20 @@ export const Header = withRouter(
       activeMenuItem: window.location.href.includes('performance')
         ? ACTIVE_MENU_ITEM.PERFORMANCE
         : window.location.href.includes(TEAM_USER_LIST)
-        ? ACTIVE_MENU_ITEM.USERS
-        : window.location.href.includes('team')
-        ? ACTIVE_MENU_ITEM.TEAM
-        : window.location.href.includes('config/certificate')
-        ? ACTIVE_MENU_ITEM.CERTIFICATE
-        : window.location.href.includes('config/application')
-        ? ACTIVE_MENU_ITEM.APPLICATION
-        : window.location.href.includes('config/form')
-        ? ACTIVE_MENU_ITEM.FORM
-        : window.location.href.includes('config/integration')
-        ? ACTIVE_MENU_ITEM.INTEGRATION
-        : window.location.href.includes('vsexports')
-        ? ACTIVE_MENU_ITEM.VSEXPORTS
-        : ACTIVE_MENU_ITEM.DECLARATIONS,
+          ? ACTIVE_MENU_ITEM.USERS
+          : window.location.href.includes('team')
+            ? ACTIVE_MENU_ITEM.TEAM
+            : window.location.href.includes('config/certificate')
+              ? ACTIVE_MENU_ITEM.CERTIFICATE
+              : window.location.href.includes('config/application')
+                ? ACTIVE_MENU_ITEM.APPLICATION
+                : window.location.href.includes('config/form')
+                  ? ACTIVE_MENU_ITEM.FORM
+                  : window.location.href.includes('config/integration')
+                    ? ACTIVE_MENU_ITEM.INTEGRATION
+                    : window.location.href.includes('vsexports')
+                      ? ACTIVE_MENU_ITEM.VSEXPORTS
+                      : ACTIVE_MENU_ITEM.DECLARATIONS,
       language: store.i18n.language,
       offlineData: getOfflineData(store),
       fieldNames: Object.values(getRegisterForm(store))

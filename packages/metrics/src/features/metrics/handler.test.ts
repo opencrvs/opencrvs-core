@@ -58,7 +58,8 @@ describe('verify metrics handler', () => {
 
   it('returns ok for valid request for birth', async () => {
     fetch.mockResponseOnce(JSON.stringify(mockLocationBundle))
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    /* eslint-disable @typescript-eslint/no-require-imports */
+    /* eslint-disable @typescript-eslint/no-var-requires */
     const { readPoints } = require('../../influxdb/client')
     readPoints.mockResolvedValueOnce([
       {
@@ -100,7 +101,7 @@ describe('verify metrics handler', () => {
         locationLevel2: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201'
       }
     ])
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+
     const utilService = require('./utils')
     jest
       .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')
@@ -122,7 +123,6 @@ describe('verify metrics handler', () => {
   })
 
   it('returns ok for valid request for death', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const { readPoints } = require('../../influxdb/client')
     readPoints.mockResolvedValueOnce([
       {
@@ -163,7 +163,7 @@ describe('verify metrics handler', () => {
         locationLevel2: 'Location/0eaa73dd-2a21-4998-b1e6-b08430595201'
       }
     ])
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+
     const utilService = require('./utils')
     jest
       .spyOn(utilService, 'fetchEstimateForTargetDaysByLocationId')

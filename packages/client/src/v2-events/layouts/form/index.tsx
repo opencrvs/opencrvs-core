@@ -11,16 +11,12 @@
 
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-
 import { Frame, Spinner } from '@opencrvs/components'
+import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { ROUTES } from '@client/v2-events/routes'
 import { FormHeader } from './FormHeader'
-
-type AllowedRoute =
-  | typeof ROUTES.V2.EVENTS.REGISTER
-  | typeof ROUTES.V2.EVENTS.DECLARE
+import { AllowedRouteWithEventId } from './utils'
 
 /**
  * Layout for form and review pages.
@@ -29,17 +25,17 @@ type AllowedRoute =
 export function FormLayout({
   route,
   children,
-  onSaveAndExit
+  onSaveAndExit,
+  appbarIcon = <DeclarationIcon />
 }: {
-  route: AllowedRoute
+  route: AllowedRouteWithEventId
   children: React.ReactNode
-  onSaveAndExit: () => void
+  onSaveAndExit?: () => void | Promise<void>
+  appbarIcon?: React.ReactNode
 }) {
   const { eventId } = useTypedParams(route)
   const events = useEvents()
-
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
-
+  const event = events.getEventState.useSuspenseQuery(eventId)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -47,7 +43,12 @@ export function FormLayout({
   return (
     <Frame
       header={
-        <FormHeader label={configuration.label} onSaveAndExit={onSaveAndExit} />
+        <FormHeader
+          appbarIcon={appbarIcon}
+          label={configuration.label}
+          route={route}
+          onSaveAndExit={onSaveAndExit}
+        />
       }
       skipToContentText="Skip to form"
     >

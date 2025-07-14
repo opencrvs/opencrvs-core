@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { Area } from 'react-easy-crop'
-
+import type { Area } from 'react-easy-crop'
 import {
   ALLOWED_IMAGE_TYPE,
   ALLOWED_IMAGE_TYPE_FOR_CERTIFICATE_TEMPLATE

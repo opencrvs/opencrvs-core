@@ -9,14 +9,51 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import format from 'date-fns/format'
-import { ResponsiveModal, Stack } from '@opencrvs/components'
+import { Pill, ResponsiveModal, Stack, Table } from '@opencrvs/components'
 import { Text } from '@opencrvs/components/lib/Text'
-import { ActionDocument } from '@opencrvs/commons/client'
-import { ResolvedUser } from '@opencrvs/commons'
+import {
+  ActionDocument,
+  ActionType,
+  ActionUpdate
+} from '@opencrvs/commons/client'
+import { ResolvedUser } from '@opencrvs/commons/client'
 import { getUsersFullName, joinValues } from '@client/v2-events/utils'
-import { messages } from './messages'
+export const eventHistoryStatusMessage = {
+  id: `v2.events.history.status`,
+  defaultMessage:
+    '{status, select, CREATE {Draft} VALIDATE {Validated} DRAFT {Draft} DECLARE {Declared} REGISTER {Registered} PRINT_CERTIFICATE {Print certificate} REJECT {Rejected} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
+}
+
+const messages = defineMessages({
+  'event.history.modal.timeFormat': {
+    defaultMessage: 'MMMM dd, yyyy · hh.mm a',
+    id: 'v2.configuration.timeFormat',
+    description: 'Time format for timestamps in event history'
+  },
+  comment: {
+    defaultMessage: 'Comment',
+    description: 'Label for rejection comment',
+    id: 'v2.constants.comment'
+  },
+  markAsDuplicate: {
+    id: 'v2.event.history.markAsDuplicate',
+    defaultMessage: 'Marked as a duplicate'
+  }
+})
+
+function prepareComments(action: ActionType, annotation: ActionUpdate) {
+  const comments: { comment: string }[] = []
+
+  if (action === ActionType.REJECT && typeof annotation.message === 'string') {
+    comments.push({ comment: annotation.message })
+  }
+  if (action === ActionType.ARCHIVE && typeof annotation.message === 'string') {
+    comments.push({ comment: annotation.message })
+  }
+  return comments
+}
 
 /**
  * Detailed view of single Action, showing the history of the event.
@@ -34,7 +71,21 @@ export function EventHistoryModal({
 }) {
   const intl = useIntl()
 
-  const name = getUsersFullName(user.name, intl.locale)
+  const userName = getUsersFullName(user.name, intl.locale)
+  const title = intl.formatMessage(eventHistoryStatusMessage, {
+    status: history.type
+  })
+
+  const commentsColumn = [
+    {
+      key: 'comment',
+      label: intl.formatMessage(messages.comment),
+      width: 100
+    }
+  ]
+
+  const content = prepareComments(history.type, history.annotation ?? {})
+
   return (
     <ResponsiveModal
       autoHeight
@@ -42,23 +93,36 @@ export function EventHistoryModal({
       handleClose={close}
       responsive={true}
       show={true}
-      title={history.type}
+      title={title}
       width={1024}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg19">
           {joinValues(
             [
-              name,
+              userName,
               format(
                 new Date(history.createdAt),
-                intl.formatMessage(messages['event.history.timeFormat'])
+                intl.formatMessage(messages['event.history.modal.timeFormat'])
               )
             ],
             ' — '
           )}
         </Text>
       </Stack>
+      {content.length > 0 && (
+        <Table columns={commentsColumn} content={content} noResultText=" " />
+      )}
+      {history.type === ActionType.ARCHIVE &&
+        history.annotation?.isDuplicate && (
+          <p>
+            <Pill
+              label={intl.formatMessage(messages.markAsDuplicate)}
+              size="small"
+              type="inactive"
+            />
+          </p>
+        )}
     </ResponsiveModal>
   )
 }

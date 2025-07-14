@@ -33,7 +33,6 @@ import {
   IReviewFormState,
   reviewReducer
 } from '@opencrvs/client/src/forms/register/reviewReducer'
-// eslint-disable-next-line no-restricted-imports
 import {
   advancedSearchParamReducer,
   IAdvancedSearchParamState
@@ -90,9 +89,12 @@ export const createStore = (): { store: AppStore } => {
     applyMiddleware(persistenceMiddleware),
     // @ts-ignore types are not correct for this module yet
     applyMiddleware(createSentryMiddleware(Sentry)),
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     typeof (window as any).__REDUX_DEVTOOLS_EXTENSION__ !== 'undefined'
-      ? (window as any).__REDUX_DEVTOOLS_EXTENSION__()
-      : (f: any) => f
+      ? /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        (window as any).__REDUX_DEVTOOLS_EXTENSION__()
+      : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        (f: any) => f
   ) as StoreEnhancer<IStoreState>
 
   const store = enhancedCreateStore<IStoreState, AnyAction>(

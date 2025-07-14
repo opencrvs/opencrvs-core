@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React, { useState } from 'react'
-// eslint-disable-next-line no-restricted-imports
 import * as Sentry from '@sentry/react'
 import styled from 'styled-components'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'

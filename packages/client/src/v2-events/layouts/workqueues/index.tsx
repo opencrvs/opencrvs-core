@@ -13,22 +13,55 @@ import React from 'react'
 
 import { noop } from 'lodash'
 import { useNavigate } from 'react-router-dom'
+import { useIntl, defineMessages } from 'react-intl'
 import {
   AppBar,
   Button,
   Frame,
   Icon,
+  INavigationType,
   SearchTool,
   Stack
 } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
+import { workqueues } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
+import { Hamburger } from '@client/components/Header/Hamburger'
+import * as routes from '@client/navigation/routes'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
+
+const messagesToDefine = {
+  header: {
+    id: 'home.header.advancedSearch',
+    defaultMessage: 'Advanced Search',
+    description: 'Search menu advanced search type'
+  }
+}
+const messages = defineMessages(messagesToDefine)
+
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
+  const intl = useIntl()
+  const allEvents = useEventConfigurations()
+
+  const advancedSearchEvents = allEvents.filter(
+    (event) => event.advancedSearch.length > 0
+  )
+
+  const advancedSearchNavigationList: INavigationType[] = [
+    {
+      label: intl.formatMessage(messages.header),
+      id: 'advanced-search',
+      onClick: () => {
+        navigate(ROUTES.V2.ADVANCED_SEARCH.path)
+      }
+    }
+  ]
 
   return (
     <Frame
@@ -37,6 +70,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           desktopCenter={
             <Stack gap={16}>
               <Button
+                id="header-new-event"
                 type="iconPrimary"
                 onClick={() => {
                   navigate(ROUTES.V2.EVENTS.CREATE.path)
@@ -47,6 +81,11 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
 
               <SearchTool
                 language="en"
+                navigationList={
+                  advancedSearchEvents.length > 0
+                    ? advancedSearchNavigationList // only available when enable in at least one form
+                    : []
+                }
                 searchHandler={noop}
                 searchTypeList={[
                   {
@@ -59,6 +98,18 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
               />
             </Stack>
           }
+          desktopRight={<ProfileMenu key="profileMenu" />}
+          mobileLeft={<Hamburger />}
+          mobileRight={
+            <Button type={'icon'} onClick={() => navigate(routes.SEARCH)}>
+              <Icon color="primary" name="MagnifyingGlass" size="medium" />
+            </Button>
+          }
+          /**
+           * We need to revisit on how the workqueue is picked
+           * during 'workqueue' feature.
+           */
+          mobileTitle={intl.formatMessage(workqueues.all.title)}
         />
       }
       skipToContentText="skip"

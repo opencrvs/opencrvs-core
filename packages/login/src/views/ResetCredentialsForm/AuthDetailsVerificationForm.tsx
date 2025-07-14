@@ -214,8 +214,8 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
                   notificationMethod === 'sms'
                     ? intl.formatMessage(messages.phoneNumberFieldLabel)
                     : notificationMethod === 'email'
-                    ? intl.formatMessage(messages.emailAddressFieldLabel)
-                    : ''
+                      ? intl.formatMessage(messages.emailAddressFieldLabel)
+                      : ''
                 }
                 touched={touched}
                 error={
@@ -225,8 +225,8 @@ const AuthDetailsVerificationComponent = ({ intl }: WrappedComponentProps) => {
                         validationError.props
                       )
                     : error
-                    ? errorMessage
-                    : ''
+                      ? errorMessage
+                      : ''
                 }
                 hideAsterisk={true}
               >

@@ -53,6 +53,7 @@ const VerifyButton = styled(Button)`
 `
 type MetaProps = { touched: boolean; error: string }
 type InputProps = {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   value: any
   onBlur: FocusEventHandler<HTMLInputElement>
   onChange: (e: ChangeEvent<HTMLInputElement>) => void

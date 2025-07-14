@@ -134,6 +134,7 @@ const mockSearchData = {
   deceasedName: null,
   createdAt: '2018-05-23T14:44:58+02:00'
 }
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const searchData: any = []
 for (let i = 0; i < 14; i++) {
   searchData.push(mockSearchData)

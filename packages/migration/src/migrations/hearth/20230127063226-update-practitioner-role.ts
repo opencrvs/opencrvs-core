@@ -61,7 +61,7 @@ export const up = async (db: Db, client: MongoClient) => {
           skip
         )
         const count = await practitionerRoleCursor.count()
-        // eslint-disable-next-line no-console
+
         console.log(
           `Migration Up - PractitionerRole :: Processing ${
             processedDocCount + 1
@@ -137,7 +137,7 @@ export const up = async (db: Db, client: MongoClient) => {
           (processedDocCount / totalPractitionerRoleCount) *
           100
         ).toFixed(2)
-        // eslint-disable-next-line no-console
+
         console.log(
           `Migration Up - PractitionerRole :: Processing done ${percentage}%`
         )
@@ -166,7 +166,7 @@ export const down = async (db: Db, client: MongoClient) => {
           skip
         )
         const count = await practitionerRoleCursor.count()
-        // eslint-disable-next-line no-console
+
         console.log(
           `Migration Down - PractitionerRole :: Processing ${
             processedDocCount + 1
@@ -214,7 +214,7 @@ export const down = async (db: Db, client: MongoClient) => {
           (processedDocCount / totalPractitionerRoleCount) *
           100
         ).toFixed(2)
-        // eslint-disable-next-line no-console
+
         console.log(
           `Migration Down - PractitionerRole :: Processing done ${percentage}%`
         )
