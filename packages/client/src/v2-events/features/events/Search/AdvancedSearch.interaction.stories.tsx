@@ -133,12 +133,17 @@ const serializedParams = serializeSearchParams({
     firstname: 'Nina',
     surname: 'Roy'
   },
-  // @TODO: Update tests
-  ['event.legalStatuses.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
-  ['event.legalStatuses.REGISTERED.createdAtLocation']:
+  'event.legalStatuses.REGISTERED.acceptedAt': {
+    start: '2024-06-01',
+    end: '2025-06-30'
+  },
+  'event.legalStatuses.REGISTERED.createdAtLocation':
     '028d2c85-ca31-426d-b5d1-2cef545a4902',
   'event.status': 'ALL',
-  'event.updatedAt': ['2025-05-03', '2025-06-03'],
+  'event.updatedAt': {
+    start: '2025-05-03',
+    end: '2025-06-03'
+  },
   'recommender.name': {
     firstname: 'Annina',
     surname: ''
@@ -267,8 +272,11 @@ export const AdvancedSearchTabsBehaviour: Story = {
 }
 
 const serializedParams2 = serializeSearchParams({
-  ['event.legalStatuses.REGISTERED.acceptedAt']: ['2024-06-01', '2025-06-30'],
-  ['event.legalStatuses.REGISTERED.createdAtLocation']:
+  'event.legalStatuses.REGISTERED.acceptedAt': {
+    start: '2024-06-01',
+    end: '2025-06-30'
+  },
+  'event.legalStatuses.REGISTERED.createdAtLocation':
     '028d2c85-ca31-426d-b5d1-2cef545a4902',
   'recommender.name': {
     firstname: 'Annina',
