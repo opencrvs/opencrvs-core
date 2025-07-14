@@ -38,11 +38,11 @@ export const SerializedQueryExpression = z
     status: z.optional(z.union([AnyOfStatus, ExactStatus])),
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
-    'legalStatus.REGISTERED.createdAt': z.optional(DateCondition),
-    'legalStatus.REGISTERED.createdAtLocation': z.optional(
+    'legalStatuses.REGISTERED.createdAt': z.optional(DateCondition),
+    'legalStatuses.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),
-    'legalStatus.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
     createdAtLocation: z.optional(
       z.union([SerializableWithin, SerializableExact])
     ),

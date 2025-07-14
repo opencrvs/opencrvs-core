@@ -15,6 +15,7 @@ import { useIntl } from 'react-intl'
 import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
+  FullDocumentPath,
   MimeType,
   SelectOption
 } from '@opencrvs/commons/client'
@@ -101,9 +102,9 @@ function DocumentUploaderWithOption({
   const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
     name,
     {
-      onSuccess: ({ type, originalFilename, filename, id }) => {
+      onSuccess: ({ type, originalFilename, path, id }) => {
         const newFile = {
-          filename,
+          path,
           originalFilename: originalFilename,
           type: type,
           option: id
@@ -143,12 +144,10 @@ function DocumentUploaderWithOption({
     maxFileSize
   })
 
-  const onDeleteFile = (fileName: string) => {
-    deleteFileFromBackend(fileName)
-    setFiles((prevFiles) =>
-      prevFiles.filter((file) => file.filename !== fileName)
-    )
-    onChange(files.filter((file) => file.filename !== fileName))
+  const onDeleteFile = (path: FullDocumentPath) => {
+    deleteFileFromBackend(path)
+    setFiles((prevFiles) => prevFiles.filter((file) => file.path !== path))
+    onChange(files.filter((file) => file.path !== path))
     setPreviewImage(null)
   }
 
@@ -237,7 +236,7 @@ function DocumentUploaderWithOption({
           previewImage={previewImage}
           title={getLabelForDocumentOption(previewImage.option)}
           onDelete={(file) => {
-            onDeleteFile(file.filename)
+            onDeleteFile(file.path)
           }}
         />
       )}
