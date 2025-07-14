@@ -180,7 +180,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
-        icon: 'SpeakerSimpleHigh',
+        icon: 'PencilLine',
         onClick: (workqueue?: string) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
@@ -194,7 +194,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
-        icon: 'CircleWavyCheck',
+        icon: 'PencilLine',
         onClick: (workqueue?: string) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
@@ -206,7 +206,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
-        icon: 'Plus',
+        icon: 'PencilLine',
         onClick: (workqueue?: string) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
