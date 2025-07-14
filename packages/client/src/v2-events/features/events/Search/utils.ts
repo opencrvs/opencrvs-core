@@ -24,7 +24,7 @@ import {
   EventState,
   FieldType,
   QueryExpression,
-  NameFieldValue,
+  NameFieldSearchValue,
   getDeclarationFields,
   DateRangeFieldValue,
   SelectDateRangeValue,
@@ -333,7 +333,9 @@ function buildSearchQueryFields(
       }
 
       if (config.fieldConfig?.type === FieldType.NAME) {
-        const parsedName = NameFieldValue.safeParse(searchInput[config.fieldId])
+        const parsedName = NameFieldSearchValue.safeParse(
+          searchInput[config.fieldId]
+        )
 
         if (parsedName.success) {
           return {
@@ -352,9 +354,8 @@ function buildSearchQueryFields(
       // In both cases, we convert the local date(s) into a UTC-based range to ensure
       // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
       if (
-        config.fieldType === 'event' &&
-        (config.fieldConfig?.type === FieldType.DATE_RANGE ||
-          config.fieldConfig?.type === FieldType.DATE)
+        config.fieldConfig?.type === FieldType.DATE_RANGE ||
+        config.fieldConfig?.type === FieldType.DATE
       ) {
         return {
           ...result,

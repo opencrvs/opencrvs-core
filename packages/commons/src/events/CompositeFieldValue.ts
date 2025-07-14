@@ -78,8 +78,26 @@ export const NameFieldUpdateValue = z
   .or(z.null())
   .or(z.undefined())
 
+export const NameFieldSearchValue = NameFieldUpdateValue.refine(
+  (val) => {
+    if (!val || typeof val !== 'object') {
+      return false
+    }
+    return (
+      (val.firstname != null && val.firstname !== '') ||
+      (val.surname != null && val.surname !== '') ||
+      (val.middlename != null && val.middlename !== '')
+    )
+  },
+  {
+    message:
+      'At least one of firstname, surname, or middlename must be a non-empty string'
+  }
+)
+
 export type NameFieldValue = z.infer<typeof NameFieldValue>
 export type NameFieldUpdateValue = z.infer<typeof NameFieldUpdateValue>
+export type NameFieldSearchValue = z.infer<typeof NameFieldSearchValue>
 
 export type UrbanAddressUpdateValue = z.infer<typeof UrbanAddressUpdateValue>
 
