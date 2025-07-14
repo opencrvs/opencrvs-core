@@ -9,12 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import formatISO from 'date-fns/formatISO'
 import {
   CertificateTemplateConfig,
   JSONSchema,
   ActionType,
   generateEventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  EventDocument,
+  ActionStatus
 } from '@opencrvs/commons/client'
 
 // Test event document with proper structure using generateEventDocument
@@ -85,6 +88,27 @@ export const testDeclaration = {
   // Form data directly in the declaration object
   ...testDeclarationFormData
 }
+
+// Test event document with modified metadata for print count testing
+export const testEventDocumentWithPrintCount = {
+  ...testEventDocument,
+  metadata: {
+    ...testEventDocument,
+    copiesPrintedForTemplate: 3
+  }
+}
+
+// Mock event document with multiple print actions
+export const testEventDocumentWithMultiplePrints: EventDocument =
+  generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [
+      ActionType.CREATE,
+      ActionType.REGISTER,
+      ActionType.PRINT_CERTIFICATE,
+      ActionType.PRINT_CERTIFICATE
+    ]
+  })
 
 // Certificate Templates using the NEW UNIFIED CONDITIONAL SCHEMA
 
@@ -260,6 +284,308 @@ export const tennisClubMembershipCertificateWithFailingFormConditionals: Certifi
             'child.gender': { const: 'female' }
           },
           required: ['child.gender']
+        } as unknown as JSONSchema
+      }
+    ]
+  }
+
+export const tennisClubMembershipCertificateWithPrintCountConditionals: CertificateTemplateConfig =
+  {
+    id: 'tennis-club-membership-certificate-print-count',
+    event: 'tennis-club-membership',
+    label: {
+      id: 'certificates.tennis-club-membership.certificate.print-count',
+      defaultMessage: 'Tennis Club Membership Certificate (Replacement Copy)',
+      description:
+        'The label for a replacement tennis club membership certificate shown after multiple prints'
+    },
+    isDefault: false,
+    svgUrl: '/certificates/tennis-club-membership-print-count.svg',
+    svg: '<svg>Replacement Certificate</svg>',
+    fee: {
+      onTime: 25,
+      late: 30,
+      delayed: 35
+    },
+    conditionals: [
+      {
+        type: 'SHOW',
+        conditional: {
+          type: 'object',
+          properties: {
+            event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  contains: {
+                    type: 'object',
+                    properties: {
+                      type: { const: 'PRINT_CERTIFICATE' }
+                    },
+                    required: ['type']
+                  }
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['event']
+        } as unknown as JSONSchema
+      }
+    ]
+  }
+
+export const tennisClubMembershipCertificateWithMultiplePrintConditionals: CertificateTemplateConfig =
+  {
+    id: 'tennis-club-membership-certificate-multiple-print',
+    event: 'tennis-club-membership',
+    label: {
+      id: 'certificates.tennis-club-membership.certificate.multiple-print',
+      defaultMessage: 'Tennis Club Membership Certificate (Multiple Prints)',
+      description:
+        'The label for a tennis club membership certificate shown after multiple prints'
+    },
+    isDefault: false,
+    svgUrl: '/certificates/tennis-club-membership-multiple-print.svg',
+    svg: '<svg>Multiple Print Certificate</svg>',
+    fee: {
+      onTime: 30,
+      late: 35,
+      delayed: 40
+    },
+    conditionals: [
+      {
+        type: 'SHOW',
+        conditional: {
+          type: 'object',
+          properties: {
+            event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  minContains: 2,
+                  contains: {
+                    type: 'object',
+                    properties: {
+                      type: {
+                        const: 'PRINT_CERTIFICATE'
+                      }
+                    },
+                    required: ['type']
+                  }
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['event']
+        } as unknown as JSONSchema
+      }
+    ]
+  }
+
+// Template that shows only after the basic template has been printed at least once
+export const tennisClubMembershipReplacementCertificate: CertificateTemplateConfig =
+  {
+    id: 'tennis-club-membership-replacement-certificate',
+    event: 'tennis-club-membership',
+    label: {
+      id: 'certificates.tennis-club-membership.certificate.replacement',
+      defaultMessage: 'Replacement Tennis Club Membership Certificate',
+      description:
+        'A replacement certificate shown after the original has been printed'
+    },
+    isDefault: false,
+    svgUrl: '/certificates/tennis-club-membership-replacement.svg',
+    svg: '<svg>Replacement Certificate</svg>',
+    fee: {
+      onTime: 15, // Higher fee for replacement
+      late: 20,
+      delayed: 25
+    },
+    conditionals: [
+      {
+        type: 'SHOW',
+        conditional: {
+          type: 'object',
+          properties: {
+            event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  contains: {
+                    type: 'object',
+                    properties: {
+                      type: { const: 'PRINT_CERTIFICATE' },
+                      templateId: {
+                        const: 'tennis-club-membership-certificate'
+                      }
+                    },
+                    required: ['type', 'templateId']
+                  }
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['event']
+        } as unknown as JSONSchema
+      }
+    ]
+  }
+
+// Template that shows only after the basic template has been printed 2+ times
+export const tennisClubMembershipThirdCopyCertificate: CertificateTemplateConfig =
+  {
+    id: 'tennis-club-membership-third-copy-certificate',
+    event: 'tennis-club-membership',
+    label: {
+      id: 'certificates.tennis-club-membership.certificate.third-copy',
+      defaultMessage: 'Third Copy Tennis Club Membership Certificate',
+      description:
+        'A third copy certificate shown after 2+ prints of the original'
+    },
+    isDefault: false,
+    svgUrl: '/certificates/tennis-club-membership-third-copy.svg',
+    svg: '<svg>Third Copy Certificate</svg>',
+    fee: {
+      onTime: 25, // Even higher fee for third copy
+      late: 30,
+      delayed: 35
+    },
+    conditionals: [
+      {
+        type: 'SHOW',
+        conditional: {
+          type: 'object',
+          properties: {
+            event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  minContains: 2,
+                  contains: {
+                    type: 'object',
+                    properties: {
+                      type: { const: 'PRINT_CERTIFICATE' },
+                      templateId: {
+                        const: 'tennis-club-membership-certificate'
+                      }
+                    },
+                    required: ['type', 'templateId']
+                  }
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['event']
+        } as unknown as JSONSchema
+      }
+    ]
+  }
+
+// Template that shows as a certified copy after the basic template has been printed
+export const tennisClubMembershipDuplicateCertificate: CertificateTemplateConfig =
+  {
+    id: 'tennis-club-membership-duplicate-certificate',
+    event: 'tennis-club-membership',
+    label: {
+      id: 'certificates.tennis-club-membership.certificate.duplicate',
+      defaultMessage: 'Certified Copy Tennis Club Membership Certificate',
+      description:
+        'A certified copy certificate available after the basic template has been printed'
+    },
+    isDefault: false,
+    svgUrl: '/certificates/tennis-club-membership-duplicate.svg',
+    svg: '<svg>Certified Copy Certificate</svg>',
+    fee: {
+      onTime: 20,
+      late: 25,
+      delayed: 30
+    },
+    conditionals: [
+      {
+        type: 'SHOW',
+        conditional: {
+          type: 'object',
+          properties: {
+            event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  contains: {
+                    type: 'object',
+                    properties: {
+                      type: { const: 'PRINT_CERTIFICATE' },
+                      templateId: {
+                        const: 'tennis-club-membership-certificate'
+                      }
+                    },
+                    required: ['type', 'templateId']
+                  }
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['event']
+        } as unknown as JSONSchema
+      }
+    ]
+  }
+
+// Template that can be re-ordered after it has been printed (self-referential)
+export const tennisClubMembershipReorderCertificate: CertificateTemplateConfig =
+  {
+    id: 'tennis-club-membership-reorder-certificate',
+    event: 'tennis-club-membership',
+    label: {
+      id: 'certificates.tennis-club-membership.certificate.reorder',
+      defaultMessage: 'Re-order Tennis Club Membership Certificate',
+      description:
+        'A certificate that can be re-ordered after it has been printed once'
+    },
+    isDefault: false,
+    svgUrl: '/certificates/tennis-club-membership-reorder.svg',
+    svg: '<svg>Re-order Certificate</svg>',
+    fee: {
+      onTime: 30,
+      late: 35,
+      delayed: 40
+    },
+    conditionals: [
+      {
+        type: 'SHOW',
+        conditional: {
+          type: 'object',
+          properties: {
+            event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  contains: {
+                    type: 'object',
+                    properties: {
+                      type: { const: 'PRINT_CERTIFICATE' },
+                      templateId: {
+                        const: 'tennis-club-membership-reorder-certificate'
+                      }
+                    },
+                    required: ['type', 'templateId']
+                  }
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['event']
         } as unknown as JSONSchema
       }
     ]

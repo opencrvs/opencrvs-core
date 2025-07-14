@@ -682,7 +682,16 @@ export function generateActionDocument({
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
     case ActionType.PRINT_CERTIFICATE:
-      return { ...actionBase, type: action }
+      return {
+        ...actionBase,
+        type: action,
+        // Default to the event type + '-certificate' for backwards compatibility
+        // Real implementations can override this with specific template IDs
+        templateId:
+          'templateId' in defaults && typeof defaults.templateId === 'string'
+            ? defaults.templateId
+            : `${configuration.id}-certificate`
+      }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
