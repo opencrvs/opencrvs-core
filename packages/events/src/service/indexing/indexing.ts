@@ -135,7 +135,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
         }
@@ -153,7 +153,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'nested',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' },
           option: { type: 'keyword' }
