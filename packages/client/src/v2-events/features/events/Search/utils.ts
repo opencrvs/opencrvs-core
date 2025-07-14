@@ -28,7 +28,8 @@ import {
   getDeclarationFields,
   DateRangeFieldValue,
   SelectDateRangeValue,
-  timePeriodToDateRange
+  timePeriodToDateRange,
+  NameFieldUpdateValue
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
 import { EventStatus } from '@opencrvs/commons/client'

@@ -15,6 +15,7 @@ import {
   FieldType,
   getValidatorsForField,
   joinValues,
+  NameFieldUpdateValue,
   NameFieldValue,
   TextField
 } from '@opencrvs/commons/client'
@@ -190,7 +191,7 @@ function NameInput(props: Props) {
   )
 }
 
-function stringify(value?: NameFieldValue) {
+function stringify(value?: NameFieldUpdateValue) {
   return joinValues([value?.firstname, value?.middlename, value?.surname])
 }
 
