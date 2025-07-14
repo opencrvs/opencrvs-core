@@ -63,6 +63,7 @@ interface Window {
     STATISTICS_DASHBOARD_URL: string
     LEADERBOARDS_DASHBOARD_URL: string
     SIGNATURE_REQUIRED_FOR_ROLES: string[]
+    SYSTEM_IANA_TIMEZONE: string
   }
   __localeId__: string
   __WB_MANIFEST: Array<{ url: string; revision: string }>

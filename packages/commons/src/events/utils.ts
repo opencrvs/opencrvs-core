@@ -44,6 +44,8 @@ import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
+import { SelectDateRangeValue } from './FieldValue'
+import { subDays } from 'date-fns'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -63,6 +65,17 @@ export function getDeclarationPages(configuration: EventConfig) {
 
 export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
+}
+
+export function getPrintCertificatePages(configuration: EventConfig) {
+  const action = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  return getOrThrow(
+    action?.printForm.pages,
+    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
+  )
 }
 
 export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
@@ -386,4 +399,26 @@ export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
     (eventConfiguration) => eventConfiguration.id === id
   )
   return getOrThrow(eventConfig, `Event config for ${id} not found`)
+}
+
+export function timePeriodToDateRange(value: SelectDateRangeValue) {
+  let startDate: Date
+  switch (value) {
+    case 'last7Days':
+      startDate = subDays(new Date(), 6)
+      break
+    case 'last30Days':
+      startDate = subDays(new Date(), 29)
+      break
+    case 'last90Days':
+      startDate = subDays(new Date(), 89)
+      break
+    case 'last365Days':
+      startDate = subDays(new Date(), 364)
+      break
+  }
+  return {
+    startDate: startDate.toISOString(),
+    endDate: new Date().toISOString()
+  }
 }

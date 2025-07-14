@@ -31,12 +31,10 @@ import {
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
-import { defailtNameFieldValue } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields,
+  getMetadataFieldConfigs,
   serializeSearchParams
 } from './utils'
 const MIN_PARAMS_TO_SEARCH = 2
@@ -81,6 +79,15 @@ function enhanceFieldWithSearchFieldConfig(
     return {
       ...field,
       configuration: {
+        searchMode: true
+      }
+    }
+  }
+  if (field.type === FieldType.NAME) {
+    return {
+      ...field,
+      configuration: {
+        ...field.configuration,
         searchMode: true
       }
     }
@@ -156,7 +163,7 @@ function buildSearchSections({
   const allUniqueFields = getAllUniqueFields(enhancedEvent)
 
   return enhancedEvent.advancedSearch.map((section) => {
-    const metadataFields = getDefaultSearchFields(section)
+    const metadataFields = getMetadataFieldConfigs(section.fields)
 
     const matchingFields = allUniqueFields.filter((f) =>
       section.fields.some((searchField) => searchField.fieldId === f.id)
@@ -237,11 +244,12 @@ export function TabSearch({
   const nonEmptyValues = filterEmptyValues(formValues)
 
   const handleSearch = () => {
-    const fieldTypesWithDefaults: FieldType[] = [FieldType.NAME]
-
-    const fields = enhancedEvent.declaration.pages.flatMap(
-      (page) => page.fields
-    )
+    const fields = [
+      ...enhancedEvent.declaration.pages.flatMap((page) => page.fields),
+      ...getMetadataFieldConfigs(
+        enhancedEvent.advancedSearch.flatMap((section) => section.fields)
+      )
+    ]
 
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
@@ -249,19 +257,15 @@ export function TabSearch({
         if (!field || !isFieldVisible(field, formValues)) {
           return result
         }
-
-        if (fieldTypesWithDefaults.includes(field.type)) {
-          // If the field is a NAME type, we want to merge the default value with the current value
-          // This is to ensure that the NAME field always has a default structure
-          // even if the user has not filled it yet. Otherwise, it will throw invalid field error
-          // when the user tries to search without filling all the NAME fields (ex: { firstname: "Jhon", surname: undefined }).
-
-          if (field.type === FieldType.NAME) {
-            const mergedValue = mergeWithoutNullsOrUndefined(
-              defailtNameFieldValue,
-              value as NameFieldValue
-            )
-            return { ...result, [fieldId]: mergedValue }
+        if (field.type === FieldType.NAME && typeof value === 'object') {
+          const nameValue = NameFieldValue.safeParse(value)
+          if (
+            nameValue.success &&
+            !nameValue.data.firstname &&
+            !nameValue.data.surname &&
+            !nameValue.data.middlename
+          ) {
+            return result
           }
         }
 

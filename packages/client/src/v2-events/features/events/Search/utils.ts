@@ -9,15 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable max-lines */
-import startOfDay from 'date-fns/startOfDay'
-import addMinutes from 'date-fns/addMinutes'
-import endOfDay from 'date-fns/endOfDay'
-import parse from 'date-fns/parse'
+import { isArray, isNil, isPlainObject, isString, partition } from 'lodash'
 import { parse as parseQuery, stringify } from 'query-string'
-import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import { useSelector } from 'react-redux'
 import {
-  AdvancedSearchConfig,
   EventConfig,
   FieldConfig,
   QueryInputType,
@@ -30,6 +25,10 @@ import {
   FieldType,
   QueryExpression,
   NameFieldValue,
+  getDeclarationFields,
+  DateRangeFieldValue,
+  SelectDateRangeValue,
+  timePeriodToDateRange,
   AddressFieldValue
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
@@ -42,6 +41,7 @@ import { getScope } from '@client/profile/profileSelectors'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 
 export const getAdvancedSearchFieldErrors = (
   currentEvent: EventConfig,
@@ -96,8 +96,8 @@ const defaultSearchFieldGenerator: Record<
   EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
-  [EventFieldId.enum['legalStatus.REGISTERED.createdAtLocation']]: (_) => ({
-    id: 'event.legalStatus.REGISTERED.createdAtLocation',
+  'legalStatuses.REGISTERED.createdAtLocation': (_) => ({
+    id: 'event.legalStatuses.REGISTERED.createdAtLocation',
     type: FieldType.OFFICE,
     label: {
       defaultMessage: 'Place of registration',
@@ -110,31 +110,50 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.registeredAtLocation.helperText'
     }
   }),
-  [EventFieldId.enum['legalStatus.REGISTERED.createdAt']]: (_) => ({
-    id: 'event.legalStatus.REGISTERED.createdAt',
+  'legalStatuses.REGISTERED.acceptedAt': (_) => ({
+    id: 'event.legalStatuses.REGISTERED.acceptedAt',
     type: FieldType.DATE_RANGE,
     label: {
-      defaultMessage: 'Date of registration',
+      defaultMessage: 'Date of the registration was accepted',
       description: 'Label for date of registration field',
       id: 'v2.advancedSearch.registeredAt'
     }
   }),
-  [EventFieldId.enum.updatedAt]: (config) => ({
-    id: 'event.updatedAt',
-    type: FieldType.SELECT,
-    label: {
-      defaultMessage: 'Time period',
-      description: 'Label for date of update field',
-      id: 'v2.advancedSearch.updatedAt'
-    },
-    helperText: {
-      defaultMessage: 'Period of time since the record status changed',
-      description: 'Helper text for date of update field',
-      id: 'v2.advancedSearch.updatedAt.helperText'
-    },
-    options: config.options ?? []
-  }),
-  [EventFieldId.enum.trackingId]: (_) => ({
+  updatedAt: (_) => {
+    if (_.config.type === 'range') {
+      return {
+        id: 'event.updatedAt',
+        type: FieldType.SELECT_DATE_RANGE,
+        label: {
+          defaultMessage: 'Time period',
+          description: 'Label for date of update field',
+          id: 'v2.advancedSearch.updatedAt'
+        },
+        helperText: {
+          defaultMessage: 'Period of time since the record status changed',
+          description: 'Helper text for date of update field',
+          id: 'v2.advancedSearch.updatedAt.helperText'
+        },
+        options: timePeriodOptions
+      }
+    } else {
+      return {
+        id: 'event.updatedAt',
+        type: FieldType.DATE_RANGE,
+        label: {
+          defaultMessage: 'Time period',
+          description: 'Label for date of update field',
+          id: 'v2.advancedSearch.updatedAt'
+        },
+        helperText: {
+          defaultMessage: 'Period of time since the record status changed',
+          description: 'Helper text for date of update field',
+          id: 'v2.advancedSearch.updatedAt.helperText'
+        }
+      }
+    }
+  },
+  trackingId: (_) => ({
     id: 'event.trackingId',
     type: FieldType.TEXT,
     label: {
@@ -143,7 +162,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.trackingId'
     }
   }),
-  [EventFieldId.enum.status]: (config) => ({
+  status: (_) => ({
     id: 'event.status',
     type: FieldType.SELECT,
     label: {
@@ -151,25 +170,26 @@ const defaultSearchFieldGenerator: Record<
       description: 'Label for status field',
       id: 'v2.advancedSearch.status'
     },
-    options: config.options ?? []
+    options: statusOptions
   })
-}
+} satisfies Record<EventFieldId, (config: SearchField) => FieldConfig>
 
 function isEventFieldId(id: string): id is EventFieldId {
-  return Object.values(EventFieldId.enum).includes(id as EventFieldId)
+  return EventFieldId.safeParse(id).success
 }
 
-export const getDefaultSearchFields = (
-  section: AdvancedSearchConfig
+export const getMetadataFieldConfigs = (
+  fields: SearchField[]
 ): FieldConfig[] => {
   const searchFields: FieldConfig[] = []
-  section.fields.forEach((fieldConfig) => {
+  fields.forEach((fieldConfig) => {
     const fieldId = fieldConfig.fieldId
     if (isEventFieldId(fieldId)) {
       const generator = defaultSearchFieldGenerator[fieldId]
       searchFields.push(generator(fieldConfig))
     }
   })
+
   return searchFields
 }
 
@@ -221,7 +241,7 @@ export function toAdvancedSearchQueryType(
   }
 }
 
-function buildCondition(
+function buildSearchClause(
   value: string,
   type: keyof typeof MatchType = 'exact'
 ): Condition {
@@ -240,37 +260,21 @@ function buildCondition(
   }
 }
 
+function toRangeDateString(value: DateRangeFieldValue): string {
+  const parsedValue = DateRangeFieldValue.parse(value)
+  if (typeof parsedValue === 'string') {
+    return `${parsedValue},${parsedValue}`
+  }
+  return `${parsedValue.start},${parsedValue.end}`
+}
+
+function timePeriodToRangeString(value: SelectDateRangeValue): string {
+  const { startDate, endDate } = timePeriodToDateRange(value)
+  return `${startDate},${endDate}`
+}
+
 function buildConditionForStatus(): Condition {
   return { type: 'anyOf', terms: Object.values([...EventStatus.options]) }
-}
-/**
- * Converts a date range input string into a UTC-based range string.
- *
- * This function:
- * - Takes a date range input in the format "YYYY-MM-DD,YYYY-MM-DD" or "YYYY-MM-DD".
- * - Converts the local date(s) to UTC by adjusting for the current timezone offset.
- * - Returns a string formatted as "startUTC,endUTC".
- *
- * @param {string} inputDateString - The date range input string.
- * @returns {string} A comma-separated string of ISO-formatted UTC start and end timestamps.
- */
-function getUtcRangeFromInput(inputDateString: string) {
-  const offsetMinutes = new Date().getTimezoneOffset()
-
-  const [startDateStr, endDateStr] = inputDateString
-    .split(',')
-    .map((s) => s.trim())
-
-  const dateFormat = 'yyyy-MM-dd'
-  const startLocal = startOfDay(parse(startDateStr, dateFormat, new Date()))
-  const endLocal = endOfDay(
-    parse(endDateStr || startDateStr, dateFormat, new Date())
-  )
-
-  const utcStart = addMinutes(startLocal, offsetMinutes)
-  const utcEnd = addMinutes(endLocal, offsetMinutes)
-
-  return `${utcStart.toISOString()},${utcEnd.toISOString()}`
 }
 
 /**
@@ -287,14 +291,14 @@ function getUtcRangeFromInput(inputDateString: string) {
  *   config?: { type: keyof typeof MatchType },
  *   fieldType: 'field' | 'event',
  *   fieldConfig?: FieldConfig
- * }>} searchKeys - The list of fields with their metadata used to build query conditions.
+ * }>} searchConfigurations - The list of fields with their metadata used to build query conditions.
  *
- * @param {EventState} rawInput - The user input or query parameters in flat key-value form.
+ * @param {EventState} searchInput - The user input or query parameters in flat key-value form.
  *
  * @returns {Record<string, Condition>} A mapping of transformed field keys to their respective query conditions.
  */
-function buildDataConditionFromSearchKeys(
-  searchKeys: {
+function buildSearchQueryFields(
+  searchConfigurations: {
     fieldId: string
     config?: {
       type: keyof typeof MatchType
@@ -302,62 +306,156 @@ function buildDataConditionFromSearchKeys(
     fieldType: 'field' | 'event'
     fieldConfig?: FieldConfig
   }[],
-  rawInput: EventState // values from UI or query string
+  searchInput: EventState // values from UI or query string
 ): Record<string, Condition> {
-  return searchKeys.reduce(
-    (
-      result: Record<string, Condition>,
-      { fieldId, fieldType, config, fieldConfig }
-    ) => {
-      let value = String(rawInput[fieldId])
-      if (fieldId === 'event.status' && value === 'ALL') {
-        const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
-        result[transformedKey] = buildConditionForStatus()
-      } else if (value) {
-        let searchType = config?.type
-        // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
-        // we treat the input as a range, regardless of whether the user entered a single date (e.g., "2023-01-01")
-        // or a date range (e.g., "2023-01-01,2023-12-31").
-        // In both cases, we convert the local date(s) into a UTC-based range to ensure
-        // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
-        if (
-          (fieldConfig?.type === FieldType.DATE_RANGE ||
-            fieldConfig?.type === FieldType.DATE) &&
-          fieldType === 'event'
-        ) {
-          searchType = 'range'
-          value = getUtcRangeFromInput(value)
-        }
-        if (
-          fieldConfig?.type === FieldType.NAME &&
-          NameFieldValue.safeParse(rawInput[fieldId]).success
-        ) {
-          value = Name.stringify(rawInput[fieldId] as NameFieldValue)
-        }
-        if (
-          fieldConfig?.type === FieldType.ADDRESS &&
-          AddressFieldValue.safeParse(rawInput[fieldId]).success
-        ) {
-          value = JSON.stringify(rawInput[fieldId])
-        }
-        // Handle the case where we want to search by range but the value is not a comma-separated string
-        // e.g. "2023-01-01,2023-12-31" should be treated as a range
-        // but "2023-01-01" should be treated as an exact match
-        else if (config?.type === 'range' && value.split(',').length === 1) {
-          searchType = 'exact'
-        }
+  // return searchKeys.reduce(
+  //   (
+  //     result: Record<string, Condition>,
+  //     { fieldId, fieldType, config, fieldConfig }
+  //   ) => {
+  //     let value = String(rawInput[fieldId])
+  //     if (fieldId === 'event.status' && value === 'ALL') {
+  //       const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
+  //       result[transformedKey] = buildConditionForStatus()
+  //     } else if (value) {
+  //       let searchType = config?.type
+  //       // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
+  //       // we treat the input as a range, regardless of whether the user entered a single date (e.g., "2023-01-01")
+  //       // or a date range (e.g., "2023-01-01,2023-12-31").
+  //       // In both cases, we convert the local date(s) into a UTC-based range to ensure
+  //       // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
+  //       if (
+  //         (fieldConfig?.type === FieldType.DATE_RANGE ||
+  //           fieldConfig?.type === FieldType.DATE) &&
+  //         fieldType === 'event'
+  //       ) {
+  //         searchType = 'range'
+  //         value = getUtcRangeFromInput(value)
+  //       }
+  //       if (
+  //         fieldConfig?.type === FieldType.NAME &&
+  //         NameFieldValue.safeParse(rawInput[fieldId]).success
+  //       ) {
+  //         value = Name.stringify(rawInput[fieldId] as NameFieldValue)
+  //       }
+  //       if (
+  //         fieldConfig?.type === FieldType.ADDRESS &&
+  //         AddressFieldValue.safeParse(rawInput[fieldId]).success
+  //       ) {
+  //         value = JSON.stringify(rawInput[fieldId])
+  //       }
+  //       // Handle the case where we want to search by range but the value is not a comma-separated string
+  //       // e.g. "2023-01-01,2023-12-31" should be treated as a range
+  //       // but "2023-01-01" should be treated as an exact match
+  //       else if (config?.type === 'range' && value.split(',').length === 1) {
+  //         searchType = 'exact'
+  //       }
+  return searchConfigurations.reduce(
+    (result: Record<string, Condition>, config) => {
+      const value = searchInput[config.fieldId]
+      // @TODO: Double check whether we are actually reverting this on the next step. Ideally we would not leak ____ to user.
+      const transformedKey = config.fieldId.replace(/\./g, FIELD_SEPARATOR)
 
-        const condition = buildCondition(value, searchType)
-        const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
-        result[transformedKey] = condition
+      // Handle the case where we want to search by range but the value is not a comma-separated string
+      // e.g. "2023-01-01,2023-12-31" should be treated as a range
+      // but "2023-01-01" should be treated as an exact match
+      let searchType = config.config?.type ?? 'exact'
+      if (
+        searchType === 'range' &&
+        typeof value === 'string' &&
+        value.split(',').length === 1
+      ) {
+        searchType = 'exact'
       }
-      return result
+
+      if (!value) {
+        return result
+      }
+
+      if (config.fieldId === 'event.status' && value === 'ALL') {
+        return {
+          ...result,
+          [transformedKey]: buildConditionForStatus()
+        }
+      }
+
+      if (config.fieldId === 'event.updatedAt') {
+        return {
+          ...result,
+          [transformedKey]: buildSearchClause(
+            timePeriodToRangeString(SelectDateRangeValue.parse(value)),
+            'range'
+          )
+        }
+      }
+
+      if (config.fieldConfig?.type === FieldType.NAME) {
+        const parsedName = NameFieldValue.safeParse(searchInput[config.fieldId])
+
+        if (parsedName.success) {
+          if (Name.stringify(parsedName.data) === '') {
+            return result
+          }
+          return {
+            ...result,
+            [transformedKey]: buildSearchClause(
+              Name.stringify(parsedName.data),
+              searchType
+            )
+          }
+        }
+      }
+
+      if (
+        config.fieldConfig?.type === FieldType.ADDRESS &&
+        AddressFieldValue.safeParse(searchInput[config.fieldId]).success
+      ) {
+        return {
+          ...result,
+          [transformedKey]: buildSearchClause(
+            JSON.stringify(searchInput[config.fieldId]),
+            searchType
+          )
+        }
+      }
+
+      // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
+      // we treat the input as a range, regardless of whether the user entered a single date (e.g., "2023-01-01")
+      // or a date range (e.g., {"2023-01-01,2024-01-01").
+      // In both cases, we convert the local date(s) into a UTC-based range to ensure
+      // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
+      if (
+        config.fieldType === 'event' &&
+        (config.fieldConfig?.type === FieldType.DATE_RANGE ||
+          config.fieldConfig?.type === FieldType.DATE)
+      ) {
+        return {
+          ...result,
+          [transformedKey]: buildSearchClause(
+            toRangeDateString(DateRangeFieldValue.parse(value)),
+            'range'
+          )
+        }
+      }
+
+      return {
+        ...result,
+        // @TODO: Previously an issue was fixed by turning all the values into string. Ask Tareq about it so we can make sure the case is still handled.
+
+        [transformedKey]: buildSearchClause(value.toString(), searchType)
+      }
     },
     {}
   )
 }
 
 /**
+ *
+ * @TODO: We need to check whether buildSearchQueryFields is needed or can it be incorporated under same function.
+ * Nevertheless, we need to rewrite parts of it and see that it keep returning correct values. (Currently it does not handle all the range/date-range/select-date-range cases)
+ *
+ * @see buildSearchQueryFields
+ *
  * Builds a data condition object based on the provided event state and configuration.
  *
  * This function:
@@ -366,65 +464,88 @@ function buildDataConditionFromSearchKeys(
  * - Filters out any search keys that don't have corresponding values in the raw input (`flat`).
  * - Uses the filtered search keys and raw input to construct a query-compatible condition.
  *
- * @param {EventState} flat - A flat key-value object representing the current form/input state.
+ *
+ * @param {EventState} searchParameters - A flat key-value object representing the current search
  * @param {EventConfig} eventConfig - The event configuration object that includes
  *                                    advanced search sections and declaration field mappings.
  * @returns {QueryInputType} A query object representing the current search condition,
  *                           ready to be used for filtering or querying data.
  */
-export function buildDataCondition(
-  flat: EventState,
+export function buildSearchQuery(
+  searchParameters: EventState,
   eventConfig: EventConfig
 ): QueryInputType {
-  const advancedSearch = eventConfig.advancedSearch
-
-  // Extract default metadata-based search fields from each advanced search section.
-  const defaultMetadataSearchFields = advancedSearch.flatMap((section) =>
-    getDefaultSearchFields(section)
+  // Flatten all advanced search fields across all sections
+  const allSearchFields = eventConfig.advancedSearch.flatMap(
+    (section) => section.fields
   )
 
+  const fieldsToSearch = allSearchFields.filter(
+    // @TODO: This might actually be a bad fix. If only metadata values event. prefix, this would filter out all the rest.
+    // It might be the reason why we use  config: metadataSearchFields.find((x) => field.id.includes(x.fieldId)) below.
+    // After fixing it we should be able to just match the id.
+    (field) =>
+      !!searchParameters[`event.${field.fieldId}`] ||
+      !!searchParameters[`${field.fieldId}`]
+  )
+
+  const [metadataSearchFields, declarationSearchFields] = partition(
+    fieldsToSearch,
+    (field) => field.fieldType === 'event'
+  )
+
+  const metadataFieldConfigs = getMetadataFieldConfigs(metadataSearchFields)
+
   // Build default search key metadata for event-level fields
-  const defaultSearchKeys = defaultMetadataSearchFields.map((field) => ({
+  const metadataSearchFieldConfigs = metadataFieldConfigs.map((field) => ({
     fieldId: field.id,
     // Find matching event field config based on fieldId pattern
-    config: advancedSearch
-      .flatMap((x) => x.fields)
-      .filter((x) => x.fieldType === 'event')
-      .find((x) => field.id.includes(x.fieldId))?.config,
+    // @TODO: is the `event.` pattern added here previously or why we are using includes for string? Unsafe.
+    // @TODO: Check whether both config and fieldConfig are needed. Does not make sense to me.
+    config: metadataSearchFields.find((x) => field.id.includes(x.fieldId))
+      ?.config,
     fieldType: 'event' as const,
     fieldConfig: field
   }))
 
-  // Flatten all advanced search fields across all sections
-  const allFields = advancedSearch.flatMap((section) => section.fields)
+  // This whole thing seems to be "the wrong way around" to get the configurations.
+  const declarationFields = getDeclarationFields(eventConfig).filter(
+    (field) => !!searchParameters[field.id]
+  )
 
   // Build a list of search keys from all advanced search fields,
   // linking each to the corresponding declaration field config
-  const searchKeys = allFields.map((field) => ({
-    fieldId: field.fieldId,
-    config: field.config, // assumes each advanced search field has a config
-    fieldType: field.fieldType,
-    fieldConfig: eventConfig.declaration.pages
-      .flatMap((page) => page.fields)
-      .find((f) => f.id === field.fieldId)
-  }))
-
-  // Combine default and advanced search keys, and filter to only include keys
-  // that are present in the actual flat input data (i.e., user provided values)
-  const filteredSearchKeys = [...defaultSearchKeys, ...searchKeys].filter(
-    (searchKey) => Object.keys(flat).some((key) => key === searchKey.fieldId)
+  const declarationSearchFieldConfigs = declarationSearchFields.map(
+    (field) => ({
+      fieldId: field.fieldId,
+      config: field.config, // assumes each advanced search field has a config
+      fieldType: field.fieldType,
+      // @TODO: It seems that config and fieldConfig would be the same?
+      fieldConfig: declarationFields.find((f) => f.id === field.fieldId)
+    })
   )
 
+  const searchConfigs = [
+    ...metadataSearchFieldConfigs,
+    ...declarationSearchFieldConfigs
+  ]
+
   // Generate the final query condition object from the filtered keys and raw input
-  return buildDataConditionFromSearchKeys(filteredSearchKeys, flat)
+  const foo = buildSearchQueryFields(searchConfigs, searchParameters)
+
+  return foo
 }
 
+/**
+ * @returns field configurations for advanced search fields (@see EventFieldId) and declaration fields that are in the search parameters.
+ */
 export function getSearchParamsFieldConfigs(
   eventConfig: EventConfig,
   searchParams: SearchQueryParams
 ): Inferred[] {
-  const eventFieldConfigs = Object.entries(eventConfig.advancedSearch).flatMap(
-    ([, value]) => getDefaultSearchFields(value)
+  // Flatten all advanced search fields across all sections
+  const allSearchFields = eventConfig.advancedSearch.flatMap(
+    (section) => section.fields
   )
   const declarationFieldConfigs = getAllUniqueFields(eventConfig).map((x) => {
     if (x.type === FieldType.ADDRESS) {
@@ -432,15 +553,23 @@ export function getSearchParamsFieldConfigs(
     }
     return x
   })
+
+  const metadataFieldConfigs = getMetadataFieldConfigs(allSearchFields)
+
   const searchFieldConfigs = [
-    ...eventFieldConfigs,
+    ...metadataFieldConfigs,
     ...declarationFieldConfigs
   ].filter((field) => {
     return Object.keys(searchParams).some((key) => key === field.id)
   })
+
   return searchFieldConfigs
 }
 
+/**
+ * @returns A filtered object of search parameters that include only fields in the event configuration.
+ *
+ */
 export function parseFieldSearchParams(
   eventConfig: EventConfig,
   searchParams: SearchQueryParams
@@ -449,11 +578,14 @@ export function parseFieldSearchParams(
     eventConfig,
     searchParams
   )
+
+  // filter out any unrelated search parameters
   const filteredSearchParams = Object.fromEntries(
     Object.entries(searchParams).filter(([key]) =>
       searchFieldConfigs.some((config) => config.id === key)
     )
   )
+
   return filteredSearchParams
 }
 
@@ -475,7 +607,7 @@ function metadataFieldTypeMapping(value: string) {
         term: value,
         type: 'exact' as const
       },
-      'legalStatus.REGISTERED.registrationNumber': {
+      'legalStatuses.REGISTERED.registrationNumber': {
         term: value,
         type: 'exact' as const
       }

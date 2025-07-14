@@ -35,9 +35,11 @@ import { NavigationHistoryProvider } from '@client/v2-events/components/Navigati
 import {
   addUserToQueryData,
   setEventData,
-  addLocalEventConfig
+  addLocalEventConfig,
+  setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
+  Draft,
   EventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
@@ -66,8 +68,6 @@ initialize({
     print.warning()
   }
 })
-
-const { store } = createStore()
 
 type WrapperProps = PropsWithChildren<{
   store: ReturnType<typeof createStore>['store']
@@ -183,7 +183,8 @@ const preview: Preview = {
         id: generator.user.id.localRegistrar,
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: 'LOCAL_REGISTRAR',
-        signature: undefined
+        signature: undefined,
+        avatar: undefined
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline
@@ -193,6 +194,11 @@ const preview: Preview = {
         setEventData(event.id, event)
       })
 
+      if (options.parameters?.offline?.drafts) {
+        const offlineDrafts: Array<Draft> = options.parameters.offline.drafts
+        setDraftData(() => offlineDrafts)
+      }
+
       //  Intermittent failures starts to happen when global state gets out of whack.
       // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
       await new Promise((resolve) => setTimeout(resolve, 50))
@@ -200,6 +206,8 @@ const preview: Preview = {
   ],
   decorators: [
     (Story, context) => {
+      const { store } = createStore()
+
       return (
         <Wrapper
           store={store}

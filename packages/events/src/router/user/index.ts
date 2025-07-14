@@ -11,20 +11,24 @@
 
 import { z } from 'zod'
 import { TRPCError } from '@trpc/server'
+import { User } from '@opencrvs/commons'
 import { router, publicProcedure } from '@events/router/trpc'
 import { getUsersById } from '@events/service/users/users'
 
 export const userRouter = router({
-  get: publicProcedure.input(z.string()).query(async (options) => {
-    const [user] = await getUsersById([options.input], options.ctx.token)
+  get: publicProcedure
+    .input(z.string())
+    .output(User)
+    .query(async (options) => {
+      const [user] = await getUsersById([options.input], options.ctx.token)
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    if (!user) {
-      throw new TRPCError({ code: 'NOT_FOUND' })
-    }
+      // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+      if (!user) {
+        throw new TRPCError({ code: 'NOT_FOUND' })
+      }
 
-    return user
-  }),
+      return user
+    }),
   list: publicProcedure
     .input(z.array(z.string()))
     .query(async (options) => getUsersById(options.input, options.ctx.token))

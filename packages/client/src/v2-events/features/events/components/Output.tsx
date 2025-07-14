@@ -36,7 +36,8 @@ import {
   isTextFieldType,
   isNameFieldType,
   isIdFieldType,
-  isPhoneFieldType
+  isPhoneFieldType,
+  isSelectDateRangeFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -110,7 +111,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     return BulletList.Output
   }
 
-  if (isSelectFieldType(field)) {
+  if (isSelectFieldType(field) || isSelectDateRangeFieldType(field)) {
     return Select.Output({
       options: field.config.options,
       value: field.value

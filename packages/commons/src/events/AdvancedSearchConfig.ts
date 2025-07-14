@@ -102,8 +102,8 @@ export const FieldConfigSchema = BaseField.extend({
 export const EventFieldId = z.enum([
   'trackingId',
   'status',
-  'legalStatus.REGISTERED.createdAt',
-  'legalStatus.REGISTERED.createdAtLocation',
+  'legalStatuses.REGISTERED.acceptedAt',
+  'legalStatuses.REGISTERED.createdAtLocation',
   'updatedAt'
 ])
 
