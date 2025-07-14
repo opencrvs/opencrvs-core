@@ -35,5 +35,13 @@ export async function fileExists(path: FullDocumentPath, token: string) {
     }
   )
 
-  return res.ok
+  if (res.status === 404) {
+    return false
+  } else if (!res.ok) {
+    throw new Error(
+      `Failed to check file existence: ${res.status} ${res.statusText}`
+    )
+  }
+
+  return true
 }

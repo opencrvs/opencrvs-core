@@ -210,6 +210,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     if (!clause[key]) {
       continue
     }
+
     switch (key) {
       case 'id': {
         must.push({

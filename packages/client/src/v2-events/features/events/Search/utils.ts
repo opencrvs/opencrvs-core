@@ -28,8 +28,8 @@ import {
   getDeclarationFields,
   DateRangeFieldValue,
   SelectDateRangeValue,
-  timePeriodToDateRange,
-  AddressFieldValue
+  AddressFieldValue,
+  timePeriodToDateRange
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
 import { EventStatus } from '@opencrvs/commons/client'
@@ -308,48 +308,6 @@ function buildSearchQueryFields(
   }[],
   searchInput: EventState // values from UI or query string
 ): Record<string, Condition> {
-  // return searchKeys.reduce(
-  //   (
-  //     result: Record<string, Condition>,
-  //     { fieldId, fieldType, config, fieldConfig }
-  //   ) => {
-  //     let value = String(rawInput[fieldId])
-  //     if (fieldId === 'event.status' && value === 'ALL') {
-  //       const transformedKey = fieldId.replace(/\./g, FIELD_SEPARATOR)
-  //       result[transformedKey] = buildConditionForStatus()
-  //     } else if (value) {
-  //       let searchType = config?.type
-  //       // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
-  //       // we treat the input as a range, regardless of whether the user entered a single date (e.g., "2023-01-01")
-  //       // or a date range (e.g., "2023-01-01,2023-12-31").
-  //       // In both cases, we convert the local date(s) into a UTC-based range to ensure
-  //       // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
-  //       if (
-  //         (fieldConfig?.type === FieldType.DATE_RANGE ||
-  //           fieldConfig?.type === FieldType.DATE) &&
-  //         fieldType === 'event'
-  //       ) {
-  //         searchType = 'range'
-  //         value = getUtcRangeFromInput(value)
-  //       }
-  //       if (
-  //         fieldConfig?.type === FieldType.NAME &&
-  //         NameFieldValue.safeParse(rawInput[fieldId]).success
-  //       ) {
-  //         value = Name.stringify(rawInput[fieldId] as NameFieldValue)
-  //       }
-  //       if (
-  //         fieldConfig?.type === FieldType.ADDRESS &&
-  //         AddressFieldValue.safeParse(rawInput[fieldId]).success
-  //       ) {
-  //         value = JSON.stringify(rawInput[fieldId])
-  //       }
-  //       // Handle the case where we want to search by range but the value is not a comma-separated string
-  //       // e.g. "2023-01-01,2023-12-31" should be treated as a range
-  //       // but "2023-01-01" should be treated as an exact match
-  //       else if (config?.type === 'range' && value.split(',').length === 1) {
-  //         searchType = 'exact'
-  //       }
   return searchConfigurations.reduce(
     (result: Record<string, Condition>, config) => {
       const value = searchInput[config.fieldId]
@@ -549,6 +507,9 @@ export function getSearchParamsFieldConfigs(
   )
   const declarationFieldConfigs = getAllUniqueFields(eventConfig).map((x) => {
     if (x.type === FieldType.ADDRESS) {
+      return { ...x, configuration: { searchMode: true } }
+    }
+    if (x.type === FieldType.NAME) {
       return { ...x, configuration: { searchMode: true } }
     }
     return x

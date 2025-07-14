@@ -173,12 +173,15 @@ function buildSearchSections({
 
     const modifiedFields = combinedFields.map((f) => {
       const fieldSearchConfig = section.fields.find((a) => a.fieldId === f.id)
+      let optionsOverride = {}
+      if (fieldSearchConfig?.options && fieldSearchConfig.options.length > 0) {
+        optionsOverride = {
+          options: fieldSearchConfig.options
+        }
+      }
       return {
         ...f,
-        ...(fieldSearchConfig?.options &&
-          fieldSearchConfig.options.length > 0 && {
-            options: fieldSearchConfig.options
-          }),
+        ...optionsOverride,
         required: false as const,
         conditionals: fieldSearchConfig?.conditionals ?? f.conditionals,
         validation: fieldSearchConfig?.validations ?? f.validation
