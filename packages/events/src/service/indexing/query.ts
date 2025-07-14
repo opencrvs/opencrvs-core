@@ -105,7 +105,7 @@ function generateQuery(
         const allIds = [fieldId, ...(alternateFieldMap[fieldId] ?? [])]
 
         if (
-          alternateFieldMap[fieldId] &&
+          fieldId in alternateFieldMap &&
           alternateFieldMap[fieldId].length > 0
         ) {
           const queries: estypes.QueryDslQueryContainer[] = allIds.map((id) => {
