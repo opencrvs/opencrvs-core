@@ -23,8 +23,7 @@ import { TranslationConfig } from '../events/TranslationConfig'
 
 const ajv = new Ajv({
   $data: true,
-  allowUnionTypes: true,
-  strict: false // Allow newer JSON Schema features like minContains
+  allowUnionTypes: true
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -121,9 +120,9 @@ export function areConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, unknown>
 ) {
-  return conditions.every((condition) => {
-    return ajv.validate(condition.conditional, values)
-  })
+  return conditions.every((condition) =>
+    isConditionMet(condition.conditional, values)
+  )
 }
 
 function isFieldConditionMet(
