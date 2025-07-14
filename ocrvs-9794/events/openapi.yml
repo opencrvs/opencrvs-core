@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 5ad08f41-7d5f-4681-9f22-b9e861ab13fe
+                transactionId: d968718d-6ab2-4649-9a57-a4e3aa001442
                 type: v2.birth
       responses:
         "200":
@@ -125,40 +125,54 @@ paths:
                         format: date
                         description: Date in the format YYYY-MM-DD
                       - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
                           - type: string
                             format: date
                             description: Date in the format YYYY-MM-DD
-                          - type: array
-                            maxItems: 2
-                            minItems: 2
-                            items:
-                              oneOf:
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: &a1
+                          - last7Days
+                          - last30Days
+                          - last90Days
+                          - last365Days
                       - type: boolean
                       - type: number
                       - type: object
                         properties:
-                          filename:
+                          path:
                             type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
                           originalFilename:
                             type: string
                           type:
                             type: string
                         required:
-                          - filename
+                          - path
                           - originalFilename
                           - type
                       - type: array
                         items:
                           type: object
                           properties:
-                            filename:
+                            path:
                               type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
                             originalFilename:
                               type: string
                             type:
@@ -166,7 +180,7 @@ paths:
                             option:
                               type: string
                           required:
-                            - filename
+                            - path
                             - originalFilename
                             - type
                             - option
@@ -270,14 +284,13 @@ paths:
                                 properties:
                                   firstname:
                                     type: string
+                                    nullable: true
                                   surname:
                                     type: string
+                                    nullable: true
                                   middlename:
                                     type: string
                                     nullable: true
-                                required:
-                                  - firstname
-                                  - surname
                               - type: "null"
                   default: {}
                 annotation:
@@ -289,40 +302,50 @@ paths:
                         format: date
                         description: Date in the format YYYY-MM-DD
                       - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
                           - type: string
                             format: date
                             description: Date in the format YYYY-MM-DD
-                          - type: array
-                            maxItems: 2
-                            minItems: 2
-                            items:
-                              oneOf:
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
-                                - type: string
-                                  format: date
-                                  description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: *a1
                       - type: boolean
                       - type: number
                       - type: object
                         properties:
-                          filename:
+                          path:
                             type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
                           originalFilename:
                             type: string
                           type:
                             type: string
                         required:
-                          - filename
+                          - path
                           - originalFilename
                           - type
                       - type: array
                         items:
                           type: object
                           properties:
-                            filename:
+                            path:
                               type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
                             originalFilename:
                               type: string
                             type:
@@ -330,7 +353,7 @@ paths:
                             option:
                               type: string
                           required:
-                            - filename
+                            - path
                             - originalFilename
                             - type
                             - option
@@ -434,14 +457,13 @@ paths:
                                 properties:
                                   firstname:
                                     type: string
+                                    nullable: true
                                   surname:
                                     type: string
+                                    nullable: true
                                   middlename:
                                     type: string
                                     nullable: true
-                                required:
-                                  - firstname
-                                  - surname
                               - type: "null"
                 originalActionId:
                   type: string
@@ -458,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 8486530c-b86d-4617-bc38-e467846e473a
+                transactionId: 9300e2f0-695e-4036-ba51-dbbf5e72e521
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -525,7 +547,7 @@ paths:
               - eventType: tennis-club-membership
                 status:
                   type: anyOf
-                  terms: &a13
+                  terms: &a14
                     - CREATED
                     - NOTIFIED
                     - DECLARED
@@ -619,7 +641,7 @@ paths:
                             type: string
                           createdByUserType:
                             type: string
-                            enum: &a10
+                            enum: &a11
                               - user
                               - system
                           createdAt:
@@ -649,7 +671,7 @@ paths:
                               or accepted by 3rd party integration.
                           type:
                             type: string
-                            enum: &a11
+                            enum: &a12
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -760,7 +782,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: &a1 []
+                        default: &a2 []
                       id:
                         type: string
                         description: Id of summary field
@@ -796,7 +818,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: *a1
+                        default: *a2
                       fieldId:
                         type: string
                       label:
@@ -877,7 +899,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: &a2
+                              enum: &a3
                                 - fuzzy
                                 - exact
                                 - range
@@ -957,7 +979,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: &a3 []
+                          default: &a4 []
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -999,7 +1021,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: &a4 []
+                          default: &a5 []
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -1019,7 +1041,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: *a2
+                              enum: *a3
                               description: Determines the type of field
                           required:
                             - type
@@ -1096,7 +1118,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a3
+                          default: *a4
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -1138,7 +1160,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a4
+                          default: *a5
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -1146,8 +1168,8 @@ components:
                           enum:
                             - trackingId
                             - status
-                            - legalStatus.REGISTERED.createdAt
-                            - legalStatus.REGISTERED.createdAtLocation
+                            - legalStatuses.REGISTERED.acceptedAt
+                            - legalStatuses.REGISTERED.createdAtLocation
                             - updatedAt
                         fieldType:
                           type: string
@@ -1254,7 +1276,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: &a9 []
+          default: &a10 []
         draft:
           type: boolean
         type:
@@ -1302,8 +1324,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a5 []
+              default: &a6 []
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1320,7 +1345,7 @@ components:
                 required:
                   - validator
                   - message
-              default: &a6 []
+              default: &a7 []
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1441,8 +1466,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1459,7 +1487,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1514,8 +1542,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1532,7 +1563,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1582,8 +1613,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1600,7 +1634,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1656,8 +1690,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1674,7 +1711,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1701,7 +1738,7 @@ components:
             - id
             - label
             - type
-          description: A single date input (dd-mm-YYYY)
+          description: A single date input (yyyy-MM-dd)
         - type: object
           properties:
             id:
@@ -1720,8 +1757,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1738,7 +1778,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1752,20 +1792,24 @@ components:
                 - DATE_RANGE
             defaultValue:
               anyOf:
+                - type: object
+                  properties:
+                    start:
+                      type: string
+                      format: date
+                      description: Date in the format YYYY-MM-DD
+                    end:
+                      type: string
+                      format: date
+                      description: Date in the format YYYY-MM-DD
+                  required:
+                    - start
+                    - end
                 - type: string
                   format: date
                   description: Date in the format YYYY-MM-DD
-                - type: array
-                  maxItems: 2
-                  minItems: 2
-                  items:
-                    oneOf:
-                      - type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
-                      - type: string
-                        format: date
-                        description: Date in the format YYYY-MM-DD
+              description: Date range with start and end dates in the format YYYY-MM-DD.
+                Inclusive start, exclusive end.
             configuration:
               type: object
               properties:
@@ -1777,8 +1821,7 @@ components:
             - id
             - label
             - type
-          description: "A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY
-            })"
+          description: "A date range input ({ start: yyyy-MM-dd, end: yyyy-MM-dd })"
         - type: object
           properties:
             id:
@@ -1797,8 +1840,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1815,7 +1861,84 @@ components:
                 required:
                   - validator
                   - message
+              default: *a7
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            type:
+              type: string
+              enum:
+                - SELECT_DATE_RANGE
+            defaultValue:
+              type: string
+              enum: *a1
+            options:
+              type: array
+              items:
+                type: object
+                properties:
+                  value:
+                    type: string
+                    enum: *a1
+                    description: The value of the option
+                  label:
+                    description: The label of the option
+                    allOf:
+                      - $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - value
+                  - label
+              description: A list of options
+          required:
+            - id
+            - label
+            - type
+            - options
+          description: Select input with date range options
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a field by its ID
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
               default: *a6
+            required:
+              type: boolean
+              default: false
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1838,7 +1961,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a7
+                      enum: &a8
                         - reg12
                         - reg14
                         - reg16
@@ -1872,8 +1995,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1890,7 +2016,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -1955,8 +2081,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -1973,7 +2102,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2000,7 +2129,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a7
+                      enum: *a8
               default: {}
           required:
             - id
@@ -2027,8 +2156,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2045,7 +2177,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2083,8 +2215,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2101,7 +2236,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2155,8 +2290,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2173,7 +2311,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2207,6 +2345,12 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                includeMiddlename:
+                  type: boolean
+                  default: false
+                  description: To make middle name visible in Name form field
+                searchMode:
+                  type: boolean
           required:
             - id
             - label
@@ -2230,8 +2374,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2248,7 +2395,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2286,8 +2433,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2304,7 +2454,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2342,8 +2492,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2360,7 +2513,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2397,8 +2550,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2415,7 +2571,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2430,14 +2586,16 @@ components:
             defaultValue:
               type: object
               properties:
-                filename:
+                path:
                   type: string
+                  description: A full absolute path with bucket name, starting from the root of
+                    the S3 server, /bucket-name/document-id.jpg
                 originalFilename:
                   type: string
                 type:
                   type: string
               required:
-                - filename
+                - path
                 - originalFilename
                 - type
             configuration:
@@ -2451,7 +2609,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a8
+                    enum: &a9
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -2497,8 +2655,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2515,7 +2676,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2553,8 +2714,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2571,7 +2735,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2630,8 +2794,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2648,7 +2815,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2682,8 +2849,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2700,7 +2870,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2738,8 +2908,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2756,7 +2929,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2794,8 +2967,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2812,7 +2988,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2850,8 +3026,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2868,7 +3047,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2897,7 +3076,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a8
+                    enum: *a9
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2928,8 +3107,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -2946,7 +3128,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -2991,8 +3173,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -3009,7 +3194,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3042,8 +3227,10 @@ components:
               items:
                 type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -3051,7 +3238,7 @@ components:
                   option:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
                   - option
@@ -3066,7 +3253,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a8
+                    enum: *a9
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -3096,8 +3283,11 @@ components:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a5
+              default: *a6
             required:
+              type: boolean
+              default: false
+            secured:
               type: boolean
               default: false
             placeholder:
@@ -3114,7 +3304,7 @@ components:
                 required:
                   - validator
                   - message
-              default: *a6
+              default: *a7
             label:
               $ref: "#/components/schemas/TranslationConfig"
             helperText:
@@ -3241,7 +3431,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3304,7 +3494,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3367,7 +3557,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3413,7 +3603,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3459,7 +3649,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3505,7 +3695,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3568,7 +3758,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3614,7 +3804,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3754,7 +3944,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3854,7 +4044,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -3900,7 +4090,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a9
+          default: *a10
         draft:
           type: boolean
         type:
@@ -4160,7 +4350,7 @@ components:
                     type: string
                   createdByUserType:
                     type: string
-                    enum: *a10
+                    enum: *a11
                   createdAt:
                     type: string
                     format: date-time
@@ -4188,7 +4378,7 @@ components:
                       or accepted by 3rd party integration.
                   type:
                     type: string
-                    enum: *a11
+                    enum: *a12
                 required:
                   - id
                   - transactionId
@@ -4252,7 +4442,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -4277,40 +4467,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4318,7 +4518,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4422,14 +4622,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -4441,40 +4640,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4482,7 +4691,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4586,18 +4795,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: &a12
+          enum: &a13
             - Requested
             - Accepted
             - Rejected
@@ -4631,7 +4839,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -4656,40 +4864,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4697,7 +4915,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4801,14 +5019,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -4820,40 +5037,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4861,7 +5088,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -4965,18 +5192,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -5007,7 +5233,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -5032,40 +5258,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5073,7 +5309,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5177,14 +5413,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -5196,40 +5431,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5237,7 +5482,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5341,18 +5586,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -5396,7 +5640,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -5421,40 +5665,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5462,7 +5716,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5566,14 +5820,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -5585,40 +5838,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5626,7 +5889,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5730,18 +5993,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -5772,7 +6034,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -5797,40 +6059,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5838,7 +6110,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -5942,14 +6214,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -5961,40 +6232,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6002,7 +6283,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6106,18 +6387,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -6161,7 +6441,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6186,40 +6466,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6227,7 +6517,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6331,14 +6621,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6350,40 +6639,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6391,7 +6690,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6495,18 +6794,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -6537,7 +6835,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6562,40 +6860,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6603,7 +6911,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6707,14 +7015,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6726,40 +7033,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6767,7 +7084,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -6871,18 +7188,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -6915,7 +7231,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -6940,40 +7256,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6981,7 +7307,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7085,14 +7411,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7104,40 +7429,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7145,7 +7480,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7249,18 +7584,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -7291,7 +7625,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7316,40 +7650,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7357,7 +7701,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7461,14 +7805,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7480,40 +7823,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7521,7 +7874,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7625,18 +7978,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -7670,7 +8022,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -7695,40 +8047,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7736,7 +8098,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -7840,14 +8202,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7859,40 +8220,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7900,7 +8271,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8004,18 +8375,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -8046,7 +8416,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8071,40 +8441,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8112,7 +8492,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8216,14 +8596,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8235,40 +8614,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8276,7 +8665,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8380,18 +8769,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -8425,7 +8813,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8450,40 +8838,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8491,7 +8889,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8595,14 +8993,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8614,40 +9011,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8655,7 +9062,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8759,18 +9166,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -8804,7 +9210,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -8829,40 +9235,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8870,7 +9286,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -8974,14 +9390,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8993,40 +9408,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9034,7 +9459,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9138,18 +9563,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -9180,7 +9604,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9205,40 +9629,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9246,7 +9680,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9350,14 +9784,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -9369,40 +9802,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9410,7 +9853,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9514,18 +9957,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -9556,7 +9998,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a10
+          enum: *a11
         createdAt:
           type: string
           format: date-time
@@ -9581,40 +10023,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9622,7 +10074,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9726,14 +10178,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -9745,40 +10196,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9786,7 +10247,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -9890,18 +10351,17 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type: string
           nullable: true
@@ -9968,13 +10428,13 @@ components:
           $ref: "#/components/schemas/DateCondition"
         updatedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatus.REGISTERED.createdAt:
+        legalStatuses.REGISTERED.acceptedAt:
           $ref: "#/components/schemas/DateCondition"
-        legalStatus.REGISTERED.createdAtLocation:
+        legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
-        legalStatus.REGISTERED.registrationNumber:
+        legalStatuses.REGISTERED.registrationNumber:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
           anyOf:
@@ -9987,8 +10447,7 @@ components:
         assignedTo:
           $ref: "#/components/schemas/Exact"
         createdByUserType:
-          type: string
-          enum: *a10
+          $ref: "#/components/schemas/ExactUserType"
         createdBy:
           $ref: "#/components/schemas/Exact"
         updatedBy:
@@ -10010,7 +10469,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a13
+            enum: *a14
       required:
         - type
         - terms
@@ -10023,7 +10482,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a13
+          enum: *a14
       required:
         - type
         - term
@@ -10031,6 +10490,7 @@ components:
       anyOf:
         - $ref: "#/components/schemas/ExactDate"
         - $ref: "#/components/schemas/RangeDate"
+        - $ref: "#/components/schemas/TimePeriod"
     Exact:
       type: object
       properties:
@@ -10059,21 +10519,6 @@ components:
       required:
         - type
         - term
-    Range:
-      type: object
-      properties:
-        type:
-          type: string
-          enum:
-            - range
-        gte:
-          type: string
-        lte:
-          type: string
-      required:
-        - type
-        - gte
-        - lte
     RangeDate:
       type: object
       properties:
@@ -10097,6 +10542,19 @@ components:
         - type
         - gte
         - lte
+    TimePeriod:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - timePeriod
+        term:
+          type: string
+          enum: *a1
+      required:
+        - type
+        - term
     Within:
       type: object
       properties:
@@ -10109,6 +10567,19 @@ components:
       required:
         - type
         - location
+    ExactUserType:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - exact
+        term:
+          type: string
+          enum: *a11
+      required:
+        - type
+        - term
     ContainsFlags:
       type: object
       properties:
@@ -10167,6 +10638,21 @@ components:
       required:
         - type
         - term
+    Range:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - range
+        gte:
+          type: string
+        lte:
+          type: string
+      required:
+        - type
+        - gte
+        - lte
     AnyOf:
       type: object
       properties:
@@ -10192,7 +10678,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a13
+          enum: *a14
         legalStatuses:
           type: object
           properties:
@@ -10357,40 +10843,50 @@ components:
                 format: date
                 description: Date in the format YYYY-MM-DD
               - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
                   - type: string
                     format: date
                     description: Date in the format YYYY-MM-DD
-                  - type: array
-                    maxItems: 2
-                    minItems: 2
-                    items:
-                      oneOf:
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
-                        - type: string
-                          format: date
-                          description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
               - type: boolean
               - type: number
               - type: object
                 properties:
-                  filename:
+                  path:
                     type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
                     type: string
                 required:
-                  - filename
+                  - path
                   - originalFilename
                   - type
               - type: array
                 items:
                   type: object
                   properties:
-                    filename:
+                    path:
                       type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10398,7 +10894,7 @@ components:
                     option:
                       type: string
                   required:
-                    - filename
+                    - path
                     - originalFilename
                     - type
                     - option
@@ -10502,14 +10998,13 @@ components:
                         properties:
                           firstname:
                             type: string
+                            nullable: true
                           surname:
                             type: string
+                            nullable: true
                           middlename:
                             type: string
                             nullable: true
-                        required:
-                          - firstname
-                          - surname
                       - type: "null"
       required:
         - id
