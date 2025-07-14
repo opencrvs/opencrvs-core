@@ -14,6 +14,7 @@ import { graphql, http, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import {
   ActionType,
+  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
   tennisClubMembershipEvent
@@ -73,8 +74,8 @@ const mockUser = {
     }
   ],
   role: 'SOCIAL_WORKER',
-  signatureFilename: 'signature.png',
-  avatarURL: undefined
+  signature: 'signature.png' as FullDocumentPath,
+  avatar: undefined
 }
 
 export const ReviewForLocalRegistrarComplete: Story = {
@@ -84,6 +85,9 @@ export const ReviewForLocalRegistrarComplete: Story = {
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId
       })
+    },
+    offline: {
+      drafts: [draft]
     },
     msw: {
       handlers: {
@@ -179,6 +183,9 @@ export const ReviewForRegistrationAgentComplete: Story = {
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
         eventId
       })
+    },
+    offline: {
+      drafts: [draft]
     },
     msw: {
       handlers: {
@@ -285,6 +292,9 @@ export const ReviewForFieldAgentComplete: Story = {
         eventId
       })
     },
+    offline: {
+      drafts: [draft]
+    },
     msw: {
       handlers: {
         drafts: [
@@ -373,7 +383,10 @@ const createdEvent = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE]
 })
-
+const declareDraft = generateEventDraftDocument({
+  eventId: createdEvent.id,
+  actionType: ActionType.DECLARE
+})
 export const ReviewShowsFilesFromDraft: Story = {
   parameters: {
     reactRouter: {
@@ -383,18 +396,14 @@ export const ReviewShowsFilesFromDraft: Story = {
       })
     },
     offline: {
-      events: [createdEvent]
+      events: [createdEvent],
+      drafts: [declareDraft]
     },
     msw: {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument({
-                eventId: createdEvent.id,
-                actionType: ActionType.DECLARE
-              })
-            ]
+            return [declareDraft]
           })
         ],
         event: [
@@ -406,9 +415,9 @@ export const ReviewShowsFilesFromDraft: Story = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/:filename', (req) => {
+          http.get('/api/presigned-url/:filePath*', (req) => {
             return HttpResponse.json({
-              presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
+              presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
             })
           }),
           http.get('http://localhost:3535/ocrvs/:id', () => {

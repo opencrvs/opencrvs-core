@@ -17,7 +17,8 @@ export const SerializedUserField = z.object({
     'id',
     'name',
     'role',
-    'signatureFilename',
+    'signature',
+    'avatar',
     'primaryOfficeId'
   ])
 })

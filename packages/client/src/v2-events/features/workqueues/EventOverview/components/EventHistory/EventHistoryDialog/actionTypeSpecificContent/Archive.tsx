@@ -8,17 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import React from 'react'
+import { useIntl } from 'react-intl'
+import { Pill } from '@opencrvs/components'
 
-import { MongoClient } from 'mongodb'
-import { env } from '@events/environment'
+export function Archive() {
+  const intl = useIntl()
 
-const url = env.USER_MGNT_MONGO_URL
-const client = new MongoClient(url)
-
-export async function getClient() {
-  await client.connect()
-
-  // Providing the database name is not necessary, it will read it from the connection string.
-  // e2e-environment uses different name from deployment to deployment, so we can't hardcode it.
-  return client.db()
+  return (
+    <p>
+      <Pill
+        label={intl.formatMessage({
+          id: 'v2.event.history.markAsDuplicate',
+          defaultMessage: 'Marked as a duplicate'
+        })}
+        size="small"
+        type="inactive"
+      />
+    </p>
+  )
 }

@@ -16,7 +16,6 @@ import {
   resetServer as resetEventsPostgresServer,
   getPool
 } from '@events/storage/postgres/events'
-import { resetServer as resetUserMgntMongoServer } from '@events/storage/mongodb/__mocks__/user-mgnt'
 
 import { createIndex } from '@events/service/indexing/indexing'
 import { mswServer } from './msw'
@@ -60,13 +59,7 @@ async function resetPostgresServer() {
   getPool(EVENTS_APP_POSTGRES_URI)
 }
 
-beforeEach(async () =>
-  Promise.all([
-    resetPostgresServer(),
-    resetUserMgntMongoServer(),
-    resetESServer()
-  ])
-)
+beforeEach(async () => Promise.all([resetPostgresServer(), resetESServer()]))
 
 beforeAll(() =>
   mswServer.listen({

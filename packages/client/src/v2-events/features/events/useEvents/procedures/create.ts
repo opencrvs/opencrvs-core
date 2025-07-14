@@ -26,7 +26,7 @@ import {
 
 import {
   findLocalEventConfig,
-  invalidateEventsList,
+  refetchEventsList,
   setEventData,
   setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -88,20 +88,20 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
     }
 
     setEventData(newEvent.transactionId, optimisticEvent)
-    setEventListData((eventIndices) =>
-      eventIndices?.concat(
-        getCurrentEventState(
-          optimisticEvent,
-          findLocalEventConfig(optimisticEvent.type) ?? {}
-        )
-      )
-    )
+    setEventListData((eventIndices) => {
+      const eventConfig = findLocalEventConfig(optimisticEvent.type)
+      return eventConfig
+        ? eventIndices?.concat(
+            getCurrentEventState(optimisticEvent, eventConfig)
+          )
+        : eventIndices
+    })
     return optimisticEvent
   },
   onSuccess: async (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    await invalidateEventsList()
+    await refetchEventsList()
   }
 })
 

@@ -21,7 +21,7 @@ import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useApolloClient } from '@client/utils/apolloClient'
 import { ApolloProvider } from '@client/utils/ApolloProvider'
 import { queryClient, TRPCProvider } from '@client/v2-events/trpc'
-import { Provider } from 'react-redux'
+import { Provider, useSelector } from 'react-redux'
 import {
   createMemoryRouter,
   Outlet,
@@ -35,14 +35,17 @@ import { NavigationHistoryProvider } from '@client/v2-events/components/Navigati
 import {
   addUserToQueryData,
   setEventData,
-  addLocalEventConfig
+  addLocalEventConfig,
+  setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
+  Draft,
   EventDocument,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
+import { getUserDetails } from '@client/profile/profileSelectors'
 WebFont.load({
   google: {
     families: ['Noto+Sans:600', 'Noto+Sans:500', 'Noto+Sans:400']
@@ -66,13 +69,20 @@ initialize({
   }
 })
 
-const { store } = createStore()
-
 type WrapperProps = PropsWithChildren<{
   store: ReturnType<typeof createStore>['store']
   initialPath: string
   router?: RouteObject
 }>
+
+function WaitForUserDetails({ children }: PropsWithChildren<{}>) {
+  const currentUser = useSelector(getUserDetails)
+
+  if (!currentUser) {
+    return null
+  }
+  return children
+}
 
 function Wrapper({ store, router, initialPath, children }: WrapperProps) {
   const { client } = useApolloClient(store)
@@ -91,7 +101,9 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
                       element: (
                         <Page>
                           <NavigationHistoryProvider>
-                            <Outlet />
+                            <WaitForUserDetails>
+                              <Outlet />
+                            </WaitForUserDetails>
                           </NavigationHistoryProvider>
                         </Page>
                       ),
@@ -171,7 +183,8 @@ const preview: Preview = {
         id: generator.user.id.localRegistrar,
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: 'LOCAL_REGISTRAR',
-        signatureFilename: undefined
+        signature: undefined,
+        avatar: undefined
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline
@@ -181,6 +194,11 @@ const preview: Preview = {
         setEventData(event.id, event)
       })
 
+      if (options.parameters?.offline?.drafts) {
+        const offlineDrafts: Array<Draft> = options.parameters.offline.drafts
+        setDraftData(() => offlineDrafts)
+      }
+
       //  Intermittent failures starts to happen when global state gets out of whack.
       // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
       await new Promise((resolve) => setTimeout(resolve, 50))
@@ -188,6 +206,8 @@ const preview: Preview = {
   ],
   decorators: [
     (Story, context) => {
+      const { store } = createStore()
+
       return (
         <Wrapper
           store={store}

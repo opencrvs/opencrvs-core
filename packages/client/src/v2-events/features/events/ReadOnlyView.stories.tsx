@@ -17,6 +17,7 @@ import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
+  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
@@ -65,6 +66,17 @@ const draft = generateEventDraftDocument({
   actionType: ActionType.DECLARE,
   rng
 })
+const modifiedDraft = generateEventDraftDocument({
+  eventId: eventDocument.id,
+  actionType: ActionType.REGISTER,
+  declaration: {
+    'applicant.name': {
+      firstname: 'Riku',
+      surname: 'This value is from a draft'
+    }
+  },
+  rng
+})
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
   loaders: [
@@ -110,6 +122,10 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
       }),
       chromatic: { disableSnapshot: true }
     },
+    offline: {
+      events: [eventDocument],
+      drafts: [modifiedDraft]
+    },
     msw: {
       handlers: {
         event: [
@@ -132,19 +148,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
         ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument({
-                eventId: eventDocument.id,
-                actionType: ActionType.REGISTER,
-                declaration: {
-                  'applicant.name': {
-                    firstname: 'Riku',
-                    surname: 'This value is from a draft'
-                  }
-                },
-                rng
-              })
-            ]
+            return [modifiedDraft]
           })
         ],
         user: [
@@ -161,8 +165,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
                 id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
                 role: 'LOCAL_REGISTRAR',
-                signatureFilename: undefined,
-                avatarURL: undefined
+                signature: undefined,
+                avatar: undefined
               }
             ]
           }),
@@ -171,8 +175,8 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined,
-              avatarURL: undefined
+              signature: undefined,
+              avatar: undefined
             }
           })
         ]
@@ -193,7 +197,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [draft]
+            return []
           })
         ],
         events: [
@@ -227,8 +231,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                   }
                 ],
                 role: 'SOCIAL_WORKER',
-                signatureFilename: undefined,
-                avatarURL: undefined
+                signature: undefined,
+                avatar: undefined
               }
             ]
           }),
@@ -237,8 +241,8 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               id: generator.user.id.localRegistrar,
               name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
               role: 'LOCAL_REGISTRAR',
-              signatureFilename: undefined,
-              avatarURL: undefined
+              signature: undefined,
+              avatar: undefined
             }
           })
         ]

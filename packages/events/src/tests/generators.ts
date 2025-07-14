@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Db } from 'mongodb'
 import {
   getUUID,
   eventPayloadGenerator,
@@ -78,14 +77,12 @@ export function payloadGenerator(rng: () => number) {
  * Use with payloadGenerator for creating test data.
  */
 export function seeder() {
-  const seedUser = async (db: Db, user: Omit<CreatedUser, 'id'>) => {
-    const createdUser = await db.collection('users').insertOne(user)
-
+  const seedUser = (user: Omit<CreatedUser, 'id'>) => {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
       role: user.role as TestUserRole,
-      id: createdUser.insertedId.toString() as UUID
+      id: getUUID()
     }
   }
   const seedLocations = async (locations: Location[]) => setLocations(locations)

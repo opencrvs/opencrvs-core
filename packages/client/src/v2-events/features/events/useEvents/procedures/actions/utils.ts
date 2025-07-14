@@ -9,13 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionDocument,
   ActionInput,
   ActionStatus,
   ActionType,
   EventDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
-import { EventConfig } from '@opencrvs/commons/client'
+
 import {
   findLocalEventConfig,
   setEventListData
@@ -46,12 +48,20 @@ export function updateEventOptimistically<T extends ActionInput>(
         {
           id: createTemporaryId(),
           type: actionType,
-          declaration: variables.declaration,
+          /*
+           * These need to be casted or otherwise branded
+           * types like FullDocumentPath causes an error here.
+           * This is because we are effectively trying to force an input type to an output type
+           */
+          declaration: (variables.declaration ||
+            {}) as ActionDocument['declaration'],
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
           createdBy: '@todo',
-          createdAtLocation: '@todo',
-          status: ActionStatus.Requested
+          createdAtLocation: '@todo' as UUID,
+          status: ActionStatus.Requested,
+          transactionId: variables.transactionId,
+          createdByRole: '@todo'
         }
       ]
     }

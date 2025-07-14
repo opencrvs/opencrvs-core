@@ -22,7 +22,6 @@ import {
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
-
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
   createEvent,
@@ -33,7 +32,7 @@ import {
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
 
-test('Throws error without proper scope', async () => {
+test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, ['record.declare-birth'])
 
@@ -77,7 +76,7 @@ test('Throws error without proper scope', async () => {
 test('Returns empty list when no events match search criteria', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -125,7 +124,10 @@ test('Returns empty list when no events match search criteria', async () => {
 test('Throws when searching without payload', async () => {
   const { user } = await setupTestCase()
 
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[event=tennis-club-membership,access=all]'
+  ])
 
   // @ts-expect-error - Intentionally passing an empty object to trigger the error
   await expect(client.event.search({})).rejects.toMatchSnapshot()
@@ -134,7 +136,10 @@ test('Throws when searching without payload', async () => {
 test('Throws when searching by unrelated properties', async () => {
   const { user } = await setupTestCase()
 
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[event=tennis-club-membership,access=all]'
+  ])
 
   await expect(
     client.event.search({
@@ -151,7 +156,10 @@ test('Throws when searching by unrelated properties', async () => {
 test('Throws when searching with empty clauses', async () => {
   const { user } = await setupTestCase()
 
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[event=tennis-club-membership,access=all]'
+  ])
 
   await expect(
     client.event.search({
@@ -163,7 +171,10 @@ test('Throws when searching with empty clauses', async () => {
 
 test('Throws when date field is invalid', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[event=tennis-club-membership,access=all]'
+  ])
 
   await expect(
     client.event.search({
@@ -182,7 +193,10 @@ test('Throws when date field is invalid', async () => {
 
 test('Throws when one of the date range fields has invalid date', async () => {
   const { user } = await setupTestCase()
-  const client = createTestClient(user, [SCOPES.SEARCH_BIRTH])
+  const client = createTestClient(user, [
+    'search.birth',
+    'search[event=tennis-club-membership,access=all]'
+  ])
 
   await expect(
     client.event.search({
@@ -204,7 +218,7 @@ test('Returns events based on the updatedAt column', async () => {
   const { user, generator } = await setupTestCase()
 
   const client = createTestClient(user, [
-    SCOPES.SEARCH_BIRTH,
+    'search[event=tennis-club-membership,access=all]',
     SCOPES.RECORD_IMPORT,
     ...TEST_USER_DEFAULT_SCOPES
   ])
@@ -287,8 +301,8 @@ test('Returns events based on the updatedAt column', async () => {
     )
   )
 
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const today = new Date().toISOString()
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
   const acceptedTodayResult = await client.event.search({
     type: 'and',
@@ -317,10 +331,78 @@ test('Returns events based on the updatedAt column', async () => {
   })
 })
 
+test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    SCOPES.RECORD_IMPORT,
+    ...TEST_USER_DEFAULT_SCOPES
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request({
+    ...generator.event.actions.declare(event.id),
+    keepAssignment: true
+  })
+  await client.event.actions.validate.request({
+    ...generator.event.actions.validate(event.id),
+    keepAssignment: true
+  })
+  await client.event.actions.register.request(
+    generator.event.actions.register(event.id)
+  )
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+
+  const resultForToday = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: today
+        }
+      }
+    ]
+  })
+  const resultForYesterday = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: yesterday
+        }
+      }
+    ]
+  })
+  const resultForTomorrow = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: tomorrow
+        }
+      }
+    ]
+  })
+
+  expect(resultForToday).toHaveLength(1)
+  expect(resultForYesterday).toHaveLength(0)
+  expect(resultForTomorrow).toHaveLength(0)
+})
+
 test.skip('Returns events that match the name field criteria of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -413,10 +495,54 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
   expect(fetchedEvents).toHaveLength(2)
 })
 
+test('properly returns search by name even when there is an undercore in someones name', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Matt_Johnson',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: record1
+    })
+  )
+
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    clauses: [{ data: { 'applicant.name': { type: 'fuzzy', term: 'Matt' } } }]
+  })
+
+  expect(fetchedEvents).toHaveLength(1)
+
+  expect(
+    getMixedPath(fetchedEvents[0].declaration, 'applicant.name.firstname')
+  ).toBe('Matt_Johnson')
+})
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -492,7 +618,7 @@ test('Returns events that match date of birth of applicant', async () => {
 test('Does not return events when searching with a similar but different date of birth', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -562,7 +688,7 @@ test('Does not return events when searching with a similar but different date of
 test('Returns single document after creation', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -610,7 +736,7 @@ test('Returns single document after creation', async () => {
 test('Returns multiple documents after creation', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -703,7 +829,7 @@ test('Returns multiple documents after creation', async () => {
 test('Returns no documents when search params are not matched', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -798,7 +924,7 @@ test('Returns no documents when search params are not matched', async () => {
 test('Throws error when search params are not matching proper schema', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -843,7 +969,7 @@ test('Throws error when search params are not matching proper schema', async () 
 test('Returns events assigned to a specific user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
-    'search.birth',
+    'search[event=tennis-club-membership,access=all]',
     'search.death',
     'record.declare-birth'
   ])
@@ -935,7 +1061,10 @@ test('Returns events assigned to a specific user', async () => {
 test('Returns relevant events in right order', async () => {
   const { user, generator } = await setupTestCase(4432)
 
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=all]'
+  ])
 
   // Until we have a way to reindex from mongodb, we create events through API.
   // Since it is expensive and time consuming, we will run multiple checks against the same set of events.
@@ -1051,4 +1180,238 @@ test('Returns relevant events in right order', async () => {
       { firstname: 'Zara', surname: 'Sarajanen' }
     ])
   )
+})
+
+test('User with my-jurisdiction scope only sees events from their primary office', async () => {
+  const { user, generator, locations } = await setupTestCase(5541)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  const ownOfficeId = user.primaryOfficeId
+
+  await createEvent(client, generator)
+
+  const OTHER_OFFICE_ID = locations[1].id // using different location id for a different user
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: OTHER_OFFICE_ID
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen)
+
+  // Test user should only see their own event
+  const events = await client.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(events).toHaveLength(1)
+  expect(events[0].updatedAtLocation).toBe(ownOfficeId)
+  expect(
+    sanitizeForSnapshot(events[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
+
+test('User without an event in the scope should not be able to view events of that type', async () => {
+  const { user, generator, locations } = await setupTestCase(5541)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=v2.birth,access=my-jurisdiction]'
+  ])
+
+  await createEvent(client, generator)
+
+  // Create another user from a different office
+  const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
+  const userFromOtherOffice = {
+    ...otherUser,
+    primaryOfficeId: locations[1].id // using different location id for a different user
+  }
+
+  const otherClient = createTestClient(userFromOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  // Create an event from another office
+  await createEvent(otherClient, otherGen)
+
+  // Test user should only see their own event
+  const events = await client.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(events).toHaveLength(0)
+})
+
+test('User with my-jurisdiction scope can see events from other offices based on their scopes', async () => {
+  const { user: userA, locations } = await setupTestCase(6003)
+
+  const clientA = createTestClient(userA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  const { user: userB, generator: generatorB } = await setupTestCase(6004)
+  const userBOverride = {
+    ...userB,
+    primaryOfficeId: locations[1].id // using different location id for a different user
+  }
+
+  const clientB = createTestClient(userBOverride, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  // Only user B creates event
+  await createEvent(clientB, generatorB)
+
+  // user A should see nothing
+  const eventsA = await clientA.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(eventsA).toHaveLength(0)
+
+  const eventsB = await clientB.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  // user B should see the created event
+  expect(eventsB).toHaveLength(1)
+  expect(eventsB[0].updatedAtLocation).toBe(userBOverride.primaryOfficeId)
+  expect(
+    sanitizeForSnapshot(eventsB[0], UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
+})
+
+test('Does not return events of tennis club membership when scopes are not available', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    'search[event=v2.birth,access=all]',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  await createEvent(client, generator)
+
+  const resultEvent = await client.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(resultEvent).toHaveLength(0)
+})
+
+test('User with "all" scope sees events from all offices', async () => {
+  const { user: userA, generator: generatorA } = await setupTestCase(6005)
+  const clientA = createTestClient(userA, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=all]'
+  ])
+
+  const { user: userB, generator: generatorB } = await setupTestCase(6006)
+  const clientB = createTestClient(userB, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  await createEvent(clientA, generatorA)
+  await createEvent(clientB, generatorB)
+
+  const events = await clientA.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(events).toHaveLength(2)
+  const locations = events.map((e) => e.updatedAtLocation)
+  expect(locations).toContain(userA.primaryOfficeId)
+  expect(locations).toContain(userB.primaryOfficeId)
+})
+
+test('User with both "all" and "my-jurisdiction" scopes sees all matching events', async () => {
+  const { user, generator } = await setupTestCase(6007)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=all]',
+    'search[event=v2.birth,access=my-jurisdiction]'
+  ])
+
+  const { generator: tennisGen, user: otherUser } = await setupTestCase(6008)
+  const otherClient = createTestClient(otherUser, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  await createEvent(client, generator)
+  await createEvent(otherClient, tennisGen)
+
+  const events = await client.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(events.length).toBe(2)
+})
+
+test('User only sees tennis club membership events within their jurisdiction', async () => {
+  const { user, generator, locations } = await setupTestCase(6011)
+  const ownOfficeId = user.primaryOfficeId
+
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=my-jurisdiction]'
+  ])
+
+  // Create 2 events in user's own jurisdiction
+  await createEvent(client, generator)
+  await createEvent(client, generator)
+
+  const otherOfficeId = locations[1].id // using different location id for a different user
+  const userOtherOffice = { ...user, primaryOfficeId: otherOfficeId }
+  const clientOtherOffice = createTestClient(userOtherOffice, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    'search[event=tennis-club-membership,access=all]'
+  ])
+
+  await createEvent(clientOtherOffice, generator)
+
+  // User should only see the 2 events from their own office
+  const events = await client.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+
+  expect(events).toHaveLength(2)
+  for (const event of events) {
+    expect(event.updatedAtLocation).toBe(ownOfficeId)
+  }
+  expect(
+    events.map((e) => sanitizeForSnapshot(e, UNSTABLE_EVENT_FIELDS))
+  ).toMatchSnapshot()
+
+  // User should only see the 3 events from their all offices
+  const eventsOthersOffice = await clientOtherOffice.event.search({
+    type: 'and',
+    clauses: [{ eventType: TENNIS_CLUB_MEMBERSHIP }]
+  })
+  expect(eventsOthersOffice).toHaveLength(3)
+  expect(
+    eventsOthersOffice.map((e) => sanitizeForSnapshot(e, UNSTABLE_EVENT_FIELDS))
+  ).toMatchSnapshot()
 })

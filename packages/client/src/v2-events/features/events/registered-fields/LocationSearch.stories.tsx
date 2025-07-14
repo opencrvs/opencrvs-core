@@ -20,7 +20,9 @@ const meta: Meta<typeof LocationSearch.Output> = {
   decorators: [
     (Story) => (
       <TRPCProvider>
-        <Story />
+        <React.Suspense>
+          <Story />
+        </React.Suspense>
       </TRPCProvider>
     )
   ]
