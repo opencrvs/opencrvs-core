@@ -9,10 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { createEventConditionals } from '../conditionals/conditionals'
+import { defineConditional } from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
+import { ActionType } from './ActionType'
 import { EventFieldId } from './AdvancedSearchConfig'
-import { SelectOption } from './FieldConfig'
 import {
   WorkqueueColumnKeys,
   WorkqueueColumnValue
@@ -25,13 +25,41 @@ import {
  * event('status') // → returns search config
  * event.hasAction('CLICKED') // → returns conditional
  */
-function eventFn(fieldId: EventFieldId, options?: SelectOption[]) {
-  return createEventFieldConfig(fieldId, options)
+function eventFn(fieldId: EventFieldId) {
+  return createEventFieldConfig(fieldId)
 }
 
 // Attach conditional helpers directly to the function
 const event = Object.assign(eventFn, {
-  ...createEventConditionals(),
+  /**
+   * Checks if the event contains a specific action type.
+   * @param action - The action type to check for.
+   */
+  hasAction: (action: ActionType) =>
+    defineConditional({
+      type: 'object',
+      properties: {
+        $event: {
+          type: 'object',
+          properties: {
+            actions: {
+              type: 'array',
+              contains: {
+                type: 'object',
+                properties: {
+                  type: {
+                    const: action
+                  }
+                },
+                required: ['type']
+              }
+            }
+          },
+          required: ['actions']
+        }
+      },
+      required: ['$event']
+    }),
   field(field: WorkqueueColumnKeys): WorkqueueColumnValue {
     return {
       $event: field
