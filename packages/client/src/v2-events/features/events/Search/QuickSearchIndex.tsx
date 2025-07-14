@@ -37,6 +37,7 @@ function QuickSearch() {
 
   return (
     <SearchResultComponent
+      actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={eventConfigurations}
       queryData={queryData}
