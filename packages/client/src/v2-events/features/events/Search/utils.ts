@@ -250,7 +250,7 @@ function buildSearchClause(
     case MatchType.anyOf:
       return { type: 'anyOf', terms: value.split(',') }
     case MatchType.range:
-      const [gte, lte] = value.split(',')
+      const [gte, lte = gte] = value.split(',')
       return { type: 'range', gte, lte }
     default:
       return { type: 'exact', term: value } // Fallback to exact match
