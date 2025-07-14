@@ -87,8 +87,6 @@ function EventOverviewFull({
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
-  const actions = getAcceptedActions(event)
-
   return (
     <Content
       icon={() => <IconWithName flags={flags} name={''} status={status} />}
@@ -108,7 +106,7 @@ function EventOverviewFull({
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />
-      <EventHistory history={actions} />
+      <EventHistory fullEvent={event} />
     </Content>
   )
 }

@@ -58,6 +58,12 @@ import { TokenUserType } from '../authentication'
 import { z } from 'zod'
 
 /**
+ * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
+ * Since we query by range, providing UTC offset will result to different results when DST changes during the range.
+ */
+export const TEST_SYSTEM_IANA_TIMEZONE = 'Asia/Dhaka'
+
+/**
  * In real application, the roles are defined in the countryconfig.
  * These are just for testing purposes to generate realistic mock data.
  */
@@ -160,8 +166,12 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATE_RANGE:
-      return ['2021-01-01', '2021-01-02']
+      return {
+        start: '2021-01-01',
+        end: '2021-01-31'
+      }
     case FieldType.CHECKBOX:
       return true
     case FieldType.SIGNATURE:
@@ -259,7 +269,16 @@ export function eventPayloadGenerator(rng: () => number) {
       id
     }),
     draft: (
-      { eventId, actionType }: { eventId: UUID; actionType: ActionType },
+      {
+        eventId,
+        actionType,
+        annotation
+      }: {
+        eventId: UUID
+        actionType: ActionType
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        annotation?: Record<string, any>
+      },
       input: Partial<Draft> = {}
     ): Draft =>
       merge(
@@ -282,7 +301,8 @@ export function eventPayloadGenerator(rng: () => number) {
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
-              'correction.request.reason': "Child's name was incorrect"
+              'correction.request.reason': "Child's name was incorrect",
+              ...annotation
             },
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
