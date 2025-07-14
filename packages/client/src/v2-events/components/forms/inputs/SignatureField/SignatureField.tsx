@@ -21,7 +21,11 @@ import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
 import { messages } from '@client/i18n/messages/views/review'
 import { buttonMessages, validationMessages } from '@client/i18n/messages'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
-import { cacheFile, getUnsignedFileUrl } from '@client/v2-events/cache'
+import {
+  cacheFile,
+  getFullDocumentPath,
+  getUnsignedFileUrl
+} from '@client/v2-events/cache'
 import { useOnFileChange } from '../FileInput/useOnFileChange'
 import { SignatureCanvasModal } from './components/SignatureCanvasModal'
 
@@ -77,15 +81,15 @@ export function SignatureField({
   const [touched, setTouched] = useState(false)
 
   const { uploadFile } = useFileUpload(name, {
-    onSuccess: ({ filename, originalFilename, type }) => {
+    onSuccess: ({ path, originalFilename, type }) => {
       setSignature({
-        filename,
+        path,
         originalFilename,
         type
       })
 
       onChange({
-        filename,
+        path,
         originalFilename,
         type
       })
@@ -147,7 +151,7 @@ export function SignatureField({
       {signature && (
         <SignaturePreview
           alt={modalTitle}
-          src={getUnsignedFileUrl(signature.filename)}
+          src={getUnsignedFileUrl(signature.path)}
         />
       )}
       {signature && !disabled && (
@@ -177,16 +181,17 @@ export function SignatureField({
               signatureBase64,
               `signature-${name}-${Date.now()}.png`
             )
+            const path = getFullDocumentPath(signatureFile.name)
 
             // When we are in offline mode, the actual upload might not happen immediately.
             // Cache the "temporary" file to allow using same functionality for all files.
             await cacheFile({
-              filename: signatureFile.name,
+              url: getUnsignedFileUrl(path),
               file: signatureFile
             })
 
             setSignature({
-              filename: signatureFile.name,
+              path,
               originalFilename: signatureFile.name,
               type: signatureFile.type
             })

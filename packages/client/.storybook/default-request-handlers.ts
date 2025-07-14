@@ -27,7 +27,8 @@ import {
   UUID,
   tennisClubMembershipEvent,
   footballClubMembershipEvent,
-  libraryMembershipEvent
+  libraryMembershipEvent,
+  FullDocumentPath
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 
@@ -475,7 +476,7 @@ export const handlers = {
     })
   ],
   files: [
-    http.get('/api/presigned-url/:filename', async (req) => {
+    http.get('/api/presigned-url/:filePath*', async (req) => {
       return HttpResponse.json({
         presignedURL: `http://localhost:3535/ocrvs/tree.svg`
       })
@@ -485,7 +486,7 @@ export const handlers = {
 
       return HttpResponse.text(`${formData.get('transactionId')}.jpg`)
     }),
-    http.delete('/api/files/:filename', async (request) => {
+    http.delete('/api/files/:filePath*', async (request) => {
       return HttpResponse.text('OK')
     }),
     http.get('http://localhost:3535/ocrvs/:id', async (request) => {
@@ -1195,8 +1196,8 @@ export const handlers = {
           id: testDataGenerator().user.id.localRegistrar,
           name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
           role: 'LOCAL_REGISTRAR',
-          signatureFilename: undefined,
-          avatarURL: undefined
+          signature: undefined,
+          avatar: undefined
         }
       ]
     }),
@@ -1211,8 +1212,8 @@ export const handlers = {
           }
         ],
         role: 'LOCAL_REGISTRAR',
-        signatureFilename: 'signature.png',
-        avatarURL: undefined
+        signature: 'signature.png' as FullDocumentPath,
+        avatar: undefined
       }
     })
   ],

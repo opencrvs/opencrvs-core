@@ -11,15 +11,18 @@
 import React from 'react'
 import { useLocation } from 'react-router-dom'
 import { useIntl } from 'react-intl'
+import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { mandatoryColumns } from '@opencrvs/commons/client'
 import { SearchResultComponent } from '@client/v2-events/features/events/Search/SearchResult'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { ROUTES } from '@client/v2-events/routes'
 import { buildQuickSearchQuery, deserializeSearchParams } from './utils'
 
 function QuickSearch() {
   const intl = useIntl()
+  const [typedSearchParams] = useTypedSearchParams(ROUTES.V2.SEARCH)
   const location = useLocation()
   const { searchEvent } = useEvents()
   const eventConfigurations = useEventConfigurations()
@@ -34,6 +37,7 @@ function QuickSearch() {
 
   return (
     <SearchResultComponent
+      actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={eventConfigurations}
       queryData={queryData}
@@ -47,6 +51,7 @@ function QuickSearch() {
           searchTerm: searchParams.keys
         }
       )}
+      {...typedSearchParams}
     />
   )
 }

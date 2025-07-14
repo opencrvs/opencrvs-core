@@ -8,22 +8,13 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { MongoClient } from 'mongodb'
-import { inject } from 'vitest'
 
-let client: MongoClient | undefined
-let databaseName = 'user-mgnt_' + Date.now()
-
-export function resetServer() {
-  databaseName = 'user-mgnt_' + Date.now()
+export function joinURL(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return new URL(path, baseWithSlash)
 }
 
-export async function getClient() {
-  if (!client) {
-    client = new MongoClient(inject('USER_MGNT_MONGO_URI'))
-  }
-
-  await client.connect()
-
-  return client.db(databaseName)
+export function joinURLPaths(base: string, path: string) {
+  const baseWithSlash = base.endsWith('/') ? base : base + '/'
+  return baseWithSlash + path.replace(/^\//, '')
 }

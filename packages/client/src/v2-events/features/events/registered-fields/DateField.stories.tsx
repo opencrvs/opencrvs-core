@@ -56,7 +56,7 @@ export const DateInput: StoryObj<typeof FormFieldGenerator> = {
         '{backspace}'
       )
 
-      await canvas.findByText('Required for registration')
+      await canvas.findByText('Required')
     })
   },
   render: function Component(args) {

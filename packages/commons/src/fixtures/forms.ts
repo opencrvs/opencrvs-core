@@ -829,6 +829,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'applicant.address',
           type: 'ADDRESS',
           required: true,
+          secured: true,
           conditionals: [],
           label: {
             defaultMessage: "Applicant's address",

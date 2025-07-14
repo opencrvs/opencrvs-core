@@ -18,7 +18,8 @@ import {
   FieldType,
   defineActionForm,
   getDeclaration,
-  PageTypes
+  PageTypes,
+  FullDocumentPath
 } from '@opencrvs/commons/client'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -45,38 +46,38 @@ export const EmptyDocumentViewer: StoryObj<typeof DocumentViewer> = {
 
 const form = {
   'documents.one': {
-    filename: 'tree.svg',
+    path: '/ocrvs/tree.svg' as FullDocumentPath,
     originalFilename: 'tree.svg',
     type: 'image/svg+xml'
   },
   'documents.two': [
     {
-      filename: 'fish.svg',
+      path: '/ocrvs/fish.svg' as FullDocumentPath,
       originalFilename: 'fish.svg',
       type: 'image/svg+xml',
       option: 'NATIONAL_ID'
     },
     {
-      filename: 'mountain.svg',
+      path: '/ocrvs/mountain.svg' as FullDocumentPath,
       originalFilename: 'mountain.svg',
       type: 'image/svg+xml',
       option: 'PASSPORT'
     },
     {
-      filename: 'tree.svg',
+      path: '/ocrvs/tree.svg' as FullDocumentPath,
       originalFilename: 'tree.svg',
       type: 'image/svg+xml',
       option: 'BIRTH_REGISTRATION_NUMBER'
     },
     {
-      filename: 'fish.svg',
+      path: '/ocrvs/fish.svg' as FullDocumentPath,
       originalFilename: 'fish.svg',
       type: 'image/svg+xml',
       option: 'NONE'
     }
   ],
   'documents.three': {
-    filename: 'tree.svg',
+    path: '/ocrvs/tree.svg' as FullDocumentPath,
     originalFilename: 'tree.svg',
     type: 'image/svg+xml'
   }
@@ -166,25 +167,25 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
 
     const duplicateDocuments = [
       {
-        filename: 'fish.svg',
+        path: '/ocrvs/fish.svg' as FullDocumentPath,
         originalFilename: 'fish.svg',
         type: 'image/svg+xml',
         option: 'NATIONAL_ID'
       },
       {
-        filename: 'mountain.svg',
+        path: '/ocrvs/mountain.svg' as FullDocumentPath,
         originalFilename: 'mountain.svg',
         type: 'image/svg+xml',
         option: 'PASSPORT'
       },
       {
-        filename: 'tree.svg',
+        path: '/ocrvs/tree.svg' as FullDocumentPath,
         originalFilename: 'tree.svg',
         type: 'image/svg+xml',
         option: 'BIRTH_REGISTRATION_NUMBER'
       },
       {
-        filename: 'fish.svg',
+        path: '/ocrvs/fish.svg' as FullDocumentPath,
         originalFilename: 'fish.svg',
         type: 'image/svg+xml',
         option: 'NONE'
@@ -195,7 +196,7 @@ export const SameOptionsForDifferentFields: StoryObj<typeof DocumentViewer> = {
       'documents.one': duplicateDocuments,
       'documents.two': duplicateDocuments,
       'documents.three': {
-        filename: 'tree.svg',
+        path: '/ocrvs/tree.svg' as FullDocumentPath,
         originalFilename: 'tree.svg',
         type: 'image/svg+xml'
       }

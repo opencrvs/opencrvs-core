@@ -64,9 +64,16 @@ export const getAllUniqueFields = (eventConfig: EventConfig) => {
   return uniqBy(getDeclarationFields(eventConfig), (field) => field.id)
 }
 
-export function flattenEventIndex(event: NonNullable<EventIndex>) {
-  const { declaration, ...rest } = event
-  return { ...rest, ...declaration }
+export function flattenEventIndex(event: EventIndex) {
+  const { declaration, trackingId, status, ...rest } = event
+  return {
+    ...rest,
+    ...declaration,
+    'event.trackingId': trackingId,
+    'event.status': status,
+    'event.registrationNumber':
+      rest.legalStatuses.REGISTERED?.registrationNumber
+  }
 }
 
 export type RequireKey<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
@@ -205,18 +212,6 @@ export function filterEmptyValues(
 export interface Option<T = string> {
   value: T
   label: string
-}
-
-export function mergeWithoutNullsOrUndefined<T>(
-  object: T,
-  source: Partial<T>
-): T {
-  return mergeWith({}, object, source, (objValue, srcValue) => {
-    if (srcValue === undefined || srcValue === null) {
-      return objValue
-    }
-    return undefined
-  })
 }
 
 export enum CoreWorkqueues {

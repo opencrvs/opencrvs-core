@@ -27,9 +27,11 @@ interface Props {
   maxLength?: number
   validation: FieldConfig['validation']
   value?: NameFieldValue
+  includeMiddlename?: boolean
+  searchMode?: boolean
 }
 
-export const defailtNameFieldValue: NameFieldValue = {
+const defailtNameFieldValue: NameFieldValue = {
   firstname: '',
   middlename: '',
   surname: ''
@@ -109,7 +111,15 @@ function FocusNameInputsOnHash({
 }
 
 function NameInput(props: Props) {
-  const { id, onChange, required = true, value = {}, maxLength } = props
+  const {
+    id,
+    onChange,
+    required = true,
+    value = {},
+    maxLength,
+    includeMiddlename,
+    searchMode = false
+  } = props
   const validators = props.validation || []
 
   const fields: TextField[] = [
@@ -127,6 +137,23 @@ function NameInput(props: Props) {
       },
       validation: getValidatorsForField('firstname', validators)
     },
+    ...(includeMiddlename
+      ? [
+          {
+            id: 'middlename',
+            type: FieldType.TEXT,
+            configuration: {
+              maxLength
+            },
+            label: {
+              defaultMessage: 'Middle name',
+              description: 'This is the label for the middlename field',
+              id: 'v2.field.name.middlename.label'
+            },
+            validation: getValidatorsForField('middlename', validators)
+          }
+        ]
+      : []),
     {
       id: 'surname',
       type: FieldType.TEXT,
@@ -149,7 +176,14 @@ function NameInput(props: Props) {
         fields={fields}
         id={id}
         initialValues={{ ...value }}
-        onChange={(values) => onChange(values as NameFieldValue)}
+        onChange={(values) => {
+          if (searchMode) {
+            // when in search mode, we initialize empty name fields with empty string
+            // to avoid name field validation
+            values = { ...defailtNameFieldValue, ...values }
+          }
+          onChange(values as NameFieldValue)
+        }}
       />
       <FocusNameInputsOnHash id={id} value={value} />
     </>

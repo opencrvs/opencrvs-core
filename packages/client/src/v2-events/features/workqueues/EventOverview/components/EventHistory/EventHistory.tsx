@@ -17,9 +17,15 @@ import { useSelector } from 'react-redux'
 import { Link, Pagination } from '@opencrvs/components'
 import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Divider } from '@opencrvs/components/lib/Divider'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import { Text } from '@opencrvs/components/lib/Text'
 import { Table } from '@opencrvs/components/lib/Table'
-import { ActionDocument, ActionType } from '@opencrvs/commons/client'
+import {
+  ActionDocument,
+  ActionType,
+  EventDocument,
+  getAcceptedActions
+} from '@opencrvs/commons/client'
 import { Box } from '@opencrvs/components/lib/icons'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { constantsMessages } from '@client/v2-events/messages'
@@ -30,14 +36,21 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import {
-  EventHistoryModal,
+  EventHistoryDialog,
   eventHistoryStatusMessage
-} from './EventHistoryModal'
+} from './EventHistoryDialog/EventHistoryDialog'
 import { UserAvatar } from './UserAvatar'
 
 /**
  * Based on packages/client/src/views/RecordAudit/History.tsx
  */
+
+const LargeGreyedInfo = styled.div`
+  height: 231px;
+  background-color: ${({ theme }) => theme.colors.grey200};
+  max-width: 100%;
+  border-radius: 4px;
+`
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -127,10 +140,25 @@ function getSystemAvatar(name: string) {
   )
 }
 
+export function EventHistorySkeleton() {
+  const intl = useIntl()
+  return (
+    <>
+      <Divider />
+      <Stack alignItems="stretch" direction="column" gap={16}>
+        <Text color="copy" element="h3" variant="h3">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
+        <LargeGreyedInfo />
+      </Stack>
+    </>
+  )
+}
+
 /**
  *  Renders the event history table. Used for audit trail.
  */
-export function EventHistory({ history }: { history: ActionDocument[] }) {
+export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [currentPageNumber, setCurrentPageNumber] = React.useState(1)
   const { systems } = useSelector(getOfflineData)
 
@@ -141,9 +169,16 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
-      <EventHistoryModal close={close} history={item} userName={userName} />
+      <EventHistoryDialog
+        action={item}
+        close={close}
+        fullEvent={fullEvent}
+        userName={userName}
+      />
     ))
   }
+
+  const history = getAcceptedActions(fullEvent)
 
   const visibleHistory = history.filter(
     ({ type }) => type !== ActionType.CREATE
@@ -175,9 +210,7 @@ export function EventHistory({ history }: { history: ActionDocument[] }) {
         action: (
           <Link
             font="bold14"
-            onClick={() => {
-              onHistoryRowClick(action, userName)
-            }}
+            onClick={() => onHistoryRowClick(action, userName)}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
               status: action.type

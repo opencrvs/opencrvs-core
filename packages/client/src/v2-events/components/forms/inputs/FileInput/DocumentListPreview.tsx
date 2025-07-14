@@ -17,6 +17,7 @@ import { Icon } from '@opencrvs/components/lib/Icon/Icon'
 import { Button } from '@opencrvs/components/lib/Button/Button'
 import {
   FileFieldValueWithOption,
+  FullDocumentPath,
   SelectOption
 } from '@opencrvs/commons/client'
 import { IAttachmentValue } from '@client/forms'
@@ -63,7 +64,7 @@ interface Props {
   label?: string
   onSelect: (document: FileFieldValueWithOption | IAttachmentValue) => void
   dropdownOptions?: SelectOption[]
-  onDelete?: (fileName: string) => void
+  onDelete?: (path: FullDocumentPath) => void
   inReviewSection?: boolean
 }
 
@@ -118,7 +119,7 @@ export const DocumentListPreview = ({
                 id="preview_delete"
                 size="small"
                 type="icon"
-                onClick={() => onDelete(document.filename)}
+                onClick={() => onDelete(document.path)}
               >
                 <Icon color="red" name="Trash" size="small" />
               </Button>

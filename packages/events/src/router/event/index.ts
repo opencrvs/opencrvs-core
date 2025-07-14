@@ -11,7 +11,9 @@
 
 import { z } from 'zod'
 import { extendZodWithOpenApi } from 'zod-openapi'
-import { getUUID, SCOPES, UUID } from '@opencrvs/commons'
+import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
+import { OpenApiMeta } from 'trpc-to-openapi'
+import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
@@ -19,7 +21,6 @@ import {
   ApproveCorrectionActionInput,
   AssignActionInput,
   CONFIG_GET_ALLOWED_SCOPES,
-  CONFIG_SEARCH_ALLOWED_SCOPES,
   DeleteActionInput,
   Draft,
   DraftInput,
@@ -58,24 +59,35 @@ import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
 
+/*
+ * Explicitely type the procedure to reduce the inference
+ * thus avoiding "The inferred type of this node exceeds the maximum length the
+ * compiler will serialize" error
+ */
+const eventConfigGetProcedure: QueryProcedure<{
+  meta: OpenApiMeta
+  input: void
+  output: EventConfig[]
+}> = publicProcedure
+  .meta({
+    openapi: {
+      summary: 'List event configurations',
+      method: 'GET',
+      path: '/config',
+      tags: ['events'],
+      protect: true
+    }
+  })
+  .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+  .input(z.void())
+  .output(z.array(EventConfig))
+  .query(async (options) => {
+    return getEventConfigurations(options.ctx.token)
+  })
+
 export const eventRouter = router({
   config: router({
-    get: publicProcedure
-      .meta({
-        openapi: {
-          summary: 'List event configurations',
-          method: 'GET',
-          path: '/config',
-          tags: ['events'],
-          protect: true
-        }
-      })
-      .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
-      .input(z.void())
-      .output(z.array(EventConfig))
-      .query(async (options) => {
-        return getEventConfigurations(options.ctx.token)
-      })
+    get: eventConfigGetProcedure
   }),
   create: systemProcedure
     .meta({
@@ -269,12 +281,27 @@ export const eventRouter = router({
         path: '/events/search'
       }
     })
-    .use(requiresAnyOfScopes(CONFIG_SEARCH_ALLOWED_SCOPES))
+    // @todo: remove legacy scopes once all users are configured with new search scopes
+    .use(requiresAnyOfScopes([], ['search']))
     .input(QueryType)
     .output(z.array(EventIndex))
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
-      return getIndex(input, eventConfigs)
+      const scopes = getScopes({ Authorization: ctx.token })
+
+      const searchScope = findScope(scopes, 'search')
+
+      // Only to satisfy type checking, as findScope will return undefined if no scope is found
+      if (!searchScope) {
+        throw new Error('No search scope provided')
+      }
+      const searchScopeOptions = searchScope.options
+      return getIndex(
+        input,
+        eventConfigs,
+        searchScopeOptions,
+        ctx.user.primaryOfficeId
+      )
     }),
   import: systemProcedure
     .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))

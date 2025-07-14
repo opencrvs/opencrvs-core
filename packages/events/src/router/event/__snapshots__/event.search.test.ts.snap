@@ -9,24 +9,12 @@ exports[`Returns events based on the updatedAt column 1`] = `
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
-    "applicant.address": {
-      "addressType": "DOMESTIC",
-      "country": "FAR",
-      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-      "number": "55",
-      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-      "residentialArea": "Example Residential Area",
-      "street": "Example Street",
-      "town": "Example Town",
-      "urbanOrRural": "URBAN",
-      "zipCode": "123456",
-    },
     "applicant.age": 19,
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -67,24 +55,12 @@ exports[`Returns events based on the updatedAt column 2`] = `
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
-    "applicant.address": {
-      "addressType": "DOMESTIC",
-      "country": "FAR",
-      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-      "number": "55",
-      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-      "residentialArea": "Example Residential Area",
-      "street": "Example Street",
-      "town": "Example Town",
-      "urbanOrRural": "URBAN",
-      "zipCode": "123456",
-    },
     "applicant.age": 19,
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -126,24 +102,12 @@ exports[`Returns relevant events in right order 1`] = `
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
-    "applicant.address": {
-      "addressType": "DOMESTIC",
-      "country": "FAR",
-      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-      "number": "55",
-      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-      "residentialArea": "Example Residential Area",
-      "street": "Example Street",
-      "town": "Example Town",
-      "urbanOrRural": "URBAN",
-      "zipCode": "123456",
-    },
     "applicant.age": 19,
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -185,24 +149,12 @@ exports[`Returns relevant events in right order 2`] = `
   "createdByUserType": "[sanitized]",
   "dateOfEvent": "[sanitized]",
   "declaration": {
-    "applicant.address": {
-      "addressType": "DOMESTIC",
-      "country": "FAR",
-      "district": "5ef450bc-712d-48ad-93f3-8da0fa453baa",
-      "number": "55",
-      "province": "a45b982a-5c7b-4bd9-8fd8-a42d0994054c",
-      "residentialArea": "Example Residential Area",
-      "street": "Example Street",
-      "town": "Example Town",
-      "urbanOrRural": "URBAN",
-      "zipCode": "123456",
-    },
     "applicant.age": 19,
     "applicant.dobUnknown": true,
     "applicant.email": "test@opencrvs.org",
     "applicant.image": {
-      "filename": "4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "originalFilename": "abcd.png",
+      "path": "/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png",
       "type": "image/png",
     },
     "applicant.name": {
@@ -242,17 +194,6 @@ exports[`Returns relevant events in right order 2`] = `
   "updatedBy": "[sanitized]",
   "updatedByUserRole": "REGISTRATION_AGENT",
 }
-`;
-
-exports[`Returns relevant events in right order 3`] = `
-[
-  "REJECTED",
-  "VALIDATED",
-  "DECLARED",
-  "REGISTERED",
-  "ARCHIVED",
-  "CERTIFIED",
-]
 `;
 
 exports[`Throws when date field is invalid 1`] = `
@@ -363,4 +304,160 @@ exports[`Throws when searching without payload 1`] = `
     "message": "Invalid input"
   }
 ]]
+`;
+
+exports[`User only sees tennis club membership events within their jurisdiction 1`] = `
+[
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {},
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {},
+    "status": "CREATED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
+  },
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {},
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {},
+    "status": "CREATED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
+  },
+]
+`;
+
+exports[`User only sees tennis club membership events within their jurisdiction 2`] = `
+[
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {},
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {},
+    "status": "CREATED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
+  },
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {},
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {},
+    "status": "CREATED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
+  },
+  {
+    "assignedTo": "[sanitized]",
+    "createdAt": "[sanitized]",
+    "createdAtLocation": "[sanitized]",
+    "createdBy": "[sanitized]",
+    "createdBySignature": "/random-bucket/9792814a-6e22-4847-b5a2-1ab24bf887c6.png",
+    "createdByUserType": "[sanitized]",
+    "dateOfEvent": "[sanitized]",
+    "declaration": {},
+    "flags": [],
+    "id": "[sanitized]",
+    "legalStatuses": {},
+    "status": "CREATED",
+    "trackingId": "[sanitized]",
+    "type": "tennis-club-membership",
+    "updatedAt": "[sanitized]",
+    "updatedAtLocation": "[sanitized]",
+    "updatedBy": "[sanitized]",
+    "updatedByUserRole": "REGISTRATION_AGENT",
+  },
+]
+`;
+
+exports[`User with my-jurisdiction scope can see events from other offices based on their scopes 1`] = `
+{
+  "assignedTo": "[sanitized]",
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/9dcede43-d8f5-4b9e-b391-ecc7cde52c75.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {},
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {},
+  "status": "CREATED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
+`;
+
+exports[`User with my-jurisdiction scope only sees events from their primary office 1`] = `
+{
+  "assignedTo": "[sanitized]",
+  "createdAt": "[sanitized]",
+  "createdAtLocation": "[sanitized]",
+  "createdBy": "[sanitized]",
+  "createdBySignature": "/random-bucket/6dcc4bb0-4ee4-46e2-a58d-4d22985dfda4.png",
+  "createdByUserType": "[sanitized]",
+  "dateOfEvent": "[sanitized]",
+  "declaration": {},
+  "flags": [],
+  "id": "[sanitized]",
+  "legalStatuses": {},
+  "status": "CREATED",
+  "trackingId": "[sanitized]",
+  "type": "tennis-club-membership",
+  "updatedAt": "[sanitized]",
+  "updatedAtLocation": "[sanitized]",
+  "updatedBy": "[sanitized]",
+  "updatedByUserRole": "REGISTRATION_AGENT",
+}
 `;

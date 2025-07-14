@@ -16,10 +16,8 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
-  ActionType,
-  EventConfig,
   getCurrentEventState,
-  getOrThrow
+  getPrintCertificatePages
 } from '@opencrvs/commons/client'
 import { Print } from '@opencrvs/components/lib/icons'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -33,17 +31,6 @@ import {
 } from '@client/v2-events/features/events/useCertificateTemplateSelectorFieldConfig'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-
-function getPrintCertificatePages(configuration: EventConfig) {
-  const action = configuration.actions.find(
-    (a) => a.type === ActionType.PRINT_CERTIFICATE
-  )
-
-  return getOrThrow(
-    action?.printForm.pages,
-    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
-  )
-}
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(
