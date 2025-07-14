@@ -409,15 +409,8 @@ export function buildSearchQuery(
     (section) => section.fields
   )
 
-  const fieldsToSearch = allSearchFields.filter(
-    // @TODO: This might actually be a bad fix. If only metadata values event. prefix, this would filter out all the rest.
-    // It might be the reason why we use  config: metadataSearchFields.find((x) => field.id.includes(x.fieldId)) below.
-    // After fixing it we should be able to just match the id.
-    (field) => !!searchParameters[`event.${field.fieldId}`]
-  )
-
   const [metadataSearchFields, declarationSearchFields] = partition(
-    fieldsToSearch,
+    allSearchFields,
     (field) => field.fieldType === 'event'
   )
 
@@ -458,9 +451,7 @@ export function buildSearchQuery(
   ]
 
   // Generate the final query condition object from the filtered keys and raw input
-  const foo = buildSearchQueryFields(searchConfigs, searchParameters)
-
-  return foo
+  return buildSearchQueryFields(searchConfigs, searchParameters)
 }
 
 /**
