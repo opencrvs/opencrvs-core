@@ -805,6 +805,10 @@ export const mapFieldsToValues = (
       ...evalParams
     )
 
+    if (field.type === SELECT_WITH_OPTIONS && !field.initialValue) {
+      fieldInitialValue = field.options.find((x) => x.isDefault)?.value ?? ''
+    }
+
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
@@ -1194,29 +1198,7 @@ export class FormSectionComponent extends React.Component<Props> {
                             setValues(updatedValues)
                           }
                         } as ILoaderButton)
-                      : field.type === LOCATION_SEARCH_INPUT
-                        ? {
-                            ...field,
-                            locationList: generateLocations(
-                              field.searchableResource.reduce(
-                                (locations, resource) => {
-                                  return {
-                                    ...locations,
-                                    ...getListOfLocations(
-                                      offlineCountryConfig,
-                                      resource
-                                    )
-                                  }
-                                },
-                                {}
-                              ),
-                              intl,
-                              (location) =>
-                                field.searchableType.includes(location.type),
-                              field.userOfficeId
-                            )
-                          }
-                        : field
+                      : field
 
           if (
             field.type === FETCH_BUTTON ||
