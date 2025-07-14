@@ -56,6 +56,7 @@ import { AddressType, FileFieldValue } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
+import { FullDocumentPath } from '../documents'
 
 /**
  * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
@@ -177,7 +178,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as FullDocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue

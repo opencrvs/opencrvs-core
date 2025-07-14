@@ -54,6 +54,9 @@ import {
   DateRangeFieldValue,
   SelectDateRangeValue
 } from './FieldValue'
+
+import { FullDocumentPath } from '../documents'
+
 import {
   AddressFieldValue,
   AddressFieldUpdateValue,
@@ -200,7 +203,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        filename: '',
+        path: '' as FullDocumentPath,
         originalFilename: '',
         type: ''
       } satisfies FileFieldValue
