@@ -11,6 +11,7 @@
 
 import {
   areConditionsMet,
+  areCertificateConditionsMet,
   EventDocument,
   EventState,
   FieldConfig,
@@ -25,7 +26,13 @@ export const useCertificateTemplateSelectorFieldConfig = (
   event?: EventDocument
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
-  const declarationWithEventMetadata = { ...declaration, event }
+
+  const declarationWithEventMetadata = event
+    ? {
+        ...declaration,
+        event: event
+      }
+    : declaration
 
   return {
     id: CERT_TEMPLATE_ID,
@@ -44,7 +51,10 @@ export const useCertificateTemplateSelectorFieldConfig = (
       .filter(
         (template) =>
           !template.conditionals ||
-          areConditionsMet(template.conditionals, declarationWithEventMetadata)
+          areCertificateConditionsMet(
+            template.conditionals,
+            declarationWithEventMetadata
+          )
       )
       .map((x) => ({ label: x.label, value: x.id }))
   }

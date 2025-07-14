@@ -23,7 +23,8 @@ import { ConditionalParameters, JSONSchema } from './conditionals'
 
 const ajv = new Ajv({
   $data: true,
-  allowUnionTypes: true
+  allowUnionTypes: true,
+  strict: false // Allow newer JSON Schema features like minContains
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -302,4 +303,30 @@ export function runFieldValidations({
     // Assumes that custom validation errors are based on the field type, and extend the validation.
     errors: [...fieldValidationResult, ...customValidationResults]
   }
+}
+
+// Separate AJV instance for certificate template conditionals that supports newer JSON Schema features
+import Ajv2019 from 'ajv/dist/2019'
+const certificateAjv = new Ajv2019({
+  $data: true,
+  allowUnionTypes: true,
+  strict: false, // Allow minContains and other newer features
+  validateSchema: false // Disable schema validation for maximum flexibility
+})
+addFormats(certificateAjv)
+
+export function validateCertificateConditional(
+  schema: JSONSchema,
+  data: ConditionalParameters
+) {
+  return certificateAjv.validate(schema, data)
+}
+
+export function areCertificateConditionsMet(
+  conditions: FieldConditional[],
+  values: Record<string, unknown>
+) {
+  return conditions.every((condition) => {
+    return certificateAjv.validate(condition.conditional, values)
+  })
 }

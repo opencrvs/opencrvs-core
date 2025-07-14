@@ -272,6 +272,10 @@ The conditional system uses standard JSON Schema validation with support for:
 - **Numeric validation**: `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`
 - **Array validation**: `minItems`, `maxItems`, `uniqueItems`
 - **String validation**: `minLength`, `maxLength`
+- **Advanced array contains**: `contains`, `minContains`, `maxContains` for count-based validation
+- **Logical operators**: `not`, `anyOf`, `oneOf`, `allOf` for complex conditions
+
+**Note**: OpenCRVS uses JSON Schema Draft 2019-09 which provides enhanced array validation capabilities including precise count-based matching with `minContains` and `maxContains`.
 
 ## Best Practices
 
@@ -460,6 +464,192 @@ Show templates based on specific actions that have occurred in the event's histo
 }
 ```
 
+### Certificate Print Count-Based Templates
+
+Show templates based on action history for print tracking (useful for replacement certificates):
+
+```typescript
+// Example: Show "Replacement Certificate" template if any print actions exist
+{
+  type: 'SHOW',
+  conditional: {
+    type: 'object',
+    properties: {
+      event: {
+        type: 'object',
+        properties: {
+          actions: {
+            type: 'array',
+            contains: {
+              type: 'object',
+              properties: {
+                type: { const: 'PRINT_CERTIFICATE' }
+              },
+              required: ['type']
+            }
+          }
+        },
+        required: ['actions']
+      }
+    },
+    required: ['event']
+  }
+}
+
+// Example: Show "First Issue" template only when no print actions exist
+{
+  type: 'SHOW',
+  conditional: {
+    type: 'object',
+    properties: {
+      event: {
+        type: 'object',
+        properties: {
+          actions: {
+            type: 'array',
+            not: {
+              contains: {
+                type: 'object',
+                properties: {
+                  type: { const: 'PRINT_CERTIFICATE' }
+                },
+                required: ['type']
+              }
+            }
+          }
+        },
+        required: ['actions']
+      }
+    },
+    required: ['event']
+  }
+}
+
+// Example: Show template based on multiple different action types
+{
+  type: 'SHOW',
+  conditional: {
+    type: 'object',
+    properties: {
+      event: {
+        type: 'object',
+        properties: {
+          actions: {
+            type: 'array',
+            contains: {
+              type: 'object',
+              properties: {
+                type: {
+                  enum: ['PRINT_CERTIFICATE', 'CERTIFY']
+                }
+              },
+              required: ['type']
+            }
+          }
+        },
+        required: ['actions']
+      }
+    },
+    required: ['event']
+  }
+}
+```
+
+// Example: Show template only when at least 2 print actions exist (minContains)
+{
+type: 'SHOW',
+conditional: {
+type: 'object',
+properties: {
+event: {
+type: 'object',
+properties: {
+actions: {
+type: 'array',
+minContains: 2,
+contains: {
+type: 'object',
+properties: {
+type: { const: 'PRINT_CERTIFICATE' }
+},
+required: ['type']
+}
+}
+},
+required: ['actions']
+}
+},
+required: ['event']
+}
+}
+
+// Example: Show template only when exactly 2 print actions exist (minContains + maxContains)
+{
+type: 'SHOW',
+conditional: {
+type: 'object',
+properties: {
+event: {
+type: 'object',
+properties: {
+actions: {
+type: 'array',
+minContains: 2,
+maxContains: 2,
+contains: {
+type: 'object',
+properties: {
+type: { const: 'PRINT_CERTIFICATE' }
+},
+required: ['type']
+}
+}
+},
+required: ['actions']
+}
+},
+required: ['event']
+}
+}
+
+// Example: Show template when at most 1 print action exists (maxContains)
+{
+type: 'SHOW',
+conditional: {
+type: 'object',
+properties: {
+event: {
+type: 'object',
+properties: {
+actions: {
+type: 'array',
+maxContains: 1,
+contains: {
+type: 'object',
+properties: {
+type: { const: 'PRINT_CERTIFICATE' }
+},
+required: ['type']
+}
+}
+},
+required: ['actions']
+}
+},
+required: ['event']
+}
+}
+
+```
+
+**Advanced Count-Based Validation**: OpenCRVS now supports sophisticated count-based conditionals using JSON Schema Draft 2019-09 features:
+
+- **`minContains`**: Minimum number of matching items required
+- **`maxContains`**: Maximum number of matching items allowed
+- **Combined**: Use both together for exact count matching (e.g., exactly 2 prints)
+
+This enables precise control over certificate template visibility based on action history counts, making it ideal for replacement certificate workflows and audit requirements.
+
 ## Testing
 
 The system includes comprehensive test coverage for:
@@ -471,3 +661,4 @@ The system includes comprehensive test coverage for:
 - Edge cases and error handling
 
 See `useCertificateTemplateSelectorFieldConfig.test.ts` for implementation examples and test patterns.
+```
