@@ -156,10 +156,24 @@ export const SaveAndExit: Story = {
 
       await userEvent.type(applicantFirstNameInput, 'Clearly')
       await userEvent.type(applicantSurnameInput, 'Draft')
-
-      const continueButton = await canvas.findByText('Continue')
-      await userEvent.click(continueButton)
     })
+
+    await step(
+      'Ensure input field values are persisted to a draft',
+      async () => {
+        const continueButton = await canvas.findByText('Continue')
+        await userEvent.click(continueButton)
+
+        const backButton = await canvas.findByText('Back')
+        await userEvent.click(backButton)
+
+        await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+          'Clearly'
+        )
+
+        await userEvent.click(await canvas.findByText('Continue'))
+      }
+    )
 
     await step('click `Save & Exit` button', async () => {
       const button = await canvas.findByRole('button', { name: /Save & Exit/ })
@@ -260,8 +274,24 @@ export const DraftShownInForm: Story = {
       await userEvent.type(applicantFirstNameInput, 'Clearly')
       await userEvent.type(applicantSurnameInput, 'Draft')
     })
-    const continueButton = await canvas.findByText('Continue')
-    await userEvent.click(continueButton)
+
+    await step(
+      'Ensure input field values are persisted to a draft',
+      async () => {
+        const continueButton = await canvas.findByText('Continue')
+        await userEvent.click(continueButton)
+
+        const backButton = await canvas.findByText('Back')
+        await userEvent.click(backButton)
+
+        await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+          'Clearly'
+        )
+
+        await userEvent.click(await canvas.findByText('Continue'))
+      }
+    )
+
     const button = await canvas.findByRole('button', { name: /Save & Exit/ })
     await userEvent.click(button)
     const modal = within(await canvas.findByRole('dialog'))
