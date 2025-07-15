@@ -19,6 +19,7 @@
 - **`GH_TOKEN` secret is deprecated** and replaced with `GITHUB_GHCR_PUBLISH_TOKEN` and `E2E_WORKFLOWS_TOKEN` secrets. `GH_TOKEN` secret was widely used within workflows for manipulations with PRs and triggering e2e and deploy workflows in Country config template repositories. We segregated tokens with more restricted access. Please create following secrets in your repository:
   - Secret `GITHUB_GHCR_PUBLISH_TOKEN` is classic token with permissions `repo, write:packages`. Required to build and push OpenCRVS Core images.
   - Secret `E2E_WORKFLOWS_TOKEN` is fine-grained token scoped to your fork of country config template repository with permissions `Contents: Read and Write`.
+- Created a standalone `data-seeder` Docker image to decouple seeding logic from the core repository. This improves GitHub Actions runtime by avoiding full repository clone and dependency installation during environment seeding. [#8976](https://github.com/opencrvs/opencrvs-core/issues/8976)
 
 ## [1.7.3](https://github.com/opencrvs/opencrvs-core/compare/v1.7.2...v1.7.3)
 
