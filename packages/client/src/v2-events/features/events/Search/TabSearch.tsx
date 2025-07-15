@@ -67,9 +67,15 @@ function enhanceFieldWithSearchFieldConfig(
   field: Inferred,
   searchField: SearchField
 ): Inferred {
+  const commonConfig = {
+    conditionals: searchField.conditionals ?? field.conditionals,
+    validation: searchField.validations ?? field.validation,
+    required: false as const
+  }
   if (field.type === FieldType.DATE && searchField.config.type === 'range') {
     return {
       ...field,
+      ...commonConfig,
       validation: [],
       type: FieldType.DATE_RANGE,
       defaultValue: undefined
@@ -78,6 +84,7 @@ function enhanceFieldWithSearchFieldConfig(
   if (field.type === FieldType.ADDRESS) {
     return {
       ...field,
+      ...commonConfig,
       configuration: {
         searchMode: true
       }
@@ -86,13 +93,17 @@ function enhanceFieldWithSearchFieldConfig(
   if (field.type === FieldType.NAME) {
     return {
       ...field,
+      ...commonConfig,
       configuration: {
         ...field.configuration,
         searchMode: true
       }
     }
   }
-  return field
+  return {
+    ...field,
+    ...commonConfig
+  }
 }
 
 function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
