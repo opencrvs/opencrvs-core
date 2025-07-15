@@ -28,7 +28,8 @@ import {
   ActionScopes,
   WorkqueueConfigWithoutQuery,
   joinValues,
-  UUID
+  UUID,
+  SystemRole
 } from '@opencrvs/commons/client'
 
 export function getUsersFullName(
@@ -47,15 +48,23 @@ type AllKeys<T> = T extends T ? keyof T : never
  * @returns unique ids of users are referenced in the ActionDocument array.
  * Used for fetching user data in bulk.
  */
-export const getUserIdsFromActions = (actions: ActionDocument[]) => {
+export const getUserIdsFromActions = (
+  actions: ActionDocument[],
+  ignoreRoles?: SystemRole[]
+) => {
   const userIdFields = [
     'createdBy',
     'assignedTo'
   ] satisfies AllKeys<ActionDocument>[]
 
-  const userIds = actions.flatMap((action) =>
-    userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
-  )
+  const userIds = actions
+    .filter(
+      ({ createdByRole }) =>
+        !ignoreRoles?.some((role) => role === createdByRole)
+    )
+    .flatMap((action) =>
+      userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
+    )
 
   return uniq(userIds)
 }
