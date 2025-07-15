@@ -83,7 +83,10 @@ setQueryDefaults(trpcOptionsProxy.user.list, {
 
     return users.map((user) => ({
       ...user,
-      signature: user.signature ? getUnsignedFileUrl(user.signature) : undefined
+      signature: user.signature
+        ? getUnsignedFileUrl(user.signature)
+        : undefined,
+      avatar: user.avatar ? getUnsignedFileUrl(user.avatar) : undefined
     }))
   }
 })
