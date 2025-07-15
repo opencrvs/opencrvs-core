@@ -130,7 +130,7 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
 
 export const parameters = {
   layout: 'fullscreen',
-  mockingDate: new Date(2024, 3, 1),
+  mockingDate: new Date(2025, 7, 12),
   msw: {
     handlers: handlers
   }
