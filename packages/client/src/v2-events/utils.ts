@@ -58,7 +58,10 @@ export const getUserIdsFromActions = (
   ] satisfies AllKeys<ActionDocument>[]
 
   const userIds = actions
-    .filter(({ createdByRole }) => !ignoreSystems.includes(createdByRole))
+    .filter(
+      ({ createdByRole }) =>
+        !ignoreSystems?.some((system) => system === createdByRole)
+    )
     .flatMap((action) =>
       userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
     )
