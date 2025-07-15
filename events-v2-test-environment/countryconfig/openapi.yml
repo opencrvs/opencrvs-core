@@ -1925,8 +1925,8 @@ components:
               properties:
                 path:
                   type: string
-                  description: A full path with bucket name, starting from the root of the S3
-                    server, /bucket-name/document-id.jpg
+                  description: A full absolute path with bucket name, starting from the root of
+                    the S3 server, /bucket-name/document-id.jpg
                 originalFilename:
                   type: string
                 type:
@@ -2556,8 +2556,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -3686,8 +3686,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -3702,8 +3702,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -3869,8 +3869,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -3885,8 +3885,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4105,8 +4105,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -4121,8 +4121,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4288,8 +4288,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -4304,8 +4304,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4520,8 +4520,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -4536,8 +4536,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4703,8 +4703,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -4719,8 +4719,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -4948,8 +4948,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -4964,8 +4964,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5131,8 +5131,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -5147,8 +5147,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5363,8 +5363,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -5379,8 +5379,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5546,8 +5546,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -5562,8 +5562,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5791,8 +5791,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -5807,8 +5807,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -5974,8 +5974,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -5990,8 +5990,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6206,8 +6206,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -6222,8 +6222,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6389,8 +6389,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -6405,8 +6405,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6623,8 +6623,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -6639,8 +6639,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -6806,8 +6806,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -6822,8 +6822,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7038,8 +7038,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -7054,8 +7054,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7221,8 +7221,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -7237,8 +7237,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7456,8 +7456,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -7472,8 +7472,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7639,8 +7639,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -7655,8 +7655,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -7871,8 +7871,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -7887,8 +7887,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8054,8 +8054,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -8070,8 +8070,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8289,8 +8289,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -8305,8 +8305,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8472,8 +8472,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -8488,8 +8488,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8707,8 +8707,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -8723,8 +8723,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -8890,8 +8890,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -8906,8 +8906,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9122,8 +9122,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -9138,8 +9138,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9305,8 +9305,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -9321,8 +9321,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9537,8 +9537,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -9553,8 +9553,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9720,8 +9720,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -9736,8 +9736,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -9949,8 +9949,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -9965,8 +9965,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10132,8 +10132,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -10148,8 +10148,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10338,8 +10338,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -10354,8 +10354,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10520,8 +10520,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -10536,8 +10536,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10726,8 +10726,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -10742,8 +10742,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -10908,8 +10908,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -10924,8 +10924,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11112,8 +11112,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -11128,8 +11128,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11294,8 +11294,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -11310,8 +11310,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11454,7 +11454,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 3cea6b68-9dfa-4fd8-8315-eb7e4d8912f8
+        transactionId: ac90d794-4661-45a7-8b23-1e13af891b6f
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -11501,8 +11501,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -11517,8 +11517,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11683,8 +11683,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -11699,8 +11699,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -11884,8 +11884,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -11900,8 +11900,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12066,8 +12066,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -12082,8 +12082,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12280,8 +12280,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -12296,8 +12296,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12462,8 +12462,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -12478,8 +12478,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12663,8 +12663,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -12679,8 +12679,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -12845,8 +12845,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -12861,8 +12861,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13059,8 +13059,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -13075,8 +13075,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13241,8 +13241,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -13257,8 +13257,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13445,8 +13445,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -13461,8 +13461,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13627,8 +13627,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -13643,8 +13643,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -13831,8 +13831,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -13847,8 +13847,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14013,8 +14013,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -14029,8 +14029,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14214,8 +14214,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -14230,8 +14230,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14396,8 +14396,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -14412,8 +14412,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14597,8 +14597,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -14613,8 +14613,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14779,8 +14779,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -14795,8 +14795,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -14983,8 +14983,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -14999,8 +14999,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -15165,8 +15165,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -15181,8 +15181,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -15369,8 +15369,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -15385,8 +15385,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
@@ -15551,8 +15551,8 @@ components:
                 properties:
                   path:
                     type: string
-                    description: A full path with bucket name, starting from the root of the S3
-                      server, /bucket-name/document-id.jpg
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
                   originalFilename:
                     type: string
                   type:
@@ -15567,8 +15567,8 @@ components:
                   properties:
                     path:
                       type: string
-                      description: A full path with bucket name, starting from the root of the S3
-                        server, /bucket-name/document-id.jpg
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
                     originalFilename:
                       type: string
                     type:
