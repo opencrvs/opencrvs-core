@@ -50,7 +50,7 @@ type AllKeys<T> = T extends T ? keyof T : never
  */
 export const getUserIdsFromActions = (
   actions: ActionDocument[],
-  ignoreSystems?: SystemRole[]
+  ignoreRoles?: SystemRole[]
 ) => {
   const userIdFields = [
     'createdBy',
@@ -60,7 +60,7 @@ export const getUserIdsFromActions = (
   const userIds = actions
     .filter(
       ({ createdByRole }) =>
-        !ignoreSystems?.some((system) => system === createdByRole)
+        !ignoreRoles?.some((role) => role === createdByRole)
     )
     .flatMap((action) =>
       userIdFields.map((fieldName) => get(action, fieldName)).filter(isString)
