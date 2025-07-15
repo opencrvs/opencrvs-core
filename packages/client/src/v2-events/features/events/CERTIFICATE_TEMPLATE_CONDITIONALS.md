@@ -556,90 +556,97 @@ Show templates based on action history for print tracking (useful for replacemen
 ```
 
 // Example: Show template only when at least 2 print actions exist (minContains)
+
+```typescript
 {
-type: 'SHOW',
-conditional: {
-type: 'object',
-properties: {
-event: {
-type: 'object',
-properties: {
-actions: {
-type: 'array',
-minContains: 2,
-contains: {
-type: 'object',
-properties: {
-type: { const: 'PRINT_CERTIFICATE' }
-},
-required: ['type']
+  "type": "SHOW",
+  "conditional": {
+    "type": "object",
+    "properties": {
+      "event": {
+        "type": "object",
+        "properties": {
+          "actions": {
+            "type": "array",
+            "minContains": 2,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "type": { "const": "PRINT_CERTIFICATE" }
+              },
+              "required": ["type"]
+            }
+          }
+        },
+        "required": ["actions"]
+      }
+    },
+    "required": ["event"]
+  }
 }
-}
-},
-required: ['actions']
-}
-},
-required: ['event']
-}
-}
+```
 
 // Example: Show template only when exactly 2 print actions exist (minContains + maxContains)
+
+```typescript
 {
-type: 'SHOW',
-conditional: {
-type: 'object',
-properties: {
-event: {
-type: 'object',
-properties: {
-actions: {
-type: 'array',
-minContains: 2,
-maxContains: 2,
-contains: {
-type: 'object',
-properties: {
-type: { const: 'PRINT_CERTIFICATE' }
-},
-required: ['type']
+  "type": "SHOW",
+  "conditional": {
+    "type": "object",
+    "properties": {
+      "event": {
+        "type": "object",
+        "properties": {
+          "actions": {
+            "type": "array",
+            "minContains": 2,
+            "maxContains": 2,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "type": { "const": "PRINT_CERTIFICATE" }
+              },
+              "required": ["type"]
+            }
+          }
+        },
+        "required": ["actions"]
+      }
+    },
+    "required": ["event"]
+  }
 }
-}
-},
-required: ['actions']
-}
-},
-required: ['event']
-}
-}
+```
 
 // Example: Show template when at most 1 print action exists (maxContains)
-{
-type: 'SHOW',
-conditional: {
-type: 'object',
-properties: {
-event: {
-type: 'object',
-properties: {
-actions: {
-type: 'array',
-maxContains: 1,
-contains: {
-type: 'object',
-properties: {
-type: { const: 'PRINT_CERTIFICATE' }
-},
-required: ['type']
-}
-}
-},
-required: ['actions']
-}
-},
-required: ['event']
-}
-}
 
+```typescript
+{
+  "type": "SHOW",
+  "conditional": {
+    "type": "object",
+    "properties": {
+      "event": {
+        "type": "object",
+        "properties": {
+          "actions": {
+            "type": "array",
+            "maxContains": 1,
+            "contains": {
+              "type": "object",
+              "properties": {
+                "type": { "const": "PRINT_CERTIFICATE" }
+              },
+              "required": ["type"]
+            }
+          }
+        },
+        "required": ["actions"]
+      }
+    },
+    "required": ["event"]
+  }
+}
 ```
 
 **Advanced Count-Based Validation**: OpenCRVS now supports sophisticated count-based conditionals using JSON Schema Draft 2019-09 features:
@@ -661,4 +668,7 @@ The system includes comprehensive test coverage for:
 - Edge cases and error handling
 
 See `useCertificateTemplateSelectorFieldConfig.test.ts` for implementation examples and test patterns.
+
+```
+
 ```
