@@ -11,16 +11,15 @@
 
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
-import { ConditionalParameters, JSONSchema } from './conditionals'
-
 import { formatISO } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { EventState, ActionUpdate } from '../events/ActionDocument'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType, FieldConditional } from '../events/Conditional'
+import { ConditionalParameters, JSONSchema } from './conditionals'
 
 const ajv = new Ajv({
   $data: true,
@@ -303,4 +302,30 @@ export function runFieldValidations({
     // Assumes that custom validation errors are based on the field type, and extend the validation.
     errors: [...fieldValidationResult, ...customValidationResults]
   }
+}
+
+// Separate AJV instance for certificate template conditionals that supports newer JSON Schema features
+import Ajv2019 from 'ajv/dist/2019'
+const certificateAjv = new Ajv2019({
+  $data: true,
+  allowUnionTypes: true,
+  strict: false, // Allow minContains and other newer features
+  validateSchema: false // Disable schema validation for maximum flexibility
+})
+addFormats(certificateAjv)
+
+export function validateCertificateConditional(
+  schema: JSONSchema,
+  data: ConditionalParameters
+) {
+  return certificateAjv.validate(schema, data)
+}
+
+export function areCertificateConditionsMet(
+  conditions: FieldConditional[],
+  values: Record<string, unknown>
+) {
+  return conditions.every((condition) => {
+    return certificateAjv.validate(condition.conditional, values)
+  })
 }

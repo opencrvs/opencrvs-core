@@ -37,6 +37,8 @@ export const CertificateConfig = z.object({
   conditionals: z.array(FieldConditional).optional()
 })
 
+export type CertificateConfig = z.infer<typeof CertificateConfig>
+
 /**
  * Represents the way client uses it
  */
