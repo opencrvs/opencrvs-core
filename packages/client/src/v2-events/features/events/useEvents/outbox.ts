@@ -9,12 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  hashKey,
-  MutationKey,
-  partialMatchKey,
-  useMutationState
-} from '@tanstack/react-query'
+import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
 import {
   deepMerge,
