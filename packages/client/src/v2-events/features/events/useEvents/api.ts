@@ -212,8 +212,17 @@ export async function refetchEventsList() {
   })
 }
 
+async function deleteEventData(updatedEvent: EventDocument) {
+  const { id } = updatedEvent
+  setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
+  queryClient.removeQueries({
+    queryKey: trpcOptionsProxy.event.get.queryKey(id)
+  })
+  await removeCachedFiles(updatedEvent)
+}
+
 export async function updateLocalEvent(updatedEvent: EventDocument) {
-  setEventData(updatedEvent.id, updatedEvent)
+  await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
   return refetchEventsList()
 }
@@ -246,16 +255,7 @@ export async function refetchDraftsList() {
   })
 }
 
-function deleteEventData(id: string) {
-  queryClient.removeQueries({
-    queryKey: trpcOptionsProxy.event.get.queryKey(id)
-  })
-}
-
 export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
-  const { id } = updatedEvent
-  setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
-  deleteEventData(id)
-  await removeCachedFiles(updatedEvent)
+  await deleteEventData(updatedEvent)
   await invalidateWorkqueues()
 }
