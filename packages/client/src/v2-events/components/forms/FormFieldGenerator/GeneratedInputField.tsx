@@ -45,7 +45,10 @@ import {
   isNameFieldType,
   isPhoneFieldType,
   isIdFieldType,
-  getValidatorsForField
+  getValidatorsForField,
+  DateRangeFieldValue,
+  isSelectDateRangeFieldType,
+  SelectDateRangeValue
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -62,7 +65,8 @@ import {
   AdministrativeArea,
   Divider,
   PageHeader,
-  Paragraph
+  Paragraph,
+  SelectDateRangeField
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -228,21 +232,36 @@ export const GeneratedInputField = React.memo(
     }
 
     if (isDateRangeFieldType(field)) {
+      const parsed = DateRangeFieldValue.safeParse(field.value)
       return (
         <InputField {...field.inputFieldProps}>
           <DateRangeField.Input
             {...inputProps}
-            value={field.value}
+            value={parsed.data}
             onBlur={onBlur}
             onChange={(val) => {
-              //@TODO: We need to come up with a general solution for complex types.
-              // @ts-ignore
               onFieldValueChange(fieldDefinition.id, val)
             }}
           />
         </InputField>
       )
     }
+
+    if (isSelectDateRangeFieldType(field)) {
+      return (
+        <InputField {...field.inputFieldProps}>
+          <SelectDateRangeField.Input
+            {...inputProps}
+            options={field.config.options}
+            value={field.value}
+            onChange={(val: SelectDateRangeValue) => {
+              onFieldValueChange(fieldDefinition.id, val)
+            }}
+          />
+        </InputField>
+      )
+    }
+
     if (isPageHeaderFieldType(field)) {
       return (
         <PageHeader.Input>

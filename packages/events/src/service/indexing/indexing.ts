@@ -78,7 +78,6 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
-    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
@@ -136,7 +135,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
         }
@@ -145,19 +144,29 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          firstname: { type: 'text' },
-          surname: { type: 'text' },
-          __fullname: { type: 'text' }
+          firstname: { type: 'text', analyzer: 'human_name' },
+          surname: { type: 'text', analyzer: 'human_name' },
+          __fullname: { type: 'text', analyzer: 'human_name' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
       return {
         type: 'nested',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' },
           option: { type: 'keyword' }
+        }
+      }
+    // @TODO: other option would be to throw an error, since these should not be used in declaration form.
+    case FieldType.DATE_RANGE:
+    case FieldType.SELECT_DATE_RANGE:
+      return {
+        type: 'object',
+        properties: {
+          start: { type: 'date' },
+          end: { type: 'date' }
         }
       }
     default:
@@ -193,6 +202,17 @@ export async function createIndex(
             lowercase_normalizer: {
               type: 'custom',
               filter: ['lowercase']
+            }
+          },
+          analyzer: {
+            /*
+             * Human name can contain
+             * Special characters including hyphens, underscores and spaces
+             */
+            human_name: {
+              type: 'custom',
+              tokenizer: 'standard',
+              filter: ['lowercase', 'word_delimiter']
             }
           }
         }
