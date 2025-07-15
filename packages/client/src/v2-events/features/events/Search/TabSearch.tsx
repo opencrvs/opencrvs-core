@@ -297,8 +297,21 @@ export function TabSearch({
     navigate(`${searchPath}?${queryString}`)
   }
 
+  const countNonEmptyFields = (value: unknown): number => {
+    if (!value || value === '') {
+      return 0
+    }
+    if (typeof value === 'object') {
+      return Object.values(value).reduce<number>(
+        (count, val) => count + countNonEmptyFields(val),
+        0
+      )
+    }
+    return 1
+  }
+
   const hasEnoughParams =
-    Object.keys(nonEmptyValues).length >= MIN_PARAMS_TO_SEARCH
+    countNonEmptyFields(nonEmptyValues) >= MIN_PARAMS_TO_SEARCH
 
   return (
     <>
