@@ -130,6 +130,7 @@ function Wrapper({ store, router, initialPath, children }: WrapperProps) {
 
 export const parameters = {
   layout: 'fullscreen',
+  mockingDate: new Date(2024, 3, 1),
   msw: {
     handlers: handlers
   }
@@ -152,6 +153,25 @@ clearStorage()
 const preview: Preview = {
   loaders: [
     mswLoader,
+    (options) => {
+      const mockingDate = options.parameters?.mockingDate
+      if (mockingDate) {
+        const OriginalDate = Date
+        global.Date = class extends OriginalDate {
+          constructor(...args: Parameters<typeof OriginalDate>) {
+            if (args.length === 0) {
+              super(mockingDate)
+            } else {
+              super(...args)
+            }
+          }
+
+          static now() {
+            return mockingDate.getTime()
+          }
+        } as DateConstructor
+      }
+    },
     async (options) => {
       await clearStorage()
       queryClient.clear()
