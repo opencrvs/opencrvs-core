@@ -13,7 +13,14 @@ import { z } from 'zod'
 import { UserWithPrimaryOffice } from './deserializer'
 
 export const SerializedUserField = z.object({
-  $userField: z.enum(['id', 'name', 'role', 'signature', 'primaryOfficeId'])
+  $userField: z.enum([
+    'id',
+    'name',
+    'role',
+    'signature',
+    'avatar',
+    'primaryOfficeId'
+  ])
 })
 
 export type SerializedUserField = z.infer<typeof SerializedUserField>

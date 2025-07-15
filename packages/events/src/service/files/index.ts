@@ -9,24 +9,39 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
+import { FullDocumentPath, joinURLPaths } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
-export async function deleteFile(filename: string, token: string) {
-  const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
-    method: 'DELETE',
-    headers: {
-      Authorization: token
+export async function deleteFile(path: FullDocumentPath, token: string) {
+  const res = await fetch(
+    new URL(joinURLPaths('/files', path), env.DOCUMENTS_URL),
+    {
+      method: 'DELETE',
+      headers: {
+        Authorization: token
+      }
     }
-  })
+  )
   return res.ok
 }
-export async function fileExists(filename: string, token: string) {
-  const res = await fetch(new URL(`/files/${filename}`, env.DOCUMENTS_URL), {
-    method: 'HEAD',
-    headers: {
-      Authorization: token
+export async function fileExists(path: FullDocumentPath, token: string) {
+  const res = await fetch(
+    new URL(joinURLPaths('/files', path), env.DOCUMENTS_URL),
+    {
+      method: 'HEAD',
+      headers: {
+        Authorization: token
+      }
     }
-  })
+  )
 
-  return res.ok
+  if (res.status === 404) {
+    return false
+  } else if (!res.ok) {
+    throw new Error(
+      `Failed to check file existence: ${res.status} ${res.statusText}`
+    )
+  }
+
+  return true
 }

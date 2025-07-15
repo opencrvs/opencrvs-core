@@ -125,9 +125,9 @@ export const SignatureFileUpload: StoryObj<typeof StyledFormFieldGenerator> = {
           })
         ],
         files: [
-          http.get('/api/presigned-url/:filename', (req) => {
+          http.get('/api/presigned-url/:filePath*', (req) => {
             return HttpResponse.json({
-              presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
+              presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
             })
           }),
           http.get('http://localhost:3535/ocrvs/:id', () => {
@@ -237,9 +237,9 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
             })
           ],
           files: [
-            http.get('/api/presigned-url/:filename', (req) => {
+            http.get('/api/presigned-url/:filePath*', (req) => {
               return HttpResponse.json({
-                presignedURL: `http://localhost:3535/ocrvs/${req.params.filename}`
+                presignedURL: `http://localhost:3535/ocrvs/${req.params.filePath}`
               })
             }),
             http.post('/api/upload', () => {
@@ -300,16 +300,23 @@ export const SignatureCanvasUpload: StoryObj<typeof StyledFormFieldGenerator> =
 
           await canvas.findByText('Signature')
 
-          await canvas.findByText(
-            'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
-          )
+          await expect(
+            await canvas.findByText(
+              'By signing this document with an electronic signature, I agree that such signature will be valid as handwritten signatures to the extent allowed by the laws of Farajaland.'
+            )
+          ).toBeVisible()
+
           await canvas.findByRole('button', {
             name: 'Cancel'
           })
           await expect(
-            await canvas.findByRole('button', {
-              name: 'Apply'
-            })
+            await canvas.findByRole(
+              'button',
+              {
+                name: 'Apply'
+              },
+              { timeout: 1000 }
+            )
           ).toBeDisabled()
         }
       )

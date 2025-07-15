@@ -26,6 +26,11 @@ import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
 import { UUID } from '../../uuid'
+import {
+  DocumentPath,
+  FullDocumentPath,
+  FullDocumentURL
+} from '../../documents'
 
 export function getStatusFromActions(actions: Array<Action>) {
   return actions
@@ -130,11 +135,17 @@ type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny chan
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
   : T extends UUID
     ? T
-    : T extends (infer U)[]
-      ? NonNullableDeep<U>[]
-      : T extends object
-        ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
-        : NonNullable<T>
+    : T extends FullDocumentPath
+      ? T
+      : T extends DocumentPath
+        ? T
+        : T extends FullDocumentURL
+          ? T
+          : T extends (infer U)[]
+            ? NonNullableDeep<U>[]
+            : T extends object
+              ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
+              : NonNullable<T>
 
 /**
  * @returns Given arbitrary object, recursively remove all keys with null values

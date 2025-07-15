@@ -13,13 +13,12 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
-import { ActionType, tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import { setEventData, addLocalEventConfig } from '../../../useEvents/api'
 import { router } from './router'
 import * as Request from './index'
 
@@ -39,15 +38,14 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const draft = testDataGenerator().event.draft({
+  eventId: tennisClubMembershipEventDocument.id,
+  actionType: ActionType.REQUEST_CORRECTION
+})
 function FormClear() {
   const drafts = useDrafts()
   useEffect(() => {
-    drafts.setLocalDraft(
-      testDataGenerator().event.draft({
-        eventId: tennisClubMembershipEventDocument.id,
-        actionType: ActionType.REQUEST_CORRECTION
-      })
-    )
+    drafts.setLocalDraft(draft)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return <Outlet />
@@ -55,6 +53,9 @@ function FormClear() {
 
 export const ReviewWithChanges: Story = {
   parameters: {
+    offline: {
+      drafts: [draft]
+    },
     reactRouter: {
       router: {
         path: '/',
@@ -79,6 +80,9 @@ export const ReviewWithChanges: Story = {
 
 export const AdditionalDetails: Story = {
   parameters: {
+    offline: {
+      drafts: [draft]
+    },
     reactRouter: {
       router: router,
       initialPath:
@@ -99,6 +103,9 @@ export const AdditionalDetails: Story = {
 }
 export const Summary: Story = {
   parameters: {
+    offline: {
+      drafts: [draft]
+    },
     reactRouter: {
       router: {
         path: '/',

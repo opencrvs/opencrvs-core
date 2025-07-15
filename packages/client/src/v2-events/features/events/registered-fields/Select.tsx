@@ -18,15 +18,13 @@ import {
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 
-function SelectInput({
-  onChange,
-  value,
-  ...props
-}: Omit<FieldProps<'SELECT'>, 'label'> & {
+export type SelectInputProps = Omit<FieldProps<'SELECT'>, 'label'> & {
   onChange: (newValue: string) => void
   value?: string
   label?: TranslationConfig
-} & { 'data-testid'?: string }) {
+} & { 'data-testid'?: string }
+
+function SelectInput({ onChange, value, ...props }: SelectInputProps) {
   const intl = useIntl()
   const { options } = props
   const selectedOption = options.find((option) => option.value === value)
