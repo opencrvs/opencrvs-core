@@ -28,10 +28,10 @@ import {
   getDeclarationFields,
   DateRangeFieldValue,
   SelectDateRangeValue,
-  timePeriodToDateRange
+  timePeriodToDateRange,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
-import { EventStatus } from '@opencrvs/commons/client'
 import {
   Errors,
   getValidationErrorsForForm
@@ -270,7 +270,14 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
 }
 
 function buildConditionForStatus(): Condition {
-  return { type: 'anyOf', terms: Object.values([...EventStatus.options]) }
+  return {
+    type: 'anyOf',
+    terms: Object.values([
+      ...EventStatus.options.filter(
+        (status) => status !== EventStatus.enum.CREATED
+      )
+    ])
+  }
 }
 
 /**
