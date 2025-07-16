@@ -13,7 +13,6 @@ import { defineConditional } from '../conditionals/conditionals'
 import { createEventFieldConfig } from '../event-config/event-configuration'
 import { ActionType } from './ActionType'
 import { EventFieldId } from './AdvancedSearchConfig'
-import { SelectOption } from './FieldConfig'
 import {
   WorkqueueColumnKeys,
   WorkqueueColumnValue
@@ -26,8 +25,8 @@ import {
  * event('status') // → returns search config
  * event.hasAction('CLICKED') // → returns conditional
  */
-function eventFn(fieldId: EventFieldId, options: SelectOption[] = []) {
-  return createEventFieldConfig(fieldId, options)
+function eventFn(fieldId: EventFieldId) {
+  return createEventFieldConfig(fieldId)
 }
 
 // Attach conditional helpers directly to the function
