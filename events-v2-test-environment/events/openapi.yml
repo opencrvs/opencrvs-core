@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: ca74328e-0502-48b1-b4b3-f9ec1caa8814
+                transactionId: 19df63e2-dda2-4e7b-9c11-2be172f2f45b
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 350155d1-8d57-423d-b5dd-376e02473e48
+                transactionId: f9515445-42ba-47ad-ae3b-e8e78d656e0e
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2910,6 +2910,17 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            configuration:
+              type: object
+              properties:
+                searchableResource:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - locations
+                      - facilities
+                      - offices
           required:
             - id
             - label
