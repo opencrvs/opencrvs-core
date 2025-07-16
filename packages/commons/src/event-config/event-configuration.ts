@@ -11,22 +11,16 @@
 
 import { createSearchConfig } from '../searchConfigs'
 import { EventFieldId } from '../events/AdvancedSearchConfig'
-import { SelectOption } from 'src/events'
 
 /**
  * Creates a search configuration object for a given event metadata field.
  *
  * @param fieldId - The field ID to search on.
- * @param options - UI options for rendering (optional).
  */
-export function createEventFieldConfig(
-  fieldId: EventFieldId,
-  options: SelectOption[] = []
-) {
+export function createEventFieldConfig(fieldId: EventFieldId) {
   const baseField = {
     fieldId,
-    fieldType: 'event' as const,
-    options
+    fieldType: 'event' as const
   }
 
   return createSearchConfig(baseField)
