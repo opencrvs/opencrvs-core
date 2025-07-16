@@ -439,6 +439,35 @@ type _ExpectTrue = Expect<
   EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
 >
 
+const ALL_ADDRESS_INPUT_FIELDS = [
+  ...ADMIN_STRUCTURE,
+  ...URBAN_FIELDS,
+  ...RURAL_FIELDS,
+  ...GENERIC_ADDRESS_FIELDS
+] satisfies Array<FieldConfigWithoutAddress>
+
+const SEARCH_MODE_FIELDS: Array<
+  (typeof ALL_ADDRESS_INPUT_FIELDS)[number]['id']
+> = [
+  'country',
+  'province',
+  'district',
+  'state',
+  'district2',
+  'urbanOrRural',
+  'town',
+  'village'
+]
+
+function getFilteredFields(searchMode: boolean) {
+  if (!searchMode) {
+    return ALL_ADDRESS_INPUT_FIELDS
+  }
+  return ALL_ADDRESS_INPUT_FIELDS.filter((field) =>
+    SEARCH_MODE_FIELDS.includes(field.id)
+  )
+}
+
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -446,52 +475,82 @@ type _ExpectTrue = Expect<
  * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
  * - All admin structure fields are hidden until the previous field is selected.
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
+ * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, value = {}, ...otherProps } = props
-
-  const fields = [
-    ...ADMIN_STRUCTURE,
-    ...URBAN_FIELDS,
-    ...RURAL_FIELDS,
-    ...GENERIC_ADDRESS_FIELDS
-  ] satisfies Array<FieldConfigWithoutAddress>
+  const {
+    onChange,
+    defaultValue,
+    configuration: { searchMode = false } = {},
+    value = {},
+    ...otherProps
+  } = props
+  const fields = getFilteredFields(searchMode)
+  const fieldsWithDefaults = defaultValue
+    ? fields.map(addDefaultValue(defaultValue))
+    : fields
 
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
+      fields={fieldsWithDefaults}
       initialValues={{ ...defaultValue, ...value }}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />
   )
 }
 
-function AddressOutput({ value }: { value?: AddressFieldValue }) {
+function AddressOutput({
+  value,
+  searchMode = false
+}: {
+  value?: AddressFieldValue
+  searchMode?: boolean
+}) {
   if (!value) {
     return ''
   }
-  return (
-    <>
-      {ALL_ADDRESS_FIELDS.map((field) => ({
-        field,
-        value: value[field.id as keyof typeof value]
-      }))
-        .filter(
-          (field) =>
-            field.value &&
-            isFieldDisplayedOnReview(field.field satisfies FieldConfig, value)
-        )
-        .map((field) => (
+
+  const fields = getFilteredFields(searchMode)
+    .map((field) => ({
+      field,
+      value: value[field.id as keyof typeof value]
+    }))
+    .filter(
+      (field) =>
+        field.value &&
+        isFieldDisplayedOnReview(field.field satisfies FieldConfig, value)
+    )
+
+  if (searchMode) {
+    return (
+      <>
+        {fields.map((field, index) => (
           <React.Fragment key={field.field.id}>
             <Output
               field={field.field}
               showPreviouslyMissingValuesAsChanged={false}
               value={field.value}
             />
-            <br />
+            {index < fields.length - 1 && ', '}
           </React.Fragment>
         ))}
+      </>
+    )
+  }
+
+  return (
+    <>
+      {fields.map((field) => (
+        <React.Fragment key={field.field.id}>
+          <Output
+            field={field.field}
+            showPreviouslyMissingValuesAsChanged={false}
+            value={field.value}
+          />
+          <br />
+        </React.Fragment>
+      ))}
     </>
   )
 }

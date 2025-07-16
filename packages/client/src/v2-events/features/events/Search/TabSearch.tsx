@@ -24,7 +24,9 @@ import {
   Inferred,
   SearchField,
   TranslationConfig,
-  EventState
+  EventState,
+  NameFieldValue,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
@@ -65,24 +67,43 @@ function enhanceFieldWithSearchFieldConfig(
   field: Inferred,
   searchField: SearchField
 ): Inferred {
+  const commonConfig = {
+    conditionals: searchField.conditionals ?? field.conditionals,
+    validation: searchField.validations ?? field.validation,
+    required: false as const
+  }
   if (field.type === FieldType.DATE && searchField.config.type === 'range') {
     return {
       ...field,
+      ...commonConfig,
       validation: [],
       type: FieldType.DATE_RANGE,
       defaultValue: undefined
     }
   }
+  if (field.type === FieldType.ADDRESS) {
+    return {
+      ...field,
+      ...commonConfig,
+      configuration: {
+        searchMode: true
+      }
+    }
+  }
   if (field.type === FieldType.NAME) {
     return {
       ...field,
+      ...commonConfig,
       configuration: {
         ...field.configuration,
         searchMode: true
       }
     }
   }
-  return field
+  return {
+    ...field,
+    ...commonConfig
+  }
 }
 
 function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
@@ -163,8 +184,15 @@ function buildSearchSections({
 
     const modifiedFields = combinedFields.map((f) => {
       const fieldSearchConfig = section.fields.find((a) => a.fieldId === f.id)
+      let optionsOverride = {}
+      if (fieldSearchConfig?.options && fieldSearchConfig.options.length > 0) {
+        optionsOverride = {
+          options: fieldSearchConfig.options
+        }
+      }
       return {
         ...f,
+        ...optionsOverride,
         required: false as const,
         conditionals: fieldSearchConfig?.conditionals ?? f.conditionals,
         validation: fieldSearchConfig?.validations ?? f.validation
@@ -230,7 +258,37 @@ export function TabSearch({
   const nonEmptyValues = filterEmptyValues(formValues)
 
   const handleSearch = () => {
-    const queryString = serializeSearchParams(nonEmptyValues)
+    const fields = [
+      ...enhancedEvent.declaration.pages.flatMap((page) => page.fields),
+      ...getMetadataFieldConfigs(
+        enhancedEvent.advancedSearch.flatMap((section) => section.fields)
+      )
+    ]
+
+    const updatedValues = Object.entries(nonEmptyValues).reduce(
+      (result, [fieldId, value]) => {
+        const field = fields.find((f) => f.id === fieldId)
+        if (!field || !isFieldVisible(field, formValues)) {
+          return result
+        }
+        if (field.type === FieldType.NAME && typeof value === 'object') {
+          const nameValue = NameFieldValue.safeParse(value)
+          if (
+            nameValue.success &&
+            !nameValue.data.firstname &&
+            !nameValue.data.surname &&
+            !nameValue.data.middlename
+          ) {
+            return result
+          }
+        }
+
+        return { ...result, [fieldId]: value }
+      },
+      {} as Record<string, unknown>
+    )
+
+    const queryString = serializeSearchParams(updatedValues)
 
     const searchPath = ROUTES.V2.SEARCH_RESULT.buildPath({
       eventType: enhancedEvent.id
@@ -239,8 +297,21 @@ export function TabSearch({
     navigate(`${searchPath}?${queryString}`)
   }
 
+  const countNonEmptyFields = (value: unknown): number => {
+    if (!value || value === '') {
+      return 0
+    }
+    if (typeof value === 'object') {
+      return Object.values(value).reduce<number>(
+        (count, val) => count + countNonEmptyFields(val),
+        0
+      )
+    }
+    return 1
+  }
+
   const hasEnoughParams =
-    Object.keys(nonEmptyValues).length >= MIN_PARAMS_TO_SEARCH
+    countNonEmptyFields(nonEmptyValues) >= MIN_PARAMS_TO_SEARCH
 
   return (
     <>

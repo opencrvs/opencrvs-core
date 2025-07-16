@@ -10,6 +10,7 @@
  */
 import { estypes } from '@elastic/elasticsearch'
 import {
+  AddressFieldValue,
   EventConfig,
   FieldType,
   getAllUniqueFields,
@@ -21,7 +22,11 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
-import { encodeFieldId } from './utils'
+import {
+  encodeFieldId,
+  generateQueryForAddressField,
+  getAlternateFieldMap
+} from './utils'
 
 /** Convert API date clause format to elastic syntax */
 function dateClauseToElasticQuery(
@@ -72,27 +77,92 @@ function generateQuery(
     .filter((field) => field.type === FieldType.NAME)
     .map((f) => f.id)
 
-  const must = Object.entries(event).map(([fieldId, search]) => {
-    const field = `declaration.${encodeFieldId(fieldId)}`
+  const addressFieldIds = allEventFields
+    .filter((field) => field.type === FieldType.ADDRESS)
+    .map((f) => f.id)
 
-    if (search.type === 'exact') {
-      return {
-        match: {
-          [field]: search.term
-        }
+  const alternateFieldMap = getAlternateFieldMap(eventConfigs)
+
+  const must = Object.entries(event)
+    // Exclude fields from Search query that are meant to
+    .filter(([fieldId]) => {
+      const fieldSearchConfig = eventConfigs
+        .flatMap((x) => x.advancedSearch)
+        .flatMap((s) => s.fields)
+        .find((f) => f.fieldId === fieldId)
+      if (
+        fieldSearchConfig?.fieldType === 'field' &&
+        fieldSearchConfig.excludeInSearchQuery
+      ) {
+        return false
       }
-    }
+      return true
+    })
+    .map(([fieldId, search]) => {
+      const field = `declaration.${encodeFieldId(fieldId)}`
 
-    if (search.type === 'fuzzy') {
-      /**
-       * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
-       * return a match query on the `${field}.__fullname` subfield. This allows Elasticsearch to perform
-       * a fuzzy search on the full name, improving matching for name-related fields (e.g., handling typos or variations).
-       */
-      if (nameFieldIds.includes(fieldId)) {
+      if (search.type === 'exact') {
+        const allIds = [fieldId, ...(alternateFieldMap[fieldId] ?? [])]
+
+        if (
+          fieldId in alternateFieldMap &&
+          alternateFieldMap[fieldId].length > 0
+        ) {
+          const queries: estypes.QueryDslQueryContainer[] = allIds.map((id) => {
+            if (addressFieldIds.includes(id)) {
+              const parsed = AddressFieldValue.safeParse(
+                JSON.parse(search.term)
+              )
+              if (parsed.success) {
+                return generateQueryForAddressField(
+                  `declaration.${encodeFieldId(id)}`,
+                  parsed.data
+                )
+              }
+            }
+
+            // For non-address or failed parse, return simple match
+            return {
+              match: {
+                [`declaration.${encodeFieldId(id)}`]: search.term
+              }
+            }
+          })
+
+          return {
+            bool: { should: queries, minimum_should_match: 1 }
+          }
+        }
+
+        // default exact match
         return {
           match: {
-            [`${field}.__fullname`]: {
+            [field]: search.term
+          }
+        }
+      }
+
+      // Step 3: Fuzzy
+      if (search.type === 'fuzzy') {
+        /**
+         * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
+         * return a match query on the `${field}.__fullname` subfield. This allows Elasticsearch to perform
+         * a fuzzy search on the full name, improving matching for name-related fields (e.g., handling typos or variations).
+         */
+        if (nameFieldIds.includes(fieldId)) {
+          return {
+            match: {
+              [`${field}.__fullname`]: {
+                query: search.term,
+                fuzziness: 'AUTO'
+              }
+            }
+          }
+        }
+
+        return {
+          match: {
+            [field]: {
               query: search.term,
               fuzziness: 'AUTO'
             }
@@ -100,39 +170,31 @@ function generateQuery(
         }
       }
 
-      return {
-        match: {
-          [field]: {
-            query: search.term,
-            fuzziness: 'AUTO'
+      if (search.type === 'anyOf') {
+        return {
+          terms: {
+            [field]: search.terms
           }
         }
       }
-    }
 
-    if (search.type === 'anyOf') {
-      return {
-        terms: {
-          [field]: search.terms
-        }
-      }
-    }
-
-    if (search.type === 'range') {
-      return {
-        range: {
-          [field]: {
-            gte: search.gte,
-            lte: search.lte
+      if (search.type === 'range') {
+        return {
+          range: {
+            [field]: {
+              gte: search.gte,
+              lte: search.lte
+            }
           }
         }
       }
-    }
 
-    throw new Error(`Unsupported query type: ${search.type}`)
-  }) satisfies estypes.QueryDslQueryContainer[]
+      throw new Error(`Unsupported query type: ${search.type}`)
+    })
 
-  return { bool: { must } } as estypes.QueryDslQueryContainer
+  return {
+    bool: { must, should: undefined }
+  } satisfies estypes.QueryDslQueryContainer
 }
 
 const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
@@ -148,6 +210,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
     if (!clause[key]) {
       continue
     }
+
     switch (key) {
       case 'id': {
         must.push({
