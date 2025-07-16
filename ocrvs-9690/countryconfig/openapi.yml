@@ -2244,6 +2244,17 @@ components:
             defaultValue:
               type: string
               minLength: 1
+            configuration:
+              type: object
+              properties:
+                searchableResource:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - locations
+                      - facilities
+                      - offices
           required:
             - id
             - label
@@ -11479,7 +11490,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 9e865861-d501-4d50-bfe1-3308a967ee8f
+        transactionId: b9691f8a-1dac-4037-8638-4f1ef49fee65
         declaration: {}
         annotation: {}
         type: NOTIFY
