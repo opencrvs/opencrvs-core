@@ -45,14 +45,14 @@ export const typeResolvers: GQLResolver = {
   },
   VSExport: {
     async url(
-      { url: fileUri }: GQLVSExport,
+      { url: filePath }: GQLVSExport,
       _,
       { headers: authHeader, presignDocumentUrls }
     ) {
       if (!presignDocumentUrls) {
-        return fileUri
+        return filePath
       }
-      return getPresignedUrlFromUri(fileUri, authHeader)
+      return getPresignedUrlFromUri(filePath, authHeader)
     }
   },
   EventMetricsByRegistrar: {

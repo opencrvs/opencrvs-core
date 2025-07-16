@@ -495,6 +495,50 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
   expect(fetchedEvents).toHaveLength(2)
 })
 
+test('properly returns search by name even when there is an undercore in someones name', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Matt_Johnson',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: record1
+    })
+  )
+
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    clauses: [{ data: { 'applicant.name': { type: 'fuzzy', term: 'Matt' } } }]
+  })
+
+  expect(fetchedEvents).toHaveLength(1)
+
+  expect(
+    getMixedPath(fetchedEvents[0].declaration, 'applicant.name.firstname')
+  ).toBe('Matt_Johnson')
+})
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [

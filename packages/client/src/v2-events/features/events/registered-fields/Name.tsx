@@ -18,6 +18,7 @@ import {
   NameFieldValue,
   TextField
 } from '@opencrvs/commons/client'
+import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 
 interface Props {
@@ -180,7 +181,7 @@ function NameInput(props: Props) {
           if (searchMode) {
             // when in search mode, we initialize empty name fields with empty string
             // to avoid name field validation
-            values = { ...defailtNameFieldValue, ...values }
+            values = mergeWithoutNullsOrUndefined(defailtNameFieldValue, values)
           }
           onChange(values as NameFieldValue)
         }}

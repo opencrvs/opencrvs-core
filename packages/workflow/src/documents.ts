@@ -118,8 +118,8 @@ export async function uploadBase64AttachmentsToDocumentsStore(
   if (record.registration?.attachments) {
     for (const attachment of record.registration.attachments) {
       if (attachment.data && isBase64FileString(attachment.data)) {
-        const fileUri = await uploadFileToMinio(attachment.data, authHeader)
-        attachment.data = fileUri
+        const filePath = await uploadFileToMinio(attachment.data, authHeader)
+        attachment.data = filePath
       }
     }
   }
@@ -131,16 +131,16 @@ export async function uploadBase64AttachmentsToDocumentsStore(
       if (certificate.collector.affidavit) {
         for (const affidavit of certificate.collector.affidavit) {
           if (affidavit.data && isBase64FileString(affidavit.data)) {
-            const fileUri = await uploadFileToMinio(affidavit.data, authHeader)
-            affidavit.data = fileUri
+            const filePath = await uploadFileToMinio(affidavit.data, authHeader)
+            affidavit.data = filePath
           }
         }
       }
       if (certificate.collector.photo) {
         for (const photo of certificate.collector.photo) {
           if (photo.data && isBase64FileString(photo.data)) {
-            const fileUri = await uploadFileToMinio(photo.data, authHeader)
-            photo.data = fileUri
+            const filePath = await uploadFileToMinio(photo.data, authHeader)
+            photo.data = filePath
           }
         }
       }
@@ -149,17 +149,17 @@ export async function uploadBase64AttachmentsToDocumentsStore(
   if (record.registration?.correction?.attachments) {
     for (const attachment of record.registration.correction.attachments) {
       if (attachment.data && isBase64FileString(attachment.data)) {
-        const fileUri = await uploadFileToMinio(attachment.data, authHeader)
-        attachment.data = fileUri
+        const filePath = await uploadFileToMinio(attachment.data, authHeader)
+        attachment.data = filePath
       }
     }
   }
   if (record.registration?.correction?.payment?.attachmentData) {
-    const fileUri = await uploadFileToMinio(
+    const filePath = await uploadFileToMinio(
       record.registration.correction.payment.attachmentData,
       authHeader
     )
-    record.registration.correction.payment.attachmentData = fileUri
+    record.registration.correction.payment.attachmentData = filePath
   }
   return record
 }

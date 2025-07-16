@@ -135,7 +135,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
         }
@@ -144,16 +144,16 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          firstname: { type: 'text' },
-          surname: { type: 'text' },
-          __fullname: { type: 'text' }
+          firstname: { type: 'text', analyzer: 'human_name' },
+          surname: { type: 'text', analyzer: 'human_name' },
+          __fullname: { type: 'text', analyzer: 'human_name' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
       return {
         type: 'nested',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' },
           option: { type: 'keyword' }
@@ -202,6 +202,17 @@ export async function createIndex(
             lowercase_normalizer: {
               type: 'custom',
               filter: ['lowercase']
+            }
+          },
+          analyzer: {
+            /*
+             * Human name can contain
+             * Special characters including hyphens, underscores and spaces
+             */
+            human_name: {
+              type: 'custom',
+              tokenizer: 'standard',
+              filter: ['lowercase', 'word_delimiter']
             }
           }
         }
@@ -343,7 +354,8 @@ export async function getIndexedEvents(
       should: [
         {
           bool: {
-            must_not: [{ term: { status: EventStatus.enum.CREATED } }]
+            must_not: [{ term: { status: EventStatus.enum.CREATED } }],
+            should: undefined
           }
         },
         {
@@ -351,13 +363,14 @@ export async function getIndexedEvents(
             must: [
               { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
-            ]
+            ],
+            should: undefined
           }
         }
       ],
       minimum_should_match: 1
     }
-  } as estypes.QueryDslQueryContainer
+  } satisfies estypes.QueryDslQueryContainer
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
