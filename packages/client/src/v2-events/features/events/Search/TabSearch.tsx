@@ -25,17 +25,16 @@ import {
   SearchField,
   TranslationConfig,
   EventState,
-  NameFieldValue
+  NameFieldValue,
+  isFieldVisible
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
-import { mergeWithoutNullsOrUndefined } from '@client/v2-events/utils'
-import { defailtNameFieldValue } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
-  getDefaultSearchFields,
+  getMetadataFieldConfigs,
   serializeSearchParams
 } from './utils'
 const MIN_PARAMS_TO_SEARCH = 2
@@ -68,15 +67,43 @@ function enhanceFieldWithSearchFieldConfig(
   field: Inferred,
   searchField: SearchField
 ): Inferred {
+  const commonConfig = {
+    conditionals: searchField.conditionals ?? field.conditionals,
+    validation: searchField.validations ?? field.validation,
+    required: false as const
+  }
   if (field.type === FieldType.DATE && searchField.config.type === 'range') {
     return {
       ...field,
+      ...commonConfig,
       validation: [],
       type: FieldType.DATE_RANGE,
       defaultValue: undefined
     }
   }
-  return field
+  if (field.type === FieldType.ADDRESS) {
+    return {
+      ...field,
+      ...commonConfig,
+      configuration: {
+        searchMode: true
+      }
+    }
+  }
+  if (field.type === FieldType.NAME) {
+    return {
+      ...field,
+      ...commonConfig,
+      configuration: {
+        ...field.configuration,
+        searchMode: true
+      }
+    }
+  }
+  return {
+    ...field,
+    ...commonConfig
+  }
 }
 
 function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
@@ -147,7 +174,7 @@ function buildSearchSections({
   const allUniqueFields = getAllUniqueFields(enhancedEvent)
 
   return enhancedEvent.advancedSearch.map((section) => {
-    const metadataFields = getDefaultSearchFields(section)
+    const metadataFields = getMetadataFieldConfigs(section.fields)
 
     const matchingFields = allUniqueFields.filter((f) =>
       section.fields.some((searchField) => searchField.fieldId === f.id)
@@ -157,8 +184,15 @@ function buildSearchSections({
 
     const modifiedFields = combinedFields.map((f) => {
       const fieldSearchConfig = section.fields.find((a) => a.fieldId === f.id)
+      let optionsOverride = {}
+      if (fieldSearchConfig?.options && fieldSearchConfig.options.length > 0) {
+        optionsOverride = {
+          options: fieldSearchConfig.options
+        }
+      }
       return {
         ...f,
+        ...optionsOverride,
         required: false as const,
         conditionals: fieldSearchConfig?.conditionals ?? f.conditionals,
         validation: fieldSearchConfig?.validations ?? f.validation
@@ -224,28 +258,28 @@ export function TabSearch({
   const nonEmptyValues = filterEmptyValues(formValues)
 
   const handleSearch = () => {
-    const fieldTypesWithDefaults: FieldType[] = [FieldType.NAME]
-
-    const fields = enhancedEvent.declaration.pages.flatMap(
-      (page) => page.fields
-    )
+    const fields = [
+      ...enhancedEvent.declaration.pages.flatMap((page) => page.fields),
+      ...getMetadataFieldConfigs(
+        enhancedEvent.advancedSearch.flatMap((section) => section.fields)
+      )
+    ]
 
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
-
-        if (field && fieldTypesWithDefaults.includes(field.type)) {
-          // If the field is a NAME type, we want to merge the default value with the current value
-          // This is to ensure that the NAME field always has a default structure
-          // even if the user has not filled it yet. Otherwise, it will throw invalid field error
-          // when the user tries to search without filling all the NAME fields (ex: { firstname: "Jhon", surname: undefined }).
-
-          if (field.type === FieldType.NAME) {
-            const mergedValue = mergeWithoutNullsOrUndefined(
-              defailtNameFieldValue,
-              value as NameFieldValue
-            )
-            return { ...result, [fieldId]: mergedValue }
+        if (!field || !isFieldVisible(field, formValues)) {
+          return result
+        }
+        if (field.type === FieldType.NAME && typeof value === 'object') {
+          const nameValue = NameFieldValue.safeParse(value)
+          if (
+            nameValue.success &&
+            !nameValue.data.firstname &&
+            !nameValue.data.surname &&
+            !nameValue.data.middlename
+          ) {
+            return result
           }
         }
 
@@ -263,8 +297,21 @@ export function TabSearch({
     navigate(`${searchPath}?${queryString}`)
   }
 
+  const countNonEmptyFields = (value: unknown): number => {
+    if (!value || value === '') {
+      return 0
+    }
+    if (typeof value === 'object') {
+      return Object.values(value).reduce<number>(
+        (count, val) => count + countNonEmptyFields(val),
+        0
+      )
+    }
+    return 1
+  }
+
   const hasEnoughParams =
-    Object.keys(nonEmptyValues).length >= MIN_PARAMS_TO_SEARCH
+    countNonEmptyFields(nonEmptyValues) >= MIN_PARAMS_TO_SEARCH
 
   return (
     <>

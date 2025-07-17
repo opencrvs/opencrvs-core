@@ -19,7 +19,10 @@ import {
 import { findUserIdsFromDocument, findUserIdsFromIndex } from './utils'
 
 async function cacheUsers(userIds: string[]) {
-  const users = await trpcClient.user.list.query(userIds)
+  const { queryFn, ...options } =
+    trpcOptionsProxy.user.list.queryOptions(userIds)
+
+  const users = await queryClient.fetchQuery(options)
 
   for (const user of users) {
     queryClient.setQueryData(trpcOptionsProxy.user.get.queryKey(user.id), user)

@@ -14,6 +14,7 @@ import {
   ActionStatus,
   ActionType,
   DraftInput,
+  FullDocumentPath,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
@@ -122,7 +123,7 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            filename: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
+            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
           }
         },
         transactionId: getUUID(),
@@ -137,7 +138,7 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            filename: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
+            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
           }
         },
         transactionId: getUUID(),

@@ -16,6 +16,7 @@ import {
   EventDocument,
   FileFieldValue,
   FileFieldWithOptionValue,
+  FullDocumentPath,
   getAcceptedActions
 } from '@opencrvs/commons/client'
 import { removeCached } from '@client/v2-events/cache'
@@ -27,9 +28,9 @@ import { precacheFile } from './useFileUpload'
  * @returns filename extracted from the storage key.
  *
  */
-function extractFilenameFromStorageKey(storageKey: string) {
+function extractFilepathFromStorageKey(storageKey: string) {
   try {
-    const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/([^/?#]+)`)
+    const regex = new RegExp(`^/${window.config.MINIO_BUCKET}/(.*)`)
     const match = storageKey.match(regex)
 
     if (match && match[1]) {
@@ -38,62 +39,62 @@ function extractFilenameFromStorageKey(storageKey: string) {
     // Since the key is defined in the window (external to us), we want to ensure we do not crash because of manual changes to the config.
   } catch (error) {
     // eslint-disable-next-line no-console
-    console.error('Error extracting filename from storage key:', error)
+    console.error('Error extracting filepath from storage key:', error)
 
     return undefined
   }
 }
 
-export function getFilenamesFromActionDocument(
+export function getFilepathsFromActionDocument(
   actions: ActionDocument[] | Draft['action'][]
-): string[] {
-  const filenames = actions.flatMap((action) => {
+): FullDocumentPath[] {
+  const filepaths = actions.flatMap((action) => {
     const { declaration, annotation, ...metadata } = action
     const declarationValues = Object.values(action.declaration)
     const annotationValues = Object.values(action.annotation ?? {})
 
     // Signatures follow v1 pattern where storage key includes the bucket name. e.g. /ocrvs/signature.png
     // We need to extract the filename from the storage key.
-    const metadataSignatureFilenames = Object.values(metadata)
+    const metadataSignatureFilepaths = Object.values(metadata)
       .map((val) =>
-        typeof val === 'string' ? extractFilenameFromStorageKey(val) : undefined
+        typeof val === 'string' ? extractFilepathFromStorageKey(val) : undefined
       )
-      .filter((val): val is string => typeof val === 'string')
+      .filter((val): val is FullDocumentPath => typeof val === 'string')
 
-    const actionFileNames = [...declarationValues, ...annotationValues].flatMap(
+    const actionFilePaths = [...declarationValues, ...annotationValues].flatMap(
       (value) => {
         // Handle single file field & signatures
         const fileParsed = FileFieldValue.safeParse(value)
         if (fileParsed.success) {
-          return [fileParsed.data.filename]
+          return [fileParsed.data.path]
         }
 
         // Handle multiple file field (file with options)
         const fileOptionParsed = FileFieldWithOptionValue.safeParse(value)
         if (fileOptionParsed.success) {
-          return fileOptionParsed.data.map((val) => val.filename)
+          return fileOptionParsed.data.map((val) => val.path)
         }
 
         return []
       }
     )
 
-    return [...actionFileNames, ...metadataSignatureFilenames]
+    return [...actionFilePaths, ...metadataSignatureFilepaths]
   })
 
-  return _.uniq(filenames)
+  return _.uniq(filepaths)
 }
 
 export async function cacheFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const fileNames = getFilenamesFromActionDocument(actions)
+  const fileNames = getFilepathsFromActionDocument(actions)
 
   return Promise.all(fileNames.map(async (filename) => precacheFile(filename)))
 }
 
 export async function removeCachedFiles(eventDocument: EventDocument) {
   const actions = getAcceptedActions(eventDocument)
-  const fileNames = getFilenamesFromActionDocument(actions)
+  const fileNames = getFilepathsFromActionDocument(actions)
 
   return Promise.all(fileNames.map(removeCached))
 }

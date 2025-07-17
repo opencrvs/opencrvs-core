@@ -70,7 +70,8 @@ function isTokenAboutToExpire(token: string) {
 export async function refreshToken() {
   const token = getToken()
   if (isTokenAboutToExpire(token)) {
-    const res = await fetch(`${window.config.AUTH_URL}/refreshToken`, {
+    const refreshUrl = new URL('refreshToken', window.config.AUTH_URL)
+    const res = await fetch(refreshUrl.toString(), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

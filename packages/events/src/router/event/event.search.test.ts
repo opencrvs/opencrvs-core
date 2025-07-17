@@ -301,8 +301,8 @@ test('Returns events based on the updatedAt column', async () => {
     )
   )
 
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
   const today = new Date().toISOString()
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
 
   const acceptedTodayResult = await client.event.search({
     type: 'and',
@@ -329,6 +329,74 @@ test('Returns events based on the updatedAt column', async () => {
 
     expect(sanitizeForSnapshot(event, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
   })
+})
+
+test('Returns events based on the "legalStatuses.REGISTERED.acceptedAt" column', async () => {
+  const { user, generator } = await setupTestCase()
+
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    SCOPES.RECORD_IMPORT,
+    ...TEST_USER_DEFAULT_SCOPES
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  await client.event.actions.declare.request({
+    ...generator.event.actions.declare(event.id),
+    keepAssignment: true
+  })
+  await client.event.actions.validate.request({
+    ...generator.event.actions.validate(event.id),
+    keepAssignment: true
+  })
+  await client.event.actions.register.request(
+    generator.event.actions.register(event.id)
+  )
+  const today = new Date().toISOString().split('T')[0]
+  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+  const tomorrow = new Date(Date.now() + 24 * 60 * 60 * 1000)
+    .toISOString()
+    .split('T')[0]
+
+  const resultForToday = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: today
+        }
+      }
+    ]
+  })
+  const resultForYesterday = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: yesterday
+        }
+      }
+    ]
+  })
+  const resultForTomorrow = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        ['legalStatuses.REGISTERED.acceptedAt']: {
+          type: 'exact',
+          term: tomorrow
+        }
+      }
+    ]
+  })
+
+  expect(resultForToday).toHaveLength(1)
+  expect(resultForYesterday).toHaveLength(0)
+  expect(resultForTomorrow).toHaveLength(0)
 })
 
 test.skip('Returns events that match the name field criteria of applicant', async () => {
@@ -427,6 +495,50 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
   expect(fetchedEvents).toHaveLength(2)
 })
 
+test('properly returns search by name even when there is an undercore in someones name', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'search.death',
+    'record.declare-birth'
+  ])
+
+  const record1 = {
+    'applicant.name': {
+      firstname: 'Matt_Johnson',
+      surname: 'Doe'
+    },
+    'applicant.dob': '2000-01-01',
+    'recommender.none': true,
+    'applicant.address': {
+      country: 'FAR',
+      addressType: AddressType.DOMESTIC,
+      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+      urbanOrRural: 'RURAL' as const,
+      village: 'Small village'
+    }
+  }
+
+  const event = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id, {
+      declaration: record1
+    })
+  )
+
+  const fetchedEvents = await client.event.search({
+    type: 'and',
+    clauses: [{ data: { 'applicant.name': { type: 'fuzzy', term: 'Matt' } } }]
+  })
+
+  expect(fetchedEvents).toHaveLength(1)
+
+  expect(
+    getMixedPath(fetchedEvents[0].declaration, 'applicant.name.firstname')
+  ).toBe('Matt_Johnson')
+})
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [

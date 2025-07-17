@@ -209,10 +209,7 @@ describe('Certificate collector test for a birth registration without father det
 
     it('prompt error when no option is selected', async () => {
       component.find('#confirm_form').hostNodes().simulate('click')
-      await waitForElement(component, '#certificateTemplateId_error')
-      expect(
-        component.find('#certificateTemplateId_error').hostNodes().text()
-      ).toBe('Please select certificate type')
+      await waitForElement(component, '#type_error')
       expect(component.find('#type_error').hostNodes().text()).toBe(
         'Please select who is collecting the certificate'
       )

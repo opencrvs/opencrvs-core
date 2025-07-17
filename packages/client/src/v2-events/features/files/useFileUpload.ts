@@ -11,10 +11,15 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { joinURLPaths } from '@opencrvs/commons/client'
+import { FullDocumentPath, joinURLPaths } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
-import { cacheFile, removeCached } from '@client/v2-events/cache'
+import {
+  cacheFile,
+  getFullDocumentPath,
+  getUnsignedFileUrl,
+  removeCached
+} from '@client/v2-events/cache'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 
 async function uploadFile({
@@ -62,8 +67,8 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-async function getPresignedUrl(fileUri: string) {
-  const url = joinURLPaths('/api/presigned-url', fileUri)
+async function getPresignedUrl(filePath: FullDocumentPath) {
+  const url = joinURLPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {
     method: 'GET',
@@ -76,11 +81,13 @@ async function getPresignedUrl(fileUri: string) {
   return res
 }
 
-export async function precacheFile(filename: string) {
-  const presignedUrl = (await getPresignedUrl(filename)).presignedURL
+export async function precacheFile(path: FullDocumentPath) {
+  const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
-  const file = await fetchFileFromUrl(presignedUrl, filename)
-  await cacheFile({ filename, file })
+  const file = await fetchFileFromUrl(presignedUrl, path)
+  const url = getUnsignedFileUrl(path)
+
+  await cacheFile({ url, file })
 }
 
 queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
@@ -98,7 +105,7 @@ interface Options {
   onSuccess?: (data: {
     originalFilename: string
     type: string
-    filename: string
+    path: FullDocumentPath
     id: string
   }) => void
 }
@@ -110,14 +117,15 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
     onMutate: async ({ file, transactionId, id }) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${transactionId}.${extension}`
-
-      await cacheFile({ filename: temporaryFilename, file })
+      const path = getFullDocumentPath(temporaryFilename)
+      const url = getUnsignedFileUrl(path)
+      await cacheFile({ url, file })
 
       options.onSuccess?.({
         ...file,
         originalFilename: file.name,
         type: file.type,
-        filename: temporaryFilename,
+        path,
         id
       })
     }

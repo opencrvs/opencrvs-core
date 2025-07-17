@@ -14,8 +14,6 @@ import {
   EventState,
   SystemVariables,
   isFieldConfigDefaultValue,
-  isFileFieldType,
-  isDividerFieldType,
   InteractiveFieldType
 } from '@opencrvs/commons/client'
 import { replacePlaceholders } from '@client/v2-events/utils'

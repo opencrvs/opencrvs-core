@@ -21,7 +21,8 @@ import {
   NonEmptyTextValue,
   TextValue,
   DateRangeFieldValue,
-  SignatureFieldValue
+  SignatureFieldValue,
+  SelectDateRangeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -179,11 +180,14 @@ const DateField = BaseField.extend({
       ).optional()
     })
     .optional()
-}).describe('A single date input (dd-mm-YYYY)')
+}).describe('A single date input (yyyy-MM-dd)')
 
 export type DateField = z.infer<typeof DateField>
 
-const DateRangeField = BaseField.extend({
+/**
+ * For internal use only. Needed for search functionality.
+ */
+export const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
   defaultValue: DateRangeFieldValue.optional(),
   configuration: z
@@ -193,9 +197,7 @@ const DateRangeField = BaseField.extend({
       ).optional()
     })
     .optional()
-}).describe(
-  'A date range input ({ rangeStart: dd-mm-YYYY, rangeEnd: dd-mm-YYYY })'
-)
+}).describe('A date range input ({ start: yyyy-MM-dd, end: yyyy-MM-dd })')
 
 export type DateRangeField = z.infer<typeof DateRangeField>
 
@@ -321,6 +323,24 @@ const Select = BaseField.extend({
   options: z.array(SelectOption).describe('A list of options')
 }).describe('Select input')
 
+export const SelectDateRangeOption = z.object({
+  value: SelectDateRangeValue.describe('The value of the option'),
+  label: TranslationConfig.describe('The label of the option')
+})
+
+export type SelectDateRangeOption = z.infer<typeof SelectDateRangeOption>
+
+/**
+ * For internal use only. Needed for search functionality.
+ */
+export const SelectDateRangeField = BaseField.extend({
+  type: z.literal(FieldType.SELECT_DATE_RANGE),
+  defaultValue: SelectDateRangeValue.optional(),
+  options: z.array(SelectDateRangeOption).describe('A list of options')
+}).describe('Select input with date range options')
+
+export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
+
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
   defaultValue: z
@@ -333,7 +353,13 @@ const NameField = BaseField.extend({
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
-      postfix: TranslationConfig.optional()
+      postfix: TranslationConfig.optional(),
+      includeMiddlename: z
+        .boolean()
+        .default(false)
+        .optional()
+        .describe('To make middle name visible in Name form field'),
+      searchMode: z.boolean().optional()
     })
     .optional()
 }).describe('Name input field')
@@ -390,7 +416,14 @@ export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
 const Location = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
-  defaultValue: NonEmptyTextValue.optional()
+  defaultValue: NonEmptyTextValue.optional(),
+  configuration: z
+    .object({
+      searchableResource: z
+        .array(z.enum(['locations', 'facilities', 'offices']))
+        .optional()
+    })
+    .optional()
 }).describe('Input field for a location')
 
 export type Location = z.infer<typeof Location>
@@ -432,7 +465,12 @@ export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
-  defaultValue: AddressFieldValue.optional()
+  defaultValue: AddressFieldValue.optional(),
+  configuration: z
+    .object({
+      searchMode: z.boolean().optional()
+    })
+    .optional()
 }).describe('Address input field – a combination of location and text fields')
 
 export const DataEntry = z.union([
@@ -462,34 +500,6 @@ export type DataField = z.infer<typeof DataField>
  * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
  * errors when compiling
  */
-/** @knipignore */
-export type AllFields =
-  | typeof Address
-  | typeof TextField
-  | typeof NumberField
-  | typeof TextAreaField
-  | typeof DateField
-  | typeof DateRangeField
-  | typeof Paragraph
-  | typeof RadioGroup
-  | typeof BulletList
-  | typeof PageHeader
-  | typeof Select
-  | typeof NameField
-  | typeof PhoneField
-  | typeof IdField
-  | typeof Checkbox
-  | typeof File
-  | typeof Country
-  | typeof AdministrativeArea
-  | typeof Divider
-  | typeof Location
-  | typeof Facility
-  | typeof Office
-  | typeof SignatureField
-  | typeof EmailField
-  | typeof FileUploadWithOptions
-  | typeof DataField
 
 /** @knipignore */
 export type Inferred =
@@ -499,6 +509,7 @@ export type Inferred =
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
   | z.infer<typeof DateRangeField>
+  | z.infer<typeof SelectDateRangeField>
   | z.infer<typeof Paragraph>
   | z.infer<typeof RadioGroup>
   | z.infer<typeof BulletList>
@@ -560,6 +571,7 @@ export const FieldConfig = z
     TextAreaField,
     DateField,
     DateRangeField,
+    SelectDateRangeField,
     Paragraph,
     RadioGroup,
     BulletList,

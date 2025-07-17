@@ -49,12 +49,24 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
                   {
                     "code": "invalid_type",
                     "expected": "string",
-                    "received": "object",
+                    "received": "undefined",
                     "path": [
                       "declaration",
-                      "applicant.name"
+                      "applicant.name",
+                      "start"
                     ],
-                    "message": "Expected string, received object"
+                    "message": "Required"
+                  },
+                  {
+                    "code": "invalid_type",
+                    "expected": "string",
+                    "received": "undefined",
+                    "path": [
+                      "declaration",
+                      "applicant.name",
+                      "end"
+                    ],
+                    "message": "Required"
                   }
                 ],
                 "name": "ZodError"
@@ -63,13 +75,13 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
                 "issues": [
                   {
                     "code": "invalid_type",
-                    "expected": "array",
+                    "expected": "string",
                     "received": "object",
                     "path": [
                       "declaration",
                       "applicant.name"
                     ],
-                    "message": "Expected array, received object"
+                    "message": "Expected string, received object"
                   }
                 ],
                 "name": "ZodError"
@@ -80,6 +92,21 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
               "applicant.name"
             ],
             "message": "Invalid input"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
+            "expected": "'last7Days' | 'last30Days' | 'last90Days' | 'last365Days'",
+            "received": "object",
+            "code": "invalid_type",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected 'last7Days' | 'last30Days' | 'last90Days' | 'last365Days', received object"
           }
         ],
         "name": "ZodError"
@@ -123,7 +150,7 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
             "path": [
               "declaration",
               "applicant.name",
-              "filename"
+              "path"
             ],
             "message": "Required"
           },

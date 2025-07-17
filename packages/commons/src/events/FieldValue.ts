@@ -46,8 +46,25 @@ export const DateValue = z
 
 export const DatetimeValue = z.string().datetime()
 
-export const DateRangeFieldValue = DateValue.or(z.tuple([DateValue, DateValue]))
+export const SelectDateRangeValue = z.enum([
+  'last7Days',
+  'last30Days',
+  'last90Days',
+  'last365Days'
+])
+
+export const DateRangeFieldValue = z
+  .object({
+    start: DateValue,
+    end: DateValue
+  })
+  .or(DateValue)
+  .describe(
+    'Date range with start and end dates in the format YYYY-MM-DD. Inclusive start, exclusive end.'
+  )
+
 export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
+export type SelectDateRangeValue = z.infer<typeof SelectDateRangeValue>
 
 export const EmailValue = z.string().email()
 
@@ -65,6 +82,7 @@ export const FieldValue = z.union([
   TextValue,
   DateValue,
   DateRangeFieldValue,
+  SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
@@ -83,6 +101,7 @@ export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
   DateRangeFieldValue,
+  SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
@@ -116,6 +135,7 @@ export type FieldValueSchema =
  * */
 export type FieldUpdateValueSchema =
   | typeof DateRangeFieldValue
+  | typeof SelectDateRangeValue
   | typeof FileFieldValue
   | typeof FileFieldWithOptionValue
   | typeof CheckboxFieldValue

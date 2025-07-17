@@ -25,7 +25,8 @@ import {
   EventConfig,
   getOrThrow,
   getAcceptedActions,
-  SCOPES
+  SCOPES,
+  SystemRole
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -168,7 +169,8 @@ export function Review() {
   const fullEvent = getEvent.getFromCache(eventId)
 
   const actions = getAcceptedActions(fullEvent)
-  const userIds = getUserIdsFromActions(actions)
+  const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
 

@@ -12,6 +12,7 @@
 import React from 'react'
 import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { getFullDocumentPath } from '@client/v2-events/cache'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
 
 function FileInput({
@@ -40,15 +41,15 @@ function FileInput({
   const [file, setFile] = React.useState(value)
 
   const { uploadFile } = useFileUpload(name, {
-    onSuccess: ({ filename, originalFilename, type }) => {
+    onSuccess: ({ path, originalFilename, type }) => {
       setFile({
-        filename,
+        path,
         originalFilename: originalFilename,
         type: type
       })
 
       onChange({
-        filename,
+        path,
         originalFilename: originalFilename,
         type: type
       })
@@ -69,7 +70,7 @@ function FileInput({
       onComplete={(newFile) => {
         if (newFile) {
           setFile({
-            filename: newFile.name,
+            path: getFullDocumentPath(newFile.name),
             originalFilename: newFile.name,
             type: newFile.type
           })

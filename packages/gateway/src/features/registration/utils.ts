@@ -19,14 +19,14 @@ import {
 } from '@gateway/graphql/schema'
 
 export async function getPresignedUrlFromUri(
-  fileUri: string,
+  filePath: string,
   authHeader: IAuthHeader
 ) {
   const response = (await fetchDocuments(
     '/presigned-url',
     authHeader,
     'POST',
-    JSON.stringify({ fileUri })
+    JSON.stringify({ filePath })
   )) as { presignedURL: string }
 
   return response.presignedURL

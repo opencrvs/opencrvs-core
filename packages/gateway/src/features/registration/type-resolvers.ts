@@ -1255,12 +1255,12 @@ export const typeResolvers: GQLResolver = {
       _,
       { headers: authHeader, presignDocumentUrls }
     ) {
-      const fileUri = docRef.content[0].attachment.data
-      if (fileUri) {
+      const filePath = docRef.content[0].attachment.data
+      if (filePath) {
         if (!presignDocumentUrls) {
-          return fileUri
+          return filePath
         }
-        return getPresignedUrlFromUri(fileUri, authHeader)
+        return getPresignedUrlFromUri(filePath, authHeader)
       }
       return null
     },

@@ -13,7 +13,12 @@ import { MINIO_BUCKET } from '@documents/minio/constants'
 import * as Hapi from '@hapi/hapi'
 import { v4 as uuid } from 'uuid'
 import { fromBuffer } from 'file-type'
-import { getUserId, logger } from '@opencrvs/commons'
+import {
+  FullDocumentPath,
+  getUserId,
+  logger,
+  toDocumentPath
+} from '@opencrvs/commons'
 
 import { z } from 'zod'
 import { Readable } from 'stream'
@@ -67,15 +72,18 @@ export async function fileUploadHandler(
     'created-by': userId
   })
 
-  return filename
+  return `/${MINIO_BUCKET}/${filename}` as FullDocumentPath
 }
 
 export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
-  const { filename } = request.params
-  const exists = await minioClient.statObject(MINIO_BUCKET, filename)
+  const filePath = FullDocumentPath.parse(request.params.filePath)
+  const exists = await minioClient.statObject(
+    MINIO_BUCKET,
+    toDocumentPath(filePath)
+  )
   if (!exists) {
     return notFound('File not found')
   }
