@@ -354,7 +354,8 @@ export async function getIndexedEvents(
       should: [
         {
           bool: {
-            must_not: [{ term: { status: EventStatus.enum.CREATED } }]
+            must_not: [{ term: { status: EventStatus.enum.CREATED } }],
+            should: undefined
           }
         },
         {
@@ -362,13 +363,14 @@ export async function getIndexedEvents(
             must: [
               { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
-            ]
+            ],
+            should: undefined
           }
         }
       ],
       minimum_should_match: 1
     }
-  } as estypes.QueryDslQueryContainer
+  } satisfies estypes.QueryDslQueryContainer
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),

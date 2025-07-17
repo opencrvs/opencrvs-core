@@ -495,7 +495,12 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <LocationSearch.Input
             {...field.config}
-            searchableResource={['locations']}
+            searchableResource={
+              field.config.configuration?.searchableResource &&
+              field.config.configuration.searchableResource.length > 0
+                ? field.config.configuration.searchableResource
+                : ['locations']
+            }
             value={field.value}
             onBlur={onBlur}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}

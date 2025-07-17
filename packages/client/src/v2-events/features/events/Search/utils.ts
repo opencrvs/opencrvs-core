@@ -28,6 +28,7 @@ import {
   getDeclarationFields,
   DateRangeFieldValue,
   SelectDateRangeValue,
+  AddressFieldValue,
   timePeriodToDateRange,
   EventStatus
 } from '@opencrvs/commons/client'
@@ -97,7 +98,7 @@ const defaultSearchFieldGenerator: Record<
 > = {
   'legalStatuses.REGISTERED.createdAtLocation': (_) => ({
     id: 'event.legalStatuses.REGISTERED.createdAtLocation',
-    type: FieldType.OFFICE,
+    type: FieldType.LOCATION,
     label: {
       defaultMessage: 'Place of registration',
       description: 'Label for place of registration field',
@@ -107,6 +108,9 @@ const defaultSearchFieldGenerator: Record<
       defaultMessage: 'Search for a province, district or registration office',
       description: 'Helper text for place of registration field',
       id: 'v2.advancedSearch.registeredAtLocation.helperText'
+    },
+    configuration: {
+      searchableResource: ['locations', 'offices']
     }
   }),
   'legalStatuses.REGISTERED.acceptedAt': (_) => ({
@@ -118,37 +122,40 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.registeredAt'
     }
   }),
-  updatedAt: ({ config }) =>
-    config.type === 'range'
-      ? {
-          id: 'event.updatedAt',
-          type: FieldType.SELECT_DATE_RANGE,
-          label: {
-            defaultMessage: 'Time period',
-            description: 'Label for date of update field',
-            id: 'v2.advancedSearch.updatedAt'
-          },
-          helperText: {
-            defaultMessage: 'Period of time since the record status changed',
-            description: 'Helper text for date of update field',
-            id: 'v2.advancedSearch.updatedAt.helperText'
-          },
-          options: timePeriodOptions
-        }
-      : {
-          id: 'event.updatedAt',
-          type: FieldType.DATE_RANGE,
-          label: {
-            defaultMessage: 'Time period',
-            description: 'Label for date of update field',
-            id: 'v2.advancedSearch.updatedAt'
-          },
-          helperText: {
-            defaultMessage: 'Period of time since the record status changed',
-            description: 'Helper text for date of update field',
-            id: 'v2.advancedSearch.updatedAt.helperText'
-          }
+  updatedAt: (_) => {
+    if (_.config.type === 'range') {
+      return {
+        id: 'event.updatedAt',
+        type: FieldType.SELECT_DATE_RANGE,
+        label: {
+          defaultMessage: 'Time period',
+          description: 'Label for date of update field',
+          id: 'v2.advancedSearch.updatedAt'
         },
+        helperText: {
+          defaultMessage: 'Period of time since the record status changed',
+          description: 'Helper text for date of update field',
+          id: 'v2.advancedSearch.updatedAt.helperText'
+        },
+        options: timePeriodOptions
+      }
+    } else {
+      return {
+        id: 'event.updatedAt',
+        type: FieldType.DATE_RANGE,
+        label: {
+          defaultMessage: 'Time period',
+          description: 'Label for date of update field',
+          id: 'v2.advancedSearch.updatedAt'
+        },
+        helperText: {
+          defaultMessage: 'Period of time since the record status changed',
+          description: 'Helper text for date of update field',
+          id: 'v2.advancedSearch.updatedAt.helperText'
+        }
+      }
+    }
+  },
   trackingId: (_) => ({
     id: 'event.trackingId',
     type: FieldType.TEXT,
@@ -317,6 +324,18 @@ function buildSearchQueryFields(
       // @TODO: Double check whether we are actually reverting this on the next step. Ideally we would not leak ____ to user.
       const transformedKey = config.fieldId.replace(/\./g, FIELD_SEPARATOR)
 
+      // Handle the case where we want to search by range but the value is not a comma-separated string
+      // e.g. "2023-01-01,2023-12-31" should be treated as a range
+      // but "2023-01-01" should be treated as an exact match
+      let searchType = config.config?.type ?? 'exact'
+      if (
+        searchType === 'range' &&
+        typeof value === 'string' &&
+        value.split(',').length === 1
+      ) {
+        searchType = 'exact'
+      }
+
       if (!value) {
         return result
       }
@@ -342,13 +361,29 @@ function buildSearchQueryFields(
         const parsedName = NameFieldValue.safeParse(searchInput[config.fieldId])
 
         if (parsedName.success) {
+          if (Name.stringify(parsedName.data) === '') {
+            return result
+          }
           return {
             ...result,
             [transformedKey]: buildSearchClause(
               Name.stringify(parsedName.data),
-              config.config?.type
+              searchType
             )
           }
+        }
+      }
+
+      if (
+        config.fieldConfig?.type === FieldType.ADDRESS &&
+        AddressFieldValue.safeParse(searchInput[config.fieldId]).success
+      ) {
+        return {
+          ...result,
+          [transformedKey]: buildSearchClause(
+            JSON.stringify(searchInput[config.fieldId]),
+            searchType
+          )
         }
       }
 
@@ -375,10 +410,7 @@ function buildSearchQueryFields(
         ...result,
         // @TODO: Previously an issue was fixed by turning all the values into string. Ask Tareq about it so we can make sure the case is still handled.
 
-        [transformedKey]: buildSearchClause(
-          value.toString(),
-          config.config?.type
-        )
+        [transformedKey]: buildSearchClause(value.toString(), searchType)
       }
     },
     {}
@@ -420,7 +452,9 @@ export function buildSearchQuery(
     // @TODO: This might actually be a bad fix. If only metadata values event. prefix, this would filter out all the rest.
     // It might be the reason why we use  config: metadataSearchFields.find((x) => field.id.includes(x.fieldId)) below.
     // After fixing it we should be able to just match the id.
-    (field) => !!searchParameters[`event.${field.fieldId}`]
+    (field) =>
+      !!searchParameters[`event.${field.fieldId}`] ||
+      !!searchParameters[`${field.fieldId}`]
   )
 
   const [metadataSearchFields, declarationSearchFields] = partition(
@@ -481,10 +515,18 @@ export function getSearchParamsFieldConfigs(
   const allSearchFields = eventConfig.advancedSearch.flatMap(
     (section) => section.fields
   )
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig).map((x) => {
+    if (x.type === FieldType.ADDRESS) {
+      return { ...x, configuration: { searchMode: true } }
+    }
+    if (x.type === FieldType.NAME) {
+      return { ...x, configuration: { searchMode: true } }
+    }
+    return x
+  })
 
   const metadataFieldConfigs = getMetadataFieldConfigs(allSearchFields)
 
-  const declarationFieldConfigs = getAllUniqueFields(eventConfig)
   const searchFieldConfigs = [
     ...metadataFieldConfigs,
     ...declarationFieldConfigs

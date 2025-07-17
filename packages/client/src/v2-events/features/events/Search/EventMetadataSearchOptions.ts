@@ -20,14 +20,6 @@ export const statusOptions = [
     }
   },
   {
-    value: EventStatus.enum.CREATED,
-    label: {
-      defaultMessage: 'Draft',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCreated'
-    }
-  },
-  {
     value: EventStatus.enum.NOTIFIED,
     label: {
       defaultMessage: 'Notified',
