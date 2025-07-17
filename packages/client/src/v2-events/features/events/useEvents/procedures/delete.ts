@@ -11,6 +11,7 @@
 
 import { useMutation } from '@tanstack/react-query'
 import {
+  deleteDraft,
   refetchEventsList,
   setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -25,8 +26,9 @@ setMutationDefaults(trpcOptionsProxy.event.delete, {
     return true
   },
   retryDelay: 10000,
-  onSuccess: () => {
+  onSuccess: ({ id }) => {
     void refetchEventsList()
+    deleteDraft(id)
   },
   /*
    * This ensures that when the application is reloaded with pending mutations in IndexedDB, the

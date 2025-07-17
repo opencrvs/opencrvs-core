@@ -61,6 +61,10 @@ export function setDraftData(updater: (drafts: Draft[]) => Draft[]) {
   )
 }
 
+export function deleteDraft(id: string) {
+  setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
+}
+
 export function findLocalEventIndex(id: string) {
   const queries = queryClient.getQueriesData<EventIndex>({
     queryKey: trpcOptionsProxy.event.search.queryKey()
