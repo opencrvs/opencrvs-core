@@ -93,7 +93,7 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
         continue
       }
 
-      await deleteFile(fileValue.filename, token)
+      await deleteFile(fileValue.path, token)
     }
   }
 }
@@ -218,10 +218,10 @@ async function cleanUnreferencedAttachmentsFromPreviousDrafts(
       !fileValuesInCurrentAction.some(
         (curr) =>
           curr.fieldName === previousFileValue.fieldName &&
-          curr.file.filename === previousFileValue.file.filename
+          curr.file.path === previousFileValue.file.path
       )
     ) {
-      await deleteFile(previousFileValue.file.filename, token)
+      await deleteFile(previousFileValue.file.path, token)
     }
   }
 }
@@ -254,8 +254,8 @@ export async function addAction(
   )
 
   for (const file of fileValuesInCurrentAction) {
-    if (!(await fileExists(file.file.filename, token))) {
-      throw new Error(`File not found: ${file.file.filename}`)
+    if (!(await fileExists(file.file.path, token))) {
+      throw new Error(`File not found: ${file.file.path}`)
     }
   }
 

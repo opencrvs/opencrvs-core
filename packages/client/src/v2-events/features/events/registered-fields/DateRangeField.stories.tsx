@@ -11,6 +11,7 @@
 
 import React, { useState } from 'react'
 import { StoryFn, Meta } from '@storybook/react'
+import { DateRangeFieldValue } from '@opencrvs/commons/client'
 import { DateRangeField } from './DateRangeField'
 
 // Storybook metadata
@@ -29,19 +30,26 @@ export default {
 
 // Helper to parse or pass values
 const initialExactValue = '2022-05-17'
-const initialRangeValue: [string, string] = ['2021-01-01', '2021-12-31']
+const initialRangeValue: DateRangeFieldValue = {
+  start: '2021-01-01',
+  end: '2021-12-31'
+}
 
 // Input Story
 export const DateRangeInput: StoryFn = (args) => {
-  const [value, setValue] = useState<string | [string, string]>(
-    initialExactValue
-  )
+  const [value, setValue] = useState<
+    | string
+    | {
+        start: string
+        end: string
+      }
+  >(initialExactValue)
 
   return (
     <DateRangeField.Input
       {...args}
       id="date-range-field"
-      value={value}
+      value={value as string}
       onChange={(val) => {
         setValue(val)
       }}
@@ -50,19 +58,11 @@ export const DateRangeInput: StoryFn = (args) => {
 }
 
 // Exact Date Output Story
-export const DateRangeOutputExact: StoryFn = (args) => {
-  const [value, setValue] = useState<string | [string, string]>(
-    initialExactValue
-  )
-
+export const DateRangeOutputExact: StoryFn = () => {
   return <DateRangeField.Output value={initialExactValue} />
 }
 
 // Range Date Output Story
-export const DateRangeOutputRange: StoryFn = (args) => {
-  const [value, setValue] = useState<string | [string, string]>(
-    initialExactValue
-  )
-
+export const DateRangeOutputRange: StoryFn = () => {
   return <DateRangeField.Output value={initialRangeValue} />
 }

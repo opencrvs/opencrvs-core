@@ -36,7 +36,9 @@ import {
   isTextFieldType,
   isNameFieldType,
   isIdFieldType,
-  isPhoneFieldType
+  isPhoneFieldType,
+  isSelectDateRangeFieldType,
+  isLocationFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -110,7 +112,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     return BulletList.Output
   }
 
-  if (isSelectFieldType(field)) {
+  if (isSelectFieldType(field) || isSelectDateRangeFieldType(field)) {
     return Select.Output({
       options: field.config.options,
       value: field.value
@@ -129,7 +131,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isAddressFieldType(field)) {
-    return Address.Output({ value: field.value })
+    return Address.Output({
+      value: field.value,
+      searchMode: field.config.configuration?.searchMode
+    })
   }
 
   if (isRadioGroupFieldType(field)) {
@@ -147,7 +152,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     return AdministrativeArea.Output({ value: field.value })
   }
 
-  if (isOfficeFieldType(field)) {
+  if (isOfficeFieldType(field) || isLocationFieldType(field)) {
     return LocationSearch.Output({ value: field.value })
   }
 
