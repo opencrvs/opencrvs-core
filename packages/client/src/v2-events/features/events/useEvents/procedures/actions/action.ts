@@ -343,6 +343,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
     }
   }
 
+  const a = 10
+
   return {
     mutate: (params: ActionMutationInput) =>
       mutation.mutate(getMutationPayload(params)),
