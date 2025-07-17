@@ -981,7 +981,7 @@ const messagesToDefine: IConstantsMessages = {
     id: 'constants.withinTargetDaysTo1Year'
   },
   humanName: {
-    defaultMessage: `{lastName} {middleName} {firstName}`,
+    defaultMessage: `{firstName} {middleName} {lastName}`,
     description: 'A localized order of the full name',
     id: 'constants.humanName'
   }

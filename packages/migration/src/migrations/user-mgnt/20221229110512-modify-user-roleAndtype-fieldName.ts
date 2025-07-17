@@ -193,7 +193,7 @@ export const up = async (db: Db, client: MongoClient) => {
     while (totalUserCount > processedDocCount) {
       const userCursor = await getUserCursor(db, limit, skip)
       const count = await userCursor.count()
-      // eslint-disable-next-line no-console
+
       console.log(
         `Migration Up - User role & Type :: Processing ${
           processedDocCount + 1
@@ -217,7 +217,7 @@ export const up = async (db: Db, client: MongoClient) => {
       skip += limit
       processedDocCount += count
       const percentage = ((processedDocCount / totalUserCount) * 100).toFixed(2)
-      // eslint-disable-next-line no-console
+
       console.log(
         `Migration Up - User role & Type :: Processing done ${percentage}%`
       )

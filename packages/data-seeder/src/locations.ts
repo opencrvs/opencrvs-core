@@ -52,14 +52,8 @@ const LocationSchema = z.array(
 )
 
 function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
-  const statisticsErrors = new Array<Error>()
   const locationsMap = new Map(
     locations.map(({ statistics, ...loc }) => {
-      if (!statistics) {
-        statisticsErrors.push(
-          new Error(`No statistics data given for location: ${loc.name}`)
-        )
-      }
       return [
         loc.id,
         {
@@ -71,6 +65,8 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
       ]
     })
   )
+
+  // Create a map of parent-child relationships
   const locationNodeMap = new Map(
     locations.map((loc) => [
       loc.id,
@@ -87,74 +83,37 @@ function validateAdminStructure(locations: TypeOf<typeof LocationSchema>) {
     parent.children.push(loc.id)
   })
 
-  function validateTree(root: string) {
-    const node = locationNodeMap.get(root)!
-    const location = locationsMap.get(node.id)!
-    const childLocations = node.children.map(
-      (child) => locationsMap.get(child)!
-    )
-    const accumulatedStatistics = new Map<
-      number,
-      { male_population: number; female_population: number; population: number }
-    >()
-    for (const [year, parentStats] of location.statistics.entries()) {
-      if (
-        parentStats.population <
-        parentStats.male_population + parentStats.female_population
-      ) {
+  // Validate statistics only for top-level locations (states)
+  const statisticsErrors: Error[] = []
+  locationNodeMap.get('0')!.children.forEach((stateId) => {
+    const state = locationsMap.get(stateId)!
+    if (!state.statistics || state.statistics.size === 0) {
+      statisticsErrors.push(
+        new Error(
+          `Top-level location (state) "${state.name}" must have statistics data`
+        )
+      )
+      return
+    }
+
+    // Validate statistics data for the state
+    for (const [year, stats] of state.statistics.entries()) {
+      if (stats.population < stats.male_population + stats.female_population) {
         statisticsErrors.push(
           new Error(
-            `Location: ${
-              location.name
-            }, year: ${year} -> Sum of male population and female population ${
-              parentStats.male_population + parentStats.female_population
-            } is higher than the total population ${parentStats.population}`
+            `Location: ${state.name}, year: ${year} -> Sum of male population and female population ${
+              stats.male_population + stats.female_population
+            } is higher than the total population ${stats.population}`
           )
         )
       }
-      childLocations.forEach((childLocation) => {
-        if (!childLocation.statistics.get(year)) {
-          statisticsErrors.push(
-            new Error(
-              `Couldn't find child location data: ${childLocation.name}, year: ${year} -> but that year's data exists for parent: ${location.name}`
-            )
-          )
-        }
-        const currentStats = accumulatedStatistics.get(year) ?? {
-          male_population: 0,
-          female_population: 0,
-          population: 0
-        }
-        const childStats = childLocation.statistics.get(year) ?? {
-          male_population: 0,
-          female_population: 0,
-          population: 0
-        }
-
-        accumulatedStatistics.set(year, {
-          male_population:
-            currentStats.male_population + childStats.male_population,
-          female_population:
-            currentStats.female_population + childStats.female_population,
-          population: currentStats.population + childStats.population
-        })
-      })
-      if (childLocations.length > 0) {
-        const sumPopulation = accumulatedStatistics.get(year)!.population
-        if (sumPopulation > parentStats.population) {
-          statisticsErrors.push(
-            new Error(
-              `Location: ${location.name}, year: ${year} -> Sum of child locations' population ${sumPopulation} is greater than the total population ${parentStats.population}, The total population should be >= ${sumPopulation}`
-            )
-          )
-        }
-      }
     }
-  }
-  locationNodeMap.get('0')!.children.forEach((childId) => validateTree(childId))
+  })
+
   if (statisticsErrors.length > 0) {
     raise(statisticsErrors.map((error) => error.message).join('\n'))
   }
+
   return locationsMap
 }
 
@@ -261,6 +220,7 @@ export async function seedLocations(token: string) {
   const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()
   response.entry?.forEach((res, index) => {
     if (res.response?.status !== '201') {
+      // eslint-disable-next-line no-console
       console.log(
         `Failed to create location resource for: "${locations[index].name}"`
       )
@@ -323,9 +283,11 @@ export async function seedLocationsForV2Events(token: string) {
   })
 
   if (!res.ok) {
+    // eslint-disable-next-line no-console
     console.error(
       'Unable to seed locations for v2 events. Ensure events service is running.'
     )
+    // eslint-disable-next-line no-console
     console.error(JSON.stringify(await res.json()))
   }
 }

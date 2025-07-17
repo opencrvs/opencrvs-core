@@ -17,14 +17,22 @@ import { Validation } from '@client/utils/validate'
 import { get, merge } from 'lodash'
 import { useState } from 'react'
 
+function evalTemplateString(
+  str: string,
+  ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
+) {
+  return evalExpressionInFieldDefinition(`\`${str}\``, ...evalParams)
+}
+
 function transformRequestBody(
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   body: Record<string, any>,
   ...evalParams: [IFormSectionData, IOfflineData, IFormData, UserDetails | null]
 ) {
   return Object.fromEntries(
     Object.entries(body).map(([key, value]) => [
       key,
-      evalExpressionInFieldDefinition(value, ...evalParams)
+      evalTemplateString(value, ...evalParams)
     ])
   )
 }
@@ -42,10 +50,7 @@ function transformHttpFieldIntoRequest(
     Object.keys(requestOptions.params).forEach((key) => {
       url.searchParams.append(
         key,
-        evalExpressionInFieldDefinition(
-          requestOptions.params![key],
-          ...evalParams
-        )
+        evalTemplateString(requestOptions.params![key], ...evalParams)
       )
     })
   }
@@ -138,14 +143,17 @@ export function useHttp<T = unknown>(
       onChange(updatedState)
       return updatedState
     })
-    transformHttpFieldIntoRequest(
-      {
-        ...field,
-        options: merge(field.options, additionalOptions)
-      },
-      ...evalParams
-    )
-      .then((res) => {
+    Promise.all([
+      transformHttpFieldIntoRequest(
+        {
+          ...field,
+          options: merge(field.options, additionalOptions)
+        },
+        ...evalParams
+      ),
+      new Promise((resolve) => setTimeout(resolve, 1000))
+    ])
+      .then(([res]) => {
         if (res.ok) {
           return res.json()
         }

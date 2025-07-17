@@ -14,21 +14,17 @@ import { Stack } from '../Stack'
 
 export const MainContainer = styled(Box)`
   background: ${({ theme }) => theme.colors.background};
+  border: none;
+  flex: 1;
 `
 
 export const ReadersContainer = styled(Stack)`
   width: 100%;
 
+  flex-direction: column;
+
   & > * {
-    flex: 1;
-  }
-
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    flex-direction: column;
-
-    & > * {
-      width: 100%;
-      flex: none;
-    }
+    width: 100%;
+    flex: none;
   }
 `

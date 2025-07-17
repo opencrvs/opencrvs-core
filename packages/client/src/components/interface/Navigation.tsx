@@ -170,10 +170,10 @@ const NavigationView = (props: IFullProps) => {
   const tabId = deselectAllTabs
     ? ''
     : router?.match?.params?.tabId
-    ? router.match.params.tabId
-    : activeMenuItem
-    ? activeMenuItem
-    : 'review'
+      ? router.match.params.tabId
+      : activeMenuItem
+        ? activeMenuItem
+        : 'review'
 
   const configTab: string[] = [WORKQUEUE_TABS.systems]
   const conmmunicationTab: string[] = [
@@ -765,26 +765,32 @@ const mapStateToProps: (state: IStoreState) => IStateProps = (state) => {
     activeMenuItem: window.location.href.includes(WORKQUEUE_TABS.performance)
       ? WORKQUEUE_TABS.performance
       : window.location.href.endsWith(WORKQUEUE_TABS.vsexports)
-      ? WORKQUEUE_TABS.vsexports
-      : window.location.href.includes(WORKQUEUE_TABS.organisation)
-      ? WORKQUEUE_TABS.organisation
-      : window.location.href.includes(WORKQUEUE_TABS.team)
-      ? WORKQUEUE_TABS.team
-      : window.location.href.endsWith(WORKQUEUE_TABS.application)
-      ? WORKQUEUE_TABS.application
-      : window.location.href.endsWith(WORKQUEUE_TABS.settings)
-      ? WORKQUEUE_TABS.settings
-      : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
-      ? WORKQUEUE_TABS.certificate
-      : window.location.href.endsWith(WORKQUEUE_TABS.systems)
-      ? WORKQUEUE_TABS.systems
-      : window.location.href.endsWith(WORKQUEUE_TABS.informantNotification)
-      ? WORKQUEUE_TABS.informantNotification
-      : window.location.href.endsWith(WORKQUEUE_TABS.emailAllUsers)
-      ? WORKQUEUE_TABS.emailAllUsers
-      : window.location.href.endsWith(WORKQUEUE_TABS.userRoles)
-      ? WORKQUEUE_TABS.userRoles
-      : ''
+        ? WORKQUEUE_TABS.vsexports
+        : window.location.href.includes(WORKQUEUE_TABS.organisation)
+          ? WORKQUEUE_TABS.organisation
+          : window.location.href.includes(WORKQUEUE_TABS.team)
+            ? WORKQUEUE_TABS.team
+            : window.location.href.endsWith(WORKQUEUE_TABS.application)
+              ? WORKQUEUE_TABS.application
+              : window.location.href.endsWith(WORKQUEUE_TABS.settings)
+                ? WORKQUEUE_TABS.settings
+                : window.location.href.endsWith(WORKQUEUE_TABS.certificate)
+                  ? WORKQUEUE_TABS.certificate
+                  : window.location.href.endsWith(WORKQUEUE_TABS.systems)
+                    ? WORKQUEUE_TABS.systems
+                    : window.location.href.endsWith(
+                          WORKQUEUE_TABS.informantNotification
+                        )
+                      ? WORKQUEUE_TABS.informantNotification
+                      : window.location.href.endsWith(
+                            WORKQUEUE_TABS.emailAllUsers
+                          )
+                        ? WORKQUEUE_TABS.emailAllUsers
+                        : window.location.href.endsWith(
+                              WORKQUEUE_TABS.userRoles
+                            )
+                          ? WORKQUEUE_TABS.userRoles
+                          : ''
   }
 }
 

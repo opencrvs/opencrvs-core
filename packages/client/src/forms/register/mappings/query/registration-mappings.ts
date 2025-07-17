@@ -47,6 +47,7 @@ import { LANG_EN } from '@client/utils/constants'
 /** @deprecated Use userTransformer instead */
 export const roleUserTransformer = (
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   _: any,
   sectionId: string,
   targetSectionId?: string,
@@ -67,6 +68,7 @@ export const roleUserTransformer = (
 }
 export function registrationNumberTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   targetSectionId?: string,
@@ -82,6 +84,7 @@ export const certificateDateTransformer =
   (locale: string, dateFormat: string) =>
   (
     transformedData: IFormData,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     _: any,
     sectionId: string,
     targetSectionId?: string,
@@ -231,6 +234,7 @@ export const userTransformer =
 /** @deprecated Use userTransformer instead */
 export const registrarNameUserTransformer = (
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   _: any,
   sectionId: string,
   targetSectionId?: string,
@@ -250,6 +254,7 @@ export const registrarNameUserTransformer = (
 }
 export const registrationLocationUserTransformer = (
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   targetSectionId?: string,
@@ -280,6 +285,7 @@ export const registrationLocationUserTransformer = (
 
 export const registrarSignatureUserTransformer = (
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   _: any,
   sectionId: string,
   targetSectionId?: string,
@@ -304,6 +310,7 @@ export const registrationDateTransformer =
   (locale: string, dateFormat: string) =>
   (
     transformedData: IFormData,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     _: any,
     sectionId: string,
     targetSectionId?: string,

@@ -33,7 +33,7 @@ const Template: ComponentStory<typeof ToggleIcon> = () => {
       defaultChecked={selected}
       onClick={() => setSelected(!selected)}
       name={'Star'}
-      color={selected ? 'yellow' : 'blue'}
+      color={selected ? 'yellow' : 'primary'}
       weight={'fill'}
     />
   )

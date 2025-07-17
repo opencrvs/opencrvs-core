@@ -7,6 +7,9 @@
 #
 # Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
 
+# DEPRECATION NOTICE:
+# This workflow was deprecated since it's not actively used causes a lot of failures
+# Before enabling workflow please make sure you replaced classic tokens with fine-grained tokens
 name: Auto PR to Release Branch
 
 on:
@@ -27,7 +30,7 @@ on:
 jobs:
   resolve-releases:
     if: ${{ github.event_name == 'pull_request' && github.event.pull_request.merged == true || github.event_name == 'workflow_dispatch' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     outputs:
       matrix: ${{ steps.resolve-applicable-versions.outputs.matrix }}
     steps:
@@ -105,7 +108,7 @@ jobs:
 
   create-pr:
     needs: resolve-releases
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     if: ${{ always() && needs.resolve-releases.result == 'success' }}
 
     strategy:

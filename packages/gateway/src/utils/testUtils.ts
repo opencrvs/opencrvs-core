@@ -33,8 +33,8 @@ type DeepRequired<T> = Required<{
   [P in keyof T]: IsResolver<NonNullable<T[P]>> extends true
     ? MakeAllButFirstParamUndefined<NonNullable<T[P]>>
     : NonNullable<T[P]> extends Record<any, any>
-    ? DeepRequired<T[P]>
-    : never
+      ? DeepRequired<T[P]>
+      : never
 }>
 
 export type TestResolvers = DeepRequired<GQLResolver>

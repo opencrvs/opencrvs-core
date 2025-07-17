@@ -131,7 +131,7 @@ interface IRadioButton {
   selected?: string
   disabled?: boolean
   size?: string
-
+  'data-testid'?: string
   onChange?: (value: Value) => void
 }
 
@@ -143,13 +143,15 @@ export const RadioButton = ({
   value,
   size,
   disabled,
-  onChange
+  onChange,
+  ...props
 }: IRadioButton) => {
   const handleChange = () => {
     if (onChange) {
       onChange(value)
     }
   }
+
   return (
     <Label disabled={disabled} htmlFor={id}>
       <Input
@@ -162,6 +164,7 @@ export const RadioButton = ({
         name={name}
         value={value.toString()}
         onChange={disabled ? () => null : handleChange}
+        data-testid={props['data-testid']}
       />
       <Radio size={size} disabled={disabled}>
         {value === selected ? (

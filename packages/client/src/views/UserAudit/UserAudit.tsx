@@ -35,10 +35,7 @@ import { IStoreState } from '@client/store'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import { userMutations } from '@client/user/mutations'
 import { EMPTY_STRING, LANG_EN } from '@client/utils/constants'
-import {
-  GetUserQuery,
-  GetUserQueryVariables,
-} from '@client/utils/gateway'
+import { GetUserQuery, GetUserQueryVariables } from '@client/utils/gateway'
 import { UserAuditActionModal } from '@client/views/SysAdmin/Team/user/UserAuditActionModal'
 import { UserAuditHistory } from '@client/views/UserAudit/UserAuditHistory'
 import { AppBar, Link } from '@opencrvs/components/lib'

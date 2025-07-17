@@ -12,7 +12,6 @@
 import {
   isBase64FileString,
   uploadBase64ToMinio
-  // eslint-disable-next-line import/no-relative-parent-imports
 } from '../../utils/minio-helper.js'
 import { Db, MongoClient } from 'mongodb'
 
@@ -31,13 +30,11 @@ export const up = async (db: Db, client: MongoClient) => {
       const userWithAvatarCount =
         await getTotalUserWithAvatarCountByCollectionName(db, 'users', 'avatar')
 
-      // eslint-disable-next-line no-console
       console.log(
         `Migration - Upadate user avatar with minio, total ${userWithAvatarCount} user needs to be processed`
       )
 
       for await (const user of userWithAvatar) {
-        // eslint-disable-next-line no-console
         console.log(
           `Processed ${
             processUser + 1

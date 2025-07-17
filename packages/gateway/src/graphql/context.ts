@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable import/no-relative-parent-imports */
 
 import MetricsAPI from '@gateway/features/fhir/metricsAPI'
 import { UsersAPI } from '@gateway/features/user/usersAPI'
