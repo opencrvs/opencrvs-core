@@ -12,6 +12,7 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
@@ -64,6 +65,7 @@ export function ActionMenu({
                   onAction?.()
                 }}
               >
+                <Icon color="currentColor" name={action.icon} size="small" />
                 {intl.formatMessage(action.label)}
               </DropdownMenu.Item>
             )
