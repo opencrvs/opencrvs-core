@@ -14,7 +14,7 @@ import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
   const documents = await db
-    .collection('PractitionerRole')
+    .collection('PractitionerRole_history')
     .find({ 'code.coding.system': 'http://opencrvs.org/specs/types' })
     .toArray()
 
@@ -27,7 +27,7 @@ export const up = async (db: Db, client: MongoClient) => {
     const filteredCode = transformRoleCodes(doc)
 
     await db
-      .collection('PractitionerRole')
+      .collection('PractitionerRole_history')
       .updateOne({ _id: doc._id }, { $set: { code: filteredCode } })
   }
   console.log('Documents updated.')
