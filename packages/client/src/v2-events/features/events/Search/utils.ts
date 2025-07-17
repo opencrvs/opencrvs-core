@@ -98,7 +98,7 @@ const defaultSearchFieldGenerator: Record<
 > = {
   'legalStatuses.REGISTERED.createdAtLocation': (_) => ({
     id: 'event.legalStatuses.REGISTERED.createdAtLocation',
-    type: FieldType.OFFICE,
+    type: FieldType.LOCATION,
     label: {
       defaultMessage: 'Place of registration',
       description: 'Label for place of registration field',
@@ -108,6 +108,9 @@ const defaultSearchFieldGenerator: Record<
       defaultMessage: 'Search for a province, district or registration office',
       description: 'Helper text for place of registration field',
       id: 'v2.advancedSearch.registeredAtLocation.helperText'
+    },
+    configuration: {
+      searchableResource: ['locations', 'offices']
     }
   }),
   'legalStatuses.REGISTERED.acceptedAt': (_) => ({
