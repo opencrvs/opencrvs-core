@@ -33,7 +33,7 @@ test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing requ
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.correction.request(
+    client.event.actions.correction.request.request(
       generator.event.actions.correction.request(
         'registered-event-test-id-12345'
       )
@@ -48,7 +48,7 @@ test(`${ActionType.REQUEST_CORRECTION} allows access if required scope is presen
   ])
 
   await expect(
-    client.event.actions.correction.request(
+    client.event.actions.correction.request.request(
       generator.event.actions.correction.request(
         'registered-event-test-id-12345'
       )
@@ -122,9 +122,10 @@ test('a correction request can be added to a registered event', async () => {
     ActionType.REGISTER
   ])
 
-  const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id)
-  )
+  const withCorrectionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
+    )
 
   expect(withCorrectionRequest.actions.slice(-2)).toEqual([
     expect.objectContaining({
@@ -153,7 +154,7 @@ test(`${ActionType.REQUEST_CORRECTION} validation error message contains all the
   })
 
   await expect(
-    client.event.actions.correction.request(data)
+    client.event.actions.correction.request.request(data)
   ).rejects.matchSnapshot()
 })
 
@@ -184,7 +185,7 @@ test(`${ActionType.REQUEST_CORRECTION} when mandatory field is invalid, conditio
   })
 
   await expect(
-    client.event.actions.correction.request(data)
+    client.event.actions.correction.request.request(data)
   ).rejects.matchSnapshot()
 })
 
@@ -216,7 +217,7 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
     declaration: form
   })
 
-  const response = await client.event.actions.correction.request(data)
+  const response = await client.event.actions.correction.request.request(data)
   const activeActions = getAcceptedActions(response)
 
   const savedAction = activeActions.find(
@@ -254,7 +255,7 @@ test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, as
   })
 
   await expect(
-    client.event.actions.correction.request(payload)
+    client.event.actions.correction.request.request(payload)
   ).rejects.matchSnapshot()
 })
 
@@ -273,7 +274,7 @@ test('REQUEST_CORRECTION prevents correcting a field which is configured as unco
   })
 
   await expect(
-    client.event.actions.correction.request(payload)
+    client.event.actions.correction.request.request(payload)
   ).rejects.matchSnapshot()
 })
 
@@ -309,12 +310,13 @@ describe('when a correction request exists', () => {
       ['applicant.email']
     )
 
-    withCorrectionRequest = await client.event.actions.correction.request(
-      generator.event.actions.correction.request(event.id, {
-        keepAssignment: true,
-        declaration: declarationPayload
-      })
-    )
+    withCorrectionRequest =
+      await client.event.actions.correction.request.request(
+        generator.event.actions.correction.request(event.id, {
+          keepAssignment: true,
+          declaration: declarationPayload
+        })
+      )
   })
 
   test('a correction request can be approved with correct request id', async () => {
@@ -364,11 +366,12 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
     ActionType.REGISTER
   ])
 
-  const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id, {
-      keepAssignment: true
-    })
-  )
+  const withCorrectionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id, {
+        keepAssignment: true
+      })
+    )
 
   const actionId = withCorrectionRequest.actions.at(-1)?.id
 
@@ -402,11 +405,12 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
     ActionType.REGISTER
   ])
 
-  const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id, {
-      keepAssignment: true
-    })
-  )
+  const withCorrectionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id, {
+        keepAssignment: true
+      })
+    )
 
   const actionId = withCorrectionRequest.actions.at(-1)?.id
 
@@ -436,7 +440,7 @@ test('a correction request is not allowed if the event is already waiting for co
 
   const event = await client.event.create(generator.event.create())
 
-  await client.event.actions.correction.request(
+  await client.event.actions.correction.request.request(
     generator.event.actions.correction.request(event.id)
   )
 
@@ -451,7 +455,7 @@ test('a correction request is not allowed if the event is already waiting for co
   await client.event.actions.assignment.assign(assignmentInput)
 
   await expect(
-    client.event.actions.correction.request(
+    client.event.actions.correction.request.request(
       generator.event.actions.correction.request(event.id)
     )
   ).rejects.toThrow(

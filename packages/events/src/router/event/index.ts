@@ -29,7 +29,6 @@ import {
   EventIndex,
   EventInput,
   RejectCorrectionActionInput,
-  RequestCorrectionActionInput,
   UnassignActionInput,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
   QueryType
@@ -55,7 +54,6 @@ import {
 } from '@events/service/events/events'
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
-import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -203,31 +201,9 @@ export const eventRouter = router({
         })
     }),
     correction: router({
-      request: publicProcedure
-        .use(
-          requiresAnyOfScopes(
-            ACTION_ALLOWED_SCOPES[ActionType.REQUEST_CORRECTION]
-          )
-        )
-        .input(RequestCorrectionActionInput)
-        .use(middleware.requireAssignment)
-        .use(middleware.validateAction(ActionType.REQUEST_CORRECTION))
-        .mutation(async ({ input, ctx }) => {
-          const { token, isDuplicateAction, user, event } = ctx
-
-          if (isDuplicateAction) {
-            return event
-          }
-
-          await throwConflictIfWaitingForCorrection(input.eventId, token)
-
-          return addAction(input, {
-            eventId: input.eventId,
-            user,
-            token,
-            status: ActionStatus.Accepted
-          })
-        }),
+      request: router(
+        getDefaultActionProcedures(ActionType.REQUEST_CORRECTION)
+      ),
       approve: publicProcedure
         .use(
           requiresAnyOfScopes(

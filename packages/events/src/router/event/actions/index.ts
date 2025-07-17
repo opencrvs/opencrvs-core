@@ -26,7 +26,8 @@ import {
   DeclareActionInput,
   ValidateActionInput,
   ACTION_ALLOWED_SCOPES,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  RequestCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -93,17 +94,20 @@ const ACTION_PROCEDURE_CONFIG = {
   },
   [ActionType.REJECT]: {
     ...defaultConfig,
-    notifyApiPayloadSchema: undefined,
     inputSchema: RejectDeclarationActionInput
   },
   [ActionType.ARCHIVE]: {
     ...defaultConfig,
-    notifyApiPayloadSchema: undefined,
     inputSchema: ArchiveActionInput
   },
   [ActionType.PRINT_CERTIFICATE]: {
     ...defaultConfig,
     inputSchema: PrintCertificateActionInput,
+    allowIfWaitingForCorrection: false
+  },
+  [ActionType.REQUEST_CORRECTION]: {
+    ...defaultConfig,
+    inputSchema: RequestCorrectionActionInput,
     allowIfWaitingForCorrection: false
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>

@@ -179,11 +179,12 @@ test(`Removes ${InherentFlags.PRINTED} flag after ${ActionType.APPROVE_CORRECTIO
   const index = await client.event.list()
   expect(index[0].flags).toContain(InherentFlags.PRINTED)
 
-  const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id, {
-      keepAssignment: true
-    })
-  )
+  const withCorrectionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id, {
+        keepAssignment: true
+      })
+    )
 
   const actionId = withCorrectionRequest.actions.at(-1)?.id
 
@@ -212,7 +213,7 @@ test(`Adds ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.REQUEST
     ActionType.REGISTER
   ])
 
-  await client.event.actions.correction.request(
+  await client.event.actions.correction.request.request(
     generator.event.actions.correction.request(event.id, {
       keepAssignment: true
     })
@@ -232,11 +233,12 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
     ActionType.REGISTER
   ])
 
-  const withCorrectionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id, {
-      keepAssignment: true
-    })
-  )
+  const withCorrectionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id, {
+        keepAssignment: true
+      })
+    )
 
   const index = await client.event.list()
   expect(index[0].flags).toContain(InherentFlags.CORRECTION_REQUESTED)

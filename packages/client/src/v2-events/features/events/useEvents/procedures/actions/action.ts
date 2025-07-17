@@ -147,9 +147,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.correction.request
+    trpcOptionsProxy.event.actions.correction.request.request
   ),
   retry: retryUnlessConflict,
   retryDelay: 10000,
