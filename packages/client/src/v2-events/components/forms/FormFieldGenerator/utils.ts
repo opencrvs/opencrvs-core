@@ -8,13 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-import { MessageDescriptor } from 'react-intl'
-import { EventState, FieldConfig, EventConfig } from '@opencrvs/commons/client'
 import { IndexMap } from '@client/utils'
 import {
-  FIELD_SEPARATOR,
-  makeFormFieldIdFormikCompatible
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
 
 /**
@@ -40,7 +37,7 @@ export function makeFormikFieldIdsOpenCRVSCompatible<T>(
 ): IndexMap<T> {
   return Object.fromEntries(
     Object.entries(data).map(([key, value]) => [
-      key.replaceAll(FIELD_SEPARATOR, '.'),
+      makeFormikFieldIdOpenCRVSCompatible(key),
       value
     ])
   )

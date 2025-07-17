@@ -13,7 +13,8 @@ import {
   ActionType,
   tennisClubMembershipEvent,
   generateEventDocument,
-  generateEventDraftDocument
+  generateEventDraftDocument,
+  footballClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -51,7 +52,7 @@ function createSpy<Args extends unknown[], Result>(
  *
  * @returns handlers with spy methods
  */
-function wrapHandlersWithSpies<
+export function wrapHandlersWithSpies<
   Handlers extends {
     name: string
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -103,7 +104,10 @@ const eventDocument = generateEventDocument({
   actions: [ActionType.CREATE]
 })
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
+const draft = generateEventDraftDocument({
+  eventId,
+  actionType: ActionType.REGISTER
+})
 
 /**
  * Shareable msw configuration for declaration action flows with spies.
@@ -112,11 +116,13 @@ export const createDeclarationTrpcMsw = (
   trpcMsw: ReturnType<typeof createTRPCMsw<AppRouter>>
 ) => {
   return {
+    eventDocument,
+    draft,
     events: wrapHandlersWithSpies([
       {
         name: 'event.config.get',
         procedure: trpcMsw.event.config.get.query,
-        handler: () => [tennisClubMembershipEvent]
+        handler: () => [tennisClubMembershipEvent, footballClubMembershipEvent]
       },
       {
         name: 'event.get',
@@ -212,6 +218,13 @@ export const createDeclarationTrpcMsw = (
         name: 'event.draft.list',
         procedure: trpcMsw.event.draft.list.query,
         handler: () => [draft]
+      }
+    ]),
+    search: wrapHandlersWithSpies([
+      {
+        name: 'event.search',
+        procedure: trpcMsw.event.search.query,
+        handler: () => [tennisClubMembershipEventIndex]
       }
     ])
   } as const

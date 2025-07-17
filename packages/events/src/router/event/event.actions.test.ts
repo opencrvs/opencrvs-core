@@ -10,11 +10,18 @@
  */
 
 import {
+  ActionStatus,
   ActionType,
-  AddressType,
-  getCurrentEventState
+  getCurrentEventState,
+  getUUID
 } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  createTestClient,
+  sanitizeForSnapshot,
+  setupTestCase,
+  UNSTABLE_EVENT_FIELDS
+} from '@events/tests/utils'
 
 test('actions can be added to created events', async () => {
   const { user, generator } = await setupTestCase()
@@ -34,7 +41,7 @@ test('actions can be added to created events', async () => {
   ])
 })
 
-test('Action data can be retrieved', async () => {
+test('Event document contains all created actions', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -43,8 +50,23 @@ test('Action data can be retrieved', async () => {
   const generatedDeclaration = generator.event.actions.declare(originalEvent.id)
   await client.event.actions.declare.request(generatedDeclaration)
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   const generatedValidation = generator.event.actions.validate(originalEvent.id)
   await client.event.actions.validate.request(generatedValidation)
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
 
   const generatedRegistration = generator.event.actions.register(
     originalEvent.id
@@ -58,96 +80,35 @@ test('Action data can be retrieved', async () => {
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.DECLARE }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.VALIDATE }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
+    expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({ type: ActionType.REGISTER }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.READ })
   ])
-})
 
-test('Action data accepts partial changes', async () => {
-  const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  updatedEvent.actions.forEach((action) => {
+    expect(action.createdAtLocation).toBe(user.primaryOfficeId)
+    expect(action.createdByRole).toBe(user.role)
+    expect(action.createdBySignature).toBe(user.signature)
 
-  const originalEvent = await client.event.create(generator.event.create())
+    const actionsWithoutAnnotatation = [
+      ActionType.CREATE,
+      ActionType.READ,
+      ActionType.ASSIGN,
+      ActionType.UNASSIGN
+    ]
 
-  const addressWithoutVillage = {
-    country: 'FAR',
-    addressType: AddressType.DOMESTIC,
-    province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-    district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-    urbanOrRural: 'RURAL' as const
-  }
-
-  const initialAddress = {
-    ...addressWithoutVillage,
-    village: 'Small village'
-  }
-
-  const initialForm = {
-    'applicant.dob': '2000-02-01',
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
-    'recommender.none': true,
-    'applicant.address': { ...initialAddress }
-  }
-
-  const firstDeclarationPayload = generator.event.actions.declare(
-    originalEvent.id,
-    { declaration: initialForm }
-  )
-  await client.event.actions.declare.request(firstDeclarationPayload)
-
-  const declarationWithoutVillage = generator.event.actions.declare(
-    originalEvent.id,
-    {
-      declaration: {
-        ...initialForm,
-        'applicant.address': addressWithoutVillage
-      }
+    if (actionsWithoutAnnotatation.every((ac) => ac !== action.type)) {
+      expect(action).toHaveProperty('annotation')
     }
-  )
-
-  await client.event.actions.declare.request(declarationWithoutVillage)
-
-  const updatedEvent = await client.event.get(originalEvent.id)
-
-  const eventStateBeforeVillageRemoval = getCurrentEventState(updatedEvent)
-  expect(eventStateBeforeVillageRemoval.declaration).toEqual(initialForm)
-
-  const declarationWithVillageNull = generator.event.actions.declare(
-    originalEvent.id,
-    {
-      declaration: {
-        ...initialForm,
-        'applicant.address': {
-          ...addressWithoutVillage,
-          village: null
-        }
-      }
-    }
-  )
-
-  await client.event.actions.declare.request(declarationWithVillageNull)
-  const eventAfterVillageRemoval = await client.event.get(originalEvent.id)
-  const stateAfterVillageRemoval = getCurrentEventState(
-    eventAfterVillageRemoval
-  )
-
-  expect(stateAfterVillageRemoval.declaration).toEqual({
-    ...initialForm,
-    'applicant.address': addressWithoutVillage
   })
 
-  const events = await client.event.list()
-
-  expect(events).toEqual([
-    expect.objectContaining({
-      ...stateAfterVillageRemoval,
-      modifiedAt: expect.any(String)
-    })
-  ])
+  expect(
+    sanitizeForSnapshot(updatedEvent, UNSTABLE_EVENT_FIELDS)
+  ).toMatchSnapshot()
 })
 
 test('READ action does not delete draft', async () => {
@@ -163,11 +124,12 @@ test('READ action does not delete draft', async () => {
       'applicant.image': {
         type: 'image/png',
         originalFilename: 'abcd.png',
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
-    transactionId: 'transactionId',
-    eventId: originalEvent.id
+    transactionId: getUUID(),
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)
@@ -196,11 +158,12 @@ test('Action other than READ deletes draft', async () => {
       'applicant.image': {
         type: 'image/png',
         originalFilename: 'abcd.png',
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
-    transactionId: 'transactionId',
-    eventId: originalEvent.id
+    transactionId: getUUID(),
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)
@@ -227,6 +190,16 @@ test('partial declaration update accounts for conditional field values not in pa
     generator.event.actions.declare(originalEvent.id)
   )
 
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  await client.event.actions.assignment.assign(assignmentInput)
+
   await client.event.actions.validate.request({
     type: ActionType.VALIDATE,
     duplicates: [],
@@ -235,12 +208,12 @@ test('partial declaration update accounts for conditional field values not in pa
       'applicant.age': 25
     },
     eventId: originalEvent.id,
-    transactionId: '123-123-124'
+    transactionId: getUUID()
   })
 
   const event = await client.event.get(originalEvent.id)
 
-  const eventState = getCurrentEventState(event)
+  const eventState = getCurrentEventState(event, tennisClubMembershipEvent)
 
   expect(eventState.declaration).toMatchSnapshot()
 })

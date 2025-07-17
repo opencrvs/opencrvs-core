@@ -1,6 +1,27 @@
 # Changelog
 
-## 1.8.0 Release candidate
+
+## 1.9.0 Release candidate
+
+### New features
+
+- **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
+
+### Improvements
+
+- **Upgrade node version to 22**
+
+  This version enforces environment to have Node 22 installed (supported until 30 April 2027) and removes support for Node 18 for better performance and using [new features](https://github.com/nodejs/node/releases/tag/v22.0.0) offered by NodeJS
+
+  - Use nvm to upgrade your local development environment to use node version `22.x.x.`
+
+- **UI enhancements**
+
+  - Replaced the `Download` icon with a `FloppyDisk` save icon when saving an event as draft.
+
+- Use unprivileged version of nginx container image [#6501](https://github.com/opencrvs/opencrvs-core/issues/6501)
+
+## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.8.0)
 
 ### New features
 

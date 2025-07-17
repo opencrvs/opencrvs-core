@@ -14,6 +14,7 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
   createEmptyDraft,
+  deepMerge,
   findActiveDrafts,
   getAnnotationFromDrafts
 } from '@opencrvs/commons/client'
@@ -46,9 +47,8 @@ function AnnotationActionComponent({ children, actionType }: Props) {
 
   const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
 
-  const drafts = getRemoteDrafts()
-
-  const [event] = getEvent.useSuspenseQuery(params.eventId)
+  const event = getEvent.getFromCache(params.eventId)
+  const drafts = getRemoteDrafts(event.id)
 
   const activeDraft = findActiveDrafts(event, drafts)[0]
   const localDraft = getLocalDraftOrDefault(
@@ -58,6 +58,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   )
 
   const annotation = useActionAnnotation((state) => state.annotation)
+  const clearAnnotation = useActionAnnotation((state) => state.clear)
 
   useEffect(() => {
     if (!annotation) {
@@ -78,9 +79,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   /*
    * Initialize the form state
    */
-  const setInitialAnnotation = useActionAnnotation(
-    (state) => state.setInitialAnnotation
-  )
+  const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
   const eventDrafts = drafts
     .filter((d) => d.eventId === event.id)
@@ -108,7 +107,12 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   }, [eventDrafts])
 
   useEffect(() => {
-    setInitialAnnotation(actionAnnotation)
+    // Use the annotation values from the zustand state, so that filled form state is not lost
+    // If user e.g. enters the 'screen lock' flow while filling form.
+    // Then use annotation values from drafts.
+    const initialAnnotation = deepMerge(annotation || {}, actionAnnotation)
+
+    setAnnotation(initialAnnotation)
 
     return () => {
       /*
@@ -116,6 +120,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
        * staged drafts the user has for this event id and type
        */
       setLocalDraft(null)
+      clearAnnotation()
     }
 
     /*

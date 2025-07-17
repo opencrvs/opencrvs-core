@@ -15,14 +15,15 @@ import { noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { getCurrentEventStateWithDrafts } from '@opencrvs/commons/client'
+import {
+  applyDraftsToEventIndex,
+  deepDropNulls
+} from '@opencrvs/commons/client'
 import {
   AppBar,
   Button,
   Frame,
-  Icon,
   INavigationType,
-  SearchTool,
   Stack
 } from '@opencrvs/components'
 import { BackArrow } from '@opencrvs/components/lib/icons'
@@ -38,6 +39,8 @@ import { ActionMenu } from '@client/v2-events/features/workqueues/EventOverview/
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import { flattenEventIndex } from '@client/v2-events/utils'
+import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { Sidebar } from '../sidebar/Sidebar'
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -57,17 +60,23 @@ export function EventOverviewLayout({
   children: React.ReactNode
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
-  const { getEvent } = useEvents()
+  const { searchEventById } = useEvents()
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts()
-  const [event] = getEvent.useSuspenseQuery(eventId)
-
+  const drafts = getRemoteDrafts(eventId)
   const allEvents = useEventConfigurations()
-  const { eventConfiguration } = useEventConfiguration(event.type)
-
   const navigate = useNavigate()
   const intl = useIntl()
   const flattenedIntl = useIntlFormatMessageWithFlattenedParams()
+
+  const eventResults = searchEventById.useSuspenseQuery(eventId)
+
+  if (eventResults.length === 0) {
+    throw new Error(`Event details with id ${eventId} not found`)
+  }
+
+  const eventIndex = eventResults[0]
+
+  const { eventConfiguration } = useEventConfiguration(eventIndex.type)
 
   const advancedSearchEvents = allEvents.filter(
     (e) => e.advancedSearch.length > 0
@@ -97,24 +106,7 @@ export function EventOverviewLayout({
               >
                 <Plus />
               </Button>
-
-              <SearchTool
-                language="en"
-                navigationList={
-                  advancedSearchEvents.length > 0
-                    ? advancedSearchNavigationList // only available when enable in at least one form
-                    : []
-                }
-                searchHandler={noop}
-                searchTypeList={[
-                  {
-                    name: 'TRACKING_ID',
-                    label: 'Tracking ID',
-                    icon: <Icon name="MagnifyingGlass" size="small" />,
-                    placeHolderText: 'Search'
-                  }
-                ]}
-              />
+              <SearchToolbar />
             </Stack>
           }
           desktopRight={<ProfileMenu key="profileMenu" />}
@@ -125,11 +117,16 @@ export function EventOverviewLayout({
           }
           mobileRight={<ActionMenu eventId={eventId} />}
           mobileTitle={flattenedIntl.formatMessage(
-            eventConfiguration.summary.title.label,
-            flattenEventIndex(getCurrentEventStateWithDrafts(event, drafts))
+            eventConfiguration.title,
+            flattenEventIndex(
+              deepDropNulls(
+                applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
+              )
+            )
           )}
         />
       }
+      navigation={<Sidebar />}
       skipToContentText="skip"
     >
       {children}

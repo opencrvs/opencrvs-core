@@ -24,7 +24,7 @@ export default class MinioAPI extends OpenCRVSRESTDataSource {
     request.headers['Content-Type'] = 'application/fhir+json'
   }
 
-  getStaticData(fileUri: string) {
-    return this.get(`/presigned-url${fileUri}`)
+  getStaticData(filePath: string) {
+    return this.get(`/presigned-url${filePath}`)
   }
 }

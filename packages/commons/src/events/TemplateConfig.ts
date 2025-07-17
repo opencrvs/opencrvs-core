@@ -74,6 +74,8 @@ export function isFieldValueWithoutTemplates(
 
   if (
     typeof value === 'object' &&
+    // @todo remove ts-ignore
+    //@ts-ignore
     Object.values(value).some((val) => isTemplateVariable(val))
   ) {
     return false

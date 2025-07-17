@@ -10,10 +10,21 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, DraftInput, SCOPES } from '@opencrvs/commons'
+import {
+  ActionStatus,
+  ActionType,
+  DraftInput,
+  FullDocumentPath,
+  getUUID,
+  SCOPES
+} from '@opencrvs/commons'
 import { env } from '@events/environment'
 import { mswServer } from '@events/tests/msw'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createEvent,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
@@ -26,12 +37,12 @@ test('prevents forbidden access if missing required scope', async () => {
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`allows access with required scope`, async () => {
+test('allows access with required scope', async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
 
   await expect(
-    client.event.delete({ eventId: 'some event' })
+    client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
@@ -40,7 +51,7 @@ test('should return 404 if event does not exist', async () => {
   const client = createTestClient(user)
 
   await expect(
-    client.event.delete({ eventId: 'some event' })
+    client.event.delete({ eventId: '00000000-0000-0000-0000-000000000000' })
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -66,11 +77,7 @@ test('declared event can not be deleted', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
 
   await expect(
     client.event.delete({ eventId: event.id })
@@ -116,11 +123,12 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            filename: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
+            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
           }
         },
-        transactionId: `transactionId-${n}`,
-        eventId: event.id
+        transactionId: getUUID(),
+        eventId: event.id,
+        status: ActionStatus.Requested
       }
     }
     const getDeclaration = (n: number) => {
@@ -130,10 +138,10 @@ describe('check unreferenced draft attachments are deleted while final action su
           'applicant.image': {
             type: 'image/png',
             originalFilename: `${n}-abcd.png`,
-            filename: `${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png`
+            path: `/ocrvs/${n}-4f095fc4-4312-4de2-aa38-86dcc0f71044.png` as FullDocumentPath
           }
         },
-        transactionId: `transactionId-${n}`,
+        transactionId: getUUID(),
         eventId: event.id
       }
     }

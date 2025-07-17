@@ -42,12 +42,6 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'applicant.firstname': 'Tanya',
-          'applicant.id': '2370934578',
-          'applicant.surname': 'McQuaid',
-          'applicant.dob': '1975-01-02'
-        }}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -66,10 +60,7 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
-                },
-                {
-                  fieldId: 'applicant.surname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'applicant.dob'
@@ -83,15 +74,25 @@ export const DataDisplay: StoryObj<typeof FormFieldGenerator> = {
                     description: 'This is the label for the field',
                     id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
                   },
-                  value: 'National ID | {applicant.id}'
+                  value: {
+                    defaultMessage: `National ID | {applicant.id}`,
+                    description: 'This is the label for the field',
+                    id: 'v2.event.tennis-club-membership.action.print.verify.id.label'
+                  }
                 }
               ]
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'applicant.name': {
+            firstname: 'Tanya',
+            surname: 'McQuaid'
+          },
+          'applicant.id': '2370934578',
+          'applicant.dob': '1975-01-02'
+        }}
         onChange={noop}
       />
     )
@@ -107,11 +108,6 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'recommender.none': true,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
-        }}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -130,22 +126,33 @@ export const DataDisplayWithConditionallyHiddenFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
+                  fieldId: 'applicant.name'
                 },
                 {
                   fieldId: 'recommender.none'
                 },
-                // recommender.firstname is not rendered, because recommender.none is true
+                // recommender.name is not rendered, because recommender.none is true
                 {
-                  fieldId: 'recommender.firstname'
+                  fieldId: 'recommender.name'
                 }
               ]
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'recommender.none': true,
+          // @ts-ignore
+          'recommender.name': {
+            firstname: 'John',
+            surname: ''
+          },
+          // @ts-ignore
+          'applicant.name': {
+            firstname: 'Rasheed',
+            surname: ''
+          }
+        }}
         onChange={noop}
       />
     )
@@ -161,11 +168,6 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
   render: function Component() {
     return (
       <StyledFormFieldGenerator
-        declaration={{
-          'recommender.none': false,
-          'recommender.firstname': 'John',
-          'applicant.firstname': 'Rasheed'
-        }}
         eventConfig={tennisClubMembershipEvent}
         fields={[
           {
@@ -184,19 +186,28 @@ export const DataDisplayWithConditionallyShownFields: StoryObj<
               },
               data: [
                 {
-                  fieldId: 'applicant.firstname'
+                  fieldId: 'applicant.name'
                 },
-                // recommender.firstname is rendered, because recommender.none is false
+                // recommender.name is rendered, because recommender.none is false
                 {
-                  fieldId: 'recommender.firstname'
+                  fieldId: 'recommender.name'
                 }
               ]
             }
           }
         ]}
-        form={{}}
         id="my-form"
-        setAllFieldsDirty={false}
+        initialValues={{
+          'recommender.name': {
+            firstname: 'John',
+            surname: ''
+          },
+          'applicant.name': {
+            firstname: 'Rasheed',
+            surname: ''
+          },
+          'recommender.none': false
+        }}
         onChange={noop}
       />
     )

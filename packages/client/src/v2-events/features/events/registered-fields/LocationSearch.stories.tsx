@@ -20,7 +20,9 @@ const meta: Meta<typeof LocationSearch.Output> = {
   decorators: [
     (Story) => (
       <TRPCProvider>
-        <Story />
+        <React.Suspense>
+          <Story />
+        </React.Suspense>
       </TRPCProvider>
     )
   ]
@@ -28,7 +30,7 @@ const meta: Meta<typeof LocationSearch.Output> = {
 
 export default meta
 
-const healthFacilityLocationId = '465c448a-2c85-45f5-80f0-967e91f51de9'
+const healthFacilityLocationId = '4d3279be-d026-420c-88f7-f0a4ae986973' // Ibombo Rural Health Centre ()
 export const LocationSearchOutput: StoryObj<typeof LocationSearch.Output> = {
   args: {
     value: ''

@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
+import { IntlShape } from 'react-intl'
+import { Location } from '@events/service/locations/locations'
 import {
   EventState,
   AddressFieldValue,
@@ -21,16 +23,17 @@ import {
   not,
   GeographicalArea,
   AdministrativeAreas,
-  isFieldVisible,
   alwaysTrue,
-  AddressType
+  AddressType,
+  never,
+  isFieldDisplayedOnReview
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import {
   formDataStringifierFactory,
-  useSimpleFieldStringifier
-} from '@client/v2-events/hooks/useSimpleFieldStringifier'
+  stringifySimpleField
+} from '@client/v2-events/hooks/useFormDataStringifier'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -246,6 +249,10 @@ const ADMIN_STRUCTURE = [
     id: 'urbanOrRural',
     conditionals: [
       {
+        type: ConditionalType.DISPLAY_ON_REVIEW,
+        conditional: never()
+      },
+      {
         type: ConditionalType.SHOW,
         conditional: and(
           isDomesticAddress(),
@@ -432,6 +439,35 @@ type _ExpectTrue = Expect<
   EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
 >
 
+const ALL_ADDRESS_INPUT_FIELDS = [
+  ...ADMIN_STRUCTURE,
+  ...URBAN_FIELDS,
+  ...RURAL_FIELDS,
+  ...GENERIC_ADDRESS_FIELDS
+] satisfies Array<FieldConfigWithoutAddress>
+
+const SEARCH_MODE_FIELDS: Array<
+  (typeof ALL_ADDRESS_INPUT_FIELDS)[number]['id']
+> = [
+  'country',
+  'province',
+  'district',
+  'state',
+  'district2',
+  'urbanOrRural',
+  'town',
+  'village'
+]
+
+function getFilteredFields(searchMode: boolean) {
+  if (!searchMode) {
+    return ALL_ADDRESS_INPUT_FIELDS
+  }
+  return ALL_ADDRESS_INPUT_FIELDS.filter((field) =>
+    SEARCH_MODE_FIELDS.includes(field.id)
+  )
+}
+
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -439,72 +475,103 @@ type _ExpectTrue = Expect<
  * - By default, it includes fields for admin structure and a selection between urban and rural addresses.
  * - All admin structure fields are hidden until the previous field is selected.
  * - Address details fields are only shown when district is selected (it being the last admin structure field).
+ * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const { onChange, defaultValue, value = {}, ...otherProps } = props
-
-  const fields = [
-    ...ADMIN_STRUCTURE,
-    ...URBAN_FIELDS,
-    ...RURAL_FIELDS,
-    ...GENERIC_ADDRESS_FIELDS
-  ] satisfies Array<FieldConfigWithoutAddress>
+  const {
+    onChange,
+    defaultValue,
+    configuration: { searchMode = false } = {},
+    value = {},
+    ...otherProps
+  } = props
+  const fields = getFilteredFields(searchMode)
+  const fieldsWithDefaults = defaultValue
+    ? fields.map(addDefaultValue(defaultValue))
+    : fields
 
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={defaultValue ? fields.map(addDefaultValue(defaultValue)) : fields}
-      form={value}
+      fields={fieldsWithDefaults}
       initialValues={{ ...defaultValue, ...value }}
-      setAllFieldsDirty={false}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />
   )
 }
 
-function AddressOutput({ value }: { value?: AddressFieldValue }) {
+function AddressOutput({
+  value,
+  searchMode = false
+}: {
+  value?: AddressFieldValue
+  searchMode?: boolean
+}) {
   if (!value) {
     return ''
   }
-  return (
-    <>
-      {ALL_ADDRESS_FIELDS.map((field) => ({
-        field,
-        value: value[field.id as keyof typeof value]
-      }))
-        .filter(
-          (field) =>
-            field.value &&
-            isFieldVisible(field.field satisfies FieldConfig, value)
-        )
-        .map((field) => (
+
+  const fields = getFilteredFields(searchMode)
+    .map((field) => ({
+      field,
+      value: value[field.id as keyof typeof value]
+    }))
+    .filter(
+      (field) =>
+        field.value &&
+        isFieldDisplayedOnReview(field.field satisfies FieldConfig, value)
+    )
+
+  if (searchMode) {
+    return (
+      <>
+        {fields.map((field, index) => (
           <React.Fragment key={field.field.id}>
             <Output
               field={field.field}
               showPreviouslyMissingValuesAsChanged={false}
               value={field.value}
             />
-            <br />
+            {index < fields.length - 1 && ', '}
           </React.Fragment>
         ))}
+      </>
+    )
+  }
+
+  return (
+    <>
+      {fields.map((field) => (
+        <React.Fragment key={field.field.id}>
+          <Output
+            field={field.field}
+            showPreviouslyMissingValuesAsChanged={false}
+            value={field.value}
+          />
+          <br />
+        </React.Fragment>
+      ))}
     </>
   )
 }
 
-function useStringifier() {
-  const fieldStringifier = useSimpleFieldStringifier()
+function stringify(
+  intl: IntlShape,
+  locations: Location[],
+  value: AddressFieldValue
+) {
+  const fieldStringifier = stringifySimpleField(intl, locations)
+
   /*
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
   const formStringifier = formDataStringifierFactory(fieldStringifier)
-  return (value: AddressFieldValue) => {
-    return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
-  }
+  return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
 }
 
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  useStringifier: useStringifier
+  stringify
 }

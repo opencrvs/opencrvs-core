@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { AddressType, EventStatus, SCOPES } from '@opencrvs/commons'
+import { SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
@@ -51,53 +51,22 @@ test('Returns multiple events', async () => {
   expect(events).toHaveLength(10)
 })
 
-test('Returns aggregated event with updated status and values', async () => {
+test('Does not return draft events unless they are created by the fetching user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const initialDeclaration = {
-    'applicant.firstname': 'John',
-    'applicant.surname': 'Doe',
-    'applicant.dob': '2000-01-01',
-    'recommender.none': true,
-    'applicant.address': {
-      country: 'FAR',
-      addressType: AddressType.DOMESTIC,
-      province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
-      district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
-      urbanOrRural: 'RURAL' as const,
-      village: 'Small village'
-    }
-  }
+  // Create 3 events created by the fetching user
+  await client.event.create(generator.event.create())
+  await client.event.create(generator.event.create())
+  await client.event.create(generator.event.create())
 
-  const event = await client.event.create(generator.event.create())
+  // Create 2 events created by other users
+  const { user: otherUser } = await setupTestCase()
+  const otherClient = createTestClient(otherUser)
+  await otherClient.event.create(generator.event.create())
+  await otherClient.event.create(generator.event.create())
 
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id, {
-      declaration: initialDeclaration
-    })
-  )
+  const events = await client.event.list()
 
-  const initialEvents = await client.event.list()
-
-  expect(initialEvents).toHaveLength(1)
-  expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
-  expect(initialEvents[0].declaration).toEqual(initialDeclaration)
-
-  const updatedDeclaration = {
-    ...initialDeclaration,
-    'applicant.firstname': 'Jane'
-  }
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id, {
-      declaration: updatedDeclaration
-    })
-  )
-
-  const updatedEvents = await client.event.list()
-
-  expect(updatedEvents).toHaveLength(1)
-
-  expect(updatedEvents[0].status).toBe(EventStatus.DECLARED)
-  expect(updatedEvents[0].declaration).toEqual(updatedDeclaration)
+  expect(events).toHaveLength(3)
 })

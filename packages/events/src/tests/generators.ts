@@ -9,9 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Db } from 'mongodb'
-import { getUUID, eventPayloadGenerator } from '@opencrvs/commons'
-import { Location } from '@events/service/locations/locations'
+import {
+  getUUID,
+  eventPayloadGenerator,
+  UUID,
+  TestUserRole
+} from '@opencrvs/commons'
+import { Location, setLocations } from '@events/service/locations/locations'
 
 interface Name {
   use: string
@@ -20,14 +24,14 @@ interface Name {
 }
 
 export interface CreatedUser {
-  id: string
-  primaryOfficeId: string
+  id: UUID
+  primaryOfficeId: UUID
   role: string
   name: Array<Name>
 }
 
 interface CreateUser {
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   role?: string
   name?: Array<Name>
 }
@@ -35,10 +39,10 @@ interface CreateUser {
 /**
  * @returns a payload generator for creating events and actions with sensible defaults.
  */
-export function payloadGenerator() {
+export function payloadGenerator(rng: () => number) {
   const user = {
     create: (input: CreateUser) => ({
-      role: input.role ?? 'REGISTRATION_AGENT',
+      role: input.role ?? ('REGISTRATION_AGENT' as TestUserRole),
       name: input.name ?? [{ use: 'en', family: 'Doe', given: ['John'] }],
       primaryOfficeId: input.primaryOfficeId
     })
@@ -65,7 +69,7 @@ export function payloadGenerator() {
     }
   }
 
-  return { event: eventPayloadGenerator, locations, user }
+  return { event: eventPayloadGenerator(rng), locations, user }
 }
 
 /**
@@ -73,18 +77,15 @@ export function payloadGenerator() {
  * Use with payloadGenerator for creating test data.
  */
 export function seeder() {
-  const seedUser = async (db: Db, user: Omit<CreatedUser, 'id'>) => {
-    const createdUser = await db.collection('users').insertOne(user)
-
+  const seedUser = (user: Omit<CreatedUser, 'id'>) => {
     return {
       primaryOfficeId: user.primaryOfficeId,
       name: user.name,
-      role: user.role,
-      id: createdUser.insertedId.toString()
+      role: user.role as TestUserRole,
+      id: getUUID()
     }
   }
-  const seedLocations = async (db: Db, locations: Location[]) =>
-    db.collection('locations').insertMany(locations)
+  const seedLocations = async (locations: Location[]) => setLocations(locations)
 
   return {
     user: seedUser,

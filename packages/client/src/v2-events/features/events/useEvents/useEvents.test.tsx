@@ -22,7 +22,10 @@ import {
   ActionType,
   EventDocument,
   EventInput,
-  tennisClubMembershipEvent
+  getUUID,
+  TENNIS_CLUB_MEMBERSHIP,
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import { AppRouter, queryClient, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -56,20 +59,23 @@ const createHandler = trpcHandler(async ({ request }) => {
   await new Promise((resolve) => setTimeout(resolve, 1000))
 
   return HttpResponse.json({
-    type: 'TENNIS_CLUB_MEMBERSHIP',
-    id: '_REAL_UUID_',
+    type: TENNIS_CLUB_MEMBERSHIP,
+    id: '_REAL_UUID_' as UUID,
     trackingId: 'TEST12',
     createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     updatedAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
     actions: [
       {
         type: ActionType.CREATE,
-        id: '_REAL_ACTION_UUID_',
+        id: '_REAL_ACTION_UUID_' as UUID,
         createdAt: new Date('2024-12-05T18:37:31.295Z').toISOString(),
+        createdByUserType: 'user',
         createdBy: '6733309827b97e6483877188',
-        createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176',
+        createdByRole: 'some-user-role',
+        createdAtLocation: 'ae5be1bb-6c50-4389-a72d-4c78d19ec176' as UUID,
         declaration: {},
-        status: ActionStatus.Accepted
+        status: ActionStatus.Accepted,
+        transactionId: getUUID()
       }
     ]
   })
@@ -167,12 +173,12 @@ describe('events that have unsynced actions', () => {
 
     // eslint-disable-next-line @typescript-eslint/await-thenable
     await createEventHook.result.current.mutate({
-      type: 'TENNIS_CLUB_MEMBERSHIP',
+      type: TENNIS_CLUB_MEMBERSHIP,
       transactionId: '_TEST_TRANSACTION_'
     })
 
     const getHook = renderHook(
-      () => useEvents().getEvent.useQuery('_TEST_TRANSACTION_'),
+      () => useEvents().getEvent.findFromCache('_TEST_TRANSACTION_'),
       { wrapper }
     )
 
@@ -186,7 +192,7 @@ describe('events that have unsynced actions', () => {
     createEventHook
   }) => {
     await createEventHook.result.current.mutateAsync({
-      type: 'TENNIS_CLUB_MEMBERSHIP',
+      type: TENNIS_CLUB_MEMBERSHIP,
       transactionId: '_TEST_TRANSACTION_'
     })
     // Wait for backend to sync
@@ -198,7 +204,7 @@ describe('events that have unsynced actions', () => {
     )
 
     const getHook = renderHook(
-      () => useEvents().getEvent.useQuery('_REAL_UUID_'),
+      () => useEvents().getEvent.findFromCache('_REAL_UUID_'),
       { wrapper }
     )
 

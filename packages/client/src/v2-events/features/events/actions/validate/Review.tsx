@@ -9,17 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
 import { useSelector } from 'react-redux'
 import {
   getCurrentEventState,
   ActionType,
   getActionAnnotation,
   getDeclaration,
-  getActionReview
+  getActionReview,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -38,6 +42,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { getScope } from '@client/profile/profileSelectors'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useReviewActionConfig } from './useReviewActionConfig'
 
 /**
@@ -46,13 +51,30 @@ import { useReviewActionConfig } from './useReviewActionConfig'
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.VALIDATE)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
+  const { redirectToOrigin } = useEventFormNavigation()
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEvent.findFromCache(eventId).data
+
+  useEffect(() => {
+    if (!event) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Event with id ${eventId} not found in cache. Redirecting to overview.`
+      )
+      return navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId: eventId }))
+    }
+  }, [event, eventId, navigate])
+
+  if (!event) {
+    return <div />
+  }
 
   const { setAnnotation, getAnnotation } = useActionAnnotation()
 
@@ -60,8 +82,7 @@ export function Review() {
 
   const previousAnnotation = getActionAnnotation({
     event,
-    actionType: ActionType.VALIDATE,
-    drafts: []
+    actionType: ActionType.VALIDATE
   })
 
   const annotation = getAnnotation(previousAnnotation)
@@ -73,7 +94,9 @@ export function Review() {
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
   const getFormValues = useEventFormData((state) => state.getFormValues)
-  const previousFormValues = getCurrentEventState(event).declaration
+
+  const currentEventState = getCurrentEventState(event, config)
+  const previousFormValues = currentEventState.declaration
   const form = getFormValues()
 
   const scopes = useSelector(getScope) ?? undefined
@@ -83,7 +106,8 @@ export function Review() {
     declaration: form,
     annotation,
     scopes,
-    reviewFields: reviewConfig.fields
+    reviewFields: reviewConfig.fields,
+    status: currentEventState.status
   })
 
   async function handleEdit({
@@ -106,9 +130,10 @@ export function Review() {
         ROUTES.V2.EVENTS.VALIDATE.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -139,8 +164,7 @@ export function Review() {
 
     if (confirmedValidation) {
       reviewActionConfiguration.onConfirm(eventId)
-
-      goToHome()
+      redirectToOrigin(slug)
     }
   }
 
@@ -156,7 +180,8 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message }
+          annotation: {},
+          reason: { message }
         })
       }
 
@@ -165,11 +190,11 @@ export function Review() {
           eventId,
           declaration: {},
           transactionId: uuid(),
-          annotation: { message, isDuplicate }
+          annotation: {},
+          reason: { message, isDuplicate }
         })
       }
-
-      goToHome()
+      redirectToOrigin(slug)
     }
   }
 
@@ -179,7 +204,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          goToHome()
+          redirectToOrigin(slug)
         })
       }
     >
@@ -194,11 +219,16 @@ export function Review() {
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
+          icon={reviewActionConfiguration.icon}
           incomplete={reviewActionConfiguration.incomplete}
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleValidation}
-          onReject={handleRejection}
+          onReject={
+            currentEventState.status === EventStatus.enum.REJECTED
+              ? undefined
+              : handleRejection
+          }
         />
         {modal}
       </ReviewComponent.Body>

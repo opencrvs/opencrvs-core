@@ -65,9 +65,11 @@ export const DocumentViewer = ({ id, options, children }: IProps) => {
   const [selectedOption, setSelectedOption] = useState(
     options.selectOptions[0]?.value || ''
   )
+
   const [selectedDocument, setSelectedDocument] = useState(
     options.documentOptions[0]?.value || ''
   )
+
   const [zoom, setZoom] = useState(1)
   const [rotation, setRotation] = useState(0)
 

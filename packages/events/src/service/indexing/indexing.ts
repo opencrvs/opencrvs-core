@@ -9,22 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { Transform } from 'stream'
 import { type estypes } from '@elastic/elasticsearch'
-import { z } from 'zod'
 import {
+  ActionCreationMetadata,
+  RegistrationCreationMetadata,
   AddressFieldValue,
   EventConfig,
   EventDocument,
   EventIndex,
-  EventSearchIndex,
+  EventStatus,
   FieldConfig,
   FieldType,
   getCurrentEventState,
-  getDeclarationFields
+  getDeclarationFields,
+  QueryType,
+  WorkqueueCountInput,
+  getEventConfigById,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
-import * as eventsDb from '@events/storage/mongodb/events'
 import {
   getEventAliasName,
   getEventIndexName,
@@ -36,11 +39,18 @@ import {
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
-  generateQuery
+  removeSecuredFields
 } from './utils'
+import {
+  buildElasticQueryFromSearchPayload,
+  withJurisdictionFilters
+} from './query'
 
-function eventToEventIndex(event: EventDocument): EventIndex {
-  return encodeEventIndex(getCurrentEventState(event))
+function eventToEventIndex(
+  event: EventDocument,
+  config: EventConfig
+): EventIndex {
+  return encodeEventIndex(getCurrentEventState(event, config), config)
 }
 
 /*
@@ -70,12 +80,16 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return { type: 'date' }
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
-    case FieldType.SIGNATURE:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
       return { type: 'text' }
+    case FieldType.EMAIL:
+      return {
+        type: 'keyword',
+        // apply custom normalyzer
+        normalizer: 'lowercase_normalizer'
+      }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
     case FieldType.SELECT:
@@ -86,6 +100,8 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.ID:
+    case FieldType.PHONE:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {
@@ -114,23 +130,43 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
         type: 'object',
         properties: addressProperties
       }
+    case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
         type: 'object',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
+        }
+      }
+    case FieldType.NAME:
+      return {
+        type: 'object',
+        properties: {
+          firstname: { type: 'text', analyzer: 'human_name' },
+          surname: { type: 'text', analyzer: 'human_name' },
+          __fullname: { type: 'text', analyzer: 'human_name' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
       return {
         type: 'nested',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' },
           option: { type: 'keyword' }
+        }
+      }
+    // @TODO: other option would be to throw an error, since these should not be used in declaration form.
+    case FieldType.DATE_RANGE:
+    case FieldType.SELECT_DATE_RANGE:
+      return {
+        type: 'object',
+        properties: {
+          start: { type: 'date' },
+          end: { type: 'date' }
         }
       }
     default:
@@ -159,23 +195,84 @@ export async function createIndex(
   await client.indices.create({
     index: indexName,
     body: {
+      // Define a custom normalizer to make keyword fields case-insensitive by applying a lowercase filter
+      settings: {
+        analysis: {
+          normalizer: {
+            lowercase_normalizer: {
+              type: 'custom',
+              filter: ['lowercase']
+            }
+          },
+          analyzer: {
+            /*
+             * Human name can contain
+             * Special characters including hyphens, underscores and spaces
+             */
+            human_name: {
+              type: 'custom',
+              tokenizer: 'standard',
+              filter: ['lowercase', 'word_delimiter']
+            }
+          }
+        }
+      },
       mappings: {
         properties: {
           id: { type: 'keyword' },
           type: { type: 'keyword' },
           status: { type: 'keyword' },
           createdAt: { type: 'date' },
+          createdByUserType: { type: 'keyword' },
           createdBy: { type: 'keyword' },
           createdAtLocation: { type: 'keyword' },
-          modifiedAt: { type: 'date' },
+          updatedAtLocation: { type: 'keyword' },
+          updatedAt: { type: 'date' },
           assignedTo: { type: 'keyword' },
           updatedBy: { type: 'keyword' },
+          updatedByUserRole: { type: 'keyword' },
           declaration: {
             type: 'object',
             properties: formFieldsToDataMapping(formFields)
           },
           trackingId: { type: 'keyword' },
-          registrationNumber: { type: 'keyword' }
+          legalStatuses: {
+            type: 'object',
+            properties: {
+              [EventStatus.enum.DECLARED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
+                  acceptedAt: { type: 'date' }
+                } satisfies Record<
+                  keyof ActionCreationMetadata,
+                  estypes.MappingProperty
+                >
+              },
+              [EventStatus.enum.REGISTERED]: {
+                type: 'object',
+                properties: {
+                  createdAt: { type: 'date' },
+                  createdBy: { type: 'keyword' },
+                  createdByUserType: { type: 'keyword' },
+                  createdAtLocation: { type: 'keyword' },
+                  createdByRole: { type: 'keyword' },
+                  createdBySignature: { type: 'keyword' },
+                  acceptedAt: { type: 'date' },
+                  registrationNumber: { type: 'keyword' }
+                } satisfies Record<
+                  keyof RegistrationCreationMetadata,
+                  estypes.MappingProperty
+                >
+              }
+            }
+          },
+          flags: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
@@ -195,8 +292,7 @@ export async function ensureIndexExists(eventConfiguration: EventConfig) {
     logger.info(`Creating index ${indexName}`)
     await createIndex(indexName, getDeclarationFields(eventConfiguration))
   } else {
-    logger.info(`Index ${indexName} already exists`)
-    logger.info(JSON.stringify(hasEventsIndex))
+    logger.info(`Index ${indexName} already exists.\n`)
   }
   return ensureAlias(indexName)
 }
@@ -209,43 +305,7 @@ type _Combine<
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 
-export async function indexAllEvents(eventConfiguration: EventConfig) {
-  const mongoClient = await eventsDb.getClient()
-  const esClient = getOrCreateClient()
-  const indexName = getEventIndexName(eventConfiguration.id)
-  const hasEventsIndex = await esClient.indices.exists({
-    index: indexName
-  })
-
-  if (!hasEventsIndex) {
-    await createIndex(indexName, getDeclarationFields(eventConfiguration))
-  }
-
-  const stream = mongoClient.collection(indexName).find().stream()
-
-  const transformedStreamData = new Transform({
-    readableObjectMode: true,
-    writableObjectMode: true,
-    transform: (record: EventDocument, _encoding, callback) => {
-      callback(null, eventToEventIndex(record))
-    }
-  })
-
-  await esClient.helpers.bulk({
-    retries: 3,
-    wait: 3000,
-    datasource: stream.pipe(transformedStreamData),
-    onDocument: (doc: EventIndex) => ({
-      index: {
-        _index: indexName,
-        _id: doc.id
-      }
-    }),
-    refresh: 'wait_for'
-  })
-}
-
-export async function indexEvent(event: EventDocument) {
+export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
 
@@ -253,7 +313,7 @@ export async function indexEvent(event: EventDocument) {
     index: indexName,
     id: event.id,
     /** We derive the full state (without nulls) from eventToEventIndex, replace instead of update. */
-    document: eventToEventIndex(event),
+    document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
 }
@@ -270,7 +330,10 @@ export async function deleteEventIndex(event: EventDocument) {
   return response
 }
 
-export async function getIndexedEvents() {
+export async function getIndexedEvents(
+  userId: string,
+  eventConfigs: EventConfig[]
+) {
   const esClient = getOrCreateClient()
 
   const hasEventsIndex = await esClient.indices.existsAlias({
@@ -284,41 +347,105 @@ export async function getIndexedEvents() {
     return []
   }
 
+  const query = {
+    // We basically want to fetch all events,
+    // UNLESS they are in status 'CREATED' (i.e. undeclared drafts) and not created by current user.
+    bool: {
+      should: [
+        {
+          bool: {
+            must_not: [{ term: { status: EventStatus.enum.CREATED } }],
+            should: undefined
+          }
+        },
+        {
+          bool: {
+            must: [
+              { term: { status: EventStatus.enum.CREATED } },
+              { term: { createdBy: userId } }
+            ],
+            should: undefined
+          }
+        }
+      ],
+      minimum_should_match: 1
+    }
+  } satisfies estypes.QueryDslQueryContainer
+
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
-    size: 10000,
+    query,
+    size: DEFAULT_SIZE,
     request_cache: false
   })
 
   return response.hits.hits
     .map((hit) => hit._source)
     .filter((event): event is EncodedEventIndex => event !== undefined)
-    .map(decodeEventIndex)
+    .map((eventIndex) => {
+      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
+      return removeSecuredFields(eventConfig, decodedEventIndex)
+    })
 }
 
-export async function getIndex(eventParams: EventSearchIndex) {
+export async function getIndex(
+  eventParams: QueryType,
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
+) {
   const esClient = getOrCreateClient()
-  const { type, ...queryParams } = eventParams
-
-  if (Object.values(queryParams).length === 0) {
-    throw new Error('No search params provided')
-  }
-
-  const query = generateQuery(queryParams)
-
-  const response = await esClient.search<EncodedEventIndex>({
-    index: getEventIndexName(type),
-    size: DEFAULT_SIZE,
-    request_cache: false,
-    query
-  })
-
-  const events = z.array(EventIndex).parse(
-    response.hits.hits
-      .map((hit) => hit._source)
-      .filter((event): event is EncodedEventIndex => event !== undefined)
-      .map((event) => decodeEventIndex(event))
+  const query = withJurisdictionFilters(
+    buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+    options,
+    userOfficeId
   )
 
+  const response = await esClient.search<EncodedEventIndex>({
+    index: getEventAliasName(),
+    size: DEFAULT_SIZE,
+    request_cache: false,
+    query,
+    sort: {
+      _score: {
+        order: 'desc'
+      }
+    }
+  })
+
+  const events = response.hits.hits
+    .map((hit) => hit._source)
+    .filter((event): event is EncodedEventIndex => event !== undefined)
+    .map((eventIndex) => {
+      const eventConfig = getEventConfigById(eventConfigs, eventIndex.type)
+      const decodedEventIndex = decodeEventIndex(eventConfig, eventIndex)
+      return removeSecuredFields(eventConfig, decodedEventIndex)
+    })
+
   return events
+}
+
+export async function getEventCount(
+  queries: WorkqueueCountInput,
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
+) {
+  return (
+    //  @TODO: write a query that does everything in one go.
+    (
+      await Promise.all(
+        queries.map(async ({ slug, query }) => {
+          const count = (
+            await getIndex(query, eventConfigs, options, userOfficeId)
+          ).length
+          return { slug, count }
+        })
+      )
+    ).reduce((acc: Record<string, number>, { slug, count }) => {
+      acc[slug] = count
+      return acc
+    }, {})
+  )
 }

@@ -10,8 +10,11 @@
  */
 
 import fetch from 'node-fetch'
+import { UUID } from '../uuid'
+import { FullDocumentPath } from '../documents'
+import { joinURL } from '../url'
 
-interface IUserName {
+export interface IUserName {
   use: string
   family: string
   given: string[]
@@ -23,15 +26,38 @@ type ObjectId = string
  * Let's add more fields as they are needed
  */
 type User = {
+  id: string
+  avatar?: {
+    data: FullDocumentPath
+    type: string
+  }
+  signature?: FullDocumentPath
   name: IUserName[]
   username: string
   email: string
   role: ObjectId
   practitionerId: string
-  primaryOfficeId: string
+  primaryOfficeId: UUID
   scope: string[]
   status: string
   creationDate: number
+}
+type System = {
+  name: string
+  createdBy: string
+  username: string
+  client_id: string
+  status: string
+  scope: string[]
+  sha_secret: string
+  type: string
+}
+
+export class UserNotFoundError extends Error {
+  constructor(userId: string) {
+    super(`User with id ${userId} not found`)
+    this.name = 'UserNotFoundError'
+  }
 }
 
 export async function getUser(
@@ -39,11 +65,7 @@ export async function getUser(
   userId: string,
   token: string
 ) {
-  const hostWithTrailingSlash = userManagementHost.endsWith('/')
-    ? userManagementHost
-    : userManagementHost + '/'
-
-  const res = await fetch(new URL('getUser', hostWithTrailingSlash).href, {
+  const res = await fetch(joinURL(userManagementHost, 'getUser').href, {
     method: 'POST',
     body: JSON.stringify({ userId }),
     headers: {
@@ -52,6 +74,10 @@ export async function getUser(
     }
   })
 
+  if (res.status === 404) {
+    throw new UserNotFoundError(userId)
+  }
+
   if (!res.ok) {
     throw new Error(
       `Unable to retrieve user details. Error: ${res.status} status received`
@@ -59,4 +85,31 @@ export async function getUser(
   }
 
   return res.json() as Promise<User>
+}
+
+export async function getSystem(
+  userManagementHost: string,
+  systemId: string,
+  token: string
+) {
+  const hostWithTrailingSlash = userManagementHost.endsWith('/')
+    ? userManagementHost
+    : userManagementHost + '/'
+
+  const res = await fetch(new URL('getSystem', hostWithTrailingSlash).href, {
+    method: 'POST',
+    body: JSON.stringify({ systemId }),
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: token
+    }
+  })
+
+  if (!res.ok) {
+    throw new Error(
+      `Unable to retrieve system details. Error: ${res.status} status received`
+    )
+  }
+
+  return res.json() as Promise<System>
 }

@@ -12,19 +12,64 @@
 import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
-import { ActionStatus, Draft } from '@opencrvs/commons/client'
+import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
-  invalidateDraftsList,
-  invalidateEventsList,
+  clearPendingDraftCreationRequests,
+  findLocalEventDocument,
+  refetchDraftsList,
+  refetchEventsList,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
-  setMutationDefaults
+  setMutationDefaults,
+  setQueryDefaults
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
+import { getFilepathsFromActionDocument } from '../files/cache'
+import { precacheFile } from '../files/useFileUpload'
+
+/*
+ * Overrides the default behaviour of "api.event.draft.list"
+ * Cache files referenced in the draft.
+ *
+ * This ensures the full record can be browsed even when the user goes offline
+ */
+setQueryDefaults(trpcOptionsProxy.event.draft.list, {
+  staleTime: Infinity,
+  queryFn: async (...params) => {
+    const queryOptions = trpcOptionsProxy.event.draft.list.queryOptions()
+
+    if (typeof queryOptions.queryFn !== 'function') {
+      throw new Error('queryFn is not a function')
+    }
+
+    const response = await queryOptions.queryFn(...params)
+    const drafts = response.map((draft) => Draft.parse(draft))
+
+    const filenames = drafts.flatMap((draft) =>
+      getFilepathsFromActionDocument([draft.action])
+    )
+
+    await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
+
+    const missingEventsToDownload = drafts
+      .filter((event) => !findLocalEventDocument(event.eventId))
+      .map(async (draft) =>
+        queryClient.prefetchQuery({
+          queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId),
+          queryFn: trpcOptionsProxy.event.get.queryOptions(draft.eventId)
+            .queryFn
+        })
+      )
+
+    await Promise.all(missingEventsToDownload)
+
+    return drafts
+  }
+})
 
 interface DraftStore {
   draft: Draft | null
@@ -69,36 +114,54 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
   onMutate: (variables) => {
     const optimisticDraft: Draft = {
       id: createTemporaryId(),
-      eventId: variables.eventId,
-      transactionId: variables.transactionId,
+      eventId: variables.eventId as UUID,
+      transactionId: variables.transactionId as UUID,
       action: {
-        status: ActionStatus.Accepted,
         createdAt: new Date().toISOString(),
         createdBy: '@todo',
-        createdAtLocation: '@todo',
+        createdByUserType: 'user',
+        createdByRole: '@todo',
+        createdAtLocation: '@todo' as UUID,
         ...variables,
-        declaration: variables.declaration || {}
+        originalActionId: variables.originalActionId as UUID,
+        /*
+         * Annoyingly these need to be casted or otherwise branded
+         * types like FullDocumentPath causes an error here.
+         * inferInput of trpc types causes branded types to lose the branding and
+         * just show as plain types
+         */
+        declaration: (variables.declaration ||
+          {}) as Draft['action']['declaration'],
+        annotation: (variables.annotation ||
+          {}) as Draft['action']['annotation']
       },
       createdAt: new Date().toISOString()
     }
-    setDraftData((drafts) => drafts.concat(optimisticDraft))
+    setDraftData((drafts) => {
+      return drafts
+        .filter((draft) => draft.eventId !== optimisticDraft.eventId)
+        .concat(optimisticDraft)
+    })
+    clearPendingDraftCreationRequests(variables.eventId)
     return optimisticDraft
   },
   onSuccess: async () => {
-    await invalidateEventsList()
-    await invalidateDraftsList()
+    await refetchEventsList()
+    await refetchDraftsList()
   },
   retryDelay: 10000
 })
 
 function useCreateDraft() {
   const options = trpcOptionsProxy.event.draft.create.mutationOptions()
+  const defaults = queryClient.getMutationDefaults(
+    trpcOptionsProxy.event.draft.create.mutationKey()
+  )
 
   return useMutation({
     ...options,
-    ...queryClient.getMutationDefaults(
-      trpcOptionsProxy.event.draft.create.mutationKey()
-    )
+    ...defaults,
+    mutationFn: defaults.mutationFn as typeof options.mutationFn
   })
 }
 
@@ -111,6 +174,20 @@ export function useDrafts() {
 
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
+
+  function findAllRemoteDrafts(): Draft[] {
+    // Skip the queryFn defined by tRPC and use the one defined above
+    const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
+
+    const drafts = useSuspenseQuery({
+      ...options,
+      queryKey: trpc.event.draft.list.queryKey(),
+      networkMode: 'always'
+    })
+
+    return drafts.data
+  }
+
   return {
     setLocalDraft: setDraft,
     getLocalDraftOrDefault: getLocalDraftOrDefault,
@@ -121,20 +198,16 @@ export function useDrafts() {
 
       createDraft.mutate({
         eventId: localDraft.eventId,
-        declaration: localDraft.action.declaration,
+        declaration: deepDropNulls(localDraft.action.declaration),
+        annotation: deepDropNulls(localDraft.action.annotation),
         transactionId: localDraft.transactionId,
-        type: localDraft.action.type
+        type: localDraft.action.type,
+        status: localDraft.action.status
       })
     },
-    getRemoteDrafts: function useDraftList(): Draft[] {
-      const options = trpc.event.draft.list.queryOptions()
-
-      const drafts = useSuspenseQuery({
-        ...options,
-        queryKey: trpc.event.draft.list.queryKey()
-      })
-
-      return drafts.data
+    getAllRemoteDrafts: findAllRemoteDrafts,
+    getRemoteDrafts: function useDraftList(eventId: string): Draft[] {
+      return findAllRemoteDrafts().filter((draft) => draft.eventId === eventId)
     }
   }
 }

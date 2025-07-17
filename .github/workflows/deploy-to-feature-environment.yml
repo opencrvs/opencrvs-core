@@ -138,7 +138,7 @@ jobs:
                 .trim()
                 .replace(/\s+/g, '-')
                 .replace(/-+/g, '-')
-                .substr(0, 35)
+                .substr(0, 30)
                 .replace(/[^a-zA-Z0-9]+$/g, '');
             }
             core.setOutput('stack', slugify('${{ env.BRANCH_NAME }}'));
@@ -192,7 +192,6 @@ jobs:
             echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-farajaland repo. Will use commit hash: '$COMMIT_HASH' from 'develop' branch"
           fi
           echo "FARAJALAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
-
       - name: Parse the stack name
         id: generate_stack
         run: |

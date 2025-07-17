@@ -29,28 +29,35 @@ const handlers = [
   http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
     return HttpResponse.json([
       tennisClubMembershipEvent,
-      { ...tennisClubMembershipEvent, id: 'TENNIS_CLUB_MEMBERSHIP_PREMIUM' }
+      { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
     ])
   }),
   // event.delete.test.ts
-  http.head(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
+  http.head(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
   // event.delete.test.ts
-  http.delete(`${env.DOCUMENTS_URL}/files/:fileName`, () => {
+  http.delete(`${env.DOCUMENTS_URL}/files/:filePath*`, () => {
     return HttpResponse.json({ ok: true })
   }),
   http.post(
-    `${env.COUNTRY_CONFIG_URL}/events/TENNIS_CLUB_MEMBERSHIP/actions/:action`,
+    `${env.COUNTRY_CONFIG_URL}/events/tennis-club-membership/actions/:action`,
     (ctx) => {
       const payload =
         ctx.params.action === ActionType.REGISTER
-          ? { registrationNumber: '1234567890AB' }
+          ? { registrationNumber: `ABC${Number(new Date())}` }
           : {}
 
       return HttpResponse.json(payload)
     }
-  )
+  ),
+  http.post(`${env.USER_MANAGEMENT_URL}/getUser`, () => {
+    return HttpResponse.json({
+      primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902',
+      role: 'REGISTRATION_AGENT',
+      signature: '/ocrvs/signature.png'
+    })
+  })
 ]
 
 export const mswServer = setupServer(...handlers)

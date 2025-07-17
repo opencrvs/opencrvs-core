@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { on } from 'events'
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldProps,
   RadioGroup as RadioGroupField,
@@ -22,13 +23,13 @@ import {
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 
 function RadioGroupInput({
-  setFieldValue,
+  onChange,
   value,
   options,
   configuration,
   ...props
 }: FieldProps<'RADIO_GROUP'> & {
-  setFieldValue: (name: string, val: string | undefined) => void
+  onChange: (val: string | undefined) => void
   value?: string
 }) {
   const intl = useIntl()
@@ -43,6 +44,7 @@ function RadioGroupInput({
 
   return (
     <RadioGroupComponent
+      {...props}
       data-testid={props.id}
       name={props.id}
       options={formattedOptions}
@@ -52,8 +54,7 @@ function RadioGroupInput({
           : RadioSize.LARGE
       }
       value={inputValue}
-      onChange={(val: string) => setFieldValue(props.id, val)}
-      {...props}
+      onChange={onChange}
     />
   )
 }
@@ -71,26 +72,26 @@ function RadioGroupOutput({
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
 
-function useStringifier() {
-  const intl = useIntl()
+function stringify(
+  intl: IntlShape,
+  value: string,
+  fieldConfig: RadioGroupField
+) {
+  const option = fieldConfig.options.find((opt) => opt.value === value)
 
-  return (value: string, fieldConfig: RadioGroupField) => {
-    const option = fieldConfig.options.find((opt) => opt.value === value)
-
-    if (!option) {
-      // eslint-disable-next-line no-console
-      console.error(
-        `Could not find option with value ${value} for field ${fieldConfig.id}`
-      )
-      return value
-    }
-
-    return intl.formatMessage(option.label)
+  if (!option) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Could not find option with value ${value} for field ${fieldConfig.id}`
+    )
+    return value
   }
+
+  return intl.formatMessage(option.label)
 }
 
 export const RadioGroup = {
   Input: RadioGroupInput,
   Output: RadioGroupOutput,
-  useStringifier: useStringifier
+  stringify
 }

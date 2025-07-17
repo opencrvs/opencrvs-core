@@ -9,8 +9,21 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export type User = {
-  id: string
-  name: { use: string; given: string[]; family: string }[]
-  role: string
-}
+import { FullDocumentPath } from '../documents'
+import { z } from 'zod'
+
+export const User = z.object({
+  id: z.string(),
+  name: z.array(
+    z.object({
+      use: z.string(),
+      given: z.array(z.string()),
+      family: z.string()
+    })
+  ),
+  role: z.string(),
+  avatar: FullDocumentPath.optional(),
+  signature: FullDocumentPath.optional()
+})
+
+export type User = z.infer<typeof User>

@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useIntl } from 'react-intl'
 import {
   EventState,
@@ -35,9 +35,9 @@ export function Pages({
   pageId,
   continueButtonText,
   setFormData,
-  disableContinue = false,
   eventConfig,
-  declaration
+  declaration,
+  validateBeforeNextPage = false
 }: {
   form: EventState
   setFormData: (dec: EventState) => void
@@ -47,21 +47,26 @@ export function Pages({
   onPageChange: (nextPageId: string) => void
   onSubmit: () => void
   continueButtonText?: string
-  disableContinue?: boolean
   eventConfig?: EventConfig
   declaration?: EventState
+  validateBeforeNextPage?: boolean
 }) {
   const intl = useIntl()
   const visiblePages = formPages.filter((page) => isPageVisible(page, form))
   const pageIdx = visiblePages.findIndex((p) => p.id === pageId)
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
+  const [validateAllFields, setValidateAllFields] = useState(false)
 
-  // If page changes, scroll to the top of the page using the anchor element ID
   useEffect(() => {
+    // If page changes, scroll to the top of the page using the anchor element ID
     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
   }, [pageId])
 
-  function onNextPage() {
+  function switchToNextPage() {
+    // When switching to next page, reset the validateAllFields state to false.
+    // Otherwise we would be seeing validation errors right away on the next page.
+    setValidateAllFields(false)
+
     const nextPageIdx = pageIdx + 1
     const nextPage =
       nextPageIdx < visiblePages.length ? visiblePages[nextPageIdx] : undefined
@@ -71,12 +76,24 @@ export function Pages({
     return nextPage ? onPageChange(nextPage.id) : onSubmit()
   }
 
+  function onNextPage() {
+    // If we are in validateBeforeNextPage mode, we need to validate all fields before moving to the next page.
+    // In this case, the actual switching of the page is done on the 'onAllFieldsValidated' callback.
+    if (validateBeforeNextPage) {
+      setValidateAllFields(true)
+      return
+    }
+
+    switchToNextPage()
+  }
+
   function onPreviousPage() {
     const previousPageIdx = pageIdx - 1
     const previousPage =
       previousPageIdx >= 0 ? visiblePages[previousPageIdx] : undefined
 
     if (previousPage) {
+      setValidateAllFields(false)
       return onPageChange(previousPage.id)
     }
   }
@@ -92,13 +109,19 @@ export function Pages({
 
   const fields = (
     <FormFieldGenerator
-      declaration={declaration}
       eventConfig={eventConfig}
       fields={page.fields}
-      form={form}
       id="locationForm"
-      initialValues={form}
-      setAllFieldsDirty={false}
+      // As initial values we use both the provided declaration data (previously saved to the event)
+      // and the form data (which is currently being edited).
+      initialValues={{ ...declaration, ...form }}
+      validateAllFields={validateAllFields}
+      onAllFieldsValidated={(success) => {
+        setValidateAllFields(false)
+        if (success) {
+          switchToNextPage()
+        }
+      }}
       onChange={(values) => setFormData(values)}
     />
   )
@@ -121,11 +144,7 @@ export function Pages({
   }
 
   return (
-    <FormWizard
-      {...wizardProps}
-      continueButtonText={continueButtonText}
-      disableContinue={disableContinue}
-    >
+    <FormWizard {...wizardProps} continueButtonText={continueButtonText}>
       {fields}
     </FormWizard>
   )

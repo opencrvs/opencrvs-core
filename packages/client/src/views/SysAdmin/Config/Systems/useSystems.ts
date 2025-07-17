@@ -25,12 +25,11 @@ import {
   RegisterSystemMutation,
   RegisterSystemMutationVariables,
   System,
-  SystemType,
   UpdatePermissionsMutation,
   UpdatePermissionsMutationVariables,
   WebhookPermission
 } from '@client/utils/gateway'
-
+import { SystemRole } from '@opencrvs/commons/client'
 import React, { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import * as mutations from './mutations'
@@ -38,8 +37,8 @@ import * as mutations from './mutations'
 /** Handles the user input when creating a new system in a modal */
 function useNewSystemDraft() {
   const [newClientName, setNewClientName] = useState(EMPTY_STRING)
-  const [newSystemType, setNewSystemType] = useState<SystemType>(
-    SystemType.Health
+  const [newSystemType, setNewSystemType] = useState<SystemRole>(
+    SystemRole.enum.HEALTH
   )
 
   const onChangeClientName = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -49,7 +48,7 @@ function useNewSystemDraft() {
 
   const clearNewSystemDraft = () => {
     setNewClientName(EMPTY_STRING)
-    setNewSystemType(SystemType.Health)
+    setNewSystemType(SystemRole.enum.HEALTH)
   }
 
   return {
@@ -290,7 +289,7 @@ export function useSystems() {
           type: newSystemType,
           name: newClientName,
           integratingSystemType: undefined,
-          ...(newSystemType === SystemType.Webhook && {
+          ...(newSystemType === SystemRole.enum.WEBHOOK && {
             settings: {
               dailyQuota: 0,
               webhook: [birthPermissions, deathPermissions]

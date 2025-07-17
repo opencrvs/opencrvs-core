@@ -38,15 +38,14 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const draft = testDataGenerator().event.draft({
+  eventId: tennisClubMembershipEventDocument.id,
+  actionType: ActionType.REQUEST_CORRECTION
+})
 function FormClear() {
   const drafts = useDrafts()
   useEffect(() => {
-    drafts.setLocalDraft(
-      testDataGenerator().event.draft({
-        eventId: tennisClubMembershipEventDocument.id,
-        actionType: ActionType.REQUEST_CORRECTION
-      })
-    )
+    drafts.setLocalDraft(draft)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
   return <Outlet />
@@ -54,6 +53,9 @@ function FormClear() {
 
 export const ReviewWithChanges: Story = {
   parameters: {
+    offline: {
+      drafts: [draft]
+    },
     reactRouter: {
       router: {
         path: '/',
@@ -78,6 +80,9 @@ export const ReviewWithChanges: Story = {
 
 export const AdditionalDetails: Story = {
   parameters: {
+    offline: {
+      drafts: [draft]
+    },
     reactRouter: {
       router: router,
       initialPath:
@@ -98,6 +103,9 @@ export const AdditionalDetails: Story = {
 }
 export const Summary: Story = {
   parameters: {
+    offline: {
+      drafts: [draft]
+    },
     reactRouter: {
       router: {
         path: '/',

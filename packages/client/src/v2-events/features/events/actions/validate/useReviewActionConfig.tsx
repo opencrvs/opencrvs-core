@@ -15,7 +15,8 @@ import {
   DeclarationFormConfig,
   Scope,
   SCOPES,
-  FieldConfig
+  FieldConfig,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
@@ -26,13 +27,15 @@ export function useReviewActionConfig({
   declaration,
   annotation,
   reviewFields,
-  scopes
+  scopes,
+  status
 }: {
   formConfig: DeclarationFormConfig
   declaration: EventState
   annotation?: EventState
   reviewFields: FieldConfig[]
   scopes?: Scope[]
+  status: EventStatus
 }) {
   const events = useEvents()
   const incomplete = validationErrorsInActionFormExist({
@@ -46,15 +49,26 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.customActions.registerOnValidate.mutate({
+      onConfirm: (eventId: string) => {
+        if (status === EventStatus.Enum.NOTIFIED) {
+          return events.customActions.registerOnDeclare.mutate({
+            eventId,
+            declaration,
+            transactionId: uuid(),
+            annotation
+          })
+        }
+        return events.customActions.registerOnValidate.mutate({
           eventId,
           declaration,
+          transactionId: uuid(),
           annotation
-        }),
+        })
+      },
       messages: incomplete
         ? reviewMessages.incomplete.register
-        : reviewMessages.complete.register
+        : reviewMessages.complete.register,
+      icon: 'PaperPlaneTilt'
     } as const
   }
 
@@ -62,17 +76,27 @@ export function useReviewActionConfig({
     return {
       buttonType: 'positive' as const,
       incomplete,
-      onConfirm: (eventId: string) =>
-        events.actions.validate.mutate({
+      onConfirm: (eventId: string) => {
+        if (status === EventStatus.Enum.NOTIFIED) {
+          return events.customActions.validateOnDeclare.mutate({
+            eventId,
+            declaration,
+            annotation,
+            transactionId: uuid()
+          })
+        }
+        return events.actions.validate.mutate({
           eventId,
           declaration,
           annotation,
           transactionId: uuid(),
           duplicates: []
-        }),
+        })
+      },
       messages: incomplete
         ? reviewMessages.incomplete.validate
-        : reviewMessages.complete.validate
+        : reviewMessages.complete.validate,
+      icon: 'PaperPlaneTilt'
     } as const
   }
 

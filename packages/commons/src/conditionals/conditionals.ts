@@ -12,8 +12,8 @@
 import { EventDocument } from '../events/EventDocument'
 import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
-import { ActionType } from '../events/ActionType'
 import { PartialSchema as AjvJSONSchemaType } from 'ajv/dist/types/json-schema'
+import { userSerializer } from '../events/serializers/user/serializer'
 
 /** @knipignore */
 export type JSONSchema = {
@@ -129,7 +129,7 @@ export function never(): JSONSchema {
  *
  * Generate conditional rules for user.
  */
-export const user = {
+export const user = Object.assign(userSerializer, {
   hasScope: (scope: Scope) =>
     defineConditional({
       type: 'object',
@@ -150,45 +150,8 @@ export const user = {
       },
       required: ['$user']
     })
-}
+})
 
-/**
- *
- * Generate conditional rules for event.
- */
-export const event = {
-  hasAction: (action: ActionType) =>
-    defineConditional({
-      type: 'object',
-      properties: {
-        $event: {
-          type: 'object',
-          properties: {
-            actions: {
-              type: 'array',
-              contains: {
-                type: 'object',
-                properties: {
-                  type: {
-                    const: action
-                  }
-                },
-                required: ['type']
-              }
-            }
-          },
-          required: ['actions']
-        }
-      },
-      required: ['$event']
-    })
-}
-
-function getDateFromNow(days: number) {
-  return new Date(Date.now() - days * 24 * 60 * 60 * 1000)
-    .toISOString()
-    .split('T')[0]
-}
 /**
  * This function will output JSONSchema which looks for example like this:
  * @example
@@ -229,9 +192,9 @@ function getDateRangeToFieldReference(
   }
 }
 
-type FieldReference = { _fieldId: string; [key: string]: unknown }
+type FieldReference = { $$field: string }
 function isFieldReference(value: unknown): value is FieldReference {
-  return typeof value === 'object' && value !== null && '_fieldId' in value
+  return typeof value === 'object' && value !== null && '$$field' in value
 }
 
 /**
@@ -242,9 +205,25 @@ function isFieldReference(value: unknown): value is FieldReference {
  *  and(field('foo').isEqualTo('bar'), field('baz').isUndefined())
  *
  */
-export function field(fieldId: string) {
+
+export function createFieldConditionals(fieldId: string) {
+  const getDayRange = (days: number, clause: 'before' | 'after') => ({
+    type: 'object',
+    properties: {
+      [fieldId]: {
+        type: 'string',
+        format: 'date',
+        daysFromNow: {
+          days,
+          clause
+        }
+      }
+    },
+    required: [fieldId]
+  })
+
   const getDateRange = (
-    date: string,
+    date: string | FieldReference | { $data: '/$now' },
     clause: 'formatMinimum' | 'formatMaximum'
   ) => ({
     type: 'object',
@@ -262,21 +241,15 @@ export function field(fieldId: string) {
     /**
      * @private Internal property used for field reference tracking.
      */
-    _fieldId: fieldId,
+    $$field: fieldId,
     isAfter: () => ({
       days: (days: number) => ({
-        inPast: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(days), 'formatMinimum')
-          ),
-        inFuture: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(-days), 'formatMinimum')
-          )
+        inPast: () => defineFormConditional(getDayRange(-days, 'after')),
+        inFuture: () => defineFormConditional(getDayRange(days, 'after'))
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
-          const comparedFieldId = date._fieldId
+          const comparedFieldId = date.$$field
           return defineFormConditional(
             getDateRangeToFieldReference(
               fieldId,
@@ -289,22 +262,16 @@ export function field(fieldId: string) {
         return defineFormConditional(getDateRange(date, 'formatMinimum'))
       },
       now: () =>
-        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMinimum'))
+        defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMinimum'))
     }),
     isBefore: () => ({
       days: (days: number) => ({
-        inPast: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(days), 'formatMaximum')
-          ),
-        inFuture: () =>
-          defineFormConditional(
-            getDateRange(getDateFromNow(-days), 'formatMaximum')
-          )
+        inPast: () => defineFormConditional(getDayRange(days, 'before')),
+        inFuture: () => defineFormConditional(getDayRange(-days, 'before'))
       }),
       date: (date: string | FieldReference) => {
         if (isFieldReference(date)) {
-          const comparedFieldId = date._fieldId
+          const comparedFieldId = date.$$field
           return defineFormConditional(
             getDateRangeToFieldReference(
               fieldId,
@@ -317,19 +284,19 @@ export function field(fieldId: string) {
         return defineFormConditional(getDateRange(date, 'formatMaximum'))
       },
       now: () =>
-        defineFormConditional(getDateRange(getDateFromNow(0), 'formatMaximum'))
+        defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMaximum'))
     }),
     isEqualTo: (value: string | boolean | FieldReference) => {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {
-        const comparedFieldId = value._fieldId
+        const comparedFieldId = value.$$field
 
         return defineFormConditional({
           type: 'object',
           properties: {
             [fieldId]: {
               type: ['string', 'boolean'],
-              const: { $data: `1/${comparedFieldId}` }
+              const: { $data: `/$form/${comparedFieldId}` }
             },
             [comparedFieldId]: { type: ['string', 'boolean'] }
           },
@@ -446,6 +413,24 @@ export function field(fieldId: string) {
             type: 'number',
             minimum: min,
             maximum: max
+          }
+        },
+        required: [fieldId]
+      }),
+    getId: () => ({ fieldId }),
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    object: (options: Record<string, any>) =>
+      defineFormConditional({
+        type: 'object',
+        properties: {
+          [fieldId]: {
+            type: 'object',
+            properties: Object.fromEntries(
+              Object.entries(options).map(([key, value]) => {
+                return [key, value.properties.$form.properties[key]]
+              })
+            ),
+            required: Object.keys(options)
           }
         },
         required: [fieldId]

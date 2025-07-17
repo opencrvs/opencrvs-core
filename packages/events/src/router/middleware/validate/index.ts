@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
+import { OpenApiMeta } from 'trpc-to-openapi'
 import {
   ActionType,
   ActionUpdate,
@@ -16,7 +18,7 @@ import {
   AnnotationActionType,
   EventConfig,
   isPageVisible,
-  isVerificationPage,
+  getVisibleVerificationPageIds,
   annotationActions,
   findRecordActionPages,
   DeclarationUpdateActionType,
@@ -28,17 +30,72 @@ import {
   EventDocument,
   deepMerge,
   deepDropNulls,
-  omitHiddenFields
+  omitHiddenFields,
+  EventState,
+  Inferred,
+  isFieldVisible,
+  errorMessages,
+  runFieldValidations,
+  ActionInputWithType
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
-import { ActionMiddlewareOptions } from '@events/router/middleware/utils'
+import { TrpcContext } from '@events/context'
 import {
-  getFormFieldErrors,
   getInvalidUpdateKeys,
   getVerificationPageErrors,
   throwWhenNotEmpty
 } from './utils'
+
+export function getFieldErrors(
+  fields: Inferred[],
+  data: ActionUpdate,
+  declaration: EventState = {}
+) {
+  const visibleFields = fields.filter((field) =>
+    isFieldVisible(field, { ...data, ...declaration })
+  )
+
+  const visibleFieldIds = visibleFields.map((field) => field.id)
+
+  const hiddenFieldIds = fields
+    .filter(
+      (field) =>
+        // If field is not visible and not in the visible fields list, it is a hidden field
+        // We need to check against the visible fields list because there might be fields with same ids, one of which is visible and others are hidden
+        !isFieldVisible(field, data) && !visibleFieldIds.includes(field.id)
+    )
+    .map((field) => field.id)
+
+  // Add errors if there are any hidden fields sent in the payloa
+  const hiddenFieldErrors = hiddenFieldIds.flatMap((fieldId) => {
+    if (data[fieldId as keyof typeof data]) {
+      return {
+        message: errorMessages.hiddenField.defaultMessage,
+        id: fieldId,
+        value: data[fieldId as keyof typeof data]
+      }
+    }
+
+    return []
+  })
+
+  // For visible fields, run the field validations as configured
+  const visibleFieldErrors = visibleFields.flatMap((field) => {
+    const fieldErrors = runFieldValidations({
+      field,
+      values: data
+    })
+
+    return fieldErrors.errors.map((error) => ({
+      message: error.message.defaultMessage,
+      id: field.id,
+      value: data[field.id as keyof typeof data]
+    }))
+  })
+
+  return [...hiddenFieldErrors, ...visibleFieldErrors]
+}
 
 function validateDeclarationUpdateAction({
   eventConfig,
@@ -60,19 +117,24 @@ function validateDeclarationUpdateAction({
    */
 
   // 1. Merge declaration update with previous declaration to validate based on the right conditional rules
-  const previousDeclaration = getCurrentEventState(event).declaration
+  const previousDeclaration = getCurrentEventState(
+    event,
+    eventConfig
+  ).declaration
   // at this stage, there could be a situation where the toggle (.e.g. dob unknown) is applied but payload would still have both age and dob.
   const completeDeclaration = deepMerge(previousDeclaration, declarationUpdate)
 
   const declarationConfig = getDeclaration(eventConfig)
 
-  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed (e.g. when dob is unknown anduser has send the age previously. Now they only send dob, without setting dob unknown to false).
+  // 2. Strip declaration of hidden fields. Without additional checks, client could send an update with hidden fields that are malformed
+  // (e.g. when dob is unknown anduser has send the age previously.Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
     completeDeclaration
   )
 
-  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid. Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
+  // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
+  // Even though it could work when cleaned and merged, it would make it harder to use the `getCurrentEventState` function.
   const invalidKeys = getInvalidUpdateKeys({
     update: declarationUpdate,
     cleaned: cleanedDeclaration
@@ -83,9 +145,14 @@ function validateDeclarationUpdateAction({
   }
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
-  const declarationErrors = declarationConfig.pages
+  const allVisiblePageFields = declarationConfig.pages
     .filter((page) => isPageVisible(page, cleanedDeclaration))
-    .flatMap((page) => getFormFieldErrors(page.fields, cleanedDeclaration))
+    .flatMap((page) => page.fields)
+
+  const declarationErrors = getFieldErrors(
+    allVisiblePageFields,
+    cleanedDeclaration
+  )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
 
@@ -99,10 +166,7 @@ function validateDeclarationUpdateAction({
     deepDropNulls(annotation ?? {})
   )
 
-  const annotationErrors = getFormFieldErrors(
-    reviewFields,
-    visibleAnnotationFields
-  )
+  const annotationErrors = getFieldErrors(reviewFields, visibleAnnotationFields)
 
   return [...declarationErrors, ...annotationErrors]
 }
@@ -110,39 +174,129 @@ function validateDeclarationUpdateAction({
 function validateActionAnnotation({
   eventConfig,
   actionType,
-  annotation = {}
+  annotation = {},
+  declaration = {}
 }: {
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
+  declaration: EventState
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
-  const visibleVerificationPageIds = pages
-    .filter((page) => isVerificationPage(page))
-    .filter((page) => isPageVisible(page, annotation))
-    .map((page) => page.id)
+  const visibleVerificationPageIds = getVisibleVerificationPageIds(
+    pages,
+    annotation
+  )
 
   const formFields = pages.flatMap(({ fields }) =>
     fields.flatMap((field) => field)
   )
 
   const errors = [
-    ...getFormFieldErrors(formFields, annotation),
+    ...getFieldErrors(formFields, annotation, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
   return errors
 }
 
-export function validateAction(actionType: ActionType) {
-  return async ({ input, ctx, next }: ActionMiddlewareOptions) => {
-    const event = await getEventById(input.eventId)
+function validateNotifyAction({
+  eventConfig,
+  annotation = {},
+  declaration = {}
+}: {
+  eventConfig: EventConfig
+  annotation?: ActionUpdate
+  declaration: ActionUpdate
+}) {
+  const declarationConfig = getDeclaration(eventConfig)
 
+  const formFields = declarationConfig.pages.flatMap(({ fields }) =>
+    fields.flatMap((field) => field)
+  )
+
+  const reviewFields = getActionReviewFields(eventConfig, ActionType.DECLARE)
+
+  const annotationErrors = Object.entries(annotation).flatMap(
+    ([key, value]) => {
+      const field = reviewFields.find((f) => f.id === key)
+
+      if (!field) {
+        return {
+          message: errorMessages.unexpectedField.defaultMessage,
+          id: key,
+          value
+        }
+      }
+
+      const fieldErrors = runFieldValidations({
+        field,
+        values: annotation
+      })
+
+      return fieldErrors.errors.map((error) => ({
+        message: error.message.defaultMessage,
+        id: field.id,
+        value: annotation[field.id]
+      }))
+    }
+  )
+
+  const declarationErrors = Object.entries(declaration).flatMap(
+    ([key, value]) => {
+      const field = formFields.find((f) => f.id === key)
+
+      if (!field) {
+        return {
+          message: errorMessages.unexpectedField.defaultMessage,
+          id: key,
+          value
+        }
+      }
+
+      const fieldErrors = runFieldValidations({
+        field,
+        values: declaration
+      })
+
+      return fieldErrors.errors.map((error) => ({
+        message: error.message.defaultMessage,
+        id: field.id,
+        value: declaration[field.id]
+      }))
+    }
+  )
+
+  return [...annotationErrors, ...declarationErrors]
+}
+
+export function validateAction(actionType: ActionType) {
+  const fn: MiddlewareFunction<
+    TrpcContext,
+    OpenApiMeta,
+    TrpcContext,
+    TrpcContext,
+    ActionInputWithType
+  > = async ({ input, ctx, next }) => {
+    const event = await getEventById(input.eventId)
     const eventConfig = await getEventConfigurationById({
       token: ctx.token,
       eventType: event.type
     })
+
+    const declaration = getCurrentEventState(event, eventConfig).declaration
+
+    if (actionType === ActionType.NOTIFY) {
+      const errors = validateNotifyAction({
+        eventConfig,
+        annotation: input.annotation,
+        declaration: input.declaration
+      })
+
+      throwWhenNotEmpty(errors)
+      return next()
+    }
 
     const declarationUpdateAction =
       DeclarationUpdateActions.safeParse(actionType)
@@ -157,6 +311,7 @@ export function validateAction(actionType: ActionType) {
       })
 
       throwWhenNotEmpty(errors)
+      return next()
     }
 
     const annotationActionParse = annotationActions.safeParse(actionType)
@@ -165,12 +320,16 @@ export function validateAction(actionType: ActionType) {
       const errors = validateActionAnnotation({
         eventConfig,
         annotation: input.annotation,
-        actionType: annotationActionParse.data
+        actionType: annotationActionParse.data,
+        declaration
       })
 
       throwWhenNotEmpty(errors)
+      return next()
     }
 
-    return next()
+    throw new Error('Trying to validate unsupported action type')
   }
+
+  return fn
 }

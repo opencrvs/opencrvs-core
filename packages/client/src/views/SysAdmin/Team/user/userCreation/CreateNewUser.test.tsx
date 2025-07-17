@@ -33,7 +33,7 @@ import {
   setScopes,
   TestComponentWithRouteMock
 } from '@client/tests/util'
-import { waitForElement } from '@client/tests/wait-for-element'
+import { waitFor, waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
 import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
@@ -161,9 +161,7 @@ describe('create new user tests', () => {
     it('clicking submit button submits the form data', async () => {
       testComponent.find('#submit_user_form').hostNodes().simulate('click')
 
-      await flushPromises()
-
-      expect(store.getState().userForm.submitting).toBe(false)
+      await waitFor(() => store.getState().userForm.submitting === false)
     })
   })
 })

@@ -51,7 +51,6 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         fields={[
@@ -65,12 +64,9 @@ export const EmptyAddressField: StoryObj<typeof FormFieldGenerator> = {
             }
           }
         ]}
-        form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )
@@ -85,7 +81,6 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
     layout: 'centered'
   },
   render: function Component(args) {
-    const [formData, setFormData] = React.useState({})
     return (
       <StyledFormFieldGenerator
         fields={[
@@ -100,18 +95,15 @@ export const AddressFieldWithUserPrimaryOfficeAddress: StoryObj<
             defaultValue: {
               country: 'FAR',
               addressType: AddressType.DOMESTIC,
-              province: '$user.province',
-              district: '$user.district',
+              province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+              district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
               urbanOrRural: 'URBAN'
             }
           }
         ]}
-        form={formData}
         id="my-form"
-        setAllFieldsDirty={false}
         onChange={(data) => {
           args.onChange(data)
-          setFormData(data)
         }}
       />
     )

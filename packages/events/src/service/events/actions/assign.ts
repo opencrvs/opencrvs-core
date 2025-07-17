@@ -17,20 +17,18 @@ import {
   findLastAssignmentAction
 } from '@opencrvs/commons/events'
 import { addAction, getEventById } from '@events/service/events/events'
+import { TrpcUserContext } from '@events/context'
 
 export async function assignRecord({
-  createdBy,
+  user,
   token,
-  createdAtLocation,
   input
 }: {
-  createdBy: string
-  createdAtLocation: string
+  user: TrpcUserContext
   token: string
   input: AssignActionInput
 }) {
   const storedEvent = await getEventById(input.eventId)
-
   const lastAssignmentAction = findLastAssignmentAction(storedEvent.actions)
 
   if (lastAssignmentAction?.type === ActionType.ASSIGN) {
@@ -44,10 +42,8 @@ export async function assignRecord({
 
   return addAction(input, {
     eventId: input.eventId,
-    createdBy,
+    user,
     token,
-    createdAtLocation,
-    transactionId: input.transactionId,
     status: ActionStatus.Accepted
   })
 }

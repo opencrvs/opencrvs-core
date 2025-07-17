@@ -11,17 +11,19 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 
-import { fireEvent, within } from '@storybook/test'
+import { fireEvent, within, expect, userEvent, waitFor } from '@storybook/test'
 import React from 'react'
 import superjson from 'superjson'
 import { noop } from 'lodash'
 import {
+  ActionType,
   AddressFieldValue,
   AddressType,
   ConditionalType,
   defineDeclarationForm,
   field,
   FieldType,
+  generateEventDocument,
   generateTranslationConfig,
   TENNIS_CLUB_DECLARATION_FORM,
   tennisClubMembershipEvent
@@ -30,11 +32,14 @@ import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 
 import { useModal } from '@client/v2-events/hooks/useModal'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { RejectionState, Review } from './Review'
 
 const mockDeclaration = {
-  'applicant.firstname': 'John',
-  'applicant.surname': 'Doe',
+  'applicant.name': {
+    firstname: 'John',
+    surname: 'Doe'
+  },
   'applicant.dob': '1990-01-01',
   'applicant.address': {
     country: 'FAR',
@@ -63,7 +68,9 @@ const meta: Meta<typeof Review.Body> = {
   decorators: [
     (Story) => (
       <TRPCProvider>
-        <Story />
+        <React.Suspense>
+          <Story />
+        </React.Suspense>
       </TRPCProvider>
     )
   ]
@@ -182,6 +189,7 @@ export const ChangeModalInteraction: StoryObj<typeof Review.Body> = {
           onEdit={handleEdit}
         >
           <Review.Actions
+            icon="Check"
             incomplete={false}
             messages={reviewActionMessages}
             onConfirm={handleDeclaration}
@@ -208,9 +216,11 @@ export const ReviewWithValidationErrors: Story = {
   },
   args: {
     form: {
-      'applicant.firstname': 'Mia',
       // @ts-ignore
-      'applicant.surname': undefined,
+      'applicant.name': {
+        firstname: 'Mia',
+        surname: undefined
+      },
       // @ts-ignore
       'applicant.dob': undefined,
       'applicant.email': 'mia@',
@@ -239,6 +249,7 @@ export const ReviewWithValidationErrors: Story = {
         onEdit={noop}
       >
         <Review.Actions
+          icon="Check"
           incomplete={false}
           messages={reviewActionMessages}
           onConfirm={noop}
@@ -381,6 +392,7 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         onEdit={noop}
       >
         <Review.Actions
+          icon="Check"
           incomplete={false}
           messages={reviewActionMessages}
           onConfirm={noop}
@@ -389,5 +401,153 @@ export const ReviewWithConditionallyHiddenFields: Story = {
         {modal}
       </Review.Body>
     )
+  }
+}
+
+export const RejectModalInteraction: StoryObj<typeof Review.Body> = {
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await step('Open reject modal', async () => {
+      const [changeButton] = await canvas.findAllByRole('button', {
+        name: 'Reject test'
+      })
+
+      await fireEvent.click(changeButton)
+
+      const modal = await canvas.findByTestId('reject-modal')
+
+      await within(modal).findByRole('heading', {
+        name: 'Reason for rejection?'
+      })
+      const textarea = await within(modal).findByTestId('reject-reason')
+      const checkbox = await within(modal).findByRole('checkbox')
+      const cancel = await within(modal).findByRole('button', {
+        name: 'Cancel'
+      })
+      const archive = await within(modal).findByRole('button', {
+        name: 'Archive'
+      })
+      const sendForUpdate = await within(modal).findByRole('button', {
+        name: 'Send For Update'
+      })
+
+      await expect(cancel).toBeEnabled()
+      await expect(archive).toBeDisabled()
+      await expect(sendForUpdate).toBeDisabled()
+
+      await userEvent.type(textarea, 'Duplicate', { delay: 100 })
+
+      await expect(archive).toBeEnabled()
+      await expect(sendForUpdate).toBeEnabled()
+
+      await userEvent.click(checkbox)
+
+      await expect(archive).toBeEnabled()
+      await expect(sendForUpdate).toBeDisabled()
+
+      await userEvent.click(cancel)
+
+      await waitFor(async () => {
+        await expect(
+          canvas.queryByTestId('reject-modal')
+        ).not.toBeInTheDocument()
+      })
+    })
+  },
+  render: function Component() {
+    const [modal, openModal] = useModal()
+
+    async function handleDeclaration() {
+      await openModal<boolean | null>((close) => {
+        return (
+          <Review.ActionModal.Accept
+            action="Declare"
+            close={close}
+            copy={{
+              description: generateTranslationConfig('description'),
+              title: generateTranslationConfig('title'),
+              onCancel: generateTranslationConfig('onCancel'),
+              onConfirm: generateTranslationConfig('onConfirm'),
+              eventLabel: tennisClubMembershipEvent.label
+            }}
+          />
+        )
+      })
+    }
+
+    async function handleRejection() {
+      await openModal<RejectionState | null>((close) => (
+        <Review.ActionModal.Reject close={close} />
+      ))
+    }
+
+    async function handleEdit() {
+      await openModal<boolean | null>((close) => (
+        <Review.EditModal close={close}></Review.EditModal>
+      ))
+
+      return
+    }
+
+    return (
+      <>
+        <Review.Body
+          form={mockDeclaration}
+          formConfig={TENNIS_CLUB_DECLARATION_FORM}
+          title="My test action"
+          onEdit={handleEdit}
+        >
+          <Review.Actions
+            icon="Check"
+            incomplete={false}
+            messages={reviewActionMessages}
+            onConfirm={handleDeclaration}
+            onReject={handleRejection}
+          />
+        </Review.Body>
+        {modal}
+      </>
+    )
+  }
+}
+
+const declareEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE]
+})
+
+const eventDocumentWithoutSurname = {
+  ...declareEventDocument,
+  actions: declareEventDocument.actions.map((action) => {
+    if (action.type !== ActionType.DECLARE || action.status !== 'Accepted') {
+      return action
+    }
+
+    return {
+      ...action,
+      declaration: {
+        ...action.declaration,
+        'applicant.name': {
+          firstname: 'John',
+          surname: ''
+        }
+      }
+    }
+  })
+}
+
+export const ReviewWithIncompleteName: Story = {
+  name: 'Review with incomplete name',
+  parameters: {
+    offline: {
+      events: [eventDocumentWithoutSurname]
+    },
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: eventDocumentWithoutSurname.id
+      })
+    }
   }
 }

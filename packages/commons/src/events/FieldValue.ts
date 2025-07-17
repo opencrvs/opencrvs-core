@@ -19,7 +19,9 @@ import {
   UrbanAddressValue,
   UrbanAddressUpdateValue,
   GenericAddressValue,
-  GenericAddressUpdateValue
+  GenericAddressUpdateValue,
+  NameFieldValue,
+  NameFieldUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -35,12 +37,34 @@ import {
  */
 
 export const TextValue = z.string()
-export const RequiredTextValue = TextValue.min(1)
+export const NonEmptyTextValue = TextValue.min(1)
 
 export const DateValue = z
   .string()
   .date()
   .describe('Date in the format YYYY-MM-DD')
+
+export const DatetimeValue = z.string().datetime()
+
+export const SelectDateRangeValue = z.enum([
+  'last7Days',
+  'last30Days',
+  'last90Days',
+  'last365Days'
+])
+
+export const DateRangeFieldValue = z
+  .object({
+    start: DateValue,
+    end: DateValue
+  })
+  .or(DateValue)
+  .describe(
+    'Date range with start and end dates in the format YYYY-MM-DD. Inclusive start, exclusive end.'
+  )
+
+export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
+export type SelectDateRangeValue = z.infer<typeof SelectDateRangeValue>
 
 export const EmailValue = z.string().email()
 
@@ -51,9 +75,14 @@ export type NumberFieldValue = z.infer<typeof NumberFieldValue>
 export const DataFieldValue = z.undefined()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
+export const SignatureFieldValue = z.string()
+export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
+
 export const FieldValue = z.union([
   TextValue,
   DateValue,
+  DateRangeFieldValue,
+  SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
@@ -61,7 +90,9 @@ export const FieldValue = z.union([
   UrbanAddressValue,
   RuralAddressValue,
   DataFieldValue,
-  GenericAddressValue
+  GenericAddressValue,
+  NameFieldValue,
+  NameFieldUpdateValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -69,6 +100,8 @@ export type FieldValue = z.infer<typeof FieldValue>
 export const FieldUpdateValue = z.union([
   TextValue,
   DateValue,
+  DateRangeFieldValue,
+  SelectDateRangeValue,
   CheckboxFieldValue,
   NumberFieldValue,
   FileFieldValue,
@@ -76,7 +109,8 @@ export const FieldUpdateValue = z.union([
   UrbanAddressUpdateValue,
   RuralAddressUpdateValue,
   DataFieldValue,
-  GenericAddressUpdateValue
+  GenericAddressUpdateValue,
+  NameFieldUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
@@ -91,6 +125,7 @@ export type FieldValueSchema =
   | typeof AddressFieldValue
   | typeof NumberFieldValue
   | typeof DataFieldValue
+  | typeof NameFieldValue
   | z.ZodString
   | z.ZodBoolean
 /**
@@ -99,11 +134,15 @@ export type FieldValueSchema =
  * FieldValueInputSchema uses Input types which have set optional values as nullish
  * */
 export type FieldUpdateValueSchema =
+  | typeof DateRangeFieldValue
+  | typeof SelectDateRangeValue
   | typeof FileFieldValue
   | typeof FileFieldWithOptionValue
   | typeof CheckboxFieldValue
   | typeof AddressFieldUpdateValue
   | typeof NumberFieldValue
   | typeof DataFieldValue
+  | typeof NameFieldValue
+  | typeof NameFieldUpdateValue
   | z.ZodString
   | z.ZodBoolean

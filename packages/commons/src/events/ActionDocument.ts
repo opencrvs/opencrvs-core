@@ -8,9 +8,16 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+
 import { z } from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
+import { extendZodWithOpenApi } from 'zod-openapi'
+import { UUID } from '../uuid'
+import { CreatedAtLocation } from './CreatedAtLocation'
+import { TokenUserType } from '../authentication'
+
+extendZodWithOpenApi(z)
 
 /**
  * ActionUpdate is a record of a specific action that updated data fields.
@@ -20,7 +27,9 @@ export type ActionUpdate = z.infer<typeof ActionUpdate>
 /**
  * EventState is an aggregate of all the actions that have been applied to event data.
  */
-export type EventState = Record<string, FieldValue>
+
+export const EventState = z.record(z.string(), FieldValue)
+export type EventState = z.infer<typeof EventState>
 
 export const ActionStatus = {
   Requested: 'Requested',
@@ -31,19 +40,30 @@ export const ActionStatus = {
 export type ActionStatus = keyof typeof ActionStatus
 
 export const ActionBase = z.object({
-  id: z.string(),
+  id: UUID,
+  transactionId: z.string(),
+  createdByUserType: TokenUserType,
   createdAt: z.string().datetime(),
   createdBy: z.string(),
+  createdByRole: z.string(),
+  createdBySignature: z
+    .string()
+    .nullish()
+    .describe('Reference to signature of the user who created the action'),
+  createdAtLocation: CreatedAtLocation,
   declaration: ActionUpdate,
-  annotation: ActionUpdate.optional(),
-  createdAtLocation: z.string(),
+  annotation: ActionUpdate.optional().nullable(),
   status: z.enum([
     ActionStatus.Requested,
     ActionStatus.Accepted,
     ActionStatus.Rejected
   ]),
   // If the action is an asynchronous confirmation for another action, we will save the original action id here.
-  originalActionId: z.string().optional()
+  originalActionId: UUID.optional()
+    .nullable()
+    .describe(
+      'Reference to the original action that was asynchronously rejected or accepted by 3rd party integration.'
+    )
 })
 
 export type ActionBase = z.infer<typeof ActionBase>
@@ -57,8 +77,7 @@ const AssignedAction = ActionBase.merge(
 
 const UnassignedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.UNASSIGN),
-    assignedTo: z.literal(null).default(null)
+    type: z.literal(ActionType.UNASSIGN)
   })
 )
 
@@ -83,9 +102,18 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
+export const RejectionReason = z.object({
+  message: z
+    .string()
+    .min(1, { message: 'Message cannot be empty' })
+    .describe('Message describing reason for rejection or archiving'),
+  isDuplicate: z.boolean().optional().describe('If a declaration is duplicated')
+})
+
 const RejectAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.REJECT)
+    type: z.literal(ActionType.REJECT),
+    reason: RejectionReason
   })
 )
 
@@ -97,7 +125,8 @@ const MarkAsDuplicateAction = ActionBase.merge(
 
 const ArchiveAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.ARCHIVE)
+    type: z.literal(ActionType.ARCHIVE),
+    reason: RejectionReason
   })
 )
 
@@ -145,31 +174,33 @@ const ReadAction = ActionBase.merge(
   })
 )
 
-export const ActionDocument = z.discriminatedUnion('type', [
-  CreatedAction,
-  ValidateAction,
-  RejectAction,
-  MarkAsDuplicateAction,
-  ArchiveAction,
-  NotifiedAction,
-  RegisterAction,
-  DeclareAction,
-  AssignedAction,
-  RequestedCorrectionAction,
-  ApprovedCorrectionAction,
-  RejectedCorrectionAction,
-  UnassignedAction,
-  PrintCertificateAction,
-  ReadAction
-])
+export const ActionDocument = z
+  .discriminatedUnion('type', [
+    CreatedAction.openapi({ ref: 'CreatedAction' }),
+    ValidateAction.openapi({ ref: 'ValidateAction' }),
+    RejectAction.openapi({ ref: 'RejectAction' }),
+    MarkAsDuplicateAction.openapi({ ref: 'MarkAsDuplicateAction' }),
+    ArchiveAction.openapi({ ref: 'ArchiveAction' }),
+    NotifiedAction.openapi({ ref: 'NotifiedAction' }),
+    RegisterAction.openapi({ ref: 'RegisterAction' }),
+    DeclareAction.openapi({ ref: 'DeclareAction' }),
+    AssignedAction.openapi({ ref: 'AssignedAction' }),
+    RequestedCorrectionAction.openapi({ ref: 'RequestedCorrectionAction' }),
+    ApprovedCorrectionAction.openapi({ ref: 'ApprovedCorrectionAction' }),
+    RejectedCorrectionAction.openapi({ ref: 'RejectedCorrectionAction' }),
+    UnassignedAction.openapi({ ref: 'UnassignedAction' }),
+    PrintCertificateAction.openapi({ ref: 'PrintCertificateAction' }),
+    ReadAction.openapi({ ref: 'ReadAction' })
+  ])
+  .openapi({
+    ref: 'ActionDocument'
+  })
 
 export type ActionDocument = z.infer<typeof ActionDocument>
 
 export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,
-  annotation: true,
-  createdBy: true,
-  createdAtLocation: true
+  annotation: true
 }).merge(
   z.object({
     type: z.enum(ConfirmableActions),

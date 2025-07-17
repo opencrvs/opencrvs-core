@@ -21,16 +21,24 @@ import {
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
+  isDateRangeFieldType,
   isDividerFieldType,
   isEmailFieldType,
   isFacilityFieldType,
   isFileFieldType,
   isNumberFieldType,
+  isOfficeFieldType,
   isPageHeaderFieldType,
   isParagraphFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
-  isTextFieldType
+  isTextAreaFieldType,
+  isTextFieldType,
+  isNameFieldType,
+  isIdFieldType,
+  isPhoneFieldType,
+  isSelectDateRangeFieldType,
+  isLocationFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -49,6 +57,8 @@ import {
   Text
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
+import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -60,13 +70,26 @@ const Deleted = styled.del`
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
-  if (isEmailFieldType(field) || isTextFieldType(field)) {
+export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
+  if (
+    isEmailFieldType(field) ||
+    isIdFieldType(field) ||
+    isPhoneFieldType(field) ||
+    isTextFieldType(field)
+  ) {
+    return Text.Output({ value: field.value })
+  }
+
+  if (isTextAreaFieldType(field)) {
     return Text.Output({ value: field.value })
   }
 
   if (isDateFieldType(field)) {
     return DateField.Output({ value: field.value })
+  }
+
+  if (isDateRangeFieldType(field)) {
+    return DateRangeField.Output({ value: field.value })
   }
 
   if (isPageHeaderFieldType(field)) {
@@ -89,7 +112,7 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     return BulletList.Output
   }
 
-  if (isSelectFieldType(field)) {
+  if (isSelectFieldType(field) || isSelectDateRangeFieldType(field)) {
     return Select.Output({
       options: field.config.options,
       value: field.value
@@ -108,7 +131,10 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isAddressFieldType(field)) {
-    return Address.Output({ value: field.value })
+    return Address.Output({
+      value: field.value,
+      searchMode: field.config.configuration?.searchMode
+    })
   }
 
   if (isRadioGroupFieldType(field)) {
@@ -118,8 +144,16 @@ function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     })
   }
 
+  if (isNameFieldType(field)) {
+    return Name.Output({ value: field.value })
+  }
+
   if (isAdministrativeAreaFieldType(field)) {
     return AdministrativeArea.Output({ value: field.value })
+  }
+
+  if (isOfficeFieldType(field) || isLocationFieldType(field)) {
+    return LocationSearch.Output({ value: field.value })
   }
 
   if (isDividerFieldType(field)) {
@@ -153,20 +187,40 @@ export function Output({
     return ValueOutput({ config: field, value: '' })
   }
 
+  const hasPreviousValue = previousValue !== undefined
+
   // Note, checking for previousValue !== value is not enough, as we have composite fields.
-  if (previousValue && !_.isEqual(previousValue, value)) {
+  if (hasPreviousValue && !_.isEqual(previousValue, value)) {
+    const valueOutput = ValueOutput({
+      config: field,
+      value
+    })
+
+    if (valueOutput === null) {
+      return null
+    }
+
+    const previousValueOutput = ValueOutput({
+      config: field,
+      value: previousValue
+    })
+
     return (
       <>
-        <Deleted>
-          <ValueOutput config={field} value={previousValue} />
-        </Deleted>
-        <br />
-        <ValueOutput config={field} value={value} />
+        {previousValueOutput !== null && (
+          <>
+            <Deleted>
+              <ValueOutput config={field} value={previousValue} />
+            </Deleted>
+            <br />
+          </>
+        )}
+        {valueOutput}
       </>
     )
   }
 
-  if (!previousValue && showPreviouslyMissingValuesAsChanged) {
+  if (!hasPreviousValue && showPreviouslyMissingValuesAsChanged) {
     return (
       <>
         <Deleted>

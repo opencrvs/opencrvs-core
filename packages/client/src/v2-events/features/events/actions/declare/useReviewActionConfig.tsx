@@ -48,7 +48,7 @@ export function useReviewActionConfig({
     scopes.includes(SCOPES.RECORD_DECLARE)
   ) {
     return {
-      buttonType: 'primary' as const,
+      buttonType: 'primary',
       incomplete,
       onConfirm: (eventId: string) => {
         events.actions.notify.mutate({
@@ -58,8 +58,9 @@ export function useReviewActionConfig({
           transactionId: uuid()
         })
       },
-      messages: reviewMessages.incomplete.declare
-    }
+      messages: reviewMessages.incomplete.declare,
+      icon: 'UploadSimple'
+    } as const
   }
 
   if (scopes?.includes(SCOPES.RECORD_REGISTER)) {
@@ -70,33 +71,37 @@ export function useReviewActionConfig({
         events.customActions.registerOnDeclare.mutate({
           eventId,
           declaration,
+          transactionId: uuid(),
           annotation
         }),
       messages: incomplete
         ? reviewMessages.incomplete.register
-        : reviewMessages.complete.register
-    }
+        : reviewMessages.complete.register,
+      icon: 'Check'
+    } as const
   }
 
   if (scopes?.includes(SCOPES.RECORD_SUBMIT_FOR_APPROVAL)) {
     return {
-      buttonType: 'positive' as const,
+      buttonType: 'positive',
       incomplete,
       onConfirm: (eventId: string) =>
         events.customActions.validateOnDeclare.mutate({
           eventId,
           declaration,
+          transactionId: uuid(),
           annotation
         }),
       messages: incomplete
         ? reviewMessages.incomplete.validate
-        : reviewMessages.complete.validate
-    }
+        : reviewMessages.complete.validate,
+      icon: 'PaperPlaneTilt'
+    } as const
   }
 
   if (scopes?.includes(SCOPES.RECORD_DECLARE)) {
     return {
-      buttonType: 'positive' as const,
+      buttonType: 'positive',
       incomplete,
       onConfirm: (eventId: string) =>
         events.actions.declare.mutate({
@@ -107,8 +112,9 @@ export function useReviewActionConfig({
         }),
       messages: incomplete
         ? reviewMessages.incomplete.declare
-        : reviewMessages.complete.declare
-    }
+        : reviewMessages.complete.declare,
+      icon: 'UploadSimple'
+    } as const
   }
 
   throw new Error('No valid scope found for the action')

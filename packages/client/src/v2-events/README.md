@@ -60,7 +60,7 @@ const ReviewIndex = withSuspense(Review)
 export { PagesIndex as Pages, ReviewIndex as Review }
 ```
 
-- `withSuspense` allows the route to use suspense queries. Usage without the hook will result to intermittent crashing of the route components.
+- `withSuspense` allows the route to use suspense queries. **Usage without the hook will result to intermittent crashing of the route components**.
 
 ## Development practices
 

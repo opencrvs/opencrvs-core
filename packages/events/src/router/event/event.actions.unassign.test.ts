@@ -10,7 +10,7 @@
  */
 
 import { TRPCError } from '@trpc/server'
-import { ActionType, SCOPES } from '@opencrvs/commons'
+import { ActionStatus, ActionType, getUUID, SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 
 describe(`Without scope: ${SCOPES.RECORD_UNASSIGN_OTHERS}`, () => {
@@ -104,11 +104,12 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
       'applicant.image': {
         type: 'image/png',
         originalFilename: 'abcd.png',
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
       }
     },
-    transactionId: 'transactionId',
-    eventId: originalEvent.id
+    transactionId: getUUID(),
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
   }
 
   await client.event.draft.create(draftData)
@@ -124,4 +125,42 @@ test(`${ActionType.UNASSIGN} action deletes draft`, async () => {
   expect(draftsAfterUnassign).toEqual([])
 
   expect(response.actions.at(-1)?.type).toEqual(ActionType.UNASSIGN)
+})
+
+test(`${ActionType.UNASSIGN} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_DECLARE])
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(originalEvent.id, { assignedTo: user.id })
+  )
+  const draftData = {
+    type: ActionType.DECLARE,
+    declaration: {
+      ...generator.event.actions.declare(originalEvent.id).declaration,
+      'applicant.image': {
+        type: 'image/png',
+        originalFilename: 'abcd.png',
+        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png'
+      }
+    },
+    transactionId: getUUID(),
+    eventId: originalEvent.id,
+    status: ActionStatus.Requested
+  }
+
+  await client.event.draft.create(draftData)
+  const draftsBeforeUnassign = await client.event.draft.list()
+
+  expect(draftsBeforeUnassign).not.toEqual([])
+
+  const unassignPayload = generator.event.actions.unassign(originalEvent.id)
+  const firstResponse =
+    await client.event.actions.assignment.unassign(unassignPayload)
+  const secondResponse =
+    await client.event.actions.assignment.unassign(unassignPayload)
+
+  expect(firstResponse).toEqual(secondResponse)
 })

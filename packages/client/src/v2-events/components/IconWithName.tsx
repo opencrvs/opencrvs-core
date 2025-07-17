@@ -12,6 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { Flag, InherentFlags } from '@opencrvs/commons/client'
 
 const Flex = styled.div`
   display: flex;
@@ -22,29 +23,7 @@ const Flex = styled.div`
   }
 `
 
-interface IconProps {
-  status?: string
-  name: React.ReactNode
-  isValidatedOnReview?: boolean
-  isArchived?: boolean
-}
-
-interface IconWithNameEventProps extends IconProps {
-  event: string
-}
-
-const Event = styled.div`
-  color: ${({ theme }) => theme.colors.grey500};
-  ${({ theme }) => theme.fonts.reg16}
-`
-
-const NameEventContainer = styled.div`
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-`
-
-const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
+const STATUS_TO_COLOR_MAP = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
   DRAFT: 'purple',
@@ -56,7 +35,6 @@ const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
   VALIDATED: 'orange',
   REGISTERED: 'green',
   CERTIFIED: 'teal',
-  CORRECTION_REQUESTED: 'blue',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
   SUBMITTING: 'orange',
@@ -72,66 +50,44 @@ const Icon = styled.div`
   width: 24px;
 `
 
-function IconComp({
-  status,
-  isValidatedOnReview,
-  isArchived
-}: {
-  status: string
-  isValidatedOnReview?: boolean
-  isArchived?: boolean
-}) {
-  return (
-    <Icon>
-      <DeclarationIcon
-        color={STATUS_TO_COLOR_MAP[status]}
-        isArchive={isArchived}
-        isValidatedOnReview={isValidatedOnReview}
-      />
-    </Icon>
-  )
+function getIconColor(
+  status: keyof typeof STATUS_TO_COLOR_MAP,
+  flags?: Flag[]
+) {
+  let color = STATUS_TO_COLOR_MAP[status]
+
+  if (flags?.length) {
+    if (flags.includes(InherentFlags.CORRECTION_REQUESTED)) {
+      color = 'blue'
+    }
+  }
+
+  return color
 }
 
 export function IconWithName({
   status,
   name,
   isValidatedOnReview,
-  isArchived
-}: IconProps) {
+  isArchived,
+  flags
+}: {
+  status: keyof typeof STATUS_TO_COLOR_MAP
+  name: React.ReactNode
+  isValidatedOnReview?: boolean
+  isArchived?: boolean
+  flags?: Flag[]
+}) {
   return (
     <Flex id="flex">
-      {status && (
-        <IconComp
-          isArchived={isArchived}
+      <Icon>
+        <DeclarationIcon
+          color={getIconColor(status, flags)}
+          isArchive={isArchived}
           isValidatedOnReview={isValidatedOnReview}
-          status={status}
         />
-      )}
+      </Icon>
       {name}
-    </Flex>
-  )
-}
-
-export function IconWithNameEvent({
-  status,
-  name,
-  event,
-  isValidatedOnReview,
-  isArchived
-}: IconWithNameEventProps) {
-  return (
-    <Flex id="flex">
-      {status && (
-        <IconComp
-          isArchived={isArchived}
-          isValidatedOnReview={isValidatedOnReview}
-          status={status}
-        />
-      )}
-      <NameEventContainer id="nameEvent">
-        {name}
-        {event && <Event>{event}</Event>}
-      </NameEventContainer>
     </Flex>
   )
 }

@@ -51,9 +51,11 @@
     "pkg-up": "^3.1.0",
     "typescript": "5.6.3",
     "uuid": "^9.0.0",
-    "zod": "^3.23.8"
+    "zod": "^3.23.8",
+    "zod-openapi": "^4.2.4"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.9",
     "@typescript-eslint/eslint-plugin": "8.28.0",
     "@typescript-eslint/parser": "^8.28.0",
     "eslint": "^9.23.0",
@@ -62,6 +64,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-prettier": "^5.2.5",
     "jest-fetch-mock": "^2.1.2",
+    "jsonwebtoken": "^9.0.2",
     "pino-pretty": "^11.0.0",
     "ts-jest": "29.2.5"
   },

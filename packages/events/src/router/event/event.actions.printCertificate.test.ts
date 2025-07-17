@@ -11,7 +11,11 @@
 
 import { TRPCError } from '@trpc/server'
 import { ActionType, PageTypes, SCOPES } from '@opencrvs/commons'
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  createEvent,
+  createTestClient,
+  setupTestCase
+} from '@events/tests/utils'
 
 test('prevents forbidden access if missing required scope', async () => {
   const { user, generator } = await setupTestCase()
@@ -41,14 +45,15 @@ test(`Has validation errors when required ${PageTypes.enum.VERIFICATION} page fi
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-  const declaredEvent = await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
 
   await expect(
     client.event.actions.printCertificate.request(
-      generator.event.actions.printCertificate(declaredEvent.id, {
+      generator.event.actions.printCertificate(event.id, {
         // The tennis club membership print certificate form has a verification page with conditional 'field('collector.requesterId').isEqualTo('INFORMANT')'
         // Thus if the requester is set as INFORMANT and verification page result is not set, we should see a validation error.
         annotation: { 'collector.requesterId': 'INFORMANT' }
@@ -61,14 +66,15 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
-  const declaredEvent = await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
 
   await expect(
     client.event.actions.printCertificate.request(
-      generator.event.actions.printCertificate(declaredEvent.id, {
+      generator.event.actions.printCertificate(event.id, {
         annotation: {
           'collector.requesterId': 'INFORMANT',
           'collector.identity.verify': true
@@ -78,22 +84,30 @@ test(`Has no validation errors when required ${PageTypes.enum.VERIFICATION} page
   ).resolves.toBeDefined()
 })
 
+test(`${ActionType.PRINT_CERTIFICATE} action can not be performed on a declared, non-registered event`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+  const event = await createEvent(client, generator, [ActionType.DECLARE])
+
+  await expect(
+    client.event.actions.printCertificate.request(
+      generator.event.actions.printCertificate(event.id)
+    )
+  ).rejects.toThrowErrorMatchingSnapshot()
+})
+
 test(`${ActionType.PRINT_CERTIFICATE} action can be added to registered event`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const originalEvent = await client.event.create(generator.event.create())
-
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(originalEvent.id)
-  )
-
-  const registeredEvent = await client.event.actions.register.request(
-    generator.event.actions.register(originalEvent.id)
-  )
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
 
   const printCertificate = await client.event.actions.printCertificate.request(
-    generator.event.actions.printCertificate(registeredEvent.id)
+    generator.event.actions.printCertificate(event.id)
   )
 
   expect(printCertificate.actions.slice(-2)).toEqual([
@@ -106,7 +120,11 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
 
   await expect(
     client.event.actions.printCertificate.request(
@@ -115,4 +133,28 @@ test('when mandatory field is invalid, conditional hidden fields are still skipp
       })
     )
   ).rejects.matchSnapshot()
+})
+
+test(`${ActionType.PRINT_CERTIFICATE} is idempotent`, async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
+
+  const printCertificatePayload = generator.event.actions.printCertificate(
+    event.id,
+    { keepAssignment: true }
+  )
+  const firstResponse = await client.event.actions.printCertificate.request(
+    printCertificatePayload
+  )
+  const secondResponse = await client.event.actions.printCertificate.request(
+    printCertificatePayload
+  )
+
+  expect(firstResponse).toEqual(secondResponse)
 })

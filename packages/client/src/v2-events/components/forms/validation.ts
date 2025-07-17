@@ -11,12 +11,12 @@
 import { MessageDescriptor } from 'react-intl'
 import {
   FieldConfig,
-  getFieldValidationErrors,
   EventState,
   omitHiddenPaginatedFields,
   isPageVisible,
   FormConfig,
-  omitHiddenFields
+  omitHiddenFields,
+  runFieldValidations
 } from '@opencrvs/commons/client'
 
 interface FieldErrors {
@@ -44,7 +44,7 @@ export function getValidationErrorsForForm(
 
     return {
       ...errorsForAllFields,
-      [field.id]: getFieldValidationErrors({ field, values })
+      [field.id]: runFieldValidations({ field, values })
     }
   }, {})
 }

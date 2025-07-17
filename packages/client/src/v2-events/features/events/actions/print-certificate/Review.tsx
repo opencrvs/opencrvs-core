@@ -19,13 +19,14 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import ReactTooltip from 'react-tooltip'
+import toast from 'react-hot-toast'
 import {
   ActionType,
   EventConfig,
-  EventDocument,
   getOrThrow,
   getAcceptedActions,
-  SCOPES
+  SCOPES,
+  SystemRole
 } from '@opencrvs/commons/client'
 import {
   Box,
@@ -35,7 +36,8 @@ import {
   Icon,
   ResponsiveModal,
   Spinner,
-  Stack
+  Stack,
+  Toast
 } from '@opencrvs/components'
 import { Print } from '@opencrvs/components/lib/icons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -127,6 +129,11 @@ const messages = defineMessages({
     defaultMessage:
       'Print certificate is an online only action. Please go online to print the certificate',
     description: 'Print certificate online only message'
+  },
+  toastMessage: {
+    id: 'v2.print.certificate.toast.message',
+    defaultMessage: 'Certificate is ready to print',
+    description: 'Floating Toast message upon certificate ready to print'
   }
 })
 
@@ -143,7 +150,7 @@ function getPrintForm(configuration: EventConfig) {
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW)
-  const [{ templateId }] = useTypedSearchParams(
+  const [{ templateId, workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW
   )
 
@@ -159,10 +166,11 @@ export function Review() {
   const [modal, openModal] = useModal()
 
   const { getEvent, onlineActions } = useEvents()
-  const [fullEvent] = getEvent.useSuspenseQuery(eventId)
+  const fullEvent = getEvent.getFromCache(eventId)
 
   const actions = getAcceptedActions(fullEvent)
-  const userIds = getUserIdsFromActions(actions)
+  const userIds = getUserIdsFromActions(actions, [SystemRole.enum.HEALTH])
+
   const { getUsers } = useUsers()
   const [users] = getUsers.useSuspenseQuery(userIds)
 
@@ -174,8 +182,12 @@ export function Review() {
     (template) => template.id === templateId
   )
 
+  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
+  const formConfig = getPrintForm(eventConfiguration)
+
   const { svgCode, handleCertify } = usePrintableCertificate({
     event: fullEvent,
+    config: eventConfiguration,
     locations,
     users,
     certificateConfig,
@@ -187,13 +199,6 @@ export function Review() {
    * print certificate form page, since the user should not be able to
    * review/print the certificate if there are validation errors.
    */
-  const { eventConfiguration } = useEventConfiguration(fullEvent.type)
-  const formConfig = getPrintForm(eventConfiguration)
-
-  if (!svgCode) {
-    return <Spinner id="review-certificate-loading" />
-  }
-
   const validationErrorExist = validationErrorsInActionFormExist({
     formConfig,
     form: annotation
@@ -204,13 +209,25 @@ export function Review() {
     console.warn('Form is not properly filled. Redirecting to the beginning...')
     return (
       <Navigate
-        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath({ eventId })}
+        to={ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
+          { eventId },
+          { workqueue: slug }
+        )}
       />
     )
   }
 
+  if (!svgCode) {
+    return <Spinner id="review-certificate-loading" />
+  }
+
   const handleCorrection = () =>
-    navigate(ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath({ eventId }))
+    navigate(
+      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
+        { eventId },
+        { workqueue: slug }
+      )
+    )
 
   const handlePrint = async () => {
     const confirmed = await openModal<boolean>((close) => (
@@ -247,27 +264,33 @@ export function Review() {
 
     if (confirmed) {
       try {
-        const response: EventDocument =
-          await onlineActions.printCertificate.mutateAsync({
-            eventId: fullEvent.id,
-            declaration: {},
-            annotation: { ...annotation, templateId },
-            transactionId: uuid(),
-            type: ActionType.PRINT_CERTIFICATE
-          })
-        const printAction = response.actions
-          .reverse()
-          .find((a) => a.type === ActionType.PRINT_CERTIFICATE)
+        await onlineActions.printCertificate.mutateAsync({
+          fullEvent,
+          eventId: fullEvent.id,
+          declaration: {},
+          annotation: { ...annotation, templateId },
+          transactionId: uuid(),
+          type: ActionType.PRINT_CERTIFICATE
+        })
 
-        if (printAction) {
-          await handleCertify({
-            ...fullEvent,
-            actions: [...fullEvent.actions, printAction]
-          })
-          navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
-        } else {
-          throw new Error('Print action not found in the response')
-        }
+        await handleCertify(fullEvent)
+
+        toast.custom(
+          <Toast
+            duration={null}
+            type={'success'}
+            onClose={() => toast.remove(`print-successful${eventId}`)}
+          >
+            {intl.formatMessage(messages.toastMessage)}
+          </Toast>,
+          {
+            id: `print-successful${eventId}`
+          }
+        )
+
+        slug
+          ? navigate(ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug }))
+          : navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
       } catch (error) {
         // TODO: add notification alert
         // eslint-disable-next-line no-console

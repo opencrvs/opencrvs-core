@@ -14,18 +14,20 @@ import {
   user,
   and,
   or,
-  field,
   not,
   ConditionalParameters,
   UserConditionalParameters,
   EventConditionalParameters,
-  event,
   FormConditionalParameters
 } from './conditionals'
 import { formatISO } from 'date-fns'
 import { SCOPES } from '../scopes'
 import { ActionType } from '../events/ActionType'
 import { ActionStatus } from '../events/ActionDocument'
+import { field } from '../events/field'
+import { event } from '../events/event'
+import { TokenUserType } from '../authentication'
+import { UUID } from '../uuid'
 
 /*  eslint-disable max-lines */
 
@@ -130,6 +132,157 @@ describe('"universal" conditionals', () => {
         })
       )
     ).toBe(true)
+  })
+})
+
+describe('object combinator', () => {
+  it('can be used for validation composite inputs that produce objects', () => {
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams({
+          'child.name': {
+            firstname: 'John',
+            surname: 'Doe'
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams()
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.name').object({
+          firstname: field('firstname').isValidEnglishName(),
+          surname: field('surname').isValidEnglishName()
+        }),
+        getFieldParams({
+          'child.name': {
+            firstname: 'John'
+          }
+        })
+      )
+    ).toBe(false)
+  })
+  it('fully supports global variables like $now even in the nested levels', () => {
+    expect(
+      validate(
+        field('child.details').object({
+          dob: field('dob').isBefore().now()
+        }),
+        getFieldParams({
+          'child.details': {
+            dob: new Date('2125-01-01').toISOString().split('T')[0]
+          }
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.details').object({
+          dob: field('dob').isBefore().now()
+        }),
+        getFieldParams({
+          'child.details': {
+            dob: new Date('2020-01-01').toISOString().split('T')[0]
+          }
+        })
+      )
+    ).toBe(true)
+
+    expect(
+      validate(
+        field('child.details').object({
+          nested: field('nested').isEqualTo(field('random'))
+        }),
+        getFieldParams({
+          random: 'value',
+          'child.details': {
+            nested: 'value1'
+          }
+        })
+      )
+    ).toBe(false)
+
+    expect(
+      validate(
+        field('child.details').object({
+          nested: field('nested').isEqualTo(field('random'))
+        }),
+        getFieldParams({
+          random: 'value',
+          'child.details': {
+            nested: 'value'
+          }
+        })
+      )
+    ).toBe(true)
+  })
+})
+
+describe('date comparisons', () => {
+  it("throws an error if validation context doesn't contain $now", () => {
+    expect(() =>
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        $now: undefined as any // $now is not defined ❌
+      })
+    ).toThrowError()
+  })
+
+  it('validates comparisons to where date is expected to be after certain date', () => {
+    expect(
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-06-12' // needs to be after 1990-02-01 ✅
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.dob').isAfter().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-01-12' // needs to be after 1990-02-01 ❌
+        }),
+        $now: '1990-01-01'
+      })
+    ).toBe(false)
+  })
+  it('validates comparisons to where date is expected to be before certain date', () => {
+    expect(
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-02-12' // needs to be before 1990-07-06 ✅
+        }),
+        $now: '1990-06-06'
+      })
+    ).toBe(true)
+
+    expect(
+      validate(field('applicant.dob').isBefore().days(30).inFuture(), {
+        ...getFieldParams({
+          'applicant.dob': '1990-09-07' // needs to be before 1990-07-06 ❌
+        }),
+        $now: '1990-06-06'
+      })
+    ).toBe(false)
   })
 })
 
@@ -462,6 +615,7 @@ describe('"user" conditionals', () => {
       scope: ['record.register', 'record.registration-correct'],
       exp: '1739881718',
       algorithm: 'RS256',
+      userType: TokenUserType.enum.user,
       sub: '677b33fea7efb08730f3abfa33'
     },
     $now: formatISO(new Date(), { representation: 'date' })
@@ -482,20 +636,23 @@ describe('"event" conditionals', () => {
     const eventParams = {
       $now: now,
       $event: {
-        id: '123',
+        id: '123' as UUID,
         type: 'birth',
         trackingId: 'TEST12',
         createdAt: now,
         updatedAt: now,
         actions: [
           {
-            id: '1234',
+            id: '1234' as UUID,
             type: ActionType.DECLARE,
             createdAt: now,
             createdBy: '12345',
+            createdByUserType: TokenUserType.Enum.user,
+            createdByRole: 'some-role',
             declaration: {},
-            createdAtLocation: '123456',
-            status: ActionStatus.Accepted
+            createdAtLocation: '123456' as UUID,
+            status: ActionStatus.Accepted,
+            transactionId: '123456'
           }
         ]
       }

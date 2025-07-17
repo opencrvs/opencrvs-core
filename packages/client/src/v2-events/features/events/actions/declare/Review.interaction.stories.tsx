@@ -18,34 +18,18 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  FullDocumentPath
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter } from '@client/v2-events/trpc'
+import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
+import { setEventData, addLocalEventConfig } from '../../useEvents/api'
 import { ReviewIndex } from './Review'
 
 const generator = testDataGenerator()
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
-})
-
-const meta: Meta<typeof ReviewIndex> = {
-  title: 'Declare/Interaction',
-  beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
-    })
-  }
-}
-
-export default meta
-
-type Story = StoryObj<typeof ReviewIndex>
 const tRPCMsw = createTRPCMsw<AppRouter>({
   links: [
     httpLink({
@@ -55,16 +39,32 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const declareEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE]
+})
 const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
+const meta: Meta<typeof ReviewIndex> = {
+  title: 'Declare/Interaction',
+  parameters: {
+    offline: {
+      events: [declareEventDocument]
+    }
+  },
+  beforeEach: () => {
+    useEventFormData.setState({
+      formValues: getCurrentEventState(
+        declareEventDocument,
+        tennisClubMembershipEvent
+      ).declaration
+    })
+  }
+}
 
-const eventId = eventDocument.id
+export default meta
 
-const draft = generateEventDraftDocument(eventId, ActionType.REGISTER)
+type Story = StoryObj<typeof ReviewIndex>
 
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
@@ -75,27 +75,58 @@ const mockUser = {
       family: 'Bwalya'
     }
   ],
-  role: 'SOCIAL_WORKER'
+  role: 'SOCIAL_WORKER',
+  signature: 'signature.png' as FullDocumentPath,
+  avatar: undefined
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
+    // For this test, we want to have empty form values in zustand state
+    useEventFormData.setState({ formValues: {} })
   },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId
+        eventId: declarationTrpcMsw.eventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
+    offline: {
+      events: [declarationTrpcMsw.eventDocument],
+      drafts: [declarationTrpcMsw.draft]
+    },
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -106,6 +137,17 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -114,9 +156,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based on content', async () => {
       const canvas = within(canvasElement)
-      await userEvent.click(
-        await canvas.findByRole('button', { name: 'Register' })
-      )
+
+      await waitFor(async () => {
+        const registerButton = await canvas.findByRole('button', {
+          name: 'Register'
+        })
+
+        await expect(registerButton).toBeEnabled()
+        await userEvent.click(registerButton)
+      })
 
       const modal = within(await canvas.findByRole('dialog'))
 
@@ -128,7 +176,9 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -144,15 +194,21 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
 }
 
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem(
-      'opencrvs',
-      generator.user.token.registrationAgent
-    )
-  },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -164,7 +220,17 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -175,6 +241,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -197,7 +266,9 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -213,12 +284,18 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
 }
 
 export const ReviewForFieldAgentCompleteInteraction: Story = {
-  beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
-  },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
@@ -230,7 +307,17 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     msw: {
       handlers: {
         drafts: declarationTrpcMsw.drafts.handlers,
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -241,6 +328,9 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -264,7 +354,9 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -279,19 +371,42 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
   }
 }
 
+const eventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+
+const eventId = eventDocument.id
+
 export const ReviewForFieldAgentIncompleteInteraction: Story = {
   beforeEach: () => {
-    declarationTrpcMsw.events.reset()
-    declarationTrpcMsw.drafts.reset()
-
-    window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+    // For this test, we want to have empty form values in zustand state
+    useEventFormData.setState({ formValues: {} })
   },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: eventId
       })
+    },
+    offline: {
+      /*
+       * Ensure record is "downloaded offline" in the user's browser
+       */
+      events: [eventDocument]
     },
     chromatic: { disableSnapshot: true },
     msw: {
@@ -301,7 +416,17 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
             return []
           })
         ],
-        events: declarationTrpcMsw.events.handlers,
+        events: [
+          tRPCMsw.event.search.query((input) => {
+            return [
+              getCurrentEventState(
+                declarationTrpcMsw.eventDocument,
+                tennisClubMembershipEvent
+              )
+            ]
+          }),
+          ...declarationTrpcMsw.events.handlers
+        ],
         user: [
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
@@ -312,6 +437,9 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           }),
           tRPCMsw.user.list.query(([id]) => {
             return [mockUser]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return mockUser
           })
         ]
       }
@@ -337,7 +465,9 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
     })
 
     await step('Confirm action triggers scope based actions', async () => {
-      await within(canvasElement).findByText('All events')
+      const searchResult =
+        await within(canvasElement).findByTestId('search-result')
+      await within(searchResult).findAllByText('All events')
 
       await waitFor(async () => {
         await expect(declarationTrpcMsw.events.getSpyCalls()).toMatchObject({
@@ -354,9 +484,11 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 
 export const ChangeFieldInReview: Story = {
   beforeEach: () => {
-    useEventFormData.setState({
-      formValues: getCurrentEventState(declareEventDocument).declaration
-    })
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(tennisClubMembershipEvent)
+    setEventData(declareEventDocument.id, declareEventDocument)
   },
   parameters: {
     reactRouter: {
@@ -370,7 +502,12 @@ export const ChangeFieldInReview: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [draft]
+            return [
+              generateEventDraftDocument({
+                eventId,
+                actionType: ActionType.REGISTER
+              })
+            ]
           })
         ],
         events: [
@@ -386,9 +523,9 @@ export const ChangeFieldInReview: Story = {
   },
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    await step('Start changing the surname', async () => {
+    await step('Start changing the name', async () => {
       const surnameChangeButton = await canvas.findByTestId(
-        'change-button-applicant.surname'
+        'change-button-applicant.name'
       )
 
       await userEvent.click(surnameChangeButton)
@@ -398,9 +535,7 @@ export const ChangeFieldInReview: Story = {
     })
 
     await step('Change input field value', async () => {
-      const surnameInput = await canvas.findByTestId(
-        'text__applicant____surname'
-      )
+      const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
       await userEvent.type(surnameInput, 'Nileem-Rowa')
     })
@@ -409,10 +544,8 @@ export const ChangeFieldInReview: Story = {
       const backToReviewButton = await canvas.findByText('Back to review')
       await userEvent.click(backToReviewButton)
 
-      const surnameValue = await canvas.findByTestId(
-        'row-value-applicant.surname'
-      )
-      await expect(surnameValue).toHaveTextContent('Nileem-Rowa')
+      await canvas.findByText("Applicant's name")
+      await canvas.findByText('John Nileem-Rowa')
     })
   }
 }

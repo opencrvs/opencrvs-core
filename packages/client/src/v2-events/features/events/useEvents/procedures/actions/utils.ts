@@ -9,12 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
+  ActionDocument,
   ActionInput,
+  ActionStatus,
   ActionType,
   EventDocument,
-  getCurrentEventState
+  getCurrentEventState,
+  UUID
 } from '@opencrvs/commons/client'
-import { setEventListData } from '@client/v2-events/features/events/useEvents/api'
+
+import {
+  findLocalEventConfig,
+  setEventListData
+} from '@client/v2-events/features/events/useEvents/api'
 import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
 
@@ -28,6 +35,12 @@ export function updateEventOptimistically<T extends ActionInput>(
     if (!localEvent) {
       return
     }
+
+    const eventConfig = findLocalEventConfig(localEvent.type)
+    if (!eventConfig) {
+      return
+    }
+
     const optimisticEvent: EventDocument = {
       ...localEvent,
       actions: [
@@ -35,10 +48,20 @@ export function updateEventOptimistically<T extends ActionInput>(
         {
           id: createTemporaryId(),
           type: actionType,
-          declaration: variables.declaration,
+          /*
+           * These need to be casted or otherwise branded
+           * types like FullDocumentPath causes an error here.
+           * This is because we are effectively trying to force an input type to an output type
+           */
+          declaration: (variables.declaration ||
+            {}) as ActionDocument['declaration'],
           createdAt: new Date().toISOString(),
+          createdByUserType: 'user',
           createdBy: '@todo',
-          createdAtLocation: '@todo'
+          createdAtLocation: '@todo' as UUID,
+          status: ActionStatus.Requested,
+          transactionId: variables.transactionId,
+          createdByRole: '@todo'
         }
       ]
     }
@@ -46,7 +69,7 @@ export function updateEventOptimistically<T extends ActionInput>(
     setEventListData((eventIndices) =>
       eventIndices
         ?.filter((ei) => ei.id !== optimisticEvent.id)
-        .concat(getCurrentEventState(optimisticEvent))
+        .concat(getCurrentEventState(optimisticEvent, eventConfig))
     )
   }
 }

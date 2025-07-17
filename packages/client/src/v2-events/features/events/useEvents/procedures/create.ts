@@ -18,11 +18,15 @@ import {
   ActionType,
   CreatedAction,
   getCurrentEventState,
-  ActionStatus
+  ActionStatus,
+  getUUID,
+  EventInput,
+  UUID
 } from '@opencrvs/commons/client'
 
 import {
-  invalidateEventsList,
+  findLocalEventConfig,
+  refetchEventsList,
   setEventData,
   setEventListData
 } from '@client/v2-events/features/events/useEvents/api'
@@ -57,11 +61,11 @@ function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
 
 setMutationDefaults(trpcOptionsProxy.event.create, {
   retry: true,
-  retryDelay: 1000,
+  retryDelay: 3333,
   mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
-      id: newEvent.transactionId,
+      id: newEvent.transactionId as UUID, // not actually an UUID, but as as it's temporary for the optimistic update, we can satisfy the type this way
       type: newEvent.type,
       trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
@@ -73,31 +77,37 @@ setMutationDefaults(trpcOptionsProxy.event.create, {
           id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
-          createdAtLocation: 'TODO',
+          createdByUserType: 'user',
+          createdByRole: 'offline',
+          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
           declaration: {},
-          status: ActionStatus.Accepted
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         } satisfies CreatedAction
       ]
     }
 
     setEventData(newEvent.transactionId, optimisticEvent)
-    setEventListData((eventIndices) =>
-      eventIndices?.concat(getCurrentEventState(optimisticEvent))
-    )
+    setEventListData((eventIndices) => {
+      const eventConfig = findLocalEventConfig(optimisticEvent.type)
+      return eventConfig
+        ? eventIndices?.concat(
+            getCurrentEventState(optimisticEvent, eventConfig)
+          )
+        : eventIndices
+    })
     return optimisticEvent
   },
   onSuccess: async (response, _variables, context) => {
     setEventData(response.id, response)
     setEventData(context.transactionId, response)
-    await invalidateEventsList()
+    await refetchEventsList()
   }
 })
 
 export function useCreateEvent() {
   const trpc = useTRPC()
-  const options = trpc.event.create.mutationOptions<{
-    transactionId: string
-  }>()
+  const options = trpc.event.create.mutationOptions<EventInput>()
 
   const overrides = queryClient.getMutationDefaults(
     trpcOptionsProxy.event.create.mutationKey()

@@ -13,19 +13,21 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { graphql, HttpResponse } from 'msw'
 import superjson from 'superjson'
 import { within } from '@testing-library/dom'
+import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
+  createPrng,
+  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
+  generateWorkqueues,
+  getCurrentEventState,
   tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
-import {
-  tennisClubMembershipEventDocument,
-  tennisClubMembershipEventIndex
-} from '@client/v2-events/features/events/fixtures'
+import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
 import { ReadonlyViewIndex } from './ReadOnlyView'
 
 const generator = testDataGenerator()
@@ -46,6 +48,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const rng = createPrng(122)
 const eventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [
@@ -53,47 +56,99 @@ const eventDocument = generateEventDocument({
     ActionType.DECLARE,
     ActionType.VALIDATE,
     ActionType.REGISTER
-  ]
+  ],
+  rng
 })
 
 const eventId = eventDocument.id
-const draft = generateEventDraftDocument(eventId)
+const draft = generateEventDraftDocument({
+  eventId,
+  actionType: ActionType.DECLARE,
+  rng
+})
+const modifiedDraft = generateEventDraftDocument({
+  eventId: eventDocument.id,
+  actionType: ActionType.REGISTER,
+  declaration: {
+    'applicant.name': {
+      firstname: 'Riku',
+      surname: 'This value is from a draft'
+    }
+  },
+  rng
+})
 
 export const ViewRecordMenuItemInsideActionMenus: Story = {
-  beforeEach: () => {
-    window.localStorage.setItem('opencrvs', generator.user.token.localRegistrar)
-  },
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
-    const dropdown = await canvas.findAllByTestId('action-dropdownMenu')
-    dropdown[0].click()
+    await step('Finds view record menu item in action menu', async () => {
+      const actionButton = await canvas.findByRole('button', {
+        name: 'Action'
+      })
+
+      await userEvent.click(actionButton)
+    })
+
+    await step('User is taken to the view record page', async () => {
+      const list = await canvas.findByRole('list')
+      await userEvent.click(within(list).getByText('View record'))
+
+      await waitFor(async () => {
+        await canvas.findByText("Applicant's name")
+        await canvas.findByText('Riku This value is from a draft')
+        await canvas.findByText(
+          'Member declaration for Riku This value is from a draft'
+        )
+        await canvas.findByText('Tennis club membership application')
+      })
+    })
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
+        eventId: eventDocument.id
+      }),
+      chromatic: { disableSnapshot: true }
+    },
+    offline: {
+      events: [eventDocument],
+      drafts: [modifiedDraft]
     },
     msw: {
       handlers: {
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return eventDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return [
+              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+            ]
+          }),
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 7 }
+            }, {})
           })
         ],
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [
-              generateEventDraftDocument(
-                tennisClubMembershipEventDocument.id,
-                ActionType.REGISTER,
-                {
-                  'applicant.firstname': 'Riku',
-                  'applicant.surname': 'This value is from a draft'
-                }
-              )
-            ]
+            return [modifiedDraft]
           })
         ],
         user: [
@@ -107,11 +162,22 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
           tRPCMsw.user.list.query(() => {
             return [
               {
-                id: '6780dbf7a263c6515c7b97d2',
+                id: generator.user.id.localRegistrar,
                 name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
-                role: 'LOCAL_REGISTRAR'
+                role: 'LOCAL_REGISTRAR',
+                signature: undefined,
+                avatar: undefined
               }
             ]
+          }),
+          tRPCMsw.user.get.query((id) => {
+            return {
+              id: generator.user.id.localRegistrar,
+              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+              role: 'LOCAL_REGISTRAR',
+              signature: undefined,
+              avatar: undefined
+            }
           })
         ]
       }
@@ -131,7 +197,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
       handlers: {
         drafts: [
           tRPCMsw.event.draft.list.query(() => {
-            return [draft]
+            return []
           })
         ],
         events: [
@@ -153,7 +219,7 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
               }
             })
           }),
-          tRPCMsw.user.list.query(([id]) => {
+          tRPCMsw.user.list.query(() => {
             return [
               {
                 id: '67bda93bfc07dee78ae558cf',
@@ -164,9 +230,20 @@ export const ReadOnlyViewForUserWithReadPermission: Story = {
                     family: 'Bwalya'
                   }
                 ],
-                role: 'SOCIAL_WORKER'
+                role: 'SOCIAL_WORKER',
+                signature: undefined,
+                avatar: undefined
               }
             ]
+          }),
+          tRPCMsw.user.get.query(() => {
+            return {
+              id: generator.user.id.localRegistrar,
+              name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
+              role: 'LOCAL_REGISTRAR',
+              signature: undefined,
+              avatar: undefined
+            }
           })
         ]
       }

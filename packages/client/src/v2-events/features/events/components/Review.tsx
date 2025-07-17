@@ -20,6 +20,7 @@ import {
   Button,
   Checkbox,
   Icon,
+  IconProps,
   Link,
   ListReview,
   ResponsiveModal,
@@ -32,14 +33,15 @@ import {
   FieldConfig,
   FieldType,
   FormConfig,
-  getFieldValidationErrors,
   isFieldDisplayedOnReview,
   isPageVisible,
+  runFieldValidations,
   SCOPES
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { getScope } from '@client/profile/profileSelectors'
+import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -308,7 +310,7 @@ function FormReview({
                 value
               })
 
-              const error = getFieldValidationErrors({
+              const error = runFieldValidations({
                 field,
                 values: form
               })
@@ -338,7 +340,7 @@ function FormReview({
           )
 
           if (!shouldDisplayPage) {
-            return <></>
+            return <React.Fragment key={`Section_${page.id}`}></React.Fragment>
           }
 
           // Only display fields that have a non-undefined/null value or have an validation error
@@ -484,11 +486,9 @@ function ReviewComponent({
               <ReviewContainter>
                 <FormFieldGenerator
                   fields={reviewFields}
-                  form={annotation}
                   id={'review'}
                   initialValues={annotation}
                   readonlyMode={readonlyMode}
-                  setAllFieldsDirty={false}
                   onChange={onAnnotationChange}
                 />
               </ReviewContainter>
@@ -578,7 +578,8 @@ function ReviewActionComponent({
   onReject,
   messages,
   primaryButtonType,
-  canSendIncomplete
+  canSendIncomplete,
+  icon
 }: {
   incomplete: boolean
   onConfirm: () => void
@@ -591,6 +592,7 @@ function ReviewActionComponent({
   }
   primaryButtonType?: 'positive' | 'primary'
   canSendIncomplete?: boolean
+  icon: IconProps['name']
 }) {
   const intl = useIntl()
 
@@ -610,7 +612,7 @@ function ReviewActionComponent({
               type={primaryButtonType ?? 'positive'}
               onClick={onConfirm}
             >
-              <Icon color="white" name="Check" />
+              <Icon color="white" name={icon} />
               {intl.formatMessage(messages.onConfirm)}
             </Button>
             {onReject && messages.onReject && (
@@ -819,6 +821,7 @@ function RejectActionModal({
       ]}
       contentHeight={270}
       handleClose={() => close(null)}
+      id="reject-modal"
       show={true}
       title={intl.formatMessage(reviewMessages.rejectModalTitle)}
       width={918}
@@ -828,6 +831,7 @@ function RejectActionModal({
           {intl.formatMessage(reviewMessages.rejectModalDescription)}
         </Text>
         <TextArea
+          data-testid="reject-reason"
           required={true}
           value={state.message}
           onChange={(e) =>
@@ -849,7 +853,7 @@ function RejectActionModal({
 }
 
 export const Review = {
-  Body: ReviewComponent,
+  Body: withSuspense(ReviewComponent),
   Actions: ReviewActionComponent,
   EditModal: EditModal,
   ActionModal: {

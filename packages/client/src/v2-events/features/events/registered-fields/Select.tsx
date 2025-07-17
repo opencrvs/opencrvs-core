@@ -9,23 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldProps,
+  SelectField,
   SelectOption,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 
-function SelectInput({
-  onChange,
-  value,
-  ...props
-}: Omit<FieldProps<'SELECT'>, 'label'> & {
+export type SelectInputProps = Omit<FieldProps<'SELECT'>, 'label'> & {
   onChange: (newValue: string) => void
   value?: string
   label?: TranslationConfig
-} & { 'data-testid'?: string }) {
+} & { 'data-testid'?: string }
+
+function SelectInput({ onChange, value, ...props }: SelectInputProps) {
   const intl = useIntl()
   const { options } = props
   const selectedOption = options.find((option) => option.value === value)
@@ -35,9 +34,11 @@ function SelectInput({
   }))
 
   const inputValue = selectedOption?.value ?? ''
+
   return (
     <SelectComponent
       {...props}
+      data-testid={props['data-testid'] || `select__${props.id}`}
       options={formattedOptions}
       value={inputValue}
       onChange={onChange}
@@ -58,7 +59,22 @@ function SelectOutput({
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
 
+function stringify(intl: IntlShape, value: string, fieldConfig: SelectField) {
+  const option = fieldConfig.options.find((opt) => opt.value === value)
+
+  if (!option) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Could not find option with value ${value} for field ${fieldConfig.id}`
+    )
+    return value
+  }
+
+  return intl.formatMessage(option.label)
+}
+
 export const Select = {
   Input: SelectInput,
-  Output: SelectOutput
+  Output: SelectOutput,
+  stringify
 }

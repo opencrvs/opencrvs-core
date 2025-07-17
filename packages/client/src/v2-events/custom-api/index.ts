@@ -17,6 +17,7 @@ import { trpcClient } from '@client/v2-events/trpc'
 export interface OnDeclareParams {
   eventId: string
   declaration: EventState
+  transactionId: string
   annotation?: EventState
 }
 /**
@@ -28,9 +29,11 @@ export interface OnDeclareParams {
 export async function registerOnDeclare({
   eventId,
   declaration,
+  transactionId,
   annotation
 }: {
   eventId: string
+  transactionId: string
   declaration: EventState
   annotation?: EventState
 }) {
@@ -38,7 +41,7 @@ export async function registerOnDeclare({
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID(),
+    transactionId,
     keepAssignment: true
   })
 
@@ -47,7 +50,7 @@ export async function registerOnDeclare({
     declaration: {},
     annotation,
     eventId,
-    transactionId: getUUID(),
+    transactionId,
     duplicates: [],
     keepAssignment: true
   })
@@ -57,7 +60,7 @@ export async function registerOnDeclare({
       declaration: {},
       annotation,
       eventId,
-      transactionId: getUUID()
+      transactionId
     }
   )
 
@@ -73,6 +76,7 @@ export async function registerOnDeclare({
 export async function validateOnDeclare(variables: {
   eventId: string
   declaration: EventState
+  transactionId: string
   annotation?: EventState
 }) {
   const { eventId, declaration, annotation } = variables
@@ -80,7 +84,7 @@ export async function validateOnDeclare(variables: {
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID(),
+    transactionId: variables.transactionId,
     keepAssignment: true
   })
 
@@ -90,7 +94,7 @@ export async function validateOnDeclare(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: getUUID(),
+      transactionId: variables.transactionId,
       duplicates: []
     }
   )
@@ -107,14 +111,16 @@ export async function validateOnDeclare(variables: {
 export async function registerOnValidate(variables: {
   eventId: string
   declaration: EventState
+  transactionId: string
   annotation?: EventState
 }) {
   const { eventId, declaration, annotation } = variables
+
   await trpcClient.event.actions.validate.request.mutate({
     declaration,
     annotation,
     eventId,
-    transactionId: getUUID(),
+    transactionId: variables.transactionId,
     duplicates: [],
     keepAssignment: true
   })
@@ -125,8 +131,7 @@ export async function registerOnValidate(variables: {
       declaration: {},
       annotation,
       eventId,
-      transactionId: getUUID(),
-      duplicates: []
+      transactionId: variables.transactionId
     }
   )
 
