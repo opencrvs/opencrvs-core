@@ -145,9 +145,10 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
-  const correctionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id)
-  )
+  const correctionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
+    )
 
   await client.event.actions.assignment.assign({
     ...assignmentInput,

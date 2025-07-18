@@ -245,7 +245,7 @@ function actionToClientAction(
         )
     case ActionType.REQUEST_CORRECTION:
       return async (eventId: string) =>
-        client.event.actions.correction.request(
+        client.event.actions.correction.request.request(
           generator.event.actions.correction.request(eventId, {
             keepAssignment: true
           })
