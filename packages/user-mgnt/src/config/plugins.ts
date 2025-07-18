@@ -10,7 +10,7 @@
  */
 import { ServerRegisterPluginObject } from '@hapi/hapi'
 import { SENTRY_DSN } from '@user-mgnt/constants'
-import { logger } from '@opencrvs/commons'
+import { logger, ErrorLoggerPlugin } from '@opencrvs/commons'
 import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
 import * as Sentry from 'hapi-sentry'
@@ -18,7 +18,10 @@ import * as Sentry from 'hapi-sentry'
 type IHapiPlugin<T = any> = ServerRegisterPluginObject<T>
 
 export default function getPlugins() {
-  const plugins: IHapiPlugin[] = [{ plugin: JWT, options: {} }]
+  const plugins: IHapiPlugin[] = [
+    { plugin: JWT, options: {} },
+    { plugin: ErrorLoggerPlugin }
+  ]
 
   if (process.env.NODE_ENV === 'production') {
     plugins.push({
