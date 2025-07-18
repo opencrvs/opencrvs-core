@@ -3595,6 +3595,8 @@ components:
                       - ARCHIVE
                       - PRINT_CERTIFICATE
                       - REQUEST_CORRECTION
+                      - APPROVE_CORRECTION
+                      - REJECT_CORRECTION
                 required:
                   - id
                   - transactionId
@@ -11061,7 +11063,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 92505308-4c6c-4101-ab7d-17d0aef02a19
+        transactionId: ffbac616-d10c-485e-bf4b-77546ec335b5
         declaration: {}
         annotation: {}
         type: NOTIFY
