@@ -44,14 +44,14 @@ jobs:
 
       - name: Get input data (when manually triggered)
         env:
-          GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         if: ${{ github.event_name == 'workflow_dispatch' }}
         run: |
-          PR_NUMBER=${{ github.event.inputs.pr_number }}
+          PR_NUMBER=${{ inputs.pr_number }}
           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
           BRANCH_NAME=$(echo "$PR_DATA" | jq -r '.headRefName')
           echo "PR_NUMBER=${PR_NUMBER}" >> $GITHUB_ENV
-          echo "keep_e2e=${{ github.event.inputs.keep_e2e }}" >> $GITHUB_ENV
+          echo "keep_e2e=${{ inputs.keep_e2e }}" >> $GITHUB_ENV
           echo "BRANCH_NAME=${BRANCH_NAME}" >> $GITHUB_ENV
 
       - name: Get PR labels on push event
@@ -112,8 +112,7 @@ jobs:
       - name: Get PR Author
         id: get_author
         env:
-          # TODO: Chech if token is needed here?
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           AUTHOR=$(gh pr view $PR_NUMBER --json author --jq '.author.login')
           echo "PR is created by $AUTHOR"
@@ -170,7 +169,7 @@ jobs:
 
       - name: Get PR Information
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
           PR_NUMBER=${{ needs.generate_stack_name_and_branch.outputs.pr_number }}
           PR_DATA=$(gh pr view $PR_NUMBER --json headRefName,headRefOid)
@@ -213,7 +212,8 @@ jobs:
         id: dispatch_e2e
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          # TODO: Replace with fine-grained e2e token
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
@@ -276,14 +276,11 @@ jobs:
       - name: Wait for Environment Deployment (Deploy Job)
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';
             const runId = ${{ needs.trigger-e2e.outputs.run_id }};
-            const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
-            const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
-
             let deployJobCompleted = false;
 
             // Check if deploy job has completed
@@ -328,7 +325,13 @@ jobs:
                 await new Promise(resolve => setTimeout(resolve, 10000));
               }
             }
-
+      - name: Update github comment on PR
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.CORE_ISSUES_PR_TOKEN }}
+          script: |
+            const prNumber = ${{ needs.generate_stack_name_and_branch.outputs.pr_number }};
+            const deployMessage = `Your environment is deployed to ${{ needs.trigger-e2e.outputs.deployment_link }}`;
             // Check if the comment already exists
             const comments = await github.rest.issues.listComments({
               owner: 'opencrvs',
@@ -353,7 +356,7 @@ jobs:
       - name: Wait for E2E Workflow Completion
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_TOKEN }}
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const owner = 'opencrvs';
             const repo = 'e2e';

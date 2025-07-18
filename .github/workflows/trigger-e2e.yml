@@ -9,6 +9,7 @@
 name: 'Trigger integration E2E tests in Farajaland development'
 
 on:
+
   push:
     branches:
       - develop
@@ -19,7 +20,7 @@ jobs:
     steps:
       - uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.E2E_TRIGGER_GITHUB_PAT }}
+          github-token: ${{ secrets.E2E_WORKFLOWS_TOKEN }}
           script: |
             const result = await github.rest.repos.createDispatchEvent({
               owner: 'opencrvs',
