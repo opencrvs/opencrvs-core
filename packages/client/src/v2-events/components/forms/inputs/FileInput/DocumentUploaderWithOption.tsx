@@ -251,12 +251,16 @@ function DocumentWithOptionOutput({
   value,
   config
 }: {
-  value: FileFieldWithOptionValue
+  value?: FileFieldWithOptionValue
   config: FileUploadWithOptions
 }) {
   const intl = useIntl()
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
+
+  if (!value || value.length === 0) {
+    return null
+  }
 
   return (
     <>
