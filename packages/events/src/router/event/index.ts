@@ -18,7 +18,6 @@ import {
   ACTION_ALLOWED_SCOPES,
   ActionStatus,
   ActionType,
-  ApproveCorrectionActionInput,
   AssignActionInput,
   CONFIG_GET_ALLOWED_SCOPES,
   DeleteActionInput,
@@ -28,7 +27,6 @@ import {
   EventDocument,
   EventIndex,
   EventInput,
-  RejectCorrectionActionInput,
   UnassignActionInput,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
   QueryType
@@ -40,9 +38,7 @@ import {
   getEventConfigurationById,
   getEventConfigurations
 } from '@events/service/config/config'
-import { approveCorrection } from '@events/service/events/actions/approve-correction'
 import { assignRecord } from '@events/service/events/actions/assign'
-import { rejectCorrection } from '@events/service/events/actions/reject-correction'
 import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
@@ -204,46 +200,10 @@ export const eventRouter = router({
       request: router(
         getDefaultActionProcedures(ActionType.REQUEST_CORRECTION)
       ),
-      approve: publicProcedure
-        .use(
-          requiresAnyOfScopes(
-            ACTION_ALLOWED_SCOPES[ActionType.APPROVE_CORRECTION]
-          )
-        )
-        .input(ApproveCorrectionActionInput)
-        .use(middleware.requireAssignment)
-        .use(middleware.validateAction(ActionType.APPROVE_CORRECTION))
-        .mutation(async ({ input, ctx }) => {
-          if (ctx.isDuplicateAction) {
-            return ctx.event
-          }
-
-          return approveCorrection(input, {
-            eventId: input.eventId,
-            user: ctx.user,
-            token: ctx.token
-          })
-        }),
-      reject: publicProcedure
-        .use(
-          requiresAnyOfScopes(
-            ACTION_ALLOWED_SCOPES[ActionType.REJECT_CORRECTION]
-          )
-        )
-        .input(RejectCorrectionActionInput)
-        .use(middleware.requireAssignment)
-        .use(middleware.validateAction(ActionType.REJECT_CORRECTION))
-        .mutation(async ({ input, ctx }) => {
-          if (ctx.isDuplicateAction) {
-            return ctx.event
-          }
-
-          return rejectCorrection(input, {
-            eventId: input.eventId,
-            user: ctx.user,
-            token: ctx.token
-          })
-        })
+      approve: router(
+        getDefaultActionProcedures(ActionType.APPROVE_CORRECTION)
+      ),
+      reject: router(getDefaultActionProcedures(ActionType.REJECT_CORRECTION))
     })
   }),
   list: systemProcedure

@@ -49,7 +49,9 @@ export const ConfirmableActions = [
   ActionType.REJECT,
   ActionType.ARCHIVE,
   ActionType.PRINT_CERTIFICATE,
-  ActionType.REQUEST_CORRECTION
+  ActionType.REQUEST_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION
 ] as const
 
 /** Testing building types from enums as an alternative */

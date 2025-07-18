@@ -140,8 +140,8 @@ export function useEvents() {
       register: useEventAction(trpc.event.actions.register.request),
       correction: {
         request: useEventAction(trpc.event.actions.correction.request.request),
-        approve: useEventAction(trpc.event.actions.correction.approve),
-        reject: useEventAction(trpc.event.actions.correction.reject)
+        approve: useEventAction(trpc.event.actions.correction.approve.request),
+        reject: useEventAction(trpc.event.actions.correction.reject.request)
       },
       assignment: {
         assign: {

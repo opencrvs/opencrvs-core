@@ -27,7 +27,9 @@ import {
   ValidateActionInput,
   ACTION_ALLOWED_SCOPES,
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  RequestCorrectionActionInput
+  RequestCorrectionActionInput,
+  ApproveCorrectionActionInput,
+  RejectCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -109,6 +111,14 @@ const ACTION_PROCEDURE_CONFIG = {
     ...defaultConfig,
     inputSchema: RequestCorrectionActionInput,
     allowIfWaitingForCorrection: false
+  },
+  [ActionType.APPROVE_CORRECTION]: {
+    ...defaultConfig,
+    inputSchema: ApproveCorrectionActionInput
+  },
+  [ActionType.REJECT_CORRECTION]: {
+    ...defaultConfig,
+    inputSchema: RejectCorrectionActionInput
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
