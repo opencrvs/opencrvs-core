@@ -99,11 +99,15 @@ function FileOutput({
   value,
   config
 }: {
-  value: FileFieldValue
+  value?: FileFieldValue
   config: FileConfig
 }) {
   const intl = useIntl()
   const [previewImage, setPreviewImage] = useState<boolean>(false)
+
+  if (!value) {
+    return '-'
+  }
 
   return (
     <>
