@@ -54,13 +54,13 @@ update_settings(max_parallel_updates=1)
 
 # Build baseimage
 docker_build("ghcr.io/opencrvs/ocrvs-base", ".",
-              dockerfile="packages/Dockerfile.base", 
-              only=["packages/commons","package.json","yarn.lock"], 
+              dockerfile="packages/Dockerfile.base",
+              only=["packages/commons","package.json","yarn.lock"],
               network="host")
 
 # Build services
 docker_build("ghcr.io/opencrvs/ocrvs-client:local", ".",
-              dockerfile="packages/client/Dockerfile", 
+              dockerfile="packages/client/Dockerfile",
               only=[
                 "infrastructure",
                 "packages/components",
@@ -70,26 +70,26 @@ docker_build("ghcr.io/opencrvs/ocrvs-client:local", ".",
               ],
               network="host")
 docker_build("ghcr.io/opencrvs/ocrvs-login:local", ".",
-              dockerfile="packages/login/Dockerfile", 
-              only=["infrastructure", "packages/components", "packages/login"], 
+              dockerfile="packages/login/Dockerfile",
+              only=["infrastructure", "packages/components", "packages/login"],
               network="host")
 docker_build("ghcr.io/opencrvs/ocrvs-gateway:local", ".",
-              dockerfile="packages/gateway/Dockerfile", 
-              only=["packages/components","packages/gateway", "packages/events"], 
+              dockerfile="packages/gateway/Dockerfile",
+              only=["packages/components","packages/gateway", "packages/events"],
               network="host")
 apps = [
-    'auth', 
+    'auth',
     'config',
-    'dashboards', 
-    'documents', 
+    'dashboards',
+    'documents',
     'events',
-    'metrics', 
-    'migration', 
-    'notification', 
-    'scheduler', 
-    'search', 
-    'user-mgnt', 
-    'webhooks', 
+    'metrics',
+    'migration',
+    'notification',
+    'scheduler',
+    'search',
+    'user-mgnt',
+    'webhooks',
     'workflow'
 ]
 
@@ -118,11 +118,11 @@ namespace_create(opencrvs_namespace)
 # OpenCRVS Dependencies Deployment
 # NOTE: This helm chart can be deployed as helm release
 if security_enabled:
-    deps_configuration_file = '../infrastructure/infrastructure/localhost/dependencies/values-dev-secure.yaml'
-    opencrvs_configuration_file = '../infrastructure/infrastructure/localhost/opencrvs-services/values-dev-secure.yaml'
+    deps_configuration_file = '../infrastructure/examples/localhost/dependencies/values-dev-secure.yaml'
+    opencrvs_configuration_file = '../infrastructure/examples/localhost/opencrvs-services/values-dev-secure.yaml'
 else:
-    deps_configuration_file = '../infrastructure/infrastructure/localhost/dependencies/values-dev.yaml'
-    opencrvs_configuration_file = '../infrastructure/infrastructure/localhost/opencrvs-services/values-dev.yaml'
+    deps_configuration_file = '../infrastructure/examples/localhost/dependencies/values-dev.yaml'
+    opencrvs_configuration_file = '../infrastructure/examples/localhost/opencrvs-services/values-dev.yaml'
 k8s_yaml(helm('../infrastructure/charts/dependencies',
   namespace=dependencies_namespace,
   values=[deps_configuration_file]))
