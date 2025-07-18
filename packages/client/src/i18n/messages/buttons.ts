@@ -8,77 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { defineMessages, MessageDescriptor } from 'react-intl'
+import { defineMessages } from 'react-intl'
 
-interface IButtonsMessages
-  extends Record<string | number | symbol, MessageDescriptor> {
-  archive: MessageDescriptor
-  back: MessageDescriptor
-  apply: MessageDescriptor
-  assign: MessageDescriptor
-  cancel: MessageDescriptor
-  change: MessageDescriptor
-  confirm: MessageDescriptor
-  configure: MessageDescriptor
-  continueButton: MessageDescriptor
-  createUser: MessageDescriptor
-  create: MessageDescriptor
-  deactivate: MessageDescriptor
-  delete: MessageDescriptor
-  edit: MessageDescriptor
-  editRegistration: MessageDescriptor
-  exitButton: MessageDescriptor
-  finish: MessageDescriptor
-  forgotPassword: MessageDescriptor
-  forgottenPIN: MessageDescriptor
-  goToHomepage: MessageDescriptor
-  login: MessageDescriptor
-  logout: MessageDescriptor
-  next: MessageDescriptor
-  no: MessageDescriptor
-  preview: MessageDescriptor
-  print: MessageDescriptor
-  issue: MessageDescriptor
-  register: MessageDescriptor
-  reject: MessageDescriptor
-  rejectDeclaration: MessageDescriptor
-  replace: MessageDescriptor
-  retry: MessageDescriptor
-  review: MessageDescriptor
-  save: MessageDescriptor
-  saving: MessageDescriptor
-  refresh: MessageDescriptor
-  saveExitButton: MessageDescriptor
-  deleteDeclaration: MessageDescriptor
-  printDeclaration: MessageDescriptor
-  closeDeclaration: MessageDescriptor
-  reactivate: MessageDescriptor
-  search: MessageDescriptor
-  select: MessageDescriptor
-  send: MessageDescriptor
-  sendForReview: MessageDescriptor
-  sendIncomplete: MessageDescriptor
-  sendForApproval: MessageDescriptor
-  settings: MessageDescriptor
-  start: MessageDescriptor
-  status: MessageDescriptor
-  unassign: MessageDescriptor
-  update: MessageDescriptor
-  upload: MessageDescriptor
-  verify: MessageDescriptor
-  yes: MessageDescriptor
-  approve: MessageDescriptor
-  editRecord: MessageDescriptor
-  makeCorrection: MessageDescriptor
-  publish: MessageDescriptor
-  add: MessageDescriptor
-  copy: MessageDescriptor
-  copied: MessageDescriptor
-  exactDateUnknown: MessageDescriptor
-  sendForUpdates: MessageDescriptor
-}
-
-const messagesToDefine: IButtonsMessages = {
+export const buttonMessages = defineMessages({
   archive: {
     id: 'buttons.archive',
     defaultMessage: 'Archive declaration',
@@ -411,6 +343,4 @@ const messagesToDefine: IButtonsMessages = {
     id: 'buttons.sendForUpdates',
     defaultMessage: 'Send for updates'
   }
-}
-
-export const buttonMessages: IButtonsMessages = defineMessages(messagesToDefine)
+})

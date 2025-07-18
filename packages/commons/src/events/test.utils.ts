@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString } from 'lodash'
+import { merge, omitBy, isString, omit } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -545,10 +545,13 @@ export function eventPayloadGenerator(rng: () => number) {
           transactionId: input.transactionId ?? getUUID(),
           declaration:
             input.declaration ??
-            generateActionDeclarationInput(
-              tennisClubMembershipEvent,
-              ActionType.REQUEST_CORRECTION,
-              rng
+            omit(
+              generateActionDeclarationInput(
+                tennisClubMembershipEvent,
+                ActionType.REQUEST_CORRECTION,
+                rng
+              ),
+              ['applicant.email']
             ),
           annotation:
             input.annotation ??

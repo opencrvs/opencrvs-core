@@ -101,7 +101,7 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isNumberFieldType(field)) {
-    return Number.Output({ value: field.value })
+    return Number.Output(field)
   }
 
   if (isFileFieldType(field)) {
@@ -174,7 +174,7 @@ export function Output({
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
-  showPreviouslyMissingValuesAsChanged: boolean
+  showPreviouslyMissingValuesAsChanged?: boolean
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value
   const hasValue = value !== undefined

@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { BackArrowDeepBlue, Cross } from '../icons'
 import { CircleButton } from '../buttons'
 import { AppBar, IAppBarProps } from '../AppBar'
+
 const ActionContainer = styled.div`
   width: 100%;
 `
