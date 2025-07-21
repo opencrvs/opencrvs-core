@@ -152,7 +152,7 @@ jobs:
     secrets: inherit
 
   trigger-e2e:
-    if: needs.trigger-build.outputs.build_status == 'success'
+    if: always() && needs.trigger-build.outputs.build_status == 'success'
     runs-on: ubuntu-24.04
     needs: [generate_stack_name_and_branch, trigger-build]
     environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
