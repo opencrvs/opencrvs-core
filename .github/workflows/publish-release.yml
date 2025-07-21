@@ -60,7 +60,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
 
       - name: Build and push base image
         uses: docker/build-push-action@v6
@@ -99,7 +99,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
 
       - name: Build and push
         uses: docker/build-push-action@v6

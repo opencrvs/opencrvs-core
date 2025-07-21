@@ -1635,28 +1635,31 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
             }
           })
       })
+      const hasVerificationStatus =
+        this.includesVerificationStatus(section) &&
+        declaration.data[section.id]?.detailsExist !== false &&
+        Boolean(declaration.data[section.id]?.verified)
+
       return {
         id: section.id,
         title: section.title ? intl.formatMessage(section.title) : '',
         items: items.filter((item) => item),
-        action:
-          this.includesVerificationStatus(section) &&
-          declaration.data[section.id]?.detailsExist !== false &&
-          Boolean(declaration.data[section.id]?.verified) ? (
-            <VerificationPill
-              type={declaration.data[section.id].verified as string}
-            />
-          ) : this.shouldShowChangeAll(section) &&
-            declaration.registrationStatus !== RegStatus.CorrectionRequested ? (
-            <Link
-              font="reg16"
-              onClick={() =>
-                this.replaceHandler(section.id, visibleGroups[0].id)
-              }
-            >
-              {intl.formatMessage(buttonMessages.replace)}
-            </Link>
-          ) : undefined
+        pills: hasVerificationStatus ? (
+          <VerificationPill
+            type={declaration.data[section.id].verified as string}
+          />
+        ) : null,
+        action: hasVerificationStatus ? null : this.shouldShowChangeAll(
+            section
+          ) &&
+          declaration.registrationStatus !== RegStatus.CorrectionRequested ? (
+          <Link
+            font="reg16"
+            onClick={() => this.replaceHandler(section.id, visibleGroups[0].id)}
+          >
+            {intl.formatMessage(buttonMessages.replace)}
+          </Link>
+        ) : undefined
       }
     })
   }
@@ -1820,6 +1823,7 @@ class ReviewSectionComp extends React.Component<FullProps, State> {
                               messages.showLabel
                             )}
                             expand={true}
+                            pills={sec.pills}
                           >
                             <ListReview id={'Section_' + sec.id}>
                               {sec.items.map((item) => (

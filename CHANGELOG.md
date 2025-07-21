@@ -21,12 +21,17 @@
 
 - Use unprivileged version of nginx container image [#6501](https://github.com/opencrvs/opencrvs-core/issues/6501)
 
-## 1.8.0 Release candidate
+- **Upgraded MinIO** to RELEASE.2025-06-13T11-33-47Z and MinIO Client (mc) to RELEASE.2025-05-21T01-59-54Z and ensured compatibility across both amd64 and arm64 architectures.
+
+## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.8.0)
 
 ### New features
 
 - **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
 - Build OpenCRVS release images for arm devices [#9455](https://github.com/opencrvs/opencrvs-core/issues/9455)
+
+### Bug fixes
+- When the building the graphql payload from form data, we now check if a field was changed. If so then include it in the payload even if it might have been changed to an empty value.[#9369](https://github.com/opencrvs/opencrvs-core/issues/9369)
 
 ### Improvements
 
@@ -34,6 +39,10 @@
 - **Github runners upgraded** to latest Ubuntu LTS release 24.04 [#7045](https://github.com/opencrvs/opencrvs-core/issues/7045)
 - **Switch to GitHub Packages** from Docker hub [#6910](https://github.com/opencrvs/opencrvs-core/issues/6910)
 - **Upgrade Elasticsearch** to a AGPLv3 licensed version 8.16.4 [#8749](https://github.com/opencrvs/opencrvs-core/issues/8749)
+- **`GH_TOKEN` secret is deprecated** and replaced with `GITHUB_GHCR_PUBLISH_TOKEN` and `E2E_WORKFLOWS_TOKEN` secrets. `GH_TOKEN` secret was widely used within workflows for manipulations with PRs and triggering e2e and deploy workflows in Country config template repositories. We segregated tokens with more restricted access. Please create following secrets in your repository:
+  - Secret `GITHUB_GHCR_PUBLISH_TOKEN` is classic token with permissions `repo, write:packages`. Required to build and push OpenCRVS Core images.
+  - Secret `E2E_WORKFLOWS_TOKEN` is fine-grained token scoped to your fork of country config template repository with permissions `Contents: Read and Write`.
+- Created a standalone `data-seeder` Docker image to decouple seeding logic from the core repository. This improves GitHub Actions runtime by avoiding full repository clone and dependency installation during environment seeding. [#8976](https://github.com/opencrvs/opencrvs-core/issues/8976)
 
 ## [1.7.3](https://github.com/opencrvs/opencrvs-core/compare/v1.7.2...v1.7.3)
 
@@ -44,6 +53,7 @@
 - Allow booleanTransformer to be used as a certificate handlebar template transformer [#9631](https://github.com/opencrvs/opencrvs-core/issues/9631)
 - Fix international to local number conversion from failing if the number was already local [#9634](https://github.com/opencrvs/opencrvs-core/issues/9634)
 - Pre-select default certificate option in print certificate collector form [#9935](https://github.com/opencrvs/opencrvs-core/issues/9935)
+
 
 ## [1.7.2](https://github.com/opencrvs/opencrvs-core/compare/v1.7.1...v1.7.2)
 
@@ -58,7 +68,8 @@
 - Filter out inactive locations in the Organisations menu [#8782](https://github.com/opencrvs/opencrvs-core/issues/8782)
 - Improve quick search results when searching by name [#9272](https://github.com/opencrvs/opencrvs-core/issues/9272)
 - Fix practitioner role history entries from being created with every view and download [#9462](https://github.com/opencrvs/opencrvs-core/issues/9462)
-- Fix a child's NID form field cannot be added eithe rmanually or via ESignet. A father section cannot be placed before a mother section if you wish to use a radio button to control mapping addresses from one individual to aother to make data entry easier [#9582](https://github.com/opencrvs/opencrvs-core/issues/9582)
+- Fix a child's NID form field cannot be added either manually or via ESignet. A father section cannot be placed before a mother section if you wish to use a radio button to control mapping addresses from one individual to another to make data entry easier [#9582](https://github.com/opencrvs/opencrvs-core/issues/9582)
+- Fixed deduplication for records created from event notifications with identical details. [#9532](https://github.com/opencrvs/opencrvs-core/pull/9532)
 - Fix the role of the certifier unable to get resolved for new users which in turn caused the download of the declaration to fail [#9643](https://github.com/opencrvs/opencrvs-core/issues/9643)
 - Fix one failing unassign blocking all other unassign actions from continuing [#9651](https://github.com/opencrvs/opencrvs-core/issues/9651)
 - Fix record not getting unassigned when validating an already validated record again [#9648](https://github.com/opencrvs/opencrvs-core/issues/9648)
@@ -143,8 +154,18 @@
 - Add 6th level support for addresses [#6956](https://github.com/opencrvs/opencrvs-core/issues/6956)
 - Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
 - Fix slow render of location options [#8562](https://github.com/opencrvs/opencrvs-core/pull/8562)
+- Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations , the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
+- Fix rendering of Custom Date fields [#8885](https://github.com/opencrvs/opencrvs-core/issues/8885)
+
+### Improvements
+
+- For countries where local phone numbers start with 0, we now ensure the prefix remains unchanged when converting to and from the international format.
 
 ## [1.6.2](https://github.com/opencrvs/opencrvs-core/compare/v1.6.1...v1.6.2)
+
+### Deprecated
+
+- `INFORMANT_SIGNATURE` & `INFORMANT_SIGNATURE_REQUIRED` are now deprecated and part of form config
 
 ### Bug fixes
 
@@ -152,6 +173,10 @@
 - Fix health facilities missing from dropdown after correcting a record address [#7528](https://github.com/opencrvs/opencrvs-core/issues/7528)
 - Fix stale validations showing for document uploader with options form field
 - Fix a bug in the POST `{{gateway}}/locations` endpoint used to create new locations, the check to verify if a `statisticalId` was already used was broken so we've fixed that. This was picked when we were trying to seed a location for a country via the endpoint [#8606](https://github.com/opencrvs/opencrvs-core/issues/8606)
+
+### Improvements
+
+- Support for 6th administrative level
 
 ## [1.6.1](https://github.com/opencrvs/opencrvs-core/compare/v1.6.0...v1.6.1)
 
