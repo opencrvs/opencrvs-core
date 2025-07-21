@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 0a28bc8d-a661-44e7-9de7-33694176c54a
+                transactionId: 24274f62-3cfc-44a4-8660-1d7efff5060a
                 type: v2.birth
       responses:
         "200":
@@ -484,7 +484,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ed86e20c-c7b2-4e54-906e-537921f01416
+                transactionId: 16fd34e4-f94a-417e-b030-6fd3709d9c5f
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1335,6 +1335,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1343,15 +1345,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: &a6 []
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1370,13 +1373,15 @@ components:
                   - validator
                   - message
               default: &a7 []
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1482,6 +1487,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1490,15 +1497,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1517,13 +1525,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1558,6 +1568,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1566,15 +1578,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1593,13 +1606,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1629,6 +1644,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1637,15 +1654,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1664,13 +1682,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1706,6 +1726,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1714,15 +1736,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1741,13 +1764,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1773,6 +1798,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1781,15 +1808,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1808,13 +1836,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1839,6 +1869,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1847,15 +1879,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1874,13 +1907,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1922,6 +1957,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1930,15 +1967,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -1957,13 +1995,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1999,6 +2039,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2007,15 +2049,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2034,13 +2077,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2065,6 +2110,10 @@ components:
                         - h3
                         - h2
                         - h1
+                      description: Font variant to use for the paragraph text
+                    hint:
+                      type: boolean
+                      description: When true, paragraph is styled as a hint with grey color
               default: {}
           required:
             - id
@@ -2077,6 +2126,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2085,15 +2136,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2112,13 +2164,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2163,6 +2217,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2171,15 +2227,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2198,13 +2255,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2238,6 +2297,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2246,15 +2307,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2273,13 +2335,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2297,6 +2361,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2305,15 +2371,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2332,13 +2399,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2372,6 +2441,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2380,15 +2451,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2407,13 +2479,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2456,6 +2530,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2464,15 +2540,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2491,13 +2568,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             defaultValue:
               type: string
               minLength: 1
@@ -2515,6 +2594,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2523,15 +2604,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2550,13 +2632,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             defaultValue:
               type: string
               minLength: 1
@@ -2574,6 +2658,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2582,15 +2668,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2609,13 +2696,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2632,6 +2721,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2640,15 +2731,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2667,13 +2759,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2737,6 +2831,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2745,15 +2841,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2772,13 +2869,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2796,6 +2895,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2804,15 +2905,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2831,13 +2933,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2876,6 +2980,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2884,15 +2990,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2911,13 +3018,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2931,6 +3040,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2939,15 +3050,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -2966,13 +3078,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3001,6 +3115,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3009,15 +3125,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -3036,13 +3153,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3060,6 +3179,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3068,15 +3189,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -3095,13 +3217,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3119,6 +3243,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3127,15 +3253,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -3154,13 +3281,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3200,6 +3329,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3208,15 +3339,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -3235,13 +3367,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3266,6 +3400,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3274,15 +3410,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -3301,13 +3438,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3376,6 +3515,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3384,15 +3525,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
               default: *a6
-            required:
-              type: boolean
-              default: false
             secured:
               type: boolean
               default: false
@@ -3411,13 +3553,15 @@ components:
                   - validator
                   - message
               default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -4057,64 +4201,47 @@ components:
           type: string
           enum:
             - REQUEST_CORRECTION
-        onboardingForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
-        additionalDetailsForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
+        correctionForm:
+          type: object
+          properties:
+            label:
+              description: Human readable description of the form
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
+            pages:
+              type: array
+              items:
+                oneOf:
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - FORM
+                        default: FORM
+                    required:
+                      - type
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - VERIFICATION
+                      actions:
+                        $ref: "#/components/schemas/VerificationActionConfig"
+                    required:
+                      - type
+                      - actions
+          required:
+            - label
+            - pages
       required:
         - label
         - conditionals
         - type
-        - onboardingForm
-        - additionalDetailsForm
+        - correctionForm
     RejectCorrectionActionConfig:
       type: object
       properties:
