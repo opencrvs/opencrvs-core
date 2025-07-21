@@ -171,15 +171,14 @@ function locationBundleToIdentifier(
 const getExternalIdFromIdentifier = (
   identifiers: fhir3.Location['identifier']
 ) =>
-  identifiers
-    ?.find(({ system }) =>
-      [
-        `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
-        `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
-      ].some((identifierSystem) => identifierSystem === system)
-    )
-    ?.value?.split('_')
-    .pop()
+  identifiers?.find(({ system }) =>
+    [
+      `${OPENCRVS_SPECIFICATION_URL}id/statistical-code`,
+      `${OPENCRVS_SPECIFICATION_URL}id/internal-id`
+    ].some((identifierSystem) => identifierSystem === system)
+  )?.value
+// ?.split('_')
+// .pop()
 
 export async function seedLocations(token: string) {
   const savedLocations = (
