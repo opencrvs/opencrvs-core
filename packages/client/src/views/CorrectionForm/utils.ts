@@ -684,10 +684,12 @@ export function isVisibleField(
     draft.data,
     user
   )
-  return (
-    !conditionalActions.includes('hide') &&
-    !conditionalActions.includes('disable')
+  const isFieldConnectedToVerifiedStatus = field.conditionals?.some(
+    (conditional) => conditional.expression.includes('$form?.verified')
   )
+  const isFieldDisabledOtherwise =
+    conditionalActions.includes('disable') && !isFieldConnectedToVerifiedStatus
+  return !conditionalActions.includes('hide') && !isFieldDisabledOtherwise
 }
 
 export function getOverriddenFieldsListForPreview(
