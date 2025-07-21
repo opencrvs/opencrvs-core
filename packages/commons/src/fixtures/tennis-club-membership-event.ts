@@ -18,10 +18,8 @@ import { event } from '../events/event'
 import { TENNIS_CLUB_MEMBERSHIP } from '../events/Constants'
 import {
   PRINT_CERTIFICATE_FORM,
-  statusOptions,
   TENNIS_CLUB_DECLARATION_FORM,
-  TENNIS_CLUB_DECLARATION_REVIEW,
-  timePeriodOptions
+  TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
 
 export const tennisClubMembershipEvent = defineConfig({
@@ -397,10 +395,10 @@ export const tennisClubMembershipEvent = defineConfig({
         id: 'v2.advancedSearch.form.registrationDetails'
       },
       fields: [
-        event('legalStatus.REGISTERED.createdAtLocation').exact(),
-        event('legalStatus.REGISTERED.createdAt').range(),
-        event('status', statusOptions).exact(),
-        event('updatedAt', timePeriodOptions).range()
+        event('legalStatuses.REGISTERED.createdAtLocation').exact(),
+        event('legalStatuses.REGISTERED.acceptedAt').range(),
+        event('status').exact(),
+        event('updatedAt').range()
       ]
     },
     {

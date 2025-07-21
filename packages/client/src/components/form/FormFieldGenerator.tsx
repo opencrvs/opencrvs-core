@@ -321,6 +321,7 @@ const GeneratedInputField = React.memo<GeneratedInputFieldProps>(
           type={fieldDefinition.bannerType}
           idFieldName={fieldDefinition.idFieldName}
           setFieldValue={setFieldValue}
+          form={values}
         />
       )
     }
@@ -804,6 +805,10 @@ export const mapFieldsToValues = (
       ...evalParams
     )
 
+    if (field.type === SELECT_WITH_OPTIONS && !field.initialValue) {
+      fieldInitialValue = field.options.find((x) => x.isDefault)?.value ?? ''
+    }
+
     if (field.type === RADIO_GROUP_WITH_NESTED_FIELDS && !field.initialValue) {
       const nestedFieldsFlatted = flatten(Object.values(field.nestedFields))
 
@@ -871,7 +876,7 @@ export interface ITouchedNestedFields {
   }
 }
 
-class FormSectionComponent extends React.Component<Props> {
+export class FormSectionComponent extends React.Component<Props> {
   componentDidUpdate(prevProps: Props) {
     const userChangedForm = !isEqual(this.props.values, prevProps.values)
     const sectionChanged = prevProps.id !== this.props.id
@@ -951,26 +956,52 @@ class FormSectionComponent extends React.Component<Props> {
     this.props.setFieldTouched(e.target.name)
   }
 
-  setFieldValuesWithDependency = (
+  static getUpdatedValuesAfterDependentFieldEvaluation = (
+    existingValues: IFormSectionData,
+    fields: IFormField[],
     fieldName: string,
-    value: IFormFieldValue
-  ) => {
-    const updatedValues = cloneDeep(this.props.values)
+    value: IFormFieldValue,
+    evalParams: {
+      config: IOfflineData
+      draft: IFormData
+      user: UserDetails | null
+    }
+  ): IFormSectionData => {
+    const updatedValues = cloneDeep(existingValues)
     set(updatedValues, fieldName, value)
     const updateDependentFields = (fieldName: string) => {
-      const dependentFields = getDependentFields(this.props.fields, fieldName)
+      const dependentFields = getDependentFields(fields, fieldName)
       for (const field of dependentFields) {
         updatedValues[field.name] = evalExpressionInFieldDefinition(
           (field.initialValue as DependencyInfo).expression,
           updatedValues,
-          this.props.offlineCountryConfig,
-          this.props.draftData,
-          this.props.userDetails
+          evalParams.config,
+          evalParams.draft,
+          evalParams.user
         )
         updateDependentFields(field.name)
       }
     }
     updateDependentFields(fieldName)
+    return updatedValues
+  }
+
+  setFieldValuesWithDependency = (
+    fieldName: string,
+    value: IFormFieldValue
+  ) => {
+    const updatedValues =
+      FormSectionComponent.getUpdatedValuesAfterDependentFieldEvaluation(
+        this.props.values,
+        this.props.fields,
+        fieldName,
+        value,
+        {
+          config: this.props.offlineCountryConfig,
+          draft: this.props.draftData,
+          user: this.props.userDetails
+        }
+      )
 
     this.props.setValues(updatedValues)
   }
@@ -1315,7 +1346,7 @@ class FormSectionComponent extends React.Component<Props> {
                 ignoreBottomMargin={field.ignoreBottomMargin}
               >
                 <Field name={field.name}>
-                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any*/}
+                  {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
                   {(formikFieldProps: FieldProps<any>) => {
                     return (
                       <MemoizedLocationList field={field}>
