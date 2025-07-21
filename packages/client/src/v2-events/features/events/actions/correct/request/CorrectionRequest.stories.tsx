@@ -13,6 +13,7 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
+import { expect, waitFor, within, userEvent } from '@storybook/test'
 import { ActionType } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -42,6 +43,7 @@ const draft = testDataGenerator().event.draft({
   eventId: tennisClubMembershipEventDocument.id,
   actionType: ActionType.REQUEST_CORRECTION
 })
+
 function FormClear() {
   const drafts = useDrafts()
   useEffect(() => {
@@ -59,7 +61,7 @@ export const ReviewWithChanges: Story = {
     reactRouter: {
       router: {
         path: '/',
-        element: <FormClear />,
+        element: <Outlet />,
         children: [router]
       },
       initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
@@ -75,32 +77,18 @@ export const ReviewWithChanges: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeDisabled()
+    })
   }
 }
 
-export const AdditionalDetails: Story = {
-  parameters: {
-    offline: {
-      drafts: [draft]
-    },
-    reactRouter: {
-      router: router,
-      initialPath:
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.ADDITIONAL_DETAILS_INDEX.buildPath({
-          eventId: tennisClubMembershipEventDocument.id
-        })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  }
-}
 export const Summary: Story = {
   parameters: {
     offline: {
