@@ -32,6 +32,88 @@ function eventFn(fieldId: EventFieldId) {
 // Attach conditional helpers directly to the function
 const event = Object.assign(eventFn, {
   /**
+   * Creates a conditional that checks if the event contains a specific action type
+   * with an optional template ID.
+   *
+   * @param templateId - The template ID to check for.
+   */
+  printActions: (templateId?: string) => {
+    return {
+      /**
+       * Creates a conditional that checks if the event contains a specific action type
+       * with a minimum count of occurrences.
+       *
+       * @param minCount - The minimum number of actions required.
+       */
+      minCount: (minCount: number) => {
+        const actionProperties: Record<string, unknown> = {
+          type: { const: ActionType.PRINT_CERTIFICATE }
+        }
+        const requiredFields = ['type']
+        if (templateId) {
+          actionProperties.templateId = { const: templateId }
+          requiredFields.push('templateId')
+        }
+        return defineConditional({
+          type: 'object',
+          properties: {
+            $event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  contains: {
+                    type: 'object',
+                    properties: actionProperties,
+                    required: requiredFields
+                  },
+                  minContains: minCount
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['$event']
+        })
+      },
+      /**
+       * Builds a conditional that sets a maximum count for the number of print actions.
+       * This is useful for limiting the number of print actions in a single event.
+       */
+      maxCount: (maxCount: number) => {
+        const actionProperties: Record<string, unknown> = {
+          type: { const: ActionType.PRINT_CERTIFICATE }
+        }
+        const requiredFields = ['type']
+        if (templateId) {
+          actionProperties.templateId = { const: templateId }
+          requiredFields.push('templateId')
+        }
+        return defineConditional({
+          type: 'object',
+          properties: {
+            $event: {
+              type: 'object',
+              properties: {
+                actions: {
+                  type: 'array',
+                  contains: {
+                    type: 'object',
+                    properties: actionProperties,
+                    required: requiredFields
+                  },
+                  maxContains: maxCount
+                }
+              },
+              required: ['actions']
+            }
+          },
+          required: ['$event']
+        })
+      }
+    }
+  },
+  /**
    * Checks if the event contains a specific action type.
    * @param action - The action type to check for.
    */

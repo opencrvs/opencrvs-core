@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import Ajv from 'ajv'
+import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 import { formatISO, isAfter, isBefore } from 'date-fns'
@@ -23,7 +23,8 @@ import { TranslationConfig } from '../events/TranslationConfig'
 
 const ajv = new Ajv({
   $data: true,
-  allowUnionTypes: true
+  allowUnionTypes: true,
+  strict: false // Allow minContains and other newer features
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -429,28 +430,12 @@ export function getValidatorsForField(
     })
     .filter((x) => x !== null) as NonNullable<FieldConfig['validation']>
 }
-// Separate AJV instance for certificate template conditionals that supports newer JSON Schema features
-import Ajv2019 from 'ajv/dist/2019'
-const certificateAjv = new Ajv2019({
-  $data: true,
-  allowUnionTypes: true,
-  strict: false, // Allow minContains and other newer features
-  validateSchema: false // Disable schema validation for maximum flexibility
-})
-addFormats(certificateAjv)
-
-export function validateCertificateConditional(
-  schema: JSONSchema,
-  data: ConditionalParameters
-) {
-  return certificateAjv.validate(schema, data)
-}
 
 export function areCertificateConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, unknown>
 ) {
   return conditions.every((condition) => {
-    return certificateAjv.validate(condition.conditional, values)
+    return ajv.validate(condition.conditional, values)
   })
 }

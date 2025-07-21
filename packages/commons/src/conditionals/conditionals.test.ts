@@ -666,6 +666,76 @@ describe('"event" conditionals', () => {
       false
     )
   })
+
+  describe('event.printActions conditional', () => {
+    const now = formatISO(new Date(), { representation: 'date' })
+    const baseEvent = {
+      $now: now,
+      $event: {
+        id: '123' as UUID,
+        type: 'birth',
+        trackingId: 'TEST12',
+        createdAt: now,
+        updatedAt: now,
+        actions: [
+          {
+            id: 'a1' as UUID,
+            type: ActionType.PRINT_CERTIFICATE,
+            templateId: 'TEMPLATE_1',
+            createdAt: now,
+            status: ActionStatus.Accepted,
+            transactionId: 'tx1',
+            createdByUserType: TokenUserType.Enum.user,
+            createdBy: 'user1',
+            createdByRole: 'role1',
+            createdAtLocation: 'loc1' as UUID,
+            declaration: {}
+          },
+          {
+            id: 'a2' as UUID,
+            type: ActionType.PRINT_CERTIFICATE,
+            templateId: 'TEMPLATE_2',
+            createdAt: now,
+            status: ActionStatus.Accepted,
+            transactionId: 'tx2',
+            createdByUserType: TokenUserType.Enum.user,
+            createdBy: 'user2',
+            createdByRole: 'role2',
+            createdAtLocation: 'loc2' as UUID,
+            declaration: {}
+          }
+        ]
+      }
+    } satisfies EventConditionalParameters
+
+    it('returns true when minCount is met for a specific templateId', () => {
+      expect(
+        validate(event.printActions('TEMPLATE_1').minCount(1), baseEvent)
+      ).toBe(true)
+      expect(
+        validate(event.printActions('TEMPLATE_1').minCount(2), baseEvent)
+      ).toBe(false)
+    })
+
+    it('returns true when minCount is met for any print certificate action', () => {
+      expect(validate(event.printActions().minCount(2), baseEvent)).toBe(true)
+      expect(validate(event.printActions().minCount(3), baseEvent)).toBe(false)
+    })
+
+    it('returns true when maxCount is not exceeded for a specific templateId', () => {
+      expect(
+        validate(event.printActions('TEMPLATE_1').maxCount(1), baseEvent)
+      ).toBe(true)
+      expect(
+        validate(event.printActions('TEMPLATE_1').maxCount(0), baseEvent)
+      ).toBe(false)
+    })
+
+    it('returns true when maxCount is not exceeded for any print certificate action', () => {
+      expect(validate(event.printActions().maxCount(2), baseEvent)).toBe(true)
+      expect(validate(event.printActions().maxCount(1), baseEvent)).toBe(false)
+    })
+  })
 })
 
 describe('"valid name" conditionals', () => {
