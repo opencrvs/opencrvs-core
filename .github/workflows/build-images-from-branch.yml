@@ -15,6 +15,10 @@ on:
         description: Branch to build from
         required: true
         type: string
+    outputs:
+      build_status:
+        description: build job output
+        value: ${{ jobs.build.result }}
   workflow_dispatch:
     inputs:
       branch_name:
