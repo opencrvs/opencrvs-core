@@ -152,9 +152,9 @@ jobs:
     secrets: inherit
 
   trigger-e2e:
-    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    if: needs.trigger-build.outputs.build_status == 'success'
     runs-on: ubuntu-24.04
-    needs: generate_stack_name_and_branch
+    needs: [generate_stack_name_and_branch, trigger-build]
     environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
