@@ -180,6 +180,26 @@ jobs:
             echo "Branch ${{ env.BRANCH_NAME }} doesn't exist in opencrvs-farajaland repo. Will use commit hash: '$COMMIT_HASH' from 'develop' branch"
           fi
           echo "FARAJALAND_COMMIT_HASH=${COMMIT_HASH}" >> $GITHUB_ENV
+      - name: Check if branch exists in e2e repo
+        env:
+          BASE_BRANCH: ${{ github.base_ref || 'develop' }}
+        run: |
+          E2E_REPO=https://github.com/opencrvs/e2e
+          BRANCH_NAME="${{ env.BRANCH_NAME }}"
+
+          if git ls-remote "$E2E_REPO" "refs/heads/$BRANCH_NAME" | grep -q "$BRANCH_NAME"; then
+            E2E_BRANCH_NAME="$BRANCH_NAME"
+            echo "Branch '$BRANCH_NAME' exists in e2e repo."
+
+          elif git ls-remote "$E2E_REPO" "refs/heads/$BASE_BRANCH" | grep -q "$BASE_BRANCH"; then
+            E2E_BRANCH_NAME="$BASE_BRANCH"
+            echo "Branch '$BRANCH_NAME' not found. Falling back to base branch '$BASE_BRANCH'."
+
+          else
+            E2E_BRANCH_NAME="develop"
+            echo "Neither '$BRANCH_NAME' nor base branch found. Falling back to 'develop'."
+          fi
+          echo "E2E_BRANCH=$E2E_BRANCH_NAME" >> $GITHUB_ENV
       - name: Parse the stack name
         id: generate_stack
         run: |
@@ -191,6 +211,7 @@ jobs:
           PR Branch: ${{ env.BRANCH_NAME }}
           PR Head Commit Hash: ${{ env.HEAD_COMMIT_HASH }}
           Farajaland Commit Hash: ${{ env.FARAJALAND_COMMIT_HASH }}
+          E2E Commit Hash: ${{ env.E2E_COMMIT_HASH }}
           Keep e2e: ${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}
           Stack: ${{ steps.generate_stack.outputs.stack }}
           """
@@ -210,7 +231,8 @@ jobs:
                 'core-image-tag': '${{ env.HEAD_COMMIT_HASH }}',
                 'countryconfig-image-tag': '${{ env.FARAJALAND_COMMIT_HASH }}',
                 stack: '${{  steps.generate_stack.outputs.stack  }}',
-                'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}'
+                'keep-e2e': '${{ needs.generate_stack_name_and_branch.outputs.keep_e2e }}',
+                branch: '${{ env.E2E_BRANCH }}'
               }
             });
 
