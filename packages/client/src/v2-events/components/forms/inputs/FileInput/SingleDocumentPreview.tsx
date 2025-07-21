@@ -28,7 +28,6 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  height: 48px;
   padding: 0px 10px;
 `
 

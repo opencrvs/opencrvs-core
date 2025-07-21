@@ -267,7 +267,7 @@ function DocumentWithOptionOutput({
         const label = config.options.find((x) => x.value === file.option)?.label
         return (
           <SingleDocumentPreview
-            key={file.filename}
+            key={file.originalFilename}
             attachment={file}
             label={label ? intl.formatMessage(label) : file.option}
             onSelect={() => setPreviewImage(file)}
