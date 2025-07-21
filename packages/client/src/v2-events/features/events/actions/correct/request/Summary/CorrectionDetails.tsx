@@ -175,8 +175,8 @@ export function CorrectionDetails({
 
             return {
               fieldLabel: intl.formatMessage(f.label),
-              original: originalOutput,
-              correction: correctionOutput
+              original: originalOutput ?? '-',
+              correction: correctionOutput ?? '-'
             }
           })
 

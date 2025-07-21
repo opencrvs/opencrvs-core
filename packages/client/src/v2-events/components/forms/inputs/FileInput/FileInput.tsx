@@ -106,7 +106,7 @@ function FileOutput({
   const [previewImage, setPreviewImage] = useState<boolean>(false)
 
   if (!value) {
-    return '-'
+    return null
   }
 
   return (

@@ -258,7 +258,7 @@ function DocumentWithOptionOutput({
     useState<FileFieldValueWithOption | null>(null)
 
   if (!value || value.length === 0) {
-    return '-'
+    return null
   }
 
   return (
