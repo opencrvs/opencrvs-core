@@ -24,6 +24,7 @@ describe('authUtils tests', () => {
         getItem: vi.fn(),
         removeItem: vi.fn()
       }
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(window as any).localStorage = storage
     })
     describe('when token is in local storage', () => {

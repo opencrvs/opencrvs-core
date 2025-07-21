@@ -19,7 +19,7 @@ type ProvideFunction = <K extends keyof ProvidedContext>(
 ) => void
 
 async function setupServer() {
-  return new ElasticsearchContainer('elasticsearch:8.14.3')
+  return new ElasticsearchContainer('elasticsearch:8.16.4')
     .withExposedPorts(9200)
     .withStartupTimeout(120_000)
     .withEnvironment({

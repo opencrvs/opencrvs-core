@@ -579,6 +579,12 @@ input RejectRegistrationInput {
   comment: String
 }
 
+input UpdateFieldInput {
+  fieldId: String!
+  valueString: String
+  valueBoolean: Boolean
+}
+
 type Mutation {
   # Generic correction handlers for all event types
   # Applying a correction request is made on a event level as payload is dependant on event type
@@ -662,4 +668,5 @@ type Mutation {
     identifierType: String!
     identifierValue: String!
   ): ID!
+  updateField(id: ID!, details: UpdateFieldInput!): Boolean!
 }

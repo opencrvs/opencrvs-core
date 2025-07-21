@@ -79,6 +79,7 @@ export interface IRadioGroupProps {
   nestedFields?: { [key: string]: JSX.Element[] }
   flexDirection?: string
   onChange: (value: string) => void
+  'data-testid'?: string
 }
 
 export const RadioGroup = ({
@@ -91,7 +92,7 @@ export const RadioGroup = ({
   flexDirection,
   ...props
 }: IRadioGroupProps) => (
-  <Wrapper>
+  <Wrapper data-testid={props['data-testid']}>
     {notice && (
       <NoticeWrapper>
         <InputLabel>{notice}</InputLabel>
@@ -109,6 +110,7 @@ export const RadioGroup = ({
                 disabled={option.disabled}
                 label={option.label}
                 value={option.value}
+                data-testid={`radio-option__${option.value}`}
                 id={
                   option.param
                     ? `${name}_${option.value}_${Object.values(
@@ -140,6 +142,7 @@ export const RadioGroup = ({
                 disabled={option.disabled}
                 label={option.label}
                 value={option.value}
+                data-testid={`radio-option__${option.value}`}
                 id={
                   option.param
                     ? `${name}_${option.value}_${Object.values(

@@ -40,7 +40,6 @@ export const up = async (db: Db, client: MongoClient) => {
       )
       console.log('Number of documents updated:', updateResult.modifiedCount)
 
-      // eslint-disable-next-line no-console
       console.log('Updating indices for collection: users')
       await db
         .collection('users')

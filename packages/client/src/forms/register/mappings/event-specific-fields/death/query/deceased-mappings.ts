@@ -18,6 +18,7 @@ export const deceasedDateToFieldTransformation =
   (alternativeSectionId?: string) =>
   (
     transformedData: IFormData,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     queryData: any,
     sectionId: string,
     field: IFormField
@@ -37,6 +38,7 @@ export const deceasedDateFormatTransformation =
   (locale: string, dateFormat: string, alternativeSectionId?: string) =>
   (
     transformedData: IFormData,
+    /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
     queryData: any,
     sectionId: string,
     field: IFormField

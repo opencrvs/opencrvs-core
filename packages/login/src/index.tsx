@@ -50,8 +50,15 @@ const { store } = createStore()
 
 const container = document.getElementById('root')
 const root = createRoot(container!)
-const router = createBrowserRouter(routesConfig)
-
+const router = createBrowserRouter(routesConfig, {
+  future: {
+    v7_relativeSplatPath: true,
+    v7_fetcherPersist: true,
+    v7_normalizeFormMethod: true,
+    v7_partialHydration: true,
+    v7_skipActionErrorRevalidation: true
+  }
+})
 async function renderAppWithConfig() {
   return authApi.getApplicationConfig().then((res) => {
     store.dispatch(applicationConfigLoadedAction(res))

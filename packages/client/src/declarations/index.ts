@@ -404,6 +404,7 @@ interface IRemoveUnassignedDeclarationAction {
 interface IDownloadDeclarationSuccess {
   type: typeof DOWNLOAD_DECLARATION_SUCCESS
   payload: {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     queryData: any
     form: {
       [key in EventType]: IForm
@@ -757,8 +758,8 @@ export async function updateWorkqueueData(
     declaration.event === 'birth'
       ? ['child']
       : declaration.event === 'death'
-      ? ['deceased']
-      : ['groom', 'bride']
+        ? ['deceased']
+        : ['groom', 'bride']
 
   let transformedName: (GQLHumanName | null)[] | undefined
   let transformedNameForGroom: (GQLHumanName | null)[] | undefined
@@ -785,7 +786,8 @@ export async function updateWorkqueueData(
       declaration.data,
       declaration.id,
       getUserDetails(state),
-      getOfflineData(state)
+      getOfflineData(state),
+      declaration.originalData
     )
 
     const transformedDeclarationForBride = draftToGqlTransformer(
@@ -794,7 +796,8 @@ export async function updateWorkqueueData(
       declaration.data,
       declaration.id,
       getUserDetails(state),
-      getOfflineData(state)
+      getOfflineData(state),
+      declaration.originalData
     )
 
     transformedNameForGroom =
@@ -824,7 +827,8 @@ export async function updateWorkqueueData(
       declaration.data,
       declaration.id,
       getUserDetails(state),
-      getOfflineData(state)
+      getOfflineData(state),
+      declaration.originalData
     )
     transformedName =
       (transformedDeclaration &&
@@ -966,6 +970,34 @@ export async function writeDeclarationByUser(
       'printTab',
       currentUserData.workqueue
     )
+  }
+
+  await storage.setItem('USER_DATA', JSON.stringify(allUserData))
+  return declaration
+}
+
+export async function writeDeclarationByUserWithoutStateUpdate(
+  userId: string,
+  declaration: IDeclaration
+) {
+  const uID = userId || (await getCurrentUserID())
+  const userData = await getUserData(uID)
+  const { allUserData } = userData
+  let { currentUserData } = userData
+
+  if (currentUserData) {
+    currentUserData.declarations = [
+      ...currentUserData.declarations.filter(
+        (savedDeclaration) => savedDeclaration.id !== declaration.id
+      ),
+      declaration
+    ]
+  } else {
+    currentUserData = {
+      userID: uID,
+      declarations: [declaration]
+    }
+    allUserData.push(currentUserData)
   }
 
   await storage.setItem('USER_DATA', JSON.stringify(allUserData))
@@ -1170,6 +1202,7 @@ function downloadDeclarationSuccess({
   store,
   client
 }: {
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   data: any
   store: IStoreState
   client: ApolloClient<{}>
@@ -1490,6 +1523,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const { request, requestArgs } = createRequestForDeclaration(
         declaration,
         client
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ) as any
 
       return loop(
@@ -1608,6 +1642,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         createRequestForDeclaration(
           declarationToDownload,
           clientFromSuccess
+          /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
         ) as any
 
       // Return state, write to indexedDB and download the next ready to download declaration, all in sequence
@@ -1656,6 +1691,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
         (erroredDeclaration.downloadRetryAttempt || 0) + 1
 
       const { request: retryRequest, requestArgs: retryRequestArgs } =
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         createRequestForDeclaration(erroredDeclaration, clientFromFail) as any
 
       const declarationsAfterError = Array.from(state.declarations)
@@ -1728,6 +1764,7 @@ export const declarationsReducer: LoopReducer<IDeclarationsState, Action> = (
       const {
         request: nextDeclarationRequest,
         requestArgs: nextDeclarationRequestArgs
+        /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
       } = createRequestForDeclaration(nextDeclaration, clientFromFail) as any
       return loop(
         {

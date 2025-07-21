@@ -83,7 +83,8 @@ const StyledInput = styled.input<ICustomProps>`
   outline: none;
   border: none;
   ${({ theme }) => theme.fonts.reg19};
-  color: ${({ theme }) => theme.colors.copy};
+  color: ${({ theme, disabled }) =>
+    disabled ? theme.colors.grey500 : theme.colors.copy};
   background: ${({ theme }) => theme.colors.white};
 
   &::-webkit-input-placeholder {

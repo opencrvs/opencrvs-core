@@ -1,0 +1,155 @@
+classDiagram
+    class EventConfig {
+        id: string
+        summary: SummaryConfig
+        label: TranslationConfig
+        actions: ActionConfig[]
+        declaration: DeclarationFormConfig
+        workqueues: WorkqueueConfig[]
+        deduplication?: DeduplicationConfig[]
+        advancedSearch?: AdvancedSearchConfig[]
+    }
+
+    class SummaryConfig {
+        title: Title
+        fields: Field[]
+    }
+
+    class Title {
+        id: string
+        label: TranslationConfig
+        emptyValueMessage?: TranslationConfig
+    }
+
+    class Field {
+        id: string
+        value: TranslationConfig
+        label: TranslationConfig
+        emptyValueMessage?: TranslationConfig
+    }
+
+    class TranslationConfig {
+        id: string
+        defaultMessage: string
+        description: string
+    }
+
+    class ActionConfig {
+        label: TranslationConfig
+        conditionals?: ActionConditional[]
+        draft: boolean
+        <<discriminated union>>
+    }
+
+    class DeclarationFormConfig {
+        label: TranslationConfig
+        pages: FormPageConfig[]
+    }
+
+    class ActionFormConfig {
+        label: TranslationConfig
+        pages: FormPageConfig[]
+    }
+
+    class ActionConditional {
+        type: 'SHOW' | 'ENABLE'
+        conditional: Conditional
+        <<discriminated union>>
+    }
+
+    class FormConfig {
+        <<discriminated union>>
+    }
+
+
+    class PageConfig {
+        id: string
+        title: TranslationConfig
+        type: 'FORM' | 'VERIFICATION'
+        fields: FieldConfig[]
+        <<discriminated union>>
+    }
+
+    class FormPageConfig {
+        type: 'FORM'
+    }
+
+    class VerificationPageConfig {
+        type: 'VERIFICATION'
+        actions: VerificationActionConfig
+
+    }
+
+    class DeclarationReviewConfig {
+        title: TranslationConfig
+        fields: FieldConfig[]
+    }
+
+    class FieldConfig {
+        type:
+            | Address
+            | TextField
+            | NumberField
+            | TextAreaField
+            | DateField
+            | Paragraph
+            | RadioGroup
+            | BulletList
+            | PageHeader
+            | Select
+            | Checkbox
+            | File
+            | Country
+            | AdministrativeArea
+            | Divider
+            | Location
+            | Facility
+            | Office
+            | SignatureField
+            | EmailField
+            | FileUploadWithOptions
+            | DataField
+        <<discriminated union>>
+    }
+
+class DeclarationAction {
+    type: 'DECLARE' | 'VALIDATE' | 'REGISTER'
+    review: DeclarationReviewConfig
+}
+
+class RecordAction {
+    type:
+    | 'PRINT_CERTIFICATE'
+    | 'REQUEST_CORRECTION'
+    | 'REJECT_CORRECTION'
+    | 'APPROVE_CORRECTION'
+    [customForm]?: FormConfig
+}
+
+    EventConfig "1" --> "1" SummaryConfig
+    EventConfig "1" --> "*" ActionConfig
+    EventConfig "1" --> "*" DeclarationFormConfig
+
+
+    SummaryConfig "1" --> "1" Title
+    SummaryConfig "1" --> "*" Field
+
+    ActionConfig "1" --> "*" ActionConditional
+
+    ActionConfig "1" --> "1" DeclarationAction
+    DeclarationAction "1" --> "1" DeclarationReviewConfig
+    ActionConfig "1" --> "1" RecordAction
+    ActionConfig "1" --> "1" SystemAction
+
+
+    FormConfig "1" --> "*" DeclarationFormConfig
+    FormConfig "1" --> "*" ActionFormConfig
+    PageConfig "1" --> "*" FormPageConfig
+    PageConfig "1" --> "*" VerificationPageConfig
+
+    DeclarationFormConfig "1" --> "*" FormPageConfig
+    ActionFormConfig "1" --> "*" PageConfig
+
+
+    PageConfig "1" --> "*" FieldConfig
+

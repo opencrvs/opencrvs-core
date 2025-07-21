@@ -43,8 +43,8 @@ export const composeFhirLocation = (
             location.jurisdictionType === JurisdictionType.LOCATION_LEVEL_1
               ? JurisdictionType.STATE
               : location.jurisdictionType === JurisdictionType.LOCATION_LEVEL_2
-              ? JurisdictionType.DISTRICT
-              : location.jurisdictionType
+                ? JurisdictionType.DISTRICT
+                : location.jurisdictionType
         }
       ],
       name: location.name,
@@ -151,6 +151,7 @@ export function generateStatisticalExtensions(
   const birthRates: Statistics = []
 
   for (const data of sourceStatistic) {
+    // Add statistics without validation
     femalePopulations.push({
       [data.year]: data.female_population
     })

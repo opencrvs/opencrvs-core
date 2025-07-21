@@ -15,6 +15,7 @@ import type { GQLRegWorkflow } from '@client/utils/gateway-deprecated-do-not-use
 
 export function getMarriageRegistrationSectionTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string
 ) {
@@ -59,6 +60,7 @@ export function getMarriageRegistrationSectionTransformer(
 
 export function groomSignatureTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   targetSectionId?: string,
@@ -73,6 +75,7 @@ export function groomSignatureTransformer(
 
 export function brideSignatureTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   targetSectionId?: string,
@@ -87,6 +90,7 @@ export function brideSignatureTransformer(
 
 export function witnessOneSignatureTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   targetSectionId?: string,
@@ -101,6 +105,7 @@ export function witnessOneSignatureTransformer(
 
 export function witnessTwoSignatureTransformer(
   transformedData: IFormData,
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string,
   targetSectionId?: string,

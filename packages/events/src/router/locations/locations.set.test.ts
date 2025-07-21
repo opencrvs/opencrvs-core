@@ -8,11 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { createTestClient, setupTestCase } from '@events/tests/utils'
 import { SCOPES } from '@opencrvs/commons'
+import { createTestClient, setupTestCase } from '@events/tests/utils'
 
-test('prevents unauthorized access from registrar', async () => {
+test('prevents forbidden access if missing required scope', async () => {
   const { user } = await setupTestCase()
+  // User missing required scope
   const registrarClient = createTestClient(user)
 
   await expect(

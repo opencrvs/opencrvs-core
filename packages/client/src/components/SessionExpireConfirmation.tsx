@@ -65,4 +65,5 @@ export const SessionExpireConfirmation = connect<
   IStoreState
 >(mapStateToProps, {
   redirectToAuthentication
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 })(injectIntl(SessionExpireComponent)) as any

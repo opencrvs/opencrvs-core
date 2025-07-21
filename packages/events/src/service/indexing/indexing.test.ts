@@ -9,14 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
-
 import { indexAllEvents } from './indexing'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 
 test('indexes all records from MongoDB with one function call', async () => {
   const { user, generator } = await setupTestCase()

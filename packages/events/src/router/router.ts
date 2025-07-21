@@ -10,7 +10,6 @@
  */
 
 import { router } from '@events/router/trpc'
-
 import { eventRouter } from './event'
 import { userRouter } from './user'
 import { locationRouter } from './locations'
@@ -21,7 +20,5 @@ export const appRouter = router({
   locations: locationRouter
 })
 
-/**
- * @public
- */
+/** @knipignore */
 export type AppRouter = typeof appRouter

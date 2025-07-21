@@ -11,7 +11,6 @@
 import { join } from 'path'
 import * as fetch from 'jest-fetch-mock'
 
-// eslint-disable-next-line import/no-relative-parent-imports
 import { IDatabaseConnector } from '../src/database'
 
 jest.setMock('node-fetch', { default: fetch })

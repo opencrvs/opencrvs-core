@@ -13,7 +13,7 @@ import { createObjectCsvWriter as createCSV } from 'csv-writer'
 import * as DateFNS from 'date-fns'
 import { CsvWriter } from 'csv-writer/src/lib/csv-writer'
 import * as fs from 'fs'
-// eslint-disable-next-line import/no-relative-parent-imports
+
 import { BIRTH_REPORT_PATH, DEATH_REPORT_PATH } from '../constants'
 import {
   isHealthFacility,
@@ -446,9 +446,8 @@ async function setObservationDetailsInComposition(
         birthPluralityOfPregnancy.valueQuantity?.value?.toString() ?? ''
     }
     if (bodyWeightMeasured) {
-      observationObj[
-        'bodyWeightMeasured'
-      ] = `${bodyWeightMeasured.valueQuantity?.value} ${bodyWeightMeasured.valueQuantity?.unit}`
+      observationObj['bodyWeightMeasured'] =
+        `${bodyWeightMeasured.valueQuantity?.value} ${bodyWeightMeasured.valueQuantity?.unit}`
     }
     if (birthAttendantTitle) {
       observationObj['birthAttendantTitle'] =

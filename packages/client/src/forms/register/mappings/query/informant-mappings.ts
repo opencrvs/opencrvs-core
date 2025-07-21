@@ -13,6 +13,7 @@ import { IFormData } from '@client/forms'
 
 export function getInformantSectionTransformer(
   transformedData: IFormData,
+  /*  eslint-disable-next-line @typescript-eslint/no-explicit-any */
   queryData: any,
   sectionId: string
 ) {

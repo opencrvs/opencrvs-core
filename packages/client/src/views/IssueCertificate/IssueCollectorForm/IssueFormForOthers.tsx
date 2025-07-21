@@ -45,8 +45,8 @@ function collectorFormFieldsForOthers(event: EventType) {
     event === EventType.Birth
       ? collectBirthCertificateFormSection
       : event === EventType.Death
-      ? collectDeathCertificateFormSection
-      : collectMarriageCertificateFormSection
+        ? collectDeathCertificateFormSection
+        : collectMarriageCertificateFormSection
 
   return collectCertFormSection.groups.find(
     (group) => group.id === 'otherCertCollector'

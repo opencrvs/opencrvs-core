@@ -20,7 +20,6 @@ interface PrintRecordHeaderProps {
   heading: string
   subject: string
   info?: { label: string; value: string }
-  subjectColor: keyof typeof colors
 }
 
 const Container = styled.div`
@@ -53,7 +52,7 @@ const Box = styled.div`
 `
 
 export function PrintRecordHeader(props: PrintRecordHeaderProps) {
-  const { logoSrc, title, heading, subject, info, subjectColor } = props
+  const { logoSrc, title, heading, subject, info } = props
 
   return (
     <Container>
@@ -65,7 +64,7 @@ export function PrintRecordHeader(props: PrintRecordHeaderProps) {
         <Text variant="bold18" element="span">
           {heading}
         </Text>
-        <SubheaderText variant="bold12" element="span" color={subjectColor}>
+        <SubheaderText variant="bold12" element="span" color="grey600">
           {subject}
         </SubheaderText>
       </TextContainer>

@@ -16,8 +16,13 @@ export enum ICON_ALIGNMENT {
   LEFT,
   RIGHT
 }
-
-const ButtonBase = styled.button<{ size: IButtonSize }>`
+const ButtonBase = styled.button.withConfig({
+  shouldForwardProp: (prop, defaultValidatorFn) =>
+    ['popovertarget'].includes(prop) || defaultValidatorFn(prop)
+  // Forward popovertarget prop directly
+})<{ size: IButtonSize; dropdownName?: string }>`
+  anchor-name: ${({ dropdownName }) =>
+    `--Dropdown-Anchor-${dropdownName || ''}`};
   width: auto;
   height: ${({ size }) => dimensionsMap[size]};
   border: 0;
@@ -43,6 +48,8 @@ export interface IButtonProps
   icon?: () => React.ReactNode
   size?: IButtonSize
   align?: ICON_ALIGNMENT
+  popovertarget?: string
+  dropdownName?: string
 }
 
 export function Button({

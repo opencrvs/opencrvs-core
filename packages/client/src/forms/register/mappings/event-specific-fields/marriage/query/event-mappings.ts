@@ -18,6 +18,7 @@ export const marriageDateToFieldTransformation =
   (alternativeSectionIds?: string[]) =>
   (
     transformedData: IFormData,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     queryData: any,
     sectionId: string,
     field: IFormField
@@ -48,6 +49,7 @@ export const marriageDateFormatTransformation =
   (locale: string, dateFormat: string, alternativeSectionIds?: string[]) =>
   (
     transformedData: IFormData,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     queryData: any,
     sectionId: string,
     field: IFormField

@@ -22,23 +22,38 @@ const Flex = styled.div`
   }
 `
 
-interface IIconWith {
+interface IconProps {
   status?: string
   name: React.ReactNode
-  event?: string
-  isDuplicate?: boolean
   isValidatedOnReview?: boolean
   isArchived?: boolean
 }
+
+interface IconWithNameEventProps extends IconProps {
+  event: string
+}
+
+const Event = styled.div`
+  color: ${({ theme }) => theme.colors.grey500};
+  ${({ theme }) => theme.fonts.reg16}
+`
+
+const NameEventContainer = styled.div`
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
 
 const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
   DRAFT: 'purple',
+  CREATED: 'purple',
   IN_PROGRESS: 'purple',
+  NOTIFIED: 'purple',
   DECLARED: 'orange',
   REJECTED: 'red',
-  VALIDATED: 'grey',
+  VALIDATED: 'orange',
   REGISTERED: 'green',
   CERTIFIED: 'teal',
   CORRECTION_REQUESTED: 'blue',
@@ -82,7 +97,7 @@ export function IconWithName({
   name,
   isValidatedOnReview,
   isArchived
-}: IIconWith) {
+}: IconProps) {
   return (
     <Flex id="flex">
       {status && (
@@ -93,6 +108,30 @@ export function IconWithName({
         />
       )}
       {name}
+    </Flex>
+  )
+}
+
+export function IconWithNameEvent({
+  status,
+  name,
+  event,
+  isValidatedOnReview,
+  isArchived
+}: IconWithNameEventProps) {
+  return (
+    <Flex id="flex">
+      {status && (
+        <IconComp
+          isArchived={isArchived}
+          isValidatedOnReview={isValidatedOnReview}
+          status={status}
+        />
+      )}
+      <NameEventContainer id="nameEvent">
+        {name}
+        {event && <Event>{event}</Event>}
+      </NameEventContainer>
     </Flex>
   )
 }

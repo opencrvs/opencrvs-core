@@ -8,15 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { EventConfig } from '@opencrvs/commons/client'
-import { api } from '@client/v2-events/trpc'
+import { useTRPC } from '@client/v2-events/trpc'
 
 /**
  * Fetches configured events and finds a matching event
  * @returns a list of event configurations
  */
 export function useEventConfigurations() {
-  const [config] = api.event.config.get.useSuspenseQuery()
+  const trpc = useTRPC()
+  const config = useSuspenseQuery(trpc.event.config.get.queryOptions()).data
   return config
 }
 
@@ -28,7 +30,7 @@ export function useEventConfigurations() {
 export function useEventConfiguration(eventIdentifier: string): {
   eventConfiguration: EventConfig
 } {
-  const [config] = api.event.config.get.useSuspenseQuery()
+  const config = useEventConfigurations()
   const eventConfiguration = config.find(
     (event) => event.id === eventIdentifier
   )
