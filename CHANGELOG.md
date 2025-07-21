@@ -21,6 +21,12 @@
   - Secret `E2E_WORKFLOWS_TOKEN` is fine-grained token scoped to your fork of country config template repository with permissions `Contents: Read and Write`.
 - Created a standalone `data-seeder` Docker image to decouple seeding logic from the core repository. This improves GitHub Actions runtime by avoiding full repository clone and dependency installation during environment seeding. [#8976](https://github.com/opencrvs/opencrvs-core/issues/8976)
 
+## [1.7.4](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.7.4)
+
+### Bug fixes
+
+- Fixed historical roles displaying incorrectly in task history after migration to v1.7 [#9989](https://github.com/opencrvs/opencrvs-core/issues/9989)
+
 ## [1.7.3](https://github.com/opencrvs/opencrvs-core/compare/v1.7.2...v1.7.3)
 
 ### New features
@@ -30,7 +36,6 @@
 - Allow booleanTransformer to be used as a certificate handlebar template transformer [#9631](https://github.com/opencrvs/opencrvs-core/issues/9631)
 - Fix international to local number conversion from failing if the number was already local [#9634](https://github.com/opencrvs/opencrvs-core/issues/9634)
 - Pre-select default certificate option in print certificate collector form [#9935](https://github.com/opencrvs/opencrvs-core/issues/9935)
-
 
 ## [1.7.2](https://github.com/opencrvs/opencrvs-core/compare/v1.7.1...v1.7.2)
 
