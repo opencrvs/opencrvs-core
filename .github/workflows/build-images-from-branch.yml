@@ -143,7 +143,7 @@ jobs:
               --amend ghcr.io/opencrvs/ocrvs-base:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
           done
-      - run: exit 1
+
   build:
     needs: [base,merge-manifest]
     strategy:
@@ -230,6 +230,7 @@ jobs:
               --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
           done
+      - run: exit 1
 
   security-scans-pr:
     needs: [build, base]
