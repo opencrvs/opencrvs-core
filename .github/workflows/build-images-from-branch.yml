@@ -252,7 +252,7 @@ jobs:
           format: 'sarif'
           output: './trivy-results-base.sarif'
           exit-code: '0'
-
+      - run: exit 1
       - name: Gather Trivy output from newly build image
         uses: aquasecurity/trivy-action@0.28.0
         with:
@@ -285,7 +285,7 @@ jobs:
             trivy.yaml
             .trivyignore.yaml
           sparse-checkout-cone-mode: false
-
+      - run: exit 1
       - name: Run Trivy vulnerability scanner
         uses: aquasecurity/trivy-action@0.28.0
         with:
