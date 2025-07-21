@@ -297,8 +297,7 @@ export function eventPayloadGenerator(rng: () => number) {
                 firstname: 'Max',
                 surname: 'McLaren'
               },
-              'applicant.dob': '2020-01-02',
-              'recommender.none': true
+              'applicant.dob': '2020-01-02'
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
