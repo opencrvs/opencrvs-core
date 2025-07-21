@@ -15,7 +15,9 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  getMixedPath
+  getMixedPath,
+  ActionType,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -51,7 +53,7 @@ const messages = {
     value: {
       id: 'v2.event.summary.status.value',
       defaultMessage:
-        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
+        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} REQUEST_CORRECTION {Correction requested} other {Unknown}}',
       description: 'Status of the event'
     }
   },
@@ -98,12 +100,16 @@ const messages = {
   }
 }
 
+function checkIfCorrectionRequested(flags: string[]) {
+  return flags.includes(InherentFlags.CORRECTION_REQUESTED)
+}
+
 export function EventSummary({
   event,
   eventConfiguration,
   hideSecuredFields = false
 }: {
-  event: Record<string, FieldValue | null>
+  event: Record<string, FieldValue | null | string[]>
   eventConfiguration: EventConfig
   hideSecuredFields?: boolean
 }) {
@@ -153,6 +159,14 @@ export function EventSummary({
       value: intl.formatMessage(field.value, event)
     }
   })
+
+  const isCorrectionRequested = checkIfCorrectionRequested(
+    // type assertion is needed since flags is not available in the FieldValue type
+    event.flags as string[]
+  )
+  event['event.status'] = isCorrectionRequested
+    ? ActionType.REQUEST_CORRECTION
+    : event.status
 
   return (
     <>
