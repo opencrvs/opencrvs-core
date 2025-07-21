@@ -24,6 +24,8 @@ import { queryClient, trpcOptionsProxy } from '@client/v2-events/trpc'
 import { removeCachedFiles } from '../../files/cache'
 import { MutationType } from './procedures/utils'
 
+// foo
+
 export function addUserToQueryData(user: User) {
   return queryClient.setQueryData(
     trpcOptionsProxy.user.get.queryKey(user.id),
