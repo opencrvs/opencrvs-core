@@ -100,8 +100,8 @@ const messages = {
   }
 }
 
-function checkIfCorrectionRequested(flags: string[]) {
-  return flags.includes(InherentFlags.CORRECTION_REQUESTED)
+function checkIfCorrectionRequested(flags?: string[]) {
+  return flags && flags.includes(InherentFlags.CORRECTION_REQUESTED)
 }
 
 export function EventSummary({
@@ -160,13 +160,17 @@ export function EventSummary({
     }
   })
 
-  const isCorrectionRequested = checkIfCorrectionRequested(
-    // type assertion is needed since flags is not available in the FieldValue type
-    event.flags as string[]
-  )
-  event['event.status'] = isCorrectionRequested
-    ? ActionType.REQUEST_CORRECTION
-    : event.status
+  const flagsArray = Array.isArray(event.flags)
+    ? (event.flags as string[]) // type assertion is needed since flags is not available in the FieldValue type
+    : []
+
+  const isCorrectionRequested = checkIfCorrectionRequested(flagsArray)
+  const eventWithUpdatedStatus = {
+    ...event,
+    'event.status': isCorrectionRequested
+      ? ActionType.REQUEST_CORRECTION
+      : event.status
+  }
 
   return (
     <>
@@ -184,7 +188,10 @@ export function EventSummary({
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
-          value={intl.formatMessage(messages.status.value, event)}
+          value={intl.formatMessage(
+            messages.status.value,
+            eventWithUpdatedStatus
+          )}
         />
         <Summary.Row
           key="event"

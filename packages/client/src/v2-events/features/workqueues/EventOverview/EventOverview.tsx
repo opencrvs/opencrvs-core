@@ -73,7 +73,7 @@ function EventOverviewFull({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { flags, legalStatuses, ...flattenedEventIndex } = {
+  const { legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status is taken from the eventIndex
@@ -86,7 +86,13 @@ function EventOverviewFull({
 
   return (
     <Content
-      icon={() => <IconWithName flags={flags} name={''} status={status} />}
+      icon={() => (
+        <IconWithName
+          flags={flattenedEventIndex.flags}
+          name={''}
+          status={status}
+        />
+      )}
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
