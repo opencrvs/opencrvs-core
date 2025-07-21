@@ -61,7 +61,7 @@ test(`${ActionType.APPROVE_CORRECTION} prevents forbidden access if missing requ
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.correction.approve(
+    client.event.actions.correction.approve.request(
       generator.event.actions.correction.approve(
         'registered-event-test-id-12345',
         'request-test-id-12345'
@@ -75,7 +75,7 @@ test(`${ActionType.APPROVE_CORRECTION} allows access if required scope is presen
   const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
 
   await expect(
-    client.event.actions.correction.approve(
+    client.event.actions.correction.approve.request(
       generator.event.actions.correction.approve(
         'registered-event-test-id-12345',
         'request-test-id-12345'
@@ -89,7 +89,7 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
   const client = createTestClient(user, [])
 
   await expect(
-    client.event.actions.correction.reject(
+    client.event.actions.correction.reject.request(
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345'
@@ -103,7 +103,7 @@ test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present
   const client = createTestClient(user, [SCOPES.RECORD_REGISTRATION_CORRECT])
 
   await expect(
-    client.event.actions.correction.reject(
+    client.event.actions.correction.reject.request(
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
         'request-test-id-12345'
@@ -326,7 +326,7 @@ describe('when a correction request exists', () => {
       withCorrectionRequest.actions[withCorrectionRequest.actions.length - 1].id
 
     const withApprovedCorrectionRequest =
-      await client.event.actions.correction.approve(
+      await client.event.actions.correction.approve.request(
         generator.event.actions.correction.approve(
           withCorrectionRequest.id,
           requestId
@@ -347,7 +347,7 @@ describe('when a correction request exists', () => {
 
     const incorrectRequestId = getUUID()
 
-    const request = client.event.actions.correction.approve(
+    const request = client.event.actions.correction.approve.request(
       generator.event.actions.correction.approve(
         withCorrectionRequest.id,
         incorrectRequestId
@@ -385,10 +385,10 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
     { keepAssignment: true }
   )
 
-  const firstResponse = await client.event.actions.correction.approve(
+  const firstResponse = await client.event.actions.correction.approve.request(
     approveCorrectionPayload
   )
-  const secondResponse = await client.event.actions.correction.approve(
+  const secondResponse = await client.event.actions.correction.approve.request(
     approveCorrectionPayload
   )
 
@@ -424,10 +424,10 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
     { keepAssignment: true }
   )
 
-  const firstResponse = await client.event.actions.correction.reject(
+  const firstResponse = await client.event.actions.correction.reject.request(
     rejectCorrectionPayload
   )
-  const secondResponse = await client.event.actions.correction.reject(
+  const secondResponse = await client.event.actions.correction.reject.request(
     rejectCorrectionPayload
   )
 

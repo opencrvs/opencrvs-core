@@ -155,7 +155,7 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
-  await client.event.actions.correction.reject(
+  await client.event.actions.correction.reject.request(
     generator.event.actions.correction.reject(
       event.id,
       correctionRequest.actions[correctionRequest.actions.length - 1].id
@@ -167,7 +167,7 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
-  await client.event.actions.correction.approve(
+  await client.event.actions.correction.approve.request(
     generator.event.actions.correction.approve(
       correctionRequest.id,
       correctionRequest.actions[correctionRequest.actions.length - 1].id

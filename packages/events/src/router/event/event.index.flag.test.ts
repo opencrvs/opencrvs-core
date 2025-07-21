@@ -197,7 +197,9 @@ test(`Removes ${InherentFlags.PRINTED} flag after ${ActionType.APPROVE_CORRECTIO
     actionId
   )
 
-  await client.event.actions.correction.approve(approveCorrectionPayload)
+  await client.event.actions.correction.approve.request(
+    approveCorrectionPayload
+  )
 
   const index2 = await client.event.list()
   expect(index2[0].flags).not.toContain(InherentFlags.PRINTED)
@@ -253,7 +255,9 @@ test(`Removes ${InherentFlags.CORRECTION_REQUESTED} flag after ${ActionType.APPR
     actionId
   )
 
-  await client.event.actions.correction.approve(approveCorrectionPayload)
+  await client.event.actions.correction.approve.request(
+    approveCorrectionPayload
+  )
 
   const index2 = await client.event.list()
   expect(index2[0].flags).not.toContain(InherentFlags.CORRECTION_REQUESTED)
