@@ -273,6 +273,21 @@ export function useAction(event: EventIndex) {
           )
         },
         disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
+      },
+      [ActionType.REVIEW_CORRECTION_REQUEST]: {
+        label: {
+          defaultMessage: 'Review correction request',
+          description:
+            'This is shown as the action name anywhere the user can trigger the action from',
+          id: 'v2.event.summary.review-correction-request.label'
+        },
+        onClick: () => {
+          navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+          )
+        },
+        disabled: !eventIsAssignedToSelf,
+        shouldHide: () => !eventIsWaitingForCorrection
       }
     } satisfies Record<WorkqueueActionType, ActionConfig>,
     authentication
