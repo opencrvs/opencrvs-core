@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: c46187a7-7859-467b-b91c-01b1a4530934
+                transactionId: 6c14139d-d9cd-4eeb-8c0b-2a62c753bc70
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: f00f66a8-de55-405e-9432-0ce4c2c84969
+                transactionId: dbb20ad0-c5e3-4138-b6fa-b951fea5c1a2
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -10746,7 +10746,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|review_correction_request|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - printed
@@ -10758,7 +10758,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|review_correction_request|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - printed
@@ -10985,7 +10985,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|review_correction_request|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - printed

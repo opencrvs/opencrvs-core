@@ -48,6 +48,7 @@ paths:
               - REQUEST_CORRECTION
               - REJECT_CORRECTION
               - APPROVE_CORRECTION
+              - REVIEW_CORRECTION_REQUEST
               - READ
               - ASSIGN
               - UNASSIGN
@@ -11613,7 +11614,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 7d0631a2-1b26-4978-a7e3-368710424fb3
+        transactionId: 1423016f-9c97-4ec8-b2f2-06ab03a2fe45
         declaration: {}
         annotation: {}
         type: NOTIFY
