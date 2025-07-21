@@ -110,15 +110,42 @@ const ACTION_PROCEDURE_CONFIG = {
   [ActionType.REQUEST_CORRECTION]: {
     ...defaultConfig,
     inputSchema: RequestCorrectionActionInput,
-    allowIfWaitingForCorrection: false
+    allowIfWaitingForCorrection: false,
+    meta: {
+      openapi: {
+        summary: 'Request correction for an event',
+        method: 'POST',
+        path: '/events/correction/request',
+        tags: ['events'],
+        protect: true
+      }
+    }
   },
   [ActionType.APPROVE_CORRECTION]: {
     ...defaultConfig,
-    inputSchema: ApproveCorrectionActionInput
+    inputSchema: ApproveCorrectionActionInput,
+    meta: {
+      openapi: {
+        summary: 'Approve correction for an event',
+        method: 'POST',
+        path: '/events/correction/approve',
+        tags: ['events'],
+        protect: true
+      }
+    }
   },
   [ActionType.REJECT_CORRECTION]: {
     ...defaultConfig,
-    inputSchema: RejectCorrectionActionInput
+    inputSchema: RejectCorrectionActionInput,
+    meta: {
+      openapi: {
+        summary: 'Reject correction for an event',
+        method: 'POST',
+        path: '/events/correction/reject',
+        tags: ['events'],
+        protect: true
+      }
+    }
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
