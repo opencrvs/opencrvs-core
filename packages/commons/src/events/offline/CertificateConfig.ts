@@ -10,7 +10,7 @@
  */
 
 import { z } from 'zod'
-import { FieldConditional } from '../Conditional'
+import { ShowConditional } from '../Conditional'
 import { TranslationConfig } from '../TranslationConfig'
 
 const FontFamily = z.object({
@@ -34,7 +34,7 @@ export const CertificateConfig = z.object({
   }),
   svgUrl: z.string(),
   fonts: z.record(FontFamily).optional(),
-  conditionals: z.array(FieldConditional).optional()
+  conditionals: z.array(ShowConditional).optional()
 })
 
 export type CertificateConfig = z.infer<typeof CertificateConfig>

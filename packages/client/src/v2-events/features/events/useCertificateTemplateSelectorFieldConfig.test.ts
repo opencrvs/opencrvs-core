@@ -12,21 +12,18 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
   CertificateTemplateConfig,
-  EventState,
-  JSONSchema,
+  event,
   SelectField
 } from '@opencrvs/commons/client'
 
 import {
-  testDeclarationFormData,
-  testEventDocument,
-  testEventDocumentWithMultiplePrints,
+  tennisClubMembershipCertificateWithMultiplePrintConditionals,
   tennisClubMembershipCertificateWithoutConditionals,
-  tennisClubMembershipCertificateWithFormConditionals,
-  tennisClubMembershipCertificateWithMetaConditionals,
-  tennisClubMembershipCertificateWithFailingFormConditionals,
   tennisClubMembershipCertificateWithPrintCountConditionals,
-  tennisClubMembershipCertificateWithMultiplePrintConditionals
+  tennisClubMembershipDuplicateCertificate,
+  tennisClubMembershipReplacementCertificate,
+  testDeclarationFormData,
+  testEventDocument
 } from './testData'
 
 // Mock templates array
@@ -47,27 +44,6 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
   })
 
   describe('Basic functionality', () => {
-    it('should return certificate as option when no conditionals are present', async () => {
-      mockTemplates = [tennisClubMembershipCertificateWithoutConditionals]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData,
-        testEventDocument
-      ) as SelectField
-
-      expect(result.options).toHaveLength(1)
-      expect(result.options[0].value).toBe('tennis-club-membership-certificate')
-      expect(result.defaultValue).toBe('tennis-club-membership-certificate')
-      expect(result.type).toBe('SELECT')
-      expect(result.id).toBe('certificateTemplateId')
-      expect(result.required).toBe(true)
-    })
-
     it('should return empty options when no certificates match the event type', async () => {
       mockTemplates = [tennisClubMembershipCertificateWithoutConditionals]
 
@@ -115,211 +91,13 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
     })
   })
 
-  describe('Form-based conditionals', () => {
-    it('should show certificate when form conditional is met', async () => {
-      mockTemplates = [
-        tennisClubMembershipCertificateWithoutConditionals,
-        tennisClubMembershipCertificateWithFormConditionals
-      ]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData,
-        testEventDocument
-      ) as SelectField
-
-      // Should include both certificates since child.gender is male in test data
-      expect(result.options).toHaveLength(2)
-
-      const certificateIds = result.options.map((opt) => opt.value)
-      expect(certificateIds).toContain('tennis-club-membership-certificate')
-      expect(certificateIds).toContain(
-        'tennis-club-membership-certificate-form-conditionals'
-      )
-    })
-
-    it('should hide certificate when form conditional fails', async () => {
-      mockTemplates = [
-        tennisClubMembershipCertificateWithoutConditionals,
-        tennisClubMembershipCertificateWithFailingFormConditionals
-      ]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData,
-        testEventDocument
-      ) as SelectField
-
-      // Should only have the basic certificate (child.gender is male, not female)
-      expect(result.options).toHaveLength(1)
-      expect(result.options[0].value).toBe('tennis-club-membership-certificate')
-    })
-
-    it('should show certificate when date conditional is satisfied', async () => {
-      // Create dynamic dates relative to today
-      const today = new Date()
-      const twoYearsAgo = new Date(
-        today.getFullYear() - 2,
-        today.getMonth(),
-        today.getDate()
-      )
-      const oneYearAgo = new Date(
-        today.getFullYear() - 1,
-        today.getMonth(),
-        today.getDate()
-      )
-
-      // Format dates as YYYY-MM-DD strings
-      const twoYearsAgoStr = twoYearsAgo.toISOString().split('T')[0]
-      const oneYearAgoStr = oneYearAgo.toISOString().split('T')[0]
-
-      const oneYearAgoDeclaration: EventState = {
-        'child.dob': twoYearsAgoStr
-      }
-
-      const dateConditionalTemplate: CertificateTemplateConfig = {
-        id: 'tennis-club-membership-certificate-date',
-        event: 'tennis-club-membership',
-        label: {
-          id: 'certificates.tennis-club-membership.certificate.date',
-          defaultMessage: 'Date Conditional Certificate',
-          description: 'Certificate with date conditional'
-        },
-        isDefault: false,
-        svgUrl: '/certificates/test.svg',
-        svg: '<svg>Test</svg>',
-        fee: { onTime: 10, late: 15, delayed: 20 },
-        conditionals: [
-          {
-            type: 'SHOW',
-            conditional: {
-              type: 'object',
-              properties: {
-                'child.dob': {
-                  type: 'string',
-                  format: 'date',
-                  formatMaximum: oneYearAgoStr
-                }
-              },
-              required: ['child.dob']
-            } as unknown as JSONSchema
-          }
-        ]
-      }
-
-      mockTemplates = [dateConditionalTemplate]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        oneYearAgoDeclaration,
-        testEventDocument
-      ) as SelectField
-
-      expect(result.options).toHaveLength(1)
-      expect(result.options[0].value).toBe(
-        'tennis-club-membership-certificate-date'
-      )
-    })
-  })
-
-  describe('Event metadata-based conditionals', () => {
-    it('should show certificate when event metadata conditional is met', async () => {
-      mockTemplates = [
-        tennisClubMembershipCertificateWithoutConditionals,
-        tennisClubMembershipCertificateWithMetaConditionals
-      ]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData,
-        testEventDocument
-      ) as SelectField
-
-      // Should include both certificates since status is REGISTERED in test event data
-      expect(result.options).toHaveLength(2)
-
-      const certificateIds = result.options.map((opt) => opt.value)
-      expect(certificateIds).toContain('tennis-club-membership-certificate')
-      expect(certificateIds).toContain(
-        'tennis-club-membership-certificate-meta-conditionals'
-      )
-    })
-
-    it('should handle missing event document gracefully for meta conditionals', async () => {
-      mockTemplates = [
-        tennisClubMembershipCertificateWithoutConditionals,
-        tennisClubMembershipCertificateWithMetaConditionals
-      ]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData
-        // No event document provided
-      ) as SelectField
-
-      // Should only include the basic certificate since meta conditionals require event document
-      expect(result.options).toHaveLength(1)
-      expect(result.options[0].value).toBe('tennis-club-membership-certificate')
-    })
-
-    it('should show certificate when print action exists', async () => {
-      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
-        await import('@opencrvs/commons/client')
-
+  describe('Print action conditionals', () => {
+    it('should show only basic template when template requires print actions but none exist', async () => {
       mockTemplates = [
         tennisClubMembershipCertificateWithoutConditionals,
         tennisClubMembershipCertificateWithPrintCountConditionals
       ]
 
-      const eventWithPrintAction = testEventDocumentWithMultiplePrints
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData,
-        eventWithPrintAction
-      ) as SelectField
-
-      // Should include both certificates since there is a PRINT_CERTIFICATE action
-      expect(result.options).toHaveLength(2)
-
-      const certificateIds = result.options.map((opt) => opt.value)
-      expect(certificateIds).toContain('tennis-club-membership-certificate')
-      expect(certificateIds).toContain(
-        'tennis-club-membership-certificate-print-count'
-      )
-    })
-
-    it('should hide certificate when no print actions exist', async () => {
-      mockTemplates = [
-        tennisClubMembershipCertificateWithoutConditionals,
-        tennisClubMembershipCertificateWithPrintCountConditionals
-      ]
-
-      // Use the original test event document (no PRINT_CERTIFICATE actions)
       const { useCertificateTemplateSelectorFieldConfig } = await import(
         './useCertificateTemplateSelectorFieldConfig'
       )
@@ -330,37 +108,11 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         testEventDocument
       ) as SelectField
 
-      // Should only include the basic certificate since there are no PRINT_CERTIFICATE actions
       expect(result.options).toHaveLength(1)
       expect(result.options[0].value).toBe('tennis-club-membership-certificate')
     })
 
-    it('should show certificate only when at least 2 print actions exist (using minContains)', async () => {
-      mockTemplates = [
-        tennisClubMembershipCertificateWithoutConditionals,
-        tennisClubMembershipCertificateWithMultiplePrintConditionals
-      ]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      // Test with event that has 2 print actions (should show the template)
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData,
-        testEventDocumentWithMultiplePrints
-      ) as SelectField
-
-      expect(result.options).toHaveLength(2)
-      const certificateIds = result.options.map((opt) => opt.value)
-      expect(certificateIds).toContain('tennis-club-membership-certificate')
-      expect(certificateIds).toContain(
-        'tennis-club-membership-certificate-multiple-print'
-      )
-    })
-
-    it('should hide certificate when only 1 print action exists (using minContains)', async () => {
+    it('should show only basic template when template requires multiple print actions but only one exists', async () => {
       const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
         await import('@opencrvs/commons/client')
 
@@ -369,7 +121,6 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         tennisClubMembershipCertificateWithMultiplePrintConditionals
       ]
 
-      // Create event document with only 1 print action
       const printAction = generateActionDocument({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE
@@ -390,9 +141,266 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         eventDocumentWithOnePrint
       ) as SelectField
 
-      // Should only show the basic certificate, not the multiple-print one
       expect(result.options).toHaveLength(1)
       expect(result.options[0].value).toBe('tennis-club-membership-certificate')
+    })
+  })
+
+  describe('Template visibility and conditional logic', () => {
+    it('shows all templates when none have conditional visibility rules', async () => {
+      mockTemplates = [
+        tennisClubMembershipCertificateWithoutConditionals,
+        tennisClubMembershipReplacementCertificate
+      ]
+
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
+
+      const result = useCertificateTemplateSelectorFieldConfig(
+        'tennis-club-membership',
+        testDeclarationFormData,
+        testEventDocument
+      ) as SelectField
+
+      expect(result.options).toHaveLength(2)
+      const certificateIds = result.options.map((opt) => opt.value)
+      expect(certificateIds).toContain('tennis-club-membership-certificate')
+      expect(certificateIds).toContain(
+        'tennis-club-membership-replacement-certificate'
+      )
+      expect(result.defaultValue).toBe('tennis-club-membership-certificate')
+      expect(result.type).toBe('SELECT')
+      expect(result.id).toBe('certificateTemplateId')
+      expect(result.required).toBe(true)
+    })
+
+    it('hides conditional template when print count exceeds maximum allowed', async () => {
+      const conditionalTemplate = {
+        ...tennisClubMembershipReplacementCertificate,
+        conditionals: [
+          {
+            type: 'SHOW',
+            conditional: event
+              .printActions('tennis-club-membership-certificate')
+              .maxCount(1)
+          }
+        ]
+      } as CertificateTemplateConfig
+
+      mockTemplates = [
+        tennisClubMembershipCertificateWithoutConditionals,
+        conditionalTemplate
+      ]
+
+      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+        await import('@opencrvs/commons/client')
+
+      // Create two print actions to exceed maxCount(1)
+      const printAction1 = generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.PRINT_CERTIFICATE,
+        defaults: { templateId: 'tennis-club-membership-certificate' }
+      })
+      const printAction2 = generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.PRINT_CERTIFICATE,
+        defaults: { templateId: 'tennis-club-membership-certificate' }
+      })
+
+      const eventWithExcessivePrints = {
+        ...testEventDocument,
+        actions: [...testEventDocument.actions, printAction1, printAction2]
+      }
+
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
+
+      const result = useCertificateTemplateSelectorFieldConfig(
+        'tennis-club-membership',
+        testDeclarationFormData,
+        eventWithExcessivePrints
+      ) as SelectField
+
+      // Should only show basic template since conditional template exceeds maxCount
+      expect(result.options).toHaveLength(1)
+      expect(result.options[0].value).toBe('tennis-club-membership-certificate')
+    })
+
+    it('shows conditional template when required print action exists', async () => {
+      const conditionalTemplate = {
+        ...tennisClubMembershipReplacementCertificate,
+        conditionals: [
+          {
+            type: 'SHOW',
+            conditional: event
+              .printActions('tennis-club-membership-certificate')
+              .minCount(1)
+          }
+        ]
+      } as CertificateTemplateConfig
+
+      mockTemplates = [
+        tennisClubMembershipCertificateWithoutConditionals,
+        conditionalTemplate
+      ]
+
+      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+        await import('@opencrvs/commons/client')
+      const printBasicAction = generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.PRINT_CERTIFICATE,
+        defaults: { templateId: 'tennis-club-membership-certificate' }
+      })
+      const eventWithBasicPrint = {
+        ...testEventDocument,
+        actions: [...testEventDocument.actions, printBasicAction]
+      }
+
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
+
+      const result = useCertificateTemplateSelectorFieldConfig(
+        'tennis-club-membership',
+        testDeclarationFormData,
+        eventWithBasicPrint
+      ) as SelectField
+
+      expect(result.options).toHaveLength(2)
+      const certificateIds = result.options.map((opt) => opt.value)
+      expect(certificateIds).toContain('tennis-club-membership-certificate')
+      expect(certificateIds).toContain(
+        'tennis-club-membership-replacement-certificate'
+      )
+    })
+
+    it('shows multiple print conditional template when minimum print count is reached', async () => {
+      mockTemplates = [
+        tennisClubMembershipCertificateWithoutConditionals,
+        tennisClubMembershipCertificateWithMultiplePrintConditionals
+      ]
+
+      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+        await import('@opencrvs/commons/client')
+
+      const printAction1 = generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.PRINT_CERTIFICATE
+      })
+
+      const printAction2 = generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.PRINT_CERTIFICATE
+      })
+
+      const eventWithTwoPrintActions = {
+        ...testEventDocument,
+        actions: [...testEventDocument.actions, printAction1, printAction2]
+      }
+
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
+
+      const result = useCertificateTemplateSelectorFieldConfig(
+        'tennis-club-membership',
+        testDeclarationFormData,
+        eventWithTwoPrintActions
+      ) as SelectField
+
+      expect(result.options).toHaveLength(2)
+      const certificateIds = result.options.map((opt) => opt.value)
+      expect(certificateIds).toContain('tennis-club-membership-certificate')
+      expect(certificateIds).toContain(
+        'tennis-club-membership-certificate-multiple-print'
+      )
+    })
+
+    it('handles missing event document by showing only unconditional templates', async () => {
+      const conditionalTemplate: CertificateTemplateConfig = {
+        ...tennisClubMembershipReplacementCertificate,
+        conditionals: [
+          {
+            type: 'SHOW',
+            conditional: event
+              .printActions('tennis-club-membership-certificate')
+              .minCount(1)
+          }
+        ]
+      }
+
+      mockTemplates = [
+        tennisClubMembershipCertificateWithoutConditionals,
+        conditionalTemplate
+      ]
+
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
+
+      // Call without event document
+      const result = useCertificateTemplateSelectorFieldConfig(
+        'tennis-club-membership',
+        testDeclarationFormData
+      ) as SelectField
+
+      // Should only show basic template without conditionals
+      expect(result.options).toHaveLength(1)
+      expect(result.options[0].value).toBe('tennis-club-membership-certificate')
+    })
+
+    it('shows template with specific template ID print action conditional', async () => {
+      const templateWithSpecificPrintConditional = {
+        ...tennisClubMembershipDuplicateCertificate,
+        conditionals: [
+          {
+            type: 'SHOW' as const,
+            conditional: event
+              .printActions('tennis-club-membership-certificate')
+              .minCount(1)
+          }
+        ]
+      }
+
+      mockTemplates = [
+        tennisClubMembershipCertificateWithoutConditionals,
+        templateWithSpecificPrintConditional
+      ]
+
+      const { ActionType, generateActionDocument, tennisClubMembershipEvent } =
+        await import('@opencrvs/commons/client')
+
+      const printAction = generateActionDocument({
+        configuration: tennisClubMembershipEvent,
+        action: ActionType.PRINT_CERTIFICATE,
+        defaults: {
+          templateId: 'tennis-club-membership-certificate'
+        }
+      })
+
+      const eventWithSpecificPrint = {
+        ...testEventDocument,
+        actions: [...testEventDocument.actions, printAction]
+      }
+
+      const { useCertificateTemplateSelectorFieldConfig } = await import(
+        './useCertificateTemplateSelectorFieldConfig'
+      )
+
+      const result = useCertificateTemplateSelectorFieldConfig(
+        'tennis-club-membership',
+        testDeclarationFormData,
+        eventWithSpecificPrint
+      ) as SelectField
+
+      expect(result.options).toHaveLength(2)
+      const certificateIds = result.options.map((opt) => opt.value)
+      expect(certificateIds).toContain('tennis-club-membership-certificate')
+      expect(certificateIds).toContain(
+        'tennis-club-membership-duplicate-certificate'
+      )
     })
   })
 })

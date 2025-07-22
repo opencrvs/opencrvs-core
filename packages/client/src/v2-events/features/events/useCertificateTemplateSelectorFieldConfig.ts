@@ -9,8 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import formatISO from 'date-fns/formatISO'
 import {
-  areConditionsMet,
   areCertificateConditionsMet,
   EventDocument,
   EventState,
@@ -29,10 +29,14 @@ export const useCertificateTemplateSelectorFieldConfig = (
 
   const declarationWithEventMetadata = event
     ? {
-        ...declaration,
-        event: event
+        $form: declaration,
+        $event: event,
+        $now: formatISO(new Date(), { representation: 'date' })
       }
-    : declaration
+    : {
+        $form: declaration,
+        $now: formatISO(new Date(), { representation: 'date' })
+      }
 
   return {
     id: CERT_TEMPLATE_ID,
