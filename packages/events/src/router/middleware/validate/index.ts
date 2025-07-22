@@ -36,11 +36,14 @@ import {
   isFieldVisible,
   errorMessages,
   runFieldValidations,
-  ActionInputWithType
+  ActionInputWithType,
+  ApproveCorrectionActionInput,
+  RejectCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
 import { TrpcContext } from '@events/context'
+import { RequestNotFoundError } from '@events/service/events/actions/correction'
 import {
   getInvalidUpdateKeys,
   getVerificationPageErrors,
@@ -271,6 +274,19 @@ function validateNotifyAction({
   return [...annotationErrors, ...declarationErrors]
 }
 
+function checkRequestActionExists(
+  storedEvent: EventDocument,
+  input: ApproveCorrectionActionInput | RejectCorrectionActionInput
+) {
+  const requestAction = storedEvent.actions.find(
+    (a) => a.id === input.requestId
+  )
+
+  if (!requestAction) {
+    throw new RequestNotFoundError(input.requestId)
+  }
+}
+
 /*
  * For request correction, we need to validate that the payload does not contain fields that are configured as not correctable,
  * i.e. configured with the 'uncorrectable' flag set to true.
@@ -303,74 +319,77 @@ function validateCorrectableFields({
   return errors
 }
 
-export function validateAction(actionType: ActionType) {
-  const fn: MiddlewareFunction<
-    TrpcContext,
-    OpenApiMeta,
-    TrpcContext,
-    TrpcContext,
-    ActionInputWithType
-  > = async ({ input, ctx, next }) => {
-    const event = await getEventById(input.eventId)
-    const eventConfig = await getEventConfigurationById({
-      token: ctx.token,
-      eventType: event.type
+export const validateAction: MiddlewareFunction<
+  TrpcContext,
+  OpenApiMeta,
+  TrpcContext,
+  TrpcContext & { isDuplicateAction?: boolean; event: EventDocument },
+  ActionInputWithType
+> = async ({ input, next, ctx }) => {
+  const actionType = input.type
+  const event = await getEventById(input.eventId)
+  const eventConfig = await getEventConfigurationById({
+    token: ctx.token,
+    eventType: event.type
+  })
+
+  const declaration = getCurrentEventState(event, eventConfig).declaration
+
+  if (actionType === ActionType.NOTIFY) {
+    const errors = validateNotifyAction({
+      eventConfig,
+      annotation: input.annotation,
+      declaration: input.declaration
     })
 
-    const declaration = getCurrentEventState(event, eventConfig).declaration
-
-    if (actionType === ActionType.NOTIFY) {
-      const errors = validateNotifyAction({
-        eventConfig,
-        annotation: input.annotation,
-        declaration: input.declaration
-      })
-
-      throwWhenNotEmpty(errors)
-      return next()
-    }
-
-    if (actionType === ActionType.REQUEST_CORRECTION) {
-      const errors = validateCorrectableFields({
-        eventConfig,
-        declarationUpdate: input.declaration
-      })
-
-      throwWhenNotEmpty(errors)
-    }
-
-    const declarationUpdateAction =
-      DeclarationUpdateActions.safeParse(actionType)
-
-    if (declarationUpdateAction.success) {
-      const errors = validateDeclarationUpdateAction({
-        eventConfig,
-        event,
-        declarationUpdate: input.declaration,
-        annotation: input.annotation,
-        actionType: declarationUpdateAction.data
-      })
-
-      throwWhenNotEmpty(errors)
-      return next()
-    }
-
-    const annotationActionParse = annotationActions.safeParse(actionType)
-
-    if (annotationActionParse.success) {
-      const errors = validateActionAnnotation({
-        eventConfig,
-        annotation: input.annotation,
-        actionType: annotationActionParse.data,
-        declaration
-      })
-
-      throwWhenNotEmpty(errors)
-      return next()
-    }
-
-    throw new Error('Trying to validate unsupported action type')
+    throwWhenNotEmpty(errors)
+    return next()
   }
 
-  return fn
+  if (actionType === ActionType.REQUEST_CORRECTION) {
+    const errors = validateCorrectableFields({
+      eventConfig,
+      declarationUpdate: input.declaration
+    })
+
+    throwWhenNotEmpty(errors)
+  }
+
+  if (
+    actionType === ActionType.APPROVE_CORRECTION ||
+    actionType === ActionType.REJECT_CORRECTION
+  ) {
+    checkRequestActionExists(event, input)
+  }
+
+  const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
+
+  if (declarationUpdateAction.success) {
+    const errors = validateDeclarationUpdateAction({
+      eventConfig,
+      event,
+      declarationUpdate: input.declaration,
+      annotation: input.annotation,
+      actionType: declarationUpdateAction.data
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
+  }
+
+  const annotationActionParse = annotationActions.safeParse(actionType)
+
+  if (annotationActionParse.success) {
+    const errors = validateActionAnnotation({
+      eventConfig,
+      annotation: input.annotation,
+      actionType: annotationActionParse.data,
+      declaration
+    })
+
+    throwWhenNotEmpty(errors)
+    return next()
+  }
+
+  throw new Error('Trying to validate unsupported action type')
 }

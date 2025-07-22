@@ -177,7 +177,7 @@ export const eventRouter = router({
     assignment: router({
       assign: publicProcedure
         .input(AssignActionInput)
-        .use(middleware.validateAction(ActionType.ASSIGN))
+        .use(middleware.validateAction)
         .mutation(async (options) => {
           return assignRecord({
             input: options.input,
@@ -187,7 +187,7 @@ export const eventRouter = router({
         }),
       unassign: publicProcedure
         .input(UnassignActionInput)
-        .use(middleware.validateAction(ActionType.UNASSIGN))
+        .use(middleware.validateAction)
         .mutation(async (options) => {
           return unassignRecord(options.input, {
             eventId: options.input.eventId,

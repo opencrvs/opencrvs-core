@@ -206,7 +206,7 @@ export function getDefaultActionProcedures(
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction(actionType))
+      .use(middleware.validateAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
         const { token, user, isDuplicateAction } = ctx
@@ -280,7 +280,7 @@ export function getDefaultActionProcedures(
     accept: systemProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(middleware.validateAction(actionType))
+      .use(middleware.validateAction)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
