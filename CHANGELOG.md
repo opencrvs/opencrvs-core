@@ -1,11 +1,11 @@
 # Changelog
 
-
 ## 1.9.0 Release candidate
 
 ### New features
 
 - **Redis password support with authorization and authentication** [#9338](https://github.com/opencrvs/opencrvs-core/pull/9338). By default password is disabled for local development environment and enabled on server environments.
+- Expose number of copies printed for a certificate template so it can be printed on the certificate. [#7586](https://github.com/opencrvs/opencrvs-core/issues/7586)
 
 ### Improvements
 
