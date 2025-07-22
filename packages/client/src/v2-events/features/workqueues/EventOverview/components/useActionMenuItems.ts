@@ -287,7 +287,9 @@ export function useAction(event: EventIndex) {
         },
         onClick: () => {
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+              eventId
+            })
           )
         },
         disabled: !eventIsAssignedToSelf,

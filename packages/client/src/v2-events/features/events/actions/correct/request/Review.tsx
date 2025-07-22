@@ -30,6 +30,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { hasFieldChanged } from '../utils'
+import { ReviewCorrection } from './ReviewCorrection'
 
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -79,6 +80,7 @@ export function Review() {
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
+      <ReviewCorrection />
       <ReviewComponent.Body
         form={form}
         formConfig={formConfig}
