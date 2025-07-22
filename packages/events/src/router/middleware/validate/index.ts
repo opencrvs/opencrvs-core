@@ -274,15 +274,15 @@ function validateNotifyAction({
   return [...annotationErrors, ...declarationErrors]
 }
 
-function checkRequestActionExists(
+function throwIfRequestActionNotFound(
   storedEvent: EventDocument,
   input: ApproveCorrectionActionInput | RejectCorrectionActionInput
 ) {
-  const requestAction = storedEvent.actions.find(
-    (a) => a.id === input.requestId
+  const correctionRequestAction = storedEvent.actions.find(
+    (a) => a.id === input.requestId && a.type === ActionType.REQUEST_CORRECTION
   )
 
-  if (!requestAction) {
+  if (!correctionRequestAction) {
     throw new RequestNotFoundError(input.requestId)
   }
 }
@@ -359,7 +359,7 @@ export const validateAction: MiddlewareFunction<
     actionType === ActionType.APPROVE_CORRECTION ||
     actionType === ActionType.REJECT_CORRECTION
   ) {
-    checkRequestActionExists(event, input)
+    throwIfRequestActionNotFound(event, input)
   }
 
   const declarationUpdateAction = DeclarationUpdateActions.safeParse(actionType)
