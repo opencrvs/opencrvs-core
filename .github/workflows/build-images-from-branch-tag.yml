@@ -15,6 +15,10 @@ on:
         description: Branch or Tag to build from
         required: true
         type: string
+      publish_release:
+        type: boolean
+        required: false
+        default: false
     outputs:
       build_status:
         description: build job output
