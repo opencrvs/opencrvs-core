@@ -326,7 +326,10 @@ export function applyDraftsToEventIndex(
   }
 
   return applyDeclarationToEventIndex(
-    eventIndex,
+    {
+      ...eventIndex,
+      updatedAt: activeDrafts[activeDrafts.length - 1].createdAt
+    },
     activeDrafts[activeDrafts.length - 1].declaration,
     eventConfiguration
   )
