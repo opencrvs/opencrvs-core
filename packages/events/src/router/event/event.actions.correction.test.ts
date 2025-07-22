@@ -193,7 +193,11 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
 
   const form = {
     'applicant.dob': '2024-02-01',
@@ -438,7 +442,11 @@ test('a correction request is not allowed if the event is already waiting for co
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const event = await client.event.create(generator.event.create())
+  const event = await createEvent(client, generator, [
+    ActionType.DECLARE,
+    ActionType.VALIDATE,
+    ActionType.REGISTER
+  ])
 
   await client.event.actions.correction.request.request(
     generator.event.actions.correction.request(event.id)
