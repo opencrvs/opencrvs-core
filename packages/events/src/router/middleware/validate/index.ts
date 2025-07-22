@@ -256,7 +256,7 @@ function validateNotifyAction({
       }
 
       const fieldErrors = runFieldValidations({
-        field,
+        field: { ...field, required: false },
         values: declaration
       })
 
