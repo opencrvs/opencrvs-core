@@ -246,6 +246,12 @@ function DocumentUploaderWithOption({
   )
 }
 
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
 function DocumentWithOptionOutput({
   value,
   config
@@ -262,7 +268,7 @@ function DocumentWithOptionOutput({
   }
 
   return (
-    <>
+    <Wrapper>
       {value.map((file) => {
         const label = config.options.find((x) => x.value === file.option)?.label
         return (
@@ -274,7 +280,6 @@ function DocumentWithOptionOutput({
           />
         )
       })}
-
       {previewImage && (
         <DocumentPreview
           disableDelete={true}
@@ -286,7 +291,7 @@ function DocumentWithOptionOutput({
           onDelete={() => setPreviewImage(null)}
         />
       )}
-    </>
+    </Wrapper>
   )
 }
 

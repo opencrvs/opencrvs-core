@@ -18,9 +18,6 @@ import { ISelectOption } from '@opencrvs/components/lib/Select'
 
 const Wrapper = styled.div`
   max-width: 100%;
-  & > *:last-child {
-    margin-bottom: 8px;
-  }
 `
 const Container = styled.div`
   width: 100%;
@@ -28,7 +25,6 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  padding: 0px 10px;
 `
 
 const Label = styled.div`
@@ -59,7 +55,8 @@ export function SingleDocumentPreview({
   label,
   onSelect,
   dropdownOptions,
-  onDelete
+  onDelete,
+  ...props
 }: Props) {
   function getFormattedLabelForDocType(docType: string) {
     const matchingOptionForDocType =
@@ -68,7 +65,7 @@ export function SingleDocumentPreview({
     return matchingOptionForDocType && matchingOptionForDocType.label
   }
   return (
-    <Wrapper id={`preview-list-${id}`}>
+    <Wrapper id={`preview-list-${id}`} {...props}>
       {attachment && label && (
         <Container>
           <Label>
