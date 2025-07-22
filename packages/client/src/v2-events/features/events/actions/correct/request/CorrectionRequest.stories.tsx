@@ -89,6 +89,102 @@ export const ReviewWithChanges: Story = {
   }
 }
 
+export const Review: Story = {
+  parameters: {
+    offline: {
+      drafts: [draft]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Outlet />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeDisabled()
+    })
+
+    await step('Change applicant values', async () => {
+      await userEvent.click(
+        canvas.getByTestId('change-button-applicant.address')
+      )
+
+      await userEvent.click(canvas.getByTestId('location__country'))
+      await userEvent.type(canvas.getByTestId('location__country'), 'Far')
+      await userEvent.click(canvas.getByText('Farajaland', { exact: true }))
+
+      await userEvent.type(canvas.getByTestId('text__state'), 'My State')
+      await userEvent.type(canvas.getByTestId('text__district2'), 'My District')
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+    })
+
+    await step('Go back to review', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+      await waitFor(async () => {
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeDisabled()
+      })
+    })
+
+    await step("Check applicant's profile picture", async () => {
+      const container = canvas.getByTestId('row-value-applicant.image')
+      const buttons = within(container).getAllByRole('button', {
+        name: "Applicant's profile picture"
+      })
+      await expect(buttons).toHaveLength(2)
+      await userEvent.click(buttons[0])
+      const closeButton = (await canvas.findAllByRole('button')).find(
+        (btn) => btn.id === 'preview_close'
+      )
+      if (!closeButton) {
+        throw new Error("Close button with id 'preview_close' not found")
+      }
+      await userEvent.click(closeButton)
+    })
+
+    await step('Change recommender values', async () => {
+      await userEvent.click(canvas.getByTestId('change-button-recommender.id'))
+      await userEvent.type(
+        canvas.getByTestId('text__recommender____id'),
+        '1234567890'
+      )
+    })
+
+    await step('Go back to review', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+      await waitFor(async () => {
+        await expect(
+          canvas.getByRole('button', { name: 'Continue' })
+        ).toBeEnabled()
+      })
+    })
+  }
+}
+
 export const Summary: Story = {
   parameters: {
     offline: {
@@ -113,5 +209,28 @@ export const Summary: Story = {
         ]
       }
     }
+  },
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+    await step('Check the summary table', async () => {
+      const button = (await canvas.findAllByRole('button')).find(
+        (x) => x.innerText === "Applicant's profile picture"
+      )
+      await expect(button).toBeInTheDocument()
+
+      if (!button) {
+        throw new Error(
+          "Button with text 'Applicant's profile picture' not found"
+        )
+      }
+      await userEvent.click(button)
+      const closeButton = (await canvas.findAllByRole('button')).find(
+        (btn) => btn.id === 'preview_close'
+      )
+      if (!closeButton) {
+        throw new Error("Close button with id 'preview_close' not found")
+      }
+      await userEvent.click(closeButton)
+    })
   }
 }

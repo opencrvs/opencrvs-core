@@ -298,7 +298,11 @@ export function eventPayloadGenerator(rng: () => number) {
                 surname: 'McLaren'
               },
               'applicant.dob': '2020-01-02',
-              'recommender.none': true
+              'applicant.image': {
+                path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+                originalFilename: 'Screenshot.png',
+                type: 'image/png'
+              }
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
