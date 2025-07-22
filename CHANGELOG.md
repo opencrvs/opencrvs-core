@@ -29,6 +29,14 @@
 
 - **Kubernetes support for local development** Introduced Tiltfile for OpenCRVS deployment on local Kubernetes cluster. Check https://github.com/opencrvs/infrastructure for more information.
 - Build OpenCRVS release images for arm devices [#9455](https://github.com/opencrvs/opencrvs-core/issues/9455)
+- **New form components** 
+  - `ID_READER` - Parse the contents of a QR code and pre-populate some fields in the form
+  - `HTTP` - Allows making HTTP requests to external APIs. Used in conjunction with `BUTTON` component to trigger the request & the response can be used to pre-populate fields in the form
+  - `BUTTON` - Used to trigger actions in the form, such as a `HTTP` component
+  - `LINK_BUTTON` - Redirect to a URL when clicked
+  - `ID_VERIFICATION_BANNER` - A banner component that can be used to display information about the ID verification process
+
+  More on how these components can be used can be found here: [In-form authentication/verification](https://documentation.opencrvs.org/technology/interoperability/national-id-client/in-form-authentication-verification)
 
 ### Bug fixes
 - When the building the graphql payload from form data, we now check if a field was changed. If so then include it in the payload even if it might have been changed to an empty value.[#9369](https://github.com/opencrvs/opencrvs-core/issues/9369)
