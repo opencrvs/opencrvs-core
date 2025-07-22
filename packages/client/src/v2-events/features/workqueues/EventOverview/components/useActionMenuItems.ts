@@ -243,7 +243,8 @@ export function useAction(event: EventIndex) {
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
+        shouldHide: () => eventIsWaitingForCorrection
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
@@ -282,7 +283,10 @@ export function useAction(event: EventIndex) {
             })
           )
         },
-        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
+        shouldHide: () =>
+          eventIsWaitingForCorrection &&
+          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
       }
     } satisfies Record<WorkqueueActionType, ActionConfig>,
     authentication

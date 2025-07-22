@@ -43,7 +43,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
       // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
       [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
@@ -63,7 +63,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
       // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
       [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
@@ -85,7 +85,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
       // @TODO when correction approval/rejection is implemented, this should show 'Approve Correction' action
       [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
