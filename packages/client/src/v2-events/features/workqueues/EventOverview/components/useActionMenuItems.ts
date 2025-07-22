@@ -258,6 +258,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
+        icon: 'NotePencil',
         onClick: () => {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
