@@ -14,18 +14,15 @@ import { Pages } from './Pages'
 import { Review } from './Review'
 import { Onboarding } from './Onboarding/Onboarding'
 import { Summary } from './Summary/Summary'
-import { AdditionalDetails } from './AdditionalDetails/AdditionalDetails'
 
 const PagesIndex = withSuspense(Pages)
 const OnboardingIndex = withSuspense(Onboarding)
 const SummaryIndex = withSuspense(Summary)
 const ReviewIndex = withSuspense(Review)
-const AdditionalDetailsIndex = withSuspense(AdditionalDetails)
 
 export {
   PagesIndex as Pages,
   ReviewIndex as Review,
   OnboardingIndex as Onboarding,
-  SummaryIndex as Summary,
-  AdditionalDetailsIndex as AdditionalDetails
+  SummaryIndex as Summary
 }

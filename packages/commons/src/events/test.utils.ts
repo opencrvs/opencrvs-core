@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString } from 'lodash'
+import { merge, omitBy, isString, omit } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -298,7 +298,11 @@ export function eventPayloadGenerator(rng: () => number) {
                 surname: 'McLaren'
               },
               'applicant.dob': '2020-01-02',
-              'recommender.none': true
+              'applicant.image': {
+                path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+                originalFilename: 'Screenshot.png',
+                type: 'image/png'
+              }
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
@@ -545,10 +549,13 @@ export function eventPayloadGenerator(rng: () => number) {
           transactionId: input.transactionId ?? getUUID(),
           declaration:
             input.declaration ??
-            generateActionDeclarationInput(
-              tennisClubMembershipEvent,
-              ActionType.REQUEST_CORRECTION,
-              rng
+            omit(
+              generateActionDeclarationInput(
+                tennisClubMembershipEvent,
+                ActionType.REQUEST_CORRECTION,
+                rng
+              ),
+              ['applicant.email']
             ),
           annotation:
             input.annotation ??

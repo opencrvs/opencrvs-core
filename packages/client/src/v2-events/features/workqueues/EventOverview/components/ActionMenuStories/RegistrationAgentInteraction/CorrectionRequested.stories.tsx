@@ -23,10 +23,10 @@ import {
 
 export default {
   ...baseMeta,
-  title: 'ActionMenu/LocalRegistrar/Registered'
+  title: 'ActionMenu/RegistrationAgent/CorrectionRequested'
 } as Meta<typeof ActionMenu>
 
-const registeredScenariosForLocalRegistrar: Scenario[] = [
+const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
   {
     name: 'Unassigned',
     recordDownloaded: false,
@@ -36,14 +36,15 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.DECLARE,
       ActionType.VALIDATE,
       ActionType.REGISTER,
-      ActionType.UNASSIGN
+      ActionType.UNASSIGN,
+      ActionType.REQUEST_CORRECTION
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.ENABLED,
+      [ActionType.ASSIGN]: AssertType.HIDDEN,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
     }
   },
   {
@@ -54,14 +55,15 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       AssignmentStatus.ASSIGNED_TO_SELF,
       ActionType.DECLARE,
       ActionType.VALIDATE,
-      ActionType.REGISTER
+      ActionType.REGISTER,
+      ActionType.REQUEST_CORRECTION
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
+      [ActionType.UNASSIGN]: AssertType.HIDDEN,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.ENABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.ENABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
     }
   },
   {
@@ -74,21 +76,21 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.UNASSIGN,
-      AssignmentStatus.ASSIGNED_TO_OTHERS
+      AssignmentStatus.ASSIGNED_TO_OTHERS,
+      ActionType.REQUEST_CORRECTION
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
     }
   }
 ]
 
 const stories = createStoriesFromScenarios(
-  registeredScenariosForLocalRegistrar,
-  UserRoles.LOCAL_REGISTRAR
+  correctionRequestedScenariosForRegistrationAgent,
+  UserRoles.REGISTRATION_AGENT
 )
 
 export const Unassigned = stories['Unassigned']

@@ -20,7 +20,6 @@ const Wrapper = styled.div`
   max-width: 100%;
   & > *:last-child {
     margin-bottom: 8px;
-    border-bottom: 1.5px solid ${({ theme }) => theme.colors.grey100};
   }
 `
 const Container = styled.div`
@@ -29,8 +28,6 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   gap: 4px;
-  border-top: 1.5px solid ${({ theme }) => theme.colors.grey100};
-  height: 48px;
   padding: 0px 10px;
 `
 
@@ -80,15 +77,17 @@ export function SingleDocumentPreview({
               <span>{getFormattedLabelForDocType(label) || label}</span>
             </Link>
           </Label>
-          <Button
-            aria-label="Delete attachment"
-            id="preview_delete"
-            size="small"
-            type="icon"
-            onClick={() => onDelete && onDelete(attachment)}
-          >
-            <Icon color="red" name="Trash" size="small" />
-          </Button>
+          {onDelete && (
+            <Button
+              aria-label="Delete attachment"
+              id="preview_delete"
+              size="small"
+              type="icon"
+              onClick={() => onDelete(attachment)}
+            >
+              <Icon color="red" name="Trash" size="small" />
+            </Button>
+          )}
         </Container>
       )}
     </Wrapper>

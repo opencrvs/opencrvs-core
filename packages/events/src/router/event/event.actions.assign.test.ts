@@ -36,7 +36,7 @@ test(`Should add an ${ActionType.ASSIGN} action when last action is not ${Action
   expect(sanitizeForSnapshot(response, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
 })
 
-test(`Should not add any new actions when assigned to the same user`, async () => {
+test('Should not add any new actions when assigned to the same user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -66,7 +66,7 @@ test(`Should not add any new actions when assigned to the same user`, async () =
   ])
 })
 
-test(`Should throw error when assigned to a different user`, async () => {
+test('Should throw error when assigned to a different user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 

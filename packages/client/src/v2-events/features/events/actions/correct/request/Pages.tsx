@@ -15,7 +15,11 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { getDeclarationPages } from '@opencrvs/commons/client'
+import {
+  getDeclarationPages,
+  isNonInteractiveFieldType,
+  PageConfig
+} from '@opencrvs/commons/client'
 import { getCurrentEventState } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events//features/events/useEvents/useEvents'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
@@ -24,6 +28,16 @@ import { useEventFormData } from '@client/v2-events/features/events/useEventForm
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+
+// Filter out pages where all fields either have 'uncorrectable' set to true or are non-interactive
+function getCorrectablePages(formPages: PageConfig[]) {
+  return formPages.filter(
+    (page) =>
+      !page.fields.every(
+        (field) => field.uncorrectable || isNonInteractiveFieldType(field)
+      )
+  )
+}
 
 export function Pages() {
   const { eventId, pageId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER.PAGES)
@@ -42,9 +56,10 @@ export function Pages() {
   const eventIndex = getCurrentEventState(event, configuration)
 
   const formPages = getDeclarationPages(configuration)
+  const correctablePages = getCorrectablePages(formPages)
 
   const currentPageId =
-    formPages.find((p) => p.id === pageId)?.id || formPages[0]?.id
+    correctablePages.find((p) => p.id === pageId)?.id || correctablePages[0]?.id
 
   if (!currentPageId) {
     throw new Error('Form does not have any pages')
@@ -53,14 +68,17 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath({
-          eventId,
-          pageId: currentPageId
-        }),
+        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+          {
+            eventId,
+            pageId: currentPageId
+          },
+          searchParams
+        ),
         { replace: true }
       )
     }
-  }, [pageId, currentPageId, navigate, eventId])
+  }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
@@ -69,7 +87,8 @@ export function Pages() {
         declaration={eventIndex.declaration}
         eventConfig={configuration}
         form={form}
-        formPages={formPages}
+        formPages={correctablePages}
+        isCorrection={true}
         pageId={currentPageId}
         setFormData={(data) => setFormValues(data)}
         showReviewButton={searchParams.from === 'review'}
@@ -80,7 +99,7 @@ export function Pages() {
                 eventId,
                 pageId: nextPageId
               },
-              { workqueue: searchParams.workqueue }
+              searchParams
             )
           )
         }
