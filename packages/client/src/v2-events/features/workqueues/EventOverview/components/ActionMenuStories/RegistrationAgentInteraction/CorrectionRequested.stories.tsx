@@ -41,10 +41,10 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.ASSIGN]: AssertType.DISABLED,
+      [ActionType.ASSIGN]: AssertType.HIDDEN,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
     }
   },
   {
@@ -60,10 +60,10 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     ],
     expected: {
       ...getHiddenActions(),
-      [ActionType.UNASSIGN]: AssertType.ENABLED,
+      [ActionType.UNASSIGN]: AssertType.HIDDEN,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
     }
   },
   {
@@ -82,8 +82,8 @@ const correctionRequestedScenariosForRegistrationAgent: Scenario[] = [
     expected: {
       ...getHiddenActions(),
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
-      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
+      [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN
     }
   }
 ]
