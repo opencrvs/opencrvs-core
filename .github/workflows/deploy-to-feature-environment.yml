@@ -108,6 +108,7 @@ jobs:
           else
             e2e_branch="develop"
           fi
+          echo "e2e branch name=${e2e_branch}"
           echo "branch=$e2e_branch" >> $GITHUB_OUTPUT
       - name: Get PR Author
         id: get_author
