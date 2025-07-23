@@ -12,13 +12,14 @@ import React from 'react'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { Button, Content, Divider, Icon } from '@opencrvs/components'
-import { ROUTES } from '@client/v2-events/routes'
+import { EventState } from '@opencrvs/commons/client'
+import { Button, Icon } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages/buttons'
-import { useEvents } from '../../../useEvents/useEvents'
-import { useEventFormData } from '../../../useEventFormData'
+import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '../../../useActionAnnotation'
+import { useEvents } from '../../../useEvents/useEvents'
 import { CorrectionDetails } from './Summary/CorrectionDetails'
+import { ReviewHeader } from './ReviewHeader'
 
 const Card = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -37,6 +38,25 @@ const ReviewContainter = styled.div<{ paddingT?: boolean }>`
   }
 `
 
+const Row = styled.div<{
+  position?: 'left' | 'center'
+  background?: 'white' | 'background'
+}>`
+  display: flex;
+  gap: 24px;
+  width: 100%;
+  justify-content: ${({ position }) => position || 'center'};
+  background-color: ${({ theme, background }) =>
+    !background || background === 'background'
+      ? theme.colors.background
+      : theme.colors.white};
+  flex-direction: row;
+  padding: 24px;
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    padding: 0;
+  }
+`
+
 const messages = defineMessages({
   correctionRequest: {
     id: 'v2-events.correction.correctionRequest',
@@ -45,63 +65,43 @@ const messages = defineMessages({
   }
 })
 
-export function ReviewCorrection() {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
-  const events = useEvents()
+export function ReviewCorrection({ form }: { form: EventState }) {
   const intl = useIntl()
-  const event = events.getEvent.getFromCache(eventId)
-  const getFormValues = useEventFormData((state) => state.getFormValues)
-
-  const form = getFormValues()
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const events = useEvents()
+  const event = events.getEvent.getFromCache(eventId)
 
   return (
-    <>
-      <Content
-        bottomActionButtons={[
-          <>
-            <Button
-              id="ApproveCorrectionBtn"
-              size="large"
-              type="positive"
-              onClick={() => alert('approve correction')}
-            >
-              <Icon name="Check" />
-              {intl.formatMessage(buttonMessages.approve)}
-            </Button>
-            <Button
-              id="rejectCorrectionBtn"
-              size="large"
-              type="negative"
-              onClick={() => alert('reject correction')}
-            >
-              <Icon name="X" />
-              {intl.formatMessage(buttonMessages.reject)}
-            </Button>
-          </>
-        ]}
-        showTitleOnMobile={true}
-        title={intl.formatMessage(messages.correctionRequest)}
-      >
-        <ReviewContainter>
-          <Card>
-            <CorrectionDetails
-              annotation={annotation}
-              event={{
-                type: event.type,
-                id: event.id,
-                actions: event.actions,
-                trackingId: event.trackingId,
-                updatedAt: event.updatedAt,
-                createdAt: event.createdAt
-              }}
-              form={form}
-            />
-          </Card>
-          <Divider />
-        </ReviewContainter>
-      </Content>
-    </>
+    <Card>
+      <ReviewContainter paddingT={true}>
+        <ReviewHeader
+          id="correction_header"
+          subject={messages.correctionRequest}
+        />
+        <CorrectionDetails annotation={annotation} event={event} form={form} />
+        <Row background="white" position="left">
+          <Button
+            id="ApproveCorrectionBtn"
+            size="large"
+            type="positive"
+            onClick={() => alert('Approve correction clicked')}
+          >
+            <Icon name="Check" />
+            {intl.formatMessage(buttonMessages.approve)}
+          </Button>
+          <Button
+            id="rejectCorrectionBtn"
+            size="large"
+            type="negative"
+            onClick={() => alert('Reject correction clicked')}
+          >
+            <Icon name="X" />
+            {intl.formatMessage(buttonMessages.reject)}
+          </Button>
+        </Row>
+      </ReviewContainter>
+    </Card>
   )
 }
