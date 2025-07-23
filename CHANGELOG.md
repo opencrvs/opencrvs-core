@@ -5,6 +5,7 @@
 ### Bug fixes
 
 - Fixed historical roles displaying incorrectly in task history after migration to v1.7 [#9989](https://github.com/opencrvs/opencrvs-core/issues/9989)
+- Remove special characters from role ids on generation [#10049](https://github.com/opencrvs/opencrvs-core/issues/10049)
 
 ## [1.7.3](https://github.com/opencrvs/opencrvs-core/compare/v1.7.2...v1.7.3)
 
