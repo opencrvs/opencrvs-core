@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f8d992d0-9866-42e4-a896-8aa06a7fc8cc
+                transactionId: 39470255-8e35-4dd8-92d5-92f065fe09b5
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: b889a8f6-e86c-49c2-b47f-b57cfcbd1638
+                transactionId: 0c8e2f69-5b09-4c99-ba2a-637bff65f5c5
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -10471,8 +10471,6 @@ components:
             - $ref: "#/components/schemas/Within"
             - $ref: "#/components/schemas/Exact"
         legalStatuses.REGISTERED.registrationNumber:
-          $ref: "#/components/schemas/Exact"
-        legalStatuses.VALIDATED.createdBy:
           $ref: "#/components/schemas/Exact"
         createdAtLocation:
           anyOf:
