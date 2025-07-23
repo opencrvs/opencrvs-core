@@ -169,8 +169,6 @@ export const UpdateCondtionalValues: StoryObj<typeof FormFieldGenerator> = {
   }
 }
 
-const styles = ['defensive', 'allrounder', 'hard-hitter'] as const
-
 const tennisStyleFields = [
   {
     id: 'tennis.style',

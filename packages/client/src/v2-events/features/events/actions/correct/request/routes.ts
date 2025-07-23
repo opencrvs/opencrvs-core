@@ -41,20 +41,6 @@ export const routes = route(
         workqueue: string()
       }
     }),
-    ADDITIONAL_DETAILS_INDEX: route('details', {
-      params: { pageId: string() },
-      searchParams: {
-        workqueue: string()
-      },
-      hash: hashValues()
-    }),
-    ADDITIONAL_DETAILS: route('details/:pageId', {
-      params: { pageId: string() },
-      searchParams: {
-        workqueue: string()
-      },
-      hash: hashValues()
-    }),
     SUMMARY: route('summary', {
       searchParams: {
         workqueue: string()
