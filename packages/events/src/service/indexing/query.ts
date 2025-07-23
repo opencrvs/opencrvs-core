@@ -240,6 +240,7 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
       case 'createdBy':
       case 'updatedBy':
       case 'createdByUserType':
+      case 'legalStatuses.VALIDATED.createdBy':
       case 'legalStatuses.REGISTERED.registrationNumber': {
         const value = clause[key]
         must.push({ term: { [key]: value.term } })

@@ -181,6 +181,7 @@ export const QueryExpression = z
       z.union([Within, Exact])
     ),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.VALIDATED.createdBy': z.optional(Exact),
     createdAtLocation: z.optional(z.union([Within, Exact])),
     updatedAtLocation: z.optional(z.union([Within, Exact])),
     assignedTo: z.optional(Exact),

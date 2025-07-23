@@ -112,7 +112,16 @@ function deserializeQueryExpression(
         : {
             ...expression.updatedAtLocation,
             term: userDeserializer(expression.updatedAtLocation.term, user)
-          })
+          }),
+    ['legalStatuses.VALIDATED.createdBy']: expression[
+      'legalStatuses.VALIDATED.createdBy'
+    ] && {
+      ...expression['legalStatuses.VALIDATED.createdBy'],
+      term: userDeserializer(
+        expression['legalStatuses.VALIDATED.createdBy'].term,
+        user
+      )
+    }
   }
 }
 

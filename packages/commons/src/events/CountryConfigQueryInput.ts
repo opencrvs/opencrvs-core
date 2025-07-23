@@ -43,6 +43,7 @@ export const SerializedQueryExpression = z
       z.union([Within, Exact])
     ),
     'legalStatuses.REGISTERED.registrationNumber': z.optional(Exact),
+    'legalStatuses.VALIDATED.createdBy': z.optional(SerializableExact),
     createdAtLocation: z.optional(
       z.union([SerializableWithin, SerializableExact])
     ),

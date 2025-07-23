@@ -138,14 +138,22 @@ export function getActionUpdateMetadata(actions: Action[]) {
  * @see EventIndex for the description of the returned object.
  */
 export function getLegalStatuses(actions: Action[]) {
+  const sortedActions = [...actions].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt)
+  )
+
   return {
     [EventStatus.enum.DECLARED]: getDeclarationActionCreationMetadata(
       ActionType.DECLARE,
-      actions
+      sortedActions
+    ),
+    [EventStatus.enum.VALIDATED]: getDeclarationActionCreationMetadata(
+      ActionType.VALIDATE,
+      sortedActions
     ),
     [EventStatus.enum.REGISTERED]: getDeclarationActionCreationMetadata(
       ActionType.REGISTER,
-      actions
+      sortedActions
     )
   }
 }
