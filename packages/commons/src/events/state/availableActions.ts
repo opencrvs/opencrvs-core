@@ -37,11 +37,6 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.ARCHIVE,
     ActionType.REJECT
   ],
-  [EventStatus.enum.REJECTED]: [
-    ActionType.READ,
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
