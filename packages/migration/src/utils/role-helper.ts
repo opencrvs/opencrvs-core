@@ -171,6 +171,7 @@ export const transformRoleCodes = (doc: any) => {
 
       if (englishLabel?.label) {
         const transformedLabel = englishLabel.label
+          .replace(/[^a-zA-Z0-9 ]/g, '')
           .toUpperCase()
           .replace(/ /g, '_')
 
