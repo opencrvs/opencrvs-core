@@ -45,12 +45,16 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
     ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
     ActionType.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.CERTIFIED]: [
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
     ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
     ActionType.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.ARCHIVED]: [
