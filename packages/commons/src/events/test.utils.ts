@@ -20,11 +20,13 @@ import {
   EventState
 } from './ActionDocument'
 import {
+  ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
   NotifyActionInput,
   RegisterActionInput,
+  RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   UnassignActionInput,
@@ -572,7 +574,7 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
+              ApproveCorrectionActionInput,
               'transactionId' | 'annotation' | 'keepAssignment'
             >
           > = {}
@@ -596,7 +598,7 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
+              RejectCorrectionActionInput,
               'transactionId' | 'annotation' | 'keepAssignment'
             >
           > = {}
