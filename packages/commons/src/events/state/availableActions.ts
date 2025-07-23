@@ -9,7 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ActionType } from '../ActionType'
-import { EventStatus } from '../EventMetadata'
+import { EventIndex } from '../EventIndex'
+import { EventStatus, InherentFlags } from '../EventMetadata'
 
 export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.CREATED]: [
@@ -57,3 +58,17 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.UNASSIGN
   ]
 } as const satisfies Record<EventStatus, ActionType[]>
+
+export const getAvailableActionsForEvent = (
+  event: EventIndex
+): ActionType[] => {
+  return event.flags.includes(InherentFlags.REJECTED)
+    ? [
+        ActionType.READ,
+        event.status === EventStatus.Enum.VALIDATED
+          ? ActionType.VALIDATE
+          : ActionType.DECLARE,
+        ActionType.ARCHIVE
+      ]
+    : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+}

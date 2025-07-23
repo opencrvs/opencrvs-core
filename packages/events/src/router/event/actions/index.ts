@@ -164,7 +164,7 @@ export function getDefaultActionProcedures(
           return ctx.event
         }
 
-        await throwConflictIfActionNotAllowed(eventId, actionType)
+        await throwConflictIfActionNotAllowed(eventId, actionType, ctx.token)
 
         const event = await getEventById(eventId)
 

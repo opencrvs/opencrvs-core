@@ -20,7 +20,8 @@ import {
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls,
-  EventStatus
+  EventStatus,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -57,7 +58,9 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const { status } = eventIndex
+  const status = eventIndex.flags.includes(InherentFlags.REJECTED)
+    ? EventStatus.enum.REJECTED
+    : eventIndex.status
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts(eventIndex.id)
   const eventWithDrafts = getCurrentEventStateWithDrafts({
