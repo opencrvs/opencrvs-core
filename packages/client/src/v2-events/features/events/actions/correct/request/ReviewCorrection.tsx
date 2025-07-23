@@ -13,13 +13,49 @@ import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { EventState } from '@opencrvs/commons/client'
-import { Button, Icon } from '@opencrvs/components'
+import {
+  Button,
+  Icon,
+  ResponsiveModal,
+  Stack,
+  Text
+} from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { ROUTES } from '@client/v2-events/routes'
+import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '../../../useActionAnnotation'
 import { useEvents } from '../../../useEvents/useEvents'
 import { CorrectionDetails } from './Summary/CorrectionDetails'
 import { ReviewHeader } from './ReviewHeader'
+
+const reviewCorrectionMessages = defineMessages({
+  actionModalCancel: {
+    id: 'v2.actionModal.cancel',
+    defaultMessage: 'Cancel',
+    description: 'The label for cancel button of action modal'
+  },
+  actionModalDescription: {
+    id: 'v2.actionModal.description',
+    defaultMessage:
+      'The declarant will be notified of this action and a record of this decision will be recorded',
+    description: 'The description for action modal'
+  },
+  approveCorrection: {
+    id: 'v2.modal.approveCorrection',
+    defaultMessage: 'Approve correction?',
+    description: 'The title for approve correction modal'
+  },
+  rejectCorrection: {
+    id: 'v2.modal.rejectCorrection',
+    defaultMessage: 'Reject correction?',
+    description: 'The title for reject correction modal'
+  },
+  actionModalConfirm: {
+    id: 'v2.actionModal.confirm',
+    defaultMessage: 'Confirm',
+    description: 'The label for confirm button of action modal'
+  }
+})
 
 const Card = styled.div`
   border: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -65,6 +101,90 @@ const messages = defineMessages({
   }
 })
 
+function ApproveModal({ close }: { close: (result: boolean | null) => void }) {
+  const intl = useIntl()
+  return (
+    <ResponsiveModal
+      autoHeight
+      showHeaderBorder
+      actions={[
+        <Button
+          key="cancel_correction"
+          id="cancel_correction"
+          type="tertiary"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
+        </Button>,
+        <Button
+          key="confirm_correction"
+          id="confirm_correction"
+          type="primary"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
+        </Button>
+      ]}
+      handleClose={() => close(null)}
+      responsive={false}
+      show={true}
+      title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
+    >
+      <Stack>
+        <Text color="grey500" element="p" variant="reg16">
+          {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
+        </Text>
+      </Stack>
+    </ResponsiveModal>
+  )
+}
+
+function RejectModal({ close }: { close: (result: boolean | null) => void }) {
+  const intl = useIntl()
+  return (
+    <ResponsiveModal
+      autoHeight
+      showHeaderBorder
+      actions={[
+        <Button
+          key="cancel_reject_correction"
+          id="cancel_reject_correction"
+          type="tertiary"
+          onClick={() => {
+            close(null)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
+        </Button>,
+        <Button
+          key="reject_correction"
+          id="reject_correction"
+          type="primary"
+          onClick={() => {
+            close(true)
+          }}
+        >
+          {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
+        </Button>
+      ]}
+      handleClose={() => close(null)}
+      responsive={false}
+      show={true}
+      title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
+    >
+      <Stack>
+        <Text color="grey500" element="p" variant="reg16">
+          {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
+        </Text>
+      </Stack>
+    </ResponsiveModal>
+  )
+}
+
 export function ReviewCorrection({ form }: { form: EventState }) {
   const intl = useIntl()
   const { getAnnotation } = useActionAnnotation()
@@ -72,6 +192,15 @@ export function ReviewCorrection({ form }: { form: EventState }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
+  const [modal, openModal] = useModal()
+
+  const openApproveModal = async () => {
+    await openModal((close) => <ApproveModal close={close} />)
+  }
+
+  const openRejectModal = async () => {
+    await openModal((close) => <RejectModal close={close} />)
+  }
 
   return (
     <Card>
@@ -86,7 +215,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
             id="ApproveCorrectionBtn"
             size="large"
             type="positive"
-            onClick={() => alert('Approve correction clicked')}
+            onClick={openApproveModal}
           >
             <Icon name="Check" />
             {intl.formatMessage(buttonMessages.approve)}
@@ -95,13 +224,14 @@ export function ReviewCorrection({ form }: { form: EventState }) {
             id="rejectCorrectionBtn"
             size="large"
             type="negative"
-            onClick={() => alert('Reject correction clicked')}
+            onClick={openRejectModal}
           >
             <Icon name="X" />
             {intl.formatMessage(buttonMessages.reject)}
           </Button>
         </Row>
       </ReviewContainter>
+      {modal}
     </Card>
   )
 }
