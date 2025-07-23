@@ -10,19 +10,18 @@
  */
 
 import React from 'react'
+import styled from 'styled-components'
 import { Summary } from '@opencrvs/components/lib/Summary'
 import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  getMixedPath
+  getMixedPath,
+  Flag
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
-/**
- * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
- */
 
 const messages = {
   assignedTo: {
@@ -54,6 +53,11 @@ const messages = {
         '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
       description: 'Status of the event'
     }
+  },
+  flags: {
+    id: 'v2.event.summary.flags',
+    defaultMessage: 'Flags',
+    description: 'Label for the flags'
   },
   event: {
     label: {
@@ -98,14 +102,51 @@ const messages = {
   }
 }
 
+const Pill = styled.span`
+  border: 1px dashed #0a52aa;
+  font: ${({ theme }) => theme.fonts.reg12};
+  padding: 2px 8px;
+  border-radius: 0.8rem;
+  color: #0a52aa;
+  background-color: #ecfaff;
+`
+
+const Pill2 = styled.span`
+  border: 1px dashed #2a7158;
+  font: ${({ theme }) => theme.fonts.reg12};
+  padding: 2px 8px;
+  border-radius: 0.8rem;
+  color: #2a7158;
+  background-color: #f0f9f5;
+`
+
+const StatusContainer = styled.div`
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+`
+
+const Status = styled.span`
+  padding-right: 6px;
+`
+
+function FlagPill({ flag }: { flag: Flag }) {
+  return <Pill>Correction requested</Pill>
+}
+
+/**
+ * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
+ */
 export function EventSummary({
   event,
   eventConfiguration,
-  hideSecuredFields = false
+  hideSecuredFields = false,
+  flags
 }: {
   event: Record<string, FieldValue | null>
   eventConfiguration: EventConfig
   hideSecuredFields?: boolean
+  flags: Flag[]
 }) {
   const intl = useIntlFormatMessageWithFlattenedParams()
   const { summary, label: eventLabelMessage } = eventConfiguration
@@ -170,7 +211,17 @@ export function EventSummary({
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
-          value={intl.formatMessage(messages.status.value, event)}
+          value={
+            <StatusContainer>
+              <Status>
+                {intl.formatMessage(messages.status.value, event)}
+              </Status>
+              {flags.map((flag) => (
+                <FlagPill key={flag} flag={flag} />
+              ))}
+              <Pill2>Printed</Pill2>
+            </StatusContainer>
+          }
         />
         <Summary.Row
           key="event"
