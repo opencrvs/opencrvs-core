@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventState, getUUID } from '@opencrvs/commons/client'
+import { EventState, getUUID, ActionType } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
@@ -134,6 +134,47 @@ export async function registerOnValidate(variables: {
       transactionId: variables.transactionId
     }
   )
+
+  return latestResponse
+}
+
+/**
+ * Runs a sequence of actions from  validate to register.
+ *
+ * Defining the function here, statically allows offline support.
+ * Moving the function to one level up will break offline support since the definition needs to be static.
+ */
+export async function makeCorrectionOnRequest(variables: {
+  eventId: string
+  declaration: EventState
+  transactionId: string
+  annotation?: EventState
+}) {
+  const { eventId, declaration, annotation } = variables
+
+  const response = await trpcClient.event.actions.correction.request.mutate({
+    eventId,
+    declaration,
+    transactionId: variables.transactionId,
+    annotation,
+    keepAssignment: true
+  })
+
+  const requestId = response.actions.find(
+    (x) => x.transactionId === variables.transactionId
+  )?.id
+  if (!requestId) {
+    throw new Error(
+      `Request ID not found in response for eventId: ${eventId}, transactionId: ${variables.transactionId}`
+    )
+  }
+  const latestResponse =
+    await trpcClient.event.actions.correction.approve.mutate({
+      requestId,
+      type: ActionType.APPROVE_CORRECTION,
+      transactionId: getUUID(),
+      eventId
+    })
 
   return latestResponse
 }

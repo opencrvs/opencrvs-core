@@ -13,7 +13,7 @@ import { hashValues, route, string } from 'react-router-typesafe-routes/dom'
 import { uuid } from '@client/v2-events/routes/utils'
 
 export const routes = route(
-  'request-correction/:eventId',
+  'correction/:eventId',
   {
     params: { eventId: uuid().defined() },
     searchParams: {

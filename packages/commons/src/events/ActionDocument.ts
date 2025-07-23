@@ -158,6 +158,15 @@ export type RequestedCorrectionAction = z.infer<
   typeof RequestedCorrectionAction
 >
 
+const CorrectedAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.CORRECT),
+    requestId: z.string()
+  })
+)
+
+export type CorrectedAction = z.infer<typeof CorrectedAction>
+
 const ApprovedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION),
@@ -190,6 +199,7 @@ export const ActionDocument = z
     DeclareAction.openapi({ ref: 'DeclareAction' }),
     AssignedAction.openapi({ ref: 'AssignedAction' }),
     RequestedCorrectionAction.openapi({ ref: 'RequestedCorrectionAction' }),
+    CorrectedAction.openapi({ ref: 'CorrectedAction' }),
     ApprovedCorrectionAction.openapi({ ref: 'ApprovedCorrectionAction' }),
     RejectedCorrectionAction.openapi({ ref: 'RejectedCorrectionAction' }),
     UnassignedAction.openapi({ ref: 'UnassignedAction' }),

@@ -95,6 +95,7 @@ export const ACTION_ALLOWED_CONFIGURABLE_SCOPES = {
   [ActionType.REGISTER]: [],
   [ActionType.PRINT_CERTIFICATE]: [],
   [ActionType.REQUEST_CORRECTION]: [],
+  [ActionType.CORRECT]: [],
   [ActionType.REJECT_CORRECTION]: [],
   [ActionType.APPROVE_CORRECTION]: [],
   [ActionType.MARKED_AS_DUPLICATE]: [],

@@ -55,6 +55,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.UNASSIGN:
         case ActionType.REJECT:
         case ActionType.REQUEST_CORRECTION:
+        case ActionType.CORRECT:
         case ActionType.APPROVE_CORRECTION:
         case ActionType.MARKED_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:

@@ -20,6 +20,7 @@ import {
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -153,10 +154,22 @@ export function EventSummary({
       value: intl.formatMessage(field.value, event)
     }
   })
-
+  const events = useEvents()
   return (
     <>
       <Summary id="summary">
+        <button
+          onClick={() => {
+            events.actions.correction.approve.mutate({
+              requestId: '4c7bdfe7-cdf6-4167-8970-d798418f33ce',
+              type: 'APPROVE_CORRECTION',
+              transactionId: 'sdf0baccd9f-4829-43ef-baab-9348c629dc8d',
+              eventId: '0baccd9f-4829-43ef-baab-9348c629dc8d'
+            })
+          }}
+        >
+          meo
+        </button>
         <Summary.Row
           key="assignedTo"
           data-testid="assignedTo"

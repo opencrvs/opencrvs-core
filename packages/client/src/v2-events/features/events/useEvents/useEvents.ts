@@ -180,6 +180,9 @@ export function useEvents() {
       ]),
       registerOnValidate: useEventCustomAction([
         ...customMutationKeys.registerOnValidate
+      ]),
+      makeCorrectionOnRequest: useEventCustomAction([
+        ...customMutationKeys.makeCorrectionOnRequest
       ])
     }
   }

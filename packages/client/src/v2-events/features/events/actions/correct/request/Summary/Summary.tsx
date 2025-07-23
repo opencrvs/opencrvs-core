@@ -23,7 +23,8 @@ import {
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getCurrentEventState
+  getCurrentEventState,
+  ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -42,6 +43,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { hasFieldChanged } from '../../utils'
+import { useCorrectionActionType } from '../../useCorrectionActionType'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -49,6 +51,11 @@ const messages = defineMessages({
     id: 'v2-events.buttons.submitCorrectionRequest',
     defaultMessage: 'Submit correction request',
     description: 'Submit correction request button text'
+  },
+  makeCorrection: {
+    id: 'v2-events.buttons.makeCorrection',
+    defaultMessage: 'Make correction',
+    description: 'Make correction button text'
   }
 })
 
@@ -68,14 +75,12 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 }
 
 export function Summary() {
-  const { eventId } = useTypedParams(
-    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
-  )
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.SUMMARY)
 
   const [{ workqueue }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+    ROUTES.V2.EVENTS.CORRECTION.SUMMARY
   )
-
+  const { correctionActionType } = useCorrectionActionType()
   const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
@@ -116,20 +121,34 @@ export function Summary() {
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
-    events.actions.correction.request.mutate({
-      eventId,
-      declaration: {
-        ...formWithOnlyChangedValues,
-        ...nullifiedHiddenValues
-      },
-      transactionId: generateTransactionId(),
-      annotation
-    })
+    if (correctionActionType === ActionType.CORRECT) {
+      events.customActions.makeCorrectionOnRequest.mutate({
+        eventId,
+        declaration: {
+          ...formWithOnlyChangedValues,
+          ...nullifiedHiddenValues
+        },
+        transactionId: generateTransactionId(),
+        annotation
+      })
+    } else {
+      events.actions.correction.request.mutate({
+        eventId,
+        declaration: {
+          ...formWithOnlyChangedValues,
+          ...nullifiedHiddenValues
+        },
+        transactionId: generateTransactionId(),
+        annotation
+      })
+    }
 
     navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
   }, [
     form,
     fields,
+    correctionActionType,
+    events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,
     eventId,
     annotation,
@@ -157,7 +176,9 @@ export function Summary() {
             >
               <Check />
               {/* TODO: when direct correction is implemented, we should use different button message for that */}
-              {intl.formatMessage(messages.submitCorrectionRequest)}
+              {correctionActionType === ActionType.REQUEST_CORRECTION
+                ? intl.formatMessage(messages.submitCorrectionRequest)
+                : intl.formatMessage(messages.makeCorrection)}
             </Button>
           ]}
           showTitleOnMobile={true}
@@ -168,7 +189,7 @@ export function Summary() {
               id="back-to-review"
               onClick={() =>
                 navigate(
-                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+                  ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
                     eventId
                   })
                 )

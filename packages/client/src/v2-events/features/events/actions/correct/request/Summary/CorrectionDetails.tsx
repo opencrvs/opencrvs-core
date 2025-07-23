@@ -132,7 +132,7 @@ export function CorrectionDetails({
                 onClick={(e) => {
                   e.stopPropagation()
                   navigate(
-                    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+                    ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath(
                       {
                         pageId,
                         eventId: event.id

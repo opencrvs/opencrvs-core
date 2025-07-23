@@ -31,6 +31,7 @@ export const ActionType = {
   // Record actions
   PRINT_CERTIFICATE: 'PRINT_CERTIFICATE',
   REQUEST_CORRECTION: 'REQUEST_CORRECTION',
+  CORRECT: 'CORRECT',
   REJECT_CORRECTION: 'REJECT_CORRECTION',
   APPROVE_CORRECTION: 'APPROVE_CORRECTION',
   // General actions
@@ -68,6 +69,7 @@ export const ActionTypes = z.enum([
   'ARCHIVE',
   'PRINT_CERTIFICATE',
   'REQUEST_CORRECTION',
+  'CORRECT',
   'REJECT_CORRECTION',
   'APPROVE_CORRECTION',
   'READ',
@@ -94,7 +96,8 @@ export type DeclarationActionType = z.infer<typeof DeclarationActions>
 
 const declarationUpdateActionValues = [
   ...declarationActionValues,
-  ActionTypes.enum.REQUEST_CORRECTION
+  ActionTypes.enum.REQUEST_CORRECTION,
+  ActionTypes.enum.CORRECT
 ] as const
 
 /** Actions that can modify declaration data. Request can be corrected after declaring it. */

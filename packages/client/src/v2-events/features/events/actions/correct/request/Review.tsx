@@ -51,7 +51,7 @@ function isRequestCorrectionAction(
 
 export function Review() {
   const scopes = useSelector(getScope)
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.REVIEW)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.VALIDATE.REVIEW
   )
@@ -132,7 +132,7 @@ export function Review() {
         )}
         onEdit={({ pageId, fieldId }) => {
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+            ROUTES.V2.EVENTS.CORRECTION.PAGES.buildPath(
               { pageId, eventId },
               {
                 from: 'review',
@@ -150,7 +150,7 @@ export function Review() {
             id="continue_button"
             onClick={() => {
               navigate(
-                ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
+                ROUTES.V2.EVENTS.CORRECTION.SUMMARY.buildPath(
                   { eventId },
                   { workqueue: slug }
                 )

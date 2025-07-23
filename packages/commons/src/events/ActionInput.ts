@@ -142,6 +142,13 @@ export type RequestCorrectionActionInput = z.infer<
   typeof RequestCorrectionActionInput
 >
 
+export const CorrectionActionInput = BaseActionInput.merge(
+  z.object({
+    type: z.literal(ActionType.CORRECT).default(ActionType.CORRECT)
+  })
+)
+export type CorrectionActionInput = z.infer<typeof CorrectionActionInput>
+
 export const RejectCorrectionActionInput = BaseActionInput.merge(
   z.object({
     requestId: z.string(),
@@ -207,6 +214,7 @@ export const ActionInput = z
     RequestCorrectionActionInput.openapi({
       ref: 'RequestCorrectionActionInput'
     }),
+    CorrectionActionInput.openapi({ ref: 'CorrectionActionInput' }),
     RejectCorrectionActionInput.openapi({ ref: 'RejectCorrectionActionInput' }),
     ApproveCorrectionActionInput.openapi({
       ref: 'ApproveCorrectionActionInput'

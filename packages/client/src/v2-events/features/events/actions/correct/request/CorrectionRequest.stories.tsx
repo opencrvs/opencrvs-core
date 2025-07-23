@@ -68,7 +68,7 @@ export const ReviewWithChanges: Story = {
         element: <Outlet />,
         children: [router]
       },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -104,7 +104,7 @@ export const Review: Story = {
         element: <Outlet />,
         children: [router]
       },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
@@ -200,7 +200,7 @@ export const Summary: Story = {
         element: <FormClear />,
         children: [router]
       },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath({
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.SUMMARY.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
     },
