@@ -32,6 +32,10 @@ export const DocumentUploader = styled(ImageUploader)<{ fullWidth?: boolean }>`
   }
 `
 
+const Preview = styled(SingleDocumentPreview)`
+  padding: 0px 10px 8px 10px;
+`
+
 const FieldDescription = styled.div`
   margin-top: 0px;
   margin-bottom: 6px;
@@ -104,7 +108,7 @@ export function SimpleDocumentUploader({
       {errorMessage && (touched || error) && (
         <ErrorText id="field-error">{errorMessage}</ErrorText>
       )}
-      <SingleDocumentPreview
+      <Preview
         attachment={file}
         label={label}
         onDelete={onDelete}
