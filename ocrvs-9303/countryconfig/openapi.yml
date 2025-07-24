@@ -3809,6 +3809,9 @@ components:
                       - REJECT
                       - ARCHIVE
                       - PRINT_CERTIFICATE
+                      - REQUEST_CORRECTION
+                      - APPROVE_CORRECTION
+                      - REJECT_CORRECTION
                 required:
                   - id
                   - transactionId
@@ -8454,8 +8457,6 @@ components:
         type:
           type: string
           const: CORRECT
-        requestId:
-          type: string
       required:
         - id
         - transactionId
@@ -8466,7 +8467,6 @@ components:
         - declaration
         - status
         - type
-        - requestId
     ApprovedCorrectionAction:
       type: object
       properties:
@@ -12114,7 +12114,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 8f4a931d-195b-4658-a5f8-ae0eaf0b316a
+        transactionId: 8aa6c7c3-3186-4c22-8480-0fd6f42da862
         declaration: {}
         annotation: {}
         type: NOTIFY
