@@ -21,7 +21,8 @@ import {
   WorkqueueActionType,
   EventStatus,
   isMetaAction,
-  getAvailableActionsForEvent
+  getAvailableActionsForEvent,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -238,7 +239,6 @@ const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.NOTIFIED]: [
     ActionType.READ,
     ActionType.VALIDATE,
-    ActionType.DECLARE,
     ActionType.ARCHIVE,
     ActionType.REJECT
   ]
@@ -259,6 +259,7 @@ export function useActionMenuItems(event: EventIndex) {
 
   // Find actions available based on the event status
   const availableActions =
+    !event.flags.includes(InherentFlags.REJECTED) &&
     event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
       ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
           event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
