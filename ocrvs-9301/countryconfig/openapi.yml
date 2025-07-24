@@ -3766,6 +3766,7 @@ components:
         - $ref: "#/components/schemas/ApprovedCorrectionAction"
         - $ref: "#/components/schemas/RejectedCorrectionAction"
         - $ref: "#/components/schemas/UnassignedAction"
+        - $ref: "#/components/schemas/ReviewCorrectionRequestAction"
         - $ref: "#/components/schemas/PrintCertificateAction"
         - $ref: "#/components/schemas/ReadAction"
       discriminator:
@@ -3784,6 +3785,7 @@ components:
           APPROVE_CORRECTION: "#/components/schemas/ApprovedCorrectionAction"
           REJECT_CORRECTION: "#/components/schemas/RejectedCorrectionAction"
           UNASSIGN: "#/components/schemas/UnassignedAction"
+          REVIEW_CORRECTION_REQUEST: "#/components/schemas/ReviewCorrectionRequestAction"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateAction"
           READ: "#/components/schemas/ReadAction"
     CreatedAction:
@@ -9222,6 +9224,421 @@ components:
         - declaration
         - status
         - type
+    ReviewCorrectionRequestAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+        createdByUserType:
+          type: string
+          enum: *a11
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          format: uuid
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a7
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: URBAN
+                  town:
+                    type:
+                      - string
+                      - "null"
+                  residentialArea:
+                    type:
+                      - string
+                      - "null"
+                  street:
+                    type:
+                      - string
+                      - "null"
+                  number:
+                    type:
+                      - string
+                      - "null"
+                  zipCode:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: RURAL
+                  village:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type:
+                      - string
+                      - "null"
+                  addressLine1:
+                    type:
+                      - string
+                      - "null"
+                  addressLine2:
+                    type:
+                      - string
+                      - "null"
+                  addressLine3:
+                    type:
+                      - string
+                      - "null"
+                  postcodeOrZip:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type:
+                              - string
+                              - "null"
+                          surname:
+                            type:
+                              - string
+                              - "null"
+                          middlename:
+                            type:
+                              - string
+                              - "null"
+                      - type: "null"
+        annotation:
+          type:
+            - object
+            - "null"
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a7
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: URBAN
+                  town:
+                    type:
+                      - string
+                      - "null"
+                  residentialArea:
+                    type:
+                      - string
+                      - "null"
+                  street:
+                    type:
+                      - string
+                      - "null"
+                  number:
+                    type:
+                      - string
+                      - "null"
+                  zipCode:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: RURAL
+                  village:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type:
+                      - string
+                      - "null"
+                  addressLine1:
+                    type:
+                      - string
+                      - "null"
+                  addressLine2:
+                    type:
+                      - string
+                      - "null"
+                  addressLine3:
+                    type:
+                      - string
+                      - "null"
+                  postcodeOrZip:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type:
+                              - string
+                              - "null"
+                          surname:
+                            type:
+                              - string
+                              - "null"
+                          middlename:
+                            type:
+                              - string
+                              - "null"
+                      - type: "null"
+        status:
+          type: string
+          enum: *a12
+        originalActionId:
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
+        type:
+          type: string
+          const: REVIEW_CORRECTION_REQUEST
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
     PrintCertificateAction:
       type: object
       properties:
@@ -11617,7 +12034,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: d1488b6e-e435-4a80-86bc-465bca59bd97
+        transactionId: 87cf57c1-4b00-479b-8880-da77a2c7a8b1
         declaration: {}
         annotation: {}
         type: NOTIFY

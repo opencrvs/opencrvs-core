@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2bd2d941-220d-4805-888f-8c76fbe28376
+                transactionId: 9efcd8fe-4bef-42fe-b257-3c32113b4aa4
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 84003f0f-b334-432e-b315-1896d04b71cb
+                transactionId: 09a01293-dafb-4bfc-8138-cdacebce09a0
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -5806,6 +5806,7 @@ components:
         - $ref: "#/components/schemas/ApprovedCorrectionAction"
         - $ref: "#/components/schemas/RejectedCorrectionAction"
         - $ref: "#/components/schemas/UnassignedAction"
+        - $ref: "#/components/schemas/ReviewCorrectionRequestAction"
         - $ref: "#/components/schemas/PrintCertificateAction"
         - $ref: "#/components/schemas/ReadAction"
       discriminator:
@@ -5824,6 +5825,7 @@ components:
           APPROVE_CORRECTION: "#/components/schemas/ApprovedCorrectionAction"
           REJECT_CORRECTION: "#/components/schemas/RejectedCorrectionAction"
           UNASSIGN: "#/components/schemas/UnassignedAction"
+          REVIEW_CORRECTION_REQUEST: "#/components/schemas/ReviewCorrectionRequestAction"
           PRINT_CERTIFICATE: "#/components/schemas/PrintCertificateAction"
           READ: "#/components/schemas/ReadAction"
     CreatedAction:
@@ -10978,6 +10980,400 @@ components:
           type: string
           enum:
             - UNASSIGN
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
+    ReviewCorrectionRequestAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+        createdByUserType:
+          type: string
+          enum: *a12
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        createdBySignature:
+          type: string
+          nullable: true
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type: string
+          nullable: true
+          format: uuid
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                            nullable: true
+                          surname:
+                            type: string
+                            nullable: true
+                          middlename:
+                            type: string
+                            nullable: true
+                      - type: "null"
+        annotation:
+          type: object
+          nullable: true
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a1
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - URBAN
+                  town:
+                    type: string
+                    nullable: true
+                  residentialArea:
+                    type: string
+                    nullable: true
+                  street:
+                    type: string
+                    nullable: true
+                  number:
+                    type: string
+                    nullable: true
+                  zipCode:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    enum:
+                      - RURAL
+                  village:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    enum:
+                      - INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type: string
+                    nullable: true
+                  addressLine1:
+                    type: string
+                    nullable: true
+                  addressLine2:
+                    type: string
+                    nullable: true
+                  addressLine3:
+                    type: string
+                    nullable: true
+                  postcodeOrZip:
+                    type: string
+                    nullable: true
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                            nullable: true
+                          surname:
+                            type: string
+                            nullable: true
+                          middlename:
+                            type: string
+                            nullable: true
+                      - type: "null"
+        status:
+          type: string
+          enum: *a14
+        originalActionId:
+          type: string
+          nullable: true
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
+        type:
+          type: string
+          enum:
+            - REVIEW_CORRECTION_REQUEST
       required:
         - id
         - transactionId
