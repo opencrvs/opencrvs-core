@@ -169,7 +169,7 @@ export function EventSummary({
     ...event,
     'event.status': isCorrectionRequested
       ? ActionType.REQUEST_CORRECTION
-      : event.status
+      : event['event.status']
   }
 
   return (

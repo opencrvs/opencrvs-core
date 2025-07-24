@@ -296,6 +296,7 @@ export function useAction(event: EventIndex) {
             'This is shown as the action name anywhere the user can trigger the action from',
           id: 'v2.event.summary.review-correction-request.label'
         },
+        icon: 'NotePencil',
         onClick: () => {
           navigate(
             ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
