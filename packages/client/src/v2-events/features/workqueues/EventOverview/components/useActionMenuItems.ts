@@ -234,6 +234,16 @@ export function useAction(event: EventIndex) {
   }
 }
 
+const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
+  [EventStatus.enum.NOTIFIED]: [
+    ActionType.READ,
+    ActionType.VALIDATE,
+    ActionType.DECLARE,
+    ActionType.ARCHIVE,
+    ActionType.REJECT
+  ]
+} satisfies Partial<Record<EventStatus, ActionType[]>>
+
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
@@ -248,7 +258,12 @@ export function useActionMenuItems(event: EventIndex) {
   )
 
   // Find actions available based on the event status
-  const availableActions = getAvailableActionsForEvent(event)
+  const availableActions =
+    event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+      ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
+          event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+        ]
+      : getAvailableActionsForEvent(event)
 
   const actions = [...availableAssignmentActions, ...availableActions]
 
