@@ -16,18 +16,20 @@ import {
   FileFieldValueWithOption,
   FileFieldWithOptionValue,
   FullDocumentPath,
+  FileUploadWithOptions,
   MimeType,
   SelectOption
 } from '@opencrvs/commons/client'
 import { ErrorText } from '@opencrvs/components'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
 import { Select } from '@client/v2-events/features/events/registered-fields/Select'
-import { formMessages as messages } from '@client/i18n/messages'
+import { buttonMessages, formMessages as messages } from '@client/i18n/messages'
 import { DocumentUploader } from './SimpleDocumentUploader'
 import { DocumentListPreview } from './DocumentListPreview'
 import { DocumentPreview } from './DocumentPreview'
 import { File } from './FileInput'
 import { useOnFileChange } from './useOnFileChange'
+import { SingleDocumentPreview } from './SingleDocumentPreview'
 
 const UploadWrapper = styled.div`
   width: 100%;
@@ -244,7 +246,54 @@ function DocumentUploaderWithOption({
   )
 }
 
-const DocumentWithOptionOutput = null
+const Wrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+function DocumentWithOptionOutput({
+  value,
+  config
+}: {
+  value?: FileFieldWithOptionValue
+  config: FileUploadWithOptions
+}) {
+  const intl = useIntl()
+  const [previewImage, setPreviewImage] =
+    useState<FileFieldValueWithOption | null>(null)
+
+  if (!value || value.length === 0) {
+    return null
+  }
+
+  return (
+    <Wrapper>
+      {value.map((file) => {
+        const label = config.options.find((x) => x.value === file.option)?.label
+        return (
+          <SingleDocumentPreview
+            key={file.originalFilename}
+            attachment={file}
+            label={label ? intl.formatMessage(label) : file.option}
+            onSelect={() => setPreviewImage(file)}
+          />
+        )
+      })}
+      {previewImage && (
+        <DocumentPreview
+          disableDelete={true}
+          goBack={() => {
+            setPreviewImage(null)
+          }}
+          previewImage={previewImage}
+          title={intl.formatMessage(buttonMessages.preview)}
+          onDelete={() => setPreviewImage(null)}
+        />
+      )}
+    </Wrapper>
+  )
+}
 
 export const FileWithOption = {
   Input: DocumentUploaderWithOption,

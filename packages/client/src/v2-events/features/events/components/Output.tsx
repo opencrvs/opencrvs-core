@@ -27,6 +27,7 @@ import {
   isEmailFieldType,
   isFacilityFieldType,
   isFileFieldType,
+  isFileFieldWithOptionType,
   isNumberFieldType,
   isOfficeFieldType,
   isPageHeaderFieldType,
@@ -61,6 +62,7 @@ import {
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -111,7 +113,11 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isFileFieldType(field)) {
-    return File.Output
+    return File.Output(field)
+  }
+
+  if (isFileFieldWithOptionType(field)) {
+    return FileWithOption.Output(field)
   }
 
   if (isBulletListFieldType(field)) {
