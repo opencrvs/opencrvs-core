@@ -88,18 +88,18 @@ export const FieldConfigSchema = BaseField.extend({
     .optional()
     .describe(
       `Sometimes there might be need to search a value against multiple field of same FormField type. For example
-      search Country, Province, District against child.address.private and child.address.other. In such case, we 
+      search Country, Province, District against child.address.private and child.address.other. In such case, we
       add a one field as fieldId, and accomodate others in alternateFieldIds`
     ),
   excludeInSearchQuery: z.boolean().default(false).optional()
-    .describe(`Sometimes there will be search fields which are used to 
-    conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth 
+    .describe(`Sometimes there will be search fields which are used to
+    conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth
     is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
     related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
     In such case, populate this field (excludeInSearchQuery) with boolean true`)
 })
 
-export const EventFieldId = z.enum([
+export const EventFieldIdInput = z.enum([
   'trackingId',
   'status',
   'legalStatuses.REGISTERED.acceptedAt',
@@ -107,6 +107,15 @@ export const EventFieldId = z.enum([
   'updatedAt'
 ])
 
+export const EventFieldId = z.enum([
+  'event.trackingId',
+  'event.status',
+  'event.legalStatuses.REGISTERED.acceptedAt',
+  'event.legalStatuses.REGISTERED.createdAtLocation',
+  'event.updatedAt'
+])
+
+export type EventFieldIdInput = z.infer<typeof EventFieldIdInput>
 export type EventFieldId = z.infer<typeof EventFieldId>
 
 export const EventFieldConfigSchema = BaseField.extend({

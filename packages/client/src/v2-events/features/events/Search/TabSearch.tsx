@@ -21,8 +21,6 @@ import {
   FieldConfig,
   FieldType,
   FieldValue,
-  Inferred,
-  SearchField,
   TranslationConfig,
   EventState,
   NameFieldValue,
@@ -32,6 +30,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import {
+  applySearchFieldConfigToFieldConfig,
   flattenFieldErrors,
   getAdvancedSearchFieldErrors,
   getMetadataFieldConfigs,
@@ -63,49 +62,6 @@ const messagesToDefine = {
 
 const messages = defineMessages(messagesToDefine)
 
-function enhanceFieldWithSearchFieldConfig(
-  field: Inferred,
-  searchField: SearchField
-): Inferred {
-  const commonConfig = {
-    conditionals: searchField.conditionals ?? field.conditionals,
-    validation: searchField.validations ?? field.validation,
-    required: false as const
-  }
-  if (field.type === FieldType.DATE && searchField.config.type === 'range') {
-    return {
-      ...field,
-      ...commonConfig,
-      validation: [],
-      type: FieldType.DATE_RANGE,
-      defaultValue: undefined
-    }
-  }
-  if (field.type === FieldType.ADDRESS) {
-    return {
-      ...field,
-      ...commonConfig,
-      configuration: {
-        searchMode: true
-      }
-    }
-  }
-  if (field.type === FieldType.NAME) {
-    return {
-      ...field,
-      ...commonConfig,
-      configuration: {
-        ...field.configuration,
-        searchMode: true
-      }
-    }
-  }
-  return {
-    ...field,
-    ...commonConfig
-  }
-}
-
 function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
   return {
     ...event,
@@ -118,7 +74,7 @@ function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
             .flatMap((x) => x.fields)
             .find((f) => f.fieldId === field.id)
           return searchField
-            ? enhanceFieldWithSearchFieldConfig(field, searchField)
+            ? applySearchFieldConfigToFieldConfig(field, searchField)
             : field
         })
       }))

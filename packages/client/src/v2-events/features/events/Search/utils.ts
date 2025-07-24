@@ -96,7 +96,7 @@ const defaultSearchFieldGenerator: Record<
   EventFieldId,
   (config: SearchField) => FieldConfig
 > = {
-  'legalStatuses.REGISTERED.createdAtLocation': (_) => ({
+  'event.legalStatuses.REGISTERED.createdAtLocation': (_) => ({
     id: 'event.legalStatuses.REGISTERED.createdAtLocation',
     type: FieldType.LOCATION,
     label: {
@@ -113,7 +113,7 @@ const defaultSearchFieldGenerator: Record<
       searchableResource: ['locations', 'offices']
     }
   }),
-  'legalStatuses.REGISTERED.acceptedAt': (_) => ({
+  'event.legalStatuses.REGISTERED.acceptedAt': (_) => ({
     id: 'event.legalStatuses.REGISTERED.acceptedAt',
     type: FieldType.DATE_RANGE,
     label: {
@@ -122,7 +122,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.registeredAt'
     }
   }),
-  updatedAt: (_) => {
+  'event.updatedAt': (_) => {
     if (_.config.type === 'range') {
       return {
         id: 'event.updatedAt',
@@ -156,7 +156,7 @@ const defaultSearchFieldGenerator: Record<
       }
     }
   },
-  trackingId: (_) => ({
+  'event.trackingId': (_) => ({
     id: 'event.trackingId',
     type: FieldType.TEXT,
     label: {
@@ -165,7 +165,7 @@ const defaultSearchFieldGenerator: Record<
       id: 'v2.advancedSearch.trackingId'
     }
   }),
-  status: (_) => ({
+  'event.status': (_) => ({
     id: 'event.status',
     type: FieldType.SELECT,
     label: {
@@ -310,11 +310,11 @@ function buildConditionForStatus(): Condition {
 function buildSearchQueryFields(
   searchConfigurations: {
     fieldId: string
-    config?: {
+    config: {
       type: keyof typeof MatchType
     }
     fieldType: 'field' | 'event'
-    fieldConfig?: FieldConfig
+    fieldConfig: FieldConfig
   }[],
   searchInput: EventState // values from UI or query string
 ): Record<string, Condition> {
@@ -327,7 +327,7 @@ function buildSearchQueryFields(
       // Handle the case where we want to search by range but the value is not a comma-separated string
       // e.g. "2023-01-01,2023-12-31" should be treated as a range
       // but "2023-01-01" should be treated as an exact match
-      let searchType = config.config?.type ?? 'exact'
+      let searchType = config.config.type
       if (
         searchType === 'range' &&
         typeof value === 'string' &&
@@ -357,7 +357,7 @@ function buildSearchQueryFields(
         }
       }
 
-      if (config.fieldConfig?.type === FieldType.NAME) {
+      if (config.fieldConfig.type === FieldType.NAME) {
         const parsedName = NameFieldValue.safeParse(searchInput[config.fieldId])
 
         if (parsedName.success) {
@@ -375,7 +375,7 @@ function buildSearchQueryFields(
       }
 
       if (
-        config.fieldConfig?.type === FieldType.ADDRESS &&
+        config.fieldConfig.type === FieldType.ADDRESS &&
         AddressFieldValue.safeParse(searchInput[config.fieldId]).success
       ) {
         return {
@@ -394,8 +394,8 @@ function buildSearchQueryFields(
       // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
       if (
         config.fieldType === 'event' &&
-        (config.fieldConfig?.type === FieldType.DATE_RANGE ||
-          config.fieldConfig?.type === FieldType.DATE)
+        (config.fieldConfig.type === FieldType.DATE_RANGE ||
+          config.fieldConfig.type === FieldType.DATE)
       ) {
         return {
           ...result,
@@ -415,93 +415,6 @@ function buildSearchQueryFields(
     },
     {}
   )
-}
-
-/**
- *
- * @TODO: We need to check whether buildSearchQueryFields is needed or can it be incorporated under same function.
- * Nevertheless, we need to rewrite parts of it and see that it keep returning correct values. (Currently it does not handle all the range/date-range/select-date-range cases)
- *
- * @see buildSearchQueryFields
- *
- * Builds a data condition object based on the provided event state and configuration.
- *
- * This function:
- * - Extracts default metadata fields and advanced search fields from the event configuration.
- * - Constructs a list of search keys by resolving the matching field configurations.
- * - Filters out any search keys that don't have corresponding values in the raw input (`flat`).
- * - Uses the filtered search keys and raw input to construct a query-compatible condition.
- *
- *
- * @param {EventState} searchParameters - A flat key-value object representing the current search
- * @param {EventConfig} eventConfig - The event configuration object that includes
- *                                    advanced search sections and declaration field mappings.
- * @returns {QueryInputType} A query object representing the current search condition,
- *                           ready to be used for filtering or querying data.
- */
-export function buildSearchQuery(
-  searchParameters: EventState,
-  eventConfig: EventConfig
-): QueryInputType {
-  // Flatten all advanced search fields across all sections
-  const allSearchFields = eventConfig.advancedSearch.flatMap(
-    (section) => section.fields
-  )
-
-  const fieldsToSearch = allSearchFields.filter(
-    // @TODO: This might actually be a bad fix. If only metadata values event. prefix, this would filter out all the rest.
-    // It might be the reason why we use  config: metadataSearchFields.find((x) => field.id.includes(x.fieldId)) below.
-    // After fixing it we should be able to just match the id.
-    (field) =>
-      !!searchParameters[`event.${field.fieldId}`] ||
-      !!searchParameters[`${field.fieldId}`]
-  )
-
-  const [metadataSearchFields, declarationSearchFields] = partition(
-    fieldsToSearch,
-    (field) => field.fieldType === 'event'
-  )
-
-  const metadataFieldConfigs = getMetadataFieldConfigs(metadataSearchFields)
-
-  // Build default search key metadata for event-level fields
-  const metadataSearchFieldConfigs = metadataFieldConfigs.map((field) => ({
-    fieldId: field.id,
-    // Find matching event field config based on fieldId pattern
-    // @TODO: is the `event.` pattern added here previously or why we are using includes for string? Unsafe.
-    // @TODO: Check whether both config and fieldConfig are needed. Does not make sense to me.
-    config: metadataSearchFields.find((x) => field.id.includes(x.fieldId))
-      ?.config,
-    fieldType: 'event' as const,
-    fieldConfig: field
-  }))
-
-  // This whole thing seems to be "the wrong way around" to get the configurations.
-  const declarationFields = getDeclarationFields(eventConfig).filter(
-    (field) => !!searchParameters[field.id]
-  )
-
-  // Build a list of search keys from all advanced search fields,
-  // linking each to the corresponding declaration field config
-  const declarationSearchFieldConfigs = declarationSearchFields.map(
-    (field) => ({
-      fieldId: field.fieldId,
-      config: field.config, // assumes each advanced search field has a config
-      fieldType: field.fieldType,
-      // @TODO: It seems that config and fieldConfig would be the same?
-      fieldConfig: declarationFields.find((f) => f.id === field.fieldId)
-    })
-  )
-
-  const searchConfigs = [
-    ...metadataSearchFieldConfigs,
-    ...declarationSearchFieldConfigs
-  ]
-
-  // Generate the final query condition object from the filtered keys and raw input
-  const foo = buildSearchQueryFields(searchConfigs, searchParameters)
-
-  return foo
 }
 
 /**
@@ -558,6 +471,110 @@ export function parseFieldSearchParams(
   )
 
   return filteredSearchParams
+}
+
+export function applySearchFieldConfigToFieldConfig(
+  field: Inferred,
+  searchField: SearchField
+): Inferred {
+  const commonConfig = {
+    conditionals: searchField.conditionals ?? field.conditionals,
+    validation: searchField.validations ?? field.validation,
+    required: false as const
+  }
+  if (field.type === FieldType.DATE && searchField.config.type === 'range') {
+    return {
+      ...field,
+      ...commonConfig,
+      validation: [],
+      type: FieldType.DATE_RANGE,
+      defaultValue: undefined
+    }
+  }
+  if (field.type === FieldType.ADDRESS) {
+    return {
+      ...field,
+      ...commonConfig,
+      configuration: {
+        searchMode: true
+      }
+    }
+  }
+  if (field.type === FieldType.NAME) {
+    return {
+      ...field,
+      ...commonConfig,
+      configuration: {
+        ...field.configuration,
+        searchMode: true
+      }
+    }
+  }
+  return {
+    ...field,
+    ...commonConfig
+  }
+}
+
+/**
+ *
+ * @TODO: We need to check whether buildSearchQueryFields is needed or can it be incorporated under same function.
+ * Nevertheless, we need to rewrite parts of it and see that it keep returning correct values. (Currently it does not handle all the range/date-range/select-date-range cases)
+ *
+ * @see buildSearchQueryFields
+ *
+ * Builds a data condition object based on the provided event state and configuration.
+ *
+ * This function:
+ * - Extracts default metadata fields and advanced search fields from the event configuration.
+ * - Constructs a list of search keys by resolving the matching field configurations.
+ * - Filters out any search keys that don't have corresponding values in the raw input (`flat`).
+ * - Uses the filtered search keys and raw input to construct a query-compatible condition.
+ *
+ *
+ * @param {EventState} searchParameters - A flat key-value object representing the current search
+ * @param {EventConfig} eventConfig - The event configuration object that includes
+ *                                    advanced search sections and declaration field mappings.
+ * @returns {QueryInputType} A query object representing the current search condition,
+ *                           ready to be used for filtering or querying data.
+ */
+export function buildSearchQuery(
+  searchParameters: EventState,
+  eventConfig: EventConfig
+): QueryInputType {
+  // Flatten all advanced search fields across all sections
+  const allSearchFields = eventConfig.advancedSearch.flatMap(
+    (section) => section.fields
+  )
+
+  const queriedSearchFields = allSearchFields.filter(
+    (field) => !!searchParameters[`${field.fieldId}`]
+  )
+
+  const searchFieldConfigs = getSearchParamsFieldConfigs(
+    eventConfig,
+    searchParameters
+  )
+  const fieldsMap = searchFieldConfigs.reduce(
+    (acc, config) => {
+      acc[config.id] = config
+      return acc
+    },
+    {} as Record<string, Inferred>
+  )
+
+  const searchConfigs = queriedSearchFields.map((searchField) => ({
+    fieldId: searchField.fieldId,
+    config: searchField.config,
+    fieldType: searchField.fieldType,
+    fieldConfig: applySearchFieldConfigToFieldConfig(
+      fieldsMap[searchField.fieldId],
+      searchField
+    )
+  }))
+
+  // Generate the final query condition object from the filtered keys and raw input
+  return buildSearchQueryFields(searchConfigs, searchParameters)
 }
 
 const searchFieldTypeMapping = {

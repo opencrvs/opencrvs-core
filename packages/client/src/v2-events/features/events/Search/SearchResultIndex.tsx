@@ -24,7 +24,6 @@ import { SearchResultComponent } from './SearchResult'
 import {
   buildSearchQuery,
   toAdvancedSearchQueryType,
-  parseFieldSearchParams,
   deserializeSearchParams
 } from './utils'
 
@@ -44,10 +43,10 @@ export const SearchResultIndex = () => {
     () => SearchQueryParams.parse(deserializeSearchParams(location.search)),
     [location.search]
   )
-  const searchQuery = useMemo(() => {
-    const validSearchParams = parseFieldSearchParams(eventConfig, searchParams)
-    return buildSearchQuery(validSearchParams, eventConfig)
-  }, [searchParams, eventConfig])
+  const searchQuery = useMemo(
+    () => buildSearchQuery(searchParams, eventConfig),
+    [searchParams, eventConfig]
+  )
 
   /*
    * useSuspenseQuery unmounts the component causing the searchQuery to be
