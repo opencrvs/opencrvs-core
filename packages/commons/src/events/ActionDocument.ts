@@ -154,6 +154,10 @@ const RequestedCorrectionAction = ActionBase.merge(
   })
 )
 
+export type RequestedCorrectionAction = z.infer<
+  typeof RequestedCorrectionAction
+>
+
 const ApprovedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION),
