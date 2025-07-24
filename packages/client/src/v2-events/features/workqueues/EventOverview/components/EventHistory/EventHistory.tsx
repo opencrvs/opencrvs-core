@@ -187,8 +187,10 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const historyRows = visibleHistory
     .reduce(
       (actionList, currentAction) => {
-        const previousAction = actionList.at(-1) // safer than actionList[actionList.length - 1]
+        const previousAction = actionList.at(-1)
 
+        // If correction request is approved by same user who requested it, we merge the actions
+        // and label it as 'CORRECT' action (which is an UI only action).
         if (
           previousAction &&
           currentAction.type === ActionType.APPROVE_CORRECTION &&

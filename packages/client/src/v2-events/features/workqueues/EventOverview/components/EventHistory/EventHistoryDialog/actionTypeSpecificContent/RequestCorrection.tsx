@@ -48,6 +48,7 @@ export function RequestCorrection({
     <CorrectionDetails
       annotation={deepMerge(eventIndex.declaration, action.annotation)}
       event={eventBeforeCorrectionRequest}
+      eventType={action.type}
       form={deepMerge(eventIndex.declaration, action.declaration)}
     />
   )

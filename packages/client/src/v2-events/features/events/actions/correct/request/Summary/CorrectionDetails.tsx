@@ -57,12 +57,14 @@ export function CorrectionDetails({
   event,
   form,
   annotation,
+  eventType,
   editable = false,
   workqueue
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
+  eventType: typeof ActionType.REQUEST_CORRECTION | typeof ActionType.CORRECT
   editable?: boolean
   workqueue?: string
 }) {
@@ -70,7 +72,10 @@ export function CorrectionDetails({
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const previousFormValues = eventIndex.declaration
+  const previousFormValues =
+    eventType === ActionType.REQUEST_CORRECTION
+      ? eventIndex.declaration
+      : annotation
   const formConfig = getDeclaration(eventConfiguration)
   const navigate = useNavigate()
 
@@ -154,33 +159,36 @@ export function CorrectionDetails({
       ></Table>
 
       <CorrectionSectionTitle element="h3" variant="h3">
-        {intl.formatMessage(messages.correctionSectionTitle)}
+        {eventType === ActionType.REQUEST_CORRECTION
+          ? intl.formatMessage(messages.correctionSectionTitle)
+          : intl.formatMessage(messages.makeCorrectionSectionTitle)}
       </CorrectionSectionTitle>
 
       {formConfig.pages.map((page) => {
-        const changedFields = page.fields
-          .filter((f) => hasFieldChanged(f, form, previousFormValues))
-          .map((f) => {
-            const originalOutput = Output({
-              field: f,
-              value: previousFormValues[f.id],
-              showPreviouslyMissingValuesAsChanged: false
-            })
-
-            const correctionOutput = Output({
-              field: f,
-              value: form[f.id],
-              showPreviouslyMissingValuesAsChanged: false
-            })
-
-            return {
-              fieldLabel: intl.formatMessage(f.label),
-              original: originalOutput ?? '-',
-              correction: correctionOutput ?? '-'
-            }
+        const changedFields = page.fields.filter((f) =>
+          hasFieldChanged(f, form, previousFormValues)
+        )
+        const meomeo = changedFields.map((f) => {
+          const originalOutput = Output({
+            field: f,
+            value: previousFormValues[f.id],
+            showPreviouslyMissingValuesAsChanged: false
           })
 
-        if (changedFields.length === 0) {
+          const correctionOutput = Output({
+            field: f,
+            value: form[f.id],
+            showPreviouslyMissingValuesAsChanged: false
+          })
+
+          return {
+            fieldLabel: intl.formatMessage(f.label),
+            original: originalOutput ?? '-',
+            correction: correctionOutput ?? '-'
+          }
+        })
+
+        if (meomeo.length === 0) {
           return
         }
 
@@ -214,7 +222,7 @@ export function CorrectionDetails({
                 key: 'correction'
               }
             ]}
-            content={changedFields}
+            content={meomeo}
             hideTableBottomBorder={true}
             id={`corrections-table-${page.id}`}
           ></Table>

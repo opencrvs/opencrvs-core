@@ -203,6 +203,7 @@ export function Summary() {
             annotation={annotation}
             editable={true}
             event={event}
+            eventType={correctionActionType}
             form={form}
             workqueue={workqueue}
           />
