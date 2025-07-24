@@ -53,8 +53,10 @@ import {
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
 import {
+  Address,
   BulletList,
   Checkbox,
+  Data,
   DateField,
   RadioGroup,
   LocationSearch,
@@ -62,15 +64,13 @@ import {
   SelectCountry,
   Text,
   Number,
+  Phone,
   AdministrativeArea,
   Divider,
   PageHeader,
   Paragraph,
   SelectDateRangeField
 } from '@client/v2-events/features/events/registered-fields'
-
-import { Address } from '@client/v2-events/features/events/registered-fields/Address'
-import { Data } from '@client/v2-events/features/events/registered-fields/Data'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
@@ -192,10 +192,11 @@ export const GeneratedInputField = React.memo(
     if (isPhoneFieldType(field)) {
       return (
         <InputField {...field.inputFieldProps}>
-          <Text.Input
+          <Phone.Input
             {...inputProps}
-            isDisabled={disabled}
-            type="text"
+            country={field.config.country}
+            disabled={disabled}
+            options={field.config.options}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />

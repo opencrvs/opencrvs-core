@@ -34,5 +34,6 @@
   },
   "[dockerfile]": {
     "editor.defaultFormatter": "ms-azuretools.vscode-docker"
-  }
+  },
+  "prettier.prettierPath": "./node_modules/prettier"
 }

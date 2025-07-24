@@ -21,6 +21,6 @@
     "skipLibCheck": true,
     "declarationMap": true
   },
-  "include": ["src/**/*.tsx", "src/**/*.ts", ".storybook"],
+  "include": ["src/**/*.tsx", "src/**/*.ts", ".storybook", "typings"],
   "exclude": ["node_modules", "lib"]
 }

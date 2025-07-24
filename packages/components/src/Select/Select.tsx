@@ -41,7 +41,7 @@ const DropdownIndicator = (props: IndicatorProps<ISelectOption>) => {
 }
 
 const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
-  width: 100%;
+  ${({ width }) => (width ? `width: ${width}px;` : `width: 100%`)}
   ${({ theme }) => theme.fonts.reg19};
   background: ${({ theme }) => theme.colors.white};
   color: ${({ theme }) => theme.colors.grey600};
@@ -51,7 +51,8 @@ const StyledSelect = styled(ReactSelect)<IStyledSelectProps>`
   }
 
   .react-select__control {
-    height: 46px;
+    height: 48px;
+    ${({ height }) => (height ? `height: ${height}px;` : `height: 46px`)}
     cursor: pointer;
     border: 1.5px solid
       ${({ error, touched, disabled, theme }) =>
@@ -161,6 +162,7 @@ export interface ISelectProps
   onChange: (value: string) => void
   value: string
   searchableLength?: number
+  width?: string | number
 }
 
 type ControlProps = React.ComponentProps<typeof components.Control>

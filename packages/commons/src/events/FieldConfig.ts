@@ -259,6 +259,11 @@ const File = BaseField.extend({
 
 export type File = z.infer<typeof File>
 
+export const IntlPhoneOption = z.object({
+  value: z.string().describe('The value of the option'),
+  label: z.string().describe('The label of the option')
+})
+
 export const SelectOption = z.object({
   value: z.string().describe('The value of the option'),
   label: TranslationConfig.describe('The label of the option')
@@ -346,6 +351,10 @@ const NameField = BaseField.extend({
 }).describe('Name input field')
 
 const PhoneField = BaseField.extend({
+  country: z.string(),
+  options: z
+    .array(IntlPhoneOption)
+    .describe('A list of options not requiring translations'),
   defaultValue: NonEmptyTextValue.optional(),
   type: z.literal(FieldType.PHONE)
 }).describe('Phone input field')

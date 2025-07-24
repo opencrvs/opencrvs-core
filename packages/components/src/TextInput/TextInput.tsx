@@ -49,8 +49,8 @@ const StyledInputContainer = styled.div<{
       error && touched
         ? theme.colors.negative
         : disabled
-        ? theme.colors.grey300
-        : theme.colors.copy
+          ? theme.colors.grey300
+          : theme.colors.copy
     };
     &:hover {
       box-shadow: 0 0 0 4px ${theme.colors.grey200};
