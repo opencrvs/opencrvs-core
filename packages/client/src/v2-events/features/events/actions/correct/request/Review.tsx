@@ -44,7 +44,7 @@ import { hasFieldChanged } from '../utils'
 
 function mergeCorrectionFormValues(
   form: EventState,
-  declaration: Record<string, FieldUpdateValue>
+  declaration: EventState
 ): EventState {
   return deepMerge(form, declaration)
 }
@@ -111,12 +111,19 @@ export function Review() {
     )
   }
 
+  const isRequestCorrectionAction = (
+    action: typeof lastWriteAction
+  ): action is typeof lastWriteAction & { declaration: EventState } => {
+    return action.type === 'REQUEST_CORRECTION'
+  }
+
   const isReviewCorrection =
     canReviewCorrection && isLastActionCorrectionRequest
 
-  const formWithNewValues = isReviewCorrection
-    ? mergeCorrectionFormValues(form, lastWriteAction.declaration)
-    : form
+  const formWithNewValues =
+    isReviewCorrection && isRequestCorrectionAction(lastWriteAction)
+      ? mergeCorrectionFormValues(form, lastWriteAction.declaration)
+      : form
 
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>

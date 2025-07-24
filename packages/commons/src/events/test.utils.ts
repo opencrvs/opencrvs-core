@@ -682,6 +682,8 @@ export function generateActionDocument({
       return { ...actionBase, type: action }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
+    case ActionType.REVIEW_CORRECTION_REQUEST:
+      return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
       return { ...actionBase, requestId: getUUID(), type: action }
     case ActionType.REJECT_CORRECTION:

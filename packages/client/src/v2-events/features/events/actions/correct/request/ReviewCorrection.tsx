@@ -11,8 +11,16 @@
 import React from 'react'
 import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { EventState } from '@opencrvs/commons/client'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import { useNavigate } from 'react-router-dom'
+import {
+  EventState,
+  generateTransactionId,
+  isMetaAction
+} from '@opencrvs/commons/client'
 import {
   Button,
   Icon,
@@ -101,7 +109,13 @@ const messages = defineMessages({
   }
 })
 
-function ApproveModal({ close }: { close: (result: boolean | null) => void }) {
+function ApproveModal({
+  close,
+  onSubmit
+}: {
+  close: (result: boolean | null) => void
+  onSubmit: () => void
+}) {
   const intl = useIntl()
   return (
     <ResponsiveModal
@@ -123,6 +137,7 @@ function ApproveModal({ close }: { close: (result: boolean | null) => void }) {
           id="confirm_correction"
           type="primary"
           onClick={() => {
+            onSubmit()
             close(true)
           }}
         >
@@ -130,7 +145,7 @@ function ApproveModal({ close }: { close: (result: boolean | null) => void }) {
         </Button>
       ]}
       handleClose={() => close(null)}
-      responsive={false}
+      responsive={true}
       show={true}
       title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
     >
@@ -143,7 +158,13 @@ function ApproveModal({ close }: { close: (result: boolean | null) => void }) {
   )
 }
 
-function RejectModal({ close }: { close: (result: boolean | null) => void }) {
+function RejectModal({
+  close,
+  onSubmit
+}: {
+  close: (result: boolean | null) => void
+  onSubmit: () => void
+}) {
   const intl = useIntl()
   return (
     <ResponsiveModal
@@ -165,6 +186,7 @@ function RejectModal({ close }: { close: (result: boolean | null) => void }) {
           id="reject_correction"
           type="primary"
           onClick={() => {
+            onSubmit()
             close(true)
           }}
         >
@@ -190,16 +212,66 @@ export function ReviewCorrection({ form }: { form: EventState }) {
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const [searchParams] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW
+  )
+
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
   const [modal, openModal] = useModal()
+  const navigate = useNavigate()
+
+  const writeActions = event.actions.filter(
+    (action) => !isMetaAction(action.type)
+  )
+
+  // latest action should be correction action
+  const lastWriteAction = writeActions[writeActions.length - 1]
 
   const openApproveModal = async () => {
-    await openModal((close) => <ApproveModal close={close} />)
+    await openModal((close) => (
+      <ApproveModal
+        close={close}
+        onSubmit={() => {
+          events.actions.correction.approve.mutate({
+            transactionId: generateTransactionId(),
+            eventId,
+            requestId: lastWriteAction.id,
+            annotation,
+            declaration: form
+          })
+          return navigate(
+            ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
+          )
+        }}
+      />
+    ))
   }
 
   const openRejectModal = async () => {
-    await openModal((close) => <RejectModal close={close} />)
+    await openModal((close) => (
+      <RejectModal
+        close={close}
+        onSubmit={() => {
+          events.actions.correction.reject.mutate({
+            transactionId: generateTransactionId(),
+            eventId,
+            requestId: lastWriteAction.id,
+            annotation,
+            declaration: form
+          })
+          return navigate(
+            ROUTES.V2.EVENTS.OVERVIEW.buildPath(
+              { eventId },
+              { workqueue: searchParams.workqueue }
+            )
+          )
+        }}
+      />
+    ))
   }
 
   return (
