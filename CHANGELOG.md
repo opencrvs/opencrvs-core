@@ -23,6 +23,8 @@
 
 - **Upgraded MinIO** to RELEASE.2025-06-13T11-33-47Z and MinIO Client (mc) to RELEASE.2025-05-21T01-59-54Z and ensured compatibility across both amd64 and arm64 architectures.
 
+- Add retry on deploy-to-feature-environment workflow at core repo [#9847](https://github.com/opencrvs/opencrvs-core/issues/9847)
+
 ## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.8.0)
 
 ### New features
