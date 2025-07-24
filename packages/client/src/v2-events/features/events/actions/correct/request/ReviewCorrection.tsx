@@ -237,8 +237,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
             transactionId: generateTransactionId(),
             eventId,
             requestId: lastWriteAction.id,
-            annotation,
-            declaration: form
+            annotation
           })
           return navigate(
             ROUTES.V2.EVENTS.OVERVIEW.buildPath(
@@ -260,8 +259,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
             transactionId: generateTransactionId(),
             eventId,
             requestId: lastWriteAction.id,
-            annotation,
-            declaration: form
+            annotation
           })
           return navigate(
             ROUTES.V2.EVENTS.OVERVIEW.buildPath(

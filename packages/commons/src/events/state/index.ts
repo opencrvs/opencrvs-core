@@ -56,6 +56,7 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.ASSIGN:
         case ActionType.UNASSIGN:
         case ActionType.REQUEST_CORRECTION:
+        case ActionType.REVIEW_CORRECTION_REQUEST:
         case ActionType.APPROVE_CORRECTION:
         case ActionType.MARKED_AS_DUPLICATE:
         case ActionType.REJECT_CORRECTION:
@@ -103,7 +104,8 @@ function aggregateActionDeclarations(
 
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REJECT_CORRECTION
   ]
 
   return actions.reduce((declaration, action) => {
