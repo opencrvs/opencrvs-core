@@ -70,7 +70,7 @@ function getAvailableAssignmentActions(
 }
 interface ActionConfig {
   label: TranslationConfig
-  icon?: IconProps['name']
+  icon: IconProps['name']
   onClick: (workqueue?: string) => Promise<void> | void
   disabled?: boolean
   shouldHide?: (actions: ActionType[]) => boolean
