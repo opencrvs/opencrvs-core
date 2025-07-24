@@ -160,8 +160,7 @@ export type RequestedCorrectionAction = z.infer<
 
 const CorrectedAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.CORRECT),
-    requestId: z.string()
+    type: z.literal(ActionType.CORRECT)
   })
 )
 

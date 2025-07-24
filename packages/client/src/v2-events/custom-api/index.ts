@@ -152,13 +152,14 @@ export async function makeCorrectionOnRequest(variables: {
 }) {
   const { eventId, declaration, annotation } = variables
 
-  const response = await trpcClient.event.actions.correction.request.mutate({
-    eventId,
-    declaration,
-    transactionId: variables.transactionId,
-    annotation,
-    keepAssignment: true
-  })
+  const response =
+    await trpcClient.event.actions.correction.request.request.mutate({
+      eventId,
+      declaration,
+      transactionId: variables.transactionId,
+      annotation,
+      keepAssignment: true
+    })
 
   const requestId = response.actions.find(
     (x) => x.transactionId === variables.transactionId
@@ -169,11 +170,11 @@ export async function makeCorrectionOnRequest(variables: {
     )
   }
   const latestResponse =
-    await trpcClient.event.actions.correction.approve.mutate({
-      requestId,
+    await trpcClient.event.actions.correction.approve.request.mutate({
       type: ActionType.APPROVE_CORRECTION,
       transactionId: getUUID(),
-      eventId
+      eventId,
+      requestId: requestId
     })
 
   return latestResponse

@@ -158,18 +158,6 @@ export function EventSummary({
   return (
     <>
       <Summary id="summary">
-        <button
-          onClick={() => {
-            events.actions.correction.approve.mutate({
-              requestId: '4c7bdfe7-cdf6-4167-8970-d798418f33ce',
-              type: 'APPROVE_CORRECTION',
-              transactionId: 'sdf0baccd9f-4829-43ef-baab-9348c629dc8d',
-              eventId: '0baccd9f-4829-43ef-baab-9348c629dc8d'
-            })
-          }}
-        >
-          meo
-        </button>
         <Summary.Row
           key="assignedTo"
           data-testid="assignedTo"

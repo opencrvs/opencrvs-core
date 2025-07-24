@@ -28,7 +28,7 @@ export function getActionTypeSpecificContent(
     return <Archive />
   }
 
-  if (type === ActionType.REQUEST_CORRECTION) {
+  if (type === ActionType.REQUEST_CORRECTION || type === ActionType.CORRECT) {
     return <RequestCorrection action={action} fullEvent={fullEvent} />
   }
 

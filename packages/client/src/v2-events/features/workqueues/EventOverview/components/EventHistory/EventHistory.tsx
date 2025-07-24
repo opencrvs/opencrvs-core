@@ -185,6 +185,35 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   )
 
   const historyRows = visibleHistory
+    .reduce(
+      (actionList, currentAction) => {
+        const previousAction = actionList.at(-1) // safer than actionList[actionList.length - 1]
+
+        if (
+          previousAction &&
+          currentAction.type === ActionType.APPROVE_CORRECTION &&
+          previousAction.type === ActionType.REQUEST_CORRECTION &&
+          currentAction.createdBy === previousAction.createdBy &&
+          currentAction.requestId === previousAction.id
+        ) {
+          // Replace previous action with merged one
+          actionList = actionList.map((x) => {
+            if (x.id === previousAction.id) {
+              x = {
+                ...previousAction,
+                type: ActionType.CORRECT
+              }
+            }
+            return x
+          })
+        } else {
+          actionList.push(currentAction)
+        }
+
+        return actionList
+      },
+      [] as typeof visibleHistory
+    )
     .slice(
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE

@@ -10,6 +10,7 @@
  */
 import React from 'react'
 import {
+  CorrectedAction,
   deepMerge,
   EventDocument,
   getCurrentEventState,
@@ -22,7 +23,7 @@ export function RequestCorrection({
   action,
   fullEvent
 }: {
-  action: RequestedCorrectionAction
+  action: RequestedCorrectionAction | CorrectedAction
   fullEvent: EventDocument
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
