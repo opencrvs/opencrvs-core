@@ -23,7 +23,8 @@ import {
   deepDropNulls,
   applyDraftsToEventIndex,
   WorkqueueActionsWithDefault,
-  isMetaAction
+  isMetaAction,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -150,6 +151,12 @@ function changeSortedColumn(
 }
 
 const messages = defineMessages({
+  noRecord: {
+    id: 'v2.search.noRecord',
+    defaultMessage:
+      'No records {slug, select draft {in my draft} outbox {require processing} other {{title}}}',
+    description: 'The no record text'
+  },
   noResult: {
     id: 'v2.search.noResult',
     defaultMessage: 'No results',
@@ -230,7 +237,8 @@ export const SearchResultComponent = ({
   offset = 0,
   title: contentTitle,
   tabBarContent,
-  actions = []
+  actions = [],
+  emptyMessage
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -240,6 +248,7 @@ export const SearchResultComponent = ({
   title: string
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
+  emptyMessage?: TranslationConfig
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
@@ -466,6 +475,13 @@ export const SearchResultComponent = ({
 
   const isShowPagination = totalPages > 1
 
+  const noResultText = slug
+    ? intl.formatMessage(messages.noRecord, {
+        slug,
+        title: contentTitle.toLowerCase()
+      })
+    : intl.formatMessage(messages.noResult)
+
   return (
     <WithTestId>
       <WQContentWrapper
@@ -473,11 +489,9 @@ export const SearchResultComponent = ({
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         noContent={queryData.length === 0}
-        noResultText={intl.formatMessage(
-          slug === CoreWorkqueues.OUTBOX
-            ? messages.noResultsOutbox
-            : messages.noResult
-        )}
+        noResultText={
+          emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
+        }
         paginationId={currentPageNumber}
         tabBarContent={tabBarContent}
         title={contentTitle}
