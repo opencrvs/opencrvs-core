@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable max-lines */
-import { isArray, isNil, isPlainObject, isString, partition } from 'lodash'
+import { isArray, isNil, isPlainObject, isString } from 'lodash'
 import { parse as parseQuery, stringify } from 'query-string'
 import { useSelector } from 'react-redux'
 import {
@@ -25,7 +25,6 @@ import {
   FieldType,
   QueryExpression,
   NameFieldValue,
-  getDeclarationFields,
   DateRangeFieldValue,
   SelectDateRangeValue,
   AddressFieldValue,
@@ -38,7 +37,6 @@ import {
   getValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
 import { getScope } from '@client/profile/profileSelectors'
-import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
@@ -308,10 +306,7 @@ function buildConditionForStatus(): Condition {
 function buildSearchQueryFields(
   searchConfigurations: {
     fieldId: string
-    config: {
-      type: keyof typeof MatchType
-    }
-    fieldType: 'field' | 'event'
+    searchType: keyof typeof MatchType
     fieldConfig: FieldConfig
   }[],
   searchInput: EventState // values from UI or query string
@@ -321,17 +316,7 @@ function buildSearchQueryFields(
       const value = searchInput[config.fieldId]
       const fieldId = config.fieldId
 
-      // Handle the case where we want to search by range but the value is not a comma-separated string
-      // e.g. "2023-01-01,2023-12-31" should be treated as a range
-      // but "2023-01-01" should be treated as an exact match
-      let searchType = config.config.type
-      if (
-        searchType === 'range' &&
-        typeof value === 'string' &&
-        value.split(',').length === 1
-      ) {
-        searchType = 'exact'
-      }
+      const searchType = config.searchType
 
       if (!value) {
         return result
@@ -384,16 +369,13 @@ function buildSearchQueryFields(
         }
       }
 
-      // If the field is of DATE or DATE_RANGE type and the fieldType is 'event' (metadata search field),
-      // we treat the input as a range, regardless of whether the user entered a single date (e.g., "2023-01-01")
-      // or a date range (e.g., {"2023-01-01,2024-01-01").
-      // In both cases, we convert the local date(s) into a UTC-based range to ensure
-      // accurate matching in Elasticsearch, which stores these metadata dates in UTC.
-      if (
-        config.fieldType === 'event' &&
-        (config.fieldConfig.type === FieldType.DATE_RANGE ||
-          config.fieldConfig.type === FieldType.DATE)
-      ) {
+      /* If the field is of DATE_RANGE type we treat the input as a range,
+       * regardless of whether the user entered a single date (e.g., "2023-01-01")
+       * or a date range (e.g., { start: "2023-01-01" end: "2024-01-01" }).
+       * In both cases, we convert the local date(s) into a UTC-based range to ensure
+       * accurate matching in Elasticsearch, which stores these metadata dates in UTC.
+       */
+      if (config.fieldConfig.type === FieldType.DATE_RANGE) {
         return {
           ...result,
           [fieldId]: buildSearchClause(
@@ -405,8 +387,6 @@ function buildSearchQueryFields(
 
       return {
         ...result,
-        // @TODO: Previously an issue was fixed by turning all the values into string. Ask Tareq about it so we can make sure the case is still handled.
-
         [fieldId]: buildSearchClause(value.toString(), searchType)
       }
     },
@@ -513,13 +493,7 @@ export function applySearchFieldConfigToFieldConfig(
   }
 }
 
-/**
- *
- * @TODO: We need to check whether buildSearchQueryFields is needed or can it be incorporated under same function.
- * Nevertheless, we need to rewrite parts of it and see that it keep returning correct values. (Currently it does not handle all the range/date-range/select-date-range cases)
- *
- * @see buildSearchQueryFields
- *
+/*
  * Builds a data condition object based on the provided event state and configuration.
  *
  * This function:
@@ -562,8 +536,7 @@ export function buildSearchQuery(
 
   const searchConfigs = queriedSearchFields.map((searchField) => ({
     fieldId: searchField.fieldId,
-    config: searchField.config,
-    fieldType: searchField.fieldType,
+    searchType: searchField.config.type,
     fieldConfig: applySearchFieldConfigToFieldConfig(
       fieldsMap[searchField.fieldId],
       searchField
