@@ -76,7 +76,7 @@ export const actionLabels = {
   [ActionType.READ]: {
     id: 'v2.action.view.record',
     description: 'Label for view record',
-    defaultMessage: 'View record'
+    defaultMessage: 'View'
   },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
@@ -95,18 +95,18 @@ export const actionLabels = {
     id: 'v2.event.birth.action.declare.label'
   },
   [ActionType.VALIDATE]: {
-    defaultMessage: 'Validate',
+    defaultMessage: 'Review',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.validate.label'
   },
   [ActionType.REGISTER]: {
-    defaultMessage: 'Register',
+    defaultMessage: 'Review',
     description: 'Label for review record button in dropdown menu',
     id: 'v2.event.birth.action.register.label'
   },
   [ActionType.PRINT_CERTIFICATE]: {
-    defaultMessage: 'Print certificate',
+    defaultMessage: 'Print',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.collect-certificate.label'
