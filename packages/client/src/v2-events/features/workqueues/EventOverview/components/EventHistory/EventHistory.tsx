@@ -35,6 +35,7 @@ import { useEventOverviewContext } from '@client/v2-events/features/workqueues/E
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
+import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import {
   EventHistoryDialog,
   eventHistoryStatusMessage
@@ -166,6 +167,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const { getUser, getLocation } = useEventOverviewContext()
+  const { getActionTypeForHistory } = useActionForHistory()
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
@@ -187,30 +189,37 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const historyRows = visibleHistory
     .reduce(
       (actionList, currentAction) => {
-        const previousAction = actionList.at(-1)
-
-        // If correction request is approved by same user who requested it, we merge the actions
-        // and label it as 'CORRECT' action (which is an UI only action).
         if (
-          previousAction &&
           currentAction.type === ActionType.APPROVE_CORRECTION &&
-          previousAction.type === ActionType.REQUEST_CORRECTION &&
-          currentAction.createdBy === previousAction.createdBy &&
-          currentAction.requestId === previousAction.id
+          currentAction.isImmediateCorrection
         ) {
-          // Replace previous action with merged one
-          actionList = actionList.map((x) => {
-            if (x.id === previousAction.id) {
-              x = {
-                ...previousAction,
-                type: ActionType.CORRECT
+          const requestCorrectionAction = actionList.find(
+            (action) =>
+              action.type === ActionType.REQUEST_CORRECTION &&
+              action.id === currentAction.requestId
+          )
+          if (
+            requestCorrectionAction &&
+            currentAction.createdBy === requestCorrectionAction.createdBy &&
+            currentAction.requestId === requestCorrectionAction.id
+          ) {
+            // If we find a request correction action, we merge the approve action into it
+            actionList = actionList.map((action) => {
+              if (action.id === requestCorrectionAction.id) {
+                return {
+                  ...requestCorrectionAction,
+                  isImmediateCorrection: true,
+                  createdBy: currentAction.createdBy,
+                  createdAt: currentAction.createdAt,
+                  createdByRole: currentAction.createdByRole
+                }
               }
-            }
-            return x
-          })
-        } else {
-          actionList.push(currentAction)
+              return action
+            })
+            return actionList
+          }
         }
+        actionList.push(currentAction)
 
         return actionList
       },
@@ -241,10 +250,12 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         action: (
           <Link
             font="bold14"
-            onClick={() => onHistoryRowClick(action, userName)}
+            onClick={() => {
+              onHistoryRowClick(action, userName)
+            }}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
-              status: action.type
+              status: getActionTypeForHistory(history, action)
             })}
           </Link>
         ),

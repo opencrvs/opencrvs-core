@@ -79,10 +79,6 @@ const mockActions: Record<
   },
   [ActionType.READ]: { ...actionProps, type: ActionType.READ },
   [ActionType.NOTIFY]: { ...actionProps, type: ActionType.NOTIFY },
-  [ActionType.CORRECT]: {
-    ...actionProps,
-    type: ActionType.CORRECT
-  },
   [ActionType.REQUEST_CORRECTION]: {
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION

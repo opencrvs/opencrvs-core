@@ -698,7 +698,6 @@ export function generateActionDocument({
 
     case ActionType.DELETE:
     case ActionType.DETECT_DUPLICATE:
-    case ActionType.CORRECT:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }

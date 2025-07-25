@@ -58,6 +58,12 @@ export default interface EventActionsTable {
   status: ColumnType<ActionStatus, ActionStatus, ActionStatus>
 
   transactionId: ColumnType<string, string, string>
+
+  isImmediateCorrection: ColumnType<
+    boolean | null,
+    boolean | null,
+    boolean | null
+  >
 }
 
 export type EventActions = Selectable<EventActionsTable>

@@ -79,10 +79,7 @@ export function getPrintCertificatePages(configuration: EventConfig) {
 }
 
 export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
-  if (
-    actionConfig.type === ActionType.REQUEST_CORRECTION ||
-    actionConfig.type === ActionType.CORRECT
-  ) {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
     return actionConfig.correctionForm.pages.flatMap(({ fields }) => fields)
   }
 
@@ -123,10 +120,7 @@ export const findRecordActionPages = (
 ): PageConfig[] => {
   const action = config.actions.find((a) => a.type === actionType)
 
-  if (
-    action?.type === ActionType.REQUEST_CORRECTION ||
-    action?.type === ActionType.CORRECT
-  ) {
+  if (action?.type === ActionType.REQUEST_CORRECTION) {
     return action.correctionForm.pages
   }
 
@@ -261,10 +255,7 @@ export function getActionVerificationPageIds(
   actionConfig: ActionConfig,
   annotation: ActionUpdate
 ): string[] {
-  if (
-    actionConfig.type === ActionType.REQUEST_CORRECTION ||
-    actionConfig.type === ActionType.CORRECT
-  ) {
+  if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
     return getVisibleVerificationPageIds(
       actionConfig.correctionForm.pages,
       annotation

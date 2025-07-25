@@ -10,6 +10,7 @@
  */
 import React from 'react'
 import {
+  ActionType,
   CorrectedAction,
   deepMerge,
   EventDocument,
@@ -48,8 +49,11 @@ export function RequestCorrection({
     <CorrectionDetails
       annotation={deepMerge(eventIndex.declaration, action.annotation)}
       event={eventBeforeCorrectionRequest}
-      eventType={action.type}
       form={deepMerge(eventIndex.declaration, action.declaration)}
+      requesting={
+        action.type === ActionType.REQUEST_CORRECTION &&
+        !('isImmediateCorrection' in action && action.isImmediateCorrection)
+      }
     />
   )
 }

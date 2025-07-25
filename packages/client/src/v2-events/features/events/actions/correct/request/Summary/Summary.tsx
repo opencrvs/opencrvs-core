@@ -43,7 +43,6 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { hasFieldChanged } from '../../utils'
-import { useCorrectionActionType } from '../../useCorrectionActionType'
 import { CorrectionDetails } from './CorrectionDetails'
 
 const messages = defineMessages({
@@ -80,7 +79,6 @@ export function Summary() {
   const [{ workqueue }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.CORRECTION.SUMMARY
   )
-  const { correctionActionType } = useCorrectionActionType()
   const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
@@ -121,33 +119,26 @@ export function Summary() {
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
-    if (correctionActionType === ActionType.CORRECT) {
-      events.customActions.makeCorrectionOnRequest.mutate({
-        eventId,
-        declaration: {
-          ...formWithOnlyChangedValues,
-          ...nullifiedHiddenValues
-        },
-        transactionId: generateTransactionId(),
-        annotation
-      })
+    const mutationPayload = {
+      eventId,
+      declaration: {
+        ...formWithOnlyChangedValues,
+        ...nullifiedHiddenValues
+      },
+      transactionId: generateTransactionId(),
+      annotation
+    }
+    if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
+      events.customActions.makeCorrectionOnRequest.mutate(mutationPayload)
     } else {
-      events.actions.correction.request.mutate({
-        eventId,
-        declaration: {
-          ...formWithOnlyChangedValues,
-          ...nullifiedHiddenValues
-        },
-        transactionId: generateTransactionId(),
-        annotation
-      })
+      events.actions.correction.request.mutate(mutationPayload)
     }
 
     navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
   }, [
     form,
     fields,
-    correctionActionType,
+    scopes,
     events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,
     eventId,
@@ -175,10 +166,9 @@ export function Summary() {
               onClick={togglePrompt}
             >
               <Check />
-              {/* TODO: when direct correction is implemented, we should use different button message for that */}
-              {correctionActionType === ActionType.REQUEST_CORRECTION
-                ? intl.formatMessage(messages.submitCorrectionRequest)
-                : intl.formatMessage(messages.makeCorrection)}
+              {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+                ? intl.formatMessage(messages.makeCorrection)
+                : intl.formatMessage(messages.submitCorrectionRequest)}
             </Button>
           ]}
           showTitleOnMobile={true}
@@ -203,8 +193,8 @@ export function Summary() {
             annotation={annotation}
             editable={true}
             event={event}
-            eventType={correctionActionType}
             form={form}
+            requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
             workqueue={workqueue}
           />
         </Content>

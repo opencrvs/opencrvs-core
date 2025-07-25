@@ -158,6 +158,7 @@ export type RejectCorrectionActionInput = z.infer<
 export const ApproveCorrectionActionInput = BaseActionInput.merge(
   z.object({
     requestId: z.string(),
+    isImmediateCorrection: z.boolean().optional(),
     type: z
       .literal(ActionType.APPROVE_CORRECTION)
       .default(ActionType.APPROVE_CORRECTION)

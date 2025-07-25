@@ -139,7 +139,11 @@ export async function registerOnValidate(variables: {
 }
 
 /**
- * Runs a sequence of actions from  validate to register.
+ * Runs a full correction sequence:
+ * 1. Request a correction
+ * 2. Approve the correction
+ *
+ * This is used to make a direct correction (instead of a separate request and approval) by users who are allowed to do so.
  *
  * Defining the function here, statically allows offline support.
  * Moving the function to one level up will break offline support since the definition needs to be static.
@@ -150,32 +154,28 @@ export async function makeCorrectionOnRequest(variables: {
   transactionId: string
   annotation?: EventState
 }) {
-  const { eventId, declaration, annotation } = variables
-
+  const { eventId, declaration, annotation, transactionId } = variables
   const response =
     await trpcClient.event.actions.correction.request.request.mutate({
       eventId,
       declaration,
-      transactionId: variables.transactionId,
+      transactionId,
       annotation,
       keepAssignment: true
     })
-
   const requestId = response.actions.find(
-    (x) => x.transactionId === variables.transactionId
+    (a) => a.transactionId === transactionId
   )?.id
   if (!requestId) {
     throw new Error(
-      `Request ID not found in response for eventId: ${eventId}, transactionId: ${variables.transactionId}`
+      `Request ID not found in response for eventId: ${eventId}, transactionId: ${transactionId}`
     )
   }
-  const latestResponse =
-    await trpcClient.event.actions.correction.approve.request.mutate({
-      type: ActionType.APPROVE_CORRECTION,
-      transactionId: getUUID(),
-      eventId,
-      requestId: requestId
-    })
-
-  return latestResponse
+  return trpcClient.event.actions.correction.approve.request.mutate({
+    type: ActionType.APPROVE_CORRECTION,
+    transactionId: getUUID(),
+    eventId,
+    requestId,
+    isImmediateCorrection: true
+  })
 }
