@@ -24,7 +24,8 @@ import { SearchResultComponent } from './SearchResult'
 import {
   buildSearchQuery,
   toAdvancedSearchQueryType,
-  deserializeSearchParams
+  deserializeSearchParams,
+  resolveAdvancedSearchConfig
 } from './utils'
 
 export const SearchResultIndex = () => {
@@ -35,17 +36,34 @@ export const SearchResultIndex = () => {
   const location = useLocation()
   const { eventConfiguration: eventConfig } = useEventConfiguration(eventType)
 
+  const fields = useMemo(() => {
+    const sections = resolveAdvancedSearchConfig(eventConfig)
+    return sections.flatMap((section) => section.fields)
+  }, [eventConfig])
+
   /*
    * SelectDateRangeValue's are converted to DateTime values which would
    * return a new value on every render, hence we need to memoize.
    */
-  const searchParams = useMemo(
-    () => SearchQueryParams.parse(deserializeSearchParams(location.search)),
-    [location.search]
-  )
+  const formValues = useMemo(() => {
+    const searchParams = SearchQueryParams.parse(
+      deserializeSearchParams(location.search)
+    )
+    return Object.fromEntries(
+      Object.entries(searchParams).filter(([key]) =>
+        fields.some((field) => field.id === key)
+      )
+    )
+  }, [location.search, fields])
+
   const searchQuery = useMemo(
-    () => buildSearchQuery(searchParams, eventConfig),
-    [searchParams, eventConfig]
+    () =>
+      buildSearchQuery(
+        formValues,
+        fields,
+        eventConfig.advancedSearch.flatMap((section) => section.fields)
+      ),
+    [formValues, eventConfig, fields]
   )
 
   /*
@@ -65,7 +83,7 @@ export const SearchResultIndex = () => {
       tabBarContent={
         <SearchCriteriaPanel
           eventConfig={eventConfig}
-          searchParams={searchParams}
+          formValues={formValues}
         />
       }
       title={intl.formatMessage(

@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { SelectOption, ValidationConfig } from './FieldConfig'
+import { Inferred, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
 
@@ -135,5 +135,8 @@ export const AdvancedSearchConfig = z.object({
   fields: z.array(SearchField).describe('Advanced search fields.')
 })
 
-export type AdvancedSearchConfigInput = z.infer<typeof AdvancedSearchConfig>
 export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>
+export type AdvancedSearchConfigWithFieldsResolved = Omit<
+  AdvancedSearchConfig,
+  'fields'
+> & { fields: Inferred[] }

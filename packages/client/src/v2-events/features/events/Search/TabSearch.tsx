@@ -27,15 +27,13 @@ import {
   isFieldVisible
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
-import { filterEmptyValues, getAllUniqueFields } from '@client/v2-events/utils'
+import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import {
-  applySearchFieldConfigToFieldConfig,
-  flattenFieldErrors,
-  getAdvancedSearchFieldErrors,
-  getMetadataFieldConfigs,
-  serializeSearchParams
-} from './utils'
+  Errors,
+  getValidationErrorsForForm
+} from '@client/v2-events/components/forms/validation'
+import { resolveAdvancedSearchConfig, serializeSearchParams } from './utils'
 const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
@@ -61,26 +59,6 @@ const messagesToDefine = {
 }
 
 const messages = defineMessages(messagesToDefine)
-
-function enhanceEventFieldsWithSearchFieldConfig(event: EventConfig) {
-  return {
-    ...event,
-    declaration: {
-      ...event.declaration,
-      pages: event.declaration.pages.map((page) => ({
-        ...page,
-        fields: page.fields.map((field) => {
-          const searchField = event.advancedSearch
-            .flatMap((x) => x.fields)
-            .find((f) => f.fieldId === field.id)
-          return searchField
-            ? applySearchFieldConfigToFieldConfig(field, searchField)
-            : field
-        })
-      }))
-    }
-  }
-}
 
 function SearchSectionForm({
   section,
@@ -120,53 +98,6 @@ function SearchSectionForm({
   )
 }
 
-function buildSearchSections({
-  enhancedEvent,
-  fieldValues
-}: {
-  enhancedEvent: EventConfig
-  fieldValues?: EventState
-}) {
-  const allUniqueFields = getAllUniqueFields(enhancedEvent)
-
-  return enhancedEvent.advancedSearch.map((section) => {
-    const metadataFields = getMetadataFieldConfigs(section.fields)
-
-    const matchingFields = allUniqueFields.filter((f) =>
-      section.fields.some((searchField) => searchField.fieldId === f.id)
-    )
-
-    const combinedFields = [...metadataFields, ...matchingFields]
-
-    const modifiedFields = combinedFields.map((f) => {
-      const fieldSearchConfig = section.fields.find((a) => a.fieldId === f.id)
-      let optionsOverride = {}
-      if (fieldSearchConfig?.options && fieldSearchConfig.options.length > 0) {
-        optionsOverride = {
-          options: fieldSearchConfig.options
-        }
-      }
-      return {
-        ...f,
-        ...optionsOverride,
-        required: false as const,
-        conditionals: fieldSearchConfig?.conditionals ?? f.conditionals,
-        validation: fieldSearchConfig?.validations ?? f.validation
-      }
-    })
-
-    const isExpanded =
-      modifiedFields.find((f) => fieldValues?.hasOwnProperty(f.id)) !==
-      undefined
-
-    return {
-      title: section.title,
-      isExpanded,
-      fields: modifiedFields
-    }
-  })
-}
-
 export function TabSearch({
   currentEvent,
   fieldValues,
@@ -194,32 +125,34 @@ export function TabSearch({
     onChange(formValues)
   }, [formValues, onChange])
 
-  const enhancedEvent = enhanceEventFieldsWithSearchFieldConfig(currentEvent)
+  const advancedSearchSections = resolveAdvancedSearchConfig(currentEvent)
 
-  const sections = buildSearchSections({
-    enhancedEvent,
-    fieldValues
-  })
-
+  const sections = advancedSearchSections.map((section) => ({
+    ...section,
+    isExpanded: section.fields.some((field) =>
+      fieldValues.hasOwnProperty(field.id)
+    )
+  }))
   const handleFieldChange = (fieldId: string, value: FieldValue) =>
     setFormValues((prev) => ({
       ...prev,
       [fieldId]: value
     }))
 
-  const errors = flattenFieldErrors(
-    getAdvancedSearchFieldErrors(enhancedEvent, formValues)
-  )
+  const errors = Object.values(
+    sections.reduce(
+      (acc, section) => ({
+        ...acc,
+        ...getValidationErrorsForForm(section.fields, formValues)
+      }),
+      {} as Errors
+    )
+  ).flatMap((errObj) => errObj.errors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
 
   const handleSearch = () => {
-    const fields = [
-      ...enhancedEvent.declaration.pages.flatMap((page) => page.fields),
-      ...getMetadataFieldConfigs(
-        enhancedEvent.advancedSearch.flatMap((section) => section.fields)
-      )
-    ]
+    const fields = sections.flatMap((section) => section.fields)
 
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
@@ -247,7 +180,7 @@ export function TabSearch({
     const queryString = serializeSearchParams(updatedValues)
 
     const searchPath = ROUTES.V2.SEARCH_RESULT.buildPath({
-      eventType: enhancedEvent.id
+      eventType: currentEvent.id
     })
 
     navigate(`${searchPath}?${queryString}`)

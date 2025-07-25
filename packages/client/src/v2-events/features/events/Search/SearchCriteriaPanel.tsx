@@ -97,24 +97,18 @@ function SearchParamLabel({
 
 export function SearchCriteriaPanel({
   eventConfig,
-  searchParams
+  formValues
 }: {
   eventConfig: EventConfig
-  searchParams: EventState
+  formValues: EventState
 }) {
   const navigate = useNavigate()
   const intl = useIntl()
 
   const searchFieldConfigs = getSearchParamsFieldConfigs(
     eventConfig,
-    searchParams
+    formValues
   )
-  const filteredSearchParams = Object.fromEntries(
-    Object.entries(searchParams).filter(([key]) =>
-      searchFieldConfigs.some((config) => config.id === key)
-    )
-  )
-
   return (
     <>
       <SearchParamContainer>
@@ -124,7 +118,7 @@ export function SearchCriteriaPanel({
           size="small"
           type="default"
         ></Pill>
-        {Object.entries(filteredSearchParams).map(([key, value]) => (
+        {Object.entries(formValues).map(([key, value]) => (
           <SearchParamLabel
             key={key}
             eventConfig={eventConfig}
@@ -137,7 +131,7 @@ export function SearchCriteriaPanel({
           font="bold14"
           onClick={() => {
             const nonEmptyValues = filterEmptyValues({
-              ...searchParams,
+              ...formValues,
               eventType: eventConfig.id
             })
             const serializedParams = serializeSearchParams(nonEmptyValues)
