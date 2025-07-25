@@ -14,17 +14,16 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getCurrentEventState,
-  getAcceptedActions,
-  getCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftsToEventIndex,
-  deepDropNulls
+  deepDropNulls,
+  getCurrentEventState,
+  getCurrentEventStateWithDrafts,
+  EventStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
-
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -32,10 +31,10 @@ import { getLocations } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
+import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
-
 import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
@@ -85,8 +84,6 @@ function EventOverviewFull({
   const { getEventTitle } = useEventTitle()
   const { title } = getEventTitle(eventConfiguration, eventWithDrafts)
 
-  const actions = getAcceptedActions(event)
-
   return (
     <Content
       icon={() => <IconWithName flags={flags} name={''} status={status} />}
@@ -94,14 +91,19 @@ function EventOverviewFull({
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
       topActionButtons={[
-        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />
+        <ActionMenu key={event.id} eventId={event.id} onAction={onAction} />,
+        <DownloadButton
+          key={`DownloadButton-${eventIndex.id}`}
+          event={eventIndex}
+          isDraft={eventIndex.status === EventStatus.Values.CREATED}
+        />
       ]}
     >
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
       />
-      <EventHistory history={actions} />
+      <EventHistory fullEvent={event} />
     </Content>
   )
 }
@@ -122,7 +124,7 @@ function EventOverviewProtected({
   const drafts = getRemoteDrafts(eventIndex.id)
 
   const eventWithDrafts = deepDropNulls(
-    applyDraftsToEventIndex(eventIndex, drafts)
+    applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
   )
   const { getUser } = useUsers()
   const intl = useIntl()
@@ -156,6 +158,11 @@ function EventOverviewProtected({
           key={eventIndex.id}
           eventId={eventIndex.id}
           onAction={onAction}
+        />,
+        <DownloadButton
+          key={`DownloadButton-${eventIndex.id}`}
+          event={eventIndex}
+          isDraft={eventIndex.status === EventStatus.Values.CREATED}
         />
       ]}
     >

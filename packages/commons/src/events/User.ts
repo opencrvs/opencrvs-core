@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { FullDocumentPath } from '../documents'
 import { z } from 'zod'
 
 export const User = z.object({
@@ -21,7 +22,8 @@ export const User = z.object({
     })
   ),
   role: z.string(),
-  signatureFilename: z.string().optional()
+  avatar: FullDocumentPath.optional(),
+  signature: FullDocumentPath.optional()
 })
 
 export type User = z.infer<typeof User>

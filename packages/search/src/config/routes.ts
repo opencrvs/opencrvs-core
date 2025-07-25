@@ -15,7 +15,8 @@ import {
   advancedRecordSearch,
   searchAssignment,
   searchForBirthDeDuplication,
-  searchForDeathDeDuplication
+  searchForDeathDeDuplication,
+  checkDuplicatesHandler
 } from '@search/features/search/handler'
 import { deduplicateHandler } from '@search/features/registration/deduplicate/handler'
 import {
@@ -231,7 +232,8 @@ export const getRoutes = () => {
             SCOPES.SEARCH_BIRTH_MY_JURISDICTION,
             SCOPES.SEARCH_DEATH_MY_JURISDICTION,
             SCOPES.SEARCH_MARRIAGE_MY_JURISDICTION,
-            SCOPES.RECORDSEARCH
+            SCOPES.RECORDSEARCH,
+            SCOPES.PERFORMANCE_READ
           ]
         },
         description:
@@ -297,6 +299,15 @@ export const getRoutes = () => {
             jobId: Joi.string().uuid()
           })
         }
+      }
+    },
+    {
+      method: 'POST',
+      path: '/check-duplicates',
+      handler: checkDuplicatesHandler,
+      config: {
+        tags: ['api'],
+        description: 'Check for duplicate records from FHIR bundle'
       }
     }
   ]

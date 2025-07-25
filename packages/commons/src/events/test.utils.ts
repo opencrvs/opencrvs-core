@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString } from 'lodash'
+import { merge, omitBy, isString, omit } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -20,11 +20,13 @@ import {
   EventState
 } from './ActionDocument'
 import {
+  ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
   NotifyActionInput,
   RegisterActionInput,
+  RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   UnassignActionInput,
@@ -56,6 +58,13 @@ import { AddressType, FileFieldValue } from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
+import { FullDocumentPath } from '../documents'
+
+/**
+ * IANA timezone used in testing. Used for queries that expect similar results independent of the users location (e.g. when event was registered.)
+ * Since we query by range, providing UTC offset will result to different results when DST changes during the range.
+ */
+export const TEST_SYSTEM_IANA_TIMEZONE = 'Asia/Dhaka'
 
 /**
  * In real application, the roles are defined in the countryconfig.
@@ -160,14 +169,18 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATE_RANGE:
-      return ['2021-01-01', '2021-01-02']
+      return {
+        start: '2021-01-01',
+        end: '2021-01-31'
+      }
     case FieldType.CHECKBOX:
       return true
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
-        filename: '4f095fc4-4312-4de2-aa38-86dcc0f71044.png',
+        path: '/ocrvs/4f095fc4-4312-4de2-aa38-86dcc0f71044.png' as FullDocumentPath,
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
@@ -259,7 +272,16 @@ export function eventPayloadGenerator(rng: () => number) {
       id
     }),
     draft: (
-      { eventId, actionType }: { eventId: UUID; actionType: ActionType },
+      {
+        eventId,
+        actionType,
+        annotation
+      }: {
+        eventId: UUID
+        actionType: ActionType
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        annotation?: Record<string, any>
+      },
       input: Partial<Draft> = {}
     ): Draft =>
       merge(
@@ -278,11 +300,16 @@ export function eventPayloadGenerator(rng: () => number) {
                 surname: 'McLaren'
               },
               'applicant.dob': '2020-01-02',
-              'recommender.none': true
+              'applicant.image': {
+                path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+                originalFilename: 'Screenshot.png',
+                type: 'image/png'
+              }
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
-              'correction.request.reason': "Child's name was incorrect"
+              'correction.request.reason': "Child's name was incorrect",
+              ...annotation
             },
             createdAt: new Date().toISOString(),
             createdBy: '@todo',
@@ -524,10 +551,13 @@ export function eventPayloadGenerator(rng: () => number) {
           transactionId: input.transactionId ?? getUUID(),
           declaration:
             input.declaration ??
-            generateActionDeclarationInput(
-              tennisClubMembershipEvent,
-              ActionType.REQUEST_CORRECTION,
-              rng
+            omit(
+              generateActionDeclarationInput(
+                tennisClubMembershipEvent,
+                ActionType.REQUEST_CORRECTION,
+                rng
+              ),
+              ['applicant.email']
             ),
           annotation:
             input.annotation ??
@@ -544,7 +574,7 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
+              ApproveCorrectionActionInput,
               'transactionId' | 'annotation' | 'keepAssignment'
             >
           > = {}
@@ -568,7 +598,7 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
+              RejectCorrectionActionInput,
               'transactionId' | 'annotation' | 'keepAssignment'
             >
           > = {}

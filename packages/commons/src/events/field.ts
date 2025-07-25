@@ -13,7 +13,7 @@ import { createFieldConditionals } from '../conditionals/conditionals'
 import { createFieldConfig } from '../field-config/field-configuration'
 import { FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
-import { ValidationConfig } from './FieldConfig'
+import { SelectOption, ValidationConfig } from './FieldConfig'
 
 /**
  * Entry point for defining conditional logic or configuration for a form field.
@@ -23,6 +23,9 @@ import { ValidationConfig } from './FieldConfig'
 export function field(
   fieldId: string,
   options: {
+    options?: SelectOption[]
+    excludeInSearchQuery?: boolean
+    alternateFieldIds?: string[]
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig

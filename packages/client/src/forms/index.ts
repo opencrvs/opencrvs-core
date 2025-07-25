@@ -112,6 +112,7 @@ export type Action = SubmissionAction | DownloadAction
 export interface ISelectOption {
   value: SelectComponentOption['value']
   label: MessageDescriptor
+  isDefault?: boolean
 }
 export interface IRadioOption {
   value: RadioComponentOption['value']

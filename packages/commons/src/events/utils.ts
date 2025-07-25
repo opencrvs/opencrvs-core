@@ -44,6 +44,8 @@ import { ActionConfig, DeclarationActionConfig } from './ActionConfig'
 import { FormConfig } from './FormConfig'
 import { getOrThrow } from '../utils'
 import { TokenUserType } from '../authentication'
+import { SelectDateRangeValue } from './FieldValue'
+import { subDays } from 'date-fns'
 
 function isDeclarationActionConfig(
   action: ActionConfig
@@ -65,12 +67,20 @@ export function getDeclaration(configuration: EventConfig) {
   return configuration.declaration
 }
 
+export function getPrintCertificatePages(configuration: EventConfig) {
+  const action = configuration.actions.find(
+    (a) => a.type === ActionType.PRINT_CERTIFICATE
+  )
+
+  return getOrThrow(
+    action?.printForm.pages,
+    `${ActionType.PRINT_CERTIFICATE} action does not have print form set.`
+  )
+}
+
 export const getActionAnnotationFields = (actionConfig: ActionConfig) => {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return [
-      ...actionConfig.onboardingForm.flatMap(({ fields }) => fields),
-      ...actionConfig.additionalDetailsForm.flatMap(({ fields }) => fields)
-    ]
+    return actionConfig.correctionForm.pages.flatMap(({ fields }) => fields)
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
@@ -111,7 +121,7 @@ export const findRecordActionPages = (
   const action = config.actions.find((a) => a.type === actionType)
 
   if (action?.type === ActionType.REQUEST_CORRECTION) {
-    return [...action.onboardingForm, ...action.additionalDetailsForm]
+    return action.correctionForm.pages
   }
 
   if (action?.type === ActionType.PRINT_CERTIFICATE) {
@@ -246,13 +256,10 @@ export function getActionVerificationPageIds(
   annotation: ActionUpdate
 ): string[] {
   if (actionConfig.type === ActionType.REQUEST_CORRECTION) {
-    return [
-      ...getVisibleVerificationPageIds(actionConfig.onboardingForm, annotation),
-      ...getVisibleVerificationPageIds(
-        actionConfig.additionalDetailsForm,
-        annotation
-      )
-    ]
+    return getVisibleVerificationPageIds(
+      actionConfig.correctionForm.pages,
+      annotation
+    )
   }
 
   if (actionConfig.type === ActionType.PRINT_CERTIFICATE) {
@@ -386,4 +393,26 @@ export function getEventConfigById(eventConfigs: EventConfig[], id: string) {
     (eventConfiguration) => eventConfiguration.id === id
   )
   return getOrThrow(eventConfig, `Event config for ${id} not found`)
+}
+
+export function timePeriodToDateRange(value: SelectDateRangeValue) {
+  let startDate: Date
+  switch (value) {
+    case 'last7Days':
+      startDate = subDays(new Date(), 6)
+      break
+    case 'last30Days':
+      startDate = subDays(new Date(), 29)
+      break
+    case 'last90Days':
+      startDate = subDays(new Date(), 89)
+      break
+    case 'last365Days':
+      startDate = subDays(new Date(), 364)
+      break
+  }
+  return {
+    startDate: startDate.toISOString(),
+    endDate: new Date().toISOString()
+  }
 }

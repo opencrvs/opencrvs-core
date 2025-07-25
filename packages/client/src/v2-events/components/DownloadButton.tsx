@@ -129,8 +129,11 @@ export function DownloadButton({
   const assignmentStatus = getAssignmentStatus(event, authentication?.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
+  const isAssignMutationFetching = actions.assignment.assign.isAssigning(
+    event.id
+  )
 
-  if (eventDocument.isFetching) {
+  if (eventDocument.isFetching || isAssignMutationFetching) {
     return (
       <StatusIndicator
         className={className}
@@ -218,11 +221,11 @@ export function DownloadButton({
       >
         {isAssignedToSomeoneElse || isDownloadedToMe ? (
           <AvatarSmall
-            key={user?.avatarURL || 'default'}
+            key={user?.avatar || 'default'}
             avatar={
-              user?.avatarURL
+              user?.avatar
                 ? {
-                    data: user.avatarURL,
+                    data: user.avatar,
                     type: 'image/jpeg' // This is never used internally
                   }
                 : undefined

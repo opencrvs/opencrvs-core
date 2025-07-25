@@ -18,10 +18,11 @@ import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import {
   getAdvancedSearchFieldErrors,
   flattenFieldErrors,
-  getDefaultSearchFields,
-  buildDataCondition,
+  getMetadataFieldConfigs,
+  buildSearchQuery,
   serializeSearchParams,
-  deserializeSearchParams
+  deserializeSearchParams,
+  buildQuickSearchQuery
 } from './utils'
 
 describe('getAdvancedSearchFieldErrors', () => {
@@ -92,12 +93,12 @@ describe('flattenFieldErrors', () => {
 
 describe('getDefaultSearchFields', () => {
   it('should generate default search field configurations for known field IDs', () => {
-    const fields = getDefaultSearchFields(
-      tennisClubMembershipEvent.advancedSearch[0]
+    const fields = getMetadataFieldConfigs(
+      tennisClubMembershipEvent.advancedSearch[0].fields
     )
     const ids = fields.map((f) => f.id)
-    expect(ids).toContain('event.legalStatus.REGISTERED.createdAtLocation')
-    expect(ids).toContain('event.legalStatus.REGISTERED.createdAt')
+    expect(ids).toContain('event.legalStatuses.REGISTERED.createdAtLocation')
+    expect(ids).toContain('event.legalStatuses.REGISTERED.acceptedAt')
     expect(ids).toContain('event.status')
     expect(ids).toContain('event.updatedAt')
   })
@@ -106,7 +107,7 @@ describe('getDefaultSearchFields', () => {
 describe('buildDataCondition', () => {
   it('should return anyOf condition for status=ALL', () => {
     const state = { 'event.status': 'ALL' }
-    const result = buildDataCondition(state, tennisClubMembershipEvent)
+    const result = buildSearchQuery(state, tennisClubMembershipEvent)
     const eventStatusField = joinValues(
       'event.status'.split('.'),
       FIELD_SEPARATOR
@@ -115,7 +116,6 @@ describe('buildDataCondition', () => {
     expect(result[eventStatusField]).toEqual({
       type: 'anyOf',
       terms: [
-        EventStatus.enum.CREATED,
         EventStatus.enum.NOTIFIED,
         EventStatus.enum.DECLARED,
         EventStatus.enum.VALIDATED,
@@ -128,10 +128,12 @@ describe('buildDataCondition', () => {
   })
 
   it('should generate exact match condition for trackingId', () => {
-    const state = { 'event.legalStatus.REGISTERED.createdAtLocation': 'ABC123' }
-    const result = buildDataCondition(state, tennisClubMembershipEvent)
+    const state = {
+      'event.legalStatuses.REGISTERED.createdAtLocation': 'ABC123'
+    }
+    const result = buildSearchQuery(state, tennisClubMembershipEvent)
     const field = joinValues(
-      'event.legalStatus.REGISTERED.createdAtLocation'.split('.'),
+      'event.legalStatuses.REGISTERED.createdAtLocation'.split('.'),
       FIELD_SEPARATOR
     )
     expect(
@@ -195,5 +197,56 @@ describe('serializeSearchParams and deserializeSearchParams (full roundtrip)', (
     const roundtrip = deserializeSearchParams(serialized)
 
     expect(roundtrip).toEqual(expectedDeserialized)
+  })
+})
+
+describe('buildQuickSearchQuery', () => {
+  it('should build a quick search query', () => {
+    const searchParams = { key: 'abc@gmail.com' }
+    const resultQuery = buildQuickSearchQuery(searchParams, [
+      tennisClubMembershipEvent
+    ])
+
+    expect(resultQuery).toEqual({
+      type: 'or',
+      clauses: [
+        {
+          data: {
+            'applicant.name': {
+              type: 'fuzzy',
+              term: 'abc@gmail.com'
+            }
+          }
+        },
+        {
+          data: {
+            'applicant.email': {
+              type: 'exact',
+              term: 'abc@gmail.com'
+            }
+          }
+        },
+        {
+          data: {
+            'recommender.name': {
+              type: 'fuzzy',
+              term: 'abc@gmail.com'
+            }
+          }
+        },
+        {
+          trackingId: {
+            term: 'abc@gmail.com',
+            type: 'exact'
+          }
+        },
+        {
+          'legalStatuses.REGISTERED.registrationNumber': {
+            term: 'abc@gmail.com',
+            type: 'exact'
+          }
+        }
+      ]
+    })
   })
 })

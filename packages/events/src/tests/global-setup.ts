@@ -11,7 +11,6 @@
 
 import { ElasticsearchContainer } from '@testcontainers/elasticsearch'
 import { PostgreSqlContainer } from '@testcontainers/postgresql'
-import { MongoMemoryServer } from 'mongodb-memory-server'
 import type { ProvidedContext } from 'vitest'
 
 type ProvideFunction = <K extends keyof ProvidedContext>(
@@ -48,19 +47,15 @@ async function setupPostgresServer() {
 }
 
 export default async function setup({ provide }: { provide: ProvideFunction }) {
-  const userMgntMongoD = await MongoMemoryServer.create()
   const es = await setupElasticSearchServer()
   const psql = await setupPostgresServer()
 
-  const userMgntURI = userMgntMongoD.getUri()
-
   provide('ELASTICSEARCH_URI', `${es.getHost()}:${es.getMappedPort(9200)}`)
-  provide('USER_MGNT_MONGO_URI', userMgntURI)
   provide('POSTGRES_URI', `${psql.getHost()}:${psql.getMappedPort(5432)}`)
 
   return async () => {
     await es.stop()
-    await userMgntMongoD.stop()
+
     await psql.stop()
   }
 }

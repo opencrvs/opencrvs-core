@@ -76,6 +76,11 @@ setQueryDefaults(trpcOptionsProxy.event.get, {
 export function useGetEvent() {
   const trpc = useTRPC()
 
+  /*
+   * Purpose of this functions is to be able to check if
+   * an event has been downloaded and to get its data
+   * from the cache without making a network request.
+   */
   const findFromCache = (id: string) => {
     const eventConfig = useEventConfigurations()
     // Skip the queryFn defined by tRPC and use our own default defined above

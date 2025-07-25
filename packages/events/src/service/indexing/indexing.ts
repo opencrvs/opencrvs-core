@@ -24,7 +24,8 @@ import {
   getDeclarationFields,
   QueryType,
   WorkqueueCountInput,
-  getEventConfigById
+  getEventConfigById,
+  SearchScopeAccessLevels
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -40,7 +41,10 @@ import {
   encodeFieldId,
   removeSecuredFields
 } from './utils'
-import { buildElasticQueryFromSearchPayload } from './query'
+import {
+  buildElasticQueryFromSearchPayload,
+  withJurisdictionFilters
+} from './query'
 
 function eventToEventIndex(
   event: EventDocument,
@@ -74,14 +78,18 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
-    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
-    case FieldType.EMAIL:
       return { type: 'text' }
+    case FieldType.EMAIL:
+      return {
+        type: 'keyword',
+        // apply custom normalyzer
+        normalizer: 'lowercase_normalizer'
+      }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
     case FieldType.SELECT:
@@ -127,7 +135,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' }
         }
@@ -136,19 +144,29 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          firstname: { type: 'text' },
-          surname: { type: 'text' },
-          __fullname: { type: 'text' }
+          firstname: { type: 'text', analyzer: 'human_name' },
+          surname: { type: 'text', analyzer: 'human_name' },
+          __fullname: { type: 'text', analyzer: 'human_name' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
       return {
         type: 'nested',
         properties: {
-          filename: { type: 'keyword' },
+          path: { type: 'keyword' },
           originalFilename: { type: 'keyword' },
           type: { type: 'keyword' },
           option: { type: 'keyword' }
+        }
+      }
+    // @TODO: other option would be to throw an error, since these should not be used in declaration form.
+    case FieldType.DATE_RANGE:
+    case FieldType.SELECT_DATE_RANGE:
+      return {
+        type: 'object',
+        properties: {
+          start: { type: 'date' },
+          end: { type: 'date' }
         }
       }
     default:
@@ -177,6 +195,28 @@ export async function createIndex(
   await client.indices.create({
     index: indexName,
     body: {
+      // Define a custom normalizer to make keyword fields case-insensitive by applying a lowercase filter
+      settings: {
+        analysis: {
+          normalizer: {
+            lowercase_normalizer: {
+              type: 'custom',
+              filter: ['lowercase']
+            }
+          },
+          analyzer: {
+            /*
+             * Human name can contain
+             * Special characters including hyphens, underscores and spaces
+             */
+            human_name: {
+              type: 'custom',
+              tokenizer: 'standard',
+              filter: ['lowercase', 'word_delimiter']
+            }
+          }
+        }
+      },
       mappings: {
         properties: {
           id: { type: 'keyword' },
@@ -314,7 +354,8 @@ export async function getIndexedEvents(
       should: [
         {
           bool: {
-            must_not: [{ term: { status: EventStatus.enum.CREATED } }]
+            must_not: [{ term: { status: EventStatus.enum.CREATED } }],
+            should: undefined
           }
         },
         {
@@ -322,13 +363,14 @@ export async function getIndexedEvents(
             must: [
               { term: { status: EventStatus.enum.CREATED } },
               { term: { createdBy: userId } }
-            ]
+            ],
+            should: undefined
           }
         }
       ],
       minimum_should_match: 1
     }
-  } as estypes.QueryDslQueryContainer
+  } satisfies estypes.QueryDslQueryContainer
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -349,10 +391,16 @@ export async function getIndexedEvents(
 
 export async function getIndex(
   eventParams: QueryType,
-  eventConfigs: EventConfig[]
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
-  const query = buildElasticQueryFromSearchPayload(eventParams, eventConfigs)
+  const query = withJurisdictionFilters(
+    buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+    options,
+    userOfficeId
+  )
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
@@ -380,14 +428,18 @@ export async function getIndex(
 
 export async function getEventCount(
   queries: WorkqueueCountInput,
-  eventConfigs: EventConfig[]
+  eventConfigs: EventConfig[],
+  options: Record<string, SearchScopeAccessLevels>,
+  userOfficeId: string | undefined
 ) {
   return (
     //  @TODO: write a query that does everything in one go.
     (
       await Promise.all(
         queries.map(async ({ slug, query }) => {
-          const count = (await getIndex(query, eventConfigs)).length
+          const count = (
+            await getIndex(query, eventConfigs, options, userOfficeId)
+          ).length
           return { slug, count }
         })
       )

@@ -24,7 +24,6 @@ import {
 } from '@opencrvs/commons'
 import { t } from '@events/router/trpc'
 import { appRouter } from '@events/router/router'
-import * as userMgnt from '@events/storage/mongodb/__mocks__/user-mgnt'
 import { SystemContext } from '@events/context'
 import { getClient } from '@events/storage/postgres/events'
 import { getLocations } from '../service/locations/locations'
@@ -167,18 +166,17 @@ export const setupTestCase = async (rngSeed?: number) => {
   const rng = createPrng(rngSeed ?? 101)
   const generator = payloadGenerator(rng)
   const eventsDb = getClient()
-  const userMgntDb = await userMgnt.getClient()
 
   const seed = seeder()
   await seed.locations(generator.locations.set(5))
 
   const locations = await getLocations()
-  const user = await seed.user(
-    userMgntDb,
+  const user = seed.user(
     generator.user.create({
       primaryOfficeId: locations[0].id
     })
   )
+  const users = [user]
 
   return {
     locations,
@@ -187,7 +185,7 @@ export const setupTestCase = async (rngSeed?: number) => {
       signature: generateRandomSignature(rng)
     },
     eventsDb,
-    userMgntDb,
+    users,
     rng,
     seed,
     generator
@@ -208,7 +206,8 @@ function actionToClientAction(
 ) {
   switch (action) {
     case ActionType.CREATE:
-      return async () => client.event.create(generator.event.create())
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      return async (_: string) => client.event.create(generator.event.create())
     case ActionType.DECLARE:
       return async (eventId: string) =>
         client.event.actions.declare.request(
@@ -244,10 +243,16 @@ function actionToClientAction(
             keepAssignment: true
           })
         )
+    case ActionType.REQUEST_CORRECTION:
+      return async (eventId: string) =>
+        client.event.actions.correction.request.request(
+          generator.event.actions.correction.request(eventId, {
+            keepAssignment: true
+          })
+        )
 
     case ActionType.NOTIFY:
     case ActionType.DETECT_DUPLICATE:
-    case ActionType.REQUEST_CORRECTION:
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:
@@ -269,7 +274,7 @@ function actionToClientAction(
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions: ActionType[]
+  actions?: Exclude<ActionType, typeof ActionType.CREATE>[]
 ): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
 
@@ -280,10 +285,9 @@ export async function createEvent(
     ActionType.CREATE
   )
 
-  // @ts-expect-error -- createEvent does not accept any arguments
-  createdEvent = await createAction()
+  createdEvent = await createAction('')
 
-  for (const action of actions) {
+  for (const action of actions ?? []) {
     const clientAction = actionToClientAction(client, generator, action)
     createdEvent = await clientAction(createdEvent.id)
   }

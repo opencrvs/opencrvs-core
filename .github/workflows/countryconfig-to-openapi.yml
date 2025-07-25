@@ -30,8 +30,11 @@ jobs:
         run: npm install -g pnpm
 
       - name: Install dependencies
-        run: pnpm install
-
+        uses: nick-fields/retry@v3
+        with:
+          timeout_minutes: 10
+          max_attempts: 3
+          command: pnpm install
       - name: Generate OpenAPI
         run: bash build.sh
         working-directory: packages/api-docs

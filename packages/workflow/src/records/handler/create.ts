@@ -273,6 +273,28 @@ function getEventAction(record: CreatedRecord) {
   return 'sent-notification'
 }
 
+async function notifyCountryConfigForAction(
+  record: CreatedRecord,
+  token: string,
+  headers: Hapi.Request['headers'],
+  event: EVENT_TYPE,
+  eventAction: ReturnType<typeof getEventAction>
+) {
+  const recordSpecificToken = await getRecordSpecificToken(
+    token,
+    headers,
+    getComposition(record).id
+  )
+  await notifyForAction({
+    event,
+    action: eventAction,
+    record,
+    headers: {
+      ...headers,
+      authorization: `Bearer ${recordSpecificToken.access_token}`
+    }
+  })
+}
 export default async function createRecordHandler(
   request: Hapi.Request,
   _: Hapi.ResponseToolkit
@@ -309,11 +331,11 @@ export default async function createRecordHandler(
     duplicateIds
   )
 
-  await auditEvent(
-    isInProgress(record) ? 'sent-notification' : 'sent-notification-for-review',
-    record,
-    token
-  )
+  const initialAction = isInProgress(record)
+    ? 'sent-notification'
+    : 'sent-notification-for-review'
+
+  await auditEvent(initialAction, record, token)
 
   if (duplicateIds.length) {
     await indexBundle(record, token)
@@ -323,6 +345,13 @@ export default async function createRecordHandler(
       ...record,
       entry: [{ resource: task }]
     })
+    await notifyCountryConfigForAction(
+      record,
+      token,
+      request.headers,
+      event,
+      initialAction
+    )
     return {
       compositionId: getComposition(record).id,
       trackingId: getTrackingIdFromRecord(record),
@@ -368,20 +397,13 @@ export default async function createRecordHandler(
     /*
      * Notify country configuration about the event so that countries can hook into actions like "sent-for-approval"
      */
-    const recordSpecificToken = await getRecordSpecificToken(
+    await notifyCountryConfigForAction(
+      record,
       token,
       request.headers,
-      getComposition(record).id
-    )
-    await notifyForAction({
       event,
-      action: eventAction,
-      record,
-      headers: {
-        ...request.headers,
-        authorization: `Bearer ${recordSpecificToken.access_token}`
-      }
-    })
+      eventAction
+    )
   }
 
   return {

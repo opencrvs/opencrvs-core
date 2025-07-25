@@ -44,23 +44,24 @@ export default async function getUser(
   if (email) {
     criteria = { ...criteria, emailForNotification: email }
   }
-  const user = await User.findOne(criteria)
+  const result = await User.findOne(criteria)
 
-  if (!user) {
+  if (!result) {
     // Don't return a 404 as this gives away that this user account exists
     throw unauthorized()
   }
 
   let signature
   try {
-    signature = await getPractitionerSignature(token, user.practitionerId)
+    signature = await getPractitionerSignature(token, result.practitionerId)
   } catch {
     logger.error(
       'Error fetching practitioner signature. Sending user without it.'
     )
   }
 
-  return { ...user.toObject(), signature }
+  const user = result.toObject()
+  return { ...user, id: user._id, signature: signature }
 }
 
 export const getUserRequestSchema = Joi.object({

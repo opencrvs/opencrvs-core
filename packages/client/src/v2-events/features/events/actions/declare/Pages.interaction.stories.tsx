@@ -73,7 +73,9 @@ function createDraftHandlers() {
         action: {
           ...req,
           originalActionId: req.originalActionId as UUID,
-          declaration: req.declaration || {},
+          declaration: (req.declaration ||
+            {}) as Draft['action']['declaration'],
+          annotation: (req.annotation || {}) as Draft['action']['annotation'],
           createdBy: 'test-user',
           createdByUserType: 'user',
           createdByRole: 'test-role',
@@ -154,10 +156,24 @@ export const SaveAndExit: Story = {
 
       await userEvent.type(applicantFirstNameInput, 'Clearly')
       await userEvent.type(applicantSurnameInput, 'Draft')
-
-      const continueButton = await canvas.findByText('Continue')
-      await userEvent.click(continueButton)
     })
+
+    await step(
+      'Ensure input field values are persisted to a draft',
+      async () => {
+        const continueButton = await canvas.findByText('Continue')
+        await userEvent.click(continueButton)
+
+        const backButton = await canvas.findByText('Back')
+        await userEvent.click(backButton)
+
+        await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+          'Clearly'
+        )
+
+        await userEvent.click(await canvas.findByText('Continue'))
+      }
+    )
 
     await step('click `Save & Exit` button', async () => {
       const button = await canvas.findByRole('button', { name: /Save & Exit/ })
@@ -173,7 +189,20 @@ export const SaveAndExit: Story = {
       await userEvent.click(modal.getByRole('button', { name: /Confirm/ }))
     })
 
+    await step('Navigate to My drafts workqueue', async () => {
+      await waitFor(
+        async () =>
+          userEvent.click(canvas.getByRole('button', { name: /My drafts/ })),
+        { timeout: 5000 }
+      )
+    })
+
     await waitFor(async () => expect(spy).toHaveBeenCalled())
+    await waitFor(
+      async () =>
+        expect(await canvas.findByText('Clearly Draft')).toBeInTheDocument(),
+      { timeout: 5000 }
+    )
     await waitFor(async () => canvas.findByText('Clearly Draft'))
 
     const recordInCreatedState = canvas.queryByText(/CREATED_STATUS/)
@@ -245,13 +274,36 @@ export const DraftShownInForm: Story = {
       await userEvent.type(applicantFirstNameInput, 'Clearly')
       await userEvent.type(applicantSurnameInput, 'Draft')
     })
-    const continueButton = await canvas.findByText('Continue')
-    await userEvent.click(continueButton)
+
+    await step(
+      'Ensure input field values are persisted to a draft',
+      async () => {
+        const continueButton = await canvas.findByText('Continue')
+        await userEvent.click(continueButton)
+
+        const backButton = await canvas.findByText('Back')
+        await userEvent.click(backButton)
+
+        await expect(await canvas.findByTestId('text__firstname')).toHaveValue(
+          'Clearly'
+        )
+
+        await userEvent.click(await canvas.findByText('Continue'))
+      }
+    )
+
     const button = await canvas.findByRole('button', { name: /Save & Exit/ })
     await userEvent.click(button)
     const modal = within(await canvas.findByRole('dialog'))
     await userEvent.click(await modal.findByRole('button', { name: /Confirm/ }))
 
+    await waitFor(
+      async () =>
+        userEvent.click(
+          await canvas.findByRole('button', { name: /My drafts/ })
+        ),
+      { timeout: 5000 }
+    )
     await userEvent.click(await canvas.findByText('Clearly Draft'))
 
     await userEvent.click(await canvas.findByRole('button', { name: /Action/ }))

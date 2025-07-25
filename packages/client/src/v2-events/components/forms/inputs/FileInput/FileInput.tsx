@@ -9,10 +9,19 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
-import { FileFieldValue, MimeType } from '@opencrvs/commons/client'
+import React, { useState } from 'react'
+import { useIntl } from 'react-intl'
+import {
+  FileFieldValue,
+  MimeType,
+  File as FileConfig
+} from '@opencrvs/commons/client'
 import { useFileUpload } from '@client/v2-events/features/files/useFileUpload'
+import { getFullDocumentPath } from '@client/v2-events/cache'
+import { buttonMessages } from '@client/i18n/messages'
 import { SimpleDocumentUploader } from './SimpleDocumentUploader'
+import { DocumentPreview } from './DocumentPreview'
+import { SingleDocumentPreview } from './SingleDocumentPreview'
 
 function FileInput({
   width,
@@ -40,15 +49,15 @@ function FileInput({
   const [file, setFile] = React.useState(value)
 
   const { uploadFile } = useFileUpload(name, {
-    onSuccess: ({ filename, originalFilename, type }) => {
+    onSuccess: ({ path, originalFilename, type }) => {
       setFile({
-        filename,
+        path,
         originalFilename: originalFilename,
         type: type
       })
 
       onChange({
-        filename,
+        path,
         originalFilename: originalFilename,
         type: type
       })
@@ -69,7 +78,7 @@ function FileInput({
       onComplete={(newFile) => {
         if (newFile) {
           setFile({
-            filename: newFile.name,
+            path: getFullDocumentPath(newFile.name),
             originalFilename: newFile.name,
             type: newFile.type
           })
@@ -86,7 +95,47 @@ function FileInput({
   )
 }
 
+function FileOutput({
+  value,
+  config
+}: {
+  value?: FileFieldValue
+  config: FileConfig
+}) {
+  const intl = useIntl()
+  const [previewImage, setPreviewImage] = useState<boolean>(false)
+
+  if (!value) {
+    return null
+  }
+
+  return (
+    <>
+      <SingleDocumentPreview
+        attachment={value}
+        label={
+          config.configuration.fileName
+            ? intl.formatMessage(config.configuration.fileName)
+            : intl.formatMessage(config.label)
+        }
+        onSelect={() => setPreviewImage(true)}
+      />
+      {previewImage && (
+        <DocumentPreview
+          disableDelete={true}
+          goBack={() => {
+            setPreviewImage(false)
+          }}
+          previewImage={value}
+          title={intl.formatMessage(buttonMessages.preview)}
+          onDelete={() => setPreviewImage(false)}
+        />
+      )}
+    </>
+  )
+}
+
 export const File = {
   Input: FileInput,
-  Output: null
+  Output: FileOutput
 }

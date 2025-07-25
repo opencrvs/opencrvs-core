@@ -8,17 +8,20 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { isEqual } from 'lodash'
+import {
+  FieldConfig,
+  EventState,
+  isFieldVisible
+} from '@opencrvs/commons/client'
 
-import { MongoClient } from 'mongodb'
-import { env } from '@events/environment'
+export function hasFieldChanged(
+  f: FieldConfig,
+  form: EventState,
+  previousFormValues: EventState
+) {
+  const isVisible = isFieldVisible(f, form)
+  const valueHasChanged = !isEqual(previousFormValues[f.id], form[f.id])
 
-const url = env.USER_MGNT_MONGO_URL
-const client = new MongoClient(url)
-
-export async function getClient() {
-  await client.connect()
-
-  // Providing the database name is not necessary, it will read it from the connection string.
-  // e2e-environment uses different name from deployment to deployment, so we can't hardcode it.
-  return client.db()
+  return isVisible && valueHasChanged
 }

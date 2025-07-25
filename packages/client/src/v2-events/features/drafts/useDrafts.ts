@@ -9,14 +9,16 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { useMutation, useQuery, useSuspenseQuery } from '@tanstack/react-query'
+import { useMutation, useSuspenseQuery } from '@tanstack/react-query'
 import { create } from 'zustand'
 import { createJSONStorage, persist } from 'zustand/middleware'
 import { deepDropNulls, Draft, UUID } from '@opencrvs/commons/client'
 import { storage } from '@client/storage'
 import {
-  invalidateDraftsList,
-  invalidateEventsList,
+  clearPendingDraftCreationRequests,
+  findLocalEventDocument,
+  refetchDraftsList,
+  refetchEventsList,
   setDraftData
 } from '@client/v2-events/features/events/useEvents/api'
 import {
@@ -26,7 +28,7 @@ import {
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { createTemporaryId } from '@client/v2-events/utils'
-import { getFilenamesFromActionDocument } from '../files/cache'
+import { getFilepathsFromActionDocument } from '../files/cache'
 import { precacheFile } from '../files/useFileUpload'
 
 /*
@@ -36,6 +38,7 @@ import { precacheFile } from '../files/useFileUpload'
  * This ensures the full record can be browsed even when the user goes offline
  */
 setQueryDefaults(trpcOptionsProxy.event.draft.list, {
+  staleTime: Infinity,
   queryFn: async (...params) => {
     const queryOptions = trpcOptionsProxy.event.draft.list.queryOptions()
 
@@ -47,9 +50,22 @@ setQueryDefaults(trpcOptionsProxy.event.draft.list, {
     const drafts = response.map((draft) => Draft.parse(draft))
 
     const filenames = drafts.flatMap((draft) =>
-      getFilenamesFromActionDocument([draft.action])
+      getFilepathsFromActionDocument([draft.action])
     )
+
     await Promise.all(filenames.map(async (filename) => precacheFile(filename)))
+
+    const missingEventsToDownload = drafts
+      .filter((event) => !findLocalEventDocument(event.eventId))
+      .map(async (draft) =>
+        queryClient.prefetchQuery({
+          queryKey: trpcOptionsProxy.event.get.queryKey(draft.eventId),
+          queryFn: trpcOptionsProxy.event.get.queryOptions(draft.eventId)
+            .queryFn
+        })
+      )
+
+    await Promise.all(missingEventsToDownload)
 
     return drafts
   }
@@ -108,16 +124,30 @@ setMutationDefaults(trpcOptionsProxy.event.draft.create, {
         createdAtLocation: '@todo' as UUID,
         ...variables,
         originalActionId: variables.originalActionId as UUID,
-        declaration: variables.declaration || {}
+        /*
+         * Annoyingly these need to be casted or otherwise branded
+         * types like FullDocumentPath causes an error here.
+         * inferInput of trpc types causes branded types to lose the branding and
+         * just show as plain types
+         */
+        declaration: (variables.declaration ||
+          {}) as Draft['action']['declaration'],
+        annotation: (variables.annotation ||
+          {}) as Draft['action']['annotation']
       },
       createdAt: new Date().toISOString()
     }
-    setDraftData((drafts) => drafts.concat(optimisticDraft))
+    setDraftData((drafts) => {
+      return drafts
+        .filter((draft) => draft.eventId !== optimisticDraft.eventId)
+        .concat(optimisticDraft)
+    })
+    clearPendingDraftCreationRequests(variables.eventId)
     return optimisticDraft
   },
   onSuccess: async () => {
-    await invalidateEventsList()
-    await invalidateDraftsList()
+    await refetchEventsList()
+    await refetchDraftsList()
   },
   retryDelay: 10000
 })
@@ -151,7 +181,8 @@ export function useDrafts() {
 
     const drafts = useSuspenseQuery({
       ...options,
-      queryKey: trpc.event.draft.list.queryKey()
+      queryKey: trpc.event.draft.list.queryKey(),
+      networkMode: 'always'
     })
 
     return drafts.data

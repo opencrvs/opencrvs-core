@@ -49,6 +49,22 @@ export const TextOutput: Story = {
   }
 }
 
+export const TextAreaOutput: Story = {
+  args: {
+    value:
+      'The quick brown fox jumps over the lazy dog while juggling flaming torches and reciting Shakespeare in ancient Latin backwards on a unicycle during a thunderstorm',
+    field: {
+      type: FieldType.TEXTAREA,
+      id: 'applicant.firstname',
+      label: {
+        id: 'applicant.firstname',
+        defaultMessage: 'First name',
+        description: 'The first name of the applicant'
+      }
+    }
+  }
+}
+
 export const TextOutputWithoutPreviouslyMissingValueAsChanged: Story = {
   args: {
     value: 'Cat',
