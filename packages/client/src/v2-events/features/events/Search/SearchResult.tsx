@@ -154,7 +154,7 @@ const messages = defineMessages({
   noRecord: {
     id: 'v2.search.noRecord',
     defaultMessage:
-      'No records {slug, select draft {in my draft} outbox {require processing} other {{title}}}',
+      'No records {slug, select, draft {in my draft} outbox {require processing} other {{title}}}',
     description: 'The no record text'
   },
   noResult: {
