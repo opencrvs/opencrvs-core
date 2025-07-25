@@ -283,11 +283,12 @@ export async function seedLocationsForV2Events(token: string) {
   })
 
   if (!res.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
+    const msg =
       'Unable to seed locations for v2 events. Ensure events service is running.'
-    )
+    // eslint-disable-next-line no-console
+    console.error(msg)
     // eslint-disable-next-line no-console
     console.error(JSON.stringify(await res.json()))
+    raise(msg)
   }
 }
