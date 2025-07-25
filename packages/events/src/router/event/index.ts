@@ -148,7 +148,11 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
-      await throwConflictIfActionNotAllowed(input.eventId, ActionType.DELETE)
+      await throwConflictIfActionNotAllowed(
+        input.eventId,
+        ActionType.DELETE,
+        ctx.token
+      )
       return deleteEvent(input.eventId, { token: ctx.token })
     }),
   draft: router({
