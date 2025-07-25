@@ -14,12 +14,11 @@ import { useSelector } from 'react-redux'
 import { useIntl } from 'react-intl'
 import {
   EventDocument,
-  getCurrentEventState,
-  getAcceptedActions,
-  getCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls,
+  getCurrentEventState,
+  getCurrentEventStateWithDrafts,
   EventStatus,
   InherentFlags,
   VisibleStatus
@@ -27,7 +26,6 @@ import {
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
 import { ROUTES } from '@client/v2-events/routes'
-
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
@@ -39,7 +37,6 @@ import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useDrafts } from '../../drafts/useDrafts'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
-
 import { ActionMenu } from './components/ActionMenu'
 import { EventOverviewProvider } from './EventOverviewContext'
 
