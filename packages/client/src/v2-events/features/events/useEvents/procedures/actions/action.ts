@@ -147,9 +147,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.correction.request
+    trpcOptionsProxy.event.actions.correction.request.request
   ),
   retry: retryUnlessConflict,
   retryDelay: 10000,
@@ -160,9 +160,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.correction.approve
+    trpcOptionsProxy.event.actions.correction.approve.request
   ),
   retry: retryUnlessConflict,
   retryDelay: 10000,
@@ -173,9 +173,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.correction.reject
+    trpcOptionsProxy.event.actions.correction.reject.request
   ),
   retry: retryUnlessConflict,
   retryDelay: 10000,

@@ -24,6 +24,7 @@ import {
   getAvailableActionsForEvent,
   InherentFlags
 } from '@opencrvs/commons/client'
+import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
@@ -68,6 +69,7 @@ function getAvailableAssignmentActions(
 }
 interface ActionConfig {
   label: TranslationConfig
+  icon: IconProps['name']
   onClick: (workqueue?: string) => Promise<void> | void
   disabled?: boolean
   shouldHide?: (actions: ActionType[]) => boolean
@@ -163,10 +165,12 @@ export function useAction(event: EventIndex) {
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
+        icon: 'Eye',
         onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
+        icon: 'PushPin',
         onClick: async () => {
           await events.actions.assignment.assign.mutate({
             eventId,
@@ -181,6 +185,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
+        icon: 'ArrowCircleDown',
         onClick: async () => {
           await events.actions.assignment.unassign.mutateAsync({
             eventId,
@@ -191,6 +196,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
+        icon: 'PencilLine',
         onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
@@ -204,6 +210,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
+        icon: 'PencilLine',
         onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
@@ -215,6 +222,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
+        icon: 'PencilLine',
         onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
@@ -226,6 +234,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
+        icon: 'Printer',
         onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
@@ -238,6 +247,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
+        icon: 'Trash',
         onClick: (workqueue?) => {
           deleteEvent({ eventId })
           if (!workqueue) {
@@ -247,6 +257,7 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REQUEST_CORRECTION]: {
         label: actionLabels[ActionType.REQUEST_CORRECTION],
+        icon: 'NotePencil',
         onClick: () => {
           const correctionPages = eventConfiguration.actions.find(
             (action) => action.type === ActionType.REQUEST_CORRECTION
