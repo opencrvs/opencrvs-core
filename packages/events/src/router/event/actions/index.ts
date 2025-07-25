@@ -99,19 +99,16 @@ const ACTION_PROCEDURE_CONFIG = {
 
 type ActionProcedure = {
   request: MutationProcedure<{
-    meta: OpenApiMeta
     input: ActionInput
     output: EventDocument
     meta: OpenApiMeta
   }>
   accept: MutationProcedure<{
-    meta: OpenApiMeta
     input: ActionInput & { actionId: string }
     output: EventDocument
     meta: OpenApiMeta
   }>
   reject: MutationProcedure<{
-    meta: OpenApiMeta
     input: { eventId: string; actionId: string; transactionId: string }
     output: EventDocument
     meta: OpenApiMeta
