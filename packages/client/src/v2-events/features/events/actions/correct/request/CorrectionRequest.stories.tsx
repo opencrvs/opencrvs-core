@@ -17,7 +17,10 @@ import { expect, waitFor, within, userEvent } from '@storybook/test'
 import { ActionType } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventWithCorrectionRequest
+} from '@client/v2-events/features/events/fixtures'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
@@ -39,6 +42,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
+const generator = testDataGenerator()
 const draft = testDataGenerator().event.draft({
   eventId: tennisClubMembershipEventDocument.id,
   actionType: ActionType.REQUEST_CORRECTION
@@ -232,5 +236,58 @@ export const Summary: Story = {
       }
       await userEvent.click(closeButton)
     })
+  }
+}
+
+export const ReviewCorrection: Story = {
+  loaders: [
+    async () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.localRegistrar
+      )
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Outlet />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventWithCorrectionRequest.id
+      })
+    }
+  },
+
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.queryByRole('button', { name: 'Continue' })
+      ).toBeNull()
+    })
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: /approve/i })
+      ).toBeInTheDocument()
+    })
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: /reject/i })
+      ).toBeInTheDocument()
+    })
+
+    await userEvent.click(canvas.getByRole('button', { name: /approve/i }))
+    await userEvent.click(canvas.getByRole('button', { name: /cancel/i }))
+    await userEvent.click(canvas.getByRole('button', { name: /reject/i }))
+    await userEvent.click(canvas.getByRole('button', { name: /cancel/i }))
   }
 }
