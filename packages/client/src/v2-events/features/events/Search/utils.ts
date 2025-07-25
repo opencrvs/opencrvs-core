@@ -228,11 +228,9 @@ export function toAdvancedSearchQueryType(
   const metadata: Record<string, unknown> = {}
   const declaration: Record<string, unknown> = {}
 
-  Object.entries(searchParams).forEach(([_, value]) => {
-    const prefixRegex = new RegExp(`^event${FIELD_SEPARATOR}`)
-    const key = _.replace(prefixRegex, '').replaceAll(FIELD_SEPARATOR, '.')
-    if (_.startsWith(`event${FIELD_SEPARATOR}`)) {
-      metadata[key] = value
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (key.startsWith('event.')) {
+      metadata[key.replace('event.', '')] = value
     } else {
       declaration[key] = value
     }
@@ -321,8 +319,7 @@ function buildSearchQueryFields(
   return searchConfigurations.reduce(
     (result: Record<string, Condition>, config) => {
       const value = searchInput[config.fieldId]
-      // @TODO: Double check whether we are actually reverting this on the next step. Ideally we would not leak ____ to user.
-      const transformedKey = config.fieldId.replace(/\./g, FIELD_SEPARATOR)
+      const fieldId = config.fieldId
 
       // Handle the case where we want to search by range but the value is not a comma-separated string
       // e.g. "2023-01-01,2023-12-31" should be treated as a range
@@ -343,14 +340,14 @@ function buildSearchQueryFields(
       if (config.fieldId === 'event.status' && value === 'ALL') {
         return {
           ...result,
-          [transformedKey]: buildConditionForStatus()
+          [fieldId]: buildConditionForStatus()
         }
       }
 
       if (config.fieldId === 'event.updatedAt') {
         return {
           ...result,
-          [transformedKey]: buildSearchClause(
+          [fieldId]: buildSearchClause(
             timePeriodToRangeString(SelectDateRangeValue.parse(value)),
             'range'
           )
@@ -366,7 +363,7 @@ function buildSearchQueryFields(
           }
           return {
             ...result,
-            [transformedKey]: buildSearchClause(
+            [fieldId]: buildSearchClause(
               Name.stringify(parsedName.data),
               searchType
             )
@@ -380,7 +377,7 @@ function buildSearchQueryFields(
       ) {
         return {
           ...result,
-          [transformedKey]: buildSearchClause(
+          [fieldId]: buildSearchClause(
             JSON.stringify(searchInput[config.fieldId]),
             searchType
           )
@@ -399,7 +396,7 @@ function buildSearchQueryFields(
       ) {
         return {
           ...result,
-          [transformedKey]: buildSearchClause(
+          [fieldId]: buildSearchClause(
             toRangeDateString(DateRangeFieldValue.parse(value)),
             'range'
           )
@@ -410,7 +407,7 @@ function buildSearchQueryFields(
         ...result,
         // @TODO: Previously an issue was fixed by turning all the values into string. Ask Tareq about it so we can make sure the case is still handled.
 
-        [transformedKey]: buildSearchClause(value.toString(), searchType)
+        [fieldId]: buildSearchClause(value.toString(), searchType)
       }
     },
     {}
