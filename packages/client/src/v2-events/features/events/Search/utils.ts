@@ -36,7 +36,24 @@ import { findScope } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
 import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
+import {
+  Errors,
+  getValidationErrorsForForm
+} from '@client/v2-events/components/forms/validation'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
+
+export function getAdvancedSearchFieldErrors(
+  sections: AdvancedSearchConfigWithFieldsResolved[],
+  values: EventState
+) {
+  return sections.reduce(
+    (acc, section) => ({
+      ...acc,
+      ...getValidationErrorsForForm(section.fields, values)
+    }),
+    {} as Errors
+  )
+}
 
 const defaultSearchFieldGenerator: Record<
   EventFieldId,

@@ -30,10 +30,10 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { filterEmptyValues } from '@client/v2-events/utils'
 import { ROUTES } from '@client/v2-events/routes'
 import {
-  Errors,
-  getValidationErrorsForForm
-} from '@client/v2-events/components/forms/validation'
-import { resolveAdvancedSearchConfig, serializeSearchParams } from './utils'
+  getAdvancedSearchFieldErrors,
+  resolveAdvancedSearchConfig,
+  serializeSearchParams
+} from './utils'
 const MIN_PARAMS_TO_SEARCH = 2
 
 const SearchButton = styled(Button)`
@@ -140,13 +140,7 @@ export function TabSearch({
     }))
 
   const errors = Object.values(
-    sections.reduce(
-      (acc, section) => ({
-        ...acc,
-        ...getValidationErrorsForForm(section.fields, formValues)
-      }),
-      {} as Errors
-    )
+    getAdvancedSearchFieldErrors(sections, formValues)
   ).flatMap((errObj) => errObj.errors)
 
   const nonEmptyValues = filterEmptyValues(formValues)
