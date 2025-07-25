@@ -91,6 +91,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -149,14 +150,6 @@ jobs:
             fi
           done
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: node-${{ hashFiles('**/pnpm-lock.yaml', format('{0}/{1}', matrix.package, 'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Verify every file has a license header
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
@@ -209,6 +202,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -265,14 +259,6 @@ jobs:
             fi
           done
 
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: node-${{ hashFiles('**/pnpm-lock.yaml', format('{0}/{1}', matrix.package, 'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
       - name: Install dependencies
         run: CI="" pnpm install
 
@@ -308,6 +294,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -338,14 +325,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: node-${{ hashFiles('**/pnpm-lock.yaml', format('{0}/{1}', matrix.package, 'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
@@ -387,17 +367,10 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
-
-      - name: Cache pnpm store
-        uses: actions/cache@v4
-        with:
-          path: ~/.pnpm-store
-          key: node-${{ hashFiles('**/pnpm-lock.yaml', format('{0}/{1}', matrix.package, 'package.json')) }}
-          restore-keys: |
-            ${{ runner.os }}-node-
 
       - name: Install dependencies
         run: CI="" pnpm install
@@ -438,6 +411,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'pnpm'
 
       - name: Install pnpm
         run: npm install -g pnpm
