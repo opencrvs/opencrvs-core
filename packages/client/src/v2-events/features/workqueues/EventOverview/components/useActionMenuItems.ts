@@ -19,9 +19,10 @@ import {
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
   WorkqueueActionType,
-  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
   EventStatus,
-  isMetaAction
+  isMetaAction,
+  getAvailableActionsForEvent,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
@@ -33,7 +34,6 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
   EventStatus.enum.VALIDATED,
-  EventStatus.enum.REJECTED,
   EventStatus.enum.REGISTERED,
   EventStatus.enum.CERTIFIED,
   EventStatus.enum.ARCHIVED
@@ -241,11 +241,6 @@ const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
     ActionType.VALIDATE,
     ActionType.ARCHIVE,
     ActionType.REJECT
-  ],
-  [EventStatus.enum.REJECTED]: [
-    ActionType.READ,
-    ActionType.DECLARE,
-    ActionType.VALIDATE
   ]
 } satisfies Partial<Record<EventStatus, ActionType[]>>
 
@@ -264,11 +259,12 @@ export function useActionMenuItems(event: EventIndex) {
 
   // Find actions available based on the event status
   const availableActions =
+    !event.flags.includes(InherentFlags.REJECTED) &&
     event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
       ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
           event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
         ]
-      : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+      : getAvailableActionsForEvent(event)
 
   const actions = [...availableAssignmentActions, ...availableActions]
 

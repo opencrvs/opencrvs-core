@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { EventStatus, SelectDateRangeOption } from '@opencrvs/commons/client'
+import {
+  EventStatus,
+  SelectDateRangeOption,
+  VisibleStatus
+} from '@opencrvs/commons/client'
 
 export const statusOptions = [
   {
@@ -60,7 +64,7 @@ export const statusOptions = [
     }
   },
   {
-    value: EventStatus.enum.REJECTED,
+    value: VisibleStatus.enum.REJECTED,
     label: {
       defaultMessage: 'Rejected',
       description: 'Option for form field: status of record',
