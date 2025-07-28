@@ -23,7 +23,7 @@ import {
   getActionAnnotation,
   getDeclaration,
   getActionReview,
-  EventStatus
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -225,7 +225,7 @@ export function Review() {
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleValidation}
           onReject={
-            currentEventState.status === EventStatus.enum.REJECTED
+            currentEventState.flags.includes(InherentFlags.REJECTED)
               ? undefined
               : handleRejection
           }

@@ -216,6 +216,17 @@ export function createStoriesFromScenarios(
 ): Record<string, StoryObj<typeof ActionMenu>> {
   return scenarios.reduce(
     (acc, { name, actions, expected, recordDownloaded }) => {
+      // Because Validate and Register both have same message ('Review'),
+      // We need to consider them as one
+      if (expected.VALIDATE !== expected.REGISTER) {
+        if (expected.VALIDATE === AssertType.HIDDEN) {
+          expected.VALIDATE = expected.REGISTER
+        }
+        if (expected.REGISTER === AssertType.HIDDEN) {
+          expected.REGISTER = expected.VALIDATE
+        }
+      }
+
       const event = getMockEvent(actions, role)
       acc[name] = {
         loaders: [
