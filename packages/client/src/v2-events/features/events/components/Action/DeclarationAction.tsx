@@ -204,11 +204,6 @@ function DeclarationActionComponent({
 
     setFormValues(initialFormValues)
 
-    console.log('cihan test')
-    console.log(JSON.stringify(annotation, null, 2))
-    console.log(JSON.stringify(previousActionAnnotation, null, 2))
-    console.log(JSON.stringify(actionAnnotation, null, 2))
-
     const initialAnnotation = deepMerge(
       deepMerge(annotation || {}, previousActionAnnotation),
       actionAnnotation
