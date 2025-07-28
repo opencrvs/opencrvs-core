@@ -11,7 +11,6 @@
 import React from 'react'
 import {
   ActionType,
-  CorrectedAction,
   deepMerge,
   EventDocument,
   getCurrentEventState,
@@ -24,7 +23,7 @@ export function RequestCorrection({
   action,
   fullEvent
 }: {
-  action: RequestedCorrectionAction | CorrectedAction
+  action: RequestedCorrectionAction
   fullEvent: EventDocument
 }) {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
@@ -51,7 +50,6 @@ export function RequestCorrection({
       event={eventBeforeCorrectionRequest}
       form={deepMerge(eventIndex.declaration, action.declaration)}
       requesting={
-        action.type === ActionType.REQUEST_CORRECTION &&
         !('isImmediateCorrection' in action && action.isImmediateCorrection)
       }
     />
