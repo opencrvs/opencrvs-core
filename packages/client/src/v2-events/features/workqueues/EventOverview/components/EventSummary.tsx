@@ -15,9 +15,7 @@ import {
   EventConfig,
   getDeclarationFields,
   areConditionsMet,
-  getMixedPath,
-  ActionType,
-  InherentFlags
+  getMixedPath
 } from '@opencrvs/commons/client'
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
@@ -53,7 +51,7 @@ const messages = {
     value: {
       id: 'v2.event.summary.status.value',
       defaultMessage:
-        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} REQUEST_CORRECTION {Correction requested} other {Unknown}}',
+        '{event.status, select, CREATED {Draft} NOTIFIED {Incomplete} VALIDATED {Validated} DRAFT {Draft} DECLARED {Declared} REGISTERED {Registered} CERTIFIED {Certified} REJECTED {Requires update} ARCHIVED {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} other {Unknown}}',
       description: 'Status of the event'
     }
   },
@@ -100,16 +98,12 @@ const messages = {
   }
 }
 
-function checkIfCorrectionRequested(flags?: string[]) {
-  return flags && flags.includes(InherentFlags.CORRECTION_REQUESTED)
-}
-
 export function EventSummary({
   event,
   eventConfiguration,
   hideSecuredFields = false
 }: {
-  event: Record<string, FieldValue | null | string[]>
+  event: Record<string, FieldValue | null>
   eventConfiguration: EventConfig
   hideSecuredFields?: boolean
 }) {
@@ -160,18 +154,6 @@ export function EventSummary({
     }
   })
 
-  const flagsArray = Array.isArray(event.flags)
-    ? (event.flags as string[]) // type assertion is needed since flags is not available in the FieldValue type
-    : []
-
-  const isCorrectionRequested = checkIfCorrectionRequested(flagsArray)
-  const eventWithUpdatedStatus = {
-    ...event,
-    'event.status': isCorrectionRequested
-      ? ActionType.REQUEST_CORRECTION
-      : event['event.status']
-  }
-
   return (
     <>
       <Summary id="summary">
@@ -188,10 +170,7 @@ export function EventSummary({
           key="status"
           data-testid="status"
           label={intl.formatMessage(messages.status.label)}
-          value={intl.formatMessage(
-            messages.status.value,
-            eventWithUpdatedStatus
-          )}
+          value={intl.formatMessage(messages.status.value, event)}
         />
         <Summary.Row
           key="event"

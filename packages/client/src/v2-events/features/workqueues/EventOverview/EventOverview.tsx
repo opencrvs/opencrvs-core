@@ -73,7 +73,7 @@ function EventOverviewFull({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { legalStatuses, ...flattenedEventIndex } = {
+  const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status is taken from the eventIndex
@@ -86,13 +86,7 @@ function EventOverviewFull({
 
   return (
     <Content
-      icon={() => (
-        <IconWithName
-          flags={flattenedEventIndex.flags}
-          name={''}
-          status={status}
-        />
-      )}
+      icon={() => <IconWithName flags={flags} name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title}
       titleColor={event.id ? 'copy' : 'grey600'}
@@ -142,7 +136,7 @@ function EventOverviewProtected({
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
 
-  const { legalStatuses, ...flattenedEventIndex } = {
+  const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
     // so the status is taken from the eventIndex
@@ -155,13 +149,7 @@ function EventOverviewProtected({
 
   return (
     <Content
-      icon={() => (
-        <IconWithName
-          flags={flattenedEventIndex.flags}
-          name={''}
-          status={status}
-        />
-      )}
+      icon={() => <IconWithName flags={flags} name={''} status={status} />}
       size={ContentSize.LARGE}
       title={title}
       titleColor={eventIndex.id ? 'copy' : 'grey600'}
