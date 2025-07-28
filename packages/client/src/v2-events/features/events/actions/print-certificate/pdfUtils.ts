@@ -330,7 +330,8 @@ export function compileSvg({
         return ''
       }
 
-      const id = idParts.map((part) => part?.toString().toLowerCase()).join('.')
+      // NOTE: If you are having isues with casing mismatch, please ensure that you are using lookup helper rather than $lookup. Former returns actual values, latter stringified ones.
+      const id = idParts.map((part) => part?.toString()).join('.')
 
       return intl.formatMessage({
         id,
