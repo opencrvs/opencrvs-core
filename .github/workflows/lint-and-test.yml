@@ -400,13 +400,13 @@ jobs:
     steps:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v4.1.8
+        with:
+          name: client
+          path: .
       - uses: pnpm/action-setup@v4
         name: Install pnpm
         with:
           version: 10
-        with:
-          name: client
-          path: .
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
