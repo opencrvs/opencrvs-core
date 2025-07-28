@@ -31,7 +31,6 @@ jobs:
       - uses: pnpm/action-setup@v4
         with:
           version: 10
-          run_install: false
       - uses: mskelton/changelog-reminder-action@v3
         # forked repos cannot access secrets.GITHUB_TOKEN which causes this step
         # to fail
@@ -69,7 +68,6 @@ jobs:
         name: Install pnpm
         with:
           version: 10
-          run_install: false
 
       - name: Check package.json and scripts
         id: check-scripts
@@ -161,9 +159,9 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
-      - name: Runs dependency installation
-        if: steps.check-scripts.outputs.skip != 'true'
-        run: CI="" pnpm install
+      # - name: Runs dependency installation
+      #   if: steps.check-scripts.outputs.skip != 'true'
+      #   run: CI="" pnpm install
 
       - name: Build common package
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
@@ -200,7 +198,6 @@ jobs:
         name: Install pnpm
         with:
           version: 10
-          run_install: false
 
       - name: Detect changes in v2-events
         id: detect-changes
@@ -270,8 +267,8 @@ jobs:
             fi
           done
 
-      - name: Install dependencies
-        run: CI="" pnpm install
+      # - name: Install dependencies
+      #   run: CI="" pnpm install
 
       - name: Build common package
         run: cd packages/commons && pnpm build
@@ -307,8 +304,8 @@ jobs:
           node-version-file: .nvmrc
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: CI="" pnpm install
+      # - name: Install dependencies
+      #   run: CI="" pnpm install
 
       - name: Compile
         run: cd packages/client && pnpm test:compilation
@@ -335,8 +332,8 @@ jobs:
           node-version-file: .nvmrc
           cache: 'pnpm'
 
-      - name: Install dependencies
-        run: CI="" pnpm install
+      # - name: Install dependencies
+      #   run: CI="" pnpm install
 
       - name: Fetch full Git history
         run: |
@@ -435,7 +432,7 @@ jobs:
         name: Install pnpm
         with:
           version: 10
-          run_install: false
+        working-directory: base
 
       - name: Checkout the PR branch
         uses: actions/checkout@v4
@@ -446,25 +443,25 @@ jobs:
         name: Install pnpm
         with:
           version: 10
-          run_install: false
+        working-directory: pr
 
       - name: Use Node.js from .nvmrc from base branch
         uses: actions/setup-node@v4
         with:
           node-version-file: base/.nvmrc
 
-      - name: Install base dependencies
-        run: pnpm install --ignore-scripts
-        working-directory: base
+      # - name: Install base dependencies
+      #   run: pnpm install --ignore-scripts
+      #   working-directory: base
 
       - name: Use Node.js from .nvmrc from PR branch
         uses: actions/setup-node@v4
         with:
           node-version-file: pr/.nvmrc
 
-      - name: Install PR dependencies
-        run: pnpm install --ignore-scripts
-        working-directory: pr
+      # - name: Install PR dependencies
+      #   run: pnpm install --ignore-scripts
+      #   working-directory: pr
 
       - name: Run knip on base branch
         id: knip_base
@@ -506,15 +503,14 @@ jobs:
         name: Install pnpm
         with:
           version: 10
-          run_install: false
 
       - name: Use Node.js from .nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
 
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+      # - name: Install dependencies
+      #   run: pnpm install --frozen-lockfile
 
       - name: Build commons
         run: pnpm build
