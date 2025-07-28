@@ -13,14 +13,6 @@ import { useIntl, MessageDescriptor } from 'react-intl'
 import styled from 'styled-components'
 import { CountryLogo } from '@opencrvs/components/lib/icons'
 import { Stack } from '@opencrvs/components/lib/Stack'
-
-interface IReviewHeaderProps {
-  id?: string
-  logoSource?: string
-  title?: string
-  subject?: MessageDescriptor
-}
-
 const HeaderContainer = styled.div`
   padding: 16px 24px;
   border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
@@ -34,7 +26,6 @@ const HeaderContent = styled.div`
   ${({ theme }) => theme.fonts.h2}
   color: ${({ theme }) => theme.colors.copy};
 `
-
 const TitleContainer = styled.div`
   ${({ theme }) => theme.fonts.bold14}
   color: ${({ theme }) => theme.colors.supportingCopy};
@@ -44,10 +35,18 @@ const SubjectContainer = styled.div`
   ${({ theme }) => theme.fonts.h2}
   overflow-wrap: anywhere;
 `
-export const ReviewHeader = (props: IReviewHeaderProps) => {
+export const ReviewHeader = ({
+  id,
+  logoSource,
+  title,
+  subject
+}: {
+  id?: string
+  logoSource?: string
+  title?: string
+  subject?: MessageDescriptor
+}) => {
   const intl = useIntl()
-  const { id, logoSource, title, subject } = props
-
   return (
     <HeaderContainer>
       <HeaderContent id={id}>
