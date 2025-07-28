@@ -102,7 +102,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
 
     await step('User is taken to the view record page', async () => {
       const list = await canvas.findByRole('list')
-      await userEvent.click(within(list).getByText('View record'))
+      await userEvent.click(within(list).getByText('View'))
 
       await waitFor(async () => {
         await canvas.findByText("Applicant's name")
