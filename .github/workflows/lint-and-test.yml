@@ -99,6 +99,9 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+      - name: Runs dependency installation
+        if: steps.check-scripts.outputs.skip != 'true'
+        run: CI="" pnpm install
 
       - name: Extract dependencies for ${{ matrix.package }}
         if: steps.check-scripts.outputs.skip != 'true'
@@ -159,10 +162,6 @@ jobs:
         if: steps.check-scripts.outputs.skip != 'true'
         run: npx license-check-and-add check -f license-config.json
 
-      # - name: Runs dependency installation
-      #   if: steps.check-scripts.outputs.skip != 'true'
-      #   run: CI="" pnpm install
-
       - name: Build common package
         if: matrix.package != 'packages/client' && steps.check-scripts.outputs.skip != 'true' && contains(env.DEPENDENCIES, 'packages/commons')
         run: cd packages/commons && pnpm build
@@ -213,6 +212,8 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+      - name: Install dependencies
+        run: CI="" pnpm install
 
       - name: Extract dependencies for client
         id: extract-dependencies
@@ -267,9 +268,6 @@ jobs:
             fi
           done
 
-      # - name: Install dependencies
-      #   run: CI="" pnpm install
-
       - name: Build common package
         run: cd packages/commons && pnpm build
 
@@ -304,8 +302,8 @@ jobs:
           node-version-file: .nvmrc
           cache: 'pnpm'
 
-      # - name: Install dependencies
-      #   run: CI="" pnpm install
+      - name: Install dependencies
+        run: CI="" pnpm install
 
       - name: Compile
         run: cd packages/client && pnpm test:compilation
@@ -332,8 +330,8 @@ jobs:
           node-version-file: .nvmrc
           cache: 'pnpm'
 
-      # - name: Install dependencies
-      #   run: CI="" pnpm install
+      - name: Install dependencies
+        run: CI="" pnpm install
 
       - name: Fetch full Git history
         run: |
@@ -432,6 +430,13 @@ jobs:
         name: Install pnpm
         with:
           version: 10
+      - name: Use Node.js from .nvmrc from base branch
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: base/.nvmrc
+
+      - name: Install base dependencies
+        run: pnpm install --ignore-scripts
         working-directory: base
 
       - name: Checkout the PR branch
@@ -443,25 +448,15 @@ jobs:
         name: Install pnpm
         with:
           version: 10
-        working-directory: pr
-
-      - name: Use Node.js from .nvmrc from base branch
-        uses: actions/setup-node@v4
-        with:
-          node-version-file: base/.nvmrc
-
-      # - name: Install base dependencies
-      #   run: pnpm install --ignore-scripts
-      #   working-directory: base
 
       - name: Use Node.js from .nvmrc from PR branch
         uses: actions/setup-node@v4
         with:
           node-version-file: pr/.nvmrc
 
-      # - name: Install PR dependencies
-      #   run: pnpm install --ignore-scripts
-      #   working-directory: pr
+      - name: Install PR dependencies
+        run: pnpm install --ignore-scripts
+        working-directory: pr
 
       - name: Run knip on base branch
         id: knip_base
