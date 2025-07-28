@@ -33,7 +33,6 @@ export const ActionType = {
   REQUEST_CORRECTION: 'REQUEST_CORRECTION',
   REJECT_CORRECTION: 'REJECT_CORRECTION',
   APPROVE_CORRECTION: 'APPROVE_CORRECTION',
-  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST',
   // General actions
   READ: 'READ',
   ASSIGN: 'ASSIGN',
@@ -71,11 +70,17 @@ export const ActionTypes = z.enum([
   'REQUEST_CORRECTION',
   'REJECT_CORRECTION',
   'APPROVE_CORRECTION',
-  'REVIEW_CORRECTION_REQUEST',
   'READ',
   'ASSIGN',
   'UNASSIGN'
 ])
+
+export const ExclusiveActions = {
+  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
+} as const
+
+export type ExclusiveActionTypes =
+  (typeof ExclusiveActions)[keyof typeof ExclusiveActions]
 
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
@@ -126,6 +131,7 @@ export const workqueueActions = ActionTypes.exclude([
 ])
 
 export type WorkqueueActionType = z.infer<typeof workqueueActions>
+export type DisplayableAction = ActionType | ExclusiveActionTypes
 
 const META_ACTIONS: ActionType[] = [
   ActionType.ASSIGN,

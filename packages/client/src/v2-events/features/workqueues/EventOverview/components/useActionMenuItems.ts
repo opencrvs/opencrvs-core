@@ -22,7 +22,9 @@ import {
   EventStatus,
   isMetaAction,
   getAvailableActionsForEvent,
-  InherentFlags
+  InherentFlags,
+  ExclusiveActions,
+  DisplayableAction
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -284,11 +286,9 @@ export function useAction(event: EventIndex) {
           )
         },
         disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
-        shouldHide: () =>
-          eventIsWaitingForCorrection &&
-          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+        shouldHide: () => eventIsWaitingForCorrection
       },
-      [ActionType.REVIEW_CORRECTION_REQUEST]: {
+      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
         label: {
           defaultMessage: 'Review correction request',
           description:
@@ -306,7 +306,7 @@ export function useAction(event: EventIndex) {
         disabled: !eventIsAssignedToSelf,
         shouldHide: () => !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>,
+    } satisfies Partial<Record<DisplayableAction, ActionConfig>>,
     authentication
   }
 }
@@ -346,7 +346,7 @@ export function useActionMenuItems(event: EventIndex) {
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
-    (action): action is keyof typeof config =>
+    (action): action is WorkqueueActionType =>
       Object.keys(config).includes(action)
   )
 

@@ -172,12 +172,6 @@ const RejectedCorrectionAction = ActionBase.merge(
   })
 )
 
-const ReviewCorrectionRequestAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.REVIEW_CORRECTION_REQUEST)
-  })
-)
-
 const ReadAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.READ)
@@ -199,9 +193,6 @@ export const ActionDocument = z
     ApprovedCorrectionAction.openapi({ ref: 'ApprovedCorrectionAction' }),
     RejectedCorrectionAction.openapi({ ref: 'RejectedCorrectionAction' }),
     UnassignedAction.openapi({ ref: 'UnassignedAction' }),
-    ReviewCorrectionRequestAction.openapi({
-      ref: 'ReviewCorrectionRequestAction'
-    }),
     PrintCertificateAction.openapi({ ref: 'PrintCertificateAction' }),
     ReadAction.openapi({ ref: 'ReadAction' })
   ])

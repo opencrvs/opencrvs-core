@@ -253,7 +253,6 @@ function actionToClientAction(
 
     case ActionType.NOTIFY:
     case ActionType.DETECT_DUPLICATE:
-    case ActionType.REVIEW_CORRECTION_REQUEST:
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:
