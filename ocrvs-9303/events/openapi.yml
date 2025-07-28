@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: fe09f577-a824-448a-8fc3-cdfb659c0bd8
+                transactionId: 8ff0190f-8122-47d1-ae46-4bd0b2d60886
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 87e71c3d-1a3f-4d09-a5a4-9dde5109f1e6
+                transactionId: fb9c2746-b5ff-494c-a3fc-fa39f76a470d
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1296,8 +1296,6 @@ paths:
                   type: boolean
                 requestId:
                   type: string
-                isImmediateCorrection:
-                  type: boolean
                 type:
                   type: string
                   enum:
@@ -1789,7 +1787,6 @@ paths:
                     - VALIDATED
                     - REGISTERED
                     - CERTIFIED
-                    - REJECTED
                     - ARCHIVED
                 updatedAt:
                   type: range
@@ -10188,8 +10185,6 @@ components:
             - APPROVE_CORRECTION
         requestId:
           type: string
-        isImmediateCorrection:
-          type: boolean
       required:
         - id
         - transactionId

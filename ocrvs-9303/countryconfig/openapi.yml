@@ -8377,8 +8377,6 @@ components:
           const: APPROVE_CORRECTION
         requestId:
           type: string
-        isImmediateCorrection:
-          type: boolean
       required:
         - id
         - transactionId
@@ -11618,7 +11616,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: dd9bd211-d694-454c-9afe-8ab33f570279
+        transactionId: 905e8252-2f9c-4dff-a728-e8bf585357d6
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -15482,8 +15480,6 @@ components:
           type: boolean
         requestId:
           type: string
-        isImmediateCorrection:
-          type: boolean
         type:
           type: string
           const: APPROVE_CORRECTION
