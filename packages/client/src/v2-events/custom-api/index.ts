@@ -9,8 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventState, getUUID, ActionType } from '@opencrvs/commons/client'
+import {
+  EventState,
+  getUUID,
+  ActionType,
+  getCurrentEventState,
+  omitHiddenAnnotationFields,
+  EventDocument,
+  EventConfig
+} from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
+import { useEventConfigurations } from '../features/events/useEventConfiguration'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -19,6 +28,8 @@ export interface OnDeclareParams {
   declaration: EventState
   transactionId: string
   annotation?: EventState
+  fullEvent?: EventDocument
+  eventConfiguration?: EventConfig
 }
 /**
  * Runs a sequence of actions from declare to register.
@@ -153,8 +164,44 @@ export async function makeCorrectionOnRequest(variables: {
   declaration: EventState
   transactionId: string
   annotation?: EventState
+  fullEvent?: EventDocument
+  eventConfiguration?: EventConfig
 }) {
-  const { eventId, declaration, annotation, transactionId } = variables
+  const {
+    eventId,
+    declaration,
+    annotation: declarationMixedUpAnnotation,
+    transactionId,
+    fullEvent,
+    eventConfiguration
+  } = variables
+
+  if (!fullEvent) {
+    throw new Error(`full event payload not provided for makeCorrectionRequest`)
+  }
+  if (!eventConfiguration) {
+    throw new Error(
+      `Event configuration not found for event: ${fullEvent.type}`
+    )
+  }
+  // Let's find the action configuration. For NOTIFY action, we can use the DECLARE action configuration.
+  const actionConfiguration = eventConfiguration.actions.find(
+    (action) => action.type === ActionType.REQUEST_CORRECTION
+  )
+
+  const originalDeclaration = getCurrentEventState(
+    fullEvent,
+    eventConfiguration
+  ).declaration
+
+  const annotation =
+    actionConfiguration && declarationMixedUpAnnotation
+      ? omitHiddenAnnotationFields(
+          actionConfiguration,
+          originalDeclaration,
+          declarationMixedUpAnnotation
+        )
+      : {}
   const response =
     await trpcClient.event.actions.correction.request.request.mutate({
       eventId,
@@ -176,6 +223,8 @@ export async function makeCorrectionOnRequest(variables: {
     transactionId: getUUID(),
     eventId,
     requestId,
-    isImmediateCorrection: true
+    annotation: {
+      isImmediateCorrection: true
+    }
   })
 }

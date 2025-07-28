@@ -328,11 +328,6 @@ export async function addAction(
       createdAtLocation: user.primaryOfficeId,
       originalActionId: input.originalActionId,
       requestId: hasRequestId ? input.requestId : undefined,
-      isImmediateCorrection:
-        input.type === ActionType.APPROVE_CORRECTION &&
-        input.isImmediateCorrection
-          ? input.isImmediateCorrection
-          : undefined,
       reasonIsDuplicate: hasReason
         ? (input.reason.isDuplicate ?? false)
         : undefined,

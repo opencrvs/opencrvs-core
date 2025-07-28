@@ -134,7 +134,6 @@ CREATE TABLE app.event_actions (
     request_id text,
     status app.action_status NOT NULL,
     transaction_id text NOT NULL,
-    is_immediate_correction boolean,
     CONSTRAINT event_actions_check CHECK ((((action_type = 'ASSIGN'::app.action_type) AND (assigned_to IS NOT NULL)) OR ((action_type = 'UNASSIGN'::app.action_type) AND (assigned_to IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Accepted'::app.action_status) AND (registration_number IS NOT NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Requested'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REGISTER'::app.action_type) AND (status = 'Rejected'::app.action_status) AND (registration_number IS NULL)) OR ((action_type = 'REJECT'::app.action_type) AND ((reason_message IS NULL) OR (reason_message <> ''::text)) AND (reason_is_duplicate IS NOT NULL)) OR ((action_type = 'REJECT_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR ((action_type = 'APPROVE_CORRECTION'::app.action_type) AND (request_id IS NOT NULL)) OR (action_type <> ALL (ARRAY['ASSIGN'::app.action_type, 'UNASSIGN'::app.action_type, 'REGISTER'::app.action_type, 'REJECT'::app.action_type, 'REJECT_CORRECTION'::app.action_type, 'APPROVE_CORRECTION'::app.action_type]))))
 );
 

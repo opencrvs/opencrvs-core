@@ -31,7 +31,6 @@ export async function importEvent(eventDocument: EventDocument, token: string) {
     registrationNumber: (action as any).registrationNumber ?? undefined,
     assignedTo: (action as any).assignedTo ?? undefined,
     requestId: (action as any).requestId ?? undefined,
-    isImmediateCorrection: (action as any).isImmediateCorrection ?? undefined,
     /* eslint-enable @typescript-eslint/no-explicit-any */
     createdAtLocation: action.createdAtLocation ?? null,
     originalActionId: action.originalActionId ?? null,

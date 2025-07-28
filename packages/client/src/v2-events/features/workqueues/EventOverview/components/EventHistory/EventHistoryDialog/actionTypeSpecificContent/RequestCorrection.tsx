@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import {
-  ActionType,
   deepMerge,
   EventDocument,
   getCurrentEventState,
@@ -30,9 +29,10 @@ export function RequestCorrection({
 
   // We need to get the state of the event before the correction request was made
   // so that we can display the original, uncorrected values
+  const index = fullEvent.actions.findIndex((a) => a.id === action.id)
   const eventBeforeCorrectionRequest = {
     ...fullEvent,
-    actions: fullEvent.actions.slice(0, fullEvent.actions.indexOf(action))
+    actions: fullEvent.actions.slice(0, index)
   }
 
   const eventIndex = getCurrentEventState(
@@ -49,9 +49,7 @@ export function RequestCorrection({
       annotation={deepMerge(eventIndex.declaration, action.annotation)}
       event={eventBeforeCorrectionRequest}
       form={deepMerge(eventIndex.declaration, action.declaration)}
-      requesting={
-        !('isImmediateCorrection' in action && action.isImmediateCorrection)
-      }
+      requesting={!action.annotation.isImmediateCorrection}
     />
   )
 }

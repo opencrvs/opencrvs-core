@@ -191,7 +191,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
       (actionList, currentAction) => {
         if (
           currentAction.type === ActionType.APPROVE_CORRECTION &&
-          currentAction.isImmediateCorrection
+          currentAction.annotation?.isImmediateCorrection
         ) {
           const requestCorrectionAction = actionList.find(
             (action) =>
@@ -208,7 +208,10 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
               if (action.id === requestCorrectionAction.id) {
                 return {
                   ...requestCorrectionAction,
-                  isImmediateCorrection: true,
+                  annotation: {
+                    ...requestCorrectionAction.annotation,
+                    isImmediateCorrection: true
+                  },
                   createdBy: currentAction.createdBy,
                   createdAt: currentAction.createdAt,
                   createdByRole: currentAction.createdByRole

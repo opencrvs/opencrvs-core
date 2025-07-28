@@ -161,8 +161,7 @@ export type RequestedCorrectionAction = z.infer<
 const ApprovedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION),
-    requestId: z.string(),
-    isImmediateCorrection: z.boolean().optional()
+    requestId: z.string()
   })
 )
 

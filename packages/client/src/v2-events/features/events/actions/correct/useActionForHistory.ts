@@ -21,7 +21,7 @@ export function useActionForHistory() {
         (x) =>
           x.type === ActionType.APPROVE_CORRECTION &&
           x.requestId === action.id &&
-          x.isImmediateCorrection &&
+          x.annotation?.isImmediateCorrection &&
           x.createdBy === action.createdBy
       )
       if (approveAction) {
