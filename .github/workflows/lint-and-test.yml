@@ -112,7 +112,8 @@ jobs:
 
             // Get all workspace data
             const output = execSync('pnpm m ls --json', { encoding: 'utf-8' });
-            const allPackages = JSON.parse(output);
+            const allPackagesWithRoot = JSON.parse(output);
+            const allPackages = allPackagesWithRoot.filter((pkg) => !!pkg.name);
 
             const normalize = name => name.replace(/^@opencrvs\//, 'packages/');
 
@@ -225,7 +226,8 @@ jobs:
 
             // Get all workspace data
             const output = execSync('pnpm m ls --json', { encoding: 'utf-8' });
-            const allPackages = JSON.parse(output);
+            const allPackagesWithRoot = JSON.parse(output);
+            const allPackages = allPackagesWithRoot.filter((pkg) => !!pkg.name);
 
             const normalize = name => name.replace(/^@opencrvs\//, 'packages/');
 
