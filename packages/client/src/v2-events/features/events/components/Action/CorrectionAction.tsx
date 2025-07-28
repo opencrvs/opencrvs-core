@@ -17,10 +17,10 @@ import {
   findActiveDrafts,
   getCurrentEventStateWithDrafts,
   getActionAnnotation,
-  DeclarationUpdateActionType,
+  deepMerge,
   ActionType,
-  Action,
-  deepMerge
+  getAnnotationFromDrafts,
+  isMetaAction
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -33,56 +33,11 @@ import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useEventConfiguration } from '../../useEventConfiguration'
 import { getEventDrafts } from './utils'
 
-function getPreviousDeclarationActionType(
-  actions: Action[],
-  currentActionType: DeclarationUpdateActionType
-): DeclarationUpdateActionType | undefined {
-  // If action type is DECLARE, there is no previous declaration action
-  if (currentActionType === ActionType.DECLARE) {
-    return
-  }
-
-  // If action type is VALIDATE, we know that the previous declaration action is DECLARE
-  if (currentActionType === ActionType.VALIDATE) {
-    return ActionType.DECLARE
-  }
-
-  // If action type is REGISTER, we know that the previous declaration action is VALIDATE
-  if (currentActionType === ActionType.REGISTER) {
-    return ActionType.VALIDATE
-  }
-
-  // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
-  // Check for the most recent action type in order of precedence
-  const actionTypes = [
-    ActionType.REGISTER,
-    ActionType.VALIDATE,
-    ActionType.DECLARE
-  ]
-
-  for (const type of actionTypes) {
-    if (actions.find((a) => a.type === type)) {
-      return type
-    }
-  }
-
-  return
-}
-
 /**
- * Creates a wrapper component for the declaration action.
- * Manages the state of the declaration action and its local draft.
- *
- * Declaration action modifies the declaration. The action can add annotation to the declaration.
- * Declaration action is triggered only once. Declaration state is generated from series of declaration actions and drafts.
- *
- * This differs from AnnotationAction, which modify the annotation, and can be triggered multiple times.
+ * Creates a wrapper component for correction actions.
  */
-function DeclarationActionComponent({
-  children,
-  actionType
-}: PropsWithChildren<{ actionType: DeclarationUpdateActionType }>) {
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
+function CorrectionActionComponent({ children }: PropsWithChildren) {
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION)
 
   const events = useEvents()
   const navigate = useNavigate()
@@ -108,11 +63,22 @@ function DeclarationActionComponent({
     event.type
   )
 
+  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
+  const lastWriteAction = writeActions[writeActions.length - 1]
+  const isLastActionCorrectionRequest =
+    lastWriteAction.type === ActionType.REQUEST_CORRECTION
+
   const drafts = getRemoteDrafts(event.id)
   const activeDraft = findActiveDrafts(event, drafts)[0]
+
   const localDraft = getLocalDraftOrDefault(
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft || createEmptyDraft(eventId, createTemporaryId(), actionType)
+    activeDraft ||
+      createEmptyDraft(
+        eventId,
+        createTemporaryId(),
+        ActionType.REQUEST_CORRECTION
+      )
   )
 
   /*
@@ -158,40 +124,25 @@ function DeclarationActionComponent({
     [eventDrafts, event, configuration]
   )
 
+  // const actionAnnotation = useMemo(() => {
+  //   return getActionAnnotation({
+  //     event,
+  //     actionType: ActionType.REQUEST_CORRECTION,
+  //     drafts: eventDrafts
+  //   })
+  // }, [eventDrafts, event])
+
   const actionAnnotation = useMemo(() => {
-    return getActionAnnotation({
-      event,
-      actionType,
-      drafts: eventDrafts
-    })
-  }, [eventDrafts, event, actionType])
-
-  const previousActionAnnotation = useMemo(() => {
-    const previousActionType = getPreviousDeclarationActionType(
-      event.actions,
-      actionType
-    )
-
-    if (!previousActionType) {
-      return {}
+    if (isLastActionCorrectionRequest) {
+      return getActionAnnotation({
+        event,
+        actionType: ActionType.REQUEST_CORRECTION,
+        drafts: eventDrafts
+      })
     }
 
-    const prevActionAnnotation = getActionAnnotation({
-      event,
-      actionType: previousActionType
-    })
-
-    // If we found annotation data from the previous action, use that.
-    if (Object.keys(prevActionAnnotation).length) {
-      return prevActionAnnotation
-    }
-
-    // As a fallback, lets see if there is a notify action annotation and use that.
-    return getActionAnnotation({
-      event,
-      actionType: ActionType.NOTIFY
-    })
-  }, [event, actionType])
+    return getAnnotationFromDrafts(eventDrafts)
+  }, [eventDrafts, event, isLastActionCorrectionRequest])
 
   useEffect(() => {
     // Use the form values from the zustand state, so that filled form state is not lost
@@ -204,16 +155,7 @@ function DeclarationActionComponent({
 
     setFormValues(initialFormValues)
 
-    console.log('cihan test')
-    console.log(JSON.stringify(annotation, null, 2))
-    console.log(JSON.stringify(previousActionAnnotation, null, 2))
-    console.log(JSON.stringify(actionAnnotation, null, 2))
-
-    const initialAnnotation = deepMerge(
-      deepMerge(annotation || {}, previousActionAnnotation),
-      actionAnnotation
-    )
-
+    const initialAnnotation = deepMerge(annotation || {}, actionAnnotation)
     setAnnotation(initialAnnotation)
 
     return () => {
@@ -237,4 +179,4 @@ function DeclarationActionComponent({
   return <NavigationStack>{children}</NavigationStack>
 }
 
-export const DeclarationAction = withSuspense(DeclarationActionComponent)
+export const CorrectionAction = withSuspense(CorrectionActionComponent)
