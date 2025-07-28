@@ -400,6 +400,10 @@ jobs:
     steps:
       - name: Download filesystem artifact
         uses: actions/download-artifact@v4.1.8
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
         with:
           name: client
           path: .
