@@ -64,6 +64,7 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
       key={`${workqueueSlug}-${outbox.length}`}
       actions={actions}
       columns={workqueueConfig.columns}
+      emptyMessage={workqueueConfig.emptyMessage}
       eventConfigs={eventConfigs}
       queryData={events}
       title={intl.formatMessage(workqueueConfig.name)}

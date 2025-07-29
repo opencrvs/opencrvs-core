@@ -22,7 +22,8 @@ import {
   isLocationFieldType,
   isRadioGroupFieldType,
   isSelectFieldType,
-  isNameFieldType
+  isNameFieldType,
+  isDateFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -31,7 +32,8 @@ import {
   SelectCountry as Country,
   Select,
   LocationSearch,
-  Name
+  Name,
+  DateField
 } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
 
@@ -111,6 +113,10 @@ export const getFormDataStringifier = (
 
     if (isNameFieldType(field)) {
       return Name.stringify(field.value)
+    }
+
+    if (isDateFieldType(field)) {
+      return DateField.stringify(intl, field.value)
     }
 
     return simpleFieldStringifier(fieldConfig, value)

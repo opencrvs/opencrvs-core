@@ -242,7 +242,17 @@ export const NoResults: Story = {
             return []
           }),
           tRPCMsw.workqueue.config.list.query(() => {
-            return generateWorkqueues('recent')
+            const [recent] = generateWorkqueues('recent')
+            return [
+              {
+                ...recent,
+                emptyMessage: {
+                  id: 'v2.workqueues.recent.emptyMessage',
+                  defaultMessage: 'No recent records',
+                  description: 'Empty message for recent workqueue'
+                }
+              }
+            ]
           }),
           tRPCMsw.workqueue.count.query((input) => {
             return input.reduce((acc, { slug }) => {
