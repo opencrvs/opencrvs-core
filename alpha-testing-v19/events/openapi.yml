@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 4e413b21-1762-48ca-8e32-ceda6a254c71
+                transactionId: bdee44d7-1ff4-482b-a765-97c517bf7a8f
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 4c779f4c-c0b5-4ce0-b91b-83bfeb51a139
+                transactionId: a5a6fba7-10da-464d-8e8a-2c7482d15fd0
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -553,7 +553,6 @@ paths:
                     - DECLARED
                     - VALIDATED
                     - REGISTERED
-                    - CERTIFIED
                     - ARCHIVED
                 updatedAt:
                   type: range
@@ -10626,7 +10625,7 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - printed
+                  - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
@@ -10638,7 +10637,7 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - printed
+                  - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
@@ -10865,7 +10864,7 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - printed
+                  - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
