@@ -94,7 +94,7 @@ export const Button = ({
         <Spinner
           id="button-loading"
           size={24}
-          baseColor="currentColor"
+          color="currentColor"
           style={{ marginRight: '-6px' }}
         />
       )}
