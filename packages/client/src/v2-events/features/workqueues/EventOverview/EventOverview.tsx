@@ -78,9 +78,10 @@ function EventOverviewFull({
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
-    // so the status is taken from the eventIndex
+    // so the status and flags are taken from the eventIndex
     'event.status': status,
-    'event.assignedTo': assignedTo
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
   }
 
   const { getEventTitle } = useEventTitle()
@@ -142,9 +143,10 @@ function EventOverviewProtected({
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
-    // so the status is taken from the eventIndex
+    // so the status and flags are taken from the eventIndex
     'event.status': status,
-    'event.assignedTo': assignedTo
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
   }
 
   const { getEventTitle } = useEventTitle()
