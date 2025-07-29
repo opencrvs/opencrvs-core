@@ -10,7 +10,7 @@
  */
 import { z } from 'zod'
 import { TranslationConfig } from './TranslationConfig'
-import { Inferred, SelectOption, ValidationConfig } from './FieldConfig'
+import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
 
@@ -149,4 +149,4 @@ export type AdvancedSearchConfig = z.infer<typeof AdvancedSearchConfig>
 export type AdvancedSearchConfigWithFieldsResolved = Omit<
   AdvancedSearchConfig,
   'fields'
-> & { fields: Inferred[] }
+> & { fields: FieldConfig[] }

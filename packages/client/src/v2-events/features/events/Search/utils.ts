@@ -20,7 +20,6 @@ import {
   EventFieldId,
   QueryType,
   SearchQueryParams,
-  Inferred,
   EventState,
   FieldType,
   QueryExpression,
@@ -363,9 +362,9 @@ function buildSearchQueryFields(
  * @returns the field configuration with overrides applied from the search field
  */
 function applySearchFieldOverridesToFieldConfig(
-  field: Inferred,
+  field: FieldConfig,
   searchField: SearchField
-): Inferred {
+): FieldConfig {
   const commonConfig = {
     conditionals: searchField.conditionals ?? field.conditionals,
     validation: searchField.validations ?? field.validation,
@@ -443,7 +442,7 @@ export function resolveAdvancedSearchConfig(
       acc[field.id] = field
       return acc
     },
-    {} as Record<string, Inferred>
+    {} as Record<string, FieldConfig>
   )
   return eventConfig.advancedSearch.map((section) => {
     return {
@@ -468,7 +467,7 @@ export function resolveAdvancedSearchConfig(
 export function getSearchParamsFieldConfigs(
   eventConfig: EventConfig,
   searchParams: SearchQueryParams
-): Inferred[] {
+): FieldConfig[] {
   // Flatten all advanced search fields across all sections
   const allSearchFields = eventConfig.advancedSearch.flatMap(
     (section) => section.fields
@@ -521,7 +520,7 @@ export function parseFieldSearchParams(
  *
  *
  * @param {EventState} formValues - A flat key-value object representing the current search
- * @param {Inferred[]} resolvedFieldConfigs - The resolved field configurations
+ * @param {FieldConfig[]} resolvedFieldConfigs - The resolved field configurations
  * for an advanced search form, including both metadata and declaration
  * fields.
  * @param {SearchField[]} searchFieldConfigs - The search field configurations
@@ -531,7 +530,7 @@ export function parseFieldSearchParams(
  */
 export function buildSearchQuery(
   formValues: EventState,
-  resolvedFieldConfigs: Inferred[],
+  resolvedFieldConfigs: FieldConfig[],
   searchFieldConfigs: SearchField[]
 ): QueryInputType {
   const fieldsMap = searchFieldConfigs.reduce(
@@ -598,7 +597,7 @@ function addMetadataFieldsInQuickSearchQuery(
 }
 
 function buildQueryFromQuickSearchFields(
-  searchableFields: Inferred[],
+  searchableFields: FieldConfig[],
   terms: string[]
 ): QueryType {
   let clauses: QueryExpression[] = []
@@ -644,7 +643,7 @@ export function buildQuickSearchQuery(
   events: EventConfig[]
 ): QueryType {
   // Flatten all searchable fields from the selected events
-  const fieldsOfEvents = events.reduce<Inferred[]>((acc, event) => {
+  const fieldsOfEvents = events.reduce<FieldConfig[]>((acc, event) => {
     const fields = getAllUniqueFields(event)
     return [...acc, ...fields]
   }, [])

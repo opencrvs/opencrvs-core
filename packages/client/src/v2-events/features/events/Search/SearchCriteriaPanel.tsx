@@ -18,7 +18,7 @@ import {
   EventConfig,
   EventState,
   FieldValue,
-  Inferred
+  FieldConfig
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { constantsMessages } from '@client/v2-events/messages'
@@ -65,7 +65,7 @@ function SearchParamLabel({
   value
 }: {
   eventConfig: EventConfig
-  fieldConfigs: Inferred[]
+  fieldConfigs: FieldConfig[]
   fieldName: string
   value: FieldValue
 }) {
