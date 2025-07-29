@@ -968,7 +968,7 @@ export const statusOptions = [
     }
   },
   {
-    value: EventStatus.enum.CERTIFIED,
+    value: VisibleStatus.enum.CERTIFIED,
     label: {
       defaultMessage: 'Certified',
       description: 'Option for form field: status of record',
