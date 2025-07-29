@@ -20,7 +20,8 @@ import {
   DeclarationUpdateActionType,
   ActionType,
   Action,
-  deepMerge
+  deepMerge,
+  getAnnotationFromDrafts
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -31,6 +32,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useEventConfiguration } from '../../useEventConfiguration'
+import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import { getEventDrafts } from './utils'
 
 function getPreviousDeclarationActionType(
@@ -159,6 +161,14 @@ function DeclarationActionComponent({
   )
 
   const actionAnnotation = useMemo(() => {
+    // For correction request, if we are not reviewing a correction, we don't want to use any previous action annotation
+    if (
+      actionType === ActionType.REQUEST_CORRECTION &&
+      !isLastActionCorrectionRequest(event)
+    ) {
+      return getAnnotationFromDrafts(eventDrafts)
+    }
+
     return getActionAnnotation({
       event,
       actionType,
