@@ -24,8 +24,7 @@ import {
   InherentFlags,
   SCOPES,
   isMetaAction,
-  deepMerge,
-  FieldUpdateValue
+  deepMerge
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getCurrentEventState } from '@opencrvs/commons/client'
@@ -40,7 +39,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { hasFieldChanged } from '../utils'
+import { hasFieldChanged, isLastActionCorrectionRequest } from '../utils'
 
 function mergeCorrectionFormValues(
   form: EventState,
@@ -98,14 +97,13 @@ export function Review() {
 
   const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
   const lastWriteAction = writeActions[writeActions.length - 1]
-  const isLastActionCorrectionRequest =
-    lastWriteAction.type === ActionType.REQUEST_CORRECTION
+  const lastActionIsCorrectionRequest = isLastActionCorrectionRequest(event)
 
   const canReviewCorrection =
     eventIndex.flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
     scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
 
-  if (canReviewCorrection && !isLastActionCorrectionRequest) {
+  if (canReviewCorrection && !lastActionIsCorrectionRequest) {
     throw new Error(
       `Last action is not a correction request. Last action type: ${lastWriteAction.type}`
     )
@@ -118,7 +116,7 @@ export function Review() {
   }
 
   const isReviewCorrection =
-    canReviewCorrection && isLastActionCorrectionRequest
+    canReviewCorrection && lastActionIsCorrectionRequest
 
   const formWithNewValues =
     isReviewCorrection && isRequestCorrectionAction(lastWriteAction)

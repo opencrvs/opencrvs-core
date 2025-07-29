@@ -31,6 +31,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useEventConfiguration } from '../../useEventConfiguration'
+import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 import { getEventDrafts } from './utils'
 
 /**
@@ -62,11 +63,6 @@ function CorrectionActionComponent({ children }: PropsWithChildren) {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
-
-  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
-  const lastWriteAction = writeActions[writeActions.length - 1]
-  const isLastActionCorrectionRequest =
-    lastWriteAction.type === ActionType.REQUEST_CORRECTION
 
   const drafts = getRemoteDrafts(event.id)
   const activeDraft = findActiveDrafts(event, drafts)[0]
@@ -124,16 +120,8 @@ function CorrectionActionComponent({ children }: PropsWithChildren) {
     [eventDrafts, event, configuration]
   )
 
-  // const actionAnnotation = useMemo(() => {
-  //   return getActionAnnotation({
-  //     event,
-  //     actionType: ActionType.REQUEST_CORRECTION,
-  //     drafts: eventDrafts
-  //   })
-  // }, [eventDrafts, event])
-
   const actionAnnotation = useMemo(() => {
-    if (isLastActionCorrectionRequest) {
+    if (isLastActionCorrectionRequest(event)) {
       return getActionAnnotation({
         event,
         actionType: ActionType.REQUEST_CORRECTION,
@@ -142,7 +130,7 @@ function CorrectionActionComponent({ children }: PropsWithChildren) {
     }
 
     return getAnnotationFromDrafts(eventDrafts)
-  }, [eventDrafts, event, isLastActionCorrectionRequest])
+  }, [eventDrafts, event])
 
   useEffect(() => {
     // Use the form values from the zustand state, so that filled form state is not lost
