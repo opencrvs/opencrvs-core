@@ -218,7 +218,6 @@ describe('Request and confirmation flow', () => {
         () => {
           registrationNumber = generateRegistrationNumber(prng)
           const responseBody = status === 200 ? { registrationNumber } : {}
-          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
           return HttpResponse.json(responseBody, { status })
         }
       )
