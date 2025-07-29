@@ -10,7 +10,10 @@
  */
 
 import { createSearchConfig } from '../searchConfigs'
-import { EventFieldIdInput } from '../events/AdvancedSearchConfig'
+import {
+  EventFieldIdInput,
+  METADATA_FIELD_PREFIX
+} from '../events/AdvancedSearchConfig'
 
 /**
  * Creates a search configuration object for a given event metadata field.
@@ -19,7 +22,7 @@ import { EventFieldIdInput } from '../events/AdvancedSearchConfig'
  */
 export function createEventFieldConfig(fieldId: EventFieldIdInput) {
   const baseField = {
-    fieldId: `event.${fieldId}` as const,
+    fieldId: `${METADATA_FIELD_PREFIX}${fieldId}` as const,
     fieldType: 'event' as const
   }
 

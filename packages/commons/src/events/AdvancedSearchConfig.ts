@@ -112,17 +112,21 @@ export const EventFieldIdInput = z.enum([
 ])
 
 /**
+ * Represent the prefix used to differentiate event metadata fields from
+ * the declaration ones in advanced search form.
+ */
+export const METADATA_FIELD_PREFIX = 'event.'
+
+/**
  * The field IDs that are actually used in the advanced search. The `event`
- * function transforms the `EventFieldIdInput` values to these values. The
- * `event.` prefix is required to differentiate these fields from the
- * declaration form fields, which can also be used in the advanced search.
+ * function prefixes the `EventFieldIdInput` values with METADATA_FIELD_PREFIX.
  */
 export const EventFieldId = z.enum([
-  'event.trackingId',
-  'event.status',
-  'event.legalStatuses.REGISTERED.acceptedAt',
-  'event.legalStatuses.REGISTERED.createdAtLocation',
-  'event.updatedAt'
+  `${METADATA_FIELD_PREFIX}trackingId`,
+  `${METADATA_FIELD_PREFIX}status`,
+  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.acceptedAt`,
+  `${METADATA_FIELD_PREFIX}legalStatuses.REGISTERED.createdAtLocation`,
+  `${METADATA_FIELD_PREFIX}updatedAt`
 ])
 
 export type EventFieldIdInput = z.infer<typeof EventFieldIdInput>

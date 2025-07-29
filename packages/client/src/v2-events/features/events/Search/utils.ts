@@ -29,7 +29,8 @@ import {
   AddressFieldValue,
   timePeriodToDateRange,
   EventStatus,
-  AdvancedSearchConfigWithFieldsResolved
+  AdvancedSearchConfigWithFieldsResolved,
+  METADATA_FIELD_PREFIX
 } from '@opencrvs/commons/client'
 import { findScope } from '@opencrvs/commons/client'
 import { getScope } from '@client/profile/profileSelectors'
@@ -191,8 +192,8 @@ export function toAdvancedSearchQueryType(
   const declaration: Record<string, unknown> = {}
 
   Object.entries(searchParams).forEach(([key, value]) => {
-    if (key.startsWith('event.')) {
-      metadata[key.replace('event.', '')] = value
+    if (key.startsWith(METADATA_FIELD_PREFIX)) {
+      metadata[key.replace(METADATA_FIELD_PREFIX, '')] = value
     } else {
       declaration[key] = value
     }
