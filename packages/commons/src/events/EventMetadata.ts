@@ -39,7 +39,7 @@ export const InherentFlags = {
 
 export type InherentFlags = (typeof InherentFlags)[keyof typeof InherentFlags]
 
-export const Flag = z
+export const ActionFlag = z
   .string()
   .regex(
     new RegExp(
@@ -51,8 +51,9 @@ export const Flag = z
     ),
     'Flag must be in the format ActionType:ActionStatus (lowerCase)'
   )
-  .or(z.nativeEnum(InherentFlags))
+export const Flag = ActionFlag.or(z.nativeEnum(InherentFlags))
 
+export type ActionFlag = z.infer<typeof ActionFlag>
 export type Flag = z.infer<typeof Flag>
 
 export const ZodDate = z.string().date()

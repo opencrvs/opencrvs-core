@@ -104,6 +104,7 @@ function EventOverviewFull({
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistory fullEvent={event} />
     </Content>
@@ -172,6 +173,7 @@ function EventOverviewProtected({
         hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistorySkeleton />
     </Content>
