@@ -597,8 +597,8 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      # - name: Install dependencies
-      #   run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install
 
       - name: Build commons
         run: pnpm build
