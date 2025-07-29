@@ -36,7 +36,8 @@ module.exports = defineConfig([
   {
     rules: {
       'no-console': 'off',
-      '@typescript-eslint/no-unused-expressions': 'off'
+      '@typescript-eslint/no-unused-expressions': 'off',
+      'import/no-relative-parent-imports': 'off'
     }
   }
 ])
