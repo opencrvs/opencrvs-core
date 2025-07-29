@@ -26,9 +26,11 @@ import {
   Content,
   ContentSize,
   Icon,
+  InputField,
   ResponsiveModal,
   Stack,
-  Text
+  Text,
+  TextInput
 } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -68,6 +70,11 @@ const reviewCorrectionMessages = defineMessages({
     id: 'v2-events.correction.correctionRequest',
     defaultMessage: 'Correction request',
     description: 'Correction request text'
+  },
+  rejectReason: {
+    id: 'v2-events.correction.correctionReject.reason',
+    defaultMessage: 'Reason',
+    description: 'Correction request rejection reason'
   }
 })
 
@@ -87,6 +94,14 @@ const Row = styled.div<{
   padding: 24px 0px 24px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0;
+  }
+`
+
+const StyledTextInput = styled(TextInput)`
+  height: 100px;
+  width: 360px;
+  @media (max-width: 480px) {
+    width: 100%;
   }
 `
 
@@ -165,7 +180,7 @@ function RejectModal({
         <Button
           key="reject_correction"
           id="reject_correction"
-          type="primary"
+          type="negative"
           onClick={() => {
             onSubmit()
             close(true)
@@ -175,7 +190,7 @@ function RejectModal({
         </Button>
       ]}
       handleClose={() => close(null)}
-      responsive={false}
+      responsive={true}
       show={true}
       title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
     >
@@ -183,6 +198,16 @@ function RejectModal({
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
         </Text>
+      </Stack>
+      <Stack>
+        <InputField
+          id={'reject-correction'}
+          label={intl.formatMessage(reviewCorrectionMessages.rejectReason)}
+          required={false}
+          touched={false}
+        >
+          <StyledTextInput />
+        </InputField>
       </Stack>
     </ResponsiveModal>
   )
@@ -253,6 +278,32 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     ))
   }
 
+  const rejectButton = (
+    <Button
+      fullWidth={true}
+      id="rejectCorrectionBtn"
+      size="large"
+      type="negative"
+      onClick={openRejectModal}
+    >
+      <Icon name="X" />
+      {intl.formatMessage(buttonMessages.reject)}
+    </Button>
+  )
+
+  const approveButton = (
+    <Button
+      fullWidth={true}
+      id="ApproveCorrectionBtn"
+      size="large"
+      type="positive"
+      onClick={openApproveModal}
+    >
+      <Icon name="Check" />
+      {intl.formatMessage(buttonMessages.approve)}
+    </Button>
+  )
+
   return (
     <Content
       size={ContentSize.LARGE}
@@ -260,26 +311,8 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     >
       <CorrectionDetails annotation={annotation} event={event} form={form} />
       <Row background="white" position="left">
-        <Button
-          fullWidth={true}
-          id="rejectCorrectionBtn"
-          size="large"
-          type="negative"
-          onClick={openRejectModal}
-        >
-          <Icon name="X" />
-          {intl.formatMessage(buttonMessages.reject)}
-        </Button>
-        <Button
-          fullWidth={true}
-          id="ApproveCorrectionBtn"
-          size="large"
-          type="positive"
-          onClick={openApproveModal}
-        >
-          <Icon name="Check" />
-          {intl.formatMessage(buttonMessages.approve)}
-        </Button>
+        {rejectButton}
+        {approveButton}
       </Row>
       {modal}
     </Content>
