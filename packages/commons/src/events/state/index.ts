@@ -361,7 +361,6 @@ export function getActionAnnotation({
   drafts?: Draft[]
 }): EventState {
   const activeActions = getAcceptedActions(event)
-
   const action = activeActions.find(
     (activeAction) => actionType === activeAction.type
   )
