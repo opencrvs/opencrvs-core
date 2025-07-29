@@ -23,6 +23,8 @@ import {
 } from '@opencrvs/commons/client'
 import {
   Button,
+  Content,
+  ContentSize,
   Icon,
   ResponsiveModal,
   Stack,
@@ -31,10 +33,9 @@ import {
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
-import { useActionAnnotation } from '../../../useActionAnnotation'
-import { useEvents } from '../../../useEvents/useEvents'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { CorrectionDetails } from './Summary/CorrectionDetails'
-import { ReviewHeader } from './ReviewHeader'
 
 const reviewCorrectionMessages = defineMessages({
   actionModalCancel: {
@@ -62,25 +63,13 @@ const reviewCorrectionMessages = defineMessages({
     id: 'v2.actionModal.confirm',
     defaultMessage: 'Confirm',
     description: 'The label for confirm button of action modal'
+  },
+  correctionRequest: {
+    id: 'v2-events.correction.correctionRequest',
+    defaultMessage: 'Correction request',
+    description: 'Correction request text'
   }
 })
-
-const Card = styled.div`
-  border: 1px solid ${({ theme }) => theme.colors.grey300};
-  background: ${({ theme }) => theme.colors.white};
-  border-radius: 4px;
-  margin-bottom: 40px;
-  &:last-child {
-    margin-bottom: 200px;
-  }
-`
-
-const ReviewContainter = styled.div<{ paddingT?: boolean }>`
-  padding: ${({ paddingT }) => (paddingT ? '32px 32px 0 32px' : '0px 32px')};
-  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
-    padding: 0px 24px;
-  }
-`
 
 const Row = styled.div<{
   position?: 'left' | 'center'
@@ -100,14 +89,6 @@ const Row = styled.div<{
     padding: 0;
   }
 `
-
-const messages = defineMessages({
-  correctionRequest: {
-    id: 'v2-events.correction.correctionRequest',
-    defaultMessage: 'Correction request',
-    description: 'Correction request text'
-  }
-})
 
 function ApproveModal({
   close,
@@ -273,35 +254,34 @@ export function ReviewCorrection({ form }: { form: EventState }) {
   }
 
   return (
-    <Card>
-      <ReviewContainter paddingT={true}>
-        <ReviewHeader
-          id="correction_header"
-          subject={messages.correctionRequest}
-        />
-        <CorrectionDetails annotation={annotation} event={event} form={form} />
-        <Row background="white" position="left">
-          <Button
-            id="ApproveCorrectionBtn"
-            size="large"
-            type="positive"
-            onClick={openApproveModal}
-          >
-            <Icon name="Check" />
-            {intl.formatMessage(buttonMessages.approve)}
-          </Button>
-          <Button
-            id="rejectCorrectionBtn"
-            size="large"
-            type="negative"
-            onClick={openRejectModal}
-          >
-            <Icon name="X" />
-            {intl.formatMessage(buttonMessages.reject)}
-          </Button>
-        </Row>
-      </ReviewContainter>
+    <Content
+      size={ContentSize.LARGE}
+      title={intl.formatMessage(reviewCorrectionMessages.correctionRequest)}
+    >
+      <CorrectionDetails annotation={annotation} event={event} form={form} />
+      <Row background="white" position="left">
+        <Button
+          fullWidth={true}
+          id="ApproveCorrectionBtn"
+          size="large"
+          type="positive"
+          onClick={openApproveModal}
+        >
+          <Icon name="Check" />
+          {intl.formatMessage(buttonMessages.approve)}
+        </Button>
+        <Button
+          fullWidth={true}
+          id="rejectCorrectionBtn"
+          size="large"
+          type="negative"
+          onClick={openRejectModal}
+        >
+          <Icon name="X" />
+          {intl.formatMessage(buttonMessages.reject)}
+        </Button>
+      </Row>
       {modal}
-    </Card>
+    </Content>
   )
 }
