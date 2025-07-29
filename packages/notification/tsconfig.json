@@ -24,7 +24,6 @@
     "node_modules",
     "build",
     "scripts",
-    "acceptance-tests",
-    "src/**/*.test.ts",
+    "acceptance-tests"
   ]
 }
