@@ -19,8 +19,7 @@ import {
   getActionAnnotation,
   deepMerge,
   ActionType,
-  getAnnotationFromDrafts,
-  isMetaAction
+  getAnnotationFromDrafts
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
