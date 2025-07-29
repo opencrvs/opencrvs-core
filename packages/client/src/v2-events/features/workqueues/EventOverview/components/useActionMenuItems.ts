@@ -22,7 +22,9 @@ import {
   EventStatus,
   isMetaAction,
   getAvailableActionsForEvent,
-  InherentFlags
+  InherentFlags,
+  ExclusiveActions,
+  DisplayableAction
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -284,11 +286,27 @@ export function useAction(event: EventIndex) {
           )
         },
         disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
-        shouldHide: () =>
-          eventIsWaitingForCorrection &&
-          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+        shouldHide: () => eventIsWaitingForCorrection
+      },
+      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+        label: {
+          defaultMessage: 'Review correction request',
+          description:
+            'This is shown as the action name anywhere the user can trigger the action from',
+          id: 'v2.event.summary.review-correction-request.label'
+        },
+        icon: 'NotePencil',
+        onClick: () => {
+          navigate(
+            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+              eventId
+            })
+          )
+        },
+        disabled: !eventIsAssignedToSelf,
+        shouldHide: () => !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>,
+    } satisfies Partial<Record<DisplayableAction, ActionConfig>>,
     authentication
   }
 }
@@ -328,7 +346,7 @@ export function useActionMenuItems(event: EventIndex) {
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
-    (action): action is keyof typeof config =>
+    (action): action is WorkqueueActionType =>
       Object.keys(config).includes(action)
   )
 

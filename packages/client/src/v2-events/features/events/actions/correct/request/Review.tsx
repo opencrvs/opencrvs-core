@@ -16,7 +16,17 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import { ActionType, getDeclaration } from '@opencrvs/commons/client'
+import { useSelector } from 'react-redux'
+import {
+  ActionType,
+  EventState,
+  getDeclaration,
+  InherentFlags,
+  SCOPES,
+  isMetaAction,
+  deepMerge,
+  FieldUpdateValue
+} from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getCurrentEventState } from '@opencrvs/commons/client'
 import { buttonMessages } from '@client/i18n/messages'
@@ -27,11 +37,20 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { FormLayout } from '@client/v2-events/layouts'
 import { ROUTES } from '@client/v2-events/routes'
+import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { hasFieldChanged } from '../utils'
 
+function mergeCorrectionFormValues(
+  form: EventState,
+  declaration: EventState
+): EventState {
+  return deepMerge(form, declaration)
+}
+
 export function Review() {
+  const scopes = useSelector(getScope)
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
   const [{ workqueue: slug }] = useTypedSearchParams(
     ROUTES.V2.EVENTS.VALIDATE.REVIEW
@@ -77,12 +96,42 @@ export function Review() {
     form
   })
 
+  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
+  const lastWriteAction = writeActions[writeActions.length - 1]
+  const isLastActionCorrectionRequest =
+    lastWriteAction.type === ActionType.REQUEST_CORRECTION
+
+  const canReviewCorrection =
+    eventIndex.flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
+    scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+
+  if (canReviewCorrection && !isLastActionCorrectionRequest) {
+    throw new Error(
+      `Last action is not a correction request. Last action type: ${lastWriteAction.type}`
+    )
+  }
+
+  const isRequestCorrectionAction = (
+    action: typeof lastWriteAction
+  ): action is typeof lastWriteAction & { declaration: EventState } => {
+    return action.type === 'REQUEST_CORRECTION'
+  }
+
+  const isReviewCorrection =
+    canReviewCorrection && isLastActionCorrectionRequest
+
+  const formWithNewValues =
+    isReviewCorrection && isRequestCorrectionAction(lastWriteAction)
+      ? mergeCorrectionFormValues(form, lastWriteAction.declaration)
+      : form
+
   return (
     <FormLayout route={ROUTES.V2.EVENTS.REGISTER}>
       <ReviewComponent.Body
-        form={form}
+        form={formWithNewValues}
         formConfig={formConfig}
         isCorrection={true}
+        isReviewCorrection={isReviewCorrection}
         previousFormValues={previousFormValues}
         title={intlWithData.formatMessage(
           actionConfig.label,
@@ -101,21 +150,23 @@ export function Review() {
           )
         }}
       >
-        <PrimaryButton
-          key="continue_button"
-          disabled={!anyValuesHaveChanged || incomplete}
-          id="continue_button"
-          onClick={() => {
-            navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
-                { eventId },
-                { workqueue: slug }
+        {!isReviewCorrection && (
+          <PrimaryButton
+            key="continue_button"
+            disabled={!anyValuesHaveChanged || incomplete}
+            id="continue_button"
+            onClick={() => {
+              navigate(
+                ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY.buildPath(
+                  { eventId },
+                  { workqueue: slug }
+                )
               )
-            )
-          }}
-        >
-          {intl.formatMessage(buttonMessages.continueButton)}
-        </PrimaryButton>
+            }}
+          >
+            {intl.formatMessage(buttonMessages.continueButton)}
+          </PrimaryButton>
+        )}
       </ReviewComponent.Body>
     </FormLayout>
   )

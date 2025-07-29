@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from '../ActionType'
+import { ActionType, DisplayableAction, ExclusiveActions } from '../ActionType'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, InherentFlags } from '../EventMetadata'
 
@@ -42,25 +42,27 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.PRINT_CERTIFICATE,
     ActionType.REQUEST_CORRECTION,
     ActionType.APPROVE_CORRECTION,
-    ActionType.REJECT_CORRECTION
+    ActionType.REJECT_CORRECTION,
+    ExclusiveActions.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.CERTIFIED]: [
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
     ActionType.REQUEST_CORRECTION,
     ActionType.APPROVE_CORRECTION,
-    ActionType.REJECT_CORRECTION
+    ActionType.REJECT_CORRECTION,
+    ExclusiveActions.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.ARCHIVED]: [
     ActionType.READ,
     ActionType.ASSIGN,
     ActionType.UNASSIGN
   ]
-} as const satisfies Record<EventStatus, ActionType[]>
+} as const satisfies Record<EventStatus, DisplayableAction[]>
 
 export const getAvailableActionsForEvent = (
   event: EventIndex
-): ActionType[] => {
+): DisplayableAction[] => {
   return event.flags.includes(InherentFlags.REJECTED)
     ? [
         ActionType.READ,
