@@ -362,7 +362,7 @@ function buildSearchQueryFields(
 /**
  * @returns the field configuration with overrides applied from the search field
  */
-export function applySearchFieldOverridesToFieldConfig(
+function applySearchFieldOverridesToFieldConfig(
   field: Inferred,
   searchField: SearchField
 ): Inferred {
