@@ -76,7 +76,7 @@ const Row = styled.div<{
   background?: 'white' | 'background'
 }>`
   display: flex;
-  gap: 24px;
+  gap: 16px;
   width: 100%;
   justify-content: ${({ position }) => position || 'center'};
   background-color: ${({ theme, background }) =>
@@ -84,7 +84,7 @@ const Row = styled.div<{
       ? theme.colors.background
       : theme.colors.white};
   flex-direction: row;
-  padding: 24px;
+  padding: 24px 0px 24px 0px;
   @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
     padding: 0;
   }
@@ -262,16 +262,6 @@ export function ReviewCorrection({ form }: { form: EventState }) {
       <Row background="white" position="left">
         <Button
           fullWidth={true}
-          id="ApproveCorrectionBtn"
-          size="large"
-          type="positive"
-          onClick={openApproveModal}
-        >
-          <Icon name="Check" />
-          {intl.formatMessage(buttonMessages.approve)}
-        </Button>
-        <Button
-          fullWidth={true}
           id="rejectCorrectionBtn"
           size="large"
           type="negative"
@@ -279,6 +269,16 @@ export function ReviewCorrection({ form }: { form: EventState }) {
         >
           <Icon name="X" />
           {intl.formatMessage(buttonMessages.reject)}
+        </Button>
+        <Button
+          fullWidth={true}
+          id="ApproveCorrectionBtn"
+          size="large"
+          type="positive"
+          onClick={openApproveModal}
+        >
+          <Icon name="Check" />
+          {intl.formatMessage(buttonMessages.approve)}
         </Button>
       </Row>
       {modal}
