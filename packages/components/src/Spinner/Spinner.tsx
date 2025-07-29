@@ -10,13 +10,16 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
+import { colors } from '../colors'
 
 export interface ISpinner extends React.HTMLAttributes<HTMLDivElement> {
   id: string
-  baseColor?: string
+  color?: ColorKey | string
   className?: string
   size?: number
 }
+
+type ColorKey = keyof typeof colors
 
 const StyledSpinner = styled.div<ISpinner>`
   width: ${({ size }) => (size ? `${size}px` : 'auto')};
@@ -28,8 +31,12 @@ const StyledSpinner = styled.div<ISpinner>`
     height: ${({ size }) => size}px;
 
     & circle {
-      stroke: ${({ baseColor }) =>
-        baseColor ? baseColor : ({ theme }) => theme.colors.primary};
+      stroke: ${({ color, theme }) =>
+        color
+          ? color in theme.colors
+            ? theme.colors[color as ColorKey]
+            : color
+          : theme.colors.primary};
       stroke-linecap: round;
       animation: dash 1.5s ease-in-out infinite;
     }
@@ -57,17 +64,11 @@ const StyledSpinner = styled.div<ISpinner>`
   }
 `
 
-export const Spinner = ({
-  id,
-  className,
-  baseColor,
-  size,
-  ...rest
-}: ISpinner) => (
+export const Spinner = ({ id, className, color, size, ...rest }: ISpinner) => (
   <StyledSpinner
     id={id}
     className={className}
-    baseColor={baseColor}
+    color={color}
     size={size ? size : 48}
     data-testid="spinner"
     {...rest}

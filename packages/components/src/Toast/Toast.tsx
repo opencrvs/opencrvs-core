@@ -125,7 +125,7 @@ export function Toast({
         <SpinnerContainer>
           <Spinner
             id="in-progress-floating-notification"
-            baseColor={colors.white}
+            color="white"
             size={20}
           />
         </SpinnerContainer>
