@@ -99,6 +99,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Runs dependency installation
         if: steps.check-scripts.outputs.skip != 'true'
         run: CI="" pnpm install
@@ -212,6 +213,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
       - name: Install dependencies
         run: CI="" pnpm install
 
@@ -301,6 +303,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Install dependencies
         run: CI="" pnpm install
@@ -329,6 +332,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Install dependencies
         run: CI="" pnpm install
@@ -368,6 +372,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Install dependencies
         run: CI="" pnpm install
@@ -413,6 +418,7 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: 'pnpm'
+          cache-dependency-path: '**/pnpm-lock.yaml'
 
       - name: Install dependencies
         run: CI="" pnpm install
