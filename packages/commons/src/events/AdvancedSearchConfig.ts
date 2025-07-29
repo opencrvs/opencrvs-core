@@ -99,6 +99,10 @@ export const FieldConfigSchema = BaseField.extend({
     In such case, populate this field (excludeInSearchQuery) with boolean true`)
 })
 
+/**
+ * The event fields that are available for advanced search. These are the values
+ * that can be passed to the `event` function to create a field config.
+ */
 export const EventFieldIdInput = z.enum([
   'trackingId',
   'status',
@@ -107,6 +111,12 @@ export const EventFieldIdInput = z.enum([
   'updatedAt'
 ])
 
+/**
+ * The field IDs that are actually used in the advanced search. The `event`
+ * function transforms the `EventFieldIdInput` values to these values. The
+ * `event.` prefix is required to differentiate these fields from the
+ * declaration form fields, which can also be used in the advanced search.
+ */
 export const EventFieldId = z.enum([
   'event.trackingId',
   'event.status',
