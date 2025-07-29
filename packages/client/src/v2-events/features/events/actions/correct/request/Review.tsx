@@ -25,7 +25,8 @@ import {
   SCOPES,
   isMetaAction,
   deepMerge,
-  FieldUpdateValue
+  Action,
+  RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getCurrentEventState } from '@opencrvs/commons/client'
@@ -40,13 +41,12 @@ import { ROUTES } from '@client/v2-events/routes'
 import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
-import { hasFieldChanged } from '../utils'
+import { hasFieldChanged, isLastActionCorrectionRequest } from '../utils'
 
-function mergeCorrectionFormValues(
-  form: EventState,
-  declaration: EventState
-): EventState {
-  return deepMerge(form, declaration)
+function isRequestCorrectionAction(
+  action: Action
+): action is RequestedCorrectionAction & { declaration: EventState } {
+  return action.type === 'REQUEST_CORRECTION'
 }
 
 export function Review() {
@@ -98,31 +98,24 @@ export function Review() {
 
   const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
   const lastWriteAction = writeActions[writeActions.length - 1]
-  const isLastActionCorrectionRequest =
-    lastWriteAction.type === ActionType.REQUEST_CORRECTION
+  const lastActionIsCorrectionRequest = isLastActionCorrectionRequest(event)
 
   const canReviewCorrection =
     eventIndex.flags.includes(InherentFlags.CORRECTION_REQUESTED) &&
     scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
 
-  if (canReviewCorrection && !isLastActionCorrectionRequest) {
+  if (canReviewCorrection && !lastActionIsCorrectionRequest) {
     throw new Error(
       `Last action is not a correction request. Last action type: ${lastWriteAction.type}`
     )
   }
 
-  const isRequestCorrectionAction = (
-    action: typeof lastWriteAction
-  ): action is typeof lastWriteAction & { declaration: EventState } => {
-    return action.type === 'REQUEST_CORRECTION'
-  }
-
   const isReviewCorrection =
-    canReviewCorrection && isLastActionCorrectionRequest
+    canReviewCorrection && lastActionIsCorrectionRequest
 
   const formWithNewValues =
     isReviewCorrection && isRequestCorrectionAction(lastWriteAction)
-      ? mergeCorrectionFormValues(form, lastWriteAction.declaration)
+      ? deepMerge(form, lastWriteAction.declaration)
       : form
 
   return (
