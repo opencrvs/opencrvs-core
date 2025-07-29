@@ -24,7 +24,9 @@ import {
   InherentFlags,
   SCOPES,
   isMetaAction,
-  deepMerge
+  deepMerge,
+  Action,
+  RequestedCorrectionAction
 } from '@opencrvs/commons/client'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { getCurrentEventState } from '@opencrvs/commons/client'
@@ -40,6 +42,12 @@ import { getScope } from '@client/profile/profileSelectors'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { hasFieldChanged, isLastActionCorrectionRequest } from '../utils'
+
+function isRequestCorrectionAction(
+  action: Action
+): action is RequestedCorrectionAction & { declaration: EventState } {
+  return action.type === 'REQUEST_CORRECTION'
+}
 
 export function Review() {
   const scopes = useSelector(getScope)
@@ -100,12 +108,6 @@ export function Review() {
     throw new Error(
       `Last action is not a correction request. Last action type: ${lastWriteAction.type}`
     )
-  }
-
-  const isRequestCorrectionAction = (
-    action: typeof lastWriteAction
-  ): action is typeof lastWriteAction & { declaration: EventState } => {
-    return action.type === 'REQUEST_CORRECTION'
   }
 
   const isReviewCorrection =
