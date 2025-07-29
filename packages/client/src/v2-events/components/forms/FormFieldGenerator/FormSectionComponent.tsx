@@ -327,7 +327,10 @@ export function FormSectionComponent({
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}
-                  touched={touched[field.id] ?? false}
+                  touched={
+                    touched[makeFormikFieldIdOpenCRVSCompatible(field.id)] ??
+                    false
+                  }
                   value={formikField.value}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}
