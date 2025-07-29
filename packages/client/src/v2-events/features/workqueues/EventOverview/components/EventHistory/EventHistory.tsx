@@ -187,47 +187,37 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   )
 
   const historyRows = visibleHistory
-    .reduce(
-      (actionList, currentAction) => {
-        if (
-          currentAction.type === ActionType.APPROVE_CORRECTION &&
-          currentAction.annotation?.isImmediateCorrection
-        ) {
-          const requestCorrectionAction = actionList.find(
-            (action) =>
-              action.type === ActionType.REQUEST_CORRECTION &&
-              action.id === currentAction.requestId
-          )
-          if (
-            requestCorrectionAction &&
-            currentAction.createdBy === requestCorrectionAction.createdBy &&
-            currentAction.requestId === requestCorrectionAction.id
-          ) {
-            // If we find a request correction action, we merge the approve action into it
-            actionList = actionList.map((action) => {
-              if (action.id === requestCorrectionAction.id) {
-                return {
-                  ...requestCorrectionAction,
-                  annotation: {
-                    ...requestCorrectionAction.annotation,
-                    isImmediateCorrection: true
-                  },
-                  createdBy: currentAction.createdBy,
-                  createdAt: currentAction.createdAt,
-                  createdByRole: currentAction.createdByRole
-                }
-              }
-              return action
-            })
-            return actionList
+    .map((x) => {
+      if (x.type === ActionType.REQUEST_CORRECTION) {
+        const immediateApprovedCorrection = visibleHistory.find(
+          (h) =>
+            h.type === ActionType.APPROVE_CORRECTION &&
+            h.requestId === x.id &&
+            h.annotation?.isImmediateCorrection &&
+            h.createdBy === x.createdBy
+        )
+        // Adding flag on immediately approved REQUEST_CORRECTION to show it
+        // as 'Record corrected' in history table
+        if (immediateApprovedCorrection) {
+          return {
+            ...x,
+            annotation: { ...x.annotation, isImmediateCorrection: true }
           }
         }
-        actionList.push(currentAction)
-
-        return actionList
-      },
-      [] as typeof visibleHistory
-    )
+      }
+      return x
+    })
+    .filter((x) => {
+      // removing immediately APPROVED_CORRECTION to since we only show
+      // associated REQUEST_CORRECTION as 'Record corrected'
+      if (
+        x.type === ActionType.APPROVE_CORRECTION &&
+        x.annotation?.isImmediateCorrection
+      ) {
+        return false
+      }
+      return true
+    })
     .slice(
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
