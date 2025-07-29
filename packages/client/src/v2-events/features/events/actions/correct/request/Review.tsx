@@ -41,13 +41,6 @@ import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/fo
 import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
 import { hasFieldChanged, isLastActionCorrectionRequest } from '../utils'
 
-function mergeCorrectionFormValues(
-  form: EventState,
-  declaration: EventState
-): EventState {
-  return deepMerge(form, declaration)
-}
-
 export function Review() {
   const scopes = useSelector(getScope)
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
@@ -120,7 +113,7 @@ export function Review() {
 
   const formWithNewValues =
     isReviewCorrection && isRequestCorrectionAction(lastWriteAction)
-      ? mergeCorrectionFormValues(form, lastWriteAction.declaration)
+      ? deepMerge(form, lastWriteAction.declaration)
       : form
 
   return (
