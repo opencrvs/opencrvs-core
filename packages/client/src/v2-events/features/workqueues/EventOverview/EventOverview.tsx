@@ -15,14 +15,11 @@ import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
-  getAcceptedActions,
   getCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls,
-  EventStatus,
-  InherentFlags,
-  VisibleStatus
+  EventStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -59,9 +56,7 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const status = eventIndex.flags.includes(InherentFlags.REJECTED)
-    ? VisibleStatus.enum.REJECTED
-    : eventIndex.status
+  const { status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts(eventIndex.id)
   const eventWithDrafts = getCurrentEventStateWithDrafts({

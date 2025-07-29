@@ -12,8 +12,7 @@
 import {
   EventStatus,
   joinValues,
-  tennisClubMembershipEvent,
-  VisibleStatus
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
 import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import {

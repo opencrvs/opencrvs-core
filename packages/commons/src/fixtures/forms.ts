@@ -18,7 +18,7 @@ import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
-import { EventStatus, VisibleStatus } from '../events/EventMetadata'
+import { EventStatus } from '../events/EventMetadata'
 
 /** @knipignore */
 export const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -965,22 +965,6 @@ export const statusOptions = [
       defaultMessage: 'Registered',
       description: 'Option for form field: status of record',
       id: 'v2.advancedSearch.form.recordStatusRegistered'
-    }
-  },
-  {
-    value: VisibleStatus.enum.CERTIFIED,
-    label: {
-      defaultMessage: 'Certified',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusCertified'
-    }
-  },
-  {
-    value: VisibleStatus.enum.REJECTED,
-    label: {
-      defaultMessage: 'Rejected',
-      description: 'Option for form field: status of record',
-      id: 'v2.advancedSearch.form.recordStatusRejected'
     }
   },
   {

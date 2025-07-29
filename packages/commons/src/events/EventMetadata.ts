@@ -30,13 +30,6 @@ export const EventStatus = z.enum([
 
 export type EventStatus = z.infer<typeof EventStatus>
 
-export const VisibleStatus = z.enum([
-  ...EventStatus.options,
-  'REJECTED',
-  'CERTIFIED'
-])
-export type VisibleStatus = z.infer<typeof VisibleStatus>
-
 export const InherentFlags = {
   PENDING_CERTIFICATION: 'pending-certification',
   INCOMPLETE: 'incomplete',
