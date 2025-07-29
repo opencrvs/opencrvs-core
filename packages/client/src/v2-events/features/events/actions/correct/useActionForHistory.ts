@@ -25,7 +25,7 @@ export function useActionForHistory() {
           x.createdBy === action.createdBy
       )
       if (approveAction) {
-        return 'MAKE_CORRECTION'
+        return 'CORRECTED'
       }
     }
 

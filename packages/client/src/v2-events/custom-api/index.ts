@@ -184,7 +184,8 @@ export async function makeCorrectionOnRequest(variables: {
       `Event configuration not found for event: ${fullEvent.type}`
     )
   }
-  // Let's find the action configuration. For NOTIFY action, we can use the DECLARE action configuration.
+  // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
+  // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
   const actionConfiguration = eventConfiguration.actions.find(
     (action) => action.type === ActionType.REQUEST_CORRECTION
   )

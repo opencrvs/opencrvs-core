@@ -374,8 +374,8 @@ const messagesToDefine = {
     description: 'Corrections section title'
   },
   makeCorrectionSectionTitle: {
-    id: 'v2.make-correction.summary.section.title',
-    defaultMessage: 'Make correction(s)',
+    id: 'v2.record-corrected.summary.section.title',
+    defaultMessage: 'Correction(s)',
     description: 'Make corrections section title'
   },
   change: {

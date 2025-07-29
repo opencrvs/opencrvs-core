@@ -253,9 +253,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         action: (
           <Link
             font="bold14"
-            onClick={() => {
-              onHistoryRowClick(action, userName)
-            }}
+            onClick={() => onHistoryRowClick(action, userName)}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
               status: getActionTypeForHistory(history, action)
