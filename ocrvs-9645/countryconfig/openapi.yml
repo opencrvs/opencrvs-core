@@ -8795,6 +8795,18 @@ components:
           const: REJECT_CORRECTION
         requestId:
           type: string
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -8806,6 +8818,7 @@ components:
         - status
         - type
         - requestId
+        - reason
     UnassignedAction:
       type: object
       properties:
@@ -11616,7 +11629,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: da4ec33c-edb2-4bb4-98e3-e82c5d3ef5bc
+        transactionId: 27db473a-c7d9-46ec-bf5d-614dbbec9d2d
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -15098,10 +15111,23 @@ components:
           type: string
           const: REJECT_CORRECTION
           default: REJECT_CORRECTION
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
         - requestId
+        - reason
     ApproveCorrectionActionInput:
       type: object
       properties:

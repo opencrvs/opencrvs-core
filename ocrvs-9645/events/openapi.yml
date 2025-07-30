@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: cd1fdabd-78bb-4a4e-85bd-71285574309f
+                transactionId: 165f7c63-9ae3-4d8b-b28f-d49161174a8a
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 712a58be-a4a2-4313-8038-e54244e2dcec
+                transactionId: 7fc6452f-4f35-4cbf-b06d-73193e24a106
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1713,10 +1713,23 @@ paths:
                   enum:
                     - REJECT_CORRECTION
                   default: REJECT_CORRECTION
+                reason:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                      description: Message describing reason for rejection or archiving
+                    isDuplicate:
+                      type: boolean
+                      description: If a declaration is duplicated
+                  required:
+                    - message
               required:
                 - eventId
                 - transactionId
                 - requestId
+                - reason
       responses:
         "200":
           description: Successful response
@@ -10582,6 +10595,18 @@ components:
             - REJECT_CORRECTION
         requestId:
           type: string
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -10593,6 +10618,7 @@ components:
         - status
         - type
         - requestId
+        - reason
     UnassignedAction:
       type: object
       properties:
