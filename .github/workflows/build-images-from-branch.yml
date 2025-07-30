@@ -134,8 +134,8 @@ jobs:
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-base:$TAG"
             docker manifest create ghcr.io/opencrvs/ocrvs-base:$TAG \
-              --amend ghcr.io/opencrvs/ocrvs-base:$TAG \
-              --amend ghcr.io/opencrvs/ocrvs-base:$TAG-arm64
+              ghcr.io/opencrvs/ocrvs-base:$TAG \
+              ghcr.io/opencrvs/ocrvs-base:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-base:$TAG
           done
   build:
@@ -220,8 +220,8 @@ jobs:
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG"
             docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
-              --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
-              --amend ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
+              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
+              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
           done
 
