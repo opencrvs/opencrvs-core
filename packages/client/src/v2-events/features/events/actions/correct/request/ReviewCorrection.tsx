@@ -21,6 +21,7 @@ import {
   generateTransactionId,
   isMetaAction
 } from '@opencrvs/commons/client'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
   Button,
   Content,
@@ -114,9 +115,7 @@ function ApproveModal({
 }) {
   const intl = useIntl()
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
       actions={[
         <Button
           key="cancel_correction"
@@ -140,17 +139,16 @@ function ApproveModal({
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      responsive={true}
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
+      onClose={() => close(true)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
         </Text>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -164,9 +162,7 @@ function RejectModal({
   const intl = useIntl()
   const [message, setMessage] = React.useState('')
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
       actions={[
         <Button
           key="cancel_reject_correction"
@@ -191,10 +187,9 @@ function RejectModal({
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
         </Button>
       ]}
-      handleClose={() => close(null)}
-      responsive={true}
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
+      onClose={() => close(true)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
@@ -212,7 +207,7 @@ function RejectModal({
           <StyledTextInput onChange={(e) => setMessage(e.target.value)} />
         </InputField>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
