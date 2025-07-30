@@ -20,6 +20,7 @@ import {
 import { FieldValue } from '@opencrvs/commons/client'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { Output } from '@client/v2-events/features/events/components/Output'
+import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 /**
  * Based on packages/client/src/views/RecordAudit/DeclarationInfo.tsx
  */
@@ -153,7 +154,7 @@ export function EventSummary({
       value: intl.formatMessage(field.value, event)
     }
   })
-
+  const events = useEvents()
   return (
     <>
       <Summary id="summary">

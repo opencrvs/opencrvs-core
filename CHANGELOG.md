@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## 1.9.0 Release candidate
 
 ### New features
@@ -53,6 +52,13 @@
   - Secret `GITHUB_GHCR_PUBLISH_TOKEN` is classic token with permissions `repo, write:packages`. Required to build and push OpenCRVS Core images.
   - Secret `E2E_WORKFLOWS_TOKEN` is fine-grained token scoped to your fork of country config template repository with permissions `Contents: Read and Write`.
 - Created a standalone `data-seeder` Docker image to decouple seeding logic from the core repository. This improves GitHub Actions runtime by avoiding full repository clone and dependency installation during environment seeding. [#8976](https://github.com/opencrvs/opencrvs-core/issues/8976)
+## [1.7.4](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.7.4)
+
+### Bug fixes
+
+- Fixed historical roles displaying incorrectly in task history after migration to v1.7 [#9989](https://github.com/opencrvs/opencrvs-core/issues/9989)
+- Remove special characters from role ids on generation [#10049](https://github.com/opencrvs/opencrvs-core/issues/10049)
+
 ## [1.7.4](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.7.4)
 
 ### Bug fixes

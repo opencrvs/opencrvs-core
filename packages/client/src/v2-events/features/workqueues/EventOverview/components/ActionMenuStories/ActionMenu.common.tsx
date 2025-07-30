@@ -27,7 +27,9 @@ import {
   TENNIS_CLUB_MEMBERSHIP,
   tennisClubMembershipEvent,
   TranslationConfig,
-  UUID
+  UUID,
+  DisplayableAction,
+  ExclusiveActions
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -53,8 +55,8 @@ const actionProps: ActionBase = {
   transactionId: getUUID()
 }
 
-export const mockActions: Record<
-  ActionType | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
+const mockActions: Record<
+  ActionType | DisplayableAction | 'ASSIGNED_TO_SELF' | 'ASSIGNED_TO_OTHERS',
   Action
 > = {
   [ActionType.CREATE]: { ...actionProps, type: ActionType.CREATE },
@@ -78,6 +80,10 @@ export const mockActions: Record<
   [ActionType.READ]: { ...actionProps, type: ActionType.READ },
   [ActionType.NOTIFY]: { ...actionProps, type: ActionType.NOTIFY },
   [ActionType.REQUEST_CORRECTION]: {
+    ...actionProps,
+    type: ActionType.REQUEST_CORRECTION
+  },
+  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },
@@ -202,7 +208,7 @@ export interface Scenario {
   name: string
   recordDownloaded: boolean
   actions: (keyof typeof mockActions)[]
-  expected: Record<ActionType, AssertType>
+  expected: Partial<Record<DisplayableAction, AssertType>>
 }
 
 export function createStoriesFromScenarios(

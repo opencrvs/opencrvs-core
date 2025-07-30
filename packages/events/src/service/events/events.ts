@@ -32,7 +32,8 @@ import {
   EventConfig,
   EventStatus,
   getAvailableActionsForEvent,
-  getCurrentEventState
+  getCurrentEventState,
+  DisplayableAction
 } from '@opencrvs/commons/events'
 import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -111,7 +112,7 @@ export async function throwConflictIfActionNotAllowed(
   })
   const eventStatus = getStatusFromActions(event.actions)
 
-  const allowedActions: ActionType[] = getAvailableActionsForEvent(
+  const allowedActions: DisplayableAction[] = getAvailableActionsForEvent(
     getCurrentEventState(event, eventConfig)
   )
 
