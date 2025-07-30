@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: f78110bd-0053-41c5-8975-97be6b5be2e5
+                transactionId: 5a69ba95-daa5-4e63-a2e9-a87d9e5af598
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d669e05b-258a-48f7-85bf-71b0807fb2d9
+                transactionId: 6fa8146e-e035-45b9-b3ef-c664fb1ea92b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1036,15 +1036,15 @@ components:
                             Sometimes there might be need to search a value
                             against multiple field of same FormField type. For
                             example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we 
+                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
                                   add a one field as fieldId, and accomodate others in alternateFieldIds
                         excludeInSearchQuery:
                           type: boolean
                           default: false
                           description: >-
                             Sometimes there will be search fields which are used
-                            to 
-                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth 
+                            to
+                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth
                                 is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
                                 related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
                                 In such case, populate this field (excludeInSearchQuery) with boolean true
@@ -1184,11 +1184,11 @@ components:
                         fieldId:
                           type: string
                           enum:
-                            - trackingId
-                            - status
-                            - legalStatuses.REGISTERED.acceptedAt
-                            - legalStatuses.REGISTERED.createdAtLocation
-                            - updatedAt
+                            - event.trackingId
+                            - event.status
+                            - event.legalStatuses.REGISTERED.acceptedAt
+                            - event.legalStatuses.REGISTERED.createdAtLocation
+                            - event.updatedAt
                         fieldType:
                           type: string
                           enum:
