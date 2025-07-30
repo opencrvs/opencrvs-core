@@ -104,7 +104,14 @@ export const usePrintableCertificate = ({
 
   const svgCode = addFontsToSvg(svgWithoutFonts, certificateFonts)
 
-  const handleCertify = async (updatedEvent: EventDocument) => {
+  /**
+   * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. We end up losing the images in the PDF unless we run actions in correct order.
+   * 1. Prepare 2. Trigger print action 3. Open the PDF in a new window 4. Redirect user to workqueue.
+   *
+   * Prepares the PDF certificate by resolving image urls to base64 and compiles them into SVG template.
+   * @returns function that opens a new window with the PDF certificate
+   */
+  const preparePdfCertificate = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
     const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
@@ -133,11 +140,11 @@ export const usePrintableCertificate = ({
       certificateFonts
     )
 
-    printAndDownloadPdf(pdfTemplate, event.id)
+    return () => printAndDownloadPdf(pdfTemplate, event.id)
   }
 
   return {
     svgCode,
-    handleCertify
+    preparePdfCertificate
   }
 }
