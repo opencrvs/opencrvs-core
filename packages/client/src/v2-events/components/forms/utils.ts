@@ -23,7 +23,7 @@ import { replacePlaceholders } from '@client/v2-events/utils'
  * Because our form field ids can have dots in them, we temporarily transform those dots
  * to a different character before passing the data to Formik. This function unflattens
  */
-export const FIELD_SEPARATOR = '____'
+const FIELD_SEPARATOR = '____'
 const DOT_SEPARATOR = '.'
 
 export function makeFormFieldIdFormikCompatible(fieldId: string) {
