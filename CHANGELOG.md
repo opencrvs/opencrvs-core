@@ -1,6 +1,16 @@
 # Changelog
 
-## 1.8.0 Release candidate
+## [1.8.1](https://github.com/opencrvs/opencrvs-core/compare/v1.8.0...v1.8.1)
+
+### Bug fixes
+
+- Inactive health facilities still appear in the Place of birth / death select [#9311](https://github.com/opencrvs/opencrvs-core/issues/9311)
+- After migrating to v1.7 task history shows legacy system role rather than new role based on alias [#9989](https://github.com/opencrvs/opencrvs-core/issues/9989)
+- Setup hardened CSP for client and login containers [#9584](https://github.com/opencrvs/opencrvs-core/issues/9584)
+- Apostrophes in role names are generated but are not supported [#10049](https://github.com/opencrvs/opencrvs-core/issues/10049)
+
+
+## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.4...v1.8.0)
 
 ### New features
 
