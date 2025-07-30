@@ -32,93 +32,12 @@ function eventFn(fieldId: EventFieldId) {
 // Attach conditional helpers directly to the function
 const event = Object.assign(eventFn, {
   /**
-   * Creates a conditional that checks if the event contains a specific action type
-   * with an optional template ID.
-   *
-   * @param templateId - The template ID to check for.
-   */
-  printActions: (templateId?: string) => {
-    return {
-      /**
-       * Creates a conditional that checks if the event contains a specific action type
-       * with a minimum count of occurrences.
-       *
-       * @param minCount - The minimum number of actions required.
-       */
-      minCount: (minCount: number) => {
-        const actionProperties: Record<string, unknown> = {
-          type: { const: ActionType.PRINT_CERTIFICATE }
-        }
-        const requiredFields = ['type']
-        if (templateId) {
-          actionProperties.templateId = { const: templateId }
-          requiredFields.push('templateId')
-        }
-        return defineConditional({
-          type: 'object',
-          properties: {
-            $event: {
-              type: 'object',
-              properties: {
-                actions: {
-                  type: 'array',
-                  contains: {
-                    type: 'object',
-                    properties: actionProperties,
-                    required: requiredFields
-                  },
-                  minContains: minCount
-                }
-              },
-              required: ['actions']
-            }
-          },
-          required: ['$event']
-        })
-      },
-      /**
-       * Builds a conditional that sets a maximum count for the number of print actions.
-       * This is useful for limiting the number of print actions in a single event.
-       */
-      maxCount: (maxCount: number) => {
-        const actionProperties: Record<string, unknown> = {
-          type: { const: ActionType.PRINT_CERTIFICATE }
-        }
-        const requiredFields = ['type']
-        if (templateId) {
-          actionProperties.templateId = { const: templateId }
-          requiredFields.push('templateId')
-        }
-        return defineConditional({
-          type: 'object',
-          properties: {
-            $event: {
-              type: 'object',
-              properties: {
-                actions: {
-                  type: 'array',
-                  contains: {
-                    type: 'object',
-                    properties: actionProperties,
-                    required: requiredFields
-                  },
-                  maxContains: maxCount
-                }
-              },
-              required: ['actions']
-            }
-          },
-          required: ['$event']
-        })
-      }
-    }
-  },
-  /**
    * Checks if the event contains a specific action type.
+   * Can be used directly as a conditional or chained with additional methods.
    * @param action - The action type to check for.
    */
-  hasAction: (action: ActionType) =>
-    defineConditional({
+  hasAction: (action: ActionType) => {
+    const basicConditional = defineConditional({
       type: 'object',
       properties: {
         $event: {
@@ -141,7 +60,90 @@ const event = Object.assign(eventFn, {
         }
       },
       required: ['$event']
-    }),
+    })
+
+    const buildActionConstraints = (
+      additionalFields?: Record<string, unknown>
+    ) => {
+      const actionProperties: Record<string, unknown> = {
+        type: { const: action }
+      }
+      const requiredFields = ['type']
+
+      if (additionalFields) {
+        Object.entries(additionalFields).forEach(([key, value]) => {
+          actionProperties[key] = { const: value }
+          requiredFields.push(key)
+        })
+      }
+
+      return { actionProperties, requiredFields }
+    }
+
+    const createCountConditional = (
+      countType: 'minContains' | 'maxContains',
+      count: number,
+      additionalFields?: Record<string, unknown>
+    ) => {
+      const { actionProperties, requiredFields } =
+        buildActionConstraints(additionalFields)
+
+      return defineConditional({
+        type: 'object',
+        properties: {
+          $event: {
+            type: 'object',
+            properties: {
+              actions: {
+                type: 'array',
+                contains: {
+                  type: 'object',
+                  properties: actionProperties,
+                  required: requiredFields
+                },
+                [countType]: count
+              }
+            },
+            required: ['actions']
+          }
+        },
+        required: ['$event']
+      })
+    }
+
+    const createCountMethods = (additionalFields?: Record<string, unknown>) => {
+      return {
+        /**
+         * Creates a conditional that checks if the event contains a specific action type
+         * with a minimum count of occurrences.
+         *
+         * @param minCount - The minimum number of actions required.
+         */
+        minCount: (minCount: number) =>
+          createCountConditional('minContains', minCount, additionalFields),
+
+        /**
+         * Builds a conditional that sets a maximum count for the number of actions.
+         * This is useful for limiting the number of actions of a specific type in a single event.
+         */
+        maxCount: (maxCount: number) =>
+          createCountConditional('maxContains', maxCount, additionalFields)
+      }
+    }
+
+    const chainableMethods = {
+      /**
+       * Adds additional field constraints to the action matching.
+       *
+       * @param fields - Object containing additional fields to match on the action.
+       */
+      withFields: (fields: Record<string, unknown>) =>
+        createCountMethods(fields),
+      ...createCountMethods()
+    }
+
+    return { ...basicConditional, ...chainableMethods }
+  },
   field(field: WorkqueueColumnKeys): WorkqueueColumnValue {
     return {
       $event: field

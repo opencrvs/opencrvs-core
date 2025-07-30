@@ -667,7 +667,7 @@ describe('"event" conditionals', () => {
     )
   })
 
-  describe('event.printActions conditional', () => {
+  describe('hasAction given a PRINT_CERTIFICATE action', () => {
     const now = formatISO(new Date(), { representation: 'date' })
     const baseEvent = {
       $now: now,
@@ -710,30 +710,74 @@ describe('"event" conditionals', () => {
 
     it('returns true when minCount is met for a specific templateId', () => {
       expect(
-        validate(event.printActions('TEMPLATE_1').minCount(1), baseEvent)
+        validate(
+          event
+            .hasAction(ActionType.PRINT_CERTIFICATE)
+            .withFields({ templateId: 'TEMPLATE_1' })
+            .minCount(1),
+          baseEvent
+        )
       ).toBe(true)
       expect(
-        validate(event.printActions('TEMPLATE_1').minCount(2), baseEvent)
+        validate(
+          event
+            .hasAction(ActionType.PRINT_CERTIFICATE)
+            .withFields({ templateId: 'TEMPLATE_1' })
+            .minCount(2),
+          baseEvent
+        )
       ).toBe(false)
     })
 
     it('returns true when minCount is met for any print certificate action', () => {
-      expect(validate(event.printActions().minCount(2), baseEvent)).toBe(true)
-      expect(validate(event.printActions().minCount(3), baseEvent)).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(2),
+          baseEvent
+        )
+      ).toBe(true)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).minCount(3),
+          baseEvent
+        )
+      ).toBe(false)
     })
 
     it('returns true when maxCount is not exceeded for a specific templateId', () => {
       expect(
-        validate(event.printActions('TEMPLATE_1').maxCount(1), baseEvent)
+        validate(
+          event
+            .hasAction(ActionType.PRINT_CERTIFICATE)
+            .withFields({ templateId: 'TEMPLATE_1' })
+            .maxCount(1),
+          baseEvent
+        )
       ).toBe(true)
       expect(
-        validate(event.printActions('TEMPLATE_1').maxCount(0), baseEvent)
+        validate(
+          event
+            .hasAction(ActionType.PRINT_CERTIFICATE)
+            .withFields({ templateId: 'TEMPLATE_1' })
+            .maxCount(0),
+          baseEvent
+        )
       ).toBe(false)
     })
 
     it('returns true when maxCount is not exceeded for any print certificate action', () => {
-      expect(validate(event.printActions().maxCount(2), baseEvent)).toBe(true)
-      expect(validate(event.printActions().maxCount(1), baseEvent)).toBe(false)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(2),
+          baseEvent
+        )
+      ).toBe(true)
+      expect(
+        validate(
+          event.hasAction(ActionType.PRINT_CERTIFICATE).maxCount(1),
+          baseEvent
+        )
+      ).toBe(false)
     })
   })
 })
