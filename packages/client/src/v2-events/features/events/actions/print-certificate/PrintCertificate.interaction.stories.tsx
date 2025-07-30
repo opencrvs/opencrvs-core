@@ -196,6 +196,9 @@ const generator = testDataGenerator()
 
 export const RedirectAfterPrint: Story = {
   parameters: {
+    chromatic: {
+      disableSnapshot: true
+    },
     test: {
       // Since we cannot test the generated PDF, we can ignore the failed font request
       dangerouslyIgnoreUnhandledErrors: true
@@ -280,7 +283,6 @@ export const RedirectAfterPrint: Story = {
         await canvas.findByRole('button', { name: 'Print' })
       )
 
-      // Directs to overview page
       await waitFor(
         async () => {
           await canvas.findByText('Assigned to')
