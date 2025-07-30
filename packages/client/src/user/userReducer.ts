@@ -370,12 +370,12 @@ export const userFormReducer: LoopReducer<IUserFormState, UserFormAction> = (
       const { errorData } = action.payload
       const duplicateErrorFromGQL = errorData?.graphQLErrors?.find(
         (gqlErr) =>
-          gqlErr.extensions.invalidArgs?.duplicateNotificationMethodError
+          gqlErr.extensions?.invalidArgs?.duplicateNotificationMethodError
       )
 
       if (duplicateErrorFromGQL) {
         const duplicateError =
-          duplicateErrorFromGQL.extensions.invalidArgs
+          duplicateErrorFromGQL.extensions?.invalidArgs
             .duplicateNotificationMethodError
 
         if (duplicateError.field && duplicateError.field === 'email') {
