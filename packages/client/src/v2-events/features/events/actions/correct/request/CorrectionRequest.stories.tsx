@@ -258,7 +258,7 @@ export const ReviewCorrection: Story = {
         element: <Outlet />,
         children: [router]
       },
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
         eventId: tennisClubMembershipEventWithCorrectionRequest.id
       })
     }

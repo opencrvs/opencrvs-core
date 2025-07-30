@@ -53,7 +53,7 @@ const messages = defineMessages({
   },
   makeCorrection: {
     id: 'v2-events.buttons.makeCorrection',
-    defaultMessage: 'Record corrected',
+    defaultMessage: 'Correct record',
     description: 'Record corrected button text'
   }
 })
