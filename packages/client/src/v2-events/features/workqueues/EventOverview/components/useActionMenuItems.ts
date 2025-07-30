@@ -290,7 +290,7 @@ export function useAction(event: EventIndex) {
       },
       [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
         label: {
-          defaultMessage: 'Review correction request',
+          defaultMessage: 'Review',
           description:
             'This is shown as the action name anywhere the user can trigger the action from',
           id: 'v2.event.summary.review-correction-request.label'

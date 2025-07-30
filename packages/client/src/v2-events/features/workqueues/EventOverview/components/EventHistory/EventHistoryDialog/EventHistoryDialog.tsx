@@ -37,6 +37,11 @@ const messages = defineMessages({
     defaultMessage: 'Comment',
     description: 'Label for rejection comment',
     id: 'v2.constants.comment'
+  },
+  reason: {
+    defaultMessage: 'Reason',
+    description: 'Label for rejection correction reason',
+    id: 'v2.constants.reason'
   }
 })
 
@@ -51,6 +56,16 @@ function prepareComments(history: ActionDocument) {
   }
 
   return comments
+}
+
+function prepareReason(history: ActionDocument) {
+  const reason: { message?: string } = {}
+
+  if (history.type === ActionType.REJECT_CORRECTION) {
+    reason.message = history.reason.message
+  }
+
+  return reason
 }
 
 /**
@@ -73,6 +88,7 @@ export function EventHistoryDialog({
   })
 
   const comments = prepareComments(action)
+  const reason = prepareReason(action)
 
   return (
     <ResponsiveModal
@@ -109,6 +125,19 @@ export function EventHistoryDialog({
             }
           ]}
           content={comments}
+          noResultText=" "
+        />
+      )}
+      {reason.message && (
+        <Table
+          columns={[
+            {
+              key: 'message',
+              label: intl.formatMessage(messages.reason),
+              width: 100
+            }
+          ]}
+          content={[reason]}
           noResultText=" "
         />
       )}

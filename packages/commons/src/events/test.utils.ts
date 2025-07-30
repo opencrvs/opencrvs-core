@@ -688,7 +688,8 @@ export function generateActionDocument({
       return {
         ...actionBase,
         requestId: getUUID(),
-        type: action
+        type: action,
+        reason: { message: 'Correction rejection' }
       }
     case ActionType.REGISTER:
       return {

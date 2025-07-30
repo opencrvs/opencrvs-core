@@ -159,9 +159,10 @@ function RejectModal({
   onSubmit
 }: {
   close: (result: boolean | null) => void
-  onSubmit: () => void
+  onSubmit: (message: string) => void
 }) {
   const intl = useIntl()
+  const [message, setMessage] = React.useState('')
   return (
     <ResponsiveModal
       autoHeight
@@ -179,10 +180,11 @@ function RejectModal({
         </Button>,
         <Button
           key="reject_correction"
+          disabled={!message}
           id="reject_correction"
           type="negative"
           onClick={() => {
-            onSubmit()
+            onSubmit(message)
             close(true)
           }}
         >
@@ -201,12 +203,13 @@ function RejectModal({
       </Stack>
       <Stack>
         <InputField
+          hideAsterisk={true}
           id={'reject-correction'}
           label={intl.formatMessage(reviewCorrectionMessages.rejectReason)}
-          required={false}
+          required={true}
           touched={false}
         >
-          <StyledTextInput />
+          <StyledTextInput onChange={(e) => setMessage(e.target.value)} />
         </InputField>
       </Stack>
     </ResponsiveModal>
@@ -260,12 +263,13 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     await openModal((close) => (
       <RejectModal
         close={close}
-        onSubmit={() => {
+        onSubmit={(message) => {
           events.actions.correction.reject.mutate({
             transactionId: generateTransactionId(),
             eventId,
             requestId: lastWriteAction.id,
-            annotation
+            annotation,
+            reason: { message }
           })
           return navigate(
             ROUTES.V2.EVENTS.OVERVIEW.buildPath(
