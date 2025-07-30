@@ -41,10 +41,10 @@ const StyledPill = styled.span<{
   pillTheme: IPillTheme
 }>`
   --lighterShade: ${({ type, theme }) => `
-    ${type === 'active' ? theme.colors.greenLighter : ''}
-    ${type === 'inactive' ? theme.colors.redLighter : ''}
-    ${type === 'pending' ? theme.colors.orangeLighter : ''}
-    ${type === 'default' ? theme.colors.primaryLighter : ''}
+    ${type === 'active' ? theme.colors.greenLight : ''}
+    ${type === 'inactive' ? theme.colors.redLight : ''}
+    ${type === 'pending' ? theme.colors.orangeLight : ''}
+    ${type === 'default' ? theme.colors.primaryLight : ''}
   `};
 
   --darkerShade: ${({ type, theme }) => `

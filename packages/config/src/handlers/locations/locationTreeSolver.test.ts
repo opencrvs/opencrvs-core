@@ -34,7 +34,8 @@ const grandchild = fixtures.savedLocation({
 })
 
 const lateLoadModule = async () => {
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  /* eslint-disable @typescript-eslint/no-var-requires */
   const { resolveLocationChildren } = require('./locationTreeSolver')
   return resolveLocationChildren
 }

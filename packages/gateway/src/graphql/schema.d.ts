@@ -86,6 +86,7 @@ export interface GQLMutation {
   confirmRegistration: string
   rejectRegistration: string
   upsertRegistrationIdentifier: string
+  updateField: boolean
   createOrUpdateUser: GQLUser
   activateUser?: string
   changePassword?: string
@@ -573,6 +574,12 @@ export interface GQLConfirmRegistrationInput {
 export interface GQLRejectRegistrationInput {
   reason: string
   comment?: string
+}
+
+export interface GQLUpdateFieldInput {
+  fieldId: string
+  valueString?: string
+  valueBoolean?: boolean
 }
 
 export interface GQLUserInput {
@@ -2378,6 +2385,7 @@ export interface GQLMutationTypeResolver<TParent = any> {
   confirmRegistration?: MutationToConfirmRegistrationResolver<TParent>
   rejectRegistration?: MutationToRejectRegistrationResolver<TParent>
   upsertRegistrationIdentifier?: MutationToUpsertRegistrationIdentifierResolver<TParent>
+  updateField?: MutationToUpdateFieldResolver<TParent>
   createOrUpdateUser?: MutationToCreateOrUpdateUserResolver<TParent>
   activateUser?: MutationToActivateUserResolver<TParent>
   changePassword?: MutationToChangePasswordResolver<TParent>
@@ -2953,6 +2961,19 @@ export interface MutationToUpsertRegistrationIdentifierResolver<
   (
     parent: TParent,
     args: MutationToUpsertRegistrationIdentifierArgs,
+    context: Context,
+    info: GraphQLResolveInfo
+  ): TResult
+}
+
+export interface MutationToUpdateFieldArgs {
+  id: string
+  details: GQLUpdateFieldInput
+}
+export interface MutationToUpdateFieldResolver<TParent = any, TResult = any> {
+  (
+    parent: TParent,
+    args: MutationToUpdateFieldArgs,
     context: Context,
     info: GraphQLResolveInfo
   ): TResult
@@ -4025,7 +4046,11 @@ export interface DeathRegistrationToHistoryResolver<
 }
 
 export interface GQLEventRegistrationTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | 'MarriageRegistration'
@@ -4248,7 +4273,11 @@ export interface MarriageRegistrationToHistoryResolver<
 }
 
 export interface GQLRecordDetailsTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | Promise<'BirthRegistration' | 'DeathRegistration'>
@@ -4605,7 +4634,11 @@ export interface TotalMetricsResultToResultsResolver<
 }
 
 export interface GQLMixedTotalMetricsResultTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'TotalMetricsByRegistrar'
     | 'TotalMetricsByLocation'
     | 'TotalMetricsByTime'
@@ -7474,13 +7507,21 @@ export interface VSExportToCreatedOnResolver<TParent = any, TResult = any> {
 }
 
 export interface GQLUserAuditLogResultItemTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'UserAuditLogItemWithComposition'
     | 'UserAuditLogItem'
     | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>
 }
 export interface GQLEventSearchSetTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'BirthEventSearchSet'
     | 'DeathEventSearchSet'
     | 'MarriageEventSearchSet'
@@ -10147,7 +10188,11 @@ export interface WebhookPermissionToPermissionsResolver<
 }
 
 export interface GQLAuditLogItemBaseTypeResolver<TParent = any> {
-  (parent: TParent, context: Context, info: GraphQLResolveInfo):
+  (
+    parent: TParent,
+    context: Context,
+    info: GraphQLResolveInfo
+  ):
     | 'UserAuditLogItemWithComposition'
     | 'UserAuditLogItem'
     | Promise<'UserAuditLogItemWithComposition' | 'UserAuditLogItem'>

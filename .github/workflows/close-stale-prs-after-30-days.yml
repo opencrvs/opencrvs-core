@@ -1,0 +1,30 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: 'Close stale PRs after 30 days'
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+permissions:
+  pull-requests: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/stale@v9
+        with:
+          stale-pr-message: 'This PR has been marked with label stale Since it has been inactive for 20 days. It will automatically be closed in 10 days if no further activity occurs.'
+          close-pr-message: 'This PR has been automatically closed because it has been inactive for 30 days. Please reopen if you are still working on it.'
+          days-before-pr-stale: 20
+          days-before-pr-close: 10
+            
+
+

@@ -19,11 +19,19 @@ import {
 import { evalExpressionInFieldDefinition } from '@client/forms/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { getUserDetails } from '@client/profile/profileSelectors'
-import React, { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import React, { useEffect, useRef } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useHttp } from './http'
 import { Button, getTheme, Icon } from '@opencrvs/components'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
+import { useParams } from 'react-router-dom'
+import { useDeclaration } from '@client/declarations/selectors'
+import {
+  writeDeclaration,
+  writeDeclarationByUserWithoutStateUpdate
+} from '@client/declarations'
+import { merge } from 'lodash'
+import { FormSectionComponent } from './FormFieldGenerator'
 
 export const LinkButtonField = ({
   fields,
@@ -53,10 +61,54 @@ export const LinkButtonField = ({
   const trigger = fields.find(
     (f) => f.name === fieldDefinition.options.callback.trigger
   )!
-  const onChange: Parameters<typeof useHttp>[1] = ({ data, error, loading }) =>
+  const { declarationId = '', pageId: section } = useParams()
+  const declaration = useDeclaration(declarationId)
+  const dispatch = useDispatch()
+  const userId = useSelector(getUserDetails)?.id
+  const onChange: Parameters<typeof useHttp>[1] = async ({
+    data,
+    error,
+    loading
+  }) => {
     setFieldValue(trigger.name, { loading, data, error } as IFormFieldValue)
-  const [hasCallbackRequestBeenMade, setCallbackRequestBeenMade] =
-    useState(false)
+    if (data || error) {
+      if (section && declaration && userId) {
+        /**
+         * As we are redirecting to a new page with window.location.replace and
+         * this pushes a new entry to the browser's history stack, when the user
+         * clicks the back button and returns to the form, the app reloads, the state of the form
+         * will be lost. To avoid this, we are updating the declaration in the
+         * store with the updated values of the form fields. This will ensure that
+         * the form state is preserved when the user returns to the form after
+         * clicking the back button.
+         * The user experience can be seen here:
+         * https://github.com/opencrvs/opencrvs-core/issues/9096#issuecomment-2804381010
+         * @todo we should improve this user experience
+         */
+        const updatedFormData =
+          FormSectionComponent.getUpdatedValuesAfterDependentFieldEvaluation(
+            form,
+            fields,
+            trigger.name,
+            { loading, data, error } as IFormFieldValue,
+            { config, draft, user }
+          )
+        writeDeclarationByUserWithoutStateUpdate(userId, {
+          ...declaration,
+          data: {
+            ...declaration.data,
+            [section]: merge(declaration.data[section], updatedFormData)
+          }
+        })
+      }
+      // remove query parameters from the URL after successful or failed callback request
+      const url = new URL(window.location.href)
+      url.search = '' // Remove all query parameters
+      window.history.replaceState({}, document.title, url)
+    }
+  }
+
+  const hasCallbackRequestBeenMade = useRef(false)
 
   const { call } = useHttp<string>(
     trigger as IHttpFormField,
@@ -77,12 +129,12 @@ export const LinkButtonField = ({
       }
       return true
     }
-    if (checkParamsPresentInURL() && !hasCallbackRequestBeenMade) {
+    if (checkParamsPresentInURL() && !hasCallbackRequestBeenMade.current) {
       call({
         // forward params which are received after redirection to the callback request
         params: Object.fromEntries(urlParams)
       })
-      setCallbackRequestBeenMade(true)
+      hasCallbackRequestBeenMade.current = true
     }
   }, [call, params, form, trigger, hasCallbackRequestBeenMade])
   return (
@@ -93,13 +145,21 @@ export const LinkButtonField = ({
       fullWidth
       disabled={isDisabled}
       onClick={() => {
-        window.location.href = evalExpressionInFieldDefinition(
-          '`' + to + '`',
-          form,
-          config,
-          draft,
-          user
-        )
+        if (declaration) {
+          dispatch(
+            writeDeclaration(declaration, () => {
+              window.location.replace(
+                evalExpressionInFieldDefinition(
+                  '`' + decodeURIComponent(to) + '`',
+                  form,
+                  config,
+                  draft,
+                  user
+                )
+              )
+            })
+          )
+        }
       }}
     >
       {fieldDefinition.icon &&

@@ -42,6 +42,7 @@ interface Window {
       EXTERNAL_VALIDATION_WORKQUEUE: boolean
       PRINT_DECLARATION: boolean
       DATE_OF_BIRTH_UNKNOWN: boolean
+      V2_EVENTS: boolean
     }
     LANGUAGES: string
     LOGIN_URL: string

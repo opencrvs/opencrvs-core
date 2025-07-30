@@ -11,7 +11,8 @@
 
 export function createServerWithEnvironment() {
   jest.resetModules()
-  // eslint-disable-next-line @typescript-eslint/no-var-requires
+  /* eslint-disable @typescript-eslint/no-require-imports */
+  /* eslint-disable @typescript-eslint/no-var-requires */
   return require('../server').createServer()
 }
 export const translationsMock = {

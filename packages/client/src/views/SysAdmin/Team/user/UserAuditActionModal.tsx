@@ -167,6 +167,7 @@ function UserAuditActionModalComponent(
   function handleConfirm() {
     if (makeAllFieldsDirty) {
       const touched = props.form?.fields.reduce(
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
         (memo: any, field: { name: any }) => ({ ...memo, [field.name]: true }),
         {}
       )
@@ -175,7 +176,7 @@ function UserAuditActionModalComponent(
     makeErrorVisible(true)
     if (!formError) {
       const userId = user?.id ?? ''
-
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       ;(props.client as ApolloClient<any>)
         .mutate({
           mutation: USER_AUDIT_ACTION,

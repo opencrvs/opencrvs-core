@@ -137,7 +137,7 @@ const ContentWrapper = styled.span<{
   flex-shrink: 0;
   text-align: ${({ alignment }) => (alignment ? alignment.toString() : 'left')};
   cursor: ${({ sortable }) => (sortable ? 'pointer' : 'default')};
-  color: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.grey400};
   padding: 0 4px;
 `
 const ValueWrapper = styled.span<{

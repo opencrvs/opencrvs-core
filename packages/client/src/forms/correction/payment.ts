@@ -68,7 +68,7 @@ const correctionFeesPayment = (currencySymbol: string) =>
         }
       }
     ]
-  } satisfies IFormSectionGroup)
+  }) satisfies IFormSectionGroup
 
 export const correctionFeesPaymentSection = (currencySymbol: string) =>
   ({
@@ -77,4 +77,4 @@ export const correctionFeesPaymentSection = (currencySymbol: string) =>
     name: messages.name,
     title: messages.title,
     groups: [correctionFeesPayment(currencySymbol)]
-  } satisfies IFormSection)
+  }) satisfies IFormSection

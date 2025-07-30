@@ -33,6 +33,11 @@ export const SCOPES = {
   NOTIFICATION_API: 'notification-api',
   RECORDSEARCH: 'recordsearch',
 
+  /**
+   * @TODO This is a temporary scope to be used for V2 Events custom events declaration
+   */
+  RECORD_DECLARE: 'record.declare-birth',
+
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
@@ -62,6 +67,10 @@ export const SCOPES = {
   RECORD_PRINT_RECORDS_SUPPORTING_DOCUMENTS:
     'record.declaration-print-supporting-documents',
   RECORD_REGISTRATION_PRINT: 'record.registration-print', // v1.8
+  /**
+   * This scope is used to **print and **issue certified copies of a record
+   * after it has been registered. Previously Registrars had this permission.
+   */
   RECORD_PRINT_ISSUE_CERTIFIED_COPIES:
     'record.registration-print&issue-certified-copies',
   RECORD_PRINT_CERTIFIED_COPIES: 'record.registration-print-certified-copies', // v1.8

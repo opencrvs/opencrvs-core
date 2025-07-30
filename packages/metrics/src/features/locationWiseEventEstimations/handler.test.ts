@@ -44,7 +44,8 @@ describe('verify locationWiseEventEstimations handler', () => {
   })
 
   it('returns ok for valid request', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    /* eslint-disable @typescript-eslint/no-require-imports */
+    /* eslint-disable @typescript-eslint/no-var-requires */
     const utilService = require('../metrics/utils')
     fetchChildLocationsByParentId.mockReset()
     fetchChildLocationsByParentId.mockResolvedValueOnce([
@@ -140,7 +141,6 @@ describe('verify locationWiseEventEstimations handler', () => {
   })
 
   it('ingnore estimation data for invalid childlocations', async () => {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
     const utilService = require('../metrics/utils')
     fetchChildLocationsByParentId.mockReset()
     fetchChildLocationsByParentId.mockResolvedValueOnce([

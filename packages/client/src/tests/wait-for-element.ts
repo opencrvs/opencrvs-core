@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-/* eslint-disable import/export */
 import * as React from 'react'
 import { ReactWrapper } from 'enzyme'
 
@@ -45,18 +44,22 @@ export async function waitFor(condition: () => boolean) {
 }
 
 export async function waitForElement<
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   C extends React.ComponentClass<any> | React.FunctionComponent<any>
 >(
   rootComponent: ReactWrapper,
   selector: C
 ): Promise<
   C extends React.ComponentClass<infer Props>
-    ? ReactWrapper<Props, any, InstanceType<C>>
-    : ReactWrapper<any, any>
+    ? /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      ReactWrapper<Props, any, InstanceType<C>>
+    : /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+      ReactWrapper<any, any>
 >
 export async function waitForElement(
   rootComponent: ReactWrapper,
   selector: string
+  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 ): Promise<ReactWrapper<any, any>>
 
 export async function waitForElement<T extends string | (() => void)>(

@@ -2,7 +2,7 @@
 name: 'Bug'
 about: Used to submit bugs and things that appear broken.
 title: ''
-labels: 'Bug'
+type: 'Bug'
 assignees: ''
 ---
 
@@ -123,8 +123,12 @@ If applicable, add screenshots to help explain your problem.
 - Browser [e.g. stock browser, safari]
 - Version [e.g. 22]
 
+**Root cause**
+What is the underlying cause for this issue? 
+
 **Additional context**
-Add any other context about the problem here.
+Add any other context about the problem here. Does it happen in all contexts or only when a specific condition applies?
+Are you able to reproduce the issue in a clean environment with no custom code or prior changes?
 
 **Possible fixes**
 (If you can, link to the line of code that might be responsible for the problem)

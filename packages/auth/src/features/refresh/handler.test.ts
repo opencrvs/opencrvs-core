@@ -30,10 +30,10 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
         status: 200
       })
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      /* eslint-disable @typescript-eslint/no-var-requires */
       const codeService = require('../verifyCode/service')
 
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
@@ -104,9 +104,8 @@ describe('authenticate handler receives a request', () => {
       fetch.mockResponseOnce(JSON.stringify(DEFAULT_ROLES_DEFINITION), {
         status: 200
       })
-      // eslint-disable-next-line
+
       const codeService = require('../verifyCode/service')
-      // eslint-disable-next-line
       const authService = require('../authenticate/service')
       const codeSpy = jest.spyOn(codeService, 'sendVerificationCode')
       jest.spyOn(authService, 'authenticate').mockReturnValue({
