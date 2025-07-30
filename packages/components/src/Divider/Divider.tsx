@@ -32,7 +32,7 @@ export const Divider = styled.div<DividerProps>`
     background-color: ${color || theme.colors.grey200};
     margin: 16px;
   }
-  
+
   :before {
     margin-left: 0;
   }

@@ -13,7 +13,7 @@ import styled from 'styled-components'
 
 export const FormWrapper = styled.form`
   width: 100%;
-  padding: 16px 0;
+  padding: 24px 0;
 `
 
 export const LogoContainer = styled.div`

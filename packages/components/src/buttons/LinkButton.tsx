@@ -17,7 +17,7 @@ export const LinkButton = styled(Button)<{
 }>`
   ${({ theme, isBoldLink }) =>
     isBoldLink ? theme.fonts.bold16 : theme.fonts.reg16}
-  color: ${({ theme }) => theme.colors.tertiary};
+  color: ${({ theme }) => theme.colors.grey400};
   padding: 0;
   margin-left: -8px;
   border-radius: 2px;

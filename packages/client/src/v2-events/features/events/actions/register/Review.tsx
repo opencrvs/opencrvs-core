@@ -9,39 +9,46 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useEffect } from 'react'
-import { defineMessages } from 'react-intl'
+import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import { v4 as uuid } from 'uuid'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import { getCurrentEventState, ActionType } from '@opencrvs/commons/client'
+import {
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import {
+  getCurrentEventState,
+  ActionType,
+  getActionAnnotation,
+  getDeclaration,
+  getActionReview,
+  InherentFlags
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  REJECT_ACTIONS,
+  RejectionState,
+  Review as ReviewComponent
+} from '@client/v2-events/features/events/components/Review'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { FormLayout } from '@client/v2-events/layouts/form'
+import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { FormLayout } from '@client/v2-events/layouts'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { validationErrorsInActionFormExist } from '@client/v2-events/components/forms/validation'
+import { useSaveAndExitModal } from '@client/v2-events/components/SaveAndExitModal'
+import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { reviewMessages } from '../messages'
 
-const messages = defineMessages({
-  registerActionTitle: {
-    id: 'registerAction.title',
-    defaultMessage: 'Register member',
-    description: 'The title for register action'
-  },
-  registerActionDescription: {
-    id: 'registerAction.description',
-    defaultMessage:
-      'By clicking register, you confirm that the information entered is correct and the member can be registered.',
-    description: 'The description for register action'
-  },
-  registerActionDeclare: {
-    id: 'registerAction.Declare',
-    defaultMessage: 'Register',
-    description: 'The label for declare button of register action'
-  }
-})
+function getTranslations(hasErrors: boolean) {
+  const state = hasErrors ? 'incomplete' : ('complete' as const)
+
+  return reviewMessages[state].register
+}
 
 /**
  *
@@ -49,48 +56,72 @@ const messages = defineMessages({
  */
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REGISTER)
+  const [{ workqueue: slug }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+  )
   const events = useEvents()
+  const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { goToHome } = useEventFormNavigation()
+  const { redirectToOrigin } = useEventFormNavigation()
+  const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
+  const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
+
   const registerMutation = events.actions.register
 
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const event = events.getEvent.getFromCache(eventId)
+
+  const previousAnnotation = getActionAnnotation({
+    event,
+    actionType: ActionType.REGISTER
+  })
+
+  const { setAnnotation, getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation(previousAnnotation)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
 
-  const { forms: formConfigs } = config.actions.filter(
-    (action) => action.type === ActionType.REGISTER
-  )[0]
+  const formConfig = getDeclaration(config)
+  const reviewConfig = getActionReview(config, ActionType.REGISTER)
 
-  const setFormValues = useEventFormData((state) => state.setFormValues)
   const getFormValues = useEventFormData((state) => state.getFormValues)
+  const currentEventState = getCurrentEventState(event, config)
+  const previousFormValues = currentEventState.declaration
+  const form = getFormValues()
 
-  useEffect(() => {
-    setFormValues(eventId, getCurrentEventState(event).data)
-  }, [event, eventId, setFormValues])
+  const incomplete = validationErrorsInActionFormExist({
+    formConfig,
+    form,
+    annotation,
+    reviewFields: reviewConfig.fields
+  })
 
-  const form = getFormValues(eventId)
+  const messages = getTranslations(incomplete)
 
   async function handleEdit({
     pageId,
-    fieldId
+    fieldId,
+    confirmation
   }: {
     pageId: string
     fieldId?: string
+    confirmation?: boolean
   }) {
-    const confirmedEdit = await openModal<boolean | null>((close) => (
-      <ReviewComponent.EditModal close={close} />
-    ))
+    const confirmedEdit =
+      confirmation ||
+      (await openModal<boolean | null>((close) => (
+        <ReviewComponent.EditModal close={close} />
+      )))
 
     if (confirmedEdit) {
       navigate(
         ROUTES.V2.EVENTS.REGISTER.PAGES.buildPath(
           { pageId, eventId },
           {
-            from: 'review'
+            from: 'review',
+            workqueue: slug
           },
-          fieldId
+          fieldId ? makeFormFieldIdFormikCompatible(fieldId) : undefined
         )
       )
     }
@@ -98,50 +129,100 @@ export function Review() {
   }
 
   async function handleRegistration() {
-    const confirmedRegistration = await openModal<boolean | null>((close) => (
-      <ReviewComponent.ActionModal action="Register" close={close} />
-    ))
+    const confirmedRegistration = await openModal<boolean | null>((close) => {
+      if (messages.modal === undefined) {
+        // eslint-disable-next-line no-console
+        console.error(
+          'Tried to render register modal without message definitions.'
+        )
+        return
+      }
+
+      return (
+        <ReviewComponent.ActionModal.Accept
+          action="Register"
+          close={close}
+          copy={{ ...messages.modal, eventLabel: config.label }}
+        />
+      )
+    })
     if (confirmedRegistration) {
       registerMutation.mutate({
-        eventId: event.id,
-        data: form,
-        transactionId: uuid()
+        eventId,
+        declaration: form,
+        transactionId: uuid(),
+        annotation
       })
+      redirectToOrigin(slug)
+    }
+  }
 
-      goToHome()
+  async function handleRejection() {
+    const confirmedRejection = await openModal<RejectionState | null>(
+      (close) => <ReviewComponent.ActionModal.Reject close={close} />
+    )
+    if (confirmedRejection) {
+      const { rejectAction, message, isDuplicate } = confirmedRejection
+
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: {},
+          reason: { message }
+        })
+      }
+
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: {},
+          reason: { message, isDuplicate }
+        })
+      }
+
+      redirectToOrigin(slug)
     }
   }
 
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.REGISTER}
-      onSaveAndExit={() => {
-        events.actions.register.mutate({
-          eventId: event.id,
-          data: form,
-          transactionId: uuid(),
-          draft: true
+      onSaveAndExit={async () =>
+        handleSaveAndExit(() => {
+          drafts.submitLocalDraft()
+          redirectToOrigin(slug)
         })
-        goToHome()
-      }}
+      }
     >
       <ReviewComponent.Body
-        eventConfig={config}
+        annotation={annotation}
         form={form}
-        formConfig={formConfigs[0]}
-        title=""
+        formConfig={formConfig}
+        previousFormValues={previousFormValues}
+        reviewFields={reviewConfig.fields}
+        title={formatMessage(reviewConfig.title, form)}
+        onAnnotationChange={(values) => setAnnotation(values)}
         onEdit={handleEdit}
       >
         <ReviewComponent.Actions
-          messages={{
-            title: messages.registerActionTitle,
-            description: messages.registerActionDescription,
-            onConfirm: messages.registerActionDeclare
-          }}
+          icon="Check"
+          incomplete={incomplete}
+          messages={messages}
+          primaryButtonType="positive"
           onConfirm={handleRegistration}
+          onReject={
+            currentEventState.flags.includes(InherentFlags.REJECTED)
+              ? undefined
+              : handleRejection
+          }
         />
         {modal}
       </ReviewComponent.Body>
+      {saveAndExitModal}
     </FormLayout>
   )
 }

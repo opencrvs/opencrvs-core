@@ -12,6 +12,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
+import { Flag, InherentFlags } from '@opencrvs/commons/client'
 
 const Flex = styled.div`
   display: flex;
@@ -22,26 +23,18 @@ const Flex = styled.div`
   }
 `
 
-interface IIconWith {
-  status?: string
-  name: React.ReactNode
-  event?: string
-  isDuplicate?: boolean
-  isValidatedOnReview?: boolean
-  isArchived?: boolean
-}
-
-const STATUS_TO_COLOR_MAP: { [key: string]: string } = {
+const STATUS_TO_COLOR_MAP = {
   OUTBOX: 'grey',
   ARCHIVED: 'grey',
   DRAFT: 'purple',
+  CREATED: 'purple',
   IN_PROGRESS: 'purple',
+  NOTIFIED: 'purple',
   DECLARED: 'orange',
   REJECTED: 'red',
-  VALIDATED: 'grey',
+  VALIDATED: 'orange',
   REGISTERED: 'green',
   CERTIFIED: 'teal',
-  CORRECTION_REQUESTED: 'blue',
   WAITING_VALIDATION: 'teal',
   SUBMITTED: 'orange',
   SUBMITTING: 'orange',
@@ -57,41 +50,43 @@ const Icon = styled.div`
   width: 24px;
 `
 
-function IconComp({
-  status,
-  isValidatedOnReview,
-  isArchived
-}: {
-  status: string
-  isValidatedOnReview?: boolean
-  isArchived?: boolean
-}) {
-  return (
-    <Icon>
-      <DeclarationIcon
-        color={STATUS_TO_COLOR_MAP[status]}
-        isArchive={isArchived}
-        isValidatedOnReview={isValidatedOnReview}
-      />
-    </Icon>
-  )
+function getIconColor(
+  status: keyof typeof STATUS_TO_COLOR_MAP,
+  flags?: Flag[]
+) {
+  let color = STATUS_TO_COLOR_MAP[status]
+
+  if (flags?.length) {
+    if (flags.includes(InherentFlags.CORRECTION_REQUESTED)) {
+      color = 'blue'
+    }
+  }
+
+  return color
 }
 
 export function IconWithName({
   status,
   name,
   isValidatedOnReview,
-  isArchived
-}: IIconWith) {
+  isArchived,
+  flags
+}: {
+  status: keyof typeof STATUS_TO_COLOR_MAP
+  name: React.ReactNode
+  isValidatedOnReview?: boolean
+  isArchived?: boolean
+  flags?: Flag[]
+}) {
   return (
     <Flex id="flex">
-      {status && (
-        <IconComp
-          isArchived={isArchived}
+      <Icon>
+        <DeclarationIcon
+          color={getIconColor(status, flags)}
+          isArchive={isArchived}
           isValidatedOnReview={isValidatedOnReview}
-          status={status}
         />
-      )}
+      </Icon>
       {name}
     </Flex>
   )

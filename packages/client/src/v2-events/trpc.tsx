@@ -9,24 +9,36 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { AppRouter } from '@gateway/v2-events/events/router'
-import { QueryClient } from '@tanstack/react-query'
+import { onlineManager, QueryClient } from '@tanstack/react-query'
 import {
   PersistQueryClientProvider,
   type PersistedClient,
   type Persister
 } from '@tanstack/react-query-persist-client'
-import { httpLink, loggerLink, TRPCClientError } from '@trpc/client'
-import { createTRPCQueryUtils, createTRPCReact } from '@trpc/react-query'
+import {
+  createTRPCClient,
+  httpLink,
+  loggerLink,
+  TRPCClientError
+} from '@trpc/client'
+import {
+  createTRPCContext,
+  createTRPCOptionsProxy
+} from '@trpc/tanstack-react-query'
 import React from 'react'
 import superjson from 'superjson'
-
+import { useSelector } from 'react-redux'
 import { storage } from '@client/storage'
 import { getToken } from '@client/utils/authUtils'
+import { getUserDetails } from '@client/profile/profileSelectors'
 
-export const api = createTRPCReact<AppRouter>()
+const { TRPCProvider: TRPCProviderRaw, useTRPC } =
+  createTRPCContext<AppRouter>()
+
+export { AppRouter, useTRPC }
 
 function getTrpcClient() {
-  return api.createClient({
+  return createTRPCClient<AppRouter>({
     links: [
       loggerLink({
         enabled: (op) => op.direction === 'down' && op.result instanceof Error
@@ -59,36 +71,46 @@ function getQueryClient() {
   })
 }
 
-function createIDBPersister(idbValidKey = 'reactQuery') {
+function createIDBPersister(storageIdentifier: string) {
+  const fullStorageIdentifier = `react-query-${storageIdentifier}`
   return {
-    persistClient: async (client: PersistedClient) => {
-      await storage.setItem(idbValidKey, client)
+    persistClient: async (client) => {
+      await storage.setItem(fullStorageIdentifier, client)
     },
     restoreClient: async () => {
-      const client = await storage.getItem<PersistedClient>(idbValidKey)
+      const client = await storage.getItem<PersistedClient>(
+        fullStorageIdentifier
+      )
       return client || undefined
     },
     removeClient: async () => {
-      await storage.removeItem(idbValidKey)
+      await storage.removeItem(fullStorageIdentifier)
     }
   } satisfies Persister
 }
 
-const trpcClient = getTrpcClient()
-const persister = createIDBPersister()
+export const trpcClient = getTrpcClient()
 
 export const queryClient = getQueryClient()
+export const trpcOptionsProxy = createTRPCOptionsProxy({
+  queryClient,
+  client: trpcClient
+})
 
-export const utils = createTRPCQueryUtils({ queryClient, client: trpcClient })
-
-export function TRPCProvider({ children }: { children: React.ReactNode }) {
+export function TRPCProvider({
+  children,
+  storeIdentifier = 'DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK'
+}: {
+  children: React.ReactNode
+  storeIdentifier?: string
+}) {
   return (
     <PersistQueryClientProvider
       client={queryClient}
       persistOptions={{
-        persister,
-        maxAge: undefined,
+        persister: createIDBPersister(storeIdentifier),
         buster: 'persisted-indexed-db',
+        maxAge: undefined,
         dehydrateOptions: {
           shouldDehydrateMutation: (mutation) => {
             if (mutation.state.status === 'error') {
@@ -96,6 +118,7 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
               if (error instanceof TRPCClientError && error.data?.httpStatus) {
                 return !error.data.httpStatus.toString().startsWith('4')
               }
+
               return true
             }
 
@@ -106,15 +129,16 @@ export function TRPCProvider({ children }: { children: React.ReactNode }) {
       onSuccess={async () => {
         await queryClient.resumePausedMutations()
 
-        queryClient
-          .getMutationCache()
-          .getAll()
-          .map(async (m) => m.continue())
+        const mutations = queryClient.getMutationCache().getAll()
+
+        for (const mutation of mutations) {
+          await mutation.continue()
+        }
       }}
     >
-      <api.Provider client={trpcClient} queryClient={queryClient}>
+      <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
         {children}
-      </api.Provider>
+      </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
 }

@@ -17,7 +17,6 @@ import {
   EventType,
   System,
   SystemStatus,
-  SystemType,
   WebhookPermission
 } from '@client/utils/gateway'
 import { Label } from '@client/views/Settings/items/components'
@@ -50,6 +49,7 @@ import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { useSystems } from './useSystems'
 import { CopyButton } from '@opencrvs/components/lib/CopyButton/CopyButton'
+import { SystemRole } from '@opencrvs/commons/client'
 
 interface ToggleModal {
   modalVisible: boolean
@@ -179,7 +179,7 @@ export function SystemList() {
       }
     ]
 
-    if (system.type === SystemType.Webhook) {
+    if (system.type === SystemRole.enum.WEBHOOK) {
       menuItems.push({
         handler: () => {
           setSystemToShowPermission(system)
@@ -215,7 +215,8 @@ export function SystemList() {
     HEALTH: intl.formatMessage(integrationMessages.eventNotification),
     RECORD_SEARCH: intl.formatMessage(integrationMessages.recordSearch),
     NATIONAL_ID: intl.formatMessage(integrationMessages.nationalId),
-    WEBHOOK: intl.formatMessage(integrationMessages.webhook)
+    WEBHOOK: intl.formatMessage(integrationMessages.webhook),
+    IMPORT: intl.formatMessage(integrationMessages.import)
   }
 
   const systemToLabel = (system: System) => {
@@ -513,25 +514,25 @@ export function SystemList() {
               >
                 <Select
                   onChange={(val) => {
-                    setNewSystemType(val as SystemType)
+                    setNewSystemType(val as SystemRole)
                   }}
-                  value={newSystemType ?? SystemType.Health}
+                  value={newSystemType ?? SystemRole.enum.HEALTH}
                   options={[
                     {
                       label: intl.formatMessage(
                         integrationMessages.eventNotification
                       ),
-                      value: SystemType.Health
+                      value: SystemRole.enum.HEALTH
                     },
                     {
                       label: intl.formatMessage(
                         integrationMessages.recordSearch
                       ),
-                      value: SystemType.RecordSearch
+                      value: SystemRole.enum.RECORD_SEARCH
                     },
                     {
                       label: intl.formatMessage(integrationMessages.webhook),
-                      value: SystemType.Webhook
+                      value: SystemRole.enum.WEBHOOK
                     }
                   ]}
                   id={'permissions-selectors'}
@@ -539,7 +540,7 @@ export function SystemList() {
               </InputField>
             </Field>
 
-            {newSystemType === SystemType.Health && (
+            {newSystemType === SystemRole.enum.HEALTH && (
               <PaddedAlert type="info">
                 {intl.formatMessage(
                   integrationMessages.healthnotificationAlertDescription
@@ -555,7 +556,7 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {newSystemType === SystemType.RecordSearch && (
+            {newSystemType === SystemRole.enum.RECORD_SEARCH && (
               <PaddedAlert type="info">
                 {intl.formatMessage(
                   integrationMessages.recordSearchDescription
@@ -572,7 +573,7 @@ export function SystemList() {
               </PaddedAlert>
             )}
 
-            {newSystemType === SystemType.Webhook && (
+            {newSystemType === SystemRole.enum.WEBHOOK && (
               <>
                 <PaddedAlert type="info">
                   {intl.formatMessage(integrationMessages.webhookDescription)}

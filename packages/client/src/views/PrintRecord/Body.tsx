@@ -39,7 +39,8 @@ import {
   IAttachment,
   IDocumentUploaderWithOptionsFormField,
   BULLET_LIST,
-  DIVIDER
+  DIVIDER,
+  HIDDEN
 } from '@client/forms'
 import {
   getConditionalActionsForField,
@@ -407,8 +408,8 @@ function renderValue(
     return field.postfix
       ? String(value).concat(` ${field.postfix.toLowerCase()}`)
       : field.unit
-      ? String(value).concat(intl.formatMessage(field.unit))
-      : value
+        ? String(value).concat(intl.formatMessage(field.unit))
+        : value
   }
 
   return value
@@ -658,6 +659,11 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
   }
   function isVisibleField(field: IFormField, section: IFormSection) {
     const { declaration: draft } = props
+
+    if (field.type === HIDDEN) {
+      return false
+    }
+
     const conditionalActions = getConditionalActionsForField(
       field,
       draft.data[section.id] || {},
@@ -713,7 +719,9 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
     group: IFormSectionGroup,
     overriddenField: IFormField,
     field: IFormField,
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     items: any[],
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     item: any
   ) {
     overriddenField.label =
@@ -762,8 +770,10 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
   ) => {
     const { intls, declaration: draft } = props
     const overriddenFields = getOverriddenFieldsListForPreview(formSections)
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     let tempItem: any
     return formSections.map((section) => {
+      /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
       let items: any[] = []
       const visitedTags: string[] = []
       const visibleGroups = getVisibleSectionGroupsBasedOnConditions(
@@ -790,8 +800,8 @@ export function PrintRecordBody(props: PrintRecordTableProps) {
             tempItem = field.previewGroup
               ? getPreviewGroupsField(section, group, field, visitedTags)
               : field.nestedFields && field.ignoreNestedFieldWrappingInPreview
-              ? getNestedPreviewField(section, group, field)
-              : getSinglePreviewField(section, group, field)
+                ? getNestedPreviewField(section, group, field)
+                : getSinglePreviewField(section, group, field)
             if (fieldDisabled.includes('disable') && tempItem?.action) {
               tempItem.action.disabled = true
             }

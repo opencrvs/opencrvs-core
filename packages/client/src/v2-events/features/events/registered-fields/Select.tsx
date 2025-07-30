@@ -12,53 +12,69 @@ import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldProps,
-  SelectFieldValue,
-  SelectOption
+  SelectField,
+  SelectOption,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
-import { InputField } from '@client/components/form/InputField'
 
-export function Select({
-  onChange,
-  label,
-  value,
-  ...props
-}: FieldProps<'SELECT'> & {
-  onChange: (newValue: SelectFieldValue) => void
-  value?: SelectFieldValue
-}) {
+export type SelectInputProps = Omit<FieldProps<'SELECT'>, 'label'> & {
+  onChange: (newValue: string) => void
+  value?: string
+  label?: TranslationConfig
+} & { 'data-testid'?: string }
+
+function SelectInput({ onChange, value, ...props }: SelectInputProps) {
   const intl = useIntl()
   const { options } = props
-
+  const selectedOption = options.find((option) => option.value === value)
   const formattedOptions = options.map((option: SelectOption) => ({
     value: option.value,
     label: intl.formatMessage(option.label)
   }))
 
+  const inputValue = selectedOption?.value ?? ''
+
   return (
-    <InputField {...props} label={intl.formatMessage(label)} touched={false}>
-      <SelectComponent
-        label={intl.formatMessage(label)}
-        options={formattedOptions}
-        value={value ?? ''}
-        onChange={onChange}
-      />
-    </InputField>
+    <SelectComponent
+      {...props}
+      data-testid={props['data-testid'] || `select__${props.id}`}
+      options={formattedOptions}
+      value={inputValue}
+      onChange={onChange}
+    />
   )
 }
 
-export const selectFieldToString = (
-  val: SelectFieldValue,
-  options: SelectOption[] | undefined | null,
-  intl: IntlShape
-) => {
-  if (!val) {
-    return ''
-  }
-  if (!options) {
-    return typeof val === 'string' ? val : ''
+function SelectOutput({
+  value,
+  options
+}: {
+  value: string | undefined
+  options: SelectOption[]
+}) {
+  const intl = useIntl()
+  const selectedOption = options.find((option) => option.value === value)
+
+  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+}
+
+function stringify(intl: IntlShape, value: string, fieldConfig: SelectField) {
+  const option = fieldConfig.options.find((opt) => opt.value === value)
+
+  if (!option) {
+    // eslint-disable-next-line no-console
+    console.error(
+      `Could not find option with value ${value} for field ${fieldConfig.id}`
+    )
+    return value
   }
 
-  const selectedOption = options.find(({ value }) => value === val)
-  return selectedOption ? intl.formatMessage(selectedOption.label) : ''
+  return intl.formatMessage(option.label)
+}
+
+export const Select = {
+  Input: SelectInput,
+  Output: SelectOutput,
+  stringify
 }

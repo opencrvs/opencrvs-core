@@ -9,116 +9,178 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { hashKey } from '@tanstack/react-query'
-import { getQueryKey } from '@trpc/react-query'
-import { EventDocument, EventIndex } from '@opencrvs/commons/client'
-import { api, queryClient, utils } from '@client/v2-events/trpc'
-import { useEventAction } from './procedures/action'
-import { createEvent } from './procedures/create'
-import { useDeleteEventMutation } from './procedures/delete'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-function getPendingMutations(
-  mutationCreator: Parameters<typeof getQueryKey>[0]
-) {
-  const key = getQueryKey(mutationCreator)
-  return queryClient
-    .getMutationCache()
-    .getAll()
-    .filter((mutation) => mutation.state.status !== 'success')
-    .filter(
-      (mutation) =>
-        mutation.options.mutationKey &&
-        hashKey(mutation.options.mutationKey) === hashKey(key)
-    )
-}
-
-function filterOutboxEventsWithMutation<
-  T extends
-    | typeof api.event.create
-    | typeof api.event.actions.declare
-    | typeof api.event.actions.register
->(
-  events: EventIndex[],
-  mutation: T,
-  filter: (
-    event: EventIndex,
-    parameters: Exclude<ReturnType<T['useMutation']>['variables'], undefined>
-  ) => boolean
-) {
-  return getPendingMutations(mutation).flatMap((m) => {
-    const variables = m.state.variables as Exclude<
-      ReturnType<T['useMutation']>['variables'],
-      undefined
-    >
-    return events.filter((event) => filter(event, variables))
-  })
-}
+import { QueryType, UUID, getUUID } from '@opencrvs/commons/client'
+import { useTRPC } from '@client/v2-events/trpc'
+import { useGetEvent } from './procedures/get'
+import { useOutbox } from './outbox'
+import { useCreateEvent } from './procedures/create'
+import { useDeleteEvent } from './procedures/delete'
+import {
+  customMutationKeys,
+  useEventAction,
+  useEventCustomAction,
+  useIsMutating
+} from './procedures/actions/action'
+import { useGetEvents } from './procedures/list'
+import { useGetEventCounts } from './procedures/count'
+import { findLocalEventIndex } from './api'
+import { QueryOptions } from './procedures/utils'
 
 export function useEvents() {
-  const eventsList = api.event.list.useQuery().data ?? []
-
-  function getDrafts(): EventDocument[] {
-    const queries = queryClient.getQueriesData<EventDocument>({
-      queryKey: getQueryKey(api.event.get)
-    })
-
-    return queries
-      .map((query) => query[1])
-      .filter((event): event is EventDocument =>
-        Boolean(event && event.actions[event.actions.length - 1].draft)
-      )
-  }
-
-  function getOutbox() {
-    const eventFromDeclareActions = filterOutboxEventsWithMutation(
-      eventsList,
-      api.event.actions.declare,
-      (event, parameters) => {
-        return event.id === parameters.eventId && !parameters.draft
-      }
-    )
-
-    const eventFromRegisterActions = filterOutboxEventsWithMutation(
-      eventsList,
-      api.event.actions.register,
-      (event, parameters) => {
-        return event.id === parameters.eventId && !parameters.draft
-      }
-    )
-
-    return eventFromDeclareActions
-      .concat(eventFromDeclareActions)
-      .concat(eventFromRegisterActions)
-      .filter(
-        /* uniqueById */
-        (e, i, arr) => arr.findIndex((a) => a.id === e.id) === i
-      )
-  }
-
+  const trpc = useTRPC()
+  const getEvent = useGetEvent()
+  const getEvents = useGetEvents()
+  const assignMutation = useEventAction(trpc.event.actions.assignment.assign)
   return {
-    createEvent,
-    getEvent: api.event.get,
-    getEvents: api.event.list,
-    deleteEvent: useDeleteEventMutation(),
-    getOutbox,
-    getDrafts,
+    createEvent: useCreateEvent,
+    /** Returns an event with full history. If you only need the state of the event, use getEventState. */
+    getEvent,
+    getEvents,
+    useGetEventCounts,
+    deleteEvent: {
+      useMutation: useDeleteEvent
+    },
+    getOutbox: useOutbox,
+    searchEvent: {
+      useQuery: (query: QueryType) => {
+        return useQuery({
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query),
+          refetchOnMount: true,
+          staleTime: 0
+        })
+      },
+      useSuspenseQuery: (
+        query: QueryType,
+        options: QueryOptions<typeof trpc.event.search> = {}
+      ) => {
+        return useSuspenseQuery({
+          ...trpc.event.search.queryOptions(query),
+          queryKey: trpc.event.search.queryKey(query),
+          refetchOnMount: true,
+          staleTime: 0,
+          ...options
+        }).data
+      }
+    },
+    searchEventById: {
+      useQuery: (id: string) => {
+        const query = {
+          type: 'and',
+          clauses: [{ id }]
+        } satisfies QueryType
+
+        const options = trpc.event.search.queryOptions(query)
+
+        return useQuery({
+          ...options,
+          queryKey: trpc.event.search.queryKey(query),
+          enabled: !findLocalEventIndex(id),
+          staleTime: 0,
+          refetchOnMount: true,
+          queryFn: async (...args) => {
+            const queryFn = options.queryFn
+            if (!queryFn) {
+              throw new Error('Query function is not defined')
+            }
+            const res = await queryFn(...args)
+            if (res.length === 0) {
+              throw new Error(`No event found with id: ${id}`)
+            }
+            return res
+          },
+          initialData: () => {
+            const eventIndex = findLocalEventIndex(id)
+            return eventIndex ? [eventIndex] : undefined
+          }
+        })
+      },
+      useSuspenseQuery: (id: string) => {
+        const query = {
+          type: 'and',
+          clauses: [{ id }]
+        } satisfies QueryType
+
+        const options = trpc.event.search.queryOptions(query)
+
+        return useSuspenseQuery({
+          ...options,
+          queryKey: trpc.event.search.queryKey(query),
+          queryFn: async (...args) => {
+            const queryFn = options.queryFn
+            if (!queryFn) {
+              throw new Error('Query function is not defined')
+            }
+            const res = await queryFn(...args)
+            if (res.length === 0) {
+              throw new Error(`No event found with id: ${id}`)
+            }
+            return res
+          },
+          initialData: () => {
+            const eventIndex = findLocalEventIndex(id)
+            return eventIndex ? [eventIndex] : undefined
+          }
+        }).data
+      }
+    },
     actions: {
-      validate: useEventAction(
-        utils.event.actions.validate,
-        api.event.actions.validate
-      ),
-      notify: useEventAction(
-        utils.event.actions.notify,
-        api.event.actions.notify
-      ),
-      declare: useEventAction(
-        utils.event.actions.declare,
-        api.event.actions.declare
-      ),
-      register: useEventAction(
-        utils.event.actions.register,
-        api.event.actions.register
+      validate: useEventAction(trpc.event.actions.validate.request),
+      reject: useEventAction(trpc.event.actions.reject.request),
+      archive: useEventAction(trpc.event.actions.archive.request),
+      notify: useEventAction(trpc.event.actions.notify.request),
+      declare: useEventAction(trpc.event.actions.declare.request),
+      register: useEventAction(trpc.event.actions.register.request),
+      correction: {
+        request: useEventAction(trpc.event.actions.correction.request.request),
+        approve: useEventAction(trpc.event.actions.correction.approve.request),
+        reject: useEventAction(trpc.event.actions.correction.reject.request)
+      },
+      assignment: {
+        assign: {
+          isAssigning: (eventId: UUID) => {
+            return useIsMutating(eventId, trpc.event.actions.assignment.assign)
+          },
+          mutate: async ({
+            eventId,
+            assignedTo,
+            refetchEvent
+          }: {
+            eventId: string
+            assignedTo: string
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            refetchEvent: () => Promise<any>
+          }) => {
+            /**This makes sure all the files and users referenced in the event document is prefetched to be used even in offline */
+            await refetchEvent()
+
+            return assignMutation.mutate({
+              eventId,
+              transactionId: getUUID(),
+              assignedTo
+            })
+          }
+        },
+        unassign: useEventAction(trpc.event.actions.assignment.unassign)
+      }
+    },
+    onlineActions: {
+      printCertificate: useEventAction(
+        trpc.event.actions.printCertificate.request
       )
+    },
+    customActions: {
+      registerOnDeclare: useEventCustomAction([
+        ...customMutationKeys.registerOnDeclare
+      ]),
+      validateOnDeclare: useEventCustomAction([
+        ...customMutationKeys.validateOnDeclare
+      ]),
+      registerOnValidate: useEventCustomAction([
+        ...customMutationKeys.registerOnValidate
+      ])
     }
   }
 }

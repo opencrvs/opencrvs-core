@@ -8,15 +8,38 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { TRPCError } from '@trpc/server'
+import { ActionType, generateUuid, getUUID, SCOPES } from '@opencrvs/commons'
+import {
+  createTestClient,
+  setupTestCase,
+  TEST_USER_DEFAULT_SCOPES
+} from '@events/tests/utils'
 
-import { createTestClient, setupTestCase } from '@events/tests/utils'
+test('prevents forbidden access if missing required scope', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [])
 
-test('Returns 404 when not found', async () => {
+  await expect(client.event.get(generateUuid())).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+})
+
+test(`allows access with required scope`, async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
+
+  await expect(client.event.get(generateUuid())).rejects.not.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+})
+
+test(`Returns 404 when not found`, async () => {
   const { user } = await setupTestCase()
   const client = createTestClient(user)
 
   await expect(
-    client.event.get('id-not-persisted')
+    client.event.get(generateUuid())
   ).rejects.toThrowErrorMatchingSnapshot()
 })
 
@@ -28,26 +51,138 @@ test('Returns event', async () => {
 
   const fetchedEvent = await client.event.get(event.id)
 
-  expect(fetchedEvent).toEqual(event)
+  expect(fetchedEvent.id).toEqual(event.id)
+
+  const fetchedEventWithoutReadAction = fetchedEvent.actions.slice(0, -1)
+  expect(fetchedEventWithoutReadAction).toEqual(event.actions)
+
+  expect(fetchedEvent.actions[fetchedEvent.actions.length - 1]).toMatchObject({
+    type: ActionType.READ
+  })
 })
 
 test('Returns event with all actions', async () => {
   const { user, generator } = await setupTestCase()
-  const client = createTestClient(user)
+  const client = createTestClient(user, [
+    ...TEST_USER_DEFAULT_SCOPES,
+    SCOPES.RECORD_SUBMIT_INCOMPLETE
+  ])
 
   const event = await client.event.create(generator.event.create())
-
-  await client.event.actions.declare(
-    generator.event.actions.declare(event.id, { data: { name: 'John Doe' } })
+  await client.event.actions.notify.request(
+    generator.event.actions.notify(event.id)
   )
 
-  await client.event.actions.validate(
-    generator.event.actions.validate(event.id, {
-      data: { favouritePlayer: 'Elena Rybakina' }
-    })
+  const createAction = event.actions.filter(
+    (action) => action.type === ActionType.CREATE
   )
 
-  const fetchedEvent = await client.event.get(event.id)
+  const assignmentInput = generator.event.actions.assign(event.id, {
+    assignedTo: createAction[0].createdBy
+  })
 
-  expect(fetchedEvent.actions).toHaveLength(3)
+  await client.event.actions.assignment.assign(assignmentInput)
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.reject.request(
+    generator.event.actions.reject(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.register.request(
+    generator.event.actions.register(event.id)
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.printCertificate.request(
+    generator.event.actions.printCertificate(event.id)
+  )
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const correctionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
+    )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.correction.reject.request(
+    generator.event.actions.correction.reject(
+      event.id,
+      // last action is the assign action and 2nd last is the automatic unassign action
+      correctionRequest.actions[correctionRequest.actions.length - 2].id
+    )
+  )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  const correctionRequest2 =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
+    )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.correction.approve.request(
+    generator.event.actions.correction.approve(
+      event.id,
+      // last action is the assign action and 2nd last is the automatic unassign action
+      correctionRequest2.actions[correctionRequest2.actions.length - 2].id
+    )
+  )
+
+  await client.event.get(event.id)
+  const secondTimefetchedEvent = await client.event.get(event.id)
+
+  expect(
+    secondTimefetchedEvent.actions.filter(
+      (action) => action.type === ActionType.READ
+    )
+  ).toHaveLength(2)
 })

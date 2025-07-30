@@ -12,68 +12,60 @@
 import React from 'react'
 import { useIntl } from 'react-intl'
 
-import { useNavigate } from 'react-router-dom'
-import { formatISO } from 'date-fns'
-import { validate, ActionType } from '@opencrvs/commons/client'
-import { type ActionConfig } from '@opencrvs/commons'
+import { Icon } from '@opencrvs/components/lib/Icon'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
-import { ROUTES } from '@client/v2-events/routes'
 import { messages } from '@client/i18n/messages/views/action'
+import { useActionMenuItems } from './useActionMenuItems'
 
-export function ActionMenu({ eventId }: { eventId: string }) {
+export function ActionMenu({
+  eventId,
+  onAction
+}: {
+  eventId: string
+  onAction?: () => void
+}) {
   const intl = useIntl()
-  const events = useEvents()
-  const navigate = useNavigate()
-  const authentication = useAuthentication()
-  const [event] = events.getEvent.useSuspenseQuery(eventId)
+  const { searchEventById } = useEvents()
 
-  const { eventConfiguration: configuration } = useEventConfiguration(
-    event.type
-  )
+  const getEventQuery = searchEventById.useSuspenseQuery(eventId)
 
-  function isActionVisible(action: ActionConfig) {
-    if (!action.allowedWhen) {
-      return true
-    }
-    const params = {
-      $event: event,
-      $user: authentication,
-      $now: formatISO(new Date(), { representation: 'date' })
-    }
+  const eventResults = getEventQuery
 
-    return validate(action.allowedWhen, params)
+  if (eventResults.length === 0) {
+    throw new Error(`Event ${eventId} not found`)
   }
+  const eventIndex = eventResults[0]
+
+  const eventState = eventIndex
+
+  const actionMenuItems = useActionMenuItems(eventState)
 
   return (
     <>
       <DropdownMenu id="action">
-        <DropdownMenu.Trigger>
-          <PrimaryButton icon={() => <CaretDown />}>
+        <DropdownMenu.Trigger asChild>
+          <PrimaryButton
+            data-testid="action-dropdownMenu"
+            icon={() => <CaretDown />}
+          >
             {intl.formatMessage(messages.action)}
           </PrimaryButton>
         </DropdownMenu.Trigger>
         <DropdownMenu.Content>
-          {configuration.actions.filter(isActionVisible).map((action) => {
+          {actionMenuItems.map((action) => {
             return (
               <DropdownMenu.Item
                 key={action.type}
-                onClick={() => {
-                  if (
-                    action.type === ActionType.CREATE ||
-                    action.type === ActionType.CUSTOM
-                  ) {
-                    alert(`Action ${action.type} is not implemented yet.`)
-                    return
-                  }
-
-                  navigate(ROUTES.V2.EVENTS[action.type].buildPath({ eventId }))
+                disabled={'disabled' in action ? action.disabled : false}
+                onClick={async () => {
+                  await action.onClick()
+                  onAction?.()
                 }}
               >
+                <Icon color="currentColor" name={action.icon} size="small" />
                 {intl.formatMessage(action.label)}
               </DropdownMenu.Item>
             )

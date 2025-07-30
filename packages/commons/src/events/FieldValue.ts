@@ -9,76 +9,140 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { z } from 'zod'
-import { FieldType } from './FieldConfig'
+import {
+  AddressFieldValue,
+  AddressFieldUpdateValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  RuralAddressValue,
+  RuralAddressUpdateValue,
+  UrbanAddressValue,
+  UrbanAddressUpdateValue,
+  GenericAddressValue,
+  GenericAddressUpdateValue,
+  NameFieldValue,
+  NameFieldUpdateValue
+} from './CompositeFieldValue'
+/**
+ * FieldValues defined in this file are primitive field values.
+ * FieldValues defined in CompositeFieldValue.ts are composed of multiple primitive field values (Address, File etc).
+ *
+ * FieldValue is a union of primitive and composite field values.
+ * FieldValue can never be null.
+ *
+ * FieldUpdateValue accepts null values for primitive field values when they are optional.
+ * API is build assuming partial (PATCH) updates. In order to edit and remove optional value, we need to accept null values.
+ * Omitting a field value in partial updates leaves it untouched.
+ *
+ */
 
-const TextFieldValue = z.string()
-export type TextFieldValue = z.infer<typeof TextFieldValue>
+export const TextValue = z.string()
+export const NonEmptyTextValue = TextValue.min(1)
 
-const DateFieldValue = z.string().nullable()
-export type DateFieldValue = z.infer<typeof DateFieldValue>
+export const DateValue = z
+  .string()
+  .date()
+  .describe('Date in the format YYYY-MM-DD')
 
-const ParagraphFieldValue = z.string()
-export type ParagraphFieldValue = z.infer<typeof ParagraphFieldValue>
+export const DatetimeValue = z.string().datetime()
 
-const BulletListFieldValue = z.string()
-export type BulletListFieldValue = z.infer<typeof BulletListFieldValue>
+export const SelectDateRangeValue = z.enum([
+  'last7Days',
+  'last30Days',
+  'last90Days',
+  'last365Days'
+])
 
-export const FileFieldValue = z
+export const DateRangeFieldValue = z
   .object({
-    filename: z.string(),
-    originalFilename: z.string(),
-    type: z.string()
+    start: DateValue,
+    end: DateValue
   })
-  .nullable()
+  .or(DateValue)
+  .describe(
+    'Date range with start and end dates in the format YYYY-MM-DD. Inclusive start, exclusive end.'
+  )
 
-export type FileFieldValue = z.infer<typeof FileFieldValue>
+export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
+export type SelectDateRangeValue = z.infer<typeof SelectDateRangeValue>
 
-const RadioGroupFieldValue = z.string()
-export type RadioGroupFieldValue = z.infer<typeof RadioGroupFieldValue>
+export const EmailValue = z.string().email()
 
-const CheckboxFieldValue = z.enum(['true', 'false'])
+export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
+export const NumberFieldValue = z.number()
+export type NumberFieldValue = z.infer<typeof NumberFieldValue>
+export const DataFieldValue = z.undefined()
+export type DataFieldValue = z.infer<typeof DataFieldValue>
 
-const LocationFieldValue = z.string()
-export type LocationFieldValue = z.infer<typeof LocationFieldValue>
-
-const SelectFieldValue = z.string()
-export type SelectFieldValue = z.infer<typeof SelectFieldValue>
-
-const CountryFieldValue = z.string()
-export type CountryFieldValue = z.infer<typeof CountryFieldValue>
-
-export type FieldTypeToFieldValue<T extends FieldType> = T extends 'TEXT'
-  ? TextFieldValue
-  : T extends 'PARAGRAPH'
-  ? ParagraphFieldValue
-  : T extends 'BULLET_LIST'
-  ? BulletListFieldValue
-  : T extends 'DATE'
-  ? DateFieldValue
-  : T extends 'FILE'
-  ? FileFieldValue
-  : T extends 'RADIO_GROUP'
-  ? RadioGroupFieldValue
-  : T extends 'CHECKBOX'
-  ? CheckboxFieldValue
-  : T extends 'LOCATION'
-  ? LocationFieldValue
-  : T extends 'COUNTRY'
-  ? CountryFieldValue
-  : T extends 'SELECT'
-  ? SelectFieldValue
-  : never
+export const SignatureFieldValue = z.string()
+export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
 export const FieldValue = z.union([
-  TextFieldValue,
-  DateFieldValue,
-  ParagraphFieldValue,
-  FileFieldValue,
-  RadioGroupFieldValue,
+  TextValue,
+  DateValue,
+  DateRangeFieldValue,
+  SelectDateRangeValue,
   CheckboxFieldValue,
-  LocationFieldValue,
-  SelectFieldValue
+  NumberFieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  UrbanAddressValue,
+  RuralAddressValue,
+  DataFieldValue,
+  GenericAddressValue,
+  NameFieldValue,
+  NameFieldUpdateValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
+
+export const FieldUpdateValue = z.union([
+  TextValue,
+  DateValue,
+  DateRangeFieldValue,
+  SelectDateRangeValue,
+  CheckboxFieldValue,
+  NumberFieldValue,
+  FileFieldValue,
+  FileFieldWithOptionValue,
+  UrbanAddressUpdateValue,
+  RuralAddressUpdateValue,
+  DataFieldValue,
+  GenericAddressUpdateValue,
+  NameFieldUpdateValue
+])
+
+export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
+
+/**
+ * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
+ * */
+export type FieldValueSchema =
+  | typeof FileFieldValue
+  | typeof FileFieldWithOptionValue
+  | typeof CheckboxFieldValue
+  | typeof AddressFieldValue
+  | typeof NumberFieldValue
+  | typeof DataFieldValue
+  | typeof NameFieldValue
+  | z.ZodString
+  | z.ZodBoolean
+/**
+ * NOTE: This is an exception. We need schema as a type in order to generate schema dynamically.
+ *
+ * FieldValueInputSchema uses Input types which have set optional values as nullish
+ * */
+export type FieldUpdateValueSchema =
+  | typeof DateRangeFieldValue
+  | typeof SelectDateRangeValue
+  | typeof FileFieldValue
+  | typeof FileFieldWithOptionValue
+  | typeof CheckboxFieldValue
+  | typeof AddressFieldUpdateValue
+  | typeof NumberFieldValue
+  | typeof DataFieldValue
+  | typeof NameFieldValue
+  | typeof NameFieldUpdateValue
+  | z.ZodString
+  | z.ZodBoolean

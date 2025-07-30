@@ -14,11 +14,13 @@ services:
     restart: unless-stopped
 
   redis:
-    image: redis:5
+    image: docker.io/bitnami/redis:8.0
     restart: unless-stopped
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
 
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.14.3
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
     restart: unless-stopped
     environment:
       - discovery.type=single-node
@@ -40,5 +42,5 @@ services:
     restart: unless-stopped
 
   minio:
-    image: quay.io/minio/minio:RELEASE.2023-09-16T01-01-47Z.fips
+    image: quay.io/minio/minio:RELEASE.2025-06-13T11-33-47Z
     restart: unless-stopped

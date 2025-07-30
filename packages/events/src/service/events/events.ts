@@ -9,42 +9,40 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  ActionInputWithType,
-  EventDocument,
-  EventIndex,
-  EventInput,
-  FileFieldValue,
-  getCurrentEventState,
-  isUndeclaredDraft
-} from '@opencrvs/commons/events'
-
-import {
-  getEventConfigurations,
-  notifyOnAction
-} from '@events/service/config/config'
-import { searchForDuplicates } from '@events/service/deduplication/deduplication'
-import { deleteFile, fileExists } from '@events/service/files'
-import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
-import * as events from '@events/storage/mongodb/events'
-import { ActionType, getUUID } from '@opencrvs/commons'
 import { TRPCError } from '@trpc/server'
 import { z } from 'zod'
+import { NoResultError } from 'kysely'
+import {
+  ActionInputWithType,
+  ActionStatus,
+  ActionUpdate,
+  Draft,
+  EventDocument,
+  EventInput,
+  FieldConfig,
+  FieldType,
+  FieldUpdateValue,
+  FileFieldValue,
+  getDeclarationFields,
+  getAcceptedActions,
+  AsyncRejectActionDocument,
+  ActionType,
+  isWriteAction,
+  getStatusFromActions,
+  EventConfig,
+  EventStatus,
+  getAvailableActionsForEvent,
+  getCurrentEventState,
+  DisplayableAction
+} from '@opencrvs/commons/events'
+import { TokenUserType, UUID } from '@opencrvs/commons'
+import { getEventConfigurationById } from '@events/service/config/config'
+import { deleteFile, fileExists } from '@events/service/files'
+import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
+import * as eventsRepo from '@events/storage/postgres/events/events'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
+import { TrpcUserContext } from '@events/context'
 
-export const EventInputWithId = EventInput.extend({
-  id: z.string()
-})
-
-export type EventInputWithId = z.infer<typeof EventInputWithId>
-
-async function getEventByTransactionId(transactionId: string) {
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
-
-  const document = await collection.findOne({ transactionId })
-
-  return document
-}
 class EventNotFoundError extends TRPCError {
   constructor(id: string) {
     super({
@@ -54,277 +52,381 @@ class EventNotFoundError extends TRPCError {
   }
 }
 
-export async function getEventById(id: string) {
-  const db = await events.getClient()
-
-  const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ id: id })
-
-  if (!event) {
-    throw new EventNotFoundError(id)
+/** Get event by ID. Throws tRPC HTTP 404 if event is not found */
+export const getEventById = async (eventId: UUID): Promise<EventDocument> => {
+  try {
+    return await eventsRepo.getEventById(eventId)
+  } catch (error) {
+    if (error instanceof NoResultError) {
+      throw new EventNotFoundError(eventId)
+    }
+    throw error
   }
-
-  return event
 }
 
-export async function deleteEvent(
-  eventId: string,
-  { token }: { token: string }
+function getValidFileValue(
+  fieldKey: string,
+  fieldValue: FieldUpdateValue,
+  fieldTypes: Array<{ id: string; type: FieldType }>
 ) {
-  const db = await events.getClient()
-
-  const collection = db.collection<EventDocument>('events')
-  const event = await collection.findOne({ id: eventId })
-
-  if (!event) {
-    throw new EventNotFoundError(eventId)
+  const isFileType =
+    fieldTypes.find((field) => field.id === fieldKey)?.type === FieldType.FILE
+  const validFieldValue = FileFieldValue.safeParse(fieldValue)
+  if (!isFileType || !validFieldValue.success) {
+    return undefined
   }
-
-  const hasNonDeletableActions = !isUndeclaredDraft(event)
-
-  if (hasNonDeletableActions) {
-    throw new TRPCError({
-      code: 'BAD_REQUEST',
-      message: 'Event has actions that cannot be deleted'
-    })
-  }
-
-  await deleteEventAttachments(token, event)
-
-  const { id } = event
-  await collection.deleteOne({ id })
-  await deleteEventIndex(event)
-  return { id }
+  return validFieldValue.data
 }
 
 async function deleteEventAttachments(token: string, event: EventDocument) {
-  const config = await getEventConfigurations(token)
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
 
-  const form = config
-    .find((c) => c.id === event.type)
-    ?.actions.find((action) => action.type === event.type)
-    ?.forms.find((f) => f.active)
+  const actions = getAcceptedActions(event)
+  // @TODO: Check that this works after making sure data incldues only declaration fields.
+  const fieldConfigs = getDeclarationFields(configuration)
+  for (const ac of actions) {
+    for (const [key, value] of Object.entries(ac.declaration)) {
+      const fileValue = getValidFileValue(key, value, fieldConfigs)
 
-  const fieldTypes = form?.pages.flatMap((page) => page.fields)
-
-  for (const action of event.actions) {
-    for (const [key, value] of Object.entries(action.data)) {
-      const isFile =
-        fieldTypes?.find((field) => field.id === key)?.type === 'FILE'
-
-      const fileValue = FileFieldValue.safeParse(value)
-
-      if (!isFile || !fileValue.success || !fileValue.data) {
+      if (!fileValue) {
         continue
       }
 
-      await deleteFile(fileValue.data.filename, token)
+      await deleteFile(fileValue.path, token)
     }
   }
 }
 
-export async function createEvent({
-  eventInput,
-  createdAtLocation,
-  createdBy,
-  transactionId
-}: {
-  eventInput: z.infer<typeof EventInput>
-  createdBy: string
-  createdAtLocation: string
-  transactionId: string
-}): Promise<EventDocument> {
-  const existingEvent = await getEventByTransactionId(transactionId)
+export async function throwConflictIfActionNotAllowed(
+  eventId: UUID,
+  actionType: ActionType,
+  token: string
+) {
+  const event = await getEventById(eventId)
+  const eventConfig = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
+  const eventStatus = getStatusFromActions(event.actions)
 
-  if (existingEvent) {
-    return existingEvent
+  const allowedActions: DisplayableAction[] = getAvailableActionsForEvent(
+    getCurrentEventState(event, eventConfig)
+  )
+
+  if (!allowedActions.includes(actionType)) {
+    throw new TRPCError({
+      code: 'CONFLICT',
+      message: `Action '${actionType}' cannot be performed on an event in '${eventStatus}' state. Available actions: ${allowedActions.join(', ')}.`
+    })
+  }
+}
+
+export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
+  const event = await getEventById(eventId)
+  const eventStatus = getStatusFromActions(event.actions)
+
+  // Once an event is declared or notified, it can not be deleted anymore
+  if (eventStatus !== EventStatus.enum.CREATED) {
+    throw new TRPCError({
+      code: 'BAD_REQUEST',
+      message: 'A declared or notified event can not be deleted'
+    })
   }
 
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
+  const { id } = event
+  await deleteEventAttachments(token, event)
+  await deleteEventIndex(event)
+  await draftsRepo.deleteDraftsByEventId(id)
+  await eventsRepo.deleteEventById(id)
 
-  const now = new Date().toISOString()
-  const id = getUUID()
+  return { id }
+}
 
-  await collection.insertOne({
-    ...eventInput,
-    id,
-    transactionId,
-    createdAt: now,
-    updatedAt: now,
-    actions: [
-      {
-        type: ActionType.CREATE,
-        createdAt: now,
-        createdBy,
-        createdAtLocation,
-        draft: false,
-        data: {}
-      }
-    ]
-  } satisfies EventDocument)
+const TRACKING_ID_LENGTH = 6
+const TRACKING_ID_CHARACTERS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-  const event = await getEventById(id)
-  await indexEvent(event)
+function generateTrackingId(): string {
+  let result = ''
+  for (let i = 0; i < TRACKING_ID_LENGTH; i++) {
+    const randomIndex = Math.floor(
+      Math.random() * TRACKING_ID_CHARACTERS.length
+    )
+    result += TRACKING_ID_CHARACTERS[randomIndex]
+  }
+  return result
+}
+
+export async function createEvent({
+  eventInput,
+  user,
+  transactionId,
+  config
+}: {
+  eventInput: z.infer<typeof EventInput>
+  user: TrpcUserContext
+  transactionId: string
+  config: EventConfig
+}): Promise<EventDocument> {
+  const isSystem = user.type === TokenUserType.enum.system
+
+  const getOrCreateEvent = isSystem
+    ? eventsRepo.getOrCreateEvent // System users create events without assignment
+    : eventsRepo.getOrCreateEventAndAssign
+
+  const event = await getOrCreateEvent({
+    eventType: eventInput.type,
+    transactionId: transactionId,
+    trackingId: generateTrackingId(),
+    createdBy: user.id,
+    createdByUserType: user.type,
+    createdByRole: user.role,
+    createdBySignature: user.signature,
+    createdAtLocation: user.primaryOfficeId
+  })
+
+  await indexEvent(event, config)
 
   return event
+}
+
+function extractFileValues(
+  data: ActionUpdate,
+  fieldTypes: Array<{ id: string; type: FieldType }>
+): Array<{ fieldName: string; file: FileFieldValue }> {
+  const fileValues: Array<{ fieldName: string; file: FileFieldValue }> = []
+  for (const [key, value] of Object.entries(data)) {
+    const validFileValue = getValidFileValue(key, value, fieldTypes)
+    if (!validFileValue) {
+      continue
+    }
+
+    fileValues.push({
+      file: validFileValue,
+      fieldName: key
+    })
+  }
+  return fileValues
+}
+
+async function cleanUnreferencedAttachmentsFromPreviousDrafts(
+  token: string,
+  fieldConfigs: FieldConfig[],
+  fileValuesInCurrentAction: { fieldName: string; file: FileFieldValue }[],
+  drafts: Draft[]
+): Promise<void> {
+  const previousFileValuesInDrafts = drafts
+    .map((draft) => extractFileValues(draft.action.declaration, fieldConfigs))
+    .flat()
+
+  for (const previousFileValue of previousFileValuesInDrafts) {
+    if (
+      !fileValuesInCurrentAction.some(
+        (curr) =>
+          curr.fieldName === previousFileValue.fieldName &&
+          curr.file.path === previousFileValue.file.path
+      )
+    ) {
+      await deleteFile(previousFileValue.file.path, token)
+    }
+  }
 }
 
 export async function addAction(
   input: ActionInputWithType,
   {
     eventId,
-    createdBy,
+    user,
     token,
-    createdAtLocation
+    status
   }: {
-    eventId: string
-    createdBy: string
-    createdAtLocation: string
+    eventId: UUID
+    user: TrpcUserContext
     token: string
+    status: ActionStatus
   }
-) {
-  const db = await events.getClient()
-  const now = new Date().toISOString()
+): Promise<EventDocument> {
   const event = await getEventById(eventId)
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
 
-  const config = await getEventConfigurations(token)
+  // @TODO: Check that this works after making sure data incldues only declaration fields.
+  const fieldConfigs = getDeclarationFields(configuration)
+  const fileValuesInCurrentAction = extractFileValues(
+    input.declaration,
+    fieldConfigs
+  )
 
-  const form = config
-    .find((c) => c.id === event.type)
-    ?.actions.find((action) => action.type === input.type)
-    ?.forms.find((f) => f.active)
-
-  const fieldTypes = form?.pages.flatMap((page) => page.fields)
-
-  for (const [key, value] of Object.entries(input.data)) {
-    const isFile =
-      fieldTypes?.find((field) => field.id === key)?.type === 'FILE'
-
-    const fileValue = FileFieldValue.safeParse(value)
-
-    if (!isFile || !fileValue.success) {
-      continue
-    }
-
-    if (fileValue.data && !(await fileExists(fileValue.data.filename, token))) {
-      throw new Error(`File not found: ${fileValue.data.filename}`)
+  for (const file of fileValuesInCurrentAction) {
+    if (!(await fileExists(file.file.path, token))) {
+      throw new Error(`File not found: ${file.file.path}`)
     }
   }
 
-  await db.collection<EventDocument>('events').updateOne(
-    {
-      id: eventId
-    },
-    {
-      $push: {
-        actions: {
-          ...input,
-          createdBy,
-          createdAt: now,
-          createdAtLocation,
-          draft: input.draft || false
-        }
-      },
-      $set: {
-        updatedAt: now
-      }
-    }
+  if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
+    await eventsRepo.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      actionType: ActionType.MARKED_AS_DUPLICATE,
+      declaration: input.declaration,
+      annotation: input.annotation,
+      status,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdByUserType: user.type,
+      createdBySignature: user.signature,
+      createdAtLocation: user.primaryOfficeId,
+      originalActionId: input.originalActionId,
+      reasonMessage: input.reason.message,
+      reasonIsDuplicate: input.reason.isDuplicate
+    })
+  }
+
+  if (input.type === ActionType.ASSIGN) {
+    await eventsRepo.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      actionType: input.type,
+      declaration: input.declaration,
+      annotation: input.annotation,
+      status: ActionStatus.Accepted,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdByUserType: user.type,
+      createdBySignature: user.signature,
+      createdAtLocation: user.primaryOfficeId,
+      originalActionId: input.originalActionId,
+      assignedTo: user.id
+    })
+  } else {
+    const hasReason =
+      input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+
+    const hasRequestId =
+      input.type === ActionType.APPROVE_CORRECTION ||
+      input.type === ActionType.REJECT_CORRECTION
+
+    await eventsRepo.createAction({
+      eventId,
+      registrationNumber:
+        input.type === ActionType.REGISTER
+          ? input.registrationNumber
+          : undefined,
+      transactionId: input.transactionId,
+      actionType: input.type,
+      declaration: input.declaration,
+      annotation: input.annotation,
+      status,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdByUserType: user.type,
+      createdBySignature: user.signature,
+      createdAtLocation: user.primaryOfficeId,
+      originalActionId: input.originalActionId,
+      requestId: hasRequestId ? input.requestId : undefined,
+      reasonIsDuplicate: hasReason
+        ? (input.reason.isDuplicate ?? false)
+        : undefined,
+      reasonMessage: hasReason ? input.reason.message : undefined
+    })
+  }
+
+  // We want to unassign only if:
+  // - Action is a write action, since we dont want to unassign from e.g. READ action
+  // - Keep assignment is false
+  // - User is not a system user, since system users dont partake in assignment
+  const shouldUnassign =
+    isWriteAction(input.type) &&
+    !input.keepAssignment &&
+    user.type !== TokenUserType.enum.system
+
+  if (shouldUnassign) {
+    await eventsRepo.createAction({
+      eventId,
+      transactionId: input.transactionId,
+      actionType: ActionType.UNASSIGN,
+      status: ActionStatus.Accepted,
+      createdBy: user.id,
+      createdByRole: user.role,
+      createdByUserType: user.type,
+      createdBySignature: user.signature,
+      createdAtLocation: user.primaryOfficeId
+    })
+  }
+
+  const drafts = await draftsRepo.getDraftsForAction(
+    eventId,
+    user.id,
+    input.type
+  )
+
+  await cleanUnreferencedAttachmentsFromPreviousDrafts(
+    token,
+    fieldConfigs,
+    fileValuesInCurrentAction,
+    drafts
   )
 
   const updatedEvent = await getEventById(eventId)
-  await indexEvent(updatedEvent)
-  await notifyOnAction(input, updatedEvent, token)
+
+  await indexEvent(updatedEvent, configuration)
+
+  if (input.type !== ActionType.READ && input.type !== ActionType.ASSIGN) {
+    await draftsRepo.deleteDraftsByEventId(eventId)
+  }
+
   return updatedEvent
 }
 
-export async function validate(
-  input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
-  {
-    eventId,
-    createdBy,
-    token,
-    createdAtLocation
-  }: {
-    eventId: string
-    createdBy: string
-    createdAtLocation: string
-    token: string
-  }
-) {
-  const config = await getEventConfigurations(token)
-  const storedEvent = await getEventById(eventId)
-  const form = config.find((c) => c.id === storedEvent.type)
-
-  if (!form) {
-    throw new Error(`Form not found with event type: ${storedEvent.type}`)
-  }
-
-  let duplicates: EventIndex[] = []
-
-  const futureEventState = getCurrentEventState({
-    ...storedEvent,
-    actions: [
-      ...storedEvent.actions,
-      {
-        ...input,
-        createdAt: new Date().toISOString(),
-        createdBy,
-        createdAtLocation
-      }
-    ]
-  })
-
-  const resultsFromAllRules = await Promise.all(
-    form.deduplication.map(async (deduplication) => {
-      const matches = await searchForDuplicates(futureEventState, deduplication)
-      return matches
-    })
-  )
-
-  duplicates = resultsFromAllRules
-    .flat()
-    .sort((a, b) => b.score - a.score)
-    .filter((hit): hit is { score: number; event: EventIndex } => !!hit.event)
-    .map((hit) => hit.event)
-    .filter((event, index, self) => {
-      return self.findIndex((t) => t.id === event.id) === index
-    })
-
-  const event = await addAction(
-    { ...input, duplicates: duplicates.map((d) => d.id) },
-    {
-      eventId,
-      createdBy,
-      token,
-      createdAtLocation
-    }
-  )
-  return event
+type AsyncRejectActionInput = Omit<
+  z.infer<typeof AsyncRejectActionDocument>,
+  'createdAt' | 'id' | 'status'
+> & {
+  transactionId: string
+  eventId: UUID
+  originalActionId: UUID
+  createdAtLocation?: UUID
+  createdByUserType: TokenUserType
+  token: string
+  eventType: string
 }
 
-export async function patchEvent(eventInput: EventInputWithId) {
-  const existingEvent = await getEventById(eventInput.id)
+export async function addAsyncRejectAction({
+  transactionId,
+  eventId,
+  type,
+  originalActionId,
+  createdBy,
+  createdByRole,
+  createdByUserType,
+  createdAtLocation,
+  token,
+  eventType
+}: AsyncRejectActionInput) {
+  const configuration = await getEventConfigurationById({
+    token,
+    eventType
+  })
 
-  const db = await events.getClient()
-  const collection = db.collection<EventDocument>('events')
+  await eventsRepo.createAction({
+    eventId,
+    transactionId,
+    actionType: type,
+    status: ActionStatus.Rejected,
+    originalActionId,
+    createdBy,
+    createdByRole,
+    createdByUserType,
+    createdAtLocation
+  })
 
-  const now = new Date().toISOString()
+  const updatedEvent = await getEventById(eventId)
+  await indexEvent(updatedEvent, configuration)
+  await draftsRepo.deleteDraftsByEventId(eventId)
 
-  await collection.updateOne(
-    {
-      id: eventInput.id
-    },
-    {
-      $set: {
-        ...eventInput,
-        updatedAt: now
-      }
-    }
-  )
-
-  const event = await getEventById(existingEvent.id)
-  await indexEvent(event)
-
-  return event
+  return updatedEvent
 }

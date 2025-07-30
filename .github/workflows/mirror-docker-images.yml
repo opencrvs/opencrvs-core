@@ -1,0 +1,88 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at https://mozilla.org/MPL/2.0/.
+#
+# OpenCRVS is also distributed under the terms of the Civil Registration
+# & Healthcare Disclaimer located at http://opencrvs.org/license.
+#
+# Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+name: Mirror Docker Images to GHCR
+
+on:
+  schedule:
+    # Run 30 mins after trivy DB runs (the trivy job takes 15 mins max)
+    # https://github.com/aquasecurity/trivy-db/blob/cfa337a1088bbcee598ab93656c83fe6b9acb946/.github/workflows/cron.yml#L5
+    # https://github.com/aquasecurity/trivy-db/actions
+    - cron: '30 */6 * * *'
+
+  workflow_dispatch: # Allows manual triggering of the workflow
+
+jobs:
+  mirror-dbs:
+    runs-on: ubuntu-24.04
+    env:
+      RETRIES: 100
+    strategy:
+      matrix:
+        images:
+          - source: ghcr.io/aquasecurity/trivy-db:2
+            target: ghcr.io/${{ github.repository_owner }}/trivy-db:2
+          - source: ghcr.io/aquasecurity/trivy-java-db:1
+            target: ghcr.io/${{ github.repository_owner }}/trivy-java-db:1
+          - source: ghcr.io/aquasecurity/trivy-checks:1
+            target: ghcr.io/${{ github.repository_owner }}/trivy-checks:1
+          - source: docker.elastic.co/apm/apm-server:7.17.22
+            target: ghcr.io/${{ github.repository_owner }}/apm-server:7.17.22
+          - source: docker.elastic.co/elasticsearch/elasticsearch:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/elasticsearch:8.16.4
+          - source: docker.elastic.co/kibana/kibana:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/kibana:8.16.4
+          - source: docker.elastic.co/beats/filebeat:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/filebeat:8.16.4
+          - source: docker.elastic.co/beats/metricbeat:8.16.4
+            target: ghcr.io/${{ github.repository_owner }}/metricbeat:8.16.4
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+
+      - name: Create mirror-image.sh script
+        run: |
+          cat << 'EOF' > mirror-image.sh
+          #!/usr/bin/env bash
+          set -o errexit -o nounset -o pipefail
+
+          if [ "$#" -ne 3 ]; then
+            echo "Usage: $0 <source_image> <destination_image> <retries>"
+            exit 1
+          fi
+
+          SOURCE_IMAGE="docker://${1}"
+          DESTINATION_IMAGE="docker://${2}"
+          RETRIES=$3
+          COUNT=0
+
+          until skopeo copy "$SOURCE_IMAGE" "$DESTINATION_IMAGE" || [ $COUNT -ge $RETRIES ]; do
+            COUNT=$((COUNT+1))
+            echo "Retry $COUNT/$RETRIES for $SOURCE_IMAGE to $DESTINATION_IMAGE..."
+            sleep 1
+          done
+
+          if [ $COUNT -ge $RETRIES ]; then
+            echo "Failed to mirror $SOURCE_IMAGE after $RETRIES attempts."
+            exit 1
+          fi
+
+          echo "Successfully mirrored $SOURCE_IMAGE to $DESTINATION_IMAGE."
+          EOF
+
+      - name: Make mirror-image.sh executable
+        run: chmod +x mirror-image.sh
+
+
+      - name: Mirror ${{ matrix.images.source }} to ${{ matrix.images.target }}
+        run: |
+          ./mirror-image.sh "${{ matrix.images.source }}" "${{ matrix.images.target }}" "${{ env.RETRIES }}"

@@ -108,6 +108,7 @@ export const composeDocument = (
 
   createIndexBody(body, composition, record)
   updateCompositionBodyWithDuplicateIds(composition, body)
+
   return body
 }
 

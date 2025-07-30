@@ -15,7 +15,7 @@ import { constantsMessages, userMessages } from '@client/i18n/messages'
 import { integrationMessages } from '@client/i18n/messages/views/integrations'
 import { ILocation } from '@client/offline/reducer'
 import { formatLongDate } from '@client/utils/date-formatting'
-import { Avatar, History, RegStatus, SystemType } from '@client/utils/gateway'
+import { Avatar, History, RegStatus } from '@client/utils/gateway'
 import type { GQLHumanName } from '@client/utils/gateway-deprecated-do-not-use'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { getIndividualNameObj } from '@client/utils/userUtils'
@@ -26,6 +26,7 @@ import { Box } from '@opencrvs/components/lib/icons/Box'
 import { Pagination } from '@opencrvs/components/lib/Pagination'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
+import { Stack } from '@opencrvs/components/lib/Stack'
 import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
@@ -44,6 +45,7 @@ import { useNavigate } from 'react-router-dom'
 import { formatUrl } from '@client/navigation'
 import * as routes from '@client/navigation/routes'
 import { stringify } from 'query-string'
+import { SystemRole } from '@opencrvs/commons/client'
 
 const TableDiv = styled.div`
   overflow: auto;
@@ -54,7 +56,6 @@ const LargeGreyedInfo = styled.div`
   background-color: ${({ theme }) => theme.colors.grey200};
   max-width: 100%;
   border-radius: 4px;
-  margin: 15px 0px;
 `
 
 const NameAvatar = styled.div`
@@ -124,12 +125,12 @@ const GetNameWithAvatar = ({
 }
 
 function getSystemType(type: string | undefined) {
-  if (type === SystemType.RecordSearch) {
+  if (type === SystemRole.enum.RECORD_SEARCH) {
     return integrationMessages.recordSearch
   }
   return integrationMessages.healthSystem
 }
-
+/* eslint-disable-next-line @typescript-eslint/no-explicit-any */
 const getIndexByAction = (histories: any, index: number): number => {
   const newHistories = [...histories]
   if (
@@ -180,13 +181,16 @@ export const GetHistory = ({
     return (
       <>
         <Divider />
-        <Text variant="h3" element="h3" color="copy">
-          {intl.formatMessage(constantsMessages.history)}
-        </Text>
-        <LargeGreyedInfo />
+        <Stack direction="column" alignItems="stretch" gap={16}>
+          <Text variant="h3" element="h3" color="copy">
+            {intl.formatMessage(constantsMessages.history)}
+          </Text>
+          <LargeGreyedInfo />
+        </Stack>
       </>
     )
   let allHistoryData = (draft.data.history || []) as unknown as {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     [key: string]: any
   }[]
   if (!allHistoryData.length && userDetails) {
@@ -361,29 +365,31 @@ export const GetHistory = ({
   return (
     <>
       <Divider />
-      <Text variant="h3" element="h3" color="copy">
-        {intl.formatMessage(constantsMessages.history)}
-      </Text>
-      <TableDiv>
-        <Table
-          id="task-history"
-          fixedWidth={1088}
-          noResultText=""
-          columns={columns}
-          content={historyData}
-          highlightRowOnMouseOver
-          pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
-        />
-        {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
-          <Pagination
-            currentPage={currentPageNumber}
-            totalPages={Math.ceil(
-              allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
-            )}
-            onPageChange={onPageChange}
+      <Stack direction="column" alignItems="stretch" gap={16}>
+        <Text variant="h3" element="h3" color="copy">
+          {intl.formatMessage(constantsMessages.history)}
+        </Text>
+        <TableDiv>
+          <Table
+            id="task-history"
+            fixedWidth={1088}
+            noResultText=""
+            columns={columns}
+            content={historyData}
+            highlightRowOnMouseOver
+            pageSize={DEFAULT_HISTORY_RECORD_PAGE_SIZE}
           />
-        )}
-      </TableDiv>
+          {allHistoryData.length > DEFAULT_HISTORY_RECORD_PAGE_SIZE && (
+            <Pagination
+              currentPage={currentPageNumber}
+              totalPages={Math.ceil(
+                allHistoryData.length / DEFAULT_HISTORY_RECORD_PAGE_SIZE
+              )}
+              onPageChange={onPageChange}
+            />
+          )}
+        </TableDiv>
+      </Stack>
     </>
   )
 }

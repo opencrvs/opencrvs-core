@@ -10,25 +10,31 @@
  */
 
 import React from 'react'
-
-import { noop } from 'lodash'
 import { useNavigate } from 'react-router-dom'
-import {
-  AppBar,
-  Button,
-  Frame,
-  Icon,
-  SearchTool,
-  Stack
-} from '@opencrvs/components'
+import { useIntl } from 'react-intl'
+import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
+import { ProfileMenu } from '@client/components/ProfileMenu'
+import * as routes from '@client/navigation/routes'
+import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
+import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
+import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { Hamburger } from '../sidebar/Hamburger'
+import { Sidebar } from '../sidebar/Sidebar'
 
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
+
 export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
+  const { slug: workqueueSlug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const navigate = useNavigate()
+  const intl = useIntl()
+  const workqueues = useWorkqueueConfigurations()
+
+  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
   return (
     <Frame
@@ -37,6 +43,7 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
           desktopCenter={
             <Stack gap={16}>
               <Button
+                id="header-new-event"
                 type="iconPrimary"
                 onClick={() => {
                   navigate(ROUTES.V2.EVENTS.CREATE.path)
@@ -45,22 +52,22 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
                 <Plus />
               </Button>
 
-              <SearchTool
-                language="en"
-                searchHandler={noop}
-                searchTypeList={[
-                  {
-                    name: 'TRACKING_ID',
-                    label: 'Tracking ID',
-                    icon: <Icon name="MagnifyingGlass" size="small" />,
-                    placeHolderText: 'Search'
-                  }
-                ]}
-              />
+              <SearchToolbar />
             </Stack>
           }
+          desktopRight={<ProfileMenu key="profileMenu" />}
+          mobileLeft={<Hamburger />}
+          mobileRight={
+            <Button type={'icon'} onClick={() => navigate(routes.SEARCH)}>
+              <Icon color="primary" name="MagnifyingGlass" size="medium" />
+            </Button>
+          }
+          mobileTitle={intl.formatMessage(
+            workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
+          )}
         />
       }
+      navigation={<Sidebar key={workqueueSlug} />}
       skipToContentText="skip"
     >
       {children}

@@ -182,6 +182,7 @@ describe('ForgotPIN tests', () => {
   })
 
   it('clicking on logout removes indexedDB entries', async () => {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const indexeddb: Record<string, any> = {
       [SCREEN_LOCK]: true,
       [SECURITY_PIN_EXPIRED_AT]: 1234
@@ -202,6 +203,7 @@ describe('ForgotPIN tests', () => {
   })
 
   it('clicking on forgot password logs out and redirects to forgot password screen of login app', async () => {
+    /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
     const indexeddb: Record<string, any> = {
       [SCREEN_LOCK]: true,
       [SECURITY_PIN_EXPIRED_AT]: 1234

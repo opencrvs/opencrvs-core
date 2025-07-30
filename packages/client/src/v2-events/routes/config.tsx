@@ -9,73 +9,114 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React from 'react'
-import { Outlet } from 'react-router-dom'
+import React, { useEffect } from 'react'
+import { Outlet, RouteObject, Routes } from 'react-router-dom'
+
+import { useSelector } from 'react-redux'
+import { ActionType } from '@opencrvs/commons/client'
 import { Debug } from '@client/v2-events/features/debug/debug'
+import { router as correctionRouter } from '@client/v2-events/features/events/actions/correct/request/router'
 import * as Declare from '@client/v2-events/features/events/actions/declare'
-import { DeleteEvent } from '@client/v2-events/features/events/actions/delete'
+import { DeleteEventIndex } from '@client/v2-events/features/events/actions/delete'
+import * as PrintCertificate from '@client/v2-events/features/events/actions/print-certificate'
 import * as Register from '@client/v2-events/features/events/actions/register'
-import { ValidateEvent } from '@client/v2-events/features/events/actions/validate'
-import { EventSelection } from '@client/v2-events/features/events/EventSelection'
+import * as Validate from '@client/v2-events/features/events/actions/validate'
+import {
+  AdvancedSearch,
+  SearchResult
+} from '@client/v2-events/features/events/Search'
+import { EventSelectionIndex } from '@client/v2-events/features/events/EventSelection'
 import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
-import { WorkqueueIndex } from '@client/v2-events/features/workqueues/Workqueue'
-import { WorkqueueLayout } from '@client/v2-events/layouts'
-import { TRPCProvider } from '@client/v2-events/trpc'
+import { router as workqueueRouter } from '@client/v2-events/features/workqueues/router'
+import { EventOverviewLayout, WorkqueueLayout } from '@client/v2-events/layouts'
+import { TRPCErrorBoundary } from '@client/v2-events/routes/TRPCErrorBoundary'
+import {
+  queryClient,
+  trpcOptionsProxy,
+  TRPCProvider
+} from '@client/v2-events/trpc'
+import { DeclarationAction } from '@client/v2-events/features/events/components/Action/DeclarationAction'
+import { NavigationHistoryProvider } from '@client/v2-events/components/NavigationStack'
+import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyView'
+import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
+import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
+import { getUserDetails } from '@client/profile/profileSelectors'
+import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { ROUTES } from './routes'
+import { Toaster } from './Toaster'
+
+function PrefetchQueries() {
+  useEffect(() => {
+    void queryClient.prefetchQuery({
+      queryKey: trpcOptionsProxy.locations.get.queryKey()
+    })
+  }, [])
+
+  return null
+}
 
 /**
  * Configuration for the routes of the v2-events feature.
  *
  * Each route is defined as a child of the `ROUTES.V2` route.
  */
+
 export const routesConfig = {
   path: ROUTES.V2.path,
-  element: (
-    <TRPCProvider>
-      <Outlet />
-      <Debug />
-    </TRPCProvider>
-  ),
+  Component: () => {
+    const currentUser = useSelector(getUserDetails)
+
+    if (!currentUser) {
+      throw new Error(
+        'V2 routes cannot be initialised without user details. Make sure user details are fetched before the routes are rendered'
+      )
+    }
+    return (
+      <NavigationHistoryProvider>
+        <TRPCErrorBoundary>
+          <TRPCProvider storeIdentifier={currentUser.id}>
+            <Outlet />
+            <Debug />
+            <Toaster />
+            <PrefetchQueries />
+          </TRPCProvider>
+        </TRPCErrorBoundary>
+      </NavigationHistoryProvider>
+    )
+  },
   children: [
     {
-      path: ROUTES.V2.path,
-      // Alternative would be to create a navigation component that would be used here.
-      element: (
-        <WorkqueueLayout>
-          <WorkqueueIndex />
-        </WorkqueueLayout>
-      ),
-      children: [
-        {
-          index: true,
-          path: ROUTES.V2.WORKQUEUE.path,
-          element: <WorkqueueIndex />
-        }
-      ]
+      element: <RedirectToWorkqueue />,
+      index: true
+    },
+    workqueueRouter,
+    {
+      path: ROUTES.V2.EVENTS.VIEW.path,
+      element: <ReadonlyViewIndex />
     },
     {
       path: ROUTES.V2.EVENTS.OVERVIEW.path,
       element: (
-        <WorkqueueLayout>
+        <EventOverviewLayout>
           <EventOverviewIndex />
-        </WorkqueueLayout>
+        </EventOverviewLayout>
       )
     },
     {
       path: ROUTES.V2.EVENTS.CREATE.path,
-      element: <EventSelection />
+      element: <EventSelectionIndex />
     },
     {
       path: ROUTES.V2.EVENTS.DELETE.path,
-      element: <DeleteEvent />
-    },
-    {
-      path: ROUTES.V2.EVENTS.VALIDATE.path,
-      element: <ValidateEvent />
+      element: <DeleteEventIndex />
     },
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
-      element: <Outlet />,
+      element: (
+        <DeclarationAction actionType={ActionType.DECLARE}>
+          <Outlet />
+        </DeclarationAction>
+      ),
       children: [
         {
           index: true,
@@ -92,8 +133,35 @@ export const routesConfig = {
       ]
     },
     {
+      path: ROUTES.V2.EVENTS.VALIDATE.path,
+      element: (
+        <DeclarationAction actionType={ActionType.VALIDATE}>
+          <Outlet />
+        </DeclarationAction>
+      ),
+      children: [
+        {
+          index: true,
+          element: <Validate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.VALIDATE.PAGES.path,
+          element: <Validate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.VALIDATE.REVIEW.path,
+          element: <Validate.Review />
+        }
+      ]
+    },
+    correctionRouter,
+    {
       path: ROUTES.V2.EVENTS.REGISTER.path,
-      element: <Outlet />,
+      element: (
+        <DeclarationAction actionType={ActionType.REGISTER}>
+          <Outlet />
+        </DeclarationAction>
+      ),
       children: [
         {
           index: true,
@@ -108,6 +176,52 @@ export const routesConfig = {
           element: <Register.Review />
         }
       ]
+    },
+    {
+      path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.path,
+      element: (
+        <AnnotationAction actionType={ActionType.PRINT_CERTIFICATE}>
+          <Outlet />
+        </AnnotationAction>
+      ),
+      children: [
+        {
+          index: true,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.PAGES.path,
+          element: <PrintCertificate.Pages />
+        },
+        {
+          path: ROUTES.V2.EVENTS.PRINT_CERTIFICATE.REVIEW.path,
+          element: <PrintCertificate.Review />
+        }
+      ]
+    },
+    {
+      path: ROUTES.V2.ADVANCED_SEARCH.path,
+      element: (
+        <WorkqueueLayout>
+          <AdvancedSearch />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.SEARCH_RESULT.path,
+      element: (
+        <WorkqueueLayout>
+          <SearchResult />
+        </WorkqueueLayout>
+      )
+    },
+    {
+      path: ROUTES.V2.SEARCH.path,
+      element: (
+        <WorkqueueLayout>
+          <QuickSearchIndex />
+        </WorkqueueLayout>
+      )
     }
   ]
-}
+} satisfies RouteObject

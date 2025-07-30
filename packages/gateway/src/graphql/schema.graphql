@@ -213,6 +213,7 @@ type Mutation {
     identifierType: String!
     identifierValue: String!
   ): ID!
+  updateField(id: ID!, details: UpdateFieldInput!): Boolean!
   createOrUpdateUser(user: UserInput!): User!
   activateUser(
     userId: String!
@@ -427,7 +428,7 @@ type TotalMetricsResult {
 }
 
 union MixedTotalMetricsResult =
-    TotalMetricsByRegistrar
+  | TotalMetricsByRegistrar
   | TotalMetricsByLocation
   | TotalMetricsByTime
 
@@ -690,6 +691,12 @@ input ConfirmRegistrationInput {
 input RejectRegistrationInput {
   reason: String!
   comment: String
+}
+
+input UpdateFieldInput {
+  fieldId: String!
+  valueString: String
+  valueBoolean: Boolean
 }
 
 input UserInput {
@@ -1024,7 +1031,7 @@ type VSExport {
 }
 
 union UserAuditLogResultItem =
-    UserAuditLogItemWithComposition
+  | UserAuditLogItemWithComposition
   | UserAuditLogItem
 
 interface EventSearchSet {
@@ -1068,6 +1075,7 @@ enum SystemType {
   HEALTH
   RECORD_SEARCH
   WEBHOOK
+  IMPORT
 }
 
 enum IntegratingSystemType {

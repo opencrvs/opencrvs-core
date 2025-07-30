@@ -74,7 +74,8 @@ describe('authenticate handler receives a request', () => {
     it('generates a mobile verification code and sends it to notification gateway', async () => {
       server = await createProductionEnvironmentServer()
 
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      /* eslint-disable @typescript-eslint/no-require-imports */
+      /* eslint-disable @typescript-eslint/no-var-requires */
       const reloadedCodeService = require('../verifyCode/service')
 
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')
@@ -109,7 +110,6 @@ describe('authenticate handler receives a request', () => {
     it('does not generate a mobile verification code for pending users', async () => {
       server = await createProductionEnvironmentServer()
 
-      // eslint-disable-next-line
       const reloadedCodeService = require('../verifyCode/service')
 
       jest.spyOn(reloadedCodeService, 'generateNonce').mockReturnValue('12345')

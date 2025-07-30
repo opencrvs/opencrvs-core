@@ -101,11 +101,21 @@ export const getRoutes = () => {
       }
     },
     {
-      method: 'DELETE',
-      path: '/files/{filename}',
+      method: 'GET',
+      path: '/presigned-url/{filePath*}',
       handler: async (req, h) => {
         return h.proxy({
-          uri: `${DOCUMENTS_URL}/files/${req.params.filename}`,
+          uri: `${DOCUMENTS_URL}/presigned-url/${req.params.filePath}`,
+          passThrough: true
+        })
+      }
+    },
+    {
+      method: 'DELETE',
+      path: '/files/{filePath*}',
+      handler: async (req, h) => {
+        return h.proxy({
+          uri: `${DOCUMENTS_URL}/files/${req.params.filePath}`,
           passThrough: true
         })
       },

@@ -11,8 +11,16 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
+import { FullDocumentPath, joinURLPaths } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
+import {
+  cacheFile,
+  getFullDocumentPath,
+  getUnsignedFileUrl,
+  removeCached
+} from '@client/v2-events/cache'
+import { fetchFileFromUrl } from '@client/utils/imageUtils'
 
 async function uploadFile({
   file,
@@ -20,6 +28,7 @@ async function uploadFile({
 }: {
   file: File
   transactionId: string
+  id: string
 }): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
@@ -58,61 +67,27 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
 const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
-/* Must match the one defined src-sw.ts */
-const CACHE_NAME = 'workbox-runtime'
+async function getPresignedUrl(filePath: FullDocumentPath) {
+  const url = joinURLPaths('/api/presigned-url', filePath)
 
-function withPostfix(str: string, postfix: string) {
-  if (str.endsWith(postfix)) {
-    return str
-  }
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${getToken()}`
+    }
+  })
 
-  return str + postfix
+  const res = await response.json()
+  return res
 }
 
-export function getFullURL(filename: string) {
-  const minioURL = window.config.MINIO_URL
-  if (minioURL && typeof minioURL === 'string') {
-    return new URL(filename, withPostfix(minioURL, '/')).toString()
-  }
+export async function precacheFile(path: FullDocumentPath) {
+  const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
-  throw new Error('MINIO_URL is not defined')
-}
+  const file = await fetchFileFromUrl(presignedUrl, path)
+  const url = getUnsignedFileUrl(path)
 
-async function cacheFile(filename: string, file: File) {
-  const temporaryBlob = new Blob([file], { type: file.type })
-  const cacheKeys = await caches.keys()
-
-  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
-
-  if (!cacheKey) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
-    )
-    return
-  }
-
-  const cache = await caches.open(cacheKey)
-  return cache.put(
-    getFullURL(filename),
-    new Response(temporaryBlob, { headers: { 'Content-Type': file.type } })
-  )
-}
-
-async function removeCached(filename: string) {
-  const cacheKeys = await caches.keys()
-  const cacheKey = cacheKeys.find((key) => key.startsWith(CACHE_NAME))
-
-  if (!cacheKey) {
-    // eslint-disable-next-line no-console
-    console.error(
-      `Cache ${CACHE_NAME} not found. Is service worker running properly?`
-    )
-    return
-  }
-
-  const cache = await caches.open(cacheKey)
-  return cache.delete(getFullURL(filename))
+  await cacheFile({ url, file })
 }
 
 queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
@@ -130,7 +105,8 @@ interface Options {
   onSuccess?: (data: {
     originalFilename: string
     type: string
-    filename: string
+    path: FullDocumentPath
+    id: string
   }) => void
 }
 
@@ -138,21 +114,20 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   const upload = useMutation({
     mutationFn: uploadFile,
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, transactionId }) => {
+    onMutate: async ({ file, transactionId, id }) => {
       const extension = file.name.split('.').pop()
-      const temporaryUrl = `${transactionId}.${extension}`
-
-      await cacheFile(temporaryUrl, file)
+      const temporaryFilename = `${transactionId}.${extension}`
+      const path = getFullDocumentPath(temporaryFilename)
+      const url = getUnsignedFileUrl(path)
+      await cacheFile({ url, file })
 
       options.onSuccess?.({
         ...file,
         originalFilename: file.name,
         type: file.type,
-        filename: temporaryUrl
+        path,
+        id
       })
-    },
-    onSuccess: (data) => {
-      void removeCached(data.url)
     }
   })
 
@@ -165,12 +140,21 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
   })
 
   return {
-    getFullURL,
     deleteFile: (filename: string) => {
       return del.mutate({ filename })
     },
-    uploadFiles: (file: File) => {
-      return upload.mutate({ file, transactionId: uuid() })
+    /**
+     * Uploads a file with an optional identifier.
+     *
+     * @param file - The file to be uploaded.
+     * @param id An optional identifier for the file. Allows the caller to track the file when its upload completes.
+     */
+    uploadFile: (file: File, id = 'default') => {
+      return upload.mutate({
+        file,
+        transactionId: uuid(),
+        id
+      })
     }
   }
 }

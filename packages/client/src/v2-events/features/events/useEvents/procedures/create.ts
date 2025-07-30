@@ -9,44 +9,112 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { CreatedAction, getCurrentEventState } from '@opencrvs/commons/client'
-import { api, utils } from '@client/v2-events/trpc'
+import { useMutation } from '@tanstack/react-query'
+import type {
+  DecorateMutationProcedure,
+  inferInput
+} from '@trpc/tanstack-react-query'
+import {
+  ActionType,
+  CreatedAction,
+  getCurrentEventState,
+  ActionStatus,
+  getUUID,
+  EventInput,
+  UUID
+} from '@opencrvs/commons/client'
 
-utils.event.create.setMutationDefaults(({ canonicalMutationFn }) => ({
-  mutationFn: canonicalMutationFn,
+import {
+  findLocalEventConfig,
+  refetchEventsList,
+  setEventData,
+  setEventListData
+} from '@client/v2-events/features/events/useEvents/api'
+import { queryClient, useTRPC, trpcOptionsProxy } from '@client/v2-events/trpc'
+
+import { createTemporaryId } from '@client/v2-events/utils'
+import { setMutationDefaults } from './utils'
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function createEventCreationMutation<P extends DecorateMutationProcedure<any>>(
+  trpcProcedure: P
+) {
+  const mutationOptions = {
+    ...trpcProcedure.mutationOptions(),
+    ...queryClient.getMutationDefaults(trpcProcedure.mutationKey())
+  }
+
+  if (!mutationOptions.mutationFn) {
+    throw new Error(
+      'No mutation fn found for operation. This should never happen'
+    )
+  }
+
+  const defaultMutationFn = mutationOptions.mutationFn
+
+  return async (params: inferInput<P>) =>
+    defaultMutationFn({
+      ...params,
+      declaration: params.declaration
+    })
+}
+
+setMutationDefaults(trpcOptionsProxy.event.create, {
   retry: true,
+  retryDelay: 3333,
+  mutationFn: createEventCreationMutation(trpcOptionsProxy.event.create),
   onMutate: (newEvent) => {
     const optimisticEvent = {
-      id: newEvent.transactionId,
+      id: newEvent.transactionId as UUID, // not actually an UUID, but as as it's temporary for the optimistic update, we can satisfy the type this way
       type: newEvent.type,
+      trackingId: '', // Tracking ID is generated on the server side, so optimistic event can use an empty string as a placeholder
       transactionId: newEvent.transactionId,
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       actions: [
         {
-          type: 'CREATE',
+          type: ActionType.CREATE,
+          id: createTemporaryId(),
           createdAt: new Date().toISOString(),
           createdBy: 'offline',
-          createdAtLocation: 'TODO',
-          draft: false,
-          data: {}
+          createdByUserType: 'user',
+          createdByRole: 'offline',
+          createdAtLocation: '00000000-0000-0000-0000-000000000000' as UUID,
+          declaration: {},
+          status: ActionStatus.Accepted,
+          transactionId: getUUID()
         } satisfies CreatedAction
       ]
     }
 
-    utils.event.get.setData(newEvent.transactionId, optimisticEvent)
-    utils.event.list.setData(undefined, (eventIndices) =>
-      eventIndices?.concat(getCurrentEventState(optimisticEvent))
-    )
+    setEventData(newEvent.transactionId, optimisticEvent)
+    setEventListData((eventIndices) => {
+      const eventConfig = findLocalEventConfig(optimisticEvent.type)
+      return eventConfig
+        ? eventIndices?.concat(
+            getCurrentEventState(optimisticEvent, eventConfig)
+          )
+        : eventIndices
+    })
     return optimisticEvent
   },
-  onSuccess: async (response) => {
-    utils.event.get.setData(response.id, response)
-    utils.event.get.setData(response.transactionId, response)
-    await utils.event.list.invalidate()
+  onSuccess: async (response, _variables, context) => {
+    setEventData(response.id, response)
+    setEventData(context.transactionId, response)
+    await refetchEventsList()
   }
-}))
+})
 
-export function createEvent() {
-  return api.event.create.useMutation({})
+export function useCreateEvent() {
+  const trpc = useTRPC()
+  const options = trpc.event.create.mutationOptions<EventInput>()
+
+  const overrides = queryClient.getMutationDefaults(
+    trpcOptionsProxy.event.create.mutationKey()
+  )
+
+  return useMutation({
+    ...options,
+    ...overrides
+  })
 }

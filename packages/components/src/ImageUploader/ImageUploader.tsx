@@ -57,6 +57,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       {children}
       <HiddenInput
         name={props.name}
+        data-testid={props.name}
         ref={fileUploader}
         type="file"
         accept="image/*"

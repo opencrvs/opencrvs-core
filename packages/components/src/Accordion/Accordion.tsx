@@ -36,8 +36,20 @@ const AccordionHeader = styled.div`
 `
 
 const AccordionHeaderTitle = styled.div`
+  flex: 1;
   h2 {
     margin-top: 0;
+    margin-bottom: 6px;
+  }
+`
+
+const TitleContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  @media (max-width: ${({ theme }) => theme.grid.breakpoints.md}px) {
+    flex-direction: column;
     margin-bottom: 6px;
   }
 `
@@ -60,6 +72,7 @@ export interface IAccordionProps {
   labelForHideAction: string
   action?: React.ReactNode
   status?: React.ReactNode
+  pills?: React.ReactNode
   children: React.ReactNode
   expand?: boolean
 }
@@ -71,20 +84,24 @@ export const Accordion = ({
   labelForShowAction,
   labelForHideAction,
   children,
+  pills,
   expand
 }: IAccordionProps) => {
   const [isActive, setIsActive] = useState<boolean>(expand || false)
 
   return (
-    <Container id={`${name}-accordion`}>
+    <Container id={`${name}-accordion`} data-testid={`accordion-${name}`}>
       <AccordionHeader
         id={`${name}-accordion-header`}
         onClick={() => setIsActive(!isActive)}
       >
         <AccordionHeaderTitle>
-          <Text element={'h2'} variant={'h3'}>
-            {label}
-          </Text>
+          <TitleContainer>
+            <Text element={'h2'} variant={'h3'}>
+              {label}
+            </Text>
+            {pills}
+          </TitleContainer>
           {!isActive && (
             <Stack gap={4}>
               <Icon name={'CaretRight'} color={'primary'} size={'small'} />

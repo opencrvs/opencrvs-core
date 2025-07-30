@@ -14,7 +14,7 @@ import { resolve } from 'url'
 import { readFileSync } from 'fs'
 import { promisify } from 'util'
 import * as jwt from 'jsonwebtoken'
-import { get, set } from '@auth/database'
+import { redis } from '@auth/database'
 import * as t from 'io-ts'
 import {
   NotificationEvent,
@@ -25,7 +25,7 @@ import {
 import { logger, UUID } from '@opencrvs/commons'
 import { unauthorized } from '@hapi/boom'
 import * as F from 'fp-ts'
-import { Scope } from '@opencrvs/commons/authentication'
+import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
 const { pipe } = F.function
 import { env } from '@auth/environment'
@@ -123,9 +123,10 @@ export async function createToken(
   scope: string[],
   audience: string[],
   issuer: string,
-  temporary?: boolean
+  temporary?: boolean,
+  userType: TokenUserType = TokenUserType.enum.user
 ): Promise<string> {
-  return sign({ scope }, cert, {
+  return sign({ scope, userType }, cert, {
     subject: userId,
     algorithm: 'RS256',
     expiresIn: temporary
@@ -178,14 +179,14 @@ export async function storeUserInformation(
   mobile?: string,
   email?: string
 ) {
-  return set(
+  return redis.set(
     `user_information_${nonce}`,
     JSON.stringify({ userId, scope, userFullName, mobile, email })
   )
 }
 
 export async function getStoredUserInformation(nonce: string) {
-  const record = await get(`user_information_${nonce}`)
+  const record = await redis.get(`user_information_${nonce}`)
   if (record === null) {
     throw new UserInfoNotFoundError('user not found')
   }

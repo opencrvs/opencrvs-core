@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-// eslint-disable-next-line import/no-relative-parent-imports
+
 import { AugmentedRequest } from '@apollo/datasource-rest'
 import { DOCUMENTS_URL } from '@gateway/constants'
 import { OpenCRVSRESTDataSource } from '@gateway/graphql/data-source'
@@ -24,7 +24,7 @@ export default class MinioAPI extends OpenCRVSRESTDataSource {
     request.headers['Content-Type'] = 'application/fhir+json'
   }
 
-  getStaticData(fileUri: string) {
-    return this.get(`/presigned-url${fileUri}`)
+  getStaticData(filePath: string) {
+    return this.get(`/presigned-url${filePath}`)
   }
 }

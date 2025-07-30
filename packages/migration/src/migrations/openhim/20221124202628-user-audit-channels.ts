@@ -9,9 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Db, MongoClient } from 'mongodb'
-import { Channel } from '../../utils/openhim-helpers.js'
-
 import {
+  Channel,
   addRouteToChannel,
   removeRouteFromChannel,
   upsertChannel,

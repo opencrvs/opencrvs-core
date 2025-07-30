@@ -95,12 +95,15 @@ async function deactivateSuperuser(token: string) {
 async function main() {
   const token = await getToken()
 
+  // eslint-disable-next-line no-console
   console.log('Seeding locations for v1 system')
   await seedLocations(token)
 
+  // eslint-disable-next-line no-console
   console.log('Seeding locations for v2 system (events)')
   await seedLocationsForV2Events(token)
 
+  // eslint-disable-next-line no-console
   console.log('Seeding users')
   await seedUsers(token)
   await deactivateSuperuser(token)

@@ -20,7 +20,7 @@ import { IOfflineData } from '@client/offline/reducer'
 import { connect } from 'react-redux'
 import { IStoreState } from '@client/store'
 import { getOfflineData } from '@client/offline/selectors'
-import { Box, Text, Toast } from '@opencrvs/components'
+import { Stack, Box, Text, Toast } from '@opencrvs/components'
 import { BackgroundWrapper, LogoContainer } from '@client/views/common/Common'
 import styled from 'styled-components'
 
@@ -29,7 +29,7 @@ type IProps = IntlShapeProps & {
   offlineCountryConfiguration: IOfflineData
 }
 
-const Content = styled.div`
+const Content = styled(Stack)`
   padding: 16px 0;
 `
 
@@ -98,7 +98,7 @@ const CreatePinComponent = ({
   return (
     <BackgroundWrapper>
       <Box id="Box">
-        <Content>
+        <Content direction="column" gap={16} justifyContent="flex-start">
           <LogoContainer>
             <CountryLogo
               size="small"

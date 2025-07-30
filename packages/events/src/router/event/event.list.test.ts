@@ -9,8 +9,25 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventStatus } from '@opencrvs/commons'
+import { TRPCError } from '@trpc/server'
+import { SCOPES } from '@opencrvs/commons'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+
+test('prevents forbidden access if missing required scope', async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [])
+
+  await expect(client.event.list()).rejects.toMatchObject(
+    new TRPCError({ code: 'FORBIDDEN' })
+  )
+})
+
+test(`allows access with required scope`, async () => {
+  const { user } = await setupTestCase()
+  const client = createTestClient(user, [SCOPES.RECORD_READ])
+
+  await expect(client.event.list()).resolves.not.toThrow()
+})
 
 test('Returns empty list when no events', async () => {
   const { user } = await setupTestCase()
@@ -34,35 +51,22 @@ test('Returns multiple events', async () => {
   expect(events).toHaveLength(10)
 })
 
-test('Returns aggregated event with updated status and values', async () => {
+test('Does not return draft events unless they are created by the fetching user', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
-  const initialData = { name: 'John Doe', favouriteFruit: 'Banana' }
-  const event = await client.event.create(generator.event.create())
-  await client.event.actions.declare(
-    generator.event.actions.declare(event.id, {
-      data: initialData
-    })
-  )
+  // Create 3 events created by the fetching user
+  await client.event.create(generator.event.create())
+  await client.event.create(generator.event.create())
+  await client.event.create(generator.event.create())
 
-  const initialEvents = await client.event.list()
+  // Create 2 events created by other users
+  const { user: otherUser } = await setupTestCase()
+  const otherClient = createTestClient(otherUser)
+  await otherClient.event.create(generator.event.create())
+  await otherClient.event.create(generator.event.create())
 
-  expect(initialEvents).toHaveLength(1)
-  expect(initialEvents[0].status).toBe(EventStatus.DECLARED)
-  expect(initialEvents[0].data).toEqual(initialData)
+  const events = await client.event.list()
 
-  const updatedData = { name: 'John Doe', favouriteFruit: 'Strawberry' }
-  await client.event.actions.declare(
-    generator.event.actions.declare(event.id, {
-      data: updatedData
-    })
-  )
-
-  const updatedEvents = await client.event.list()
-
-  expect(updatedEvents).toHaveLength(1)
-
-  expect(updatedEvents[0].status).toBe(EventStatus.DECLARED)
-  expect(updatedEvents[0].data).toEqual(updatedData)
+  expect(events).toHaveLength(3)
 })
