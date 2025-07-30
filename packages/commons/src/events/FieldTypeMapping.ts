@@ -89,7 +89,7 @@ type NullishFieldValueSchema = z.ZodOptional<
  * Useful for building dynamic validations against FieldConfig
  */
 export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
-  let schema!: FieldUpdateValueSchema | NullishFieldValueSchema
+  let schema: FieldUpdateValueSchema | NullishFieldValueSchema
   switch (type) {
     case FieldType.DATE:
       schema = DateValue
