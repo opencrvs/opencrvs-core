@@ -15,16 +15,20 @@ import { Action, ActionStatus } from '../ActionDocument'
 import { ActionType, isMetaAction } from '../ActionType'
 import { InherentFlags, EventStatus, Flag } from '../EventMetadata'
 
-function isCertificatePrinted(actions: Action[]) {
+function isPendingCertification(actions: Action[]) {
+  if (getStatusFromActions(actions) !== EventStatus.enum.REGISTERED) {
+    return false
+  }
+
   return actions.reduce<boolean>((prev, { type }) => {
     if (type === ActionType.PRINT_CERTIFICATE) {
-      return true
-    }
-    if (type === ActionType.APPROVE_CORRECTION) {
       return false
     }
+    if (type === ActionType.APPROVE_CORRECTION) {
+      return true
+    }
     return prev
-  }, false)
+  }, true)
 }
 
 function isCorrectionRequested(actions: Action[]) {
@@ -78,8 +82,8 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
       return flag satisfies Flag
     })
 
-  if (isCertificatePrinted(sortedActions)) {
-    flags.push(InherentFlags.PRINTED)
+  if (isPendingCertification(sortedActions)) {
+    flags.push(InherentFlags.PENDING_CERTIFICATION)
   }
   if (isCorrectionRequested(sortedActions)) {
     flags.push(InherentFlags.CORRECTION_REQUESTED)

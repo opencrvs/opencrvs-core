@@ -19,6 +19,7 @@ import {
   getCurrentEventState,
   getMixedPath,
   getUUID,
+  InherentFlags,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
@@ -1103,19 +1104,25 @@ test('Returns relevant events in right order', async () => {
     sanitizeForSnapshot(declaredEvents[0], UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()
 
-  const registeredEvents = await client.event.search({
+  const registeredEventsPendingCertification = await client.event.search({
     type: 'and',
     clauses: [
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
-        status: { type: 'exact', term: EventStatus.enum.REGISTERED }
+        status: { type: 'exact', term: EventStatus.enum.REGISTERED },
+        flags: {
+          anyOf: [InherentFlags.PENDING_CERTIFICATION]
+        }
       }
     ]
   })
 
-  expect(registeredEvents).toHaveLength(1)
+  expect(registeredEventsPendingCertification).toHaveLength(1)
   expect(
-    sanitizeForSnapshot(registeredEvents[0], UNSTABLE_EVENT_FIELDS)
+    sanitizeForSnapshot(
+      registeredEventsPendingCertification[0],
+      UNSTABLE_EVENT_FIELDS
+    )
   ).toMatchSnapshot()
 
   // 3. Search by past timestamp, which should not match to any event.

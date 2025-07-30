@@ -42,11 +42,6 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.PRINT_CERTIFICATE,
     ActionType.REQUEST_CORRECTION
   ],
-  [EventStatus.enum.CERTIFIED]: [
-    ActionType.READ,
-    ActionType.PRINT_CERTIFICATE,
-    ActionType.REQUEST_CORRECTION
-  ],
   [EventStatus.enum.ARCHIVED]: [
     ActionType.READ,
     ActionType.ASSIGN,
@@ -57,13 +52,15 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
 export const getAvailableActionsForEvent = (
   event: EventIndex
 ): ActionType[] => {
-  return event.flags.includes(InherentFlags.REJECTED)
-    ? [
-        ActionType.READ,
-        event.status === EventStatus.Enum.VALIDATED
-          ? ActionType.VALIDATE
-          : ActionType.DECLARE,
-        ActionType.ARCHIVE
-      ]
-    : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+  if (event.flags.includes(InherentFlags.REJECTED)) {
+    return [
+      ActionType.READ,
+      event.status === EventStatus.Enum.VALIDATED
+        ? ActionType.VALIDATE
+        : ActionType.DECLARE,
+      ActionType.ARCHIVE
+    ]
+  }
+
+  return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
 }

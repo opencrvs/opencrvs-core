@@ -15,14 +15,11 @@ import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
-  getAcceptedActions,
   getCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftsToEventIndex,
   deepDropNulls,
-  EventStatus,
-  InherentFlags,
-  VisibleStatus
+  EventStatus
 } from '@opencrvs/commons/client'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
 import { IconWithName } from '@client/v2-events/components/IconWithName'
@@ -59,9 +56,7 @@ function EventOverviewFull({
 }) {
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const status = eventIndex.flags.includes(InherentFlags.REJECTED)
-    ? VisibleStatus.enum.REJECTED
-    : eventIndex.status
+  const { status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
   const drafts = getRemoteDrafts(eventIndex.id)
   const eventWithDrafts = getCurrentEventStateWithDrafts({
@@ -83,9 +78,10 @@ function EventOverviewFull({
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
-    // so the status is taken from the eventIndex
+    // so the status and flags are taken from the eventIndex
     'event.status': status,
-    'event.assignedTo': assignedTo
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
   }
 
   const { getEventTitle } = useEventTitle()
@@ -109,6 +105,7 @@ function EventOverviewFull({
       <EventSummary
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistory fullEvent={event} />
     </Content>
@@ -146,9 +143,10 @@ function EventOverviewProtected({
   const { flags, legalStatuses, ...flattenedEventIndex } = {
     ...flattenEventIndex(eventWithDrafts),
     // drafts should not affect the status of the event
-    // so the status is taken from the eventIndex
+    // so the status and flags are taken from the eventIndex
     'event.status': status,
-    'event.assignedTo': assignedTo
+    'event.assignedTo': assignedTo,
+    flags: eventIndex.flags
   }
 
   const { getEventTitle } = useEventTitle()
@@ -177,6 +175,7 @@ function EventOverviewProtected({
         hideSecuredFields
         event={flattenedEventIndex}
         eventConfiguration={eventConfiguration}
+        flags={flags}
       />
       <EventHistorySkeleton />
     </Content>
