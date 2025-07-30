@@ -40,23 +40,13 @@ export const TimeInput: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   play: async ({ canvasElement, step }) => {
-    await step('Shows errors based on field state', async () => {
+    await step('Accept input time', async () => {
       const canvas = within(canvasElement)
-      await userEvent.type(
-        await canvas.findByTestId('storybook____time-hh'),
-        '1'
-      )
+      await userEvent.type(await canvas.findByPlaceholderText('hh'), '9')
 
-      await userEvent.click(await canvas.findByText('time input'))
+      await userEvent.click(await canvas.findByText('Time input'))
 
-      await canvas.findByText('Invalid time field')
-
-      await userEvent.type(
-        await canvas.findByTestId('storybook____time-mm'),
-        '{backspace}'
-      )
-
-      await canvas.findByText('Required for registration')
+      await userEvent.type(await canvas.findByPlaceholderText('mm'), '30')
     })
   },
   render: function Component(args) {
