@@ -11,7 +11,7 @@
 import { server as mswServer } from '@test/setupServer'
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import * as jwt from 'jsonwebtoken'
 import {
   getStatusFromTask,
@@ -48,16 +48,16 @@ describe('archive record endpoint', () => {
 
     // Fetches a record from search
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
-        (_, res, ctx) => {
-          return res(ctx.json(READY_FOR_REVIEW_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(READY_FOR_REVIEW_BIRTH_RECORD)
         }
       )
     )
 
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'transaction-response',
@@ -72,7 +72,7 @@ describe('archive record endpoint', () => {
           ]
         }
 
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 

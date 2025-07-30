@@ -11,7 +11,7 @@
 import { createServer } from '@workflow/server'
 import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import {
   getStatusFromTask,
@@ -48,16 +48,16 @@ describe('Issue record endpoint', () => {
 
     // Gets record by id via getRecordById endpoint
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/7c3af302-08c9-41af-8701-92de9a71a3e4',
-        (_, res, ctx) => {
-          return res(ctx.json(CERTIFIED_BIRTH_RECORD))
+        () => {
+          return HttpResponse.json(CERTIFIED_BIRTH_RECORD)
         }
       )
     )
 
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'batch-response',
@@ -99,7 +99,7 @@ describe('Issue record endpoint', () => {
             }
           ]
         }
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 

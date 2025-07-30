@@ -12,7 +12,7 @@
 import { createServer } from '@workflow/server'
 import { readFileSync } from 'fs'
 import * as jwt from 'jsonwebtoken'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { server as mswServer } from '@test/setupServer'
 import { bundleWithAssignedTask } from '@test/mocks/unassignedTask'
 import { getTaskFromSavedBundle, Task } from '@opencrvs/commons/types'
@@ -49,24 +49,24 @@ describe('unassign record endpoint', () => {
 
     // Fetches a record from search
     mswServer.use(
-      rest.get(
+      http.get(
         'http://localhost:9090/records/3bd79ffd-5bd7-489f-b0d2-3c6133d36e1e',
-        (_, res, ctx) => {
-          return res(ctx.json(bundleWithAssignedTask))
+        () => {
+          return HttpResponse.json(bundleWithAssignedTask)
         }
       )
     )
 
     // Sends bundle to save in elastic search
     mswServer.use(
-      rest.post('http://localhost:9090/events/unassigned', (_, res, ctx) => {
-        return res(ctx.json({}))
+      http.post('http://localhost:9090/events/unassigned', () => {
+        return HttpResponse.json({})
       })
     )
 
     mswServer.use(
-      rest.post('http://localhost:3030/getUser', (_, res, ctx) => {
-        return res(ctx.json(registrar))
+      http.post('http://localhost:3030/getUser', () => {
+        return HttpResponse.json(registrar)
       })
     )
 

@@ -16,7 +16,7 @@ import * as fetchAny from 'jest-fetch-mock'
 import { EVENT_TYPE } from '@workflow/features/registration/fhir/constants'
 import { Bundle } from '@opencrvs/commons/types'
 import { server as mswServer } from '@test/setupServer'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 
 const fetch = fetchAny as any
 
@@ -27,8 +27,8 @@ describe('Verify utility functions', () => {
 
   it('Generates proper birth tracking id successfully even if countryconfig returns 404', async () => {
     mswServer.use(
-      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
-        res(ctx.status(404))
+      http.post('http://localhost:3040/tracking-id', () =>
+        HttpResponse.json(null, { status: 404 })
       )
     )
     const trackingId = await generateTrackingIdForEvents(
@@ -43,8 +43,8 @@ describe('Verify utility functions', () => {
 
   it('Generates proper death tracking id successfully even if countryconfig returns 404', async () => {
     mswServer.use(
-      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
-        res(ctx.status(404))
+      http.post('http://localhost:3040/tracking-id', () =>
+        HttpResponse.json(null, { status: 404 })
       )
     )
     const trackingId = await generateTrackingIdForEvents(
@@ -60,8 +60,8 @@ describe('Verify utility functions', () => {
 
   it('Generates proper marriage tracking id successfully even if countryconfig returns 404', async () => {
     mswServer.use(
-      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) =>
-        res(ctx.status(404))
+      http.post('http://localhost:3040/tracking-id', () =>
+        HttpResponse.json(null, { status: 404 })
       )
     )
     const trackingId = await generateTrackingIdForEvents(
