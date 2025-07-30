@@ -20,6 +20,7 @@ import {
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
@@ -85,7 +86,7 @@ export function Pages({
     // so that when we get back to the page, we show validation errors for all fields in the page.
     setAllTouchedFields(
       page.fields.reduce((touched, { id: fieldId }) => {
-        return { ...touched, [fieldId]: true }
+        return { ...touched, [makeFormFieldIdFormikCompatible(fieldId)]: true }
       }, initialTouchedFields)
     )
 

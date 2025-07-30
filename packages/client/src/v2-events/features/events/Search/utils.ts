@@ -515,15 +515,23 @@ export function getSearchParamsFieldConfigs(
   const allSearchFields = eventConfig.advancedSearch.flatMap(
     (section) => section.fields
   )
-  const declarationFieldConfigs = getAllUniqueFields(eventConfig).map((x) => {
-    if (x.type === FieldType.ADDRESS) {
-      return { ...x, configuration: { searchMode: true } }
+  const declarationFieldConfigs = getAllUniqueFields(eventConfig).map(
+    (field) => {
+      if (field.type === FieldType.ADDRESS) {
+        return { ...field, configuration: { searchMode: true } }
+      }
+      if (field.type === FieldType.NAME) {
+        return {
+          ...field,
+          configuration: {
+            ...field.configuration,
+            searchMode: true
+          }
+        }
+      }
+      return field
     }
-    if (x.type === FieldType.NAME) {
-      return { ...x, configuration: { searchMode: true } }
-    }
-    return x
-  })
+  )
 
   const metadataFieldConfigs = getMetadataFieldConfigs(allSearchFields)
 
