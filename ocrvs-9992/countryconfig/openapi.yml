@@ -654,7 +654,7 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default:
-            &a10 []
+            &a11 []
         draft:
           type: boolean
         type:
@@ -1695,15 +1695,33 @@ components:
                 firstname:
                   type: string
                   minLength: 1
+                middlename:
+                  type: string
+                  minLength: 1
                 surname:
                   type: string
                   minLength: 1
-              required:
-                - firstname
-                - surname
             configuration:
               type: object
               properties:
+                nameConfig:
+                  type: object
+                  properties:
+                    firstname:
+                      type: string
+                      enum:
+                        &a9
+                        - MANDATORY
+                        - OPTIONAL
+                    middlename:
+                      type: string
+                      enum: *a9
+                    surname:
+                      type: string
+                      enum: *a9
+                  default:
+                    firstname: MANDATORY
+                    surname: MANDATORY
                 maxLength:
                   type: number
                   description: Maximum length of the text
@@ -1711,12 +1729,12 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
-                includeMiddlename:
-                  type: boolean
-                  default: false
-                  description: To make middle name visible in Name form field
                 searchMode:
                   type: boolean
+              default:
+                nameConfig:
+                  firstname: MANDATORY
+                  surname: MANDATORY
           required:
             - id
             - label
@@ -1972,7 +1990,7 @@ components:
                   items:
                     type: string
                     enum:
-                      &a9
+                      &a10
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -2442,7 +2460,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a9
+                    enum: *a10
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2616,7 +2634,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a9
+                    enum: *a10
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -2788,7 +2806,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -2847,7 +2865,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -2906,7 +2924,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -2949,7 +2967,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -2992,7 +3010,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3035,7 +3053,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3094,7 +3112,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3137,7 +3155,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3269,7 +3287,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3362,7 +3380,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3405,7 +3423,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3566,7 +3584,7 @@ components:
                   createdByUserType:
                     type: string
                     enum:
-                      &a11
+                      &a12
                       - user
                       - system
                   createdAt:
@@ -3669,7 +3687,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -4054,7 +4072,7 @@ components:
         status:
           type: string
           enum:
-            &a12
+            &a13
             - Requested
             - Accepted
             - Rejected
@@ -4088,7 +4106,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -4472,7 +4490,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -4503,7 +4521,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -4887,7 +4905,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -4931,7 +4949,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -5315,7 +5333,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -5346,7 +5364,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -5730,7 +5748,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -5774,7 +5792,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -6158,7 +6176,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -6189,7 +6207,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -6573,7 +6591,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -6606,7 +6624,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -6990,7 +7008,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7021,7 +7039,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -7405,7 +7423,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7439,7 +7457,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -7823,7 +7841,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -7854,7 +7872,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -8238,7 +8256,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -8272,7 +8290,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -8656,7 +8674,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -8690,7 +8708,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -9074,7 +9092,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -9105,7 +9123,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -9489,7 +9507,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -9520,7 +9538,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -9904,7 +9922,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a12
+          enum: *a13
         originalActionId:
           type:
             - string
@@ -10132,7 +10150,7 @@ components:
                               - "null"
                       - type: "null"
           default:
-            &a13 {}
+            &a14 {}
         annotation:
           type: object
           additionalProperties:
@@ -10520,7 +10538,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -10908,7 +10926,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -11294,7 +11312,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -11490,7 +11508,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: a04a65d9-8b38-4d7c-9c12-1f9ab7e3995c
+        transactionId: 218ad80a-18d8-4853-ad64-fc9356d51125
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -11683,7 +11701,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -12066,7 +12084,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -12462,7 +12480,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -12845,7 +12863,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -13241,7 +13259,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -13627,7 +13645,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -14013,7 +14031,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -14396,7 +14414,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -14779,7 +14797,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -15165,7 +15183,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
@@ -15551,7 +15569,7 @@ components:
                               - string
                               - "null"
                       - type: "null"
-          default: *a13
+          default: *a14
         annotation:
           type: object
           additionalProperties:
