@@ -45,8 +45,6 @@ export function getStatusFromActions(actions: Array<Action>) {
           return EventStatus.enum.VALIDATED
         case ActionType.REGISTER:
           return EventStatus.enum.REGISTERED
-        case ActionType.REJECT:
-          return EventStatus.enum.REJECTED
         case ActionType.ARCHIVE:
           return EventStatus.enum.ARCHIVED
         case ActionType.NOTIFY:
@@ -55,6 +53,7 @@ export function getStatusFromActions(actions: Array<Action>) {
           return EventStatus.enum.CERTIFIED
         case ActionType.ASSIGN:
         case ActionType.UNASSIGN:
+        case ActionType.REJECT:
         case ActionType.REQUEST_CORRECTION:
         case ActionType.APPROVE_CORRECTION:
         case ActionType.MARKED_AS_DUPLICATE:
@@ -103,7 +102,8 @@ function aggregateActionDeclarations(
 
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REJECT_CORRECTION
   ]
 
   return actions.reduce((declaration, action) => {
@@ -326,7 +326,10 @@ export function applyDraftsToEventIndex(
   }
 
   return applyDeclarationToEventIndex(
-    eventIndex,
+    {
+      ...eventIndex,
+      updatedAt: activeDrafts[activeDrafts.length - 1].createdAt
+    },
     activeDrafts[activeDrafts.length - 1].declaration,
     eventConfiguration
   )

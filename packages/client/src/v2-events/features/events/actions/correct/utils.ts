@@ -12,7 +12,10 @@ import { isEqual } from 'lodash'
 import {
   FieldConfig,
   EventState,
-  isFieldVisible
+  isFieldVisible,
+  isMetaAction,
+  EventDocument,
+  ActionType
 } from '@opencrvs/commons/client'
 
 export function hasFieldChanged(
@@ -24,4 +27,10 @@ export function hasFieldChanged(
   const valueHasChanged = !isEqual(previousFormValues[f.id], form[f.id])
 
   return isVisible && valueHasChanged
+}
+
+export function isLastActionCorrectionRequest(event: EventDocument) {
+  const writeActions = event.actions.filter((a) => !isMetaAction(a.type))
+  const lastWriteAction = writeActions[writeActions.length - 1]
+  return lastWriteAction.type === ActionType.REQUEST_CORRECTION
 }
