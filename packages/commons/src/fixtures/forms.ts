@@ -18,7 +18,7 @@ import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
 import { format, subDays, subMonths, subQuarters, subYears } from 'date-fns'
-import { EventStatus } from '../events/EventMetadata'
+import { EventStatus, VisibleStatus } from '../events/EventMetadata'
 
 /** @knipignore */
 export const PRINT_CERTIFICATE_FORM = defineActionForm({
@@ -977,7 +977,7 @@ export const statusOptions = [
     }
   },
   {
-    value: EventStatus.enum.REJECTED,
+    value: VisibleStatus.enum.REJECTED,
     label: {
       defaultMessage: 'Rejected',
       description: 'Option for form field: status of record',

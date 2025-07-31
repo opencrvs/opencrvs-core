@@ -47,7 +47,7 @@ function isDeclarationIncomplete(actions: Action[]): boolean {
 }
 
 function isRejected(actions: Action[]): boolean {
-  return getStatusFromActions(actions) === EventStatus.enum.REJECTED
+  return actions.at(-1)?.type === ActionType.REJECT
 }
 
 export function getFlagsFromActions(actions: Action[]): Flag[] {

@@ -11,6 +11,7 @@
 
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
+import { v4 as uuid } from 'uuid'
 import {
   useTypedParams,
   useTypedSearchParams
@@ -18,7 +19,9 @@ import {
 import { useSelector } from 'react-redux'
 import {
   ActionType,
+  EventStatus,
   getActionReview,
+  getCurrentEventState,
   getDeclaration,
   SCOPES
 } from '@opencrvs/commons/client'
@@ -29,7 +32,11 @@ import { useEventFormNavigation } from '@client/v2-events/features/events/useEve
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { ROUTES } from '@client/v2-events/routes'
-import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
+import {
+  REJECT_ACTIONS,
+  RejectionState,
+  Review as ReviewComponent
+} from '@client/v2-events/features/events/components/Review'
 import { FormLayout } from '@client/v2-events/layouts'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -55,6 +62,8 @@ export function Review() {
   const event = events.getEvent.getFromCache(eventId)
 
   const { eventConfiguration: config } = useEventConfiguration(event.type)
+
+  const currentEventState = getCurrentEventState(event, config)
 
   const formConfig = getDeclaration(config)
   const reviewConfig = getActionReview(config, ActionType.DECLARE)
@@ -133,6 +142,36 @@ export function Review() {
     }
   }
 
+  async function handleRejection() {
+    const confirmedRejection = await openModal<RejectionState | null>(
+      (close) => <ReviewComponent.ActionModal.Reject close={close} />
+    )
+    if (confirmedRejection) {
+      const { rejectAction, message, isDuplicate } = confirmedRejection
+
+      if (rejectAction === REJECT_ACTIONS.SEND_FOR_UPDATE) {
+        events.actions.reject.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: {},
+          reason: { message }
+        })
+      }
+
+      if (rejectAction === REJECT_ACTIONS.ARCHIVE) {
+        events.actions.archive.mutate({
+          eventId,
+          declaration: {},
+          transactionId: uuid(),
+          annotation: {},
+          reason: { message, isDuplicate }
+        })
+      }
+      redirectToOrigin(slug)
+    }
+  }
+
   return (
     <FormLayout
       route={ROUTES.V2.EVENTS.DECLARE}
@@ -159,6 +198,11 @@ export function Review() {
           messages={reviewActionConfiguration.messages}
           primaryButtonType={reviewActionConfiguration.buttonType}
           onConfirm={handleDeclaration}
+          onReject={
+            currentEventState.status === EventStatus.enum.NOTIFIED
+              ? handleRejection
+              : undefined
+          }
         />
       </ReviewComponent.Body>
       {modal}

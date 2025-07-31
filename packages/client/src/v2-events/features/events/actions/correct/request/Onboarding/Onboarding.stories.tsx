@@ -41,7 +41,7 @@ export const Onboarding: Story = {
   parameters: {
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
         eventId: tennisClubMembershipEventDocument.id,
         pageId: 'corrector'
       })
