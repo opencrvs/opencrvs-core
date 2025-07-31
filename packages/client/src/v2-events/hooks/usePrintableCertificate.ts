@@ -78,7 +78,8 @@ export const usePrintableCertificate = ({
     eventConfiguration
   )
   const { getEvent } = useEvents()
-  const actions = getEvent.useSuspenseQuery(event.id)[0].actions
+
+  const actions = getEvent.getFromCache(event.id).actions
   const copiesPrintedForTemplate =
     actions.filter(
       (action) =>
