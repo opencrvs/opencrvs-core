@@ -32,6 +32,9 @@
 - After migrating to v1.7 task history shows legacy system role rather than new role based on alias [#9989](https://github.com/opencrvs/opencrvs-core/issues/9989)
 - Setup hardened CSP for client and login containers [#9584](https://github.com/opencrvs/opencrvs-core/issues/9584)
 - Apostrophes in role names are generated but are not supported [#10049](https://github.com/opencrvs/opencrvs-core/issues/10049)
+- Reconfigured Content Security Policy (CSP) to be more restrictive, enhancing protection against unauthorized content sources [#9594](https://github.com/opencrvs/opencrvs-core/issues/9584)
+- Ensure that place of birth/death only shows active facilities/offices on the form [#9311](https://github.com/opencrvs/opencrvs-core/issues/9311)
+- Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
 
 ## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.4...v1.8.0)
