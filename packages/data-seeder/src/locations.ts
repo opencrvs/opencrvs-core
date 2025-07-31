@@ -166,6 +166,8 @@ function locationBundleToIdentifier(
 /**
  * Get the externally defined id for location. Defined in country-config.
  */
+
+// FIXME: to be fixed for MDG 1.9.0
 const getExternalIdFromIdentifier = (
   identifiers: fhir3.Location['identifier']
 ) =>
