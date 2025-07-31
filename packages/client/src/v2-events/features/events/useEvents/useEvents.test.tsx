@@ -13,7 +13,7 @@ import React, { PropsWithChildren } from 'react'
 
 import { TRPCError } from '@trpc/server'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import { http, HttpResponse, HttpResponseResolver } from 'msw'
+import { http, HttpResponse, HttpResponseResolver, JsonBodyType } from 'msw'
 import { setupServer } from 'msw/node'
 import superjson, { serialize } from 'superjson'
 import { vi } from 'vitest'
@@ -37,7 +37,7 @@ const serverSpy = vi.fn()
 function trpcHandler(
   fn: HttpResponseResolver<never, EventInput, EventDocument>
 ): HttpResponseResolver<never, EventInput, EventDocument> {
-  async function wrapHttpResponseJson<T extends HttpResponse<any>>(
+  async function wrapHttpResponseJson<T extends HttpResponse<JsonBodyType>>(
     response: T
   ) {
     const jsonBody = await response.json()
@@ -51,7 +51,7 @@ function trpcHandler(
       json: EventInput
     }
     options.request.json = async () => Promise.resolve(body.json)
-    const response = (await fn(options)) as HttpResponse<any>
+    const response = (await fn(options)) as HttpResponse<JsonBodyType>
     return wrapHttpResponseJson(response)
   }) as HttpResponseResolver<never, EventInput, EventDocument>
 }
