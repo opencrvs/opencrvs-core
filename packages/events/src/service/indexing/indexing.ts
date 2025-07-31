@@ -25,7 +25,9 @@ import {
   QueryType,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels
+  SearchScopeAccessLevels,
+  DateRangeField,
+  SelectDateRangeField
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -72,7 +74,9 @@ async function ensureAlias(indexName: string) {
   return res
 }
 
-function mapFieldTypeToElasticsearch(field: FieldConfig) {
+function mapFieldTypeToElasticsearch(
+  field: FieldConfig
+): estypes.MappingProperty {
   switch (field.type) {
     case FieldType.NUMBER:
       return { type: 'double' }
@@ -158,31 +162,30 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           option: { type: 'keyword' }
         }
       }
-    // @TODO: other option would be to throw an error, since these should not be used in declaration form.
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
-      return {
-        type: 'object',
-        properties: {
-          start: { type: 'date' },
-          end: { type: 'date' }
-        }
-      }
     default:
-      const _exhaustiveCheck: never = field
+      /**
+       * The remaining fields are "search" only fields so should not be
+       * encountered when indexing events.
+       */
+      const _exhaustiveCheck: DateRangeField | SelectDateRangeField = field
       throw new Error(
-        `Unhandled field type: ${JSON.stringify(_exhaustiveCheck)}`
+        `Unsupported indexing field type: ${JSON.stringify(_exhaustiveCheck)}`
       )
   }
 }
 
 function formFieldsToDataMapping(fields: FieldConfig[]) {
-  return fields.reduce((acc, field) => {
-    return {
-      ...acc,
-      [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
-    }
-  }, {})
+  return fields.reduce(
+    (acc, field) => {
+      return {
+        ...acc,
+        [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
+      }
+    },
+    {} as Record<string, estypes.MappingProperty>
+  )
 }
 
 export async function createIndex(
