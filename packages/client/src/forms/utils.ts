@@ -590,13 +590,6 @@ export function isDefaultCountry(countryCode: string): boolean {
   return countryCode === window.config.COUNTRY.toUpperCase()
 }
 
-export function getListOfLocations(
-  resource: IOfflineData,
-  resourceType: ResourceType
-) {
-  return resource[resourceType]
-}
-
 interface IVars {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   [key: string]: any
