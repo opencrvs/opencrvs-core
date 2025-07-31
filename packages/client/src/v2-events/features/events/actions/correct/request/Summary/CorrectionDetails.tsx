@@ -72,7 +72,7 @@ export function CorrectionDetails({
   const { eventConfiguration } = useEventConfiguration(event.type)
 
   const eventIndex = getCurrentEventState(event, eventConfiguration)
-  const previousFormValues = requesting ? eventIndex.declaration : annotation
+  const previousFormValues = eventIndex.declaration
   const formConfig = getDeclaration(eventConfiguration)
   const navigate = useNavigate()
 
