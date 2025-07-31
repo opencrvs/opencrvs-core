@@ -89,6 +89,35 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
       useEventFormData()
 
+    const updateTouchFields = (
+      touched: Record<string, boolean | undefined>
+    ) => {
+      const newlyTouched =
+        Object.keys(touched).length > 0 &&
+        !isEqual(touched, initialTouchedFields) &&
+        Object.keys(touched).filter((key) => !(key in initialTouchedFields))
+      if (newlyTouched && newlyTouched.length > 0) {
+        const newlyTouchedFields = parentId
+          ? newlyTouched.reduce(
+              (prev, fieldId) => ({
+                ...prev,
+                /**
+                 * If we are touching  `firstname` from `child____name`,
+                 * we mark `child____name____firstname` as dirty
+                 */
+                [joinValues([parentId, fieldId], FIELD_SEPARATOR)]: true
+              }),
+              {}
+            )
+          : touched
+
+        setAllTouchedFields({
+          ...initialTouchedFields,
+          ...newlyTouchedFields
+        })
+      }
+    }
+
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
@@ -126,33 +155,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
              * have been touched for once during the form manipulation. So that we can show validation
              * errors for all fields that have been touched.
              */
-            const newlyTouched =
-              Object.keys(touched).length > 0 &&
-              !isEqual(touched, initialTouchedFields) &&
-              Object.keys(touched).filter(
-                (key) => !(key in initialTouchedFields)
-              )
-            if (newlyTouched && newlyTouched.length > 0) {
-              const newlyTouchedFields = parentId
-                ? newlyTouched.reduce(
-                    (prev, fieldId) => ({
-                      ...prev,
-                      /**
-                       * If we are touching  `firstname` from `child____name`,
-                       * we mark `child____name____firstname` as dirty
-                       */
-                      [joinValues([parentId, FIELD_SEPARATOR, fieldId], '')]:
-                        true
-                    }),
-                    {}
-                  )
-                : touched
-
-              setAllTouchedFields({
-                ...initialTouchedFields,
-                ...newlyTouchedFields
-              })
-            }
+            updateTouchFields(touched)
           }, [touched])
 
           return (
