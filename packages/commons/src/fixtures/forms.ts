@@ -746,10 +746,10 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.firstname.label'
           },
           configuration: {
-            nameConfig: {
-              firstname: 'MANDATORY',
-              middlename: 'OPTIONAL',
-              surname: 'MANDATORY'
+            name: {
+              firstname: { required: true },
+              middlename: { required: false },
+              surname: { required: true }
             }
           }
         },

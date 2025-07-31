@@ -118,8 +118,8 @@ function NameInput(props: Props) {
     value = {},
     maxLength,
     nameConfig = {
-      firstname: 'MANDATORY',
-      surname: 'MANDATORY'
+      firstname: { required: true },
+      surname: { required: true }
     },
     searchMode = false
   } = props
@@ -134,7 +134,7 @@ function NameInput(props: Props) {
             configuration: {
               maxLength
             },
-            required: !searchMode && nameConfig.firstname === 'MANDATORY',
+            required: !searchMode && nameConfig.firstname.required,
             label: {
               defaultMessage: 'First name(s)',
               description: 'This is the label for the firstname field',
@@ -152,7 +152,7 @@ function NameInput(props: Props) {
             configuration: {
               maxLength
             },
-            required: !searchMode && nameConfig.middlename === 'MANDATORY',
+            required: !searchMode && nameConfig.middlename.required,
             label: {
               defaultMessage: 'Middle name',
               description: 'This is the label for the middlename field',
@@ -167,7 +167,7 @@ function NameInput(props: Props) {
           {
             id: 'surname',
             type: FieldType.TEXT,
-            required: !searchMode && nameConfig.surname === 'MANDATORY',
+            required: !searchMode && nameConfig.surname.required,
             configuration: {
               maxLength
             },

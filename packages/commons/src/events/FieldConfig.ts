@@ -322,11 +322,10 @@ export const SelectDateRangeField = BaseField.extend({
 
 export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
-const optionalOrMandatory = z.enum(['MANDATORY', 'OPTIONAL'])
 export const NameConfig = z.object({
-  firstname: optionalOrMandatory.optional(),
-  middlename: optionalOrMandatory.optional(),
-  surname: optionalOrMandatory.optional()
+  firstname: z.object({ required: z.boolean() }).optional(),
+  middlename: z.object({ required: z.boolean() }).optional(),
+  surname: z.object({ required: z.boolean() }).optional()
 })
 
 export type NameConfig = z.infer<typeof NameConfig>
@@ -342,9 +341,9 @@ const NameField = BaseField.extend({
     .optional(),
   configuration: z
     .object({
-      nameConfig: NameConfig.default({
-        firstname: 'MANDATORY',
-        surname: 'MANDATORY'
+      name: NameConfig.default({
+        firstname: { required: true },
+        surname: { required: true }
       }).optional(),
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
@@ -352,9 +351,9 @@ const NameField = BaseField.extend({
       searchMode: z.boolean().optional()
     })
     .default({
-      nameConfig: {
-        firstname: 'MANDATORY',
-        surname: 'MANDATORY'
+      name: {
+        firstname: { required: true },
+        surname: { required: true }
       }
     })
     .optional()

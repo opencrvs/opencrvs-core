@@ -180,7 +180,7 @@ export const GeneratedInputField = React.memo(
           <Name.Input
             id={fieldDefinition.id}
             maxLength={field.config.configuration?.maxLength}
-            nameConfig={field.config.configuration?.nameConfig}
+            nameConfig={field.config.configuration?.name}
             searchMode={field.config.configuration?.searchMode}
             validation={validation}
             value={field.value}
