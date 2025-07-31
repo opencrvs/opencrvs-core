@@ -506,42 +506,6 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
-/** @knipignore */
-export type AllFields =
-  | typeof Address
-  | typeof TextField
-  | typeof NumberField
-  | typeof TextAreaField
-  | typeof DateField
-  | typeof TimeField
-  | typeof DateRangeField
-  | typeof Paragraph
-  | typeof RadioGroup
-  | typeof BulletList
-  | typeof PageHeader
-  | typeof Select
-  | typeof NameField
-  | typeof PhoneField
-  | typeof IdField
-  | typeof Checkbox
-  | typeof File
-  | typeof Country
-  | typeof AdministrativeArea
-  | typeof Divider
-  | typeof Location
-  | typeof Facility
-  | typeof Office
-  | typeof SignatureField
-  | typeof EmailField
-  | typeof FileUploadWithOptions
-  | typeof DataField
-
 /** @knipignore */
 export type Inferred =
   | z.infer<typeof Address>
