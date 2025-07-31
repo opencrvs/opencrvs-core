@@ -68,7 +68,7 @@ export const tennisClubMembershipCertificateWithPrintCountConditionals: Certific
     conditionals: [
       {
         type: 'SHOW',
-        conditional: event.printActions().minCount(1)
+        conditional: event.hasAction('PRINT_CERTIFICATE')
       }
     ]
   }
@@ -94,7 +94,7 @@ export const tennisClubMembershipCertificateWithMultiplePrintConditionals: Certi
     conditionals: [
       {
         type: 'SHOW',
-        conditional: event.printActions().minCount(2)
+        conditional: event.hasAction('PRINT_CERTIFICATE').minCount(2)
       }
     ]
   }
@@ -142,7 +142,8 @@ export const tennisClubMembershipDuplicateCertificate: CertificateTemplateConfig
       {
         type: 'SHOW',
         conditional: event
-          .printActions('tennis-club-membership-certificate')
+          .hasAction('PRINT_CERTIFICATE')
+          .withFields({ templateId: 'tennis-club-membership-certificate' })
           .minCount(1)
       }
     ]

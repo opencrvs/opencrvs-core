@@ -182,7 +182,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
           {
             type: 'SHOW',
             conditional: event
-              .printActions('tennis-club-membership-certificate')
+              .hasAction('PRINT_CERTIFICATE')
+              .withFields({ templateId: 'tennis-club-membership-certificate' })
               .maxCount(1)
           }
         ]
@@ -235,7 +236,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
           {
             type: 'SHOW',
             conditional: event
-              .printActions('tennis-club-membership-certificate')
+              .hasAction('PRINT_CERTIFICATE')
+              .withFields({ templateId: 'tennis-club-membership-certificate' })
               .minCount(1)
           }
         ]
@@ -325,7 +327,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
           {
             type: 'SHOW',
             conditional: event
-              .printActions('tennis-club-membership-certificate')
+              .hasAction('PRINT_CERTIFICATE')
+              .withFields({ templateId: 'tennis-club-membership-certificate' })
               .minCount(1)
           }
         ]
@@ -358,7 +361,8 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
           {
             type: 'SHOW' as const,
             conditional: event
-              .printActions('tennis-club-membership-certificate')
+              .hasAction('PRINT_CERTIFICATE')
+              .withFields({ templateId: 'tennis-club-membership-certificate' })
               .minCount(1)
           }
         ]
