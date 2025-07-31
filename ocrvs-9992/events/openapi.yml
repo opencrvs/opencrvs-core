@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2183fa25-7e95-43fc-aaad-a78c98323595
+                transactionId: ce90c6ab-db65-4d0b-8620-3a44deefb2a6
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 88b720c9-34cc-434a-8042-297bb7235a47
+                transactionId: 4d6a1366-9baa-48e7-8f60-482a49ade948
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -553,7 +553,6 @@ paths:
                     - DECLARED
                     - VALIDATED
                     - REGISTERED
-                    - CERTIFIED
                     - ARCHIVED
                 updatedAt:
                   type: range
@@ -1037,15 +1036,15 @@ components:
                             Sometimes there might be need to search a value
                             against multiple field of same FormField type. For
                             example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we 
+                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
                                   add a one field as fieldId, and accomodate others in alternateFieldIds
                         excludeInSearchQuery:
                           type: boolean
                           default: false
                           description: >-
                             Sometimes there will be search fields which are used
-                            to 
-                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth 
+                            to
+                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth
                                 is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
                                 related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
                                 In such case, populate this field (excludeInSearchQuery) with boolean true
@@ -1185,11 +1184,11 @@ components:
                         fieldId:
                           type: string
                           enum:
-                            - trackingId
-                            - status
-                            - legalStatuses.REGISTERED.acceptedAt
-                            - legalStatuses.REGISTERED.createdAtLocation
-                            - updatedAt
+                            - event.trackingId
+                            - event.status
+                            - event.legalStatuses.REGISTERED.acceptedAt
+                            - event.legalStatuses.REGISTERED.createdAtLocation
+                            - event.updatedAt
                         fieldType:
                           type: string
                           enum:
@@ -10643,7 +10642,7 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - printed
+                  - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
@@ -10655,7 +10654,7 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - printed
+                  - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
@@ -10882,7 +10881,7 @@ components:
                 pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
-                  - printed
+                  - pending-certification
                   - incomplete
                   - rejected
                   - correction-requested
