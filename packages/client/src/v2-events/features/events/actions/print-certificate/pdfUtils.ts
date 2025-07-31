@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable no-console */
 import {
   IntlShape,
   MessageDescriptor,
@@ -468,6 +469,13 @@ async function downloadAndEmbedImages(svgString: string): Promise<string> {
         const response = await fetch(href)
         const blob = await response.blob()
 
+        if (!response.ok) {
+          console.error('Failed to fetch image:', href)
+          console.error(
+            'Ensure the URL is correct and image is requested before cache is cleaned.'
+          )
+        }
+
         const base64 = await new Promise<string>((resolve, reject) => {
           const reader = new FileReader()
           reader.onload = () => resolve(reader.result as string)
@@ -575,7 +583,7 @@ interface PdfTemplate {
   fonts: Record<string, TFontFamilyTypes>
 }
 
-function createPDF(template: PdfTemplate): pdfMake.TCreatedPdf {
+function createPdf(template: PdfTemplate): pdfMake.TCreatedPdf {
   return pdfMake.createPdf(template.definition, undefined, template.fonts)
 }
 
@@ -583,7 +591,7 @@ export function printAndDownloadPdf(
   template: PdfTemplate,
   declarationId: string
 ) {
-  const pdf = createPDF(template)
+  const pdf = createPdf(template)
   if (isMobileDevice()) {
     pdf.download(`${declarationId}`)
   } else {

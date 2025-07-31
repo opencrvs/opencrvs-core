@@ -32,7 +32,7 @@ import {
   deepDropNulls,
   omitHiddenFields,
   EventState,
-  Inferred,
+  FieldConfig,
   isFieldVisible,
   errorMessages,
   runFieldValidations,
@@ -48,7 +48,7 @@ import {
 } from './utils'
 
 export function getFieldErrors(
-  fields: Inferred[],
+  fields: FieldConfig[],
   data: ActionUpdate,
   declaration: EventState = {}
 ) {
