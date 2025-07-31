@@ -143,9 +143,9 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          firstname: { type: 'text', analyzer: 'human_name' },
-          surname: { type: 'text', analyzer: 'human_name' },
-          __fullname: { type: 'text', analyzer: 'human_name' }
+          firstname: { type: 'text', analyzer: 'classic' },
+          surname: { type: 'text', analyzer: 'classic' },
+          __fullname: { type: 'text', analyzer: 'classic' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -194,22 +194,6 @@ export async function createIndex(
   await client.indices.create({
     index: indexName,
     body: {
-      // Define a custom normalizer to make keyword fields case-insensitive by applying a lowercase filter
-      settings: {
-        analysis: {
-          analyzer: {
-            /*
-             * Human name can contain
-             * Special characters including hyphens, underscores and spaces
-             */
-            human_name: {
-              type: 'custom',
-              tokenizer: 'standard',
-              filter: ['lowercase', 'word_delimiter']
-            }
-          }
-        }
-      },
       mappings: {
         properties: {
           id: { type: 'keyword' },
