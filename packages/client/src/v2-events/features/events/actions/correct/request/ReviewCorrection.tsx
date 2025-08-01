@@ -198,7 +198,10 @@ function RejectModal({
           required={true}
           touched={false}
         >
-          <StyledTextArea onChange={(e) => setMessage(e.target.value)} />
+          <StyledTextArea
+            id={'reject-correction-reason'}
+            onChange={(e) => setMessage(e.target.value)}
+          />
         </InputField>
       </StyledStack>
     </Dialog>
