@@ -227,7 +227,8 @@ export const RejectCorrection: Story = {
   args: {
     action: {
       ...actionBase,
-      type: ActionType.REJECT_CORRECTION
+      type: ActionType.REJECT_CORRECTION,
+      reason: { message: 'No legal proof' }
     }
   }
 }

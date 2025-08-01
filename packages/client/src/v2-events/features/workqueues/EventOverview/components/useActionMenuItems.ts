@@ -125,6 +125,11 @@ export const actionLabels = {
     defaultMessage: 'Request correction',
     description: 'Label for request correction button in dropdown menu',
     id: 'v2.event.birth.action.request-correction.label'
+  },
+  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+    defaultMessage: 'Review',
+    description: 'Label for review correction button in dropdown menu',
+    id: 'v2.event.action.review-correction.label'
   }
 } as const
 
@@ -289,12 +294,7 @@ export function useAction(event: EventIndex) {
         shouldHide: () => eventIsWaitingForCorrection
       },
       [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
-        label: {
-          defaultMessage: 'Review',
-          description:
-            'This is shown as the action name anywhere the user can trigger the action from',
-          id: 'v2.event.summary.review-correction-request.label'
-        },
+        label: actionLabels[ExclusiveActions.REVIEW_CORRECTION_REQUEST],
         icon: 'NotePencil',
         onClick: () => {
           navigate(
