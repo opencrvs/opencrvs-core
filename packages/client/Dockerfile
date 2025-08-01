@@ -6,19 +6,22 @@ USER node
 COPY --chown=node:node packages/gateway /app/packages/gateway
 COPY --chown=node:node packages/events /app/packages/events
 
-WORKDIR /app/packages/components
 COPY --chown=node:node packages/components /app/packages/components
-
-RUN pnpm install --frozen-lockfile  && pnpm build
+WORKDIR /app
+RUN pnpm install --filter ./packages/components --frozen-lockfile
+WORKDIR /app/packages/components
+RUN pnpm build
 
 # Placeholders:
 # Variables should be substituted in docker-compose/kubernetes manifest
 ENV CONTENT_SECURITY_POLICY_WILDCARD="{{CONTENT_SECURITY_POLICY_WILDCARD}}"
 ENV COUNTRY_CONFIG_URL_INTERNAL="{{COUNTRY_CONFIG_URL_INTERNAL}}"
 ENV GATEWAY_URL_INTERNAL="{{GATEWAY_URL_INTERNAL}}"
-WORKDIR /app/packages/client
 COPY --chown=node:node packages/client /app/packages/client
-RUN pnpm install --frozen-lockfile && pnpm build
+WORKDIR /app
+RUN pnpm install --filter ./packages/client --frozen-lockfile
+WORKDIR /app/packages/client
+RUN pnpm build
 
 FROM nginxinc/nginx-unprivileged:1.28-alpine
 
