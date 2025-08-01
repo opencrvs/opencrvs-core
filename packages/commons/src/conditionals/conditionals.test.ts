@@ -747,15 +747,15 @@ describe('"valid name" conditionals', () => {
       ).toBe(true)
     })
 
-    it('should pass when name contains an underscore', () => {
-      const validName = 'John_Doe'
+    it('should fail when name contains an underscore', () => {
+      const invalidName = 'John_Doe'
       const params = {
-        $form: { 'child.firstName': validName },
+        $form: { 'child.firstName': invalidName },
         $now: formatISO(new Date(), { representation: 'date' })
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
-      ).toBe(true)
+      ).toBe(false)
     })
 
     it('should pass when name contains a number', () => {
