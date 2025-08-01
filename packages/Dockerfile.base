@@ -15,6 +15,7 @@ WORKDIR /app
 COPY --chown=node:node *.json .
 COPY --chown=node:node pnpm-lock.yaml .
 COPY --chown=node:node patches ./patches
+COPY --chown=node:node pnpm-workspace.yaml .
 
 COPY --chown=node:node packages/commons/package.json ./packages/commons/
 
