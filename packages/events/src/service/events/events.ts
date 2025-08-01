@@ -161,8 +161,7 @@ function generateTrackingId(): string {
 export async function createEvent({
   eventInput,
   user,
-  transactionId,
-  config
+  transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
@@ -185,8 +184,6 @@ export async function createEvent({
     createdBySignature: user.signature,
     createdAtLocation: user.primaryOfficeId
   })
-
-  await indexEvent(event, config)
 
   return event
 }
