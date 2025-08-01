@@ -4,7 +4,7 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 USER node
 WORKDIR /app
 
-COPY --chown=node:node ../../package.json ../../pnpm-lock.yaml ../../pnpm-workspace.yaml ./
+COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 COPY --chown=node:node patches ./patches
 
 COPY --chown=node:node packages/gateway /app/packages/gateway
