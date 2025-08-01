@@ -496,7 +496,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
   expect(fetchedEvents).toHaveLength(2)
 })
 
-test('properly returns search by name even when there is an undercore in someones name', async () => {
+test('Should not match partially when searching with emails against name field', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
@@ -506,7 +506,7 @@ test('properly returns search by name even when there is an undercore in someone
 
   const record1 = {
     'applicant.name': {
-      firstname: 'Matt_Johnson',
+      firstname: 'Matt',
       surname: 'Doe'
     },
     'applicant.dob': '2000-01-01',
@@ -531,14 +531,16 @@ test('properly returns search by name even when there is an undercore in someone
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    clauses: [{ data: { 'applicant.name': { type: 'fuzzy', term: 'Matt' } } }]
+    clauses: [
+      {
+        data: {
+          'applicant.name': { type: 'fuzzy', term: 'matt.doe@gmail.com' }
+        }
+      }
+    ]
   })
 
-  expect(fetchedEvents).toHaveLength(1)
-
-  expect(
-    getMixedPath(fetchedEvents[0].declaration, 'applicant.name.firstname')
-  ).toBe('Matt_Johnson')
+  expect(fetchedEvents).toHaveLength(0)
 })
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
