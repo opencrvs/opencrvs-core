@@ -402,7 +402,8 @@ export const GeneratedInputField = React.memo(
     }
     if (isAddressFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
+        // We are showing errors to underlying inputs, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
             {...field.config}
             value={field.value}
