@@ -275,12 +275,15 @@ function actionToClientAction(
 
 /**
  * Create event based on actions to be used in tests.
- * Created through API to make sure it get indexed properly. (To seed directly to database we need: https://github.com/opencrvs/opencrvs-core/issues/8884)
+ * Created through API to make sure it get indexed properly.
+
+ * To seed directly to database we need:
+ * https://github.com/opencrvs/opencrvs-core/issues/8884
  */
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions?: Exclude<ActionType, typeof ActionType.CREATE>[]
+  actions: Exclude<ActionType, typeof ActionType.CREATE>[]
 ): Promise<ReturnType<typeof client.event.create>> {
   let createdEvent: EventDocument | undefined
 
@@ -293,7 +296,7 @@ export async function createEvent(
 
   createdEvent = await createAction()
 
-  for (const action of actions ?? []) {
+  for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)
     createdEvent = await clientAction(createdEvent.id)
   }
