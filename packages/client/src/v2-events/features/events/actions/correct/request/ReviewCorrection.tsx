@@ -30,10 +30,9 @@ import {
   ContentSize,
   Icon,
   InputField,
-  ResponsiveModal,
   Stack,
   Text,
-  TextInput
+  TextArea
 } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -77,7 +76,7 @@ const reviewCorrectionMessages = defineMessages({
   },
   rejectReason: {
     id: 'v2-events.correction.correctionReject.reason',
-    defaultMessage: 'Reason',
+    defaultMessage: 'Reason for rejection',
     description: 'Correction request rejection reason'
   }
 })
@@ -101,12 +100,24 @@ const Row = styled.div<{
   }
 `
 
-const StyledTextInput = styled(TextInput)`
+const StyledTextArea = styled(TextArea)`
   height: 100px;
-  width: 360px;
+  width: 420px;
   @media (max-width: 480px) {
     width: 100%;
   }
+`
+
+const StyledButton = styled(Button)`
+  width: 235px;
+  height: 56px;
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+`
+
+const StyledStack = styled(Stack)`
+  padding-top: 20px;
 `
 
 function ApproveModal({
@@ -120,27 +131,17 @@ function ApproveModal({
   return (
     <Dialog
       actions={[
-        <Button
-          key="cancel_correction"
-          id="cancel_correction"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
-        </Button>,
-        <Button
+        <StyledButton
           key="confirm_correction"
           id="confirm_correction"
-          type="primary"
+          type="positive"
           onClick={() => {
             onSubmit()
             close(true)
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </Button>
+        </StyledButton>
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
@@ -167,20 +168,11 @@ function RejectModal({
   return (
     <Dialog
       actions={[
-        <Button
-          key="cancel_reject_correction"
-          id="cancel_reject_correction"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
-        </Button>,
-        <Button
+        <StyledButton
           key="reject_correction"
           disabled={!message}
           id="reject_correction"
+          size="large"
           type="negative"
           onClick={() => {
             onSubmit(message)
@@ -188,7 +180,7 @@ function RejectModal({
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </Button>
+        </StyledButton>
       ]}
       isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
@@ -199,17 +191,16 @@ function RejectModal({
           {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
         </Text>
       </Stack>
-      <Stack>
+      <StyledStack>
         <InputField
-          hideAsterisk={true}
           id={'reject-correction'}
           label={intl.formatMessage(reviewCorrectionMessages.rejectReason)}
           required={true}
           touched={false}
         >
-          <StyledTextInput onChange={(e) => setMessage(e.target.value)} />
+          <StyledTextArea onChange={(e) => setMessage(e.target.value)} />
         </InputField>
-      </Stack>
+      </StyledStack>
     </Dialog>
   )
 }
