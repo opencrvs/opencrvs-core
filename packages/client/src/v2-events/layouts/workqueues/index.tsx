@@ -17,13 +17,12 @@ import { AppBar, Button, Frame, Icon, Stack } from '@opencrvs/components'
 import { Plus } from '@opencrvs/components/src/icons'
 import { ROUTES } from '@client/v2-events/routes'
 import { ProfileMenu } from '@client/components/ProfileMenu'
-import * as routes from '@client/navigation/routes'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
+import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
-
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -35,6 +34,8 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const workqueues = useWorkqueueConfigurations()
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+
+  const isSearchResult = workqueueSlug === undefined
 
   return (
     <Frame
@@ -56,15 +57,27 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
             </Stack>
           }
           desktopRight={<ProfileMenu key="profileMenu" />}
-          mobileLeft={<Hamburger />}
-          mobileRight={
-            <Button type={'icon'} onClick={() => navigate(routes.SEARCH)}>
-              <Icon color="primary" name="MagnifyingGlass" size="medium" />
-            </Button>
+          mobileCenter={isSearchResult ? <SearchToolbar /> : null}
+          mobileLeft={
+            isSearchResult ? <HistoryNavigator hideForward /> : <Hamburger />
           }
-          mobileTitle={intl.formatMessage(
-            workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
-          )}
+          mobileRight={
+            isSearchResult ? null : (
+              <Button
+                type={'icon'}
+                onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
+              >
+                <Icon color="primary" name="MagnifyingGlass" size="medium" />
+              </Button>
+            )
+          }
+          mobileTitle={
+            isSearchResult
+              ? null
+              : intl.formatMessage(
+                  workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
+                )
+          }
         />
       }
       navigation={<Sidebar key={workqueueSlug} />}
