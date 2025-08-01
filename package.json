@@ -81,6 +81,9 @@
       "protobufjs",
       "ssh2",
       "unrs-resolver"
-    ]
+    ],
+    "patchedDependencies": {
+      "pdfmake@0.2.20": "patches/pdfmake@0.2.20.patch"
+    }
   }
 }
