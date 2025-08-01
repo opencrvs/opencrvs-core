@@ -2,15 +2,18 @@ ARG  BRANCH=develop
 FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
+WORKDIR /app
+
+COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY --chown=node:node patches ./patches
 
 COPY --chown=node:node packages/gateway /app/packages/gateway
 COPY --chown=node:node packages/events /app/packages/events
-
 COPY --chown=node:node packages/components /app/packages/components
-WORKDIR /app
-COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY --chown=node:node patches ./patches
+COPY --chown=node:node packages/client /app/packages/client
+
 RUN pnpm install --filter './packages/components... + .' --frozen-lockfile
+
 WORKDIR /app/packages/components
 RUN pnpm build
 
@@ -19,10 +22,7 @@ RUN pnpm build
 ENV CONTENT_SECURITY_POLICY_WILDCARD="{{CONTENT_SECURITY_POLICY_WILDCARD}}"
 ENV COUNTRY_CONFIG_URL_INTERNAL="{{COUNTRY_CONFIG_URL_INTERNAL}}"
 ENV GATEWAY_URL_INTERNAL="{{GATEWAY_URL_INTERNAL}}"
-COPY --chown=node:node packages/client /app/packages/client
 WORKDIR /app
-COPY --chown=node:node package.json pnpm-lock.yaml pnpm-workspace.yaml ./
-COPY --chown=node:node patches ./patches
 RUN pnpm install --filter './packages/client... + .' --frozen-lockfile
 WORKDIR /app/packages/client
 RUN pnpm build
