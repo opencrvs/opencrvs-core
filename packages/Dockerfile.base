@@ -16,11 +16,12 @@ COPY --chown=node:node *.json .
 COPY --chown=node:node pnpm-lock.yaml .
 COPY --chown=node:node patches ./patches
 
-RUN pnpm install --production --frozen-lockfile
+COPY --chown=node:node packages/commons/package.json ./packages/commons/
 
-COPY --chown=node:node packages/commons /app/packages/commons
+RUN pnpm install --filter ./packages/commons... --frozen-lockfile --production
+
+COPY --chown=node:node packages/commons ./packages/commons
 
 WORKDIR /app/packages/commons
 
-RUN pnpm install --frozen-lockfile
 RUN pnpm build
