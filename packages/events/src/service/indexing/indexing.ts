@@ -298,18 +298,6 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
   })
 }
 
-export async function deleteEventIndex(event: EventDocument) {
-  const esClient = getOrCreateClient()
-
-  const response = await esClient.delete({
-    index: getEventIndexName(event.type),
-    id: event.id,
-    refresh: 'wait_for'
-  })
-
-  return response
-}
-
 export async function getIndexedEvents(
   userId: string,
   eventConfigs: EventConfig[]
