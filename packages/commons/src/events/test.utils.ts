@@ -139,6 +139,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.PAGE_HEADER:
     case FieldType.LOCATION:
     case FieldType.SELECT:
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
@@ -169,7 +170,8 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
-    case FieldType.SELECT_DATE_RANGE:
+    case FieldType.TIME:
+      return '09:33'
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',

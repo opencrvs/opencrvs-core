@@ -21,6 +21,14 @@ export default meta
 
 type Story = StoryObj<typeof EventHistoryDialog>
 
+const declaration = {
+  'applicant.email': 'foo@bar.fi',
+  'recommender.name': {
+    firstname: 'John',
+    surname: 'Doe'
+  }
+}
+
 const actionBase = {
   id: getUUID(),
   createdAt: '2021-01-01',
@@ -33,63 +41,86 @@ const actionBase = {
   requestId: '123'
 } as const
 
-export const Created: Story = {
-  args: {
-    action: {
+const requestCorrectionAction = {
+  ...actionBase,
+  id: getUUID(),
+  type: ActionType.REQUEST_CORRECTION,
+  declaration: {
+    'applicant.email': 'foo@baz.fi',
+    'recommender.name': {
+      firstname: 'Jane',
+      surname: 'Doe'
+    }
+  },
+  annotation: {
+    'correction.request.reason': 'My reason'
+  }
+}
+
+const fullEvent = {
+  id: getUUID(),
+  type: 'tennis-club-membership',
+  actions: [
+    {
       ...actionBase,
       type: ActionType.CREATE
+    },
+    {
+      ...actionBase,
+      type: ActionType.DECLARE,
+      declaration
+    },
+    {
+      ...actionBase,
+      type: ActionType.VALIDATE,
+      declaration
+    },
+    {
+      ...actionBase,
+      type: ActionType.REGISTER,
+      declaration
     }
+  ],
+  trackingId: 'ABCD123',
+  updatedAt: '2021-01-01',
+  createdAt: '2021-01-01'
+}
+
+const argbase = {
+  userName: 'Jhon Doe',
+  fullEvent,
+  action: {
+    ...actionBase
   }
+}
+export const Created: Story = {
+  args: { ...argbase, action: { ...argbase.action, type: ActionType.CREATE } }
 }
 
 export const Notified: Story = {
-  args: {
-    action: {
-      ...actionBase,
-      type: ActionType.NOTIFY
-    }
-  }
+  args: { ...argbase, action: { ...argbase.action, type: ActionType.NOTIFY } }
 }
 
 export const Read: Story = {
-  args: {
-    action: {
-      ...actionBase,
-      type: ActionType.READ
-    }
-  }
+  args: { ...argbase, action: { ...argbase.action, type: ActionType.READ } }
 }
 
 export const Declared: Story = {
-  args: {
-    action: {
-      ...actionBase,
-      type: ActionType.DECLARE
-    }
-  }
+  args: { ...argbase, action: { ...argbase.action, type: ActionType.DECLARE } }
 }
 export const Validated: Story = {
-  args: {
-    action: {
-      ...actionBase,
-      type: ActionType.VALIDATE
-    }
-  }
+  args: { ...argbase, action: { ...argbase.action, type: ActionType.VALIDATE } }
 }
 
 export const Registered: Story = {
-  args: {
-    action: {
-      ...actionBase,
-      type: ActionType.REGISTER
-    }
-  }
+  args: { ...argbase, action: { ...argbase.action, type: ActionType.REGISTER } }
 }
 
 export const Rejected: Story = {
   args: {
+    ...argbase,
     action: {
-      ...actionBase,
+      ...argbase.action,
       type: ActionType.REJECT,
       reason: {
         message: 'Invalid information provided'
@@ -100,8 +131,9 @@ export const Rejected: Story = {
 
 export const Archived: Story = {
   args: {
+    ...argbase,
     action: {
-      ...actionBase,
+      ...argbase.action,
       type: ActionType.ARCHIVE,
       reason: {
         message: 'Record archived',
@@ -113,8 +145,9 @@ export const Archived: Story = {
 
 export const MarkedAsDuplicate: Story = {
   args: {
+    ...argbase,
     action: {
-      ...actionBase,
+      ...argbase.action,
       type: ActionType.ARCHIVE,
       reason: {
         message: 'Duplicate record found',
@@ -124,18 +157,11 @@ export const MarkedAsDuplicate: Story = {
   }
 }
 
-const declaration = {
-  'applicant.email': 'foo@bar.fi',
-  'recommender.name': {
-    firstname: 'John',
-    surname: 'Doe'
-  }
-}
-
 export const PrintCertificate: Story = {
   args: {
+    ...argbase,
     action: {
-      ...actionBase,
+      ...argbase.action,
       type: ActionType.PRINT_CERTIFICATE,
       annotation: {
         'collector.identity.verify': true,
@@ -173,23 +199,9 @@ export const PrintCertificate: Story = {
   }
 }
 
-const requestCorrectionAction = {
-  ...actionBase,
-  type: ActionType.REQUEST_CORRECTION,
-  declaration: {
-    'applicant.email': 'foo@baz.fi',
-    'recommender.name': {
-      firstname: 'Jane',
-      surname: 'Doe'
-    }
-  },
-  annotation: {
-    'correction.request.reason': 'My reason'
-  }
-}
-
 export const RequestCorrection: Story = {
   args: {
+    ...argbase,
     action: requestCorrectionAction,
     fullEvent: {
       id: getUUID(),
@@ -197,20 +209,24 @@ export const RequestCorrection: Story = {
       actions: [
         {
           ...actionBase,
+          id: getUUID(),
           type: ActionType.CREATE
         },
         {
           ...actionBase,
+          id: getUUID(),
           type: ActionType.DECLARE,
           declaration
         },
         {
           ...actionBase,
+          id: getUUID(),
           type: ActionType.VALIDATE,
           declaration
         },
         {
           ...actionBase,
+          id: getUUID(),
           type: ActionType.REGISTER,
           declaration
         },
@@ -222,11 +238,72 @@ export const RequestCorrection: Story = {
     }
   }
 }
+export const RecordCorrected: Story = {
+  args: {
+    ...argbase,
+    action: {
+      ...requestCorrectionAction,
+      annotation: {
+        ...requestCorrectionAction.annotation,
+        isImmediateCorrection: true
+      }
+    },
+    fullEvent: {
+      id: getUUID(),
+      type: 'tennis-club-membership',
+      actions: [
+        {
+          ...actionBase,
+          id: getUUID(),
+          type: ActionType.CREATE
+        },
+        {
+          ...actionBase,
+          id: getUUID(),
+          type: ActionType.DECLARE,
+          declaration
+        },
+        {
+          ...actionBase,
+          id: getUUID(),
+          type: ActionType.VALIDATE,
+          declaration
+        },
+        {
+          ...actionBase,
+          id: getUUID(),
+          type: ActionType.REGISTER,
+          declaration
+        },
+        {
+          ...requestCorrectionAction,
+          annotation: {
+            ...requestCorrectionAction.annotation,
+            isImmediateCorrection: true
+          }
+        },
+        {
+          ...actionBase,
+          id: getUUID(),
+          type: ActionType.APPROVE_CORRECTION,
+          requestId: requestCorrectionAction.id,
+          annotation: {
+            isImmediateCorrection: true
+          }
+        }
+      ],
+      trackingId: 'ABCD123',
+      updatedAt: '2021-01-01',
+      createdAt: '2021-01-01'
+    }
+  }
+}
 
 export const RejectCorrection: Story = {
   args: {
+    ...argbase,
     action: {
-      ...actionBase,
+      ...argbase.action,
       type: ActionType.REJECT_CORRECTION,
       reason: { message: 'No legal proof' }
     }
@@ -235,17 +312,16 @@ export const RejectCorrection: Story = {
 
 export const ApproveCorrection: Story = {
   args: {
-    action: {
-      ...actionBase,
-      type: ActionType.APPROVE_CORRECTION
-    }
+    ...argbase,
+    action: { ...argbase.action, type: ActionType.APPROVE_CORRECTION }
   }
 }
 
 export const Assigned: Story = {
   args: {
+    ...argbase,
     action: {
-      ...actionBase,
+      ...argbase.action,
       type: ActionType.ASSIGN,
       assignedTo: 'John Doe'
     }
@@ -253,10 +329,5 @@ export const Assigned: Story = {
 }
 
 export const Unassigned: Story = {
-  args: {
-    action: {
-      ...actionBase,
-      type: ActionType.UNASSIGN
-    }
-  }
+  args: { ...argbase, action: { ...argbase.action, type: ActionType.UNASSIGN } }
 }

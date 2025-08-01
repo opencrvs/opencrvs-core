@@ -16,10 +16,12 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   EventState,
   generateTransactionId,
-  isMetaAction
+  isMetaAction,
+  SCOPES
 } from '@opencrvs/commons/client'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
@@ -38,6 +40,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useModal } from '@client/v2-events/hooks/useModal'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
+import { getScope } from '@client/profile/profileSelectors'
 import { CorrectionDetails } from './Summary/CorrectionDetails'
 
 const reviewCorrectionMessages = defineMessages({
@@ -213,11 +216,12 @@ function RejectModal({
 
 export function ReviewCorrection({ form }: { form: EventState }) {
   const intl = useIntl()
+  const scopes = useSelector(getScope)
   const { getAnnotation } = useActionAnnotation()
   const annotation = getAnnotation()
-  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW)
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.REVIEW)
   const [searchParams] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW
+    ROUTES.V2.EVENTS.CORRECTION.REVIEW
   )
 
   const events = useEvents()
@@ -308,7 +312,12 @@ export function ReviewCorrection({ form }: { form: EventState }) {
       size={ContentSize.LARGE}
       title={intl.formatMessage(reviewCorrectionMessages.correctionRequest)}
     >
-      <CorrectionDetails annotation={annotation} event={event} form={form} />
+      <CorrectionDetails
+        annotation={annotation}
+        event={event}
+        form={form}
+        requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
+      />
       <Row background="white" position="left">
         {rejectButton}
         {approveButton}

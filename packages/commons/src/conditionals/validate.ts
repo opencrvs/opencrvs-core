@@ -12,9 +12,8 @@
 import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
-
-import { formatISO, isAfter, isBefore } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import { formatISO, isAfter, isBefore } from 'date-fns'
 import { EventState, ActionUpdate } from '../events/ActionDocument'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
@@ -325,13 +324,9 @@ export function validateFieldInput({
   field: FieldConfig
   value: FieldUpdateValue
 }) {
-  const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
-    value,
-    {
-      // @ts-expect-error
-      errorMap: zodToIntlErrorMap
-    }
-  )
+  const zodType = mapFieldTypeToZod(field.type, field.required)
+  // @ts-expect-error
+  const rawError = zodType.safeParse(value, { errorMap: zodToIntlErrorMap })
 
   // We have overridden the standard error messages
   return (rawError.error?.issues.map((issue) => issue.message) ??

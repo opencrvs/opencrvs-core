@@ -122,7 +122,7 @@ export const actionLabels = {
     id: 'v2.event.birth.action.delete.label'
   },
   [ActionType.REQUEST_CORRECTION]: {
-    defaultMessage: 'Request correction',
+    defaultMessage: 'Correct record',
     description: 'Label for request correction button in dropdown menu',
     id: 'v2.event.birth.action.request-correction.label'
   },
@@ -276,15 +276,13 @@ export function useAction(event: EventIndex) {
 
           // If no pages are configured, skip directly to review page
           if (correctionPages.length === 0) {
-            navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
-            )
+            navigate(ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId }))
             return
           }
 
           // If pages are configured, navigate to first page
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+            ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
               eventId,
               pageId: correctionPages[0].id
             })
@@ -298,7 +296,7 @@ export function useAction(event: EventIndex) {
         icon: 'NotePencil',
         onClick: () => {
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
               eventId
             })
           )
