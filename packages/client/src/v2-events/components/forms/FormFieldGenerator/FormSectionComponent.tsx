@@ -340,7 +340,7 @@ export function FormSectionComponent({
                     (parentId
                       ? touched[
                           joinValues([parentId, FIELD_SEPARATOR, field.id], '')
-                        ]
+                        ] || touched[parentId]
                       : touched[field.id]) ?? false
                   }
                   value={formikField.value}
