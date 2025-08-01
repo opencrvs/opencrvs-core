@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
+  EventDocument,
   generateRandomSignature,
   getUUID,
   Scope,
@@ -202,8 +203,20 @@ export const setupTestCase = async (rngSeed?: number) => {
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
+  action: Extract<ActionType, 'CREATE'>
+): () => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  action: Exclude<ActionType, 'CREATE'>
+): (eventId: string) => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
   action: ActionType
-) {
+):
+  | (() => Promise<EventDocument>)
+  | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
       return async () => client.event.create(generator.event.create())
@@ -269,7 +282,7 @@ export async function createEvent(
   generator: ReturnType<typeof payloadGenerator>,
   actions?: Exclude<ActionType, typeof ActionType.CREATE>[]
 ): Promise<ReturnType<typeof client.event.create>> {
-  let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+  let createdEvent: EventDocument | undefined
 
   // Always first create the event
   const createAction = actionToClientAction(
@@ -278,7 +291,6 @@ export async function createEvent(
     ActionType.CREATE
   )
 
-  // @ts-expect-error -- createEvent does not accept any arguments
   createdEvent = await createAction()
 
   for (const action of actions ?? []) {
