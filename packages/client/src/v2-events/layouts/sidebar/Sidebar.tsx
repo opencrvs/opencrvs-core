@@ -114,7 +114,7 @@ export const Sidebar = ({
         {hasOutbox && (
           <NavigationItem
             key={WORKQUEUE_OUTBOX.slug}
-            count={outbox.length}
+            count={outbox.all.length}
             data-testid={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}
             icon={() => <Icon name={WORKQUEUE_OUTBOX.icon} size="small" />}
             id={`navigation_workqueue_${WORKQUEUE_OUTBOX.slug}`}

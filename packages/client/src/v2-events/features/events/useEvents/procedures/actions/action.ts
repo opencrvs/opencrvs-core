@@ -46,14 +46,35 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
+import { useFailedMutationStore } from '../../outbox'
 
-function retryUnlessConflict(_: unknown, error: TRPCClientError<AppRouter>) {
-  return error.data?.httpStatus !== 409
+const MAX_RETRY_ATTEMPT = 10
+
+function retryUnlessConflict(
+  failureCount: number,
+  error: TRPCClientError<AppRouter>
+) {
+  return error.data?.httpStatus !== 409 && failureCount < MAX_RETRY_ATTEMPT
 }
 
-function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
+function errorToastOnConflict(
+  error: TRPCClientError<AppRouter>,
+  variables: any
+) {
   if (error.data?.httpStatus === 409) {
     toast.error(ToastKey.NOT_ASSIGNED_ERROR)
+  } else {
+    if (variables.eventId && variables.type) {
+      useFailedMutationStore.getState().addFailedMutation({
+        eventId: variables.eventId,
+        action: variables.type,
+        declaration: variables.declaration,
+        transactionId: variables.transactionId,
+        annotation: variables.annotation
+      })
+    }
+
+    toast.error(ToastKey.SOMETHING_WENT_WRONG)
   }
 }
 
@@ -140,6 +161,8 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   mutationFn: createEventActionMutationFn(
     trpcOptionsProxy.event.actions.printCertificate.request
   ),
+  retry: retryUnlessConflict,
+  retryDelay: 10000,
   onSuccess: updateLocalEvent,
   onError: errorToastOnConflict,
   meta: {

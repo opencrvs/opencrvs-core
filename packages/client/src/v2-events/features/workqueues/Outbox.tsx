@@ -12,7 +12,11 @@
 import React from 'react'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { defineWorkqueuesColumns, event } from '@opencrvs/commons/client'
+import {
+  defineWorkqueuesColumns,
+  event,
+  EventIndex
+} from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { emptyMessage, WORKQUEUE_OUTBOX } from '@client/v2-events/utils'
 import { useEventConfigurations } from '../events/useEventConfiguration'
@@ -25,7 +29,7 @@ export function Outbox() {
   const intl = useIntl()
 
   const { getOutbox } = useEvents()
-  const outbox = getOutbox()
+  const { all } = getOutbox()
 
   const outboxColumns = defineWorkqueuesColumns([
     {
@@ -46,7 +50,7 @@ export function Outbox() {
     <SearchResultComponent
       columns={outboxColumns}
       eventConfigs={eventConfigs}
-      queryData={outbox}
+      queryData={all as EventIndex[]}
       title={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
       {...searchParams}
     />

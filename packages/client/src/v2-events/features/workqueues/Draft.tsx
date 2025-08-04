@@ -28,7 +28,7 @@ export function Draft() {
   const eventConfigs = useEventConfigurations()
   const intl = useIntl()
 
-  const outboxIds = useOutbox().map(({ id }) => id)
+  const outboxIds = useOutbox().all.map(({ id }) => id)
 
   const { getAllRemoteDrafts } = useDrafts()
 

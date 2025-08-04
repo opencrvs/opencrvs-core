@@ -11,10 +11,12 @@
 
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
+import { create } from 'zustand'
 import {
-  deepMerge,
   getCurrentEventState,
-  applyDeclarationToEventIndex
+  applyDeclarationToEventIndex,
+  EventIndex,
+  ActionBase
 } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
@@ -32,20 +34,83 @@ function assignmentMutation(mutationKey: MutationKey) {
   ].includes(hashKey(mutationKey))
 }
 
-export function useOutbox() {
+interface FailedMutation {
+  eventId: string
+  action: string
+  declaration: Partial<EventState>
+  transactionId: string
+  annotation: Partial<ActionBase['annotation']>
+}
+
+interface FailedMutationStore {
+  failedMutations: FailedMutation[]
+  addFailedMutation: (mutation: FailedMutation) => void
+  removeFailedMutation: (eventId: string, action: string) => void
+  clearFailedMutations: () => void
+}
+
+export const useFailedMutationStore = create<FailedMutationStore>()(
+  (set, get) => ({
+    failedMutations: [],
+    addFailedMutation: (mutation) => {
+      const exists = get().failedMutations.some(
+        (m) => m.eventId === mutation.eventId && m.action === mutation.action
+      )
+
+      if (!exists) {
+        set((state) => ({
+          failedMutations: [...state.failedMutations, mutation]
+        }))
+      }
+    },
+    removeFailedMutation: (eventId, action) =>
+      set((state) => ({
+        failedMutations: state.failedMutations.filter(
+          (m) => !(m.eventId === eventId && m.action === action)
+        )
+      })),
+    clearFailedMutations: () => set({ failedMutations: [] })
+  })
+)
+
+type OutboxRecords = (Partial<EventIndex> & {
+  meta?: Record<string, unknown>
+})[]
+
+export function useOutbox(): {
+  pending: OutboxRecords
+  failed: OutboxRecords
+  all: OutboxRecords
+} {
   const trpc = useTRPC()
   const eventConfigurations = useEventConfigurations()
 
   const pendingMutations = useMutationState({
     filters: {
       predicate: (mutation) =>
-        mutation.state.status !== 'success' &&
+        mutation.state.status === 'pending' &&
         !assignmentMutation(mutation.options.mutationKey as MutationKey)
     },
     select: (mutation) => mutation
   })
 
-  const outboxEvents = pendingMutations
+  const failedMutations = useFailedMutationStore((s) => s.failedMutations)
+  const failedOutboxEvents = failedMutations
+    .map(({ eventId }) => {
+      const event = queryClient.getQueryData(trpc.event.get.queryKey(eventId))
+      const config = eventConfigurations.find((c) => c.id === event?.type)
+      if (!event || !config) {
+        return null
+      }
+      const eventState = getCurrentEventState(event, config)
+      return {
+        ...eventState,
+        meta: { failed: true }
+      }
+    })
+    .filter((event) => event !== null)
+
+  const pendingOutboxEvents = pendingMutations
     .map((mutation) => {
       const maybeVariables = mutation.state.variables
 
@@ -84,5 +149,9 @@ export function useOutbox() {
     })
     .filter((event) => event !== null)
 
-  return outboxEvents
+  return {
+    pending: pendingOutboxEvents,
+    failed: failedOutboxEvents,
+    all: [...pendingOutboxEvents, ...failedOutboxEvents]
+  }
 }

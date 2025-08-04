@@ -49,7 +49,7 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const outbox = useOutbox()
   const events = getResult()
     .useSuspenseQuery()
-    .filter((event) => !outbox.find(({ id }) => id === event.id))
+    .filter((event) => !outbox.all.find(({ id }) => id === event.id))
 
   const intl = useIntl()
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
@@ -61,7 +61,7 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   const actions = workqueueConfig.actions.map(({ type }) => type)
   return (
     <SearchResultComponent
-      key={`${workqueueSlug}-${outbox.length}`}
+      key={`${workqueueSlug}-${outbox.all.length}`}
       actions={actions}
       columns={workqueueConfig.columns}
       eventConfigs={eventConfigs}
