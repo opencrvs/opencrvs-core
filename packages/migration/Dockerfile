@@ -10,11 +10,15 @@ RUN chmod +x /app/wait
 # Override the base log level (info).
 ENV NPM_CONFIG_LOGLEVEL warn
 
-WORKDIR /app/packages/migration
 
 COPY --chown=node:node packages/migration /app/packages/migration
 
-RUN pnpm install --frozen-lockfile
+WORKDIR /app
+
+RUN pnpm fetch --filter ./packages/migration... 
+RUN pnpm install -r --offline --filter ./packages/migration...
+
+WORKDIR /app/packages/migration
 RUN pnpm build
 
 WORKDIR /app/packages/migration
