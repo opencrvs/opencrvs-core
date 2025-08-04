@@ -3,9 +3,15 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-WORKDIR /app/packages/search
+WORKDIR /app
+
 COPY --chown=node:node packages/search /app/packages/search
-RUN pnpm install --frozen-lockfile && pnpm build
+
+RUN pnpm fetch --filter ./packages/search... 
+RUN pnpm install -r --offline --filter ./packages/search...
+
+WORKDIR /app/packages/search
+RUN pnpm build
 
 
 CMD [ "pnpm", "start:prod" ]
