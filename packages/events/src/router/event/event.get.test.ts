@@ -110,15 +110,6 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-
   await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
@@ -145,19 +136,21 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
-  const correctionRequest = await client.event.actions.correction.request(
-    generator.event.actions.correction.request(event.id)
-  )
+  const correctionRequest =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
+    )
 
   await client.event.actions.assignment.assign({
     ...assignmentInput,
     transactionId: getUUID()
   })
 
-  await client.event.actions.correction.reject(
+  await client.event.actions.correction.reject.request(
     generator.event.actions.correction.reject(
       event.id,
-      correctionRequest.actions[correctionRequest.actions.length - 1].id
+      // last action is the assign action and 2nd last is the automatic unassign action
+      correctionRequest.actions[correctionRequest.actions.length - 2].id
     )
   )
 
@@ -166,10 +159,21 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
-  await client.event.actions.correction.approve(
+  const correctionRequest2 =
+    await client.event.actions.correction.request.request(
+      generator.event.actions.correction.request(event.id)
+    )
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.correction.approve.request(
     generator.event.actions.correction.approve(
-      correctionRequest.id,
-      correctionRequest.actions[correctionRequest.actions.length - 1].id
+      event.id,
+      // last action is the assign action and 2nd last is the automatic unassign action
+      correctionRequest2.actions[correctionRequest2.actions.length - 2].id
     )
   )
 

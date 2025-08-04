@@ -16,15 +16,17 @@ import { Text } from '@opencrvs/components/lib/Text'
 import {
   ActionDocument,
   ActionType,
-  EventDocument
+  EventDocument,
+  getAcceptedActions
 } from '@opencrvs/commons/client'
 import { joinValues } from '@opencrvs/commons/client'
+import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { getActionTypeSpecificContent } from './actionTypeSpecificContent'
 
 export const eventHistoryStatusMessage = {
   id: `v2.events.history.status`,
   defaultMessage:
-    '{status, select, CREATE {Draft} NOTIFY {Sent incomplete} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
+    '{status, select, CREATE {Declaration started} NOTIFY {Notified} VALIDATE {Validated} DRAFT {Draft} DECLARE {Sent for review} REGISTER {Registered} PRINT_CERTIFICATE {Certified} REJECT {Rejected} ARCHIVE {Archived} MARKED_AS_DUPLICATE {Marked as a duplicate} CORRECTED {Record corrected} REQUEST_CORRECTION {Correction requested} APPROVE_CORRECTION {Correction approved} REJECT_CORRECTION {Correction rejected} READ {Viewed} ASSIGN {Assigned} UNASSIGN {Unassigned} other {Unknown}}'
 }
 
 const messages = defineMessages({
@@ -68,8 +70,10 @@ export function EventHistoryDialog({
   fullEvent: EventDocument
 }) {
   const intl = useIntl()
+  const { getActionTypeForHistory } = useActionForHistory()
+  const history = getAcceptedActions(fullEvent)
   const title = intl.formatMessage(eventHistoryStatusMessage, {
-    status: action.type
+    status: getActionTypeForHistory(history, action)
   })
 
   const comments = prepareComments(action)

@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { transformRoleCodes } from '../../utils/role-helper.js'
 import { Db, MongoClient } from 'mongodb'
 
 export const up = async (db: Db, client: MongoClient) => {
@@ -18,11 +19,12 @@ export const up = async (db: Db, client: MongoClient) => {
     .toArray()
 
   for (const doc of documents) {
-    const filteredCode = doc.code.filter((c: any) =>
-      c.coding.find(
-        (cod: any) => cod.system !== 'http://opencrvs.org/specs/types'
-      )
-    )
+    if (!doc.code) {
+      console.warn(`Document ${doc._id}: No code field, skipping`)
+      continue
+    }
+
+    const filteredCode = transformRoleCodes(doc)
 
     await db
       .collection('PractitionerRole')

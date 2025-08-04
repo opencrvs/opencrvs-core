@@ -20,15 +20,12 @@ import {
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
-
-// @TODO: Update type to more strict once REQUEST_CORRECTION uses annotations
-type Props = PropsWithChildren<{ actionType: ActionType }>
+import { getEventDrafts } from './utils'
 
 /**
  * Creates a wrapper component for the annotation action.
@@ -40,7 +37,10 @@ type Props = PropsWithChildren<{ actionType: ActionType }>
  *
  * This differs from DeclarationAction, which is a series of one-time actions that modify the declaration.
  */
-function AnnotationActionComponent({ children, actionType }: Props) {
+function AnnotationActionComponent({
+  children,
+  actionType
+}: PropsWithChildren<{ actionType: ActionType }>) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const { getEvent } = useEvents()
@@ -81,26 +81,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
    */
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const eventDrafts = drafts
-    .filter((d) => d.eventId === event.id)
-    .concat({
-      ...localDraft,
-      /*
-       * Force the local draft always to be the latest
-       * This is to prevent a situation where the local draft gets created,
-       * then a CREATE action request finishes in the background and is stored with a later
-       * timestamp
-       */
-      createdAt: new Date().toISOString(),
-      /*
-       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-       */
-      eventId: event.id,
-      action: {
-        ...localDraft.action,
-        createdAt: new Date().toISOString()
-      }
-    })
+  const eventDrafts = getEventDrafts(event.id, localDraft, drafts)
 
   const actionAnnotation = useMemo(() => {
     return getAnnotationFromDrafts(eventDrafts)

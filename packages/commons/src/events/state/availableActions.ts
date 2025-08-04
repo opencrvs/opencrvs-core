@@ -8,8 +8,9 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from '../ActionType'
-import { EventStatus } from '../EventMetadata'
+import { ActionType, DisplayableAction, ExclusiveActions } from '../ActionType'
+import { EventIndex } from '../EventIndex'
+import { EventStatus, InherentFlags } from '../EventMetadata'
 
 export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.CREATED]: [
@@ -36,24 +37,39 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.ARCHIVE,
     ActionType.REJECT
   ],
-  [EventStatus.enum.REJECTED]: [
-    ActionType.READ,
-    ActionType.DECLARE,
-    ActionType.VALIDATE
-  ],
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
-    ActionType.REQUEST_CORRECTION
+    ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
+    ExclusiveActions.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.CERTIFIED]: [
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
-    ActionType.REQUEST_CORRECTION
+    ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
+    ExclusiveActions.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.ARCHIVED]: [
     ActionType.READ,
     ActionType.ASSIGN,
     ActionType.UNASSIGN
   ]
-} as const satisfies Record<EventStatus, ActionType[]>
+} as const satisfies Record<EventStatus, DisplayableAction[]>
+
+export const getAvailableActionsForEvent = (
+  event: EventIndex
+): DisplayableAction[] => {
+  return event.flags.includes(InherentFlags.REJECTED)
+    ? [
+        ActionType.READ,
+        event.status === EventStatus.Enum.VALIDATED
+          ? ActionType.VALIDATE
+          : ActionType.DECLARE,
+        ActionType.ARCHIVE
+      ]
+    : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+}

@@ -19,21 +19,25 @@ import {
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
   WorkqueueActionType,
-  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
   EventStatus,
-  isMetaAction
+  isMetaAction,
+  getAvailableActionsForEvent,
+  InherentFlags,
+  ExclusiveActions,
+  DisplayableAction
 } from '@opencrvs/commons/client'
+import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
   EventStatus.enum.VALIDATED,
-  EventStatus.enum.REJECTED,
   EventStatus.enum.REGISTERED,
   EventStatus.enum.CERTIFIED,
   EventStatus.enum.ARCHIVED
@@ -67,7 +71,8 @@ function getAvailableAssignmentActions(
 }
 interface ActionConfig {
   label: TranslationConfig
-  onClick: (eventId: string) => Promise<void> | void
+  icon: IconProps['name']
+  onClick: (workqueue?: string) => Promise<void> | void
   disabled?: boolean
   shouldHide?: (actions: ActionType[]) => boolean
 }
@@ -76,7 +81,7 @@ export const actionLabels = {
   [ActionType.READ]: {
     id: 'v2.action.view.record',
     description: 'Label for view record',
-    defaultMessage: 'View record'
+    defaultMessage: 'View'
   },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
@@ -95,18 +100,18 @@ export const actionLabels = {
     id: 'v2.event.birth.action.declare.label'
   },
   [ActionType.VALIDATE]: {
-    defaultMessage: 'Validate',
+    defaultMessage: 'Review',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.validate.label'
   },
   [ActionType.REGISTER]: {
-    defaultMessage: 'Register',
+    defaultMessage: 'Review',
     description: 'Label for review record button in dropdown menu',
     id: 'v2.event.birth.action.register.label'
   },
   [ActionType.PRINT_CERTIFICATE]: {
-    defaultMessage: 'Print certificate',
+    defaultMessage: 'Print',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.collect-certificate.label'
@@ -115,10 +120,16 @@ export const actionLabels = {
     defaultMessage: 'Delete',
     description: 'Label for delete button in dropdown menu',
     id: 'v2.event.birth.action.delete.label'
+  },
+  [ActionType.REQUEST_CORRECTION]: {
+    defaultMessage: 'Correct record',
+    description: 'Label for request correction button in dropdown menu',
+    id: 'v2.event.birth.action.request-correction.label'
   }
 } as const
 
 export function useAction(event: EventIndex) {
+  const scopes = useSelector(getScope) ?? []
   const events = useEvents()
   const navigate = useNavigate()
   const authentication = useAuthentication()
@@ -132,6 +143,7 @@ export function useAction(event: EventIndex) {
   const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
 
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
@@ -142,6 +154,11 @@ export function useAction(event: EventIndex) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
+  const eventIsWaitingForCorrection = event.flags.includes(
+    InherentFlags.CORRECTION_REQUESTED
+  )
+  const eventId = event.id
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -150,24 +167,30 @@ export function useAction(event: EventIndex) {
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
-        onClick: (workqueue?: string) =>
-          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+        icon: 'Eye',
+        onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
-        onClick: async (workqueue?: string) => {
+        icon: 'PushPin',
+        onClick: async () => {
           await events.actions.assignment.assign.mutate({
-            eventId: event.id,
+            eventId,
             assignedTo: authentication.sub,
             refetchEvent
           })
-        }
+        },
+        disabled:
+          // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
+          eventIsWaitingForCorrection &&
+          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
-        onClick: async (workqueue?: string) => {
+        icon: 'ArrowCircleDown',
+        onClick: async () => {
           await events.actions.assignment.unassign.mutateAsync({
-            eventId: event.id,
+            eventId,
             transactionId: getUUID(),
             assignedTo: null
           })
@@ -175,10 +198,11 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
-        onClick: (workqueue?: string) =>
+        icon: 'PencilLine',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -188,10 +212,11 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
-        onClick: (workqueue?: string) =>
+        icon: 'PencilLine',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -199,10 +224,11 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
-        onClick: (workqueue?: string) =>
+        icon: 'PencilLine',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -210,27 +236,75 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        onClick: (workqueue?: string) =>
+        icon: 'Printer',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
+        shouldHide: () => eventIsWaitingForCorrection
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
-        onClick: (workqueue?: string) => {
-          deleteEvent({
-            eventId: event.id
-          })
+        icon: 'Trash',
+        onClick: (workqueue?) => {
+          deleteEvent({ eventId })
           if (!workqueue) {
             navigate(ROUTES.V2.buildPath({}))
           }
         }
+      },
+      [ActionType.REQUEST_CORRECTION]: {
+        label: actionLabels[ActionType.REQUEST_CORRECTION],
+        icon: 'NotePencil',
+        onClick: () => {
+          const correctionPages = eventConfiguration.actions.find(
+            (action) => action.type === ActionType.REQUEST_CORRECTION
+          )?.correctionForm.pages
+
+          if (!correctionPages) {
+            throw new Error('No page ID found for request correction')
+          }
+
+          // If no pages are configured, skip directly to review page
+          if (correctionPages.length === 0) {
+            navigate(ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId }))
+            return
+          }
+
+          // If pages are configured, navigate to first page
+          navigate(
+            ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
+              eventId,
+              pageId: correctionPages[0].id
+            })
+          )
+        },
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
+        shouldHide: () => eventIsWaitingForCorrection
+      },
+      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+        label: {
+          defaultMessage: 'Review correction request',
+          description:
+            'This is shown as the action name anywhere the user can trigger the action from',
+          id: 'v2.event.summary.review-correction-request.label'
+        },
+        icon: 'NotePencil',
+        onClick: () => {
+          navigate(
+            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+              eventId
+            })
+          )
+        },
+        disabled: !eventIsAssignedToSelf,
+        shouldHide: () => !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>,
+    } satisfies Partial<Record<DisplayableAction, ActionConfig>>,
     authentication
   }
 }
@@ -241,11 +315,6 @@ const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
     ActionType.VALIDATE,
     ActionType.ARCHIVE,
     ActionType.REJECT
-  ],
-  [EventStatus.enum.REJECTED]: [
-    ActionType.READ,
-    ActionType.DECLARE,
-    ActionType.VALIDATE
   ]
 } satisfies Partial<Record<EventStatus, ActionType[]>>
 
@@ -264,17 +333,18 @@ export function useActionMenuItems(event: EventIndex) {
 
   // Find actions available based on the event status
   const availableActions =
+    !event.flags.includes(InherentFlags.REJECTED) &&
     event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
       ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
           event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
         ]
-      : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+      : getAvailableActionsForEvent(event)
 
   const actions = [...availableAssignmentActions, ...availableActions]
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
-    (action): action is keyof typeof config =>
+    (action): action is WorkqueueActionType =>
       Object.keys(config).includes(action)
   )
 
@@ -286,7 +356,7 @@ export function useActionMenuItems(event: EventIndex) {
       : hasAnyOfScopes(scopes, requiredScopes)
   })
 
-  // Filter out actions which are not visible based on the action config
+  // Filter out actions which are not visible based on the action config 'shouldHide' function
   const visibleActions = allowedActions.filter((a) => {
     const actionConfig = config[a]
 

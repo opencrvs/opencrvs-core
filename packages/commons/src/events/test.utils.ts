@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString } from 'lodash'
+import { merge, omitBy, isString, omit } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -20,11 +20,13 @@ import {
   EventState
 } from './ActionDocument'
 import {
+  ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
   NotifyActionInput,
   RegisterActionInput,
+  RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   UnassignActionInput,
@@ -137,6 +139,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.PAGE_HEADER:
     case FieldType.LOCATION:
     case FieldType.SELECT:
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
@@ -167,7 +170,8 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
-    case FieldType.SELECT_DATE_RANGE:
+    case FieldType.TIME:
+      return '09:33'
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',
@@ -298,7 +302,11 @@ export function eventPayloadGenerator(rng: () => number) {
                 surname: 'McLaren'
               },
               'applicant.dob': '2020-01-02',
-              'recommender.none': true
+              'applicant.image': {
+                path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+                originalFilename: 'Screenshot.png',
+                type: 'image/png'
+              }
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
@@ -545,10 +553,13 @@ export function eventPayloadGenerator(rng: () => number) {
           transactionId: input.transactionId ?? getUUID(),
           declaration:
             input.declaration ??
-            generateActionDeclarationInput(
-              tennisClubMembershipEvent,
-              ActionType.REQUEST_CORRECTION,
-              rng
+            omit(
+              generateActionDeclarationInput(
+                tennisClubMembershipEvent,
+                ActionType.REQUEST_CORRECTION,
+                rng
+              ),
+              ['applicant.email']
             ),
           annotation:
             input.annotation ??
@@ -565,7 +576,7 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
+              ApproveCorrectionActionInput,
               'transactionId' | 'annotation' | 'keepAssignment'
             >
           > = {}
@@ -589,7 +600,7 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
+              RejectCorrectionActionInput,
               'transactionId' | 'annotation' | 'keepAssignment'
             >
           > = {}

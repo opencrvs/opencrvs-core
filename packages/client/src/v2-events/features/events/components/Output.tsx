@@ -21,11 +21,13 @@ import {
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
+  isTimeFieldType,
   isDateRangeFieldType,
   isDividerFieldType,
   isEmailFieldType,
   isFacilityFieldType,
   isFileFieldType,
+  isFileFieldWithOptionType,
   isNumberFieldType,
   isOfficeFieldType,
   isPageHeaderFieldType,
@@ -54,11 +56,13 @@ import {
   SelectCountry,
   Paragraph,
   Number,
-  Text
+  Text,
+  TimeField
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -88,6 +92,10 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
     return DateField.Output({ value: field.value })
   }
 
+  if (isTimeFieldType(field)) {
+    return TimeField.Output({ value: field.value })
+  }
+
   if (isDateRangeFieldType(field)) {
     return DateRangeField.Output({ value: field.value })
   }
@@ -101,11 +109,15 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   }
 
   if (isNumberFieldType(field)) {
-    return Number.Output({ value: field.value })
+    return Number.Output(field)
   }
 
   if (isFileFieldType(field)) {
-    return File.Output
+    return File.Output(field)
+  }
+
+  if (isFileFieldWithOptionType(field)) {
+    return FileWithOption.Output(field)
   }
 
   if (isBulletListFieldType(field)) {
@@ -174,7 +186,7 @@ export function Output({
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
-  showPreviouslyMissingValuesAsChanged: boolean
+  showPreviouslyMissingValuesAsChanged?: boolean
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value
   const hasValue = value !== undefined

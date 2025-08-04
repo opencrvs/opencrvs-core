@@ -250,7 +250,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
         },
         {
           eventType: 'bar',
-          status: { type: 'exact', term: 'REJECTED' }
+          status: { type: 'exact', term: 'VALIDATED' }
         }
       ]
     }
@@ -272,7 +272,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
             bool: {
               must: [
                 { term: { type: 'bar' } },
-                { term: { status: 'REJECTED' } }
+                { term: { status: 'VALIDATED' } }
               ]
             }
           }

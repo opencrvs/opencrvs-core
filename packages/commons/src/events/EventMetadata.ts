@@ -26,11 +26,13 @@ export const EventStatus = z.enum([
   'VALIDATED',
   'REGISTERED',
   'CERTIFIED',
-  'REJECTED',
   'ARCHIVED'
 ])
 
 export type EventStatus = z.infer<typeof EventStatus>
+
+export const VisibleStatus = z.enum([...EventStatus.options, 'REJECTED'])
+export type VisibleStatus = z.infer<typeof VisibleStatus>
 
 export const InherentFlags = {
   PRINTED: 'printed',
