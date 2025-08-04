@@ -15,14 +15,16 @@ RUN pnpm install -r --offline --filter ./packages/components...
 WORKDIR /app/packages/components
 RUN pnpm build
 
+WORKDIR /app
+
+RUN pnpm fetch --prod --filter ./packages/client... 
+RUN pnpm install -r --offline --prod --filter ./packages/client... 
+
 # Placeholders:
 # Variables should be substituted in docker-compose/kubernetes manifest
 ENV CONTENT_SECURITY_POLICY_WILDCARD="{{CONTENT_SECURITY_POLICY_WILDCARD}}"
 ENV COUNTRY_CONFIG_URL_INTERNAL="{{COUNTRY_CONFIG_URL_INTERNAL}}"
 ENV GATEWAY_URL_INTERNAL="{{GATEWAY_URL_INTERNAL}}"
-
-RUN pnpm fetch --prod --filter ./packages/client... 
-RUN pnpm install -r --offline --prod --filter ./packages/client... 
 
 WORKDIR /app/packages/client
 RUN pnpm build
