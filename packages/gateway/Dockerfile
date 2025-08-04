@@ -5,10 +5,13 @@ USER node
 
 COPY --chown=node:node packages/events /app/packages/events
 
-WORKDIR /app/packages/gateway
-COPY --chown=node:node packages/gateway/*.json /app/packages/gateway/
+WORKDIR /app
 
-RUN pnpm install --frozen-lockfile
+COPY --chown=node:node packages/gateway/*.json /app/packages/gateway/
+RUN pnpm fetch --filter ./packages/gateway... 
+RUN pnpm install -r --offline --filter ./packages/gateway...
+
+WORKDIR /app/packages/gateway
 COPY --chown=node:node packages/gateway /app/packages/gateway
 RUN pnpm build
 
