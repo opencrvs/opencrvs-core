@@ -32,7 +32,6 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-import { Location } from '@events/service/locations/locations'
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, ['record.declare-birth'])
