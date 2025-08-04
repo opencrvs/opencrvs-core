@@ -3,8 +3,12 @@ FROM ghcr.io/opencrvs/ocrvs-base:${BRANCH}
 
 USER node
 
-WORKDIR /app/packages/data-seeder
+WORKDIR /app
 COPY --chown=node:node packages/data-seeder/*.json /app/packages/data-seeder/
-RUN pnpm install --frozen-lockfile
+
+RUN pnpm fetch --filter ./packages/data-seeder... 
+RUN pnpm install -r --offline --filter ./packages/data-seeder...
+
+WORKDIR /app/packages/data-seeder
 COPY --chown=node:node packages/data-seeder /app/packages/data-seeder
 ENTRYPOINT [ "pnpm","seed" ]
