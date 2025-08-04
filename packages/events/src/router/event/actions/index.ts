@@ -217,7 +217,7 @@ export function getDefaultActionProcedures(
           return ctx.event
         }
 
-        await throwConflictIfActionNotAllowed(eventId, actionType)
+        await throwConflictIfActionNotAllowed(eventId, actionType, ctx.token)
 
         // Certain actions are not allowed if the event is waiting for correction
         if (!allowIfWaitingForCorrection) {

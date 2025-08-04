@@ -68,7 +68,7 @@ export function Pages() {
   useEffect(() => {
     if (pageId !== currentPageId) {
       navigate(
-        ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+        ROUTES.V2.EVENTS.CORRECTION.PAGES.buildPath(
           {
             eventId,
             pageId: currentPageId
@@ -81,7 +81,7 @@ export function Pages() {
   }, [pageId, currentPageId, navigate, eventId, searchParams])
 
   return (
-    <FormLayout route={ROUTES.V2.EVENTS.REQUEST_CORRECTION}>
+    <FormLayout route={ROUTES.V2.EVENTS.CORRECTION}>
       {modal}
       <PagesComponent
         declaration={eventIndex.declaration}
@@ -94,7 +94,7 @@ export function Pages() {
         showReviewButton={searchParams.from === 'review'}
         onPageChange={(nextPageId: string) =>
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.PAGES.buildPath(
+            ROUTES.V2.EVENTS.CORRECTION.PAGES.buildPath(
               {
                 eventId,
                 pageId: nextPageId
@@ -105,7 +105,7 @@ export function Pages() {
         }
         onSubmit={() =>
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath(
+            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath(
               { eventId },
               { workqueue: searchParams.workqueue }
             )

@@ -39,10 +39,16 @@ export const up = async (db: Db, client: MongoClient) => {
             $addFields: {
               role: {
                 $toUpper: {
-                  $replaceAll: {
-                    input: { $arrayElemAt: ['$roleDetails.labels.label', 0] },
-                    find: ' ',
-                    replacement: '_'
+                  $function: {
+                    body: `
+                      function(label) {
+                        return label
+                          .replace(/[^a-zA-Z0-9 ]/g, '')
+                          .replace(/ /g, '_');
+                      }
+                    `,
+                    args: [{ $arrayElemAt: ['$roleDetails.labels.label', 0] }],
+                    lang: 'js'
                   }
                 }
               }

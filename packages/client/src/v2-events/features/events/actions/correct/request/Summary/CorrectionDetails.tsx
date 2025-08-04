@@ -57,12 +57,14 @@ export function CorrectionDetails({
   event,
   form,
   annotation,
+  requesting,
   editable = false,
   workqueue
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
+  requesting: boolean
   editable?: boolean
   workqueue?: string
 }) {
@@ -132,7 +134,7 @@ export function CorrectionDetails({
                 onClick={(e) => {
                   e.stopPropagation()
                   navigate(
-                    ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath(
+                    ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath(
                       {
                         pageId,
                         eventId: event.id
@@ -154,7 +156,9 @@ export function CorrectionDetails({
       ></Table>
 
       <CorrectionSectionTitle element="h3" variant="h3">
-        {intl.formatMessage(messages.correctionSectionTitle)}
+        {requesting
+          ? intl.formatMessage(messages.correctionSectionTitle)
+          : intl.formatMessage(messages.makeCorrectionSectionTitle)}
       </CorrectionSectionTitle>
 
       {formConfig.pages.map((page) => {

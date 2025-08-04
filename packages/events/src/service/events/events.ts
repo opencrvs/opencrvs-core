@@ -30,8 +30,10 @@ import {
   isWriteAction,
   getStatusFromActions,
   EventConfig,
-  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
-  EventStatus
+  EventStatus,
+  getAvailableActionsForEvent,
+  getCurrentEventState,
+  DisplayableAction
 } from '@opencrvs/commons/events'
 import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -100,13 +102,19 @@ async function deleteEventAttachments(token: string, event: EventDocument) {
 
 export async function throwConflictIfActionNotAllowed(
   eventId: UUID,
-  actionType: ActionType
+  actionType: ActionType,
+  token: string
 ) {
   const event = await getEventById(eventId)
+  const eventConfig = await getEventConfigurationById({
+    token,
+    eventType: event.type
+  })
   const eventStatus = getStatusFromActions(event.actions)
 
-  const allowedActions: ActionType[] =
-    AVAILABLE_ACTIONS_BY_EVENT_STATUS[eventStatus]
+  const allowedActions: DisplayableAction[] = getAvailableActionsForEvent(
+    getCurrentEventState(event, eventConfig)
+  )
 
   if (!allowedActions.includes(actionType)) {
     throw new TRPCError({
@@ -296,7 +304,9 @@ export async function addAction(
     })
   } else {
     const hasReason =
-      input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+      input.type === ActionType.ARCHIVE ||
+      input.type === ActionType.REJECT ||
+      input.type === ActionType.REJECT_CORRECTION
 
     const hasRequestId =
       input.type === ActionType.APPROVE_CORRECTION ||

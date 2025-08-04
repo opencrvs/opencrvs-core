@@ -75,6 +75,13 @@ export const ActionTypes = z.enum([
   'UNASSIGN'
 ])
 
+export const ExclusiveActions = {
+  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
+} as const
+
+export type ExclusiveActionTypes =
+  (typeof ExclusiveActions)[keyof typeof ExclusiveActions]
+
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
   ActionTypes.enum.VALIDATE,
@@ -124,6 +131,7 @@ export const workqueueActions = ActionTypes.exclude([
 ])
 
 export type WorkqueueActionType = z.infer<typeof workqueueActions>
+export type DisplayableAction = ActionType | ExclusiveActionTypes
 
 const META_ACTIONS: ActionType[] = [
   ActionType.ASSIGN,

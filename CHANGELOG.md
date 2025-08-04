@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## 1.9.0 Release candidate
 
 ### New features
@@ -25,7 +24,20 @@
 
 - Add retry on deploy-to-feature-environment workflow at core repo [#9847](https://github.com/opencrvs/opencrvs-core/issues/9847)
 
-## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.8.0)
+## [1.8.1](https://github.com/opencrvs/opencrvs-core/compare/v1.8.0...v1.8.1)
+
+### Bug fixes
+
+- Inactive health facilities still appear in the Place of birth / death select [#9311](https://github.com/opencrvs/opencrvs-core/issues/9311)
+- After migrating to v1.7 task history shows legacy system role rather than new role based on alias [#9989](https://github.com/opencrvs/opencrvs-core/issues/9989)
+- Setup hardened CSP for client and login containers [#9584](https://github.com/opencrvs/opencrvs-core/issues/9584)
+- Apostrophes in role names are generated but are not supported [#10049](https://github.com/opencrvs/opencrvs-core/issues/10049)
+- Reconfigured Content Security Policy (CSP) to be more restrictive, enhancing protection against unauthorized content sources [#9594](https://github.com/opencrvs/opencrvs-core/issues/9584)
+- Ensure that place of birth/death only shows active facilities/offices on the form [#9311](https://github.com/opencrvs/opencrvs-core/issues/9311)
+- Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
+
+
+## [1.8.0](https://github.com/opencrvs/opencrvs-core/compare/v1.7.4...v1.8.0)
 
 ### New features
 
@@ -54,6 +66,13 @@
   - Secret `E2E_WORKFLOWS_TOKEN` is fine-grained token scoped to your fork of country config template repository with permissions `Contents: Read and Write`.
 - Created a standalone `data-seeder` Docker image to decouple seeding logic from the core repository. This improves GitHub Actions runtime by avoiding full repository clone and dependency installation during environment seeding. [#8976](https://github.com/opencrvs/opencrvs-core/issues/8976)
 
+## [1.7.4](https://github.com/opencrvs/opencrvs-core/compare/v1.7.3...v1.7.4)
+
+### Bug fixes
+
+- Fixed historical roles displaying incorrectly in task history after migration to v1.7 [#9989](https://github.com/opencrvs/opencrvs-core/issues/9989)
+- Remove special characters from role ids on generation [#10049](https://github.com/opencrvs/opencrvs-core/issues/10049)
+
 ## [1.7.3](https://github.com/opencrvs/opencrvs-core/compare/v1.7.2...v1.7.3)
 
 ### New features
@@ -63,7 +82,6 @@
 - Allow booleanTransformer to be used as a certificate handlebar template transformer [#9631](https://github.com/opencrvs/opencrvs-core/issues/9631)
 - Fix international to local number conversion from failing if the number was already local [#9634](https://github.com/opencrvs/opencrvs-core/issues/9634)
 - Pre-select default certificate option in print certificate collector form [#9935](https://github.com/opencrvs/opencrvs-core/issues/9935)
-
 
 ## [1.7.2](https://github.com/opencrvs/opencrvs-core/compare/v1.7.1...v1.7.2)
 
@@ -145,11 +163,6 @@
 - Fix the event name displayed in email templates for death correction requests [#7703](https://github.com/opencrvs/opencrvs-core/issues/7703)
 - Fix the "email all users" feature by setting the _To_ email to the logged user's email [#8343](https://github.com/opencrvs/opencrvs-core/issues/8343)
 
-## [1.6.5](https://github.com/opencrvs/opencrvs-core/compare/v1.6.4...v1.6.5)
-
-### Breaking changes
-
-- Limit year past record `LIMIT_YEAR_PAST_RECORDS` forcing date of birth to start from the year 1900 has been addressed [#9326](https://github.com/opencrvs/opencrvs-core/pull/9326)
 
 ## [1.6.4](https://github.com/opencrvs/opencrvs-core/compare/v1.6.3...v1.6.4)
 

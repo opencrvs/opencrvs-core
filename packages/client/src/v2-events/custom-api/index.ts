@@ -9,8 +9,17 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { EventState, getUUID } from '@opencrvs/commons/client'
+import {
+  EventState,
+  getUUID,
+  ActionType,
+  getCurrentEventState,
+  omitHiddenAnnotationFields,
+  EventDocument,
+  EventConfig
+} from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
+import { useEventConfigurations } from '../features/events/useEventConfiguration'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
@@ -19,6 +28,8 @@ export interface OnDeclareParams {
   declaration: EventState
   transactionId: string
   annotation?: EventState
+  fullEvent?: EventDocument
+  eventConfiguration?: EventConfig
 }
 /**
  * Runs a sequence of actions from declare to register.
@@ -136,4 +147,85 @@ export async function registerOnValidate(variables: {
   )
 
   return latestResponse
+}
+
+/**
+ * Runs a full correction sequence:
+ * 1. Request a correction
+ * 2. Approve the correction
+ *
+ * This is used to make a direct correction (instead of a separate request and approval) by users who are allowed to do so.
+ *
+ * Defining the function here, statically allows offline support.
+ * Moving the function to one level up will break offline support since the definition needs to be static.
+ */
+export async function makeCorrectionOnRequest(variables: {
+  eventId: string
+  declaration: EventState
+  transactionId: string
+  annotation?: EventState
+  fullEvent?: EventDocument
+  eventConfiguration?: EventConfig
+}) {
+  const {
+    eventId,
+    declaration,
+    annotation: declarationMixedUpAnnotation,
+    transactionId,
+    fullEvent,
+    eventConfiguration
+  } = variables
+
+  if (!fullEvent) {
+    throw new Error(`full event payload not provided for makeCorrectionRequest`)
+  }
+  if (!eventConfiguration) {
+    throw new Error(
+      `Event configuration not found for event: ${fullEvent.type}`
+    )
+  }
+  // Let's find the REQUEST_CORRECTION action configuration. Because the annotation passed down here is mixed up
+  // with declaration in the REQUEST_CORRECTION page form, we need to cleanup the annotation from declaration
+  const actionConfiguration = eventConfiguration.actions.find(
+    (action) => action.type === ActionType.REQUEST_CORRECTION
+  )
+
+  const originalDeclaration = getCurrentEventState(
+    fullEvent,
+    eventConfiguration
+  ).declaration
+
+  const annotation =
+    actionConfiguration && declarationMixedUpAnnotation
+      ? omitHiddenAnnotationFields(
+          actionConfiguration,
+          originalDeclaration,
+          declarationMixedUpAnnotation
+        )
+      : {}
+  const response =
+    await trpcClient.event.actions.correction.request.request.mutate({
+      eventId,
+      declaration,
+      transactionId,
+      annotation,
+      keepAssignment: true
+    })
+  const requestId = response.actions.find(
+    (a) => a.transactionId === transactionId
+  )?.id
+  if (!requestId) {
+    throw new Error(
+      `Request ID not found in response for eventId: ${eventId}, transactionId: ${transactionId}`
+    )
+  }
+  return trpcClient.event.actions.correction.approve.request.mutate({
+    type: ActionType.APPROVE_CORRECTION,
+    transactionId: getUUID(),
+    eventId,
+    requestId,
+    annotation: {
+      isImmediateCorrection: true
+    }
+  })
 }

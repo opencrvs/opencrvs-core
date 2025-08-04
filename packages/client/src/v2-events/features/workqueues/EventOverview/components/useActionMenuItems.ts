@@ -18,11 +18,13 @@ import {
   SCOPES,
   ACTION_ALLOWED_SCOPES,
   hasAnyOfScopes,
-  InherentFlags,
   WorkqueueActionType,
-  AVAILABLE_ACTIONS_BY_EVENT_STATUS,
   EventStatus,
-  isMetaAction
+  isMetaAction,
+  getAvailableActionsForEvent,
+  InherentFlags,
+  ExclusiveActions,
+  DisplayableAction
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -36,7 +38,6 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
   EventStatus.enum.DECLARED,
   EventStatus.enum.VALIDATED,
-  EventStatus.enum.REJECTED,
   EventStatus.enum.REGISTERED,
   EventStatus.enum.CERTIFIED,
   EventStatus.enum.ARCHIVED
@@ -80,7 +81,7 @@ export const actionLabels = {
   [ActionType.READ]: {
     id: 'v2.action.view.record',
     description: 'Label for view record',
-    defaultMessage: 'View record'
+    defaultMessage: 'View'
   },
   [ActionType.ASSIGN]: {
     defaultMessage: 'Assign',
@@ -99,18 +100,18 @@ export const actionLabels = {
     id: 'v2.event.birth.action.declare.label'
   },
   [ActionType.VALIDATE]: {
-    defaultMessage: 'Validate',
+    defaultMessage: 'Review',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.validate.label'
   },
   [ActionType.REGISTER]: {
-    defaultMessage: 'Register',
+    defaultMessage: 'Review',
     description: 'Label for review record button in dropdown menu',
     id: 'v2.event.birth.action.register.label'
   },
   [ActionType.PRINT_CERTIFICATE]: {
-    defaultMessage: 'Print certificate',
+    defaultMessage: 'Print',
     description:
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.collect-certificate.label'
@@ -121,9 +122,14 @@ export const actionLabels = {
     id: 'v2.event.birth.action.delete.label'
   },
   [ActionType.REQUEST_CORRECTION]: {
-    defaultMessage: 'Request correction',
+    defaultMessage: 'Correct record',
     description: 'Label for request correction button in dropdown menu',
     id: 'v2.event.birth.action.request-correction.label'
+  },
+  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+    defaultMessage: 'Review',
+    description: 'Label for review correction button in dropdown menu',
+    id: 'v2.event.action.review-correction.label'
   }
 } as const
 
@@ -270,26 +276,35 @@ export function useAction(event: EventIndex) {
 
           // If no pages are configured, skip directly to review page
           if (correctionPages.length === 0) {
-            navigate(
-              ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({ eventId })
-            )
+            navigate(ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId }))
             return
           }
 
           // If pages are configured, navigate to first page
           navigate(
-            ROUTES.V2.EVENTS.REQUEST_CORRECTION.ONBOARDING.buildPath({
+            ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
               eventId,
               pageId: correctionPages[0].id
             })
           )
         },
         disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
-        shouldHide: () =>
-          eventIsWaitingForCorrection &&
-          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+        shouldHide: () => eventIsWaitingForCorrection
+      },
+      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+        label: actionLabels[ExclusiveActions.REVIEW_CORRECTION_REQUEST],
+        icon: 'NotePencil',
+        onClick: () => {
+          navigate(
+            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+              eventId
+            })
+          )
+        },
+        disabled: !eventIsAssignedToSelf,
+        shouldHide: () => !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>,
+    } satisfies Partial<Record<DisplayableAction, ActionConfig>>,
     authentication
   }
 }
@@ -300,11 +315,6 @@ const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
     ActionType.VALIDATE,
     ActionType.ARCHIVE,
     ActionType.REJECT
-  ],
-  [EventStatus.enum.REJECTED]: [
-    ActionType.READ,
-    ActionType.DECLARE,
-    ActionType.VALIDATE
   ]
 } satisfies Partial<Record<EventStatus, ActionType[]>>
 
@@ -323,17 +333,18 @@ export function useActionMenuItems(event: EventIndex) {
 
   // Find actions available based on the event status
   const availableActions =
+    !event.flags.includes(InherentFlags.REJECTED) &&
     event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
       ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
           event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
         ]
-      : AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+      : getAvailableActionsForEvent(event)
 
   const actions = [...availableAssignmentActions, ...availableActions]
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
-    (action): action is keyof typeof config =>
+    (action): action is WorkqueueActionType =>
       Object.keys(config).includes(action)
   )
 

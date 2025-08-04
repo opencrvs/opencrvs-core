@@ -23,7 +23,8 @@ import {
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getCurrentEventState
+  getCurrentEventState,
+  ActionType
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -49,6 +50,11 @@ const messages = defineMessages({
     id: 'v2-events.buttons.submitCorrectionRequest',
     defaultMessage: 'Submit correction request',
     description: 'Submit correction request button text'
+  },
+  makeCorrection: {
+    id: 'v2-events.buttons.makeCorrection',
+    defaultMessage: 'Correct record',
+    description: 'Record corrected button text'
   }
 })
 
@@ -68,14 +74,11 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 }
 
 export function Summary() {
-  const { eventId } = useTypedParams(
-    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
-  )
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.SUMMARY)
 
   const [{ workqueue }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+    ROUTES.V2.EVENTS.CORRECTION.SUMMARY
   )
-
   const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
@@ -116,7 +119,7 @@ export function Summary() {
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
-    events.actions.correction.request.mutate({
+    const mutationPayload = {
       eventId,
       declaration: {
         ...formWithOnlyChangedValues,
@@ -124,12 +127,25 @@ export function Summary() {
       },
       transactionId: generateTransactionId(),
       annotation
-    })
+    }
+    if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
+      events.customActions.makeCorrectionOnRequest.mutate({
+        ...mutationPayload,
+        fullEvent: event,
+        eventConfiguration
+      })
+    } else {
+      events.actions.correction.request.mutate(mutationPayload)
+    }
 
     navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
   }, [
     form,
     fields,
+    event,
+    eventConfiguration,
+    scopes,
+    events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,
     eventId,
     annotation,
@@ -156,8 +172,9 @@ export function Summary() {
               onClick={togglePrompt}
             >
               <Check />
-              {/* TODO: when direct correction is implemented, we should use different button message for that */}
-              {intl.formatMessage(messages.submitCorrectionRequest)}
+              {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+                ? intl.formatMessage(messages.makeCorrection)
+                : intl.formatMessage(messages.submitCorrectionRequest)}
             </Button>
           ]}
           showTitleOnMobile={true}
@@ -168,7 +185,7 @@ export function Summary() {
               id="back-to-review"
               onClick={() =>
                 navigate(
-                  ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
+                  ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
                     eventId
                   })
                 )
@@ -183,6 +200,7 @@ export function Summary() {
             editable={true}
             event={event}
             form={form}
+            requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
             workqueue={workqueue}
           />
         </Content>

@@ -386,8 +386,7 @@ export function createFieldConditionals(fieldId: string) {
             description:
               "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
           }
-        },
-        required: [fieldId]
+        }
       }),
     /**
      * Checks if the field value matches a given regular expression pattern.

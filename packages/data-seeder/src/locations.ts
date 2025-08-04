@@ -166,6 +166,8 @@ function locationBundleToIdentifier(
 /**
  * Get the externally defined id for location. Defined in country-config.
  */
+
+// FIXME: to be fixed for MDG 1.9.0
 const getExternalIdFromIdentifier = (
   identifiers: fhir3.Location['identifier']
 ) =>
@@ -283,11 +285,12 @@ export async function seedLocationsForV2Events(token: string) {
   })
 
   if (!res.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
+    const msg =
       'Unable to seed locations for v2 events. Ensure events service is running.'
-    )
+    // eslint-disable-next-line no-console
+    console.error(msg)
     // eslint-disable-next-line no-console
     console.error(JSON.stringify(await res.json()))
+    raise(msg)
   }
 }
