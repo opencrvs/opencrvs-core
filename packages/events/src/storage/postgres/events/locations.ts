@@ -56,15 +56,15 @@ export async function getChildLocations(id: string) {
   const { rows } = await sql<Locations>`
     WITH RECURSIVE r AS (
       SELECT id, parent_id
-      FROM locations
+      FROM app.locations
       WHERE id = ${id}
       UNION ALL
       SELECT l.id, l.parent_id
-      FROM locations l
+      FROM app.locations l
       JOIN r ON l.parent_id = r.id
     )
     SELECT l.*
-    FROM locations l
+    FROM app.locations l
     JOIN r ON r.id = l.id
     WHERE l.id <> ${id};
   `.execute(db)
