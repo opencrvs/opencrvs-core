@@ -304,7 +304,9 @@ export async function addAction(
     })
   } else {
     const hasReason =
-      input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+      input.type === ActionType.ARCHIVE ||
+      input.type === ActionType.REJECT ||
+      input.type === ActionType.REJECT_CORRECTION
 
     const hasRequestId =
       input.type === ActionType.APPROVE_CORRECTION ||
