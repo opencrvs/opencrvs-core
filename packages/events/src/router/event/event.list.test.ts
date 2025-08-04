@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { SCOPES } from '@opencrvs/commons'
+import { ActionType } from '@opencrvs/commons'
 import {
   createEvent,
   createTestClient,
@@ -49,7 +50,7 @@ test('Returns multiple events', async () => {
   await Promise.all(
     new Array(10)
       .fill(null)
-      .map(async () => createEvent(client, generator, ['DECLARE']))
+      .map(async () => createEvent(client, generator, [ActionType.DECLARE]))
   )
 
   const events = await client.event.list()
