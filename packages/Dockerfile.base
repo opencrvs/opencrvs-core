@@ -17,5 +17,12 @@ COPY --chown=node:node pnpm-lock.yaml .
 COPY --chown=node:node pnpm-workspace.yaml .
 COPY --chown=node:node patches ./patches
 
+RUN pnpm fetch --prod --filter ./packages/commons... --filter .
+
+ADD --chown=node:node . ./
+RUN pnpm install -r --offline --prod --filter ./packages/commons... --filter .
+
 COPY --chown=node:node packages/commons /app/packages/commons
-RUN pnpm install --filter ./packages/commons... --frozen-lockfile --production
+
+WORKDIR /app/packages/commons
+RUN pnpm build
