@@ -168,7 +168,8 @@ const ApprovedCorrectionAction = ActionBase.merge(
 const RejectedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION),
-    requestId: z.string()
+    requestId: z.string(),
+    reason: RejectionReason
   })
 )
 

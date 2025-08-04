@@ -147,7 +147,8 @@ export const RejectCorrectionActionInput = BaseActionInput.merge(
     requestId: z.string(),
     type: z
       .literal(ActionType.REJECT_CORRECTION)
-      .default(ActionType.REJECT_CORRECTION)
+      .default(ActionType.REJECT_CORRECTION),
+    reason: RejectionReason
   })
 )
 

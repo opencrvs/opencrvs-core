@@ -23,14 +23,16 @@ import {
   isMetaAction,
   SCOPES
 } from '@opencrvs/commons/client'
+import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
 import {
   Button,
   Content,
   ContentSize,
   Icon,
-  ResponsiveModal,
+  InputField,
   Stack,
-  Text
+  Text,
+  TextArea
 } from '@opencrvs/components'
 import { buttonMessages } from '@client/i18n/messages/buttons'
 import { ROUTES } from '@client/v2-events/routes'
@@ -71,6 +73,11 @@ const reviewCorrectionMessages = defineMessages({
     id: 'v2-events.correction.correctionRequest',
     defaultMessage: 'Correction request',
     description: 'Correction request text'
+  },
+  rejectReason: {
+    id: 'v2-events.correction.correctionReject.reason',
+    defaultMessage: 'Reason for rejection',
+    description: 'Correction request rejection reason'
   }
 })
 
@@ -93,6 +100,26 @@ const Row = styled.div<{
   }
 `
 
+const StyledTextArea = styled(TextArea)`
+  height: 100px;
+  width: 420px;
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+`
+
+const StyledButton = styled(Button)`
+  width: 235px;
+  height: 56px;
+  @media (max-width: 480px) {
+    width: 100%;
+  }
+`
+
+const StyledStack = styled(Stack)`
+  padding-top: 20px;
+`
+
 function ApproveModal({
   close,
   onSubmit
@@ -102,43 +129,30 @@ function ApproveModal({
 }) {
   const intl = useIntl()
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
       actions={[
-        <Button
-          key="cancel_correction"
-          id="cancel_correction"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
-        </Button>,
-        <Button
+        <StyledButton
           key="confirm_correction"
           id="confirm_correction"
-          type="primary"
+          type="positive"
           onClick={() => {
             onSubmit()
             close(true)
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </Button>
+        </StyledButton>
       ]}
-      handleClose={() => close(null)}
-      responsive={true}
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.approveCorrection)}
+      onClose={() => close(true)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
         </Text>
       </Stack>
-    </ResponsiveModal>
+    </Dialog>
   )
 }
 
@@ -147,47 +161,50 @@ function RejectModal({
   onSubmit
 }: {
   close: (result: boolean | null) => void
-  onSubmit: () => void
+  onSubmit: (message: string) => void
 }) {
   const intl = useIntl()
+  const [message, setMessage] = React.useState('')
   return (
-    <ResponsiveModal
-      autoHeight
-      showHeaderBorder
+    <Dialog
       actions={[
-        <Button
-          key="cancel_reject_correction"
-          id="cancel_reject_correction"
-          type="tertiary"
-          onClick={() => {
-            close(null)
-          }}
-        >
-          {intl.formatMessage(reviewCorrectionMessages.actionModalCancel)}
-        </Button>,
-        <Button
+        <StyledButton
           key="reject_correction"
+          disabled={!message}
           id="reject_correction"
-          type="primary"
+          size="large"
+          type="negative"
           onClick={() => {
-            onSubmit()
+            onSubmit(message)
             close(true)
           }}
         >
           {intl.formatMessage(reviewCorrectionMessages.actionModalConfirm)}
-        </Button>
+        </StyledButton>
       ]}
-      handleClose={() => close(null)}
-      responsive={false}
-      show={true}
+      isOpen={true}
       title={intl.formatMessage(reviewCorrectionMessages.rejectCorrection)}
+      onClose={() => close(true)}
     >
       <Stack>
         <Text color="grey500" element="p" variant="reg16">
           {intl.formatMessage(reviewCorrectionMessages.actionModalDescription)}
         </Text>
       </Stack>
-    </ResponsiveModal>
+      <StyledStack>
+        <InputField
+          id={'reject-correction'}
+          label={intl.formatMessage(reviewCorrectionMessages.rejectReason)}
+          required={true}
+          touched={false}
+        >
+          <StyledTextArea
+            id={'reject-correction-reason'}
+            onChange={(e) => setMessage(e.target.value)}
+          />
+        </InputField>
+      </StyledStack>
+    </Dialog>
   )
 }
 
@@ -239,12 +256,13 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     await openModal((close) => (
       <RejectModal
         close={close}
-        onSubmit={() => {
+        onSubmit={(message) => {
           events.actions.correction.reject.mutate({
             transactionId: generateTransactionId(),
             eventId,
             requestId: lastWriteAction.id,
-            annotation
+            annotation,
+            reason: { message }
           })
           return navigate(
             ROUTES.V2.EVENTS.OVERVIEW.buildPath(
@@ -256,6 +274,32 @@ export function ReviewCorrection({ form }: { form: EventState }) {
       />
     ))
   }
+
+  const rejectButton = (
+    <Button
+      fullWidth={true}
+      id="rejectCorrectionBtn"
+      size="large"
+      type="negative"
+      onClick={openRejectModal}
+    >
+      <Icon name="X" />
+      {intl.formatMessage(buttonMessages.reject)}
+    </Button>
+  )
+
+  const approveButton = (
+    <Button
+      fullWidth={true}
+      id="ApproveCorrectionBtn"
+      size="large"
+      type="positive"
+      onClick={openApproveModal}
+    >
+      <Icon name="Check" />
+      {intl.formatMessage(buttonMessages.approve)}
+    </Button>
+  )
 
   return (
     <Content
@@ -269,26 +313,8 @@ export function ReviewCorrection({ form }: { form: EventState }) {
         requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
       />
       <Row background="white" position="left">
-        <Button
-          fullWidth={true}
-          id="rejectCorrectionBtn"
-          size="large"
-          type="negative"
-          onClick={openRejectModal}
-        >
-          <Icon name="X" />
-          {intl.formatMessage(buttonMessages.reject)}
-        </Button>
-        <Button
-          fullWidth={true}
-          id="ApproveCorrectionBtn"
-          size="large"
-          type="positive"
-          onClick={openApproveModal}
-        >
-          <Icon name="Check" />
-          {intl.formatMessage(buttonMessages.approve)}
-        </Button>
+        {rejectButton}
+        {approveButton}
       </Row>
       {modal}
     </Content>
