@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 1de3b707-bbec-4160-9ce8-20b2ad0707c5
+                transactionId: d72c3b32-35db-4c56-938a-2ae1d8e26522
                 type: v2.birth
       responses:
         "200":
@@ -124,6 +124,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -301,6 +303,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -480,7 +484,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 0385f09e-9914-4cb8-b1c5-d5d61fcc33c2
+                transactionId: 4fb9bddd-bb95-40b8-b2ca-aa205ae92cef
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -543,6 +547,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -716,6 +722,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -952,6 +960,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -1125,6 +1135,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -1364,6 +1376,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -1537,6 +1551,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -1713,10 +1729,23 @@ paths:
                   enum:
                     - REJECT_CORRECTION
                   default: REJECT_CORRECTION
+                reason:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                      description: Message describing reason for rejection or archiving
+                    isDuplicate:
+                      type: boolean
+                      description: If a declaration is duplicated
+                  required:
+                    - message
               required:
                 - eventId
                 - transactionId
                 - requestId
+                - reason
       responses:
         "200":
           description: Successful response
@@ -3024,6 +3053,77 @@ components:
             - label
             - type
           description: A single date input (yyyy-MM-dd)
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a7
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a8
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            type:
+              type: string
+              enum:
+                - TIME
+            defaultValue:
+              type: string
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+            configuration:
+              type: object
+              properties:
+                notice:
+                  description: Text to display above the time input
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - id
+            - label
+            - type
+          description: A single date input (HH-mm)
         - type: object
           properties:
             id:
@@ -5859,6 +5959,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6032,6 +6134,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6256,6 +6360,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6429,6 +6535,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6650,6 +6758,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6823,6 +6933,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7057,6 +7169,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7230,6 +7344,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7451,6 +7567,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7624,6 +7742,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7858,6 +7978,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8031,6 +8153,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8252,6 +8376,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8425,6 +8551,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8648,6 +8776,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8821,6 +8951,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9042,6 +9174,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9215,6 +9349,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9439,6 +9575,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9612,6 +9750,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9833,6 +9973,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10006,6 +10148,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10230,6 +10374,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10403,6 +10549,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10582,6 +10730,18 @@ components:
             - REJECT_CORRECTION
         requestId:
           type: string
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -10593,6 +10753,7 @@ components:
         - status
         - type
         - requestId
+        - reason
     UnassignedAction:
       type: object
       properties:
@@ -10627,6 +10788,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10800,6 +10963,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11021,6 +11186,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11194,6 +11361,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11415,6 +11584,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -11588,6 +11759,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -12235,6 +12408,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
