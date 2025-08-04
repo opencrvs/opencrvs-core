@@ -3778,15 +3778,6 @@ components:
                       - string
                       - "null"
                     format: uuid
-                  actionDetails:
-                    type:
-                      - object
-                      - "null"
-                    properties:
-                      templateId:
-                        type: string
-                      isImmediateCorrection:
-                        type: boolean
                   status:
                     type: string
                     const: Rejected
@@ -4259,15 +4250,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum:
@@ -4691,15 +4673,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -5119,15 +5092,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -5560,15 +5524,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -5988,15 +5943,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -6429,15 +6375,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -6857,15 +6794,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -7287,15 +7215,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -7715,15 +7634,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -8146,15 +8056,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -8574,15 +8475,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -9005,15 +8897,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -9436,15 +9319,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -9864,15 +9738,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -9886,6 +9751,13 @@ components:
         type:
           type: string
           const: PRINT_CERTIFICATE
+        actionDetails:
+          type:
+            - object
+            - "null"
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
@@ -10292,15 +10164,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type:
-            - object
-            - "null"
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a12
@@ -10717,13 +10580,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -11116,13 +10972,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -11515,13 +11364,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -11912,13 +11754,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -11933,7 +11768,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: df66598e-dc6b-4737-83eb-4dc4353582d2
+        transactionId: 879117a8-0c62-453f-87b2-255278278498
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -12312,13 +12147,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -12706,13 +12534,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -13113,13 +12934,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -13507,13 +13321,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -13914,13 +13721,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -14311,13 +14111,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -14708,13 +14501,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -14724,6 +14510,11 @@ components:
           type: string
           const: PRINT_CERTIFICATE
           default: PRINT_CERTIFICATE
+        actionDetails:
+          type: object
+          properties:
+            templateId:
+              type: string
       required:
         - eventId
         - transactionId
@@ -15102,13 +14893,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -15496,13 +15280,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -15893,13 +15670,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
@@ -16290,13 +16060,6 @@ components:
                               - string
                               - "null"
                       - type: "null"
-        actionDetails:
-          type: object
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         originalActionId:
           type: string
           format: uuid
