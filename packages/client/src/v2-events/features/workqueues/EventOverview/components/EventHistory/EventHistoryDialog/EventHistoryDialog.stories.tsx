@@ -302,7 +302,11 @@ export const RecordCorrected: Story = {
 export const RejectCorrection: Story = {
   args: {
     ...argbase,
-    action: { ...argbase.action, type: ActionType.REJECT_CORRECTION }
+    action: {
+      ...argbase.action,
+      type: ActionType.REJECT_CORRECTION,
+      reason: { message: 'No legal proof' }
+    }
   }
 }
 

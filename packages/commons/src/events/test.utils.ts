@@ -603,9 +603,9 @@ export function eventPayloadGenerator(rng: () => number) {
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment'
+              'transactionId' | 'annotation' | 'keepAssignment' | 'reason'
             >
-          > = {}
+          >
         ) => ({
           type: ActionType.REJECT_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
@@ -619,7 +619,8 @@ export function eventPayloadGenerator(rng: () => number) {
             ),
           eventId,
           requestId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          reason: input.reason ?? { message: '' }
         })
       }
     }
@@ -692,7 +693,8 @@ export function generateActionDocument({
       return {
         ...actionBase,
         requestId: getUUID(),
-        type: action
+        type: action,
+        reason: { message: 'Correction rejection' }
       }
     case ActionType.REGISTER:
       return {
