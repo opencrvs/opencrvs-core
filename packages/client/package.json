@@ -180,6 +180,7 @@
     "@vafanassieff/msw-trpc": "0.0.1",
     "@vitest/coverage-c8": "^0.25.5",
     "@wojtekmaj/enzyme-adapter-react-17": "^0.8.0",
+    "babel-plugin-styled-components": "^2.1.4",
     "chalk": "^2.4.1",
     "chromatic": "^11.25.2",
     "crypto-js": "^4.2.0",
