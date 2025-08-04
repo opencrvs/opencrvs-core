@@ -193,6 +193,38 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   }
 }
 
+const msw = {
+  handlers: {
+    drafts: declarationTrpcMsw.drafts.handlers,
+    events: [
+      tRPCMsw.event.search.query((input) => {
+        return [
+          getCurrentEventState(
+            declarationTrpcMsw.eventDocument,
+            tennisClubMembershipEvent
+          )
+        ]
+      }),
+      ...declarationTrpcMsw.events.handlers
+    ],
+    user: [
+      graphql.query('fetchUser', () => {
+        return HttpResponse.json({
+          data: {
+            getUser: generator.user.registrationAgent()
+          }
+        })
+      }),
+      tRPCMsw.user.list.query(([id]) => {
+        return [mockUser]
+      }),
+      tRPCMsw.user.get.query((id) => {
+        return mockUser
+      })
+    ]
+  }
+}
+
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   loaders: [
     () => {
@@ -217,37 +249,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: declarationTrpcMsw.drafts.handlers,
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
+    msw: msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -304,37 +306,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: declarationTrpcMsw.drafts.handlers,
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
+    msw: msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -508,37 +480,7 @@ export const ReviewForIncompleteNameInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: declarationTrpcMsw.drafts.handlers,
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
+    msw: msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
