@@ -559,7 +559,6 @@ export const ReviewForIncompleteNameInteraction: Story = {
 
       const surnameInput = await canvas.findByTestId('text__surname')
       await userEvent.clear(surnameInput)
-      await userEvent.tab()
 
       const backToReviewButton = await canvas.findByText('Back to review')
       await userEvent.click(backToReviewButton)
