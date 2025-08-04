@@ -49,7 +49,8 @@ import {
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
   SelectDateRangeValue,
-  isTimeFieldType
+  isTimeFieldType,
+  isPrintButtonFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -68,7 +69,8 @@ import {
   PageHeader,
   Paragraph,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  PrintButton
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -588,6 +590,16 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isPrintButtonFieldType(field)) {
+      return (
+        <PrintButton.Input
+          buttonLabel={field.config.configuration.buttonLabel}
+          disabled={disabled}
+          id={fieldDefinition.id}
+          template={field.config.configuration.template}
+        />
+      )
+    }
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
   }
 )

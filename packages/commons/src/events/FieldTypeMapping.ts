@@ -39,7 +39,8 @@ import {
   IdField,
   DateRangeField,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  PrintButton
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -145,6 +146,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.NAME:
       schema = required ? NameFieldValue : NameFieldUpdateValue
       break
+    case FieldType.PRINT_BUTTON:
+      schema = TextValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -215,6 +219,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
+    case FieldType.PRINT_BUTTON:
+      return null
   }
 }
 
@@ -421,12 +427,20 @@ export const isDataFieldType = (field: {
   return field.config.type === FieldType.DATA
 }
 
+export const isPrintButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: PrintButton } => {
+  return field.config.type === FieldType.PRINT_BUTTON
+}
+
 export type NonInteractiveFieldType =
   | Divider
   | PageHeader
   | Paragraph
   | BulletList
   | DataField
+  | PrintButton
 
 export type InteractiveFieldType = Exclude<FieldConfig, NonInteractiveFieldType>
 

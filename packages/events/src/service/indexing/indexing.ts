@@ -105,6 +105,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.DATA:
     case FieldType.ID:
     case FieldType.PHONE:
+    case FieldType.PRINT_BUTTON:
       return { type: 'keyword' }
     case FieldType.ADDRESS:
       const addressProperties = {

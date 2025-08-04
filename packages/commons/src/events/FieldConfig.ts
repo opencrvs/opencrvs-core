@@ -506,6 +506,20 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
+const PrintButton = BaseField.extend({
+  type: z.literal(FieldType.PRINT_BUTTON),
+  configuration: z.object({
+    template: z
+      .string()
+      .describe('Template ID from countryconfig templates to use for printing'),
+    buttonLabel: TranslationConfig.optional().describe(
+      'Label for the print button'
+    )
+  })
+}).describe('Print button field for printing certificates')
+
+export type PrintButton = z.infer<typeof PrintButton>
+
 /** @knipignore */
 export type Inferred =
   | z.infer<typeof Address>
@@ -536,6 +550,7 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
+  | z.infer<typeof PrintButton>
 
 /** @knipignore */
 /**
@@ -569,6 +584,7 @@ export type InferredInput =
   | z.input<typeof SignatureField>
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
+  | z.input<typeof PrintButton>
 
 export const FieldConfig = z
   .discriminatedUnion('type', [
@@ -599,7 +615,8 @@ export const FieldConfig = z
     SignatureField,
     EmailField,
     FileUploadWithOptions,
-    DataField
+    DataField,
+    PrintButton
   ])
   .openapi({
     description: 'Form field configuration',

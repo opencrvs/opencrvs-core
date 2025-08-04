@@ -172,6 +172,8 @@ export function mapFieldTypeToMockValue(
       return '2021-01-01'
     case FieldType.TIME:
       return '09:33'
+    case FieldType.PRINT_BUTTON:
+      return undefined
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',
