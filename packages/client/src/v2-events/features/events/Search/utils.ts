@@ -199,12 +199,14 @@ export const getMetadataFieldConfigs = (
 const MatchType = {
   fuzzy: 'fuzzy',
   exact: 'exact',
+  within: 'within',
   anyOf: 'anyOf',
   range: 'range'
 } as const
 
 type Condition =
   | { type: 'fuzzy'; term: string }
+  | { type: 'within'; location: string }
   | { type: 'exact'; term: string }
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
@@ -258,6 +260,8 @@ function buildSearchClause(
     case MatchType.range:
       const [gte, lte] = value.split(',')
       return { type: 'range', gte, lte }
+    case MatchType.within:
+      return { type: 'within', location: value }
     default:
       return { type: 'exact', term: value } // Fallback to exact match
   }
