@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 7bef2061-c8f3-400b-9776-974badf9d769
+                transactionId: cf855610-c3f7-4561-b60a-ed8937956c7b
                 type: v2.birth
       responses:
         "200":
@@ -484,7 +484,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a7908b06-72d4-4f17-bb10-f5c83c5dfb27
+                transactionId: d4d155b5-497f-4e24-af4e-f0090dd718ec
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1729,10 +1729,23 @@ paths:
                   enum:
                     - REJECT_CORRECTION
                   default: REJECT_CORRECTION
+                reason:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                      description: Message describing reason for rejection or archiving
+                    isDuplicate:
+                      type: boolean
+                      description: If a declaration is duplicated
+                  required:
+                    - message
               required:
                 - eventId
                 - transactionId
                 - requestId
+                - reason
       responses:
         "200":
           description: Successful response
@@ -2154,6 +2167,7 @@ components:
                                 - fuzzy
                                 - exact
                                 - range
+                                - within
                               description: Determines the type of field
                           required:
                             - type
@@ -10717,6 +10731,18 @@ components:
             - REJECT_CORRECTION
         requestId:
           type: string
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -10728,6 +10754,7 @@ components:
         - status
         - type
         - requestId
+        - reason
     UnassignedAction:
       type: object
       properties:
@@ -11970,6 +11997,10 @@ components:
           $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.acceptedAt:
           $ref: "#/components/schemas/DateCondition"
+        legalStatuses.DECLARED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
@@ -12527,8 +12558,10 @@ components:
                 properties:
                   firstname:
                     type: string
+                    minLength: 1
                   surname:
                     type: string
+                    minLength: 1
                   middlename:
                     type: string
                 required:
