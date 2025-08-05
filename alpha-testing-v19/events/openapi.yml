@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 1c5b4d49-d621-4a41-bc40-90bab60c7c85
+                transactionId: 273f25dc-a29b-4032-ac57-494bd6c9ae9d
                 type: v2.birth
       responses:
         "200":
@@ -480,7 +480,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: c211f5ab-b374-4c75-ba2c-b46560365d74
+                transactionId: df8691bf-9fb8-428e-809e-c08b8aa1cf22
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -901,6 +901,7 @@ components:
                                 - fuzzy
                                 - exact
                                 - range
+                                - within
                               description: Determines the type of field
                           required:
                             - type
@@ -10464,6 +10465,10 @@ components:
           $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.acceptedAt:
           $ref: "#/components/schemas/DateCondition"
+        legalStatuses.DECLARED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
@@ -11019,8 +11024,10 @@ components:
                 properties:
                   firstname:
                     type: string
+                    minLength: 1
                   surname:
                     type: string
+                    minLength: 1
                   middlename:
                     type: string
                 required:

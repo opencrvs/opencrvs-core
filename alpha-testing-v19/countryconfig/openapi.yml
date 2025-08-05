@@ -240,6 +240,7 @@ components:
                                 - fuzzy
                                 - exact
                                 - range
+                                - within
                               description: Determines the type of field
                           required:
                             - type
@@ -11490,7 +11491,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 88237973-e5bf-48b2-8b35-e7609a9a3e54
+        transactionId: 877a2cad-ca50-4ef5-b91c-690e2cefbc04
         declaration: {}
         annotation: {}
         type: NOTIFY
