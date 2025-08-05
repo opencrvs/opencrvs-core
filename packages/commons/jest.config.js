@@ -8,19 +8,17 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './token-verifier'
-export * from './uuid'
-export * from './documents'
-export * from './http'
-export * from './url'
-export * from './logger'
-export * from './plugins/error-logger'
-export * from './roles'
-export * from './search'
-export * from './events'
-export * from './users/service'
-export * from './users/systemRole'
-export * from './authentication'
-export * from './utils'
-export * from './countryconfig'
-export * from './icons'
+
+/** @type {import('ts-jest').JestConfigWithTsJest} */
+module.exports = {
+  preset: 'ts-jest',
+  testEnvironment: 'node',
+  testRegex: '(/__tests__/.*|(\\.|/)(test|spec))\\.tsx?$',
+  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
+  setupFiles: ['./test/setupJest.ts'],
+  globals: {
+    'ts-jest': {
+      tsconfig: 'tsconfig.json'
+    }
+  }
+}

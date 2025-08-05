@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { ServerRegisterPluginObject } from '@hapi/hapi'
-import { logger } from '@opencrvs/commons'
+import { logger, ErrorLoggerPlugin } from '@opencrvs/commons'
 import { SENTRY_DSN } from '@webhooks/constants'
 import * as JWT from 'hapi-auth-jwt2'
 import * as Pino from 'hapi-pino'
@@ -18,7 +18,10 @@ import * as Sentry from 'hapi-sentry'
 type IHapiPlugin<T = any> = ServerRegisterPluginObject<T>
 
 export default function getPlugins() {
-  const plugins: IHapiPlugin[] = [{ plugin: JWT, options: {} }]
+  const plugins: IHapiPlugin[] = [
+    { plugin: JWT, options: {} },
+    { plugin: ErrorLoggerPlugin }
+  ]
 
   if (process.env.NODE_ENV === 'production') {
     plugins.push({
