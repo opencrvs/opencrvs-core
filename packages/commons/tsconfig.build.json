@@ -6,7 +6,7 @@
       "path": "./tsconfig-esm.json"
     },
     {
-      "path": "./tsconfig-commons.json"
+      "path": "./tsconfig-commonjs.json"
     }
   ]
 }

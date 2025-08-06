@@ -5,7 +5,7 @@
   },
   "references": [
     {
-      "path": "./tsconfig-commons.json"
+      "path": "./tsconfig-commonjs.json"
     }
   ],
   "include": [

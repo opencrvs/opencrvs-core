@@ -3,7 +3,7 @@
   "include": [],
   "references": [
     {
-      "path": "./tsconfig-commons.json"
+      "path": "./tsconfig-commonjs.json"
     },
     {
       "path": "./tsconfig-tests.json"
