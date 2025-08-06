@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2d939d8a-d367-47ac-9eb8-6882f426ca5b
+                transactionId: 765d9b90-a5ca-490d-9382-62ff9257bb77
                 type: v2.birth
       responses:
         "200":
@@ -469,13 +469,6 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
-                actionDetails:
-                  type: object
-                  properties:
-                    templateId:
-                      type: string
-                    isImmediateCorrection:
-                      type: boolean
                 originalActionId:
                   type: string
                   format: uuid
@@ -491,7 +484,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ab01c16f-e992-46af-9faa-d592bd4a2548
+                transactionId: ba3f079b-067e-4b95-911c-f37193bd499b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -895,13 +888,6 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
-                actionDetails:
-                  type: object
-                  properties:
-                    templateId:
-                      type: string
-                    isImmediateCorrection:
-                      type: boolean
                 originalActionId:
                   type: string
                   format: uuid
@@ -1315,13 +1301,6 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
-                actionDetails:
-                  type: object
-                  properties:
-                    templateId:
-                      type: string
-                    isImmediateCorrection:
-                      type: boolean
                 originalActionId:
                   type: string
                   format: uuid
@@ -1738,13 +1717,6 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
-                actionDetails:
-                  type: object
-                  properties:
-                    templateId:
-                      type: string
-                    isImmediateCorrection:
-                      type: boolean
                 originalActionId:
                   type: string
                   format: uuid
@@ -1948,14 +1920,6 @@ paths:
                             type: string
                             nullable: true
                             format: uuid
-                          actionDetails:
-                            type: object
-                            nullable: true
-                            properties:
-                              templateId:
-                                type: string
-                              isImmediateCorrection:
-                                type: boolean
                           status:
                             type: string
                             enum:
@@ -2203,6 +2167,7 @@ components:
                                 - fuzzy
                                 - exact
                                 - range
+                                - within
                               description: Determines the type of field
                           required:
                             - type
@@ -5895,14 +5860,6 @@ components:
                     type: string
                     nullable: true
                     format: uuid
-                  actionDetails:
-                    type: object
-                    nullable: true
-                    properties:
-                      templateId:
-                        type: string
-                      isImmediateCorrection:
-                        type: boolean
                   status:
                     type: string
                     enum:
@@ -6344,14 +6301,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: &a14
@@ -6753,14 +6702,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -7159,14 +7100,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -7578,14 +7511,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -7984,14 +7909,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -8403,14 +8320,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -8809,14 +8718,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -9217,14 +9118,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -9623,14 +9516,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -10032,14 +9917,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -10438,14 +10315,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -10847,14 +10716,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -11269,14 +11130,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -11675,14 +11528,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -11696,6 +11541,12 @@ components:
           type: string
           enum:
             - PRINT_CERTIFICATE
+        content:
+          type: object
+          nullable: true
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
@@ -12081,14 +11932,6 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
-        actionDetails:
-          type: object
-          nullable: true
-          properties:
-            templateId:
-              type: string
-            isImmediateCorrection:
-              type: boolean
         status:
           type: string
           enum: *a14
@@ -12160,6 +12003,10 @@ components:
           $ref: "#/components/schemas/DateCondition"
         legalStatuses.REGISTERED.acceptedAt:
           $ref: "#/components/schemas/DateCondition"
+        legalStatuses.DECLARED.createdAtLocation:
+          anyOf:
+            - $ref: "#/components/schemas/Within"
+            - $ref: "#/components/schemas/Exact"
         legalStatuses.REGISTERED.createdAtLocation:
           anyOf:
             - $ref: "#/components/schemas/Within"
@@ -12564,8 +12411,6 @@ components:
                   - incomplete
                   - rejected
                   - correction-requested
-        copiesPrintedForTemplate:
-          type: number
         modifiedAt:
           type: string
         declaration:
@@ -12721,8 +12566,10 @@ components:
                 properties:
                   firstname:
                     type: string
+                    minLength: 1
                   surname:
                     type: string
+                    minLength: 1
                   middlename:
                     type: string
                 required:
