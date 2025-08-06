@@ -190,12 +190,7 @@ function NameInput(props: Props) {
         initialValues={{ ...value }}
         parentId={id}
         onChange={(values) => {
-          if (searchMode) {
-            // when in search mode, we initialize empty name fields with empty string
-            // to avoid name field validation
-            values = mergeWithoutNullsOrUndefined(defailtNameFieldValue, values)
-          }
-          onChange(values as NameFieldValue)
+          onChange(mergeWithoutNullsOrUndefined(defailtNameFieldValue, values))
         }}
       />
       <FocusNameInputsOnHash id={id} value={value} />

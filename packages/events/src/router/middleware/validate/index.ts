@@ -36,7 +36,8 @@ import {
   isFieldVisible,
   errorMessages,
   runFieldValidations,
-  ActionInputWithType
+  ActionInputWithType,
+  runStructuralValidations
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
@@ -230,7 +231,7 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
+      const fieldErrors = runStructuralValidations({
         field,
         values: annotation
       })
@@ -255,7 +256,7 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
+      const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
         values: declaration
       })

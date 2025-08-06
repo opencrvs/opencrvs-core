@@ -381,6 +381,7 @@ export function createFieldConditionals(fieldId: string) {
         properties: {
           [fieldId]: {
             type: 'string',
+            minLength: 1,
             pattern:
               "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
             description:
