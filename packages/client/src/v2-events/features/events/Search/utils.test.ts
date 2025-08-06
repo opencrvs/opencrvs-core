@@ -92,6 +92,7 @@ describe('buildDataCondition', () => {
     expect(result['event.status']).toEqual({
       type: 'anyOf',
       terms: [
+        EventStatus.enum.CREATED,
         EventStatus.enum.NOTIFIED,
         EventStatus.enum.DECLARED,
         EventStatus.enum.VALIDATED,
