@@ -14,7 +14,11 @@ import React from 'react'
 import { useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { EventIndex } from '@opencrvs/commons/client'
-import { useOutbox } from '../features/events/useEvents/outbox'
+import {
+  useFailedMutationStore,
+  useOutbox
+} from '../features/events/useEvents/outbox'
+import { useMutation } from '@tanstack/react-query'
 
 const RetryAction = styled(Button)`
   height: 40px;
@@ -33,13 +37,35 @@ const retryButtonLabel = {
 export default function RetryButton({ event }: { event: EventIndex }) {
   const { failed } = useOutbox()
   const intl = useIntl()
+  const { failedMutations, removeFailedMutation } = useFailedMutationStore()
 
   const hasActionFailed = failed.some(
     (failedEvent) => failedEvent.id === event.id
   )
 
+  const matchingMutation = failedMutations.find(
+    (mutation) => mutation.eventId === event.id
+  )
+
+  const mutation = useMutation({
+    mutationKey: matchingMutation?.mutationKey
+  })
+
+  const handleRetry = async () => {
+    if (matchingMutation) {
+      try {
+        await mutation.mutateAsync(matchingMutation.variables)
+        removeFailedMutation(event.id, event.type)
+      } catch (err) {
+        throw new Error('Cannot retry')
+      }
+    } else {
+      console.warn('No matching mutation found for retry')
+    }
+  }
+
   return hasActionFailed ? (
-    <RetryAction type="primary" onClick={() => alert('retrying')}>
+    <RetryAction type="primary" onClick={handleRetry}>
       {intl.formatMessage(retryButtonLabel)}
     </RetryAction>
   ) : null

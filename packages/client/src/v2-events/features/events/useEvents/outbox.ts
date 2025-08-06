@@ -34,12 +34,15 @@ function assignmentMutation(mutationKey: MutationKey) {
   ].includes(hashKey(mutationKey))
 }
 
-interface FailedMutation {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface FailedMutation<T = any> {
   eventId: string
   action: string
   declaration: Partial<EventState>
   transactionId: string
   annotation: Partial<ActionBase['annotation']>
+  mutationKey: MutationKey
+  variables: T
 }
 
 interface FailedMutationStore {
