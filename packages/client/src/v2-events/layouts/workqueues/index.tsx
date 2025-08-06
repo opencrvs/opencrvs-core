@@ -23,6 +23,44 @@ import { SearchToolbar } from '@client/v2-events/features/events/components/Sear
 import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
+
+function DesktopCenter() {
+  const navigate = useNavigate()
+  return (
+    <Stack gap={16}>
+      <Button
+        id="header-new-event"
+        type="iconPrimary"
+        onClick={() => {
+          navigate(ROUTES.V2.EVENTS.CREATE.path)
+        }}
+      >
+        <Plus />
+      </Button>
+      <SearchToolbar />
+    </Stack>
+  )
+}
+
+function SearchResultLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <Frame
+      header={
+        <AppBar
+          desktopCenter={<DesktopCenter />}
+          desktopRight={<ProfileMenu key="profileMenu" />}
+          mobileCenter={<SearchToolbar />}
+          mobileLeft={<HistoryNavigator hideForward />}
+        />
+      }
+      navigation={<Sidebar key={'search-result'} />}
+      skipToContentText="skip"
+    >
+      {children}
+    </Frame>
+  )
+}
+
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -35,49 +73,28 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
 
-  const isSearchResult = workqueueSlug === undefined
+  if (!workqueueSlug) {
+    return <SearchResultLayout>{children}</SearchResultLayout>
+  }
 
   return (
     <Frame
       header={
         <AppBar
-          desktopCenter={
-            <Stack gap={16}>
-              <Button
-                id="header-new-event"
-                type="iconPrimary"
-                onClick={() => {
-                  navigate(ROUTES.V2.EVENTS.CREATE.path)
-                }}
-              >
-                <Plus />
-              </Button>
-
-              <SearchToolbar />
-            </Stack>
-          }
+          desktopCenter={<DesktopCenter />}
           desktopRight={<ProfileMenu key="profileMenu" />}
-          mobileCenter={isSearchResult ? <SearchToolbar /> : null}
-          mobileLeft={
-            isSearchResult ? <HistoryNavigator hideForward /> : <Hamburger />
-          }
+          mobileLeft={<Hamburger />}
           mobileRight={
-            isSearchResult ? null : (
-              <Button
-                type={'icon'}
-                onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
-              >
-                <Icon color="primary" name="MagnifyingGlass" size="medium" />
-              </Button>
-            )
+            <Button
+              type={'icon'}
+              onClick={() => navigate(ROUTES.V2.SEARCH.buildPath({}))}
+            >
+              <Icon color="primary" name="MagnifyingGlass" size="medium" />
+            </Button>
           }
-          mobileTitle={
-            isSearchResult
-              ? null
-              : intl.formatMessage(
-                  workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
-                )
-          }
+          mobileTitle={intl.formatMessage(
+            workqueueConfig?.name ?? advancedSearchMessages.advancedSearch
+          )}
         />
       }
       navigation={<Sidebar key={workqueueSlug} />}
