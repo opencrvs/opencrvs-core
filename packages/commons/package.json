@@ -26,7 +26,7 @@
     "build:default": "tsc --project tsconfig.build.json",
     "build:esm": "tsc --project tsconfig.esm.build.json",
     "build": "pnpm build:default && pnpm build:esm",
-    "build:watch": "concurrently \"tsc --watch --project tsconfig.build.json\" \"tsc --watch --project tsconfig.esm.build.json\"",
+    "build:watch": "concurrently \"tsc --watch --preserveWatchOutput --project tsconfig.build.json\" \"tsc --watch --preserveWatchOutput --project tsconfig.esm.build.json\"",
     "build:clean": "rm -rf build"
   },
   "private": true,

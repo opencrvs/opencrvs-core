@@ -193,6 +193,38 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   }
 }
 
+const msw = {
+  handlers: {
+    drafts: declarationTrpcMsw.drafts.handlers,
+    events: [
+      tRPCMsw.event.search.query((input) => {
+        return [
+          getCurrentEventState(
+            declarationTrpcMsw.eventDocument,
+            tennisClubMembershipEvent
+          )
+        ]
+      }),
+      ...declarationTrpcMsw.events.handlers
+    ],
+    user: [
+      graphql.query('fetchUser', () => {
+        return HttpResponse.json({
+          data: {
+            getUser: generator.user.registrationAgent()
+          }
+        })
+      }),
+      tRPCMsw.user.list.query(([id]) => {
+        return [mockUser]
+      }),
+      tRPCMsw.user.get.query((id) => {
+        return mockUser
+      })
+    ]
+  }
+}
+
 export const ReviewForRegistrationAgentCompleteInteraction: Story = {
   loaders: [
     () => {
@@ -217,37 +249,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: declarationTrpcMsw.drafts.handlers,
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
+    msw: msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -304,37 +306,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
       })
     },
     chromatic: { disableSnapshot: true },
-    msw: {
-      handlers: {
-        drafts: declarationTrpcMsw.drafts.handlers,
-        events: [
-          tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
-          }),
-          ...declarationTrpcMsw.events.handlers
-        ],
-        user: [
-          graphql.query('fetchUser', () => {
-            return HttpResponse.json({
-              data: {
-                getUser: generator.user.registrationAgent()
-              }
-            })
-          }),
-          tRPCMsw.user.list.query(([id]) => {
-            return [mockUser]
-          }),
-          tRPCMsw.user.get.query((id) => {
-            return mockUser
-          })
-        ]
-      }
-    }
+    msw: msw
   },
   play: async ({ canvasElement, step }) => {
     await step('Modal has scope based content', async () => {
@@ -478,6 +450,61 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
           'event.actions.register.request': false
         })
       })
+    })
+  }
+}
+
+export const ReviewForIncompleteNameInteraction: Story = {
+  name: 'Declaration shows as incomplete when surname is left out',
+  beforeEach: () => {
+    // For this test, we want to have empty form values in zustand state
+    useEventFormData.setState({ formValues: {} })
+  },
+  loaders: [
+    () => {
+      declarationTrpcMsw.events.reset()
+      declarationTrpcMsw.drafts.reset()
+    },
+    async () => {
+      window.localStorage.setItem('opencrvs', generator.user.token.fieldAgent)
+      //  Intermittent failures starts to happen when global state gets out of whack.
+      // // This is a workaround to ensure that the state is reset when similar tests are run in parallel.
+      await new Promise((resolve) => setTimeout(resolve, 50))
+    }
+  ],
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+        eventId: declareEventDocument.id
+      })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: msw
+  },
+  play: async ({ canvasElement, step }) => {
+    await step('Modal has scope based content', async () => {
+      const canvas = within(canvasElement)
+      const changeButton = await canvas.findByTestId(
+        'change-button-applicant.name',
+        {},
+        { timeout: 5000 }
+      )
+      await userEvent.click(changeButton)
+      const modal = within(await canvas.findByRole('dialog'))
+
+      const confirmEditButton = await modal.findByRole('button', {
+        name: 'Continue'
+      })
+
+      await userEvent.click(confirmEditButton)
+
+      const surnameInput = await canvas.findByTestId('text__surname')
+      await userEvent.clear(surnameInput)
+
+      const backToReviewButton = await canvas.findByText('Back to review')
+      await userEvent.click(backToReviewButton)
+      await canvas.findByText('Declaration incomplete')
     })
   }
 }

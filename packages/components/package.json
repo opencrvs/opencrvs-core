@@ -29,7 +29,7 @@
   },
   "scripts": {
     "clean": "rimraf lib",
-    "start": "concurrently 'storybook dev --ci -p 6060' 'tsc -w'",
+    "start": "concurrently 'storybook dev --ci -p 6060' 'tsc -w --preserveWatchOutput'",
     "build": "pnpm clean && tsc",
     "lint": "pnpm lint:css",
     "test": "tsc",
