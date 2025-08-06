@@ -49,8 +49,7 @@ export function PrintCertificate({
   const { certificateTemplates } = useAppConfig()
   const certTemplateFieldConfig = useCertificateTemplateSelectorFieldConfig(
     event.type,
-    eventIndex.declaration,
-    event
+    eventIndex.declaration
   )
 
   const templateLabel = certificateTemplates.find(

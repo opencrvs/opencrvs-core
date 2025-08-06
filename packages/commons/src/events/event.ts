@@ -111,7 +111,7 @@ const event = Object.assign(eventFn, {
       })
     }
 
-    const createCountMethods = (additionalFields?: Record<string, unknown>) => {
+    const withMinMax = (additionalFields?: Record<string, unknown>) => {
       return {
         /**
          * Creates a conditional that checks if the event contains a specific action type
@@ -137,9 +137,19 @@ const event = Object.assign(eventFn, {
        *
        * @param fields - Object containing additional fields to match on the action.
        */
-      withFields: (fields: Record<string, unknown>) =>
-        createCountMethods(fields),
-      ...createCountMethods()
+      withFields: (fields: Record<string, unknown>) => withMinMax(fields),
+
+      /**
+       * Adds template ID constraint to the action matching.
+       * This is a convenience method that adds content.templateId to the fields.
+       *
+       * @param id - The template ID to match against.
+       */
+      withTemplate: (id: string) =>
+        withMinMax({
+          content: { templateId: id }
+        }),
+      ...withMinMax()
     }
 
     return { ...basicConditional, ...chainableMethods }

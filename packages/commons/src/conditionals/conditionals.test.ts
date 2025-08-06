@@ -681,7 +681,7 @@ describe('"event" conditionals', () => {
           {
             id: 'a1' as UUID,
             type: ActionType.PRINT_CERTIFICATE,
-            templateId: 'TEMPLATE_1',
+            content: { templateId: 'TEMPLATE_1' },
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx1',
@@ -694,7 +694,7 @@ describe('"event" conditionals', () => {
           {
             id: 'a2' as UUID,
             type: ActionType.PRINT_CERTIFICATE,
-            templateId: 'TEMPLATE_2',
+            content: { templateId: 'TEMPLATE_2' },
             createdAt: now,
             status: ActionStatus.Accepted,
             transactionId: 'tx2',
@@ -713,7 +713,7 @@ describe('"event" conditionals', () => {
         validate(
           event
             .hasAction(ActionType.PRINT_CERTIFICATE)
-            .withFields({ templateId: 'TEMPLATE_1' })
+            .withTemplate('TEMPLATE_1')
             .minCount(1),
           baseEvent
         )
@@ -722,7 +722,7 @@ describe('"event" conditionals', () => {
         validate(
           event
             .hasAction(ActionType.PRINT_CERTIFICATE)
-            .withFields({ templateId: 'TEMPLATE_1' })
+            .withTemplate('TEMPLATE_1')
             .minCount(2),
           baseEvent
         )
@@ -749,7 +749,7 @@ describe('"event" conditionals', () => {
         validate(
           event
             .hasAction(ActionType.PRINT_CERTIFICATE)
-            .withFields({ templateId: 'TEMPLATE_1' })
+            .withTemplate('TEMPLATE_1')
             .maxCount(1),
           baseEvent
         )
@@ -758,7 +758,7 @@ describe('"event" conditionals', () => {
         validate(
           event
             .hasAction(ActionType.PRINT_CERTIFICATE)
-            .withFields({ templateId: 'TEMPLATE_1' })
+            .withTemplate('TEMPLATE_1')
             .maxCount(0),
           baseEvent
         )

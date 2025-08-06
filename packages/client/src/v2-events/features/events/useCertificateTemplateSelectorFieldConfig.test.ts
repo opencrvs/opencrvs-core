@@ -183,7 +183,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
             type: 'SHOW',
             conditional: event
               .hasAction('PRINT_CERTIFICATE')
-              .withFields({ templateId: 'tennis-club-membership-certificate' })
+              .withTemplate('tennis-club-membership-certificate')
               .maxCount(1)
           }
         ]
@@ -201,12 +201,18 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
       const printAction1 = generateActionDocument({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
-        defaults: { templateId: 'tennis-club-membership-certificate' }
+        defaults: {
+          content: { templateId: 'tennis-club-membership-certificate' }
+        }
       })
       const printAction2 = generateActionDocument({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
-        defaults: { templateId: 'tennis-club-membership-certificate' }
+        defaults: {
+          content: {
+            templateId: 'tennis-club-membership-certificate'
+          }
+        }
       })
 
       const eventWithExcessivePrints = {
@@ -237,7 +243,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
             type: 'SHOW',
             conditional: event
               .hasAction('PRINT_CERTIFICATE')
-              .withFields({ templateId: 'tennis-club-membership-certificate' })
+              .withTemplate('tennis-club-membership-certificate')
               .minCount(1)
           }
         ]
@@ -253,7 +259,9 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
       const printBasicAction = generateActionDocument({
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
-        defaults: { templateId: 'tennis-club-membership-certificate' }
+        defaults: {
+          content: { templateId: 'tennis-club-membership-certificate' }
+        }
       })
       const eventWithBasicPrint = {
         ...testEventDocument,
@@ -328,7 +336,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
             type: 'SHOW',
             conditional: event
               .hasAction('PRINT_CERTIFICATE')
-              .withFields({ templateId: 'tennis-club-membership-certificate' })
+              .withTemplate('tennis-club-membership-certificate')
               .minCount(1)
           }
         ]
@@ -362,7 +370,7 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
             type: 'SHOW' as const,
             conditional: event
               .hasAction('PRINT_CERTIFICATE')
-              .withFields({ templateId: 'tennis-club-membership-certificate' })
+              .withTemplate('tennis-club-membership-certificate')
               .minCount(1)
           }
         ]
@@ -380,7 +388,9 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
         configuration: tennisClubMembershipEvent,
         action: ActionType.PRINT_CERTIFICATE,
         defaults: {
-          templateId: 'tennis-club-membership-certificate'
+          content: {
+            templateId: 'tennis-club-membership-certificate'
+          }
         }
       })
 

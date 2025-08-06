@@ -17,7 +17,8 @@ import {
   ActionBase,
   ActionDocument,
   ActionStatus,
-  EventState
+  EventState,
+  PrintCertificateAction
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -685,12 +686,7 @@ export function generateActionDocument({
       return {
         ...actionBase,
         type: action,
-        // Default to the event type + '-certificate' for backwards compatibility
-        // Real implementations can override this with specific template IDs
-        templateId:
-          'templateId' in defaults && typeof defaults.templateId === 'string'
-            ? defaults.templateId
-            : `${configuration.id}-certificate`
+        content: (defaults as Partial<PrintCertificateAction>).content
       }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }

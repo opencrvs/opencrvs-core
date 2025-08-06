@@ -11,6 +11,7 @@
 
 import { Location } from '@events/service/locations/locations'
 import {
+  ActionType,
   CertificateTemplateConfig,
   EventConfig,
   EventDocument,
@@ -18,6 +19,7 @@ import {
   getCurrentEventState,
   isMinioUrl,
   LanguageConfig,
+  PrintCertificateAction,
   User
 } from '@opencrvs/commons/client'
 import {
@@ -83,9 +85,9 @@ export const usePrintableCertificate = ({
   const copiesPrintedForTemplate =
     actions.filter(
       (action) =>
-        action.type === 'PRINT_CERTIFICATE' &&
-        'templateId' in action &&
-        action.templateId === certificateConfig?.id
+        action.type === ActionType.PRINT_CERTIFICATE &&
+        (action as PrintCertificateAction).content?.templateId ===
+          certificateConfig?.id
     ).length + 1 // +1 for the current print action
 
   const modifiedMetadata = {
