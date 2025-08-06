@@ -9765,6 +9765,13 @@ components:
         type:
           type: string
           const: PRINT_CERTIFICATE
+        content:
+          type:
+            - object
+            - "null"
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
@@ -11775,7 +11782,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: d13d6f60-addf-4dea-8af7-89bfe41c8633
+        transactionId: aeb8f58f-fca1-459b-85cf-24331f1b1253
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -14517,6 +14524,11 @@ components:
           type: string
           const: PRINT_CERTIFICATE
           default: PRINT_CERTIFICATE
+        content:
+          type: object
+          properties:
+            templateId:
+              type: string
       required:
         - eventId
         - transactionId
