@@ -20,11 +20,10 @@ import { ProfileMenu } from '@client/components/ProfileMenu'
 import { useWorkqueueConfigurations } from '@client/v2-events/features/events/useWorkqueueConfiguration'
 import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
-import { HistoryNavigator } from '@client/components/Header/HistoryNavigator'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
-function DesktopCenter() {
+export function DesktopCenter() {
   const navigate = useNavigate()
   return (
     <Stack gap={16}>
@@ -42,25 +41,6 @@ function DesktopCenter() {
   )
 }
 
-function SearchResultLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <Frame
-      header={
-        <AppBar
-          desktopCenter={<DesktopCenter />}
-          desktopRight={<ProfileMenu key="profileMenu" />}
-          mobileCenter={<SearchToolbar />}
-          mobileLeft={<HistoryNavigator hideForward />}
-        />
-      }
-      navigation={<Sidebar key={'search-result'} />}
-      skipToContentText="skip"
-    >
-      {children}
-    </Frame>
-  )
-}
-
 /**
  * Basic frame for the workqueues. Includes the left navigation and the app bar.
  */
@@ -72,10 +52,6 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const workqueues = useWorkqueueConfigurations()
 
   const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
-
-  if (!workqueueSlug) {
-    return <SearchResultLayout>{children}</SearchResultLayout>
-  }
 
   return (
     <Frame
