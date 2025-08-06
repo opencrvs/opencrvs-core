@@ -49,12 +49,16 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     searchEvent: {
-      useQuery: (query: QueryType) => {
+      useQuery: (
+        query: QueryType,
+        options: QueryOptions<typeof trpc.event.search> = {}
+      ) => {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
           refetchOnMount: true,
-          staleTime: 0
+          staleTime: 0,
+          ...options
         })
       },
       useSuspenseQuery: (

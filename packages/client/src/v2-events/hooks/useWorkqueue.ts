@@ -65,9 +65,11 @@ export const useWorkqueue = (workqueueSlug: string) => {
       return {
         useSuspenseQuery: () =>
           searchEvent.useSuspenseQuery(deserializedQuery, {
-            networkMode: 'offlineFirst'
+            networkMode: 'offlineFirst',
+            refetchInterval: 20000
           }),
-        useQuery: () => searchEvent.useQuery(deserializedQuery)
+        useQuery: () =>
+          searchEvent.useQuery(deserializedQuery, { refetchInterval: 10000 })
       }
     },
     getCount: {
