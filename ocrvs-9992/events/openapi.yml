@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 9fec9b78-eb81-43bb-b0b1-13fc4e89ebf9
+                transactionId: b527cd72-e35f-4dcf-8948-aaa81cbf4e6c
                 type: v2.birth
       responses:
         "200":
@@ -284,13 +284,14 @@ paths:
                                 properties:
                                   firstname:
                                     type: string
-                                    nullable: true
                                   surname:
                                     type: string
-                                    nullable: true
                                   middlename:
                                     type: string
                                     nullable: true
+                                required:
+                                  - firstname
+                                  - surname
                               - type: "null"
                   default: {}
                 annotation:
@@ -457,13 +458,14 @@ paths:
                                 properties:
                                   firstname:
                                     type: string
-                                    nullable: true
                                   surname:
                                     type: string
-                                    nullable: true
                                   middlename:
                                     type: string
                                     nullable: true
+                                required:
+                                  - firstname
+                                  - surname
                               - type: "null"
                 originalActionId:
                   type: string
@@ -480,7 +482,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 4b4ed2f3-6223-4a90-86a3-7a513724d0b1
+                transactionId: dd79644f-a36f-44cd-853e-214d01693271
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -4688,13 +4690,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -4861,13 +4864,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -5085,13 +5089,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -5258,13 +5263,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -5479,13 +5485,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -5652,13 +5659,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -5886,13 +5894,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6059,13 +6068,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -6280,13 +6290,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6453,13 +6464,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -6687,13 +6699,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -6860,13 +6873,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -7081,13 +7095,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7254,13 +7269,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -7477,13 +7493,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -7650,13 +7667,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -7871,13 +7889,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8044,13 +8063,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -8268,13 +8288,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8441,13 +8462,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -8662,13 +8684,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -8835,13 +8858,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -9059,13 +9083,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -9232,13 +9257,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -9456,13 +9482,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -9629,13 +9656,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -9850,13 +9878,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -10023,13 +10052,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -10244,13 +10274,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type: object
@@ -10417,13 +10448,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -11055,13 +11087,10 @@ components:
                 properties:
                   firstname:
                     type: string
-                    minLength: 1
                   surname:
                     type: string
-                    minLength: 1
                   middlename:
                     type: string
-                    minLength: 1
                 required:
                   - firstname
                   - surname
@@ -11071,13 +11100,14 @@ components:
                         properties:
                           firstname:
                             type: string
-                            nullable: true
                           surname:
                             type: string
-                            nullable: true
                           middlename:
                             type: string
                             nullable: true
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
       required:
         - id
