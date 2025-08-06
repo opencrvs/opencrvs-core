@@ -48,7 +48,7 @@ interface FailedMutation<T = any> {
 interface FailedMutationStore {
   failedMutations: FailedMutation[]
   addFailedMutation: (mutation: FailedMutation) => void
-  removeFailedMutation: (eventId: string, action: string) => void
+  removeFailedMutation: (eventId: string) => void
   clearFailedMutations: () => void
 }
 
@@ -66,10 +66,10 @@ export const useFailedMutationStore = create<FailedMutationStore>()(
         }))
       }
     },
-    removeFailedMutation: (eventId, action) =>
+    removeFailedMutation: (eventId) =>
       set((state) => ({
         failedMutations: state.failedMutations.filter(
-          (m) => !(m.eventId === eventId && m.action === action)
+          (m) => !(m.eventId === eventId)
         )
       })),
     clearFailedMutations: () => set({ failedMutations: [] })

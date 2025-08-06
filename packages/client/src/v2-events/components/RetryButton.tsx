@@ -54,8 +54,8 @@ export default function RetryButton({ event }: { event: EventIndex }) {
   const handleRetry = async () => {
     if (matchingMutation) {
       try {
+        removeFailedMutation(event.id)
         await mutation.mutateAsync(matchingMutation.variables)
-        removeFailedMutation(event.id, event.type)
       } catch (err) {
         throw new Error('Cannot retry')
       }
