@@ -54,6 +54,19 @@ export function createSearchConfig<T extends {}>(baseField: T) {
     fuzzy: () => ({
       ...baseField,
       config: { type: 'fuzzy' as const }
+    }),
+    /**
+     * Creates a configuration for matching locations and the child locations
+     * @returns  An object containing the field ID and a configuration object with a type of 'within'.
+     * @example field('createdAtLocation').within()
+     * // {
+     * //   ...
+     * //   config: { type: 'within' }
+     * // }
+     */
+    within: () => ({
+      ...baseField,
+      config: { type: 'within' as const }
     })
   }
 }
