@@ -74,7 +74,13 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig-tests.json",
+          "isolatedModules": true
+        }
+      ]
     },
     "coverageReporters": [
       "json",
