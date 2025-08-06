@@ -42,6 +42,21 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
       {
         "issues": [
           {
+            "code": "invalid_type",
+            "expected": "string",
+            "received": "object",
+            "path": [
+              "declaration",
+              "applicant.name"
+            ],
+            "message": "Expected string, received object"
+          }
+        ],
+        "name": "ZodError"
+      },
+      {
+        "issues": [
+          {
             "code": "invalid_union",
             "unionErrors": [
               {

@@ -101,7 +101,8 @@ function aggregateActionDeclarations(
 
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REJECT_CORRECTION
   ]
 
   return actions.reduce((declaration, action) => {

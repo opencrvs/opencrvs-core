@@ -102,7 +102,9 @@ export function Dialog({
 }: IDialogProps) {
   const dialogRef = useRef<HTMLDivElement>(null)
   const handleClose = () => {
-    onClose && onClose()
+    if (onClose) {
+      onClose()
+    }
   }
 
   const hasActions = actions && actions.length > 0
@@ -130,7 +132,12 @@ export function Dialog({
                   {title}
                 </Text>
               </DialogTitle>
-              <Button type="icon" size="medium" onClick={handleClose}>
+              <Button
+                data-testid="close-dialog"
+                type="icon"
+                size="medium"
+                onClick={handleClose}
+              >
                 <Icon name="X" size="large" weight="bold" />
               </Button>
             </DialogHeader>

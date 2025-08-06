@@ -11,7 +11,6 @@
 
 import { z } from 'zod'
 import { EnableConditional, ShowConditional } from './Conditional'
-import { PageConfig } from './PageConfig'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
@@ -109,8 +108,7 @@ const PrintCertificateActionConfig = ActionConfigBase.merge(
 const RequestCorrectionConfig = ActionConfigBase.merge(
   z.object({
     type: z.literal(ActionType.REQUEST_CORRECTION),
-    onboardingForm: z.array(PageConfig),
-    additionalDetailsForm: z.array(PageConfig)
+    correctionForm: ActionFormConfig
   })
 )
 

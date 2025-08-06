@@ -9,15 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import {
-  useQuery,
-  useQueryClient,
-  useSuspenseQuery
-} from '@tanstack/react-query'
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { useSyncExternalStore } from 'react'
-import { EventIndex, QueryType, UUID, getUUID } from '@opencrvs/commons/client'
-import { queryClient, useTRPC } from '@client/v2-events/trpc'
+import { QueryType, UUID, getUUID } from '@opencrvs/commons/client'
+import { useTRPC } from '@client/v2-events/trpc'
 import { useGetEvent } from './procedures/get'
 import { useOutbox } from './outbox'
 import { useCreateEvent } from './procedures/create'
@@ -31,7 +26,7 @@ import {
 import { useGetEvents } from './procedures/list'
 import { useGetEventCounts } from './procedures/count'
 import { findLocalEventIndex } from './api'
-import { MutationType, QueryOptions } from './procedures/utils'
+import { QueryOptions } from './procedures/utils'
 
 export function useEvents() {
   const trpc = useTRPC()
@@ -139,9 +134,9 @@ export function useEvents() {
       declare: useEventAction(trpc.event.actions.declare.request),
       register: useEventAction(trpc.event.actions.register.request),
       correction: {
-        request: useEventAction(trpc.event.actions.correction.request),
-        approve: useEventAction(trpc.event.actions.correction.approve),
-        reject: useEventAction(trpc.event.actions.correction.reject)
+        request: useEventAction(trpc.event.actions.correction.request.request),
+        approve: useEventAction(trpc.event.actions.correction.approve.request),
+        reject: useEventAction(trpc.event.actions.correction.reject.request)
       },
       assignment: {
         assign: {
@@ -185,6 +180,9 @@ export function useEvents() {
       ]),
       registerOnValidate: useEventCustomAction([
         ...customMutationKeys.registerOnValidate
+      ]),
+      makeCorrectionOnRequest: useEventCustomAction([
+        ...customMutationKeys.makeCorrectionOnRequest
       ])
     }
   }
