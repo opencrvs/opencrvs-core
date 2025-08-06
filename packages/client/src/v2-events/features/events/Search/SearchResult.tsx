@@ -41,6 +41,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
 import { CoreWorkqueues } from '@client/v2-events/utils'
+import RetryButton from '@client/v2-events/components/RetryButton'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   useAction,
@@ -307,6 +308,9 @@ export const SearchResultComponent = ({
             <ActionComponent actionType={actionType} event={event} />
           )
         }))
+        .concat({
+          actionComponent: <RetryButton event={event} />
+        })
         .concat({
           actionComponent: (
             <DownloadButton
