@@ -26,7 +26,7 @@ pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $HEARTH_CONFIG
 pnpm --dir $SCRIPT_PATH exec migrate-mongo status --file $HEARTH_CONFIG
 
 # events migrations
-DATABASE_URL=${EVENTS_POSTGRES_URL} pnpm --cwd $SCRIPT_PATH node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
+DATABASE_URL=${EVENTS_POSTGRES_URL} pnpm --dir $SCRIPT_PATH exec node-pg-migrate up --schema=app --migrations-dir=./src/migrations/events
 
 #openhim migrations
 pnpm --dir $SCRIPT_PATH exec migrate-mongo up --file $OPENHIM_CONFIG
