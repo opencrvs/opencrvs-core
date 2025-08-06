@@ -27,7 +27,7 @@ import {
   setQueryDefaults
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
-import { createTemporaryId } from '@client/v2-events/utils'
+import { createTemporaryId, isTemporaryId } from '@client/v2-events/utils'
 import { getFilepathsFromActionDocument } from '../files/cache'
 import { precacheFile } from '../files/useFileUpload'
 
@@ -38,7 +38,6 @@ import { precacheFile } from '../files/useFileUpload'
  * This ensures the full record can be browsed even when the user goes offline
  */
 setQueryDefaults(trpcOptionsProxy.event.draft.list, {
-  staleTime: Infinity,
   queryFn: async (...params) => {
     const queryOptions = trpcOptionsProxy.event.draft.list.queryOptions()
 
@@ -181,8 +180,32 @@ export function useDrafts() {
 
     const drafts = useSuspenseQuery({
       ...options,
+      // Always consider the previously fetched data as outdated
+      staleTime: 0,
+      // Always refetch the data when the component mounts
+      refetchOnMount: true,
+      // First use data from browser cache, then fetch from the server if online
+      networkMode: 'offlineFirst',
       queryKey: trpc.event.draft.list.queryKey(),
-      networkMode: 'always'
+      select: (serverStoredDrafts) => {
+        const locallyStoredDrafts =
+          queryClient.getQueryData<Draft[]>(trpc.event.draft.list.queryKey()) ??
+          []
+
+        /*
+         * These drafts are still pending for successful creation.
+         * We still want to show them to the user as if they were already created as
+         * syncing ultimately should be a background process.
+         */
+
+        const optimisticallyStoredLocalDrafts = locallyStoredDrafts.filter(
+          (d) =>
+            isTemporaryId(d.id) &&
+            !serverStoredDrafts.some((i) => i.transactionId === d.transactionId)
+        )
+
+        return [...serverStoredDrafts, ...optimisticallyStoredLocalDrafts]
+      }
     })
 
     return drafts.data
