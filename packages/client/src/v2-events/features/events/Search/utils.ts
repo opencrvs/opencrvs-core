@@ -241,17 +241,6 @@ function timePeriodToRangeString(value: SelectDateRangeValue): string {
   return `${startDate},${endDate}`
 }
 
-function buildConditionForStatus(): Condition {
-  return {
-    type: 'anyOf',
-    terms: Object.values([
-      ...EventStatus.options.filter(
-        (status) => status !== EventStatus.enum.CREATED
-      )
-    ])
-  }
-}
-
 /**
  * Builds a condition object for querying data based on a set of search keys and raw input values.
  *
@@ -294,7 +283,7 @@ function buildSearchQueryFields(
       if (config.fieldId === 'event.status' && value === 'ALL') {
         return {
           ...result,
-          [fieldId]: buildConditionForStatus()
+          [fieldId]: buildSearchClause(EventStatus.options.join(','), 'anyOf')
         }
       }
 
