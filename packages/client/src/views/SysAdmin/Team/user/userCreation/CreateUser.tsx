@@ -11,6 +11,8 @@
 
 import { clearUserFormData } from '@client/user/userReducer'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
+import { formMessages } from '@client/i18n/messages'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import React, { useEffect } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -28,7 +30,7 @@ interface IDispatchProps {
 type Props = RouteComponentProps & IDispatchProps & IntlShapeProps
 
 const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
-  const { router, clearUserFormData } = props
+  const { router, clearUserFormData, intl } = props
 
   useEffect(() => {
     const initialize = async () => {
@@ -49,7 +51,12 @@ const CreateNewUserComponent = (props: WithApolloClient<Props>) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <UserFormPage />
+  return (
+    <UserFormPage
+      title={intl.formatMessage(formMessages.userFormTitle)}
+      loadingMessage={intl.formatMessage(userFormMessages.creatingNewUser)}
+    />
+  )
 }
 
 export const CreateUser = withRouter(

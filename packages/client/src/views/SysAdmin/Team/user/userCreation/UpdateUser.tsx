@@ -9,16 +9,13 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import {
-  IFormSection,
-  IFormSectionData,
-  IFormSectionGroup
-} from '@client/forms'
-import {
   clearUserFormData,
   fetchAndStoreUserData
 } from '@client/user/userReducer'
 import { ApolloClient } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
+import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
+import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
 import React, { useEffect } from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
@@ -36,7 +33,8 @@ interface IDispatchProps {
 type Props = RouteComponentProps & IDispatchProps & IntlShapeProps
 
 const UpdateUserComponent = (props: WithApolloClient<Props>) => {
-  const { clearUserFormData, fetchAndStoreUserData, client, router } = props
+  const { clearUserFormData, fetchAndStoreUserData, client, router, intl } =
+    props
 
   const { userId } = router.params
 
@@ -60,7 +58,12 @@ const UpdateUserComponent = (props: WithApolloClient<Props>) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return <UserFormPage />
+  return (
+    <UserFormPage
+      title={intl.formatMessage(sysAdminMessages.editUserDetailsTitle)}
+      loadingMessage={intl.formatMessage(userFormMessages.updatingUser)}
+    />
+  )
 }
 
 export const UpdateUser = withRouter(

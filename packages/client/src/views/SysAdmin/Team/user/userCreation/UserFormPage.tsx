@@ -4,8 +4,6 @@ import {
   IFormSectionGroup
 } from '@client/forms'
 import { getVisibleSectionGroupsBasedOnConditions } from '@client/forms/utils'
-import { formMessages } from '@client/i18n/messages'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import {
@@ -19,12 +17,10 @@ import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ApolloClient } from '@apollo/client'
 import { withApollo, WithApolloClient } from '@apollo/client/react/hoc'
-import React, { useEffect, useReducer } from 'react'
+import React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
 import { gqlToDraftTransformer } from '@client/transformer'
-import { messages as userFormMessages } from '@client/i18n/messages/views/userForm'
-import { CREATE_USER_ON_LOCATION } from '@client/navigation/routes'
 import { getOfflineData } from '@client/offline/selectors'
 import { getScope, getUserDetails } from '@client/profile/profileSelectors'
 import {
@@ -45,12 +41,21 @@ type IUserProps = {
   loadingRoles?: boolean
 }
 
+type ItitleProps = {
+  title: string
+  loadingMessage: string
+}
+
 interface IDispatchProps {
   clearUserFormData: typeof clearUserFormData
   fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
-type Props = RouteComponentProps & IUserProps & IDispatchProps & IntlShapeProps
+type Props = RouteComponentProps &
+  IUserProps &
+  IDispatchProps &
+  IntlShapeProps &
+  ItitleProps
 
 const Container = styled.div`
   display: flex;
@@ -74,9 +79,10 @@ const SpinnerWrapper = styled.div`
 `
 export const UserFormPageComponent = (props: WithApolloClient<Props>) => {
   const {
+    title,
+    loadingMessage,
     userId,
     router,
-    intl,
     submitting,
     section,
     userDetailsStored,
@@ -86,22 +92,14 @@ export const UserFormPageComponent = (props: WithApolloClient<Props>) => {
 
   const renderLoadingPage = () => (
     <ActionPageLight
-      title={
-        userId
-          ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-          : intl.formatMessage(formMessages.userFormTitle)
-      }
+      title={title}
       goBack={() => router.navigate(-1)}
       hideBackground={true}
     >
       <Container>
         <SpinnerWrapper>
           <Spinner id="user-form-submitting-spinner" size={25} />
-          <p>
-            {userId
-              ? intl.formatMessage(userFormMessages.updatingUser)
-              : intl.formatMessage(userFormMessages.creatingNewUser)}
-          </p>
+          <p>{loadingMessage}</p>
         </SpinnerWrapper>
       </Container>
     </ActionPageLight>
