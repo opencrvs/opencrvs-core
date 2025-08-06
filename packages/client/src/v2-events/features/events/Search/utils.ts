@@ -162,12 +162,14 @@ export const getMetadataFieldConfigs = (
 const MatchType = {
   fuzzy: 'fuzzy',
   exact: 'exact',
+  within: 'within',
   anyOf: 'anyOf',
   range: 'range'
 } as const
 
 type Condition =
   | { type: 'fuzzy'; term: string }
+  | { type: 'within'; location: string }
   | { type: 'exact'; term: string }
   | { type: 'range'; gte: string; lte: string }
   | { type: 'anyOf'; terms: string[] }
@@ -219,6 +221,8 @@ function buildSearchClause(
     case MatchType.range:
       const [gte, lte] = value.split(',')
       return { type: 'range', gte, lte }
+    case MatchType.within:
+      return { type: 'within', location: value }
     default:
       return { type: 'exact', term: value } // Fallback to exact match
   }
@@ -235,17 +239,6 @@ function toRangeDateString(value: DateRangeFieldValue): string {
 function timePeriodToRangeString(value: SelectDateRangeValue): string {
   const { startDate, endDate } = timePeriodToDateRange(value)
   return `${startDate},${endDate}`
-}
-
-function buildConditionForStatus(): Condition {
-  return {
-    type: 'anyOf',
-    terms: Object.values([
-      ...EventStatus.options.filter(
-        (status) => status !== EventStatus.enum.CREATED
-      )
-    ])
-  }
 }
 
 /**
@@ -290,7 +283,7 @@ function buildSearchQueryFields(
       if (config.fieldId === 'event.status' && value === 'ALL') {
         return {
           ...result,
-          [fieldId]: buildConditionForStatus()
+          [fieldId]: buildSearchClause(EventStatus.options.join(','), 'anyOf')
         }
       }
 

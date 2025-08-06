@@ -11,7 +11,7 @@
 
 import { sql } from 'kysely'
 import { getClient } from '@events/storage/postgres/events'
-import { NewLocations } from './schema/app/Locations'
+import { Locations, NewLocations } from './schema/app/Locations'
 
 export async function setLocations(locations: NewLocations[]) {
   const db = getClient()
@@ -48,4 +48,25 @@ export async function getLocations() {
     .where('deletedAt', 'is', null)
     .$narrowType<{ deletedAt: null }>()
     .execute()
+}
+
+export async function getChildLocations(id: string) {
+  const db = getClient()
+
+  const { rows } = await sql<Locations>`
+    WITH RECURSIVE r AS (
+      SELECT id, parent_id
+      FROM app.locations
+      WHERE id = ${id}
+      UNION ALL
+      SELECT l.id, l.parent_id
+      FROM app.locations l
+      JOIN r ON l.parent_id = r.id
+    )
+    SELECT l.*
+    FROM app.locations l
+    JOIN r ON r.id = l.id
+    WHERE l.id <> ${id};
+  `.execute(db)
+  return rows
 }

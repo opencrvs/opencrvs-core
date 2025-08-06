@@ -14,7 +14,7 @@ import { FieldConfig, SelectOption, ValidationConfig } from './FieldConfig'
 import { FieldConditional } from './Conditional'
 import { FieldValue } from './FieldValue'
 
-const MatchType = z.enum(['fuzzy', 'exact', 'range'])
+const MatchType = z.enum(['fuzzy', 'exact', 'range', 'within'])
 
 const BaseField = z.object({
   config: z.object({
