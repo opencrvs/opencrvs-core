@@ -139,6 +139,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.PAGE_HEADER:
     case FieldType.LOCATION:
     case FieldType.SELECT:
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
@@ -169,7 +170,8 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
-    case FieldType.SELECT_DATE_RANGE:
+    case FieldType.TIME:
+      return '09:33'
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',
@@ -599,9 +601,9 @@ export function eventPayloadGenerator(rng: () => number) {
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment'
+              'transactionId' | 'annotation' | 'keepAssignment' | 'reason'
             >
-          > = {}
+          >
         ) => ({
           type: ActionType.REJECT_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
@@ -615,7 +617,8 @@ export function eventPayloadGenerator(rng: () => number) {
             ),
           eventId,
           requestId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          reason: input.reason ?? { message: '' }
         })
       }
     }
@@ -688,7 +691,8 @@ export function generateActionDocument({
       return {
         ...actionBase,
         requestId: getUUID(),
-        type: action
+        type: action,
+        reason: { message: 'Correction rejection' }
       }
     case ActionType.REGISTER:
       return {

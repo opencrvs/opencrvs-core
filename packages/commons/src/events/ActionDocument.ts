@@ -64,6 +64,9 @@ export const ActionBase = z.object({
     .describe(
       'Reference to the original action that was asynchronously rejected or accepted by 3rd party integration.'
     )
+  // 'content' field reserved for additional data
+  // Each action can define its own content specifc to the action
+  // See PrintCertificateAction
 })
 
 export type ActionBase = z.infer<typeof ActionBase>
@@ -71,7 +74,7 @@ export type ActionBase = z.infer<typeof ActionBase>
 const AssignedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ASSIGN),
-    assignedTo: z.string()
+    assignedTo: z.string() // TODO move into 'content' property
   })
 )
 
@@ -84,7 +87,7 @@ const UnassignedAction = ActionBase.merge(
 export const RegisterAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REGISTER),
-    registrationNumber: z.string().optional()
+    registrationNumber: z.string().optional() // TODO move into 'content' property
   })
 )
 
@@ -113,7 +116,7 @@ export const RejectionReason = z.object({
 const RejectAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT),
-    reason: RejectionReason
+    reason: RejectionReason // TODO move into 'content' property
   })
 )
 
@@ -126,7 +129,7 @@ const MarkAsDuplicateAction = ActionBase.merge(
 const ArchiveAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    reason: RejectionReason
+    reason: RejectionReason // TODO move into 'content' property
   })
 )
 
@@ -142,11 +145,20 @@ const NotifiedAction = ActionBase.merge(
   })
 )
 
+export const PrintContent = z.object({
+  templateId: z.string().optional()
+})
+
+export type PrintContent = z.infer<typeof PrintContent>
+
 const PrintCertificateAction = ActionBase.merge(
   z.object({
-    type: z.literal(ActionType.PRINT_CERTIFICATE)
+    type: z.literal(ActionType.PRINT_CERTIFICATE),
+    content: PrintContent.optional().nullable()
   })
 )
+
+export type PrintCertificateAction = z.infer<typeof PrintCertificateAction>
 
 const RequestedCorrectionAction = ActionBase.merge(
   z.object({
@@ -161,14 +173,15 @@ export type RequestedCorrectionAction = z.infer<
 const ApprovedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.APPROVE_CORRECTION),
-    requestId: z.string()
+    requestId: z.string() // TODO move into 'content' property
   })
 )
 
 const RejectedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION),
-    requestId: z.string()
+    requestId: z.string(), // TODO move into 'content' property
+    reason: RejectionReason
   })
 )
 

@@ -22,6 +22,7 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
+import { getChildLocations } from '../locations/locations'
 import {
   encodeFieldId,
   generateQueryForAddressField,
@@ -197,13 +198,14 @@ function generateQuery(
   } satisfies estypes.QueryDslQueryContainer
 }
 
-const EXACT_SEARCH_LOCATION_DISTANCE = '10km'
-
 function typedKeys<T extends object>(obj: T): (keyof T)[] {
   return Object.keys(obj) as (keyof T)[]
 }
 
-function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
+async function buildClause(
+  clause: QueryExpression,
+  eventConfigs: EventConfig[]
+) {
   const must: estypes.QueryDslQueryContainer[] = []
 
   for (const key of typedKeys(clause)) {
@@ -256,15 +258,23 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
 
       case 'createdAtLocation':
       case 'updatedAtLocation':
+      case 'legalStatuses.DECLARED.createdAtLocation':
       case 'legalStatuses.REGISTERED.createdAtLocation': {
         const value = clause[key]
+
         if (value.type === 'exact') {
           must.push({ term: { [key]: value.term } })
         } else {
+          const childLocations = await getChildLocations(value.location)
+          const locationIds = [
+            value.location,
+            ...childLocations.map((location) => location.id)
+          ]
+
           must.push({
-            geo_distance: {
-              distance: EXACT_SEARCH_LOCATION_DISTANCE,
-              location: value.location
+            bool: {
+              should: locationIds.map((id) => ({ term: { [key]: id } })),
+              minimum_should_match: 1
             }
           })
         }
@@ -309,13 +319,16 @@ function buildClause(clause: QueryExpression, eventConfigs: EventConfig[]) {
   return must
 }
 
-export function buildElasticQueryFromSearchPayload(
+export async function buildElasticQueryFromSearchPayload(
   input: QueryType,
   eventConfigs: EventConfig[]
-): estypes.QueryDslQueryContainer {
-  const must = input.clauses.flatMap((clause) =>
-    buildClause(clause, eventConfigs)
+): Promise<estypes.QueryDslQueryContainer> {
+  const mustResults = await Promise.all(
+    input.clauses.map(async (clause) => buildClause(clause, eventConfigs))
   )
+
+  const must = mustResults.flat()
+
   switch (input.type) {
     case 'and': {
       return {
@@ -328,14 +341,16 @@ export function buildElasticQueryFromSearchPayload(
       }
     }
     case 'or': {
-      const should = input.clauses.flatMap((clause) => ({
-        bool: {
-          must: buildClause(clause, eventConfigs),
-          // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
-          // when no `should` clauses are provided.
-          should: undefined
-        }
-      }))
+      const should = await Promise.all(
+        input.clauses.map(async (clause) => ({
+          bool: {
+            must: await buildClause(clause, eventConfigs),
+            // Explicitly setting `should` to `undefined` to satisfy QueryDslBoolQuery type requirements
+            // when no `should` clauses are provided.
+            should: undefined
+          }
+        }))
+      )
 
       return {
         bool: {

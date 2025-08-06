@@ -40,8 +40,9 @@ import {
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { getCountryLogoFile } from '@client/offline/selectors'
-import { getScope } from '@client/profile/profileSelectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
+import { getScope } from '@client/profile/profileSelectors'
+import { ReviewCorrection } from '../actions/correct/request/ReviewCorrection'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
 
@@ -280,7 +281,8 @@ function FormReview({
   onEdit,
   showPreviouslyMissingValuesAsChanged,
   readonlyMode,
-  isCorrection = false
+  isCorrection = false,
+  isReviewCorrection = false
 }: {
   formConfig: FormConfig
   form: EventState
@@ -289,6 +291,7 @@ function FormReview({
   showPreviouslyMissingValuesAsChanged: boolean
   readonlyMode?: boolean
   isCorrection?: boolean
+  isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
   const visiblePages = formConfig.pages.filter((page) =>
@@ -361,7 +364,9 @@ function FormReview({
 
           // If the page has any correctable fields, show the change all link
           const showChangeAllLink =
-            !readonlyMode && (!isCorrection || hasCorrectableFields)
+            !readonlyMode &&
+            (!isCorrection || hasCorrectableFields) &&
+            !isReviewCorrection
 
           return (
             <DeclarationDataContainer
@@ -396,7 +401,9 @@ function FormReview({
                       uncorrectable
                     }) => {
                       const shouldHideEditLink =
-                        readonlyMode || (isCorrection && uncorrectable)
+                        readonlyMode ||
+                        (isCorrection && uncorrectable) ||
+                        isReviewCorrection
 
                       return (
                         <ListReview.Row
@@ -407,7 +414,6 @@ function FormReview({
                                 data-testid={`change-button-${id}`}
                                 onClick={(e) => {
                                   e.stopPropagation()
-
                                   onEdit({
                                     pageId: page.id,
                                     fieldId: id
@@ -452,7 +458,8 @@ function ReviewComponent({
   onAnnotationChange,
   readonlyMode,
   reviewFields,
-  isCorrection = false
+  isCorrection = false,
+  isReviewCorrection = false
 }: {
   children: React.ReactNode
   formConfig: FormConfig
@@ -473,6 +480,7 @@ function ReviewComponent({
   onAnnotationChange?: (values: EventState) => void
   readonlyMode?: boolean
   isCorrection?: boolean
+  isReviewCorrection?: boolean
 }) {
   const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
@@ -493,12 +501,14 @@ function ReviewComponent({
   return (
     <Row>
       <LeftColumn>
+        {isReviewCorrection && <ReviewCorrection form={form} />}
         <Card>
           <ReviewHeader title={title} />
           <FormReview
             form={form}
             formConfig={formConfig}
             isCorrection={isCorrection}
+            isReviewCorrection={isReviewCorrection}
             previousForm={previousForm}
             readonlyMode={readonlyMode}
             showPreviouslyMissingValuesAsChanged={

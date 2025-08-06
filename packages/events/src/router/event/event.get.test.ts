@@ -110,15 +110,6 @@ test('Returns event with all actions', async () => {
     transactionId: getUUID()
   })
 
-  await client.event.actions.declare.request(
-    generator.event.actions.declare(event.id)
-  )
-
-  await client.event.actions.assignment.assign({
-    ...assignmentInput,
-    transactionId: getUUID()
-  })
-
   await client.event.actions.validate.request(
     generator.event.actions.validate(event.id)
   )
@@ -159,7 +150,10 @@ test('Returns event with all actions', async () => {
     generator.event.actions.correction.reject(
       event.id,
       // last action is the assign action and 2nd last is the automatic unassign action
-      correctionRequest.actions[correctionRequest.actions.length - 2].id
+      correctionRequest.actions[correctionRequest.actions.length - 2].id,
+      {
+        reason: { message: 'No legal proof' }
+      }
     )
   )
 
