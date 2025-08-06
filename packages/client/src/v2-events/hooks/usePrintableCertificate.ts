@@ -132,7 +132,8 @@ export const usePrintableCertificate = ({
         ...updatedMetadata,
         // Temporarily add `modifiedAt` to the last action's data to display
         // the current certification date in the certificate preview on the review page.
-        modifiedAt: new Date().toISOString()
+        modifiedAt: new Date().toISOString(),
+        copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
       locations,

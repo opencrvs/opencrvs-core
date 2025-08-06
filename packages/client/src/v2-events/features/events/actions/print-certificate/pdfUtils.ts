@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -75,7 +76,12 @@ export const stringifyEventMetadata = ({
   locations,
   users
 }: {
-  metadata: NonNullable<EventMetadata & { modifiedAt: string }>
+  metadata: NonNullable<
+    EventMetadata & {
+      modifiedAt: string
+      copiesPrintedForTemplate: number | undefined
+    }
+  >
   intl: IntlShape
   locations: Location[]
   users: User[]
@@ -228,7 +234,7 @@ const cache = createIntlCache()
 
 export function compileSvg({
   templateString,
-  $metadata: $metadata,
+  $metadata,
   $declaration,
   locations,
   users,
@@ -238,7 +244,7 @@ export function compileSvg({
   templateString: string
   $metadata: EventMetadata & {
     modifiedAt: string
-    copiesPrintedForTemplate?: number
+    copiesPrintedForTemplate: number | undefined
   }
   $declaration: EventState
   locations: Location[]

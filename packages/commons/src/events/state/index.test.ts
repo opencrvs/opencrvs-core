@@ -320,8 +320,7 @@ describe('getCurrentEventState()', () => {
           // @ts-expect-error -- We do not have sufficient types for this in generator
           registrationNumber: registerAcceptAction.registrationNumber
         }
-      },
-      copiesPrintedForTemplate: 0
+      }
     } satisfies EventIndex)
   })
 
@@ -440,8 +439,7 @@ describe('getCurrentEventState()', () => {
           // @ts-expect-error -- We do not have sufficient types for this in generator
           registrationNumber: registerAcceptAction.registrationNumber
         }
-      },
-      copiesPrintedForTemplate: 0
+      }
     } satisfies EventIndex)
   })
 })
