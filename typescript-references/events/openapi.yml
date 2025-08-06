@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: cf855610-c3f7-4561-b60a-ed8937956c7b
+                transactionId: 64542ac1-36d2-40ff-821e-214dc3fceead
                 type: v2.birth
       responses:
         "200":
@@ -484,7 +484,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: d4d155b5-497f-4e24-af4e-f0090dd718ec
+                transactionId: 82316c2d-0a36-4ba3-a0d2-23be2b636c4a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -11541,6 +11541,12 @@ components:
           type: string
           enum:
             - PRINT_CERTIFICATE
+        content:
+          type: object
+          nullable: true
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
