@@ -265,7 +265,8 @@ export function Review() {
           fullEvent,
           eventId: fullEvent.id,
           declaration: {},
-          annotation: { ...annotation, templateId },
+          annotation,
+          content: { templateId },
           transactionId: uuid(),
           type: ActionType.PRINT_CERTIFICATE
         })

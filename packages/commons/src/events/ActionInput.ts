@@ -11,7 +11,11 @@
 
 import { z } from 'zod'
 import { ActionType } from './ActionType'
-import { ActionUpdate, RejectionReason } from './ActionDocument'
+import {
+  PrintContent as PrintContent,
+  ActionUpdate,
+  RejectionReason
+} from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID, getUUID } from '../uuid'
 import { CreatedAtLocation } from './CreatedAtLocation'
@@ -77,7 +81,8 @@ export const PrintCertificateActionInput = BaseActionInput.merge(
   z.object({
     type: z
       .literal(ActionType.PRINT_CERTIFICATE)
-      .default(ActionType.PRINT_CERTIFICATE)
+      .default(ActionType.PRINT_CERTIFICATE),
+    content: PrintContent.optional()
   })
 )
 

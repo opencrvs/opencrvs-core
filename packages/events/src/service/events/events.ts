@@ -267,6 +267,8 @@ export async function addAction(
     }
   }
 
+  const content = ('content' in input && input.content) || undefined
+
   if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
@@ -274,6 +276,7 @@ export async function addAction(
       actionType: ActionType.MARKED_AS_DUPLICATE,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,
@@ -293,6 +296,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
@@ -322,6 +326,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,
