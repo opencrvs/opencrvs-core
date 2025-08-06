@@ -27,9 +27,13 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
+import {
+  generateCreateUserSectionUrl,
+  generateUserReviewFormUrl
+} from '@client/navigation'
 import { Scope, SCOPES, UUID } from '@opencrvs/commons/client'
 
-type IUserProps = {
+type UserFormPageProps = {
   userId?: string
   section: IFormSection
   activeGroup: IFormSectionGroup
@@ -41,21 +45,21 @@ type IUserProps = {
   loadingRoles?: boolean
 }
 
-type ItitleProps = {
-  title: string
-  loadingMessage: string
-}
-
 interface IDispatchProps {
   clearUserFormData: typeof clearUserFormData
   fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
+type Titleprops = {
+  title: string
+  loadingMessage: string
+}
+
 type Props = RouteComponentProps &
-  IUserProps &
+  UserFormPageProps &
   IDispatchProps &
   IntlShapeProps &
-  ItitleProps
+  Titleprops
 
 const Container = styled.div`
   display: flex;
@@ -90,6 +94,17 @@ export const UserFormPageComponent = (props: WithApolloClient<Props>) => {
     client
   } = props
 
+  const determineNavigationUrl = userId
+    ? generateUserReviewFormUrl({
+        userId: userId,
+        sectionId: props.nextSectionId,
+        groupId: props.nextGroupId
+      })
+    : generateCreateUserSectionUrl({
+        sectionId: props.nextSectionId,
+        groupId: props.nextGroupId
+      })
+
   const renderLoadingPage = () => (
     <ActionPageLight
       title={title}
@@ -110,7 +125,9 @@ export const UserFormPageComponent = (props: WithApolloClient<Props>) => {
   }
 
   if (section.viewType === 'form') {
-    return <UserForm {...props} />
+    return (
+      <UserForm {...props} formActionNavigationUrl={determineNavigationUrl} />
+    )
   }
 
   if (section.viewType === 'preview') {

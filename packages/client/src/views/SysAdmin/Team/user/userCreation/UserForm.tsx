@@ -23,10 +23,6 @@ import {
   buttonMessages,
   validationMessages as messages
 } from '@client/i18n/messages'
-import {
-  generateCreateUserSectionUrl,
-  generateUserReviewFormUrl
-} from '@client/navigation'
 import { IStoreState } from '@client/store'
 import styled from 'styled-components'
 import { clearUserFormData, modifyUserFormData } from '@client/user/userReducer'
@@ -36,7 +32,6 @@ import { FormikTouched, FormikValues } from 'formik'
 import * as React from 'react'
 import { injectIntl, WrappedComponentProps as IntlShapeProps } from 'react-intl'
 import { connect } from 'react-redux'
-import { messages as sysAdminMessages } from '@client/i18n/messages/views/sysAdmin'
 import { IOfflineData } from '@client/offline/reducer'
 import { getOfflineData } from '@client/offline/selectors'
 import { Content, ContentSize } from '@opencrvs/components/lib/Content'
@@ -54,6 +49,7 @@ export const Action = styled.div`
 `
 
 type IProps = {
+  title: string
   userId?: string
   section: IFormSection
   formData: IFormSectionData
@@ -62,6 +58,7 @@ type IProps = {
   nextGroupId: string
   offlineCountryConfig: IOfflineData
   user: UserDetails | null
+  formActionNavigationUrl: string
 }
 
 type IState = {
@@ -90,20 +87,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     ) {
       this.showAllValidationErrors()
     } else {
-      this.props.userId
-        ? this.props.router.navigate(
-            generateUserReviewFormUrl({
-              userId: this.props.userId,
-              sectionId: this.props.nextSectionId,
-              groupId: this.props.nextGroupId
-            })
-          )
-        : this.props.router.navigate(
-            generateCreateUserSectionUrl({
-              sectionId: this.props.nextSectionId,
-              groupId: this.props.nextGroupId
-            })
-          )
+      this.props.router.navigate(this.props.formActionNavigationUrl)
     }
   }
 
@@ -132,7 +116,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
   }
 
   render = () => {
-    const { section, intl, activeGroup, userId, formData } = this.props
+    const { section, intl, activeGroup, formData } = this.props
     const title = activeGroup?.title
       ? intl.formatMessage(activeGroup.title)
       : ''
@@ -140,11 +124,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     return (
       <>
         <ActionPageLight
-          title={
-            userId
-              ? intl.formatMessage(sysAdminMessages.editUserDetailsTitle)
-              : section.title && intl.formatMessage(section.title)
-          }
+          title={this.props.title}
           goBack={this.handleBackAction}
           goHome={() =>
             this.props.router.navigate({
