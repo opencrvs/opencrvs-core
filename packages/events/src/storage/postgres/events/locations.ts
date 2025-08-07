@@ -23,7 +23,6 @@ export async function setLocations(locations: NewLocations[]) {
     .onConflict((oc) =>
       oc.column('id').doUpdateSet({
         name: (eb) => eb.ref('excluded.name'),
-        externalId: (eb) => eb.ref('excluded.externalId'),
         parentId: (eb) => eb.ref('excluded.parentId'),
         updatedAt: () => sql`now()`,
         deletedAt: null

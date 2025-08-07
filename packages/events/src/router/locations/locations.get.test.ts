@@ -19,8 +19,7 @@ test('Returns single location in right format', async () => {
     {
       id: generateUuid(),
       partOf: null,
-      name: 'Location foobar',
-      externalId: 'ext-id-123'
+      name: 'Location foobar'
     }
   ]
 
