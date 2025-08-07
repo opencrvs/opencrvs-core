@@ -19,6 +19,7 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useWorkqueueConfigurations } from '../features/events/useWorkqueueConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
+import { queryClient, useTRPC } from '../trpc'
 import { useUsers } from './useUsers'
 
 function getDeserializedQuery(
@@ -76,6 +77,31 @@ export const useWorkqueue = (workqueueSlug: string) => {
       useSuspenseQuery: () =>
         useGetEventCounts().useSuspenseQuery(deSerializedQueries),
       useQuery: () => useGetEventCounts().useQuery(deSerializedQueries)
+    }
+  }
+}
+
+export function useWorkqueues() {
+  const legacyUser = useSelector(getUserDetails)
+  const { getUser } = useUsers()
+  const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
+  const workqueues = useWorkqueueConfigurations()
+  const trpc = useTRPC()
+
+  return {
+    prefetch: async () => {
+      return Promise.all(
+        workqueues.map(async (workqueueConfig) => {
+          const deserializedQuery = getDeserializedQuery(
+            workqueueConfig,
+            user,
+            legacyUser?.primaryOffice.id
+          )
+          return queryClient.prefetchQuery({
+            ...trpc.event.search.queryOptions(deserializedQuery)
+          })
+        })
+      )
     }
   }
 }
