@@ -11,21 +11,11 @@
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
 
-import { useNavigate } from 'react-router-dom'
-import { useEffect } from 'react'
-import {
-  EventDocument,
-  EventIndex,
-  getCurrentEventState
-} from '@opencrvs/commons/client'
-import {
-  useEventConfiguration,
-  useEventConfigurations
-} from '@client/v2-events/features/events/useEventConfiguration'
+import { EventDocument } from '@opencrvs/commons/client'
+import { useEventConfigurations } from '@client/v2-events/features/events/useEventConfiguration'
 import { cacheFiles } from '@client/v2-events/features/files/cache'
 import { useTRPC, trpcOptionsProxy, queryClient } from '@client/v2-events/trpc'
 import { cacheUsersFromEventDocument } from '@client/v2-events/features/users/cache'
-import { ROUTES } from '@client/v2-events/routes'
 import { updateLocalEventIndex } from '../api'
 import { setQueryDefaults } from './utils'
 

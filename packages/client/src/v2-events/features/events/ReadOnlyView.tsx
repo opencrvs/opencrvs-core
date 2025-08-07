@@ -15,6 +15,7 @@ import { noop } from 'lodash'
 import {
   ActionType,
   getActionReview,
+  getCurrentEventState,
   getCurrentEventStateWithDrafts,
   getDeclaration
 } from '@opencrvs/commons/client'
@@ -32,15 +33,18 @@ function ReadonlyView() {
   const events = useEvents()
   const [event] = events.getEvent.viewEvent(eventId)
 
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(event.id)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(event.id)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
 
   const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts({ event, drafts, configuration }),
-    [drafts, event, configuration]
+    () =>
+      draft
+        ? getCurrentEventStateWithDrafts({ event, draft, configuration })
+        : getCurrentEventState(event, configuration),
+    [draft, event, configuration]
   )
 
   const { title, fields } = getActionReview(configuration, ActionType.READ)

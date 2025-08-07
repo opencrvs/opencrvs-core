@@ -19,7 +19,8 @@ import {
   has,
   isNil,
   uniqBy,
-  cloneDeep
+  cloneDeep,
+  orderBy
 } from 'lodash'
 import {
   ActionType,
@@ -197,20 +198,26 @@ export function omitHiddenPaginatedFields(
   return omitHiddenFields(visiblePagesFormFields, declaration)
 }
 
-export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
-  const actions = event.actions
-    .slice()
-    .filter(({ type }) => type !== ActionType.READ)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+/**
+ *
+ * @returns a draft for the event that has been created since the last non-read action.
+ */
+export function findActiveDraftForEvent(event: EventDocument, drafts: Draft[]) {
+  const actions = orderBy(
+    event.actions.filter(({ type }) => type !== ActionType.READ),
+    ['createdAt'],
+    ['asc']
+  )
 
   const lastAction = actions[actions.length - 1]
-  return (
-    drafts
-      // Temporally allows equal timestamps as the generated demo data is not perfect yet
-      // should be > rather than >=
-      .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
-      .filter(({ eventId }) => eventId === event.id)
-  )
+  // After migrations have been run, there should always be [0..1[ actions.
+  const activeDrafts = drafts
+    // Temporally allows equal timestamps as the generated demo data is not perfect yet
+    // should be > rather than >=
+    .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
+    .filter(({ eventId }) => eventId === event.id)
+
+  return activeDrafts[drafts.length - 1]
 }
 
 export function createEmptyDraft(

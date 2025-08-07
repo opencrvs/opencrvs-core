@@ -12,7 +12,7 @@ import React, { useState, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
-import { orderBy } from 'lodash'
+import { orderBy, first } from 'lodash'
 import styled from 'styled-components'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
@@ -21,7 +21,7 @@ import {
   defaultWorkqueueColumns,
   WorkqueueColumn,
   deepDropNulls,
-  applyDraftsToEventIndex,
+  applyDraftToEventIndex,
   WorkqueueActionsWithDefault,
   isMetaAction,
   TranslationConfig
@@ -441,10 +441,12 @@ export const SearchResultComponent = ({
       if (!eventConfig) {
         throw new Error('Event configuration not found for event:' + event.type)
       }
+
       return deepDropNulls(
-        applyDraftsToEventIndex(
+        applyDraftToEventIndex(
           event,
-          drafts.filter((d) => d.eventId === event.id),
+          // there should be only one draft per event
+          first(drafts.filter((d) => d.eventId === event.id)),
           eventConfig
         )
       )

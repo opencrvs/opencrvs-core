@@ -730,27 +730,36 @@ export function generateEventDraftDocument({
   eventId,
   actionType,
   rng = () => 0.1,
-  declaration = {}
+
+  annotation,
+  declaration = {},
+  overrideDeclaration
 }: {
   eventId: UUID
   actionType: ActionType
   rng?: () => number
   declaration?: EventState
+  annotation?: EventState
+  overrideDeclaration?: boolean
 }): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: actionType,
     rng
   })
+
   return {
     id: getUUID(),
     transactionId: getUUID(),
     action: {
       ...action,
-      declaration: {
-        ...action.declaration,
-        ...declaration
-      }
+      declaration: overrideDeclaration
+        ? declaration
+        : {
+            ...action.declaration,
+            ...declaration
+          },
+      annotation: action.annotation
     },
     createdAt: new Date().toISOString(),
     eventId

@@ -58,6 +58,10 @@ const DocumentTypeRequiredError = {
   description: 'Show error message if the document type is not selected'
 }
 
+/**
+ * Document uploader with option for selecting a document type.
+ * If you don't need to select a document type, use @see SimpleDocumentUploader.
+ */
 function DocumentUploaderWithOption({
   value,
   onChange,
@@ -99,27 +103,22 @@ function DocumentUploaderWithOption({
   const [previewImage, setPreviewImage] =
     useState<FileFieldValueWithOption | null>(null)
 
-  const { uploadFile, deleteFile: deleteFileFromBackend } = useFileUpload(
-    name,
-    {
-      onSuccess: ({ type, originalFilename, path, id }) => {
-        const newFile = {
-          path,
-          originalFilename: originalFilename,
-          type: type,
-          option: id
-        }
-
-        setFilesBeingProcessed((prev) =>
-          prev.filter(({ label }) => label !== id)
-        )
-
-        setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
-        onChange(getUpdatedFiles(files, newFile))
-        setSelectedOption(undefined)
+  const { uploadFile } = useFileUpload(name, {
+    onSuccess: ({ type, originalFilename, path, id }) => {
+      const newFile = {
+        path,
+        originalFilename: originalFilename,
+        type: type,
+        option: id
       }
+
+      setFilesBeingProcessed((prev) => prev.filter(({ label }) => label !== id))
+
+      setFiles((prevFiles) => getUpdatedFiles(prevFiles, newFile))
+      onChange(getUpdatedFiles(files, newFile))
+      setSelectedOption(undefined)
     }
-  )
+  })
 
   const getLabelForDocumentOption = (docType: string) => {
     const label = options.find(({ value: val }) => val === docType)?.label
@@ -145,7 +144,6 @@ function DocumentUploaderWithOption({
   })
 
   const onDeleteFile = (path: FullDocumentPath) => {
-    deleteFileFromBackend(path)
     setFiles((prevFiles) => prevFiles.filter((file) => file.path !== path))
     onChange(files.filter((file) => file.path !== path))
     setPreviewImage(null)

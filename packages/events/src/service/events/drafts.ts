@@ -38,8 +38,7 @@ export const createDraft = async (
     createdByRole: user.role,
     createdByUserType: user.type,
     createdAtLocation: user.primaryOfficeId,
-    createdBySignature: user.signature,
-    createdAt: new Date().toISOString()
+    createdBySignature: user.signature
   })
 
   if (!draft) {

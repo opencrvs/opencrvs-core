@@ -595,3 +595,11 @@ export type SelectOption = z.infer<typeof SelectOption>
 export type AdministrativeAreaConfiguration = z.infer<
   typeof AdministrativeAreaConfiguration
 >
+
+export const AnyFileField = z.discriminatedUnion('type', [
+  SignatureField,
+  File,
+  FileUploadWithOptions
+])
+
+export type AnyFileField = z.infer<typeof AnyFileField>

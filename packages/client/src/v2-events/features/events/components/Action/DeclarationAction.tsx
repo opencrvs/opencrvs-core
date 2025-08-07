@@ -14,13 +14,14 @@ import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
 import {
   createEmptyDraft,
-  findActiveDrafts,
+  findActiveDraftForEvent,
   getCurrentEventStateWithDrafts,
   getActionAnnotation,
   DeclarationUpdateActionType,
   ActionType,
   Action,
-  deepMerge
+  deepMerge,
+  getUUID
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -85,7 +86,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
 
   const events = useEvents()
   const navigate = useNavigate()
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
+  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+    useDrafts()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -107,11 +109,17 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     event.type
   )
 
-  const drafts = getRemoteDrafts(event.id)
-  const activeDraft = findActiveDrafts(event, drafts)[0]
+  const remoteDraft = getRemoteDraftByEventId(event.id)
+
+  const activeRemoteDraft = remoteDraft
+    ? findActiveDraftForEvent(event, [remoteDraft])
+    : undefined
+
   const localDraft = getLocalDraftOrDefault(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft || createEmptyDraft(eventId, createTemporaryId(), actionType)
+    activeRemoteDraft
+      ? // new transactionId must be generated for the draft to be saved. Otherwise it will hit the "idempotency wall"
+        { ...activeRemoteDraft, transactionId: getUUID() }
+      : createEmptyDraft(eventId, createTemporaryId(), actionType)
   )
 
   /*
@@ -145,44 +153,47 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const eventDrafts = drafts
-    .filter((d) => d.eventId === event.id)
-    .concat({
-      ...localDraft,
-      /*
-       * Force the local draft always to be the latest
-       * This is to prevent a situation where the local draft gets created,
-       * then a CREATE action request finishes in the background and is stored with a later
-       * timestamp
-       */
-      createdAt: new Date().toISOString(),
-      /*
-       * If params.eventId changes (from tmp id to concrete id) then change the local draft id
-       */
-      eventId: event.id,
-      action: {
-        ...localDraft.action,
-        createdAt: new Date().toISOString()
-      }
-    })
+  const localDraftWithAdjustedTimestamp = {
+    ...localDraft,
+    /*
+     * Force the local draft always to be the latest
+     * This is to prevent a situation where the local draft gets created,
+     * then a CREATE action request finishes in the background and is stored with a later
+     * timestamp
+     */
+    createdAt: new Date().toISOString(),
+    /*
+     * If params.eventId changes (from tmp id to concrete id) then change the local draft id
+     */
+    eventId: event.id, // @TODO: Can this accidentally change from actual id to another id?
+    action: {
+      ...localDraft.action,
+      createdAt: new Date().toISOString()
+    }
+  }
+
+  // @TODO: check
+  const combinedDraft = activeRemoteDraft
+    ? deepMerge(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+    : localDraftWithAdjustedTimestamp
 
   const eventStateWithDrafts = useMemo(
     () =>
       getCurrentEventStateWithDrafts({
         event,
-        drafts: eventDrafts,
+        draft: combinedDraft,
         configuration
       }),
-    [eventDrafts, event, configuration]
+    [combinedDraft, event, configuration]
   )
 
   const actionAnnotation = useMemo(() => {
     return getActionAnnotation({
       event,
       actionType,
-      drafts: eventDrafts
+      draft: combinedDraft
     })
-  }, [eventDrafts, event, actionType])
+  }, [combinedDraft, event, actionType])
 
   const previousActionAnnotation = useMemo(() => {
     const previousActionType = getPreviousDeclarationActionType(
