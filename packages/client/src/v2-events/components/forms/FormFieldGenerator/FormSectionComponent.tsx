@@ -24,9 +24,11 @@ import {
   isFieldVisible,
   AddressType,
   TranslationConfig,
-  IndexMap
+  IndexMap,
+  joinValues
 } from '@opencrvs/commons/client'
 import {
+  FIELD_SEPARATOR,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -63,6 +65,7 @@ type AllProps = {
    * this callback is called with success true if all fields are valid, or false if there are any validation errors.
    */
   onAllFieldsValidated?: (success: boolean) => void
+  parentId?: string
 } & UsedFormikProps
 
 /**
@@ -142,7 +145,8 @@ export function FormSectionComponent({
   setErrors,
   validateAllFields,
   fieldsToShowValidationErrors,
-  onAllFieldsValidated
+  onAllFieldsValidated,
+  parentId
 }: AllProps) {
   const intl = useIntl()
   const prevValuesRef = useRef(values)
@@ -327,7 +331,18 @@ export function FormSectionComponent({
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}
-                  touched={touched[field.id] ?? false}
+                  touched={
+                    /**
+                     * We check the full path so that,
+                     * touching `child____name____firstname`
+                     * does not make `mother____name____firstname` dirty
+                     */
+                    (parentId
+                      ? touched[
+                          joinValues([parentId, FIELD_SEPARATOR, field.id], '')
+                        ] || touched[parentId]
+                      : touched[field.id]) ?? false
+                  }
                   value={formikField.value}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}
