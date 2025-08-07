@@ -13,6 +13,7 @@ import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
+  ActionTypes,
   createEmptyDraft,
   deepMerge,
   findActiveDraftForEvent,
@@ -28,7 +29,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 
 // @TODO: Update type to more strict once REQUEST_CORRECTION uses annotations
-type Props = PropsWithChildren<{ actionType: ActionType }>
+type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
 
 /**
  * Creates a wrapper component for the annotation action.

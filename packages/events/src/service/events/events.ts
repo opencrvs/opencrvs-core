@@ -191,7 +191,7 @@ export async function createEvent({
   return event
 }
 
-export function extractFileValues(
+function extractFileValues(
   data: ActionUpdate,
   fieldTypes: Array<{ id: string; type: FieldType }>
 ): Array<{ fieldName: string; file: FileFieldValue }> {
