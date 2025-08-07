@@ -202,7 +202,10 @@ export function omitHiddenPaginatedFields(
  *
  * @returns a draft for the event that has been created since the last non-read action.
  */
-export function findActiveDraftForEvent(event: EventDocument, draft: Draft) {
+export function findActiveDraftForEvent(
+  event: EventDocument,
+  draft: Draft
+): Draft | undefined {
   const actions = orderBy(
     event.actions.filter(({ type }) => type !== ActionType.READ),
     ['createdAt'],
@@ -222,7 +225,7 @@ export function findActiveDraftForEvent(event: EventDocument, draft: Draft) {
 export function createEmptyDraft(
   eventId: UUID,
   draftId: UUID,
-  actionType: ActionType
+  actionType: Exclude<ActionType, 'DELETE'>
 ): Draft {
   return {
     id: draftId,

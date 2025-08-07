@@ -13,6 +13,7 @@ import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
 import {
+  Draft,
   createEmptyDraft,
   findActiveDraftForEvent,
   getCurrentEventStateWithDrafts,
@@ -109,7 +110,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     event.type
   )
 
-  const remoteDraft = getRemoteDraftByEventId(event.id)
+  const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
     ? findActiveDraftForEvent(event, remoteDraft)

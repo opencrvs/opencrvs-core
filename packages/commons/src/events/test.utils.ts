@@ -276,7 +276,7 @@ export function eventPayloadGenerator(rng: () => number) {
         annotation
       }: {
         eventId: UUID
-        actionType: ActionType
+        actionType: Draft['action']['type']
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         annotation?: Record<string, any>
       },
