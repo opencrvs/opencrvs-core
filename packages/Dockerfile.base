@@ -17,13 +17,10 @@ COPY --chown=node:node pnpm-lock.yaml .
 COPY --chown=node:node pnpm-workspace.yaml .
 COPY --chown=node:node patches ./patches
 
-RUN pnpm fetch --filter ./packages/commons...
-RUN pnpm fetch --prod --filter .
+RUN pnpm fetch --filter ./packages/commons... --filter-prod .
 
 ADD --chown=node:node . ./
-
-RUN pnpm install -r --offline --filter ./packages/commons...
-RUN pnpm install -r --offline --prod --filter .
+RUN pnpm install -r --offline --filter ./packages/commons... --filter-prod .
 
 COPY --chown=node:node packages/commons /app/packages/commons
 
