@@ -56,7 +56,7 @@ export function useEvents() {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: true,
+          refetchOnMount: 'always',
           staleTime: 0,
           ...options
         })
@@ -68,7 +68,7 @@ export function useEvents() {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: true,
+          refetchOnMount: 'always',
           staleTime: 0,
           ...options
         }).data
@@ -88,7 +88,7 @@ export function useEvents() {
           queryKey: trpc.event.search.queryKey(query),
           enabled: !findLocalEventIndex(id),
           staleTime: 0,
-          refetchOnMount: true,
+          refetchOnMount: 'always',
           queryFn: async (...args) => {
             const queryFn = options.queryFn
             if (!queryFn) {

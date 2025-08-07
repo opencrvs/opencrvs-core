@@ -21,7 +21,7 @@ import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import { deepMerge, findActiveDrafts } from '../utils'
+import { deepMerge } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
@@ -262,7 +262,7 @@ export function getCurrentEventStateWithDrafts({
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const activeDrafts = findActiveDrafts(event, drafts)
+  const activeDrafts = drafts
     .map((draft) => draft.action)
     .flatMap((action) => {
       /*

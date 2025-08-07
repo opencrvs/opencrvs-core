@@ -58,7 +58,10 @@ function EventOverviewFull({
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(eventIndex.id)
+  const drafts = getRemoteDrafts(eventIndex.id, {
+    refetchOnMount: 'always'
+  })
+
   const eventWithDrafts = getCurrentEventStateWithDrafts({
     event,
     drafts,

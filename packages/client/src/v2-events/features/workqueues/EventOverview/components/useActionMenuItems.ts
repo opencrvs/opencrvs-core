@@ -29,6 +29,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -120,6 +121,7 @@ export const actionLabels = {
 export function useAction(event: EventIndex) {
   const events = useEvents()
   const navigate = useNavigate()
+  const drafts = useDrafts()
   const authentication = useAuthentication()
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
@@ -140,6 +142,12 @@ export function useAction(event: EventIndex) {
 
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
+
+  const openDraft = drafts
+    .getAllRemoteDrafts()
+    .find((draft) => draft.eventId === event.id)
+
+  const hasDeclarationDraftOpen = openDraft?.action.type === ActionType.DECLARE
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -181,7 +189,7 @@ export function useAction(event: EventIndex) {
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf,
+        disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen),
         // Action menu should not show DECLARE if the user can perform VALIDATE
         shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
       },

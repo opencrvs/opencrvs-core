@@ -23,6 +23,7 @@ import {
 } from '@client/v2-events/features/events/useEvents/api'
 import {
   createEventActionMutationFn,
+  QueryOptions,
   setMutationDefaults,
   setQueryDefaults
 } from '@client/v2-events/features/events/useEvents/procedures/utils'
@@ -174,23 +175,25 @@ export function useDrafts() {
   const localDraft = localDraftStore((drafts) => drafts.draft)
   const createDraft = useCreateDraft()
 
-  function findAllRemoteDrafts(): Draft[] {
+  function findAllRemoteDrafts(
+    additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
+  ): Draft[] {
     // Skip the queryFn defined by tRPC and use the one defined above
     const { queryFn, ...options } = trpc.event.draft.list.queryOptions()
 
     const drafts = useSuspenseQuery({
       ...options,
-      // Always consider the previously fetched data as outdated
-      staleTime: 0,
-      // Always refetch the data when the component mounts
-      refetchOnMount: true,
+      ...additionalOptions,
       // First use data from browser cache, then fetch from the server if online
       networkMode: 'offlineFirst',
       queryKey: trpc.event.draft.list.queryKey(),
-      select: (serverStoredDrafts) => {
+      select: (currentDraftState) => {
         const locallyStoredDrafts =
           queryClient.getQueryData<Draft[]>(trpc.event.draft.list.queryKey()) ??
           []
+        const serverStoredDrafts = currentDraftState.filter(
+          (draft) => !isTemporaryId(draft.id)
+        )
 
         /*
          * These drafts are still pending for successful creation.
@@ -229,8 +232,13 @@ export function useDrafts() {
       })
     },
     getAllRemoteDrafts: findAllRemoteDrafts,
-    getRemoteDrafts: function useDraftList(eventId: string): Draft[] {
-      return findAllRemoteDrafts().filter((draft) => draft.eventId === eventId)
+    getRemoteDrafts: function useDraftList(
+      eventId: string,
+      additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
+    ): Draft[] {
+      return findAllRemoteDrafts(additionalOptions).filter(
+        (draft) => draft.eventId === eventId
+      )
     }
   }
 }
