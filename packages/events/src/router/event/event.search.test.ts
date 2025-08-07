@@ -10,6 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { DateTime } from 'luxon'
 import {
   ActionStatus,
   ActionType,
@@ -21,7 +22,8 @@ import {
   getUUID,
   InherentFlags,
   SCOPES,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  TEST_SYSTEM_IANA_TIMEZONE
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -301,8 +303,15 @@ test('Returns events based on the updatedAt column', async () => {
     )
   )
 
-  const today = new Date().toISOString()
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const yesterday = DateTime.now()
+    .setZone(TEST_SYSTEM_IANA_TIMEZONE)
+    .startOf('day')
+    .toFormat('yyyy-MM-dd')
+
+  const today = DateTime.now()
+    .setZone(TEST_SYSTEM_IANA_TIMEZONE)
+    .endOf('day')
+    .toFormat('yyyy-MM-dd')
 
   const acceptedTodayResult = await client.event.search({
     type: 'and',
@@ -310,8 +319,8 @@ test('Returns events based on the updatedAt column', async () => {
       {
         updatedAt: {
           type: 'range',
-          gte: yesterday.split('T')[0],
-          lte: today.split('T')[0]
+          gte: yesterday,
+          lte: today
         }
       }
     ]

@@ -22,7 +22,10 @@ import type {
   inferOutput,
   TRPCQueryOptions
 } from '@trpc/tanstack-react-query'
-import { findLocalEventIndex } from '@client/v2-events/features/events/useEvents/api'
+import {
+  findLocalEventDocument,
+  findLocalEventIndex
+} from '@client/v2-events/features/events/useEvents/api'
 import { AppRouter, queryClient } from '@client/v2-events/trpc'
 import { isTemporaryId, RequireKey } from '@client/v2-events/utils'
 
@@ -36,7 +39,8 @@ export function waitUntilEventIsCreated<T extends { eventId: string }, R>(
       return canonicalMutationFn({ ...params, eventId: eventId })
     }
 
-    const localVersion = findLocalEventIndex(eventId)
+    const localVersion =
+      findLocalEventIndex(eventId) || findLocalEventDocument(eventId)
 
     if (!localVersion || isTemporaryId(localVersion.id)) {
       throw new Error(

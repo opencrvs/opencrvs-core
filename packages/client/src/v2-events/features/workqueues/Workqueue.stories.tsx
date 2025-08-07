@@ -65,13 +65,7 @@ export const Workqueue: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('recent')
           }),
@@ -79,6 +73,14 @@ export const Workqueue: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: queryData.length }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
             return queryData
@@ -120,13 +122,7 @@ export const WorkqueueWithMultipleEventType: Story = {
             return [tennisClubMembershipEvent, libraryMembershipEvent]
           })
         ],
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('recent')
           }),
@@ -134,6 +130,14 @@ export const WorkqueueWithMultipleEventType: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: queryDataWithMultipleEventType.length }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
             return queryDataWithMultipleEventType
@@ -157,13 +161,7 @@ export const WorkqueueWithPagination: Story = {
     },
     msw: {
       handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return queryData
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('recent')
           }),
@@ -171,6 +169,14 @@ export const WorkqueueWithPagination: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: queryData.length }
             }, {})
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return queryData
           }),
           tRPCMsw.event.search.query((input) => {
             return queryData
@@ -194,15 +200,7 @@ export const ReadyToPrintWorkqueue: Story = {
     },
     msw: {
       handlers: {
-        events: [
-          tRPCMsw.event.config.get.query(() => {
-            return [tennisClubMembershipEvent]
-          }),
-          tRPCMsw.event.list.query(() => {
-            return queryData.filter(
-              (record) => record.status === EventStatus.enum.REGISTERED
-            )
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('ready-to-print')
           }),
@@ -215,6 +213,16 @@ export const ReadyToPrintWorkqueue: Story = {
                 ).length
               }
             }, {})
+          })
+        ],
+        events: [
+          tRPCMsw.event.config.get.query(() => {
+            return [tennisClubMembershipEvent]
+          }),
+          tRPCMsw.event.list.query(() => {
+            return queryData.filter(
+              (record) => record.status === EventStatus.enum.REGISTERED
+            )
           }),
           tRPCMsw.event.search.query((input) => {
             return queryData.filter(
@@ -237,10 +245,7 @@ export const NoResults: Story = {
     },
     msw: {
       handlers: {
-        events: [
-          tRPCMsw.event.list.query(() => {
-            return []
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             const [recent] = generateWorkqueues('recent')
             return [
@@ -258,6 +263,11 @@ export const NoResults: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: 0 }
             }, {})
+          })
+        ],
+        events: [
+          tRPCMsw.event.list.query(() => {
+            return []
           }),
           tRPCMsw.event.search.query((input) => {
             return []

@@ -43,15 +43,23 @@ import { QuickSearchIndex } from '@client/v2-events/features/events/Search/Quick
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
+import { useWorkqueues } from '../hooks/useWorkqueue'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
 function PrefetchQueries() {
+  const workqueues = useWorkqueues()
   useEffect(() => {
     void queryClient.prefetchQuery({
       queryKey: trpcOptionsProxy.locations.get.queryKey()
     })
-  }, [])
+
+    function prefetch() {
+      void workqueues.prefetch()
+    }
+
+    prefetch()
+  }, [workqueues])
 
   return null
 }

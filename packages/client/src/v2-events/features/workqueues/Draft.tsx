@@ -12,7 +12,11 @@
 import React from 'react'
 import { useTypedSearchParams } from 'react-router-typesafe-routes/dom'
 import { useIntl } from 'react-intl'
-import { EventDocument, mandatoryColumns } from '@opencrvs/commons/client'
+import {
+  EventDocument,
+  getCurrentEventStateWithDrafts,
+  mandatoryColumns
+} from '@opencrvs/commons/client'
 import { getCurrentEventState } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { CoreWorkqueues, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
@@ -32,18 +36,19 @@ export function Draft() {
 
   const { getAllRemoteDrafts } = useDrafts()
 
-  const drafts = getAllRemoteDrafts()
+  const drafts = getAllRemoteDrafts({ refetchOnMount: 'always', staleTime: 0 })
 
   const eventsWithDrafts = drafts
     .map(({ eventId }) => findLocalEventDocument(eventId))
     .filter((event): event is EventDocument => !!event)
-    .map((event) =>
-      getCurrentEventState(
+    .map((event) => {
+      return getCurrentEventStateWithDrafts({
         event,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        eventConfigs.find(({ id }) => id === event.type)!
-      )
-    )
+        configuration: eventConfigs.find(({ id }) => id === event.type)!,
+        drafts: drafts.filter((draft) => draft.eventId === event.id)
+      })
+    })
 
   return (
     <SearchResultComponent

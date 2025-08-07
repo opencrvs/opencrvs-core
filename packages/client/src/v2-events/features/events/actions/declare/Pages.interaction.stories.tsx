@@ -119,10 +119,7 @@ export const SaveAndExit: Story = {
             ]
           })
         ],
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return undeclaredDraftEvent
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues()
           }),
@@ -130,6 +127,11 @@ export const SaveAndExit: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: 7 }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return undeclaredDraftEvent
           }),
           tRPCMsw.event.search.query((input) => {
             return [
@@ -224,6 +226,16 @@ export const DraftShownInForm: Story = {
     msw: {
       handlers: {
         drafts: createDraftHandlers(),
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues()
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          })
+        ],
         events: [
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
@@ -235,14 +247,6 @@ export const DraftShownInForm: Story = {
                 tennisClubMembershipEvent
               )
             ]
-          }),
-          tRPCMsw.workqueue.config.list.query(() => {
-            return generateWorkqueues()
-          }),
-          tRPCMsw.workqueue.count.query((input) => {
-            return input.reduce((acc, { slug }) => {
-              return { ...acc, [slug]: 1 }
-            }, {})
           }),
           tRPCMsw.event.search.query((input) => {
             return [

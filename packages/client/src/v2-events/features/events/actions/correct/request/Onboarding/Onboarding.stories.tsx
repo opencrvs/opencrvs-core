@@ -45,15 +45,6 @@ export const Onboarding: Story = {
         eventId: tennisClubMembershipEventDocument.id,
         pageId: 'corrector'
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
     }
   }
 }
