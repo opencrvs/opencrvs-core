@@ -273,7 +273,18 @@ export function useActionMenuItems(event: EventIndex) {
         ]
       : getAvailableActionsForEvent(event)
 
+  const drafts = useDrafts()
+
+  const openDraft = drafts
+    .getAllRemoteDrafts()
+    .find((draft) => draft.eventId === event.id)
+
   const actions = [...availableAssignmentActions, ...availableActions]
+    /*
+     * Ensure that if there is an open draft, that action is always included in the list
+     */
+    .concat(openDraft ? [openDraft.action.type] : [])
+    .filter((action, index, self) => self.indexOf(action) === index)
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
