@@ -159,7 +159,12 @@ const messages = defineMessages({
   },
   noResult: {
     id: 'v2.search.noResult',
-    defaultMessage: 'No results for {searchTerm}',
+    defaultMessage: 'No result',
+    description: 'The no result text'
+  },
+  noResultFor: {
+    id: 'v2.search.noResultFor',
+    defaultMessage: 'No results for "{searchTerm}"',
     description: 'The no result text'
   },
   noResultsOutbox: {
@@ -478,14 +483,21 @@ export const SearchResultComponent = ({
 
   const isShowPagination = totalPages > 1
 
-  const noResultText = slug
-    ? intl.formatMessage(messages.noRecord, {
-        slug,
-        title: contentTitle.toLowerCase()
-      })
-    : intl.formatMessage(messages.noResult, {
+  let noResultText = ''
+  if (slug) {
+    noResultText = intl.formatMessage(messages.noRecord, {
+      slug,
+      title: contentTitle.toLowerCase()
+    })
+  } else {
+    if (params.keys) {
+      noResultText = intl.formatMessage(messages.noResultFor, {
         searchTerm: params.keys
       })
+    } else {
+      noResultText = intl.formatMessage(messages.noResult)
+    }
+  }
 
   return (
     <WithTestId>
