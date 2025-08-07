@@ -11,13 +11,9 @@
 
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
-import { create } from 'zustand'
 import {
   getCurrentEventState,
-  applyDeclarationToEventIndex,
-  EventIndex,
-  ActionBase,
-  UUID
+  applyDeclarationToEventIndex
 } from '@opencrvs/commons/client'
 import { EventState } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
@@ -35,10 +31,6 @@ function assignmentMutation(mutationKey: MutationKey) {
   ].includes(hashKey(mutationKey))
 }
 
-type OutboxRecords = (Partial<EventIndex> & {
-  meta?: Record<string, unknown>
-})[]
-
 export function useOutbox() {
   const trpc = useTRPC()
   const eventConfigurations = useEventConfigurations()
@@ -46,7 +38,7 @@ export function useOutbox() {
   const pendingMutations = useMutationState({
     filters: {
       predicate: (mutation) =>
-        mutation.state.status === 'pending' &&
+        mutation.state.status !== 'success' &&
         !assignmentMutation(mutation.options.mutationKey as MutationKey)
     },
     select: (mutation) => mutation

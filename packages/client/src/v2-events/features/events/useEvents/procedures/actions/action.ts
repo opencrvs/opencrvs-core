@@ -48,15 +48,17 @@ import {
 import { ToastKey } from '@client/v2-events/routes/Toaster'
 
 function retryUnlessConflict(
-  failureCount: number,
+  _failureCount: number,
   error: TRPCClientError<AppRouter>
 ) {
+  if (_failureCount === 10) {
+    toast.error(ToastKey.SOMETHING_WENT_WRONG)
+  }
   return error.data?.httpStatus !== 409
 }
 
 function retryDelay(attemptIndex: number) {
-  return 20000
-  // return Math.max(10000, 1000 * 2 ** attemptIndex)
+  return Math.max(10000, 1000 * 2 ** attemptIndex)
 }
 
 function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
