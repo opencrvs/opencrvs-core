@@ -328,40 +328,6 @@ describe('useCertificateTemplateSelectorFieldConfig', () => {
       )
     })
 
-    it('handles missing event document by showing only unconditional templates', async () => {
-      const conditionalTemplate: CertificateTemplateConfig = {
-        ...tennisClubMembershipReplacementCertificate,
-        conditionals: [
-          {
-            type: 'SHOW',
-            conditional: event
-              .hasAction('PRINT_CERTIFICATE')
-              .withTemplate('tennis-club-membership-certificate')
-              .minCount(1)
-          }
-        ]
-      }
-
-      mockTemplates = [
-        tennisClubMembershipCertificateWithoutConditionals,
-        conditionalTemplate
-      ]
-
-      const { useCertificateTemplateSelectorFieldConfig } = await import(
-        './useCertificateTemplateSelectorFieldConfig'
-      )
-
-      // Call without event document
-      const result = useCertificateTemplateSelectorFieldConfig(
-        'tennis-club-membership',
-        testDeclarationFormData
-      ) as SelectField
-
-      // Should only show basic template without conditionals
-      expect(result.options).toHaveLength(1)
-      expect(result.options[0].value).toBe('tennis-club-membership-certificate')
-    })
-
     it('shows template with specific template ID print action conditional', async () => {
       const templateWithSpecificPrintConditional = {
         ...tennisClubMembershipDuplicateCertificate,

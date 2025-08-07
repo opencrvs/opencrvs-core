@@ -23,20 +23,15 @@ export const CERT_TEMPLATE_ID = 'certificateTemplateId'
 export const useCertificateTemplateSelectorFieldConfig = (
   eventType: string,
   declaration: EventState,
-  event?: EventDocument
+  event: EventDocument
 ): FieldConfig => {
   const { certificateTemplates } = useAppConfig()
 
-  const declarationWithEventMetadata = event
-    ? {
-        $form: declaration,
-        $event: event,
-        $now: formatISO(new Date(), { representation: 'date' })
-      }
-    : {
-        $form: declaration,
-        $now: formatISO(new Date(), { representation: 'date' })
-      }
+  const declarationWithEventMetadata = {
+    $form: declaration,
+    $event: event,
+    $now: formatISO(new Date(), { representation: 'date' })
+  }
 
   return {
     id: CERT_TEMPLATE_ID,
