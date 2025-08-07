@@ -175,8 +175,13 @@ describe('event.actions.notify', () => {
       }
     }
 
-    const notifyResponse = await client.event.actions.notify.request(payload)
-    expect(notifyResponse).toMatchSnapshot()
+    const fetchedEvent = await client.event.actions.notify.request(payload)
+    expect(fetchedEvent.actions).toEqual([
+      expect.objectContaining({ type: ActionType.CREATE }),
+      expect.objectContaining({ type: ActionType.ASSIGN }),
+      expect.objectContaining({ type: ActionType.NOTIFY }),
+      expect.objectContaining({ type: ActionType.UNASSIGN })
+    ])
   })
 
   test(`${ActionType.NOTIFY} is idempotent`, async () => {
