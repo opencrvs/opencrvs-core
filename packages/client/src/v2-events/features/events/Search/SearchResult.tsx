@@ -159,7 +159,7 @@ const messages = defineMessages({
   },
   noResult: {
     id: 'v2.search.noResult',
-    defaultMessage: 'No results',
+    defaultMessage: 'No results for {searchTerm}',
     description: 'The no result text'
   },
   noResultsOutbox: {
@@ -257,9 +257,12 @@ export const SearchResultComponent = ({
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
   const isOnline = useOnlineStatus()
+  const params = deserializeSearchParams(location.search) as Record<
+    string,
+    string
+  >
 
   const setOffset = (newOffset: number) => {
-    const params = deserializeSearchParams(location.search)
     params.offset = String(newOffset)
     navigate(
       {
@@ -482,7 +485,9 @@ export const SearchResultComponent = ({
         slug,
         title: contentTitle.toLowerCase()
       })
-    : intl.formatMessage(messages.noResult)
+    : intl.formatMessage(messages.noResult, {
+        searchTerm: params.keys
+      })
 
   return (
     <WithTestId>

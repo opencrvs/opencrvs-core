@@ -477,15 +477,7 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
-/*
- * This needs to be exported so that Typescript can refer to the type in
- * the declaration output type. If it can't do that, you might start encountering
- * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
- * errors when compiling
- */
-
-/** @knipignore */
-export type Inferred =
+export type FieldConfig =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
@@ -513,38 +505,6 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
-
-/** @knipignore */
-/**
- * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
- */
-export type InferredInput =
-  | z.input<typeof Address>
-  | z.input<typeof TextField>
-  | z.input<typeof NumberField>
-  | z.input<typeof TextAreaField>
-  | z.input<typeof DateField>
-  | z.input<typeof DateRangeField>
-  | z.input<typeof Paragraph>
-  | z.input<typeof RadioGroup>
-  | z.input<typeof BulletList>
-  | z.input<typeof PageHeader>
-  | z.input<typeof Select>
-  | z.input<typeof NameField>
-  | z.input<typeof PhoneField>
-  | z.input<typeof IdField>
-  | z.input<typeof Checkbox>
-  | z.input<typeof File>
-  | z.input<typeof FileUploadWithOptions>
-  | z.input<typeof Country>
-  | z.input<typeof AdministrativeArea>
-  | z.input<typeof Divider>
-  | z.input<typeof Location>
-  | z.input<typeof Facility>
-  | z.input<typeof Office>
-  | z.input<typeof SignatureField>
-  | z.input<typeof EmailField>
-  | z.input<typeof DataField>
 
 export const FieldConfig = z
   .discriminatedUnion('type', [
@@ -589,7 +549,6 @@ export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
-export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
