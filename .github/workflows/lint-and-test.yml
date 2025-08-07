@@ -451,7 +451,7 @@ jobs:
 
       - name: Install Playwright
         # Playwright is required since @storybook/test-runner depends on it
-        run: pnpm exec playwright install --with-deps
+        run: pnpm dlx playwright install --with-deps
 
       - name: Build Storybook
         working-directory: packages/client
@@ -461,9 +461,9 @@ jobs:
         working-directory: packages/client
         # based on https://storybook.js.org/docs/writing-tests/test-runner#run-against-non-deployed-storybooks
         run: |
-          pnpm exec concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
-            "pnpm exec http-server storybook-static --port 6006 --silent" \
-            "pnpm exec wait-on tcp:127.0.0.1:6006 && pnpm test-storybook"
+          pnpm dlx concurrently -k -s first -n "SB,TEST" -c "magenta,blue" \
+            "pnpm dlx http-server storybook-static --port 6006 --silent" \
+            "pnpm dlx wait-on tcp:127.0.0.1:6006 && pnpm test-storybook"
 
   test-client:
     name: Test client
