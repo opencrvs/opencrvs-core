@@ -15,7 +15,6 @@ import * as locationsRepo from '@events/storage/postgres/events/locations'
 
 export const Location = z.object({
   id: UUID,
-  externalId: z.string().nullable(),
   name: z.string(),
   partOf: UUID.nullable()
 })
@@ -29,9 +28,8 @@ export type Location = z.infer<typeof Location>
 
 export async function setLocations(incomingLocations: Array<Location>) {
   return locationsRepo.setLocations(
-    incomingLocations.map(({ id, externalId, name, partOf }) => ({
+    incomingLocations.map(({ id, name, partOf }) => ({
       id,
-      externalId,
       name,
       parentId: partOf
     }))
@@ -41,9 +39,8 @@ export async function setLocations(incomingLocations: Array<Location>) {
 export const getLocations = async () => {
   const locations = await locationsRepo.getLocations()
 
-  return locations.map(({ id, externalId, name, parentId }) => ({
+  return locations.map(({ id, name, parentId }) => ({
     id,
-    externalId,
     name,
     partOf: parentId
   }))
@@ -52,9 +49,8 @@ export const getLocations = async () => {
 export const getChildLocations = async (parentIdToSearch: string) => {
   const locations = await locationsRepo.getChildLocations(parentIdToSearch)
 
-  return locations.map(({ id, externalId, name, parentId }) => ({
+  return locations.map(({ id, name, parentId }) => ({
     id,
-    externalId,
     name,
     partOf: parentId
   }))
