@@ -99,10 +99,16 @@ export const trpcOptionsProxy = createTRPCOptionsProxy({
 
 export function TRPCProvider({
   children,
+  /*
+   * Should never be "false" outside test environments where we might want to get access
+   * to the query client before the client is restored from the persisted storage.
+   */
+  waitForClientRestored = true,
   storeIdentifier = 'DEFAULT_IDENTIFIER_FOR_TESTS_ONLY__THIS_SHOULD_NEVER_SHOW_OUTSIDE_STORYBOOK'
 }: {
   children: React.ReactNode
   storeIdentifier?: string
+  waitForClientRestored?: boolean
 }) {
   const [clientRestored, setClientRestored] = React.useState(false)
 
@@ -140,7 +146,7 @@ export function TRPCProvider({
       }}
     >
       <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
-        {clientRestored ? children : null}
+        {!waitForClientRestored || clientRestored ? children : null}
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
