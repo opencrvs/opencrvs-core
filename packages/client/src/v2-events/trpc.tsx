@@ -104,6 +104,8 @@ export function TRPCProvider({
   children: React.ReactNode
   storeIdentifier?: string
 }) {
+  const [clientRestored, setClientRestored] = React.useState(false)
+
   return (
     <PersistQueryClientProvider
       client={queryClient}
@@ -134,10 +136,11 @@ export function TRPCProvider({
         for (const mutation of mutations) {
           await mutation.continue()
         }
+        setClientRestored(true)
       }}
     >
       <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
-        {children}
+        {clientRestored ? children : null}
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
