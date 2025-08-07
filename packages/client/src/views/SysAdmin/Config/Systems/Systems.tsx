@@ -395,7 +395,7 @@ export function SystemList() {
                 {intl.formatMessage(integrationMessages.clientSecret)}
               </Text>
               {refreshTokenLoading ? (
-                <Spinner baseColor="#4C68C1" id="Spinner" size={24} />
+                <Spinner color="primary" id="Spinner" size={24} />
               ) : refreshTokenData && refreshTokenData?.refreshSystemSecret ? (
                 <Stack justifyContent="space-between" alignItems="center">
                   <Text variant="reg16" element="span">

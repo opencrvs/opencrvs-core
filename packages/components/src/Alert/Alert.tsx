@@ -108,7 +108,7 @@ export const Alert = ({
           {type === 'loading' && (
             <Spinner
               id="in-progress-floating-notification"
-              baseColor={colors.white}
+              color="white"
               size={20}
             />
           )}

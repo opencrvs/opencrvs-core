@@ -84,7 +84,7 @@ const LoadingIndicatorComp = ({
   <Wrapper>
     {isOnline && loading && (
       <LoadingContainer>
-        <Spinner id="Spinner" size={24} baseColor="#4C68C1" />
+        <Spinner id="Spinner" size={24} color="primary" />
       </LoadingContainer>
     )}
     <MobileViewContainer noDeclaration={noDeclaration}>

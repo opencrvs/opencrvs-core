@@ -17,7 +17,7 @@ const Template: Story<ISpinner> = (args) => <Spinner {...args} />
 export const SpinnerExample = Template.bind({})
 SpinnerExample.args = {
   id: 'Spinner',
-  baseColor: '#4C68C1'
+  color: 'primary'
 }
 
 export default {
