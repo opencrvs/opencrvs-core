@@ -202,7 +202,7 @@ export function omitHiddenPaginatedFields(
  *
  * @returns a draft for the event that has been created since the last non-read action.
  */
-export function findActiveDraftForEvent(event: EventDocument, drafts: Draft[]) {
+export function findActiveDraftForEvent(event: EventDocument, draft: Draft) {
   const actions = orderBy(
     event.actions.filter(({ type }) => type !== ActionType.READ),
     ['createdAt'],
@@ -211,13 +211,12 @@ export function findActiveDraftForEvent(event: EventDocument, drafts: Draft[]) {
 
   const lastAction = actions[actions.length - 1]
   // After migrations have been run, there should always be [0..1[ actions.
-  const activeDrafts = drafts
-    // Temporally allows equal timestamps as the generated demo data is not perfect yet
-    // should be > rather than >=
-    .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
-    .filter(({ eventId }) => eventId === event.id)
+  // Temporally allows equal timestamps as the generated demo data is not perfect yet
+  const isDraftActive = draft.createdAt >= lastAction.createdAt
 
-  return activeDrafts[drafts.length - 1]
+  const isDraftForEvent = event.id === draft.eventId
+
+  return isDraftActive && isDraftForEvent ? draft : undefined
 }
 
 export function createEmptyDraft(

@@ -32,6 +32,12 @@ function isFieldWithFile(field: FieldConfig): field is AnyFileField {
   return FileFieldType.safeParse(field.type).success
 }
 
+/**
+ *
+ * @param field File field
+ * @param update single action or event state.
+ * @returns normalised file reference based on the field id and event state.
+ */
 function getFileReferences(
   field: AnyFileField,
   update: ActionUpdate | EventState
@@ -65,6 +71,11 @@ function getFileReferences(
   )
 }
 
+/**
+ *  Since API allows sending PATCH requests with only the changed fields,
+ *  we need to check the current event state with the current draft.
+ * @returns file references that are not present in the current event state but are when previous draft is applied to the state.
+ */
 function getUnreferencedDeclarationDraftFiles({
   event,
   currentDraft,
@@ -76,9 +87,6 @@ function getUnreferencedDeclarationDraftFiles({
   previousDraft: Draft
   configuration: EventConfig
 }) {
-  // Make sure that the files are not referenced in the current event state.
-  // Since API allows sending PATCH requests with only the changed fields,
-  // we need to check the current event state with the current draft.
   const currentEventState = currentDraft
     ? getCurrentEventStateWithDrafts({
         event,
@@ -154,7 +162,7 @@ function getUnreferencedAnnotationDraftFiles({
       )
     : []
 
-  // @TODO: There might be a case where annotation shares id with declaration field.
+  // @TODO: There might be a case where annotation shares id with declaration field? Should it limited by the configuration?
   const currentAnnotationFiles = annotationFileFields.flatMap((field) =>
     getFileReferences(field, currentAction.annotation ?? {})
   )
@@ -170,6 +178,10 @@ function getUnreferencedAnnotationDraftFiles({
   )
 }
 
+/**
+ *
+ * @returns all the filenames that are referenced in the current draft, but not in the previous draft.
+ */
 export function getUnreferencedDraftFiles({
   event,
   currentDraft,
@@ -177,6 +189,9 @@ export function getUnreferencedDraftFiles({
   configuration
 }: {
   event: EventDocument
+  /**
+   * Current draft is optional, because we might be comparing the previous draft with the current event state. (e.g. actual action has been submitted)
+   */
   currentDraft?: Draft
   previousDraft: Draft
   configuration: EventConfig

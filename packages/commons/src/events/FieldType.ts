@@ -41,6 +41,9 @@ export const FieldType = {
   DATA: 'DATA'
 } as const
 
+/**
+ * Union of types that handle files. Using common type should help with compiler to know where to add new cases.
+ */
 export const FileFieldType = z.enum([
   FieldType.FILE,
   FieldType.FILE_WITH_OPTIONS,

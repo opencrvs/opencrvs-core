@@ -107,7 +107,7 @@ function DocumentUploaderWithOption({
     onSuccess: ({ type, originalFilename, path, id }) => {
       const newFile = {
         path,
-        originalFilename: originalFilename,
+        originalFilename,
         type: type,
         option: id
       }

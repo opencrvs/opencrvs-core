@@ -52,7 +52,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   const remoteDraft = getRemoteDraftByEventId(event.id)
 
   const activeRemoteDraft = remoteDraft
-    ? findActiveDraftForEvent(event, [remoteDraft])
+    ? findActiveDraftForEvent(event, remoteDraft)
     : undefined
   const localDraft = getLocalDraftOrDefault(
     activeRemoteDraft ||

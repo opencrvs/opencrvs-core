@@ -211,6 +211,11 @@ export function extractFileValues(
   return fileValues
 }
 
+/**
+ *
+ * Deletes files from external source that are referenced in previous drafts but not in the current draft.
+ *
+ */
 export async function deleteUnreferencedFilesFromPreviousDrafts(
   token: string,
   {
