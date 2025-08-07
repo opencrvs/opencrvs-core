@@ -1,27 +1,12 @@
 {
-  "compilerOptions": {
-    "baseUrl": ".",
-    "paths": {
-      "src/*": ["./src/*"]
+  "files": [],
+  "include": [],
+  "references": [
+    {
+      "path": "./tsconfig-commonjs.json"
     },
-    "target": "es6",
-    "module": "commonjs",
-    "outDir": "build/dist/common",
-    "sourceMap": true,
-    "rootDir": "src",
-    "declaration": true,
-    "lib": ["esnext.asynciterable", "es2015", "es6", "es2019"],
-    "forceConsistentCasingInFileNames": true,
-    "noImplicitReturns": true,
-    "noImplicitThis": true,
-    "noImplicitAny": true,
-    "strictNullChecks": true,
-    "noUnusedLocals": true,
-    "types": ["jest", "fhir"],
-    "skipLibCheck": true,
-    "declarationMap": true,
-    "composite": true
-  },
-  "include": ["src/**/*.ts", "typings"],
-  "exclude": ["node_modules", "build"]
+    {
+      "path": "./tsconfig-tests.json"
+    }
+  ]
 }
