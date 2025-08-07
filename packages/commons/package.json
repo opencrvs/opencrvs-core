@@ -23,10 +23,8 @@
     "test:compilation": "tsc --noEmit",
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0",
     "postinstall": "yarn build",
-    "build:default": "tsc --project tsconfig.build.json",
-    "build:esm": "tsc --project tsconfig.esm.build.json",
-    "build": "yarn build:default && yarn build:esm",
-    "build:watch": "concurrently \"tsc --watch --preserveWatchOutput --project tsconfig.build.json\" \"tsc --watch --preserveWatchOutput --project tsconfig.esm.build.json\"",
+    "build": "yarn tsc -b tsconfig.build.json",
+    "build:watch": "yarn tsc -b --watch --preserveWatchOutput tsconfig.build.json",
     "build:clean": "rm -rf build"
   },
   "private": true,
@@ -76,7 +74,13 @@
   },
   "jest": {
     "transform": {
-      "^.+\\.tsx?$": "ts-jest"
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "tsconfig": "tsconfig-tests.json",
+          "isolatedModules": true
+        }
+      ]
     },
     "coverageReporters": [
       "json",
