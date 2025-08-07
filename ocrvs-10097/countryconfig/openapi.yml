@@ -240,6 +240,7 @@ components:
                                 - fuzzy
                                 - exact
                                 - range
+                                - within
                               description: Determines the type of field
                           required:
                             - type
@@ -387,15 +388,15 @@ components:
                             Sometimes there might be need to search a value
                             against multiple field of same FormField type. For
                             example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we 
+                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
                                   add a one field as fieldId, and accomodate others in alternateFieldIds
                         excludeInSearchQuery:
                           type: boolean
                           default: false
                           description: >-
                             Sometimes there will be search fields which are used
-                            to 
-                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth 
+                            to
+                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth
                                 is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
                                 related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
                                 In such case, populate this field (excludeInSearchQuery) with boolean true
@@ -546,11 +547,11 @@ components:
                         fieldId:
                           type: string
                           enum:
-                            - trackingId
-                            - status
-                            - legalStatuses.REGISTERED.acceptedAt
-                            - legalStatuses.REGISTERED.createdAtLocation
-                            - updatedAt
+                            - event.trackingId
+                            - event.status
+                            - event.legalStatuses.REGISTERED.acceptedAt
+                            - event.legalStatuses.REGISTERED.createdAtLocation
+                            - event.updatedAt
                         fieldType:
                           type: string
                           const: event
@@ -11490,7 +11491,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 5ca23b01-8668-4116-86f8-813910da5260
+        transactionId: 532b4709-e538-47ea-bbe7-1b6e07ec4784
         declaration: {}
         annotation: {}
         type: NOTIFY
