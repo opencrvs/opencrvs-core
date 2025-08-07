@@ -166,7 +166,6 @@ function locationBundleToIdentifier(
  * Get the externally defined id for location. Defined in country-config.
  */
 
-// FIXME: to be fixed for MDG 1.9.0
 const getExternalIdFromIdentifier = (
   identifiers: fhir3.Location['identifier']
 ) =>
@@ -262,7 +261,6 @@ export async function seedLocationsForV2Events(token: string) {
           .then((bundle: fhir3.Bundle<fhir3.Location>) =>
             bundleToLocationEntries(bundle).map((location) => ({
               id: location.id,
-              externalId: getExternalIdFromIdentifier(location.identifier),
               name: location.name,
               partOf: location?.partOf?.reference
                 ? updateLocationPartOf(location?.partOf?.reference)
