@@ -44,7 +44,6 @@ jobs:
 
           # Sync countryconfig with develop, so we get both the newest changes from develop and the changes from working branch
           if [ "$working_branch" != "develop" ]; then
-          
             echo "Syncing countryconfig branch '$working_branch' with 'develop'"
 
             # Unfortunately the merge requires user.name and email to be set here
@@ -71,13 +70,16 @@ jobs:
           repository: opencrvs/opencrvs-core
           ref: ${{ github.head_ref }}
 
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
+          run_install: false
+
       - name: Setup Node.js from core nvmrc
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-
-      - name: Install pnpm
-        run: npm install -g pnpm
 
       - name: Install dependencies and check for missing translations
         run: |
