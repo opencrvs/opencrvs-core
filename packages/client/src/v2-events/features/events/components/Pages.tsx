@@ -20,6 +20,8 @@ import {
 } from '@opencrvs/commons/client'
 import { MAIN_CONTENT_ANCHOR_ID } from '@opencrvs/components/lib/Frame/components/SkipToContent'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
+import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
+import { useEventFormData } from '../useEventFormData'
 import { VerificationWizard } from './VerificationWizard'
 import { FormWizard } from './FormWizard'
 /**
@@ -57,6 +59,9 @@ export function Pages({
   const page = pageIdx === -1 ? visiblePages[0] : visiblePages[pageIdx]
   const [validateAllFields, setValidateAllFields] = useState(false)
 
+  const { setAllTouchedFields, touchedFields: initialTouchedFields } =
+    useEventFormData()
+
   useEffect(() => {
     // If page changes, scroll to the top of the page using the anchor element ID
     document.getElementById(MAIN_CONTENT_ANCHOR_ID)?.scrollTo({ top: 0 })
@@ -77,6 +82,14 @@ export function Pages({
   }
 
   function onNextPage() {
+    // Before switching to the next page, we need to mark all fields in the current page as touched
+    // so that when we get back to the page, we show validation errors for all fields in the page.
+    setAllTouchedFields(
+      page.fields.reduce((touched, { id: fieldId }) => {
+        return { ...touched, [makeFormFieldIdFormikCompatible(fieldId)]: true }
+      }, initialTouchedFields)
+    )
+
     // If we are in validateBeforeNextPage mode, we need to validate all fields before moving to the next page.
     // In this case, the actual switching of the page is done on the 'onAllFieldsValidated' callback.
     if (validateBeforeNextPage) {

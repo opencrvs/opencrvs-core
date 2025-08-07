@@ -11,6 +11,7 @@
 
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
+import { omit } from 'lodash'
 import {
   EventState,
   FieldConfig,
@@ -174,12 +175,12 @@ export const GeneratedInputField = React.memo(
       )
 
       return (
-        <InputField {...field.inputFieldProps}>
+        // We are showing errors to underlying text input, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
           <Name.Input
             id={fieldDefinition.id}
-            includeMiddlename={field.config.configuration?.includeMiddlename}
             maxLength={field.config.configuration?.maxLength}
-            required={fieldDefinition.required}
+            nameConfig={field.config.configuration?.name}
             searchMode={field.config.configuration?.searchMode}
             validation={validation}
             value={field.value}
@@ -401,7 +402,8 @@ export const GeneratedInputField = React.memo(
     }
     if (isAddressFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
+        // We are showing errors to underlying inputs, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
             {...field.config}
             value={field.value}

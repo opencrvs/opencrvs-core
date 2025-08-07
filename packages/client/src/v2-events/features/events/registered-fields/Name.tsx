@@ -15,6 +15,7 @@ import {
   FieldType,
   getValidatorsForField,
   joinValues,
+  NameConfig,
   NameFieldValue,
   TextField
 } from '@opencrvs/commons/client'
@@ -23,12 +24,11 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 
 interface Props {
   id: string
-  required?: boolean
   onChange: (newValue: NameFieldValue) => void
   maxLength?: number
   validation: FieldConfig['validation']
   value?: NameFieldValue
-  includeMiddlename?: boolean
+  nameConfig?: NameConfig
   searchMode?: boolean
 }
 
@@ -115,30 +115,36 @@ function NameInput(props: Props) {
   const {
     id,
     onChange,
-    required = true,
     value = {},
     maxLength,
-    includeMiddlename,
+    nameConfig = {
+      firstname: { required: true },
+      surname: { required: true }
+    },
     searchMode = false
   } = props
   const validators = props.validation || []
 
   const fields: TextField[] = [
-    {
-      id: 'firstname',
-      type: FieldType.TEXT,
-      configuration: {
-        maxLength
-      },
-      required,
-      label: {
-        defaultMessage: 'First name(s)',
-        description: 'This is the label for the firstname field',
-        id: 'v2.field.name.firstname.label'
-      },
-      validation: getValidatorsForField('firstname', validators)
-    },
-    ...(includeMiddlename
+    ...(nameConfig.firstname
+      ? [
+          {
+            id: 'firstname',
+            type: FieldType.TEXT,
+            configuration: {
+              maxLength
+            },
+            required: !searchMode && nameConfig.firstname.required,
+            label: {
+              defaultMessage: 'First name(s)',
+              description: 'This is the label for the firstname field',
+              id: 'v2.field.name.firstname.label'
+            },
+            validation: getValidatorsForField('firstname', validators)
+          }
+        ]
+      : []),
+    ...(nameConfig.middlename
       ? [
           {
             id: 'middlename',
@@ -146,6 +152,7 @@ function NameInput(props: Props) {
             configuration: {
               maxLength
             },
+            required: !searchMode && nameConfig.middlename.required,
             label: {
               defaultMessage: 'Middle name',
               description: 'This is the label for the middlename field',
@@ -155,21 +162,25 @@ function NameInput(props: Props) {
           }
         ]
       : []),
-    {
-      id: 'surname',
-      type: FieldType.TEXT,
-      required,
-      configuration: {
-        maxLength
-      },
-      label: {
-        defaultMessage: 'Last name',
-        description: 'This is the label for the surname field',
-        id: 'v2.field.name.surname.label'
-      },
-      validation: getValidatorsForField('surname', validators)
-    }
-  ] satisfies TextField[]
+    ...(nameConfig.surname
+      ? [
+          {
+            id: 'surname',
+            type: FieldType.TEXT,
+            required: !searchMode && nameConfig.surname.required,
+            configuration: {
+              maxLength
+            },
+            label: {
+              defaultMessage: 'Last name',
+              description: 'This is the label for the surname field',
+              id: 'v2.field.name.surname.label'
+            },
+            validation: getValidatorsForField('surname', validators)
+          }
+        ]
+      : [])
+  ]
 
   return (
     <>
@@ -177,13 +188,9 @@ function NameInput(props: Props) {
         fields={fields}
         id={id}
         initialValues={{ ...value }}
+        parentId={id}
         onChange={(values) => {
-          if (searchMode) {
-            // when in search mode, we initialize empty name fields with empty string
-            // to avoid name field validation
-            values = mergeWithoutNullsOrUndefined(defailtNameFieldValue, values)
-          }
-          onChange(values as NameFieldValue)
+          onChange(mergeWithoutNullsOrUndefined(defailtNameFieldValue, values))
         }}
       />
       <FocusNameInputsOnHash id={id} value={value} />

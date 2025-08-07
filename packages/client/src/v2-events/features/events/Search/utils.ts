@@ -38,7 +38,7 @@ import { getAllUniqueFields } from '@client/v2-events/utils'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import {
   Errors,
-  getValidationErrorsForForm
+  getStructuralValidationErrorsForForm
 } from '@client/v2-events/components/forms/validation'
 import { statusOptions, timePeriodOptions } from './EventMetadataSearchOptions'
 
@@ -49,7 +49,7 @@ export function getAdvancedSearchFieldErrors(
   return sections.reduce(
     (acc, section) => ({
       ...acc,
-      ...getValidationErrorsForForm(section.fields, values)
+      ...getStructuralValidationErrorsForForm(section.fields, values)
     }),
     {} as Errors
   )
