@@ -55,6 +55,7 @@ CREATE TYPE app.action_type AS ENUM (
     'ARCHIVE',
     'PRINT_CERTIFICATE',
     'REQUEST_CORRECTION',
+    'CORRECT',
     'REJECT_CORRECTION',
     'APPROVE_CORRECTION',
     'READ',
@@ -184,7 +185,6 @@ COMMENT ON TABLE app.events IS 'Stores life events associated with individuals, 
 
 CREATE TABLE app.locations (
     id uuid NOT NULL,
-    external_id text,
     name text NOT NULL,
     parent_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
@@ -299,14 +299,6 @@ ALTER TABLE ONLY app.events
 
 ALTER TABLE ONLY app.events
     ADD CONSTRAINT events_transaction_id_event_type_key UNIQUE (transaction_id, event_type);
-
-
---
--- Name: locations locations_external_id_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.locations
-    ADD CONSTRAINT locations_external_id_key UNIQUE (external_id);
 
 
 --
