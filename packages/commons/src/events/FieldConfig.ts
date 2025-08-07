@@ -75,7 +75,7 @@ const Divider = BaseField.extend({
 })
 export type Divider = z.infer<typeof Divider>
 
-const TextField = BaseField.extend({
+export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z
@@ -351,25 +351,39 @@ export const SelectDateRangeField = BaseField.extend({
 
 export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
+export const NameConfig = z.object({
+  firstname: z.object({ required: z.boolean() }).optional(),
+  middlename: z.object({ required: z.boolean() }).optional(),
+  surname: z.object({ required: z.boolean() }).optional()
+})
+
+export type NameConfig = z.infer<typeof NameConfig>
+
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
   defaultValue: z
     .object({
-      firstname: NonEmptyTextValue,
-      surname: NonEmptyTextValue
+      firstname: NonEmptyTextValue.optional(),
+      middlename: NonEmptyTextValue.optional(),
+      surname: NonEmptyTextValue.optional()
     })
     .optional(),
   configuration: z
     .object({
+      name: NameConfig.default({
+        firstname: { required: true },
+        surname: { required: true }
+      }).optional(),
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional(),
-      includeMiddlename: z
-        .boolean()
-        .default(false)
-        .optional()
-        .describe('To make middle name visible in Name form field'),
       searchMode: z.boolean().optional()
+    })
+    .default({
+      name: {
+        firstname: { required: true },
+        surname: { required: true }
+      }
     })
     .optional()
 }).describe('Name input field')
