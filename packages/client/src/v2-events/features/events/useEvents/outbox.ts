@@ -35,57 +35,11 @@ function assignmentMutation(mutationKey: MutationKey) {
   ].includes(hashKey(mutationKey))
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-interface Mutations<T = any> {
-  eventId: string
-  action: string
-  declaration: Partial<EventState>
-  transactionId: string
-  annotation: Partial<ActionBase['annotation']>
-  mutationKey: MutationKey
-  variables: T
-}
-
-interface FailedMutationStore {
-  failedMutations: Mutations[]
-  addFailedMutation: (mutation: Mutations) => void
-  removeFailedMutation: (eventId: string) => void
-  clearFailedMutations: () => void
-}
-
-export const useFailedMutationStore = create<FailedMutationStore>()(
-  (set, get) => ({
-    failedMutations: [],
-    addFailedMutation: (mutation) => {
-      const exists = get().failedMutations.some(
-        (m) => m.eventId === mutation.eventId && m.action === mutation.action
-      )
-
-      if (!exists) {
-        set((state) => ({
-          failedMutations: [...state.failedMutations, mutation]
-        }))
-      }
-    },
-    removeFailedMutation: (eventId) =>
-      set((state) => ({
-        failedMutations: state.failedMutations.filter(
-          (m) => !(m.eventId === eventId)
-        )
-      })),
-    clearFailedMutations: () => set({ failedMutations: [] })
-  })
-)
-
 type OutboxRecords = (Partial<EventIndex> & {
   meta?: Record<string, unknown>
 })[]
 
-export function useOutbox(): {
-  pending: OutboxRecords
-  failed: OutboxRecords
-  all: OutboxRecords
-} {
+export function useOutbox() {
   const trpc = useTRPC()
   const eventConfigurations = useEventConfigurations()
 
@@ -98,7 +52,7 @@ export function useOutbox(): {
     select: (mutation) => mutation
   })
 
-  const pendingOutboxEvents = pendingMutations
+  const outboxEvents = pendingMutations
     .map((mutation) => {
       const maybeVariables = mutation.state.variables
 
@@ -137,36 +91,5 @@ export function useOutbox(): {
     })
     .filter((event) => event !== null)
 
-  //  Extract IDs of events that are currently in a pending mutation state.
-  //  These represent "optimistically updated" events that are still being sent to the server,
-  //  so they shouldn't be treated as a failed event if they're also present in failedMutations
-  const pendingEventIds = pendingOutboxEvents
-    .map((event) => event.id)
-    .filter(Boolean)
-
-  // Build an array of failed outbox events by filtering out any failed mutations
-  // whose event is still pending (based on pendingEventIds).
-  // This ensures we don't show an event as both "pending" and "failed"
-  const failedMutations = useFailedMutationStore().failedMutations
-  const failedOutboxEvents = failedMutations
-    .filter(({ eventId }) => !pendingEventIds.includes(eventId as UUID))
-    .map(({ eventId }) => {
-      const event = queryClient.getQueryData(trpc.event.get.queryKey(eventId))
-      const config = eventConfigurations.find((c) => c.id === event?.type)
-      if (!event || !config) {
-        return null
-      }
-      const eventState = getCurrentEventState(event, config)
-      return {
-        ...eventState,
-        meta: { failed: true }
-      }
-    })
-    .filter((event) => event !== null)
-
-  return {
-    pending: pendingOutboxEvents,
-    failed: failedOutboxEvents,
-    all: [...pendingOutboxEvents, ...failedOutboxEvents]
-  }
+  return outboxEvents
 }

@@ -326,7 +326,7 @@ export const SearchResultComponent = ({
         throw new Error('Event configuration not found for event:' + event.type)
       }
 
-      const isInOutbox = outbox.all.some(
+      const isInOutbox = outbox.some(
         (outboxEvent) => outboxEvent.id === event.id
       )
 

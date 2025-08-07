@@ -46,47 +46,22 @@ import {
   trpcOptionsProxy
 } from '@client/v2-events/trpc'
 import { ToastKey } from '@client/v2-events/routes/Toaster'
-import { useFailedMutationStore } from '../../outbox'
-
-const MAX_RETRY_ATTEMPT = 10
 
 function retryUnlessConflict(
   failureCount: number,
   error: TRPCClientError<AppRouter>
 ) {
-  return error.data?.httpStatus !== 409 && failureCount < MAX_RETRY_ATTEMPT
+  return error.data?.httpStatus !== 409
 }
 
-/**
- * Returns an error handler function for a TRPC mutation.
- *
- * - If the error is a conflict (HTTP 409), it shows a specific toast notification.
- * - Otherwise, it logs the failed mutation in the `useFailedMutationStore` for retry
- *   and shows a generic error toast.
- *
- * @param mutationKey - The key identifying the mutation that failed.
- * @returns A function to handle TRPCClientError with associated mutation variables.
- */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function handleError<T extends Record<string, any>, R>(
-  mutationKey: MutationKey
-): (error: TRPCClientError<AppRouter>, variables: T) => void {
-  return function errorToastOnConflict(error, variables) {
-    if (error.data?.httpStatus === 409) {
-      toast.error(ToastKey.NOT_ASSIGNED_ERROR)
-    } else {
-      useFailedMutationStore.getState().addFailedMutation({
-        eventId: variables.eventId,
-        action: variables.type,
-        declaration: variables.declaration,
-        transactionId: variables.transactionId,
-        annotation: variables.annotation,
-        mutationKey,
-        variables
-      })
+function retryDelay(attemptIndex: number) {
+  return 20000
+  // return Math.max(10000, 1000 * 2 ** attemptIndex)
+}
 
-      toast.error(ToastKey.SOMETHING_WENT_WRONG)
-    }
+function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
+  if (error.data?.httpStatus === 409) {
+    toast.error(ToastKey.NOT_ASSIGNED_ERROR)
   }
 }
 
@@ -95,11 +70,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.declare.request, {
     trpcOptionsProxy.event.actions.declare.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.declare.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   onMutate: updateEventOptimistically(ActionType.DECLARE),
   meta: {
     actionType: ActionType.DECLARE
@@ -111,11 +84,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.register.request, {
     trpcOptionsProxy.event.actions.register.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.register.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REGISTER
   }
@@ -126,11 +97,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.notify.request, {
     trpcOptionsProxy.event.actions.notify.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.notify.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.NOTIFY
   }
@@ -141,11 +110,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.validate.request, {
     trpcOptionsProxy.event.actions.validate.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.validate.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.VALIDATE
   }
@@ -156,11 +123,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.reject.request, {
     trpcOptionsProxy.event.actions.reject.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.reject.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REJECT
   }
@@ -171,11 +136,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.archive.request, {
     trpcOptionsProxy.event.actions.archive.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.archive.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.ARCHIVE
   }
@@ -186,11 +149,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
     trpcOptionsProxy.event.actions.printCertificate.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.printCertificate.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.PRINT_CERTIFICATE
   }
@@ -201,11 +162,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
     trpcOptionsProxy.event.actions.correction.request.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.correction.request.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REQUEST_CORRECTION
   }
@@ -216,11 +175,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
     trpcOptionsProxy.event.actions.correction.approve.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.correction.approve.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.APPROVE_CORRECTION
   }
@@ -231,11 +188,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
     trpcOptionsProxy.event.actions.correction.reject.request
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.correction.reject.request.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REJECT_CORRECTION
   }
@@ -246,11 +201,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.assign, {
     trpcOptionsProxy.event.actions.assignment.assign
   ),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: onAssign,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.assignment.assign.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.ASSIGN
   }
@@ -262,11 +215,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
   ),
   retry: (_, error: TRPCClientError<AppRouter>) =>
     error.data?.httpStatus !== 403,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: cleanUpOnUnassign,
-  onError: handleError(
-    trpcOptionsProxy.event.actions.assignment.unassign.mutationKey()
-  ),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.UNASSIGN
   }
@@ -282,9 +233,9 @@ export const customMutationKeys = {
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.validateOnDeclare),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(customMutationKeys.validateOnDeclare),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.DECLARE
   }
@@ -293,9 +244,9 @@ queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
 queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnDeclare),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(customMutationKeys.registerOnDeclare),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.DECLARE
   }
@@ -304,9 +255,9 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnDeclare, {
 queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   mutationFn: waitUntilEventIsCreated(customApi.registerOnValidate),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(customMutationKeys.registerOnValidate),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REGISTER
   }
@@ -315,9 +266,9 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
 queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
   mutationFn: waitUntilEventIsCreated(customApi.makeCorrectionOnRequest),
   retry: retryUnlessConflict,
-  retryDelay: 10000,
+  retryDelay,
   onSuccess: updateLocalEvent,
-  onError: handleError(customMutationKeys.makeCorrectionOnRequest),
+  onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.APPROVE_CORRECTION
   }
