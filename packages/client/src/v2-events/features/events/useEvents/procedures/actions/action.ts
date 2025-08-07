@@ -57,6 +57,16 @@ function retryUnlessConflict(
   return error.data?.httpStatus !== 409 && failureCount < MAX_RETRY_ATTEMPT
 }
 
+/**
+ * Returns an error handler function for a TRPC mutation.
+ *
+ * - If the error is a conflict (HTTP 409), it shows a specific toast notification.
+ * - Otherwise, it logs the failed mutation in the `useFailedMutationStore` for retry
+ *   and shows a generic error toast.
+ *
+ * @param mutationKey - The key identifying the mutation that failed.
+ * @returns A function to handle TRPCClientError with associated mutation variables.
+ */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function handleError<T extends Record<string, any>, R>(
   mutationKey: MutationKey

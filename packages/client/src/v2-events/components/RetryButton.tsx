@@ -11,7 +11,7 @@
  */
 import { Button } from '@opencrvs/components/lib/Button'
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import styled from 'styled-components'
 import { EventIndex } from '@opencrvs/commons/client'
 import {
@@ -19,6 +19,7 @@ import {
   useOutbox
 } from '../features/events/useEvents/outbox'
 import { useMutation } from '@tanstack/react-query'
+import { queryClient } from '../trpc'
 
 const RetryAction = styled(Button)`
   height: 40px;
@@ -28,11 +29,13 @@ const RetryAction = styled(Button)`
   }
 `
 
-const retryButtonLabel = {
-  defaultMessage: 'Retry',
-  description: 'Label for retry button for outbox',
-  id: 'v2.event.action.outbox-retry.label'
-}
+const messages = defineMessages({
+  retryButtonLabel: {
+    defaultMessage: 'Retry',
+    description: 'Label for retry button for outbox',
+    id: 'v2.event.action.outbox-retry.label'
+  }
+})
 
 export default function RetryButton({ event }: { event: EventIndex }) {
   const { failed } = useOutbox()
@@ -43,30 +46,39 @@ export default function RetryButton({ event }: { event: EventIndex }) {
     (failedEvent) => failedEvent.id === event.id
   )
 
-  const matchingMutation = failedMutations.find(
-    (mutation) => mutation.eventId === event.id
-  )
+  const matchingMutation = failedMutations.find((m) => m.eventId === event.id)
+  const mutationKey = matchingMutation?.mutationKey
+
+  const mutationDefaults = mutationKey
+    ? queryClient.getMutationDefaults(mutationKey)
+    : undefined
 
   const mutation = useMutation({
-    mutationKey: matchingMutation?.mutationKey
+    mutationKey,
+    mutationFn: mutationDefaults?.mutationFn,
+    onSuccess: mutationDefaults?.onSuccess,
+    onError: mutationDefaults?.onError,
+    retry: mutationDefaults?.retry,
+    retryDelay: mutationDefaults?.retryDelay,
+    meta: mutationDefaults?.meta
   })
 
   const handleRetry = async () => {
     if (matchingMutation) {
       try {
-        removeFailedMutation(event.id)
         await mutation.mutateAsync(matchingMutation.variables)
+        removeFailedMutation(event.id)
       } catch (err) {
-        throw new Error('Cannot retry')
+        throw new Error(`Mutation failed again due to ${err}`)
       }
     } else {
-      console.warn('No matching mutation found for retry')
+      throw new Error('No matching mutation found for retry')
     }
   }
 
   return hasActionFailed ? (
     <RetryAction type="primary" onClick={handleRetry}>
-      {intl.formatMessage(retryButtonLabel)}
+      {intl.formatMessage(messages.retryButtonLabel)}
     </RetryAction>
   ) : null
 }
