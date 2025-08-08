@@ -730,15 +730,13 @@ export function generateEventDraftDocument({
   eventId,
   actionType,
   rng = () => 0.1,
-  declaration = {},
-  createdAt
+  declaration = {}
 }: {
   eventId: UUID
   actionType: ActionType
   rng?: () => number
   declaration?: EventState
   annotation?: EventState
-  createdAt?: string
 }): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
@@ -746,22 +744,18 @@ export function generateEventDraftDocument({
     rng
   })
 
-  console.log('action', action)
-
-  console.log('createdAt', createdAt)
   return {
     id: getUUID(),
     transactionId: getUUID(),
     action: {
       ...action,
-      createdAt: createdAt ?? action.createdAt,
       declaration: {
         ...action.declaration,
         ...declaration
       },
       annotation: action.annotation
     },
-    createdAt: createdAt ?? new Date().toISOString(),
+    createdAt: new Date().toISOString(),
     eventId
   }
 }

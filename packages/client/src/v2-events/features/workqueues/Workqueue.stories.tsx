@@ -287,9 +287,7 @@ const createdEvent = {
   ...generateEventDocument({
     configuration: tennisClubMembershipEvent,
     actions: [ActionType.CREATE]
-  }),
-  createdAt: '2020-12-05T18:37:31.295Z',
-  updatedAt: '2020-12-05T18:37:31.295Z'
+  })
 }
 
 const createdDraft = generateEventDraftDocument({
@@ -297,12 +295,10 @@ const createdDraft = generateEventDraftDocument({
   actionType: ActionType.DECLARE,
   declaration: {
     'applicant.name': {
-      firstname: 'Draft',
-      surname: 'User',
-      middlename: ''
+      firstname: 'Draft for',
+      surname: 'Declare'
     }
-  },
-  createdAt: '2024-12-05T18:37:31.295Z'
+  }
 })
 
 /**
@@ -310,6 +306,7 @@ const createdDraft = generateEventDraftDocument({
  */
 export const Draft: Story = {
   parameters: {
+    mockingDate: new Date(2024, 7, 12),
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
