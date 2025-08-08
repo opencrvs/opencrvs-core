@@ -451,7 +451,8 @@ jobs:
 
       - name: Install Playwright
         # Playwright is required since @storybook/test-runner depends on it
-        run: pnpm dlx --dir packages/client playwright install --with-deps
+        run: pnpm --filter ./packages/client add -D playwright \
+          && pnpm --filter ./packages/client exec playwright install --with-deps
 
       - name: Build Storybook
         working-directory: packages/client
