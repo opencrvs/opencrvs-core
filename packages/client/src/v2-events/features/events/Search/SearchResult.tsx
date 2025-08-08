@@ -310,7 +310,7 @@ export const SearchResultComponent = ({
     }
   }
 
-  const mapEventsToWorkqueueRows = (
+  const mapEventsToResultRows = (
     eventsWithDraft: (EventIndex & {
       title: string | null
       useFallbackTitle: boolean
@@ -471,7 +471,7 @@ export const SearchResultComponent = ({
 
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
-  const allResults = mapEventsToWorkqueueRows(sortedResult)
+  const allResults = mapEventsToResultRows(sortedResult)
 
   const currentPageNumber = Math.floor(offset / limit) + 1
 
