@@ -25,7 +25,9 @@ import {
   QueryType,
   WorkqueueCountInput,
   getEventConfigById,
-  SearchScopeAccessLevels
+  SearchScopeAccessLevels,
+  DateRangeField,
+  SelectDateRangeField
 } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import {
@@ -72,7 +74,9 @@ async function ensureAlias(indexName: string) {
   return res
 }
 
-function mapFieldTypeToElasticsearch(field: FieldConfig) {
+function mapFieldTypeToElasticsearch(
+  field: FieldConfig
+): estypes.MappingProperty {
   switch (field.type) {
     case FieldType.NUMBER:
       return { type: 'double' }
@@ -90,8 +94,7 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
     case FieldType.EMAIL:
       return {
         type: 'keyword',
-        // apply custom normalyzer
-        normalizer: 'lowercase_normalizer'
+        normalizer: 'lowercase'
       }
     case FieldType.DIVIDER:
     case FieldType.RADIO_GROUP:
@@ -147,9 +150,9 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
       return {
         type: 'object',
         properties: {
-          firstname: { type: 'text', analyzer: 'human_name' },
-          surname: { type: 'text', analyzer: 'human_name' },
-          __fullname: { type: 'text', analyzer: 'human_name' }
+          firstname: { type: 'text', analyzer: 'classic' },
+          surname: { type: 'text', analyzer: 'classic' },
+          __fullname: { type: 'text', analyzer: 'classic' }
         }
       }
     case FieldType.FILE_WITH_OPTIONS:
@@ -162,31 +165,30 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           option: { type: 'keyword' }
         }
       }
-    // @TODO: other option would be to throw an error, since these should not be used in declaration form.
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
-      return {
-        type: 'object',
-        properties: {
-          start: { type: 'date' },
-          end: { type: 'date' }
-        }
-      }
     default:
-      const _exhaustiveCheck: never = field
+      /**
+       * The remaining fields are "search" only fields so should not be
+       * encountered when indexing events.
+       */
+      const _exhaustiveCheck: DateRangeField | SelectDateRangeField = field
       throw new Error(
-        `Unhandled field type: ${JSON.stringify(_exhaustiveCheck)}`
+        `Unsupported indexing field type: ${JSON.stringify(_exhaustiveCheck)}`
       )
   }
 }
 
 function formFieldsToDataMapping(fields: FieldConfig[]) {
-  return fields.reduce((acc, field) => {
-    return {
-      ...acc,
-      [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
-    }
-  }, {})
+  return fields.reduce(
+    (acc, field) => {
+      return {
+        ...acc,
+        [encodeFieldId(field.id)]: mapFieldTypeToElasticsearch(field)
+      }
+    },
+    {} as Record<string, estypes.MappingProperty>
+  )
 }
 
 export async function createIndex(
@@ -198,28 +200,6 @@ export async function createIndex(
   await client.indices.create({
     index: indexName,
     body: {
-      // Define a custom normalizer to make keyword fields case-insensitive by applying a lowercase filter
-      settings: {
-        analysis: {
-          normalizer: {
-            lowercase_normalizer: {
-              type: 'custom',
-              filter: ['lowercase']
-            }
-          },
-          analyzer: {
-            /*
-             * Human name can contain
-             * Special characters including hyphens, underscores and spaces
-             */
-            human_name: {
-              type: 'custom',
-              tokenizer: 'standard',
-              filter: ['lowercase', 'word_delimiter']
-            }
-          }
-        }
-      },
       mappings: {
         properties: {
           id: { type: 'keyword' },
@@ -319,18 +299,6 @@ export async function indexEvent(event: EventDocument, config: EventConfig) {
     document: eventToEventIndex(event, config),
     refresh: 'wait_for'
   })
-}
-
-export async function deleteEventIndex(event: EventDocument) {
-  const esClient = getOrCreateClient()
-
-  const response = await esClient.delete({
-    index: getEventIndexName(event.type),
-    id: event.id,
-    refresh: 'wait_for'
-  })
-
-  return response
 }
 
 export async function getIndexedEvents(

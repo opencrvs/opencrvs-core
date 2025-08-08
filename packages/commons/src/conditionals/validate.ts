@@ -336,6 +336,32 @@ export function validateFieldInput({
   }[]
 }
 
+export function runStructuralValidations({
+  field,
+  values
+}: {
+  field: FieldConfig
+  values: ActionUpdate
+}) {
+  if (
+    !isFieldVisible(field, values) ||
+    isFieldEmptyAndNotRequired(field, values)
+  ) {
+    return {
+      errors: []
+    }
+  }
+
+  const fieldValidationResult = validateFieldInput({
+    field,
+    value: values[field.id]
+  })
+
+  return {
+    errors: fieldValidationResult
+  }
+}
+
 export function runFieldValidations({
   field,
   values
