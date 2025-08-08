@@ -399,16 +399,16 @@ export function timePeriodToDateRange(value: SelectDateRangeValue) {
   let startDate: Date
   switch (value) {
     case 'last7Days':
-      startDate = subDays(new Date(), 6)
+      startDate = subDays(new Date(), 7)
       break
     case 'last30Days':
-      startDate = subDays(new Date(), 29)
+      startDate = subDays(new Date(), 30)
       break
     case 'last90Days':
-      startDate = subDays(new Date(), 89)
+      startDate = subDays(new Date(), 90)
       break
     case 'last365Days':
-      startDate = subDays(new Date(), 364)
+      startDate = subDays(new Date(), 365)
       break
   }
   return {

@@ -1,7 +1,5 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`event.actions.notify > NOTIFY action fails if invalid value is sent 1`] = `[TRPCError: [{"message":"Please enter a valid date","id":"applicant.dob","value":"2050-01-01"}]]`;
-
 exports[`event.actions.notify > NOTIFY action fails if payload includes field that is not in the declaration 1`] = `[TRPCError: [{"message":"Unexpected field","id":"foo.bar","value":"hello"}]]`;
 
 exports[`event.actions.notify > NOTIFY action fails if payload includes field with unexpected type 1`] = `

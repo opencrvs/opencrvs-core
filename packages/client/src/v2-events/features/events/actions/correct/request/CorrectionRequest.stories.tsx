@@ -286,8 +286,18 @@ export const ReviewCorrection: Story = {
     })
 
     await userEvent.click(canvas.getByRole('button', { name: /approve/i }))
-    await userEvent.click(canvas.getByRole('button', { name: /cancel/i }))
+    await userEvent.click(canvas.getByTestId('close-dialog'))
+
     await userEvent.click(canvas.getByRole('button', { name: /reject/i }))
-    await userEvent.click(canvas.getByRole('button', { name: /cancel/i }))
+    const confirmButton = canvas.getByRole('button', { name: /confirm/i })
+    await expect(confirmButton).toBeDisabled()
+
+    const reasonInput = canvasElement.querySelector('#reject-correction-reason')
+    if (reasonInput) {
+      await userEvent.type(reasonInput, 'Missing legal documentation')
+      await expect(confirmButton).toBeEnabled()
+    }
+
+    await userEvent.click(canvas.getByTestId('close-dialog'))
   }
 }

@@ -17,7 +17,8 @@ import {
   ActionBase,
   ActionDocument,
   ActionStatus,
-  EventState
+  EventState,
+  PrintCertificateAction
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -601,9 +602,9 @@ export function eventPayloadGenerator(rng: () => number) {
           input: Partial<
             Pick<
               RejectCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment'
+              'transactionId' | 'annotation' | 'keepAssignment' | 'reason'
             >
-          > = {}
+          >
         ) => ({
           type: ActionType.REJECT_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
@@ -617,7 +618,8 @@ export function eventPayloadGenerator(rng: () => number) {
             ),
           eventId,
           requestId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          reason: input.reason ?? { message: '' }
         })
       }
     }
@@ -681,7 +683,11 @@ export function generateActionDocument({
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
     case ActionType.PRINT_CERTIFICATE:
-      return { ...actionBase, type: action }
+      return {
+        ...actionBase,
+        type: action,
+        content: (defaults as Partial<PrintCertificateAction>).content
+      }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
@@ -690,7 +696,8 @@ export function generateActionDocument({
       return {
         ...actionBase,
         requestId: getUUID(),
-        type: action
+        type: action,
+        reason: { message: 'Correction rejection' }
       }
     case ActionType.REGISTER:
       return {

@@ -19,7 +19,7 @@
       "@opencrvs/commons/events": ["../commons/src/events/index.ts"]
     }
   },
-  "references": [{ "path": "../commons" }],
+  "references": [{ "path": "../commons/tsconfig-commonjs.json" }],
   "include": ["src/**/*.ts"],
   "exclude": ["**/node_modules/**", "dist"]
 }

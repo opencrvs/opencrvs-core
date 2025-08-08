@@ -23,7 +23,8 @@ import {
   deepDropNulls,
   applyDraftsToEventIndex,
   WorkqueueActionsWithDefault,
-  isMetaAction
+  isMetaAction,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
 import {
@@ -150,9 +151,20 @@ function changeSortedColumn(
 }
 
 const messages = defineMessages({
+  noRecord: {
+    id: 'v2.search.noRecord',
+    defaultMessage:
+      'No records {slug, select, draft {in my draft} outbox {require processing} other {{title}}}',
+    description: 'The no record text'
+  },
   noResult: {
     id: 'v2.search.noResult',
-    defaultMessage: 'No results',
+    defaultMessage: 'No result',
+    description: 'The no result text'
+  },
+  noResultFor: {
+    id: 'v2.search.noResultFor',
+    defaultMessage: 'No results for "{searchTerm}"',
     description: 'The no result text'
   },
   noResultsOutbox: {
@@ -230,7 +242,8 @@ export const SearchResultComponent = ({
   offset = 0,
   title: contentTitle,
   tabBarContent,
-  actions = []
+  actions = [],
+  emptyMessage
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -240,6 +253,7 @@ export const SearchResultComponent = ({
   title: string
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
+  emptyMessage?: TranslationConfig
 }>) => {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
   const intl = useIntl()
@@ -248,9 +262,12 @@ export const SearchResultComponent = ({
   const theme = useTheme()
   const { getEventTitle } = useEventTitle()
   const isOnline = useOnlineStatus()
+  const params = deserializeSearchParams(location.search) as Record<
+    string,
+    string
+  >
 
   const setOffset = (newOffset: number) => {
-    const params = deserializeSearchParams(location.search)
     params.offset = String(newOffset)
     navigate(
       {
@@ -466,6 +483,22 @@ export const SearchResultComponent = ({
 
   const isShowPagination = totalPages > 1
 
+  let noResultText = ''
+  if (slug) {
+    noResultText = intl.formatMessage(messages.noRecord, {
+      slug,
+      title: contentTitle.toLowerCase()
+    })
+  } else {
+    if (params.keys) {
+      noResultText = intl.formatMessage(messages.noResultFor, {
+        searchTerm: params.keys
+      })
+    } else {
+      noResultText = intl.formatMessage(messages.noResult)
+    }
+  }
+
   return (
     <WithTestId>
       <WQContentWrapper
@@ -473,11 +506,9 @@ export const SearchResultComponent = ({
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
         noContent={queryData.length === 0}
-        noResultText={intl.formatMessage(
-          slug === CoreWorkqueues.OUTBOX
-            ? messages.noResultsOutbox
-            : messages.noResult
-        )}
+        noResultText={
+          emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
+        }
         paginationId={currentPageNumber}
         tabBarContent={tabBarContent}
         title={contentTitle}

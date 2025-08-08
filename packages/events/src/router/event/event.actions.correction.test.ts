@@ -92,7 +92,8 @@ test(`${ActionType.REJECT_CORRECTION} prevents forbidden access if missing requi
     client.event.actions.correction.reject.request(
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
-        'request-test-id-12345'
+        'request-test-id-12345',
+        { reason: { message: 'No legal proof' } }
       )
     )
   ).rejects.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -106,7 +107,8 @@ test(`${ActionType.REJECT_CORRECTION} allows access if required scope is present
     client.event.actions.correction.reject.request(
       generator.event.actions.correction.reject(
         'registered-event-test-id-12345',
-        'request-test-id-12345'
+        'request-test-id-12345',
+        { reason: { message: 'No legal proof' } }
       )
     )
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
@@ -425,7 +427,12 @@ test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
   const rejectCorrectionPayload = generator.event.actions.correction.reject(
     withCorrectionRequest.id,
     actionId,
-    { keepAssignment: true }
+    {
+      keepAssignment: true,
+      reason: {
+        message: 'no legal proof'
+      }
+    }
   )
 
   const firstResponse = await client.event.actions.correction.reject.request(
