@@ -17,7 +17,8 @@ import {
   ActionBase,
   ActionDocument,
   ActionStatus,
-  EventState
+  EventState,
+  PrintCertificateAction
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -682,7 +683,11 @@ export function generateActionDocument({
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
     case ActionType.PRINT_CERTIFICATE:
-      return { ...actionBase, type: action }
+      return {
+        ...actionBase,
+        type: action,
+        content: (defaults as Partial<PrintCertificateAction>).content
+      }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:

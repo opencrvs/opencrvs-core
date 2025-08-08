@@ -24,6 +24,8 @@ interface ApplicationConfig {
 export const useAppConfig = (): ApplicationConfig => {
   return {
     language: useSelector(getLanguage),
-    certificateTemplates: useSelector(getCertificateTemplates)
+    certificateTemplates: useSelector(
+      getCertificateTemplates
+    ) as CertificateTemplateConfig[]
   }
 }

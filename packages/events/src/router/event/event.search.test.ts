@@ -31,7 +31,6 @@ import {
   TEST_USER_DEFAULT_SCOPES,
   UNSTABLE_EVENT_FIELDS
 } from '@events/tests/utils'
-
 test('User without any search scopes should not see any events', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, ['record.declare-birth'])
@@ -824,6 +823,67 @@ test('Returns multiple documents after creation', async () => {
 
   // event1 and event2 should be returned
   expect(response).toHaveLength(2)
+})
+
+test('Returns correctly based on registration location even when a parent location level is used for searching', async () => {
+  const { user, generator, seed, locations } = await setupTestCase()
+
+  const parentLocation = {
+    ...generator.locations.set(1)[0],
+    name: 'Parent location'
+  }
+
+  const newLocations = [
+    parentLocation,
+    {
+      ...locations[0],
+      id: user.primaryOfficeId,
+      name: 'Child location',
+      partOf: parentLocation.id
+    }
+  ]
+
+  await seed.locations(newLocations)
+
+  const client = createTestClient(user, [
+    'search[event=tennis-club-membership,access=all]',
+    'record.declare-birth'
+  ])
+
+  const event = await client.event.create(generator.event.create())
+  const data = generator.event.actions.declare(event.id, {
+    declaration: {
+      'applicant.dob': '2000-11-11',
+      'applicant.name': {
+        firstname: 'Unique',
+        surname: 'Lastname'
+      },
+      'recommender.none': true,
+      'applicant.address': {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC,
+        province: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c',
+        district: '5ef450bc-712d-48ad-93f3-8da0fa453baa',
+        urbanOrRural: 'RURAL' as const,
+        village: 'Small village'
+      }
+    }
+  })
+  await client.event.actions.declare.request(data)
+
+  // search with parent id
+  const response = await client.event.search({
+    type: 'and',
+    clauses: [
+      {
+        'legalStatuses.DECLARED.createdAtLocation': {
+          type: 'within',
+          location: parentLocation.id
+        }
+      }
+    ]
+  })
+  expect(response).toHaveLength(1)
 })
 
 test('Returns no documents when search params are not matched', async () => {
