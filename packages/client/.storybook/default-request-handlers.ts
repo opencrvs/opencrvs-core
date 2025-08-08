@@ -1123,6 +1123,7 @@ export const handlers = {
             userMgntUserID: '679397db138339c63cdc24e1',
             creationDate: '1737725915295',
             username: 'k.mweene',
+            fullHonorificName: 'Mr. Kennedy Mweene',
             practitionerId: '6f672b75-ec29-4bdc-84f6-4cb3ff9bb529',
             mobile: '+260933333333',
             email: 'kalushabwalya1.7@gmail.com',
