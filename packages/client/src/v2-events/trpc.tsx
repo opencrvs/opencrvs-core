@@ -110,7 +110,7 @@ export function TRPCProvider({
   storeIdentifier?: string
   waitForClientRestored?: boolean
 }) {
-  const [clientRestored, setClientRestored] = React.useState(false)
+  const [queriesRestored, setQueriesRestored] = React.useState(false)
 
   return (
     <PersistQueryClientProvider
@@ -135,6 +135,7 @@ export function TRPCProvider({
         }
       }}
       onSuccess={async () => {
+        setQueriesRestored(true)
         await queryClient.resumePausedMutations()
 
         const mutations = queryClient.getMutationCache().getAll()
@@ -142,11 +143,10 @@ export function TRPCProvider({
         for (const mutation of mutations) {
           await mutation.continue()
         }
-        setClientRestored(true)
       }}
     >
       <TRPCProviderRaw queryClient={queryClient} trpcClient={trpcClient}>
-        {!waitForClientRestored || clientRestored ? children : null}
+        {!waitForClientRestored || queriesRestored ? children : null}
       </TRPCProviderRaw>
     </PersistQueryClientProvider>
   )
