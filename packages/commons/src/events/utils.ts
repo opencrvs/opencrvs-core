@@ -306,6 +306,14 @@ export function omitHiddenAnnotationFields(
   )
 }
 
+/**
+ * Merges two documents together.
+ *
+ * @example deepMerge({'review.signature': { path: '/path.png', type: 'image/png' }}, { foo: 'bar'}) } => { 'review.signature': { path: '/path.png', type: 'image/png' }, foo: 'bar' }
+ *
+ * NOTE: When merging deep objects, the values from the second object will override the first one.
+ * @example { annotation: {'review.signature': { path: '/path.png', type: 'image/png' }}, { annotation: { foo: 'bar'}) } } => { annotation: { foo: 'bar' } }
+ */
 export function deepMerge<
   T extends Record<string, unknown>,
   K extends Record<string, unknown>
@@ -429,5 +437,30 @@ export function timePeriodToDateRange(value: SelectDateRangeValue) {
   return {
     startDate: startDate.toISOString(),
     endDate: new Date().toISOString()
+  }
+}
+
+export function mergeDrafts(currentDraft: Draft, incomingDraft: Draft): Draft {
+  if (currentDraft.eventId !== incomingDraft.eventId) {
+    throw new Error(
+      `Cannot merge drafts for different events: ${currentDraft.eventId} and ${incomingDraft.eventId}`
+    )
+  }
+
+  return {
+    ...currentDraft,
+    ...incomingDraft,
+    action: {
+      ...currentDraft.action,
+      ...incomingDraft.action,
+      declaration: deepMerge(
+        currentDraft.action.declaration,
+        incomingDraft.action.declaration
+      ),
+      annotation: deepMerge(
+        currentDraft.action.annotation ?? {},
+        incomingDraft.action.annotation ?? {}
+      )
+    }
   }
 }

@@ -248,9 +248,13 @@ export function getCurrentEventState(
 }
 
 /**
- * @returns the future state of the event with drafts applied
+ * @returns the future state of the event with drafts applied to all fields.
+ *
+ * NOTE: We treat the draft as a new action that is applied to the event. This means that even the status of the is changed as if draft has been accepted.
+ * @see applyDraftToEventIndex to apply the draft to the event without changing the status.
+ *
  */
-export function getCurrentEventStateWithDrafts({
+export function dangerouslyGetCurrentEventStateWithDrafts({
   event,
   draft,
   configuration
@@ -263,6 +267,7 @@ export function getCurrentEventStateWithDrafts({
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
+  console.log('draft', draft)
   const draftAction =
     draft.action.type === ActionType.REQUEST_CORRECTION
       ? /*
@@ -307,8 +312,13 @@ export function applyDeclarationToEventIndex(
   }
 }
 
-// @TODO: we probably don't want to create these kind of helpers.
-// Look into unifying this with getCurrentEventStateWithDrafts?
+/**
+ * Applies draft to the event index following internal business rules.
+ *
+ * Ensure only necessary fields are updated based on the draft (declaration, updatedAt, flags).
+ * Note: When naively applying draft, it leads to incorrect event state, since drafts are
+ *
+ */
 export function applyDraftToEventIndex(
   eventIndex: EventIndex,
   draft: Draft | undefined,
@@ -316,7 +326,9 @@ export function applyDraftToEventIndex(
 ) {
   const indexedAt = eventIndex.updatedAt
 
-  const activeDraft = draft && draft.createdAt > indexedAt ? draft : undefined
+  const activeDraft = draft && draft.createdAt >= indexedAt ? draft : undefined
+
+  console.log('activeDraft', activeDraft)
 
   if (!activeDraft) {
     return eventIndex

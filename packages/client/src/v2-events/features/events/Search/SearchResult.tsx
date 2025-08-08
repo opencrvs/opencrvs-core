@@ -159,7 +159,12 @@ const messages = defineMessages({
   },
   noResult: {
     id: 'v2.search.noResult',
-    defaultMessage: 'No results for {searchTerm}',
+    defaultMessage: 'No result',
+    description: 'The no result text'
+  },
+  noResultFor: {
+    id: 'v2.search.noResultFor',
+    defaultMessage: 'No results for "{searchTerm}"',
     description: 'The no result text'
   },
   noResultsOutbox: {
@@ -231,7 +236,7 @@ function ActionComponent({
 
 export const SearchResultComponent = ({
   columns,
-  queryData,
+  queryData: events,
   eventConfigs,
   limit = 10,
   offset = 0,
@@ -306,13 +311,13 @@ export const SearchResultComponent = ({
   }
 
   const mapEventsToWorkqueueRows = (
-    eventData: (EventIndex & {
+    eventsWithDraft: (EventIndex & {
       title: string | null
       useFallbackTitle: boolean
       meta?: Record<string, unknown>
     })[]
   ) => {
-    return eventData.map(({ meta, ...event }) => {
+    return eventsWithDraft.map(({ meta, ...event }) => {
       const actionConfigs = actions
         .map((actionType) => ({
           actionComponent: (
@@ -434,7 +439,7 @@ export const SearchResultComponent = ({
     }
   }
 
-  const dataWithDraft = queryData
+  const dataWithDraft = events
     /*
      * Apply pending drafts to the event index.
      * This is necessary to show the most up to date information in the workqueue.
@@ -444,7 +449,6 @@ export const SearchResultComponent = ({
       if (!eventConfig) {
         throw new Error('Event configuration not found for event:' + event.type)
       }
-
       return deepDropNulls(
         applyDraftToEventIndex(
           event,
@@ -476,18 +480,25 @@ export const SearchResultComponent = ({
     limit * currentPageNumber
   )
 
-  const totalPages = queryData.length ? Math.ceil(queryData.length / limit) : 0
+  const totalPages = events.length ? Math.ceil(events.length / limit) : 0
 
   const isShowPagination = totalPages > 1
 
-  const noResultText = slug
-    ? intl.formatMessage(messages.noRecord, {
-        slug,
-        title: contentTitle.toLowerCase()
-      })
-    : intl.formatMessage(messages.noResult, {
+  let noResultText = ''
+  if (slug) {
+    noResultText = intl.formatMessage(messages.noRecord, {
+      slug,
+      title: contentTitle.toLowerCase()
+    })
+  } else {
+    if (params.keys) {
+      noResultText = intl.formatMessage(messages.noResultFor, {
         searchTerm: params.keys
       })
+    } else {
+      noResultText = intl.formatMessage(messages.noResult)
+    }
+  }
 
   return (
     <WithTestId>
@@ -495,7 +506,7 @@ export const SearchResultComponent = ({
         error={false}
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
-        noContent={queryData.length === 0}
+        noContent={events.length === 0}
         noResultText={
           emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
         }

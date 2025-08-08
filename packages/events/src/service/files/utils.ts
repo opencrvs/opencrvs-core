@@ -22,7 +22,7 @@ import {
   FileFieldWithOptionValue,
   FileFieldValue,
   ActionUpdate,
-  getCurrentEventStateWithDrafts,
+  dangerouslyGetCurrentEventStateWithDrafts,
   EventState,
   getCurrentEventState,
   ActionDocument
@@ -88,16 +88,15 @@ function getUnreferencedDeclarationDraftFiles({
   configuration: EventConfig
 }) {
   const currentEventState = currentDraft
-    ? getCurrentEventStateWithDrafts({
+    ? dangerouslyGetCurrentEventStateWithDrafts({
         event,
         draft: currentDraft,
         configuration
       })
     : getCurrentEventState(event, configuration)
 
-  const previousEventState = getCurrentEventStateWithDrafts({
+  const previousEventState = dangerouslyGetCurrentEventStateWithDrafts({
     event,
-
     draft: {
       // Given previous draft, if event has been updated afterwards (running deletion after submission of actual action.) the data would never get applied.
       ...previousDraft,

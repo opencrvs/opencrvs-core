@@ -17,7 +17,8 @@ import {
   createEmptyDraft,
   deepMerge,
   findActiveDraftForEvent,
-  deepDropNulls
+  deepDropNulls,
+  mergeDrafts
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
@@ -103,12 +104,11 @@ function AnnotationActionComponent({ children, actionType }: Props) {
     }
   }
 
-  const combinedDraft = activeRemoteDraft
-    ? deepMerge(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+  const mergedDraft = activeRemoteDraft
+    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
     : localDraftWithAdjustedTimestamp
 
-  // @todo --?
-  const actionAnnotation = deepDropNulls(combinedDraft.action.annotation) || {}
+  const actionAnnotation = deepDropNulls(mergedDraft.action.annotation) || {}
 
   useEffect(() => {
     // Use the annotation values from the zustand state, so that filled form state is not lost

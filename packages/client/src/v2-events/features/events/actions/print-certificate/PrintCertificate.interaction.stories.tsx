@@ -217,7 +217,7 @@ export const RedirectAfterPrint: Story = {
             })
           })
         ],
-        events: [
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues()
           }),

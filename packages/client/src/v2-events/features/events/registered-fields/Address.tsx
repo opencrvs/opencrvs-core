@@ -495,6 +495,7 @@ function AddressInput(props: Props) {
       {...otherProps}
       fields={fieldsWithDefaults}
       initialValues={{ ...defaultValue, ...value }}
+      parentId={props.id}
       onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
     />
   )

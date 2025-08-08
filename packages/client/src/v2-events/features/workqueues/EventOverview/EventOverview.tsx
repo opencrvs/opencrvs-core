@@ -15,7 +15,7 @@ import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
-  getCurrentEventStateWithDrafts,
+  dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
   applyDraftToEventIndex,
   deepDropNulls,
@@ -58,9 +58,11 @@ function EventOverviewFull({
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
   const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(eventIndex.id)
+  const draft = getRemoteDraftByEventId(eventIndex.id, {
+    refetchOnMount: 'always'
+  })
   const eventWithDrafts = draft
-    ? getCurrentEventStateWithDrafts({
+    ? dangerouslyGetCurrentEventStateWithDrafts({
         event,
         draft,
         configuration: eventConfiguration

@@ -16,13 +16,14 @@ import {
   Draft,
   createEmptyDraft,
   findActiveDraftForEvent,
-  getCurrentEventStateWithDrafts,
+  dangerouslyGetCurrentEventStateWithDrafts,
   getActionAnnotation,
   DeclarationUpdateActionType,
   ActionType,
   Action,
   deepMerge,
-  getUUID
+  getUUID,
+  mergeDrafts
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -126,13 +127,13 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   /*
    * Keep the local draft updated as per the form changes
    */
-  const formValues = useEventFormData((state) => state.formValues)
-  const annotation = useActionAnnotation((state) => state.annotation)
+  const currentDeclaration = useEventFormData((state) => state.formValues)
+  const currentAnnotation = useActionAnnotation((state) => state.annotation)
   const clearForm = useEventFormData((state) => state.clear)
   const clearAnnotation = useActionAnnotation((state) => state.clear)
 
   useEffect(() => {
-    if (!formValues || !annotation) {
+    if (!currentDeclaration || !currentAnnotation) {
       return
     }
 
@@ -141,12 +142,12 @@ function DeclarationActionComponent({ children, actionType }: Props) {
       eventId: event.id,
       action: {
         ...localDraft.action,
-        declaration: formValues,
-        annotation
+        declaration: currentDeclaration,
+        annotation: currentAnnotation
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues, annotation])
+  }, [currentDeclaration, currentAnnotation])
 
   /*
    * Initialize the form state
@@ -173,28 +174,27 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     }
   }
 
-  // @TODO: check
-  const combinedDraft = activeRemoteDraft
-    ? deepMerge(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+  const mergedDraft: Draft = activeRemoteDraft
+    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
     : localDraftWithAdjustedTimestamp
 
   const eventStateWithDrafts = useMemo(
     () =>
-      getCurrentEventStateWithDrafts({
+      dangerouslyGetCurrentEventStateWithDrafts({
         event,
-        draft: combinedDraft,
+        draft: mergedDraft,
         configuration
       }),
-    [combinedDraft, event, configuration]
+    [mergedDraft, event, configuration]
   )
 
   const actionAnnotation = useMemo(() => {
     return getActionAnnotation({
       event,
       actionType,
-      draft: combinedDraft
+      draft: mergedDraft
     })
-  }, [combinedDraft, event, actionType])
+  }, [mergedDraft, event, actionType])
 
   const previousActionAnnotation = useMemo(() => {
     const previousActionType = getPreviousDeclarationActionType(
@@ -228,14 +228,14 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     // If user e.g. enters the 'screen lock' flow while filling form.
     // Then use form values from drafts.
     const initialFormValues = deepMerge(
-      formValues || {},
+      currentDeclaration || {},
       eventStateWithDrafts.declaration
     )
 
     setFormValues(initialFormValues)
 
     const initialAnnotation = deepMerge(
-      deepMerge(annotation || {}, previousActionAnnotation),
+      deepMerge(currentAnnotation || {}, previousActionAnnotation),
       actionAnnotation
     )
 

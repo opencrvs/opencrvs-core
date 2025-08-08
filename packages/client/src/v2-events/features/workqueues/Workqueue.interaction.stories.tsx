@@ -67,13 +67,7 @@ export const SortWorkqueue: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('recent')
           }),
@@ -81,6 +75,14 @@ export const SortWorkqueue: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: queryData.length }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
             return queryData

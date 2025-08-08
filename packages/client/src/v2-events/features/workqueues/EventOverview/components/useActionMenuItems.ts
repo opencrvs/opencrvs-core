@@ -29,6 +29,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -120,6 +121,7 @@ export const actionLabels = {
 export function useAction(event: EventIndex) {
   const events = useEvents()
   const navigate = useNavigate()
+  const drafts = useDrafts()
   const authentication = useAuthentication()
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
@@ -141,10 +143,17 @@ export function useAction(event: EventIndex) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
+  const openDraft = drafts
+    .getAllRemoteDrafts()
+    .find((draft) => draft.eventId === event.id)
+
+  const hasDeclarationDraftOpen = openDraft?.action.type === ActionType.DECLARE
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
+
   return {
     config: {
       [ActionType.READ]: {
@@ -181,7 +190,7 @@ export function useAction(event: EventIndex) {
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf,
+        disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen),
         // Action menu should not show DECLARE if the user can perform VALIDATE
         shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
       },
@@ -265,7 +274,18 @@ export function useActionMenuItems(event: EventIndex) {
         ]
       : getAvailableActionsForEvent(event)
 
+  const drafts = useDrafts()
+
+  const openDraft = drafts
+    .getAllRemoteDrafts()
+    .find((draft) => draft.eventId === event.id)
+
   const actions = [...availableAssignmentActions, ...availableActions]
+    /*
+     * Ensure that if there is an open draft, that action is always included in the list
+     */
+    .concat(openDraft ? [openDraft.action.type] : [])
+    .filter((action, index, self) => self.indexOf(action) === index)
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
