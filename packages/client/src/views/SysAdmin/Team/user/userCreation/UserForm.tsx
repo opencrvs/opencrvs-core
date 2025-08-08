@@ -131,6 +131,8 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
     this.props.modifyUserFormData({ ...formData, ...values })
   }
 
+  officeId = String(this.props.formData.registrationOffice)
+
   render = () => {
     const { section, intl, activeGroup, userId, formData } = this.props
     const title = activeGroup?.title
@@ -150,7 +152,7 @@ class UserFormComponent extends React.Component<IFullProps, IState> {
             this.props.router.navigate({
               pathname: routes.TEAM_USER_LIST,
               search: stringify({
-                locationId: String(formData.registrationOffice)
+                locationId: this.officeId
               })
             })
           }
