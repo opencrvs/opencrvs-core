@@ -109,8 +109,6 @@ function FocusNameInputsOnHash({
   return null
 }
 
-const DEFAULT_FIELD_ORDER = ['firstname', 'middlename', 'surname']
-
 function NameInput(props: Props) {
   const { id, onChange, value = {}, configuration } = props
 
@@ -118,13 +116,21 @@ function NameInput(props: Props) {
 
   const nameConfig = configuration?.name || {
     firstname: { required: true },
-    middlename: { required: false },
     surname: { required: true }
   }
-  const validators = props.validation || []
-  const defaultOrder = order || DEFAULT_FIELD_ORDER
 
-  const fields: TextField[] = defaultOrder.map((field) => {
+  console.log('mid', nameConfig.middlename)
+
+  const defaultNameOrder = [
+    'firstname',
+    ...(nameConfig.middlename ? ['middlename'] : []),
+    'surname'
+  ]
+
+  const validators = props.validation || []
+  const nameOrder = order || defaultNameOrder
+
+  const fields: TextField[] = nameOrder.map((field) => {
     switch (field) {
       case 'firstname':
         return {
@@ -199,7 +205,12 @@ export const Name = {
     value?: NameFieldValue
     configuration?: NameField
   }) => {
-    const order = configuration?.configuration?.order || DEFAULT_FIELD_ORDER
+    const defaultNameOrder = [
+      'firstname',
+      ...(configuration?.configuration?.name?.middlename ? ['middlename'] : []),
+      'surname'
+    ]
+    const order = configuration?.configuration?.order || defaultNameOrder
 
     return (
       <>
