@@ -15,7 +15,6 @@ import {
   GQLDeathRegistrationInput
 } from '@gateway/graphql/schema'
 import { IAuthHeader } from '@opencrvs/commons'
-import fetch from '@gateway/fetch'
 
 type DeathDuplicateSearchBody = {
   deceasedFirstNames?: string
@@ -37,7 +36,7 @@ export const findDeathDuplicates = (
     body: JSON.stringify(criteria)
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<Array<{ id: string }>>
     })
     .catch((error) => {
       return Promise.reject(
@@ -69,7 +68,7 @@ export const findBirthDuplicates = (
     body: JSON.stringify(criteria)
   })
     .then((response) => {
-      return response.json()
+      return response.json() as Promise<Array<{ id: string }>>
     })
     .catch((error) => {
       return Promise.reject(

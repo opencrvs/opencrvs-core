@@ -17,7 +17,6 @@ import * as fetchAny from 'jest-fetch-mock'
 import { Context } from './context'
 import { Request } from '@hapi/hapi'
 import { ApolloServer } from '@apollo/server'
-import { Headers } from 'node-fetch'
 const fetch = fetchAny as fetchAny.FetchMock
 
 describe('Test apollo server config', () => {

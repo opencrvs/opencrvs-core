@@ -9,15 +9,15 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as React from 'react'
-import { RegisterForm } from '@opencrvs/client/src/views/RegisterForm/RegisterForm'
+import { RegisterForm } from '@client/views/RegisterForm/RegisterForm'
 import {
   DRAFT_BIRTH_PARENT_FORM_PAGE_GROUP,
   DRAFT_DEATH_FORM_PAGE_GROUP,
   DRAFT_MARRIAGE_FORM_PAGE_GROUP,
   HOME
-} from '@opencrvs/client/src/navigation/routes'
-import { getRegisterForm } from '@opencrvs/client/src/forms/register/declaration-selectors'
-import { IStoreState } from '@opencrvs/client/src/store'
+} from '@client/navigation/routes'
+import { getRegisterForm } from '@client/forms/register/declaration-selectors'
+import { IStoreState } from '@client/store'
 import { connect } from 'react-redux'
 import { IForm } from '@client/forms'
 import { EventType } from '@client/utils/gateway'

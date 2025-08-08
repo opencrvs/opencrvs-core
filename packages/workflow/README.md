@@ -1,6 +1,7 @@
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
-**Table of Contents**  
+
+**Table of Contents**
 
 - [OpenCRVS Workflow Service](#opencrvs-workflow-service)
   - [Dev guide](#dev-guide)
@@ -13,8 +14,8 @@ A microservice to manage business workflows such as handling pre / post hearth d
 
 ## Dev guide
 
-Start the service with `yarn start`
+Start the service with `pnpm start`
 
-Watch the tests with `yarn test:watch`
+Watch the tests with `pnpm test:watch`
 
 When in dev mode swagger API docs are available at `http://localhost:5050/documentation`

@@ -9,8 +9,9 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { join } from 'path'
-import * as fetch from 'jest-fetch-mock'
+import * as fetchMock from 'jest-fetch-mock'
 
-jest.setMock('node-fetch', { default: fetch })
+//@ts-ignore
+globalThis.fetch = fetchMock
 
 process.env.CERT_PUBLIC_KEY_PATH = join(__dirname, './cert.key.pub')

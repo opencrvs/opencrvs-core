@@ -10,7 +10,6 @@
  */
 import { env } from '@user-mgnt/environment'
 import { EventConfig, joinURL } from '@opencrvs/commons'
-import fetch from 'node-fetch'
 
 export async function getEventConfigurations(authorization: string) {
   const url = joinURL(env.COUNTRY_CONFIG_URL, '/events')

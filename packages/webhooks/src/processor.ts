@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 import { Worker } from 'bullmq'
 import * as IORedis from 'ioredis'
@@ -37,6 +36,7 @@ export function initWorker(name: string, connection: IORedis.Redis): Worker {
         throw err
       }
     },
+    // @ts-ignore
     { connection }
   )
 }

@@ -38,7 +38,7 @@ import styled from 'styled-components'
 import { getLocalizedLocationName } from '@client/utils/locationUtils'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import * as routes from '@client/navigation/routes'
-import { stringify } from 'querystring'
+import { stringify } from '@client/utils'
 
 const DEFAULT_PAGINATION_LIST_SIZE = 10
 

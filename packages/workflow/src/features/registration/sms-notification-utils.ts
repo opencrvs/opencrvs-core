@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { COUNTRY_CONFIG_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 import { logger } from '@opencrvs/commons'
 
 type EventNotificationFlags = {

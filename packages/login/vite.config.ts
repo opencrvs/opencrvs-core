@@ -35,13 +35,6 @@ export default defineConfig(({ mode }): any => {
   const vitePWAPlugin = () => {
     return VitePWA({
       strategies: 'generateSW',
-      injectManifest: {
-        globDirectory: 'build/',
-        globIgnores: ['**/config.js'],
-        globPatterns: ['**/*.{json,ico,ttf,html,js}'],
-        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024,
-        swDest: 'build/service-worker.js'
-      },
       registerType: 'autoUpdate',
       workbox: {
         cacheId: 'ocrvs-login',
@@ -52,7 +45,8 @@ export default defineConfig(({ mode }): any => {
           }
         ],
         navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/__.*$/]
+        navigateFallbackDenylist: [/^\/__.*$/],
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024
       },
       devOptions: {
         enabled: false

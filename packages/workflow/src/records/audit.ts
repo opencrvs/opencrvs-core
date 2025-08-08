@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { getEventType } from '@workflow/features/registration/utils'
 import { ValidRecord } from '@opencrvs/commons/types'
 import { METRICS_URL } from '@workflow/constants'

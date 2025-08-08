@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { env } from '@config/environment'
-import fetch from 'node-fetch'
 
 interface AuthHeader {
   Authorization: string
@@ -28,5 +27,5 @@ export const fetchUserManagement = async <T = any>(
       ...authHeader
     }
   })
-  return response.json()
+  return response.json() as T
 }

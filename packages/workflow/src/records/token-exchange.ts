@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { AUTH_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 
 export async function getRecordSpecificToken(
   token: string,

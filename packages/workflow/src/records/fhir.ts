@@ -57,7 +57,6 @@ import {
   URLReference
 } from '@opencrvs/commons/types'
 import { FHIR_URL } from '@workflow/constants'
-import fetch from 'node-fetch'
 import { getUUID, UUID } from '@opencrvs/commons'
 import { MAKE_CORRECTION_EXTENSION_URL } from '@workflow/features/task/fhir/constants'
 import {
@@ -1167,7 +1166,7 @@ export async function sendBundleToHearth(
     )
   }
 
-  const responseBundle: TransactionResponse = await res.json()
+  const responseBundle = (await res.json()) as TransactionResponse
 
   const ok = responseBundle.entry.every((e) =>
     e.response.status.startsWith('2')
@@ -1542,7 +1541,7 @@ export async function findTaskFromIdentifier(
     )
   }
 
-  return res.json()
+  return res.json() as Promise<Bundle<SavedTask>>
 }
 
 export async function getTaskHistory(taskId: string): Promise<Bundle<Task>> {
@@ -1561,7 +1560,7 @@ export async function getTaskHistory(taskId: string): Promise<Bundle<Task>> {
     )
   }
 
-  return res.json()
+  return res.json() as Promise<Bundle<Task>>
 }
 
 export async function getLocationsById(
@@ -1582,5 +1581,5 @@ export async function getLocationsById(
     )
   }
 
-  return res.json()
+  return res.json() as Promise<Bundle<Location>>
 }

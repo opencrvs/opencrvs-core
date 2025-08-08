@@ -13,7 +13,7 @@ import * as jwt from 'jsonwebtoken'
 import { readFileSync } from 'fs'
 import { createBirthRegistrationPayload } from '@test/mocks/createBirthRecord'
 import { server as mswServer } from '@test/setupServer'
-import { rest } from 'msw'
+import { http, HttpResponse } from 'msw'
 import {
   SavedBundle,
   SavedTask,
@@ -76,8 +76,8 @@ describe('Create record endpoint', () => {
 
     // Notification endpoint mockcall
     mswServer.use(
-      rest.get('http://localhost:3040/record-notification', (_, res, ctx) => {
-        return res(ctx.json({}))
+      http.get('http://localhost:3040/record-notification', () => {
+        return HttpResponse.json({})
       })
     )
 
@@ -88,26 +88,24 @@ describe('Create record endpoint', () => {
       // ?grant_type=urn:opencrvs:oauth:grant-type:token-exchange&subject_token=${token}&subject_token_type=urn:ietf:params:oauth:token-type:access_token
       // &requested_token_type=urn:opencrvs:oauth:token-type:single_record_token&record_id=${recordId}
 
-      rest.post(`http://localhost:4040/token`, (_, res, ctx) => {
-        return res(
-          ctx.json({
-            access_token: 'some-token'
-          })
-        )
+      http.post(`http://localhost:4040/token`, () => {
+        return HttpResponse.json({
+          access_token: 'some-token'
+        })
       })
     )
 
     // used for checking already created composition with
     // the same draftId
     mswServer.use(
-      rest.get('http://localhost:3447/fhir/Task', (_, res, ctx) => {
-        return res(ctx.json(existingTaskBundle))
+      http.get('http://localhost:3447/fhir/Task', () => {
+        return HttpResponse.json(existingTaskBundle)
       })
     )
 
     // response after sending bundle to hearth
     mswServer.use(
-      rest.post('http://localhost:3447/fhir', (_, res, ctx) => {
+      http.post('http://localhost:3447/fhir', () => {
         const responseBundle: TransactionResponse = {
           resourceType: 'Bundle',
           type: 'batch-response',
@@ -163,28 +161,28 @@ describe('Create record endpoint', () => {
             }
           ]
         }
-        return res(ctx.json(responseBundle))
+        return HttpResponse.json(responseBundle)
       })
     )
 
     mswServer.use(
-      rest.get('http://localhost:3447/fhir/Location', (_, res, ctx) => {
-        return res(ctx.json(existingLocationBundle))
+      http.get('http://localhost:3447/fhir/Location', () => {
+        return HttpResponse.json(existingLocationBundle)
       })
     )
 
-    // mock tracking-id generation from country confgi
+    // mock tracking-id generation from country config
     mswServer.use(
-      rest.post('http://localhost:3040/tracking-id', (_, res, ctx) => {
-        return res(ctx.text('BYW6MFW'))
+      http.post('http://localhost:3040/tracking-id', () => {
+        return HttpResponse.text('BYW6MFW')
       })
     )
 
     // mock country config event action hook returning a basic 200
     mswServer.use(
-      rest.post(
+      http.post(
         'http://localhost:3040/events/BIRTH/actions/sent-notification-for-review',
-        (_, res, ctx) => res(ctx.status(200))
+        () => HttpResponse.json(null, { status: 200 })
       )
     )
 

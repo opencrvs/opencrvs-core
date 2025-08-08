@@ -49,16 +49,16 @@ do
 done
 
 if $dependencies; then
-  concurrently "yarn run compose:deps"
+  concurrently "pnpm run compose:deps"
   exit 0
 elif $services; then
-  yarn dev:secrets:gen
-  yarn run start
+  pnpm dev:secrets:gen
+  pnpm run start
   exit 0
 fi
 
 echo
-echo -e "This command starts the OpenCRVS Core development environment, which consists of multiple NodeJS microservices running in parallel on many ports.  OpenCRVS requires a companion country configuration server to also be running. \n\nIf you ran our setup command, the country configuration server exists in the directory opencrvs-countryconfig alongside this directory, otherwise you may have cloned or forked it somewhere else.\n\nSo, before we start...\n\n1. Copy this command: \033[32myarn dev \033[0m\n\n2. Create another terminal window.\n\n3. cd into your country config directory and prepare to run the command in that terminal window \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m\n\nin order to start the country config server and be able to use OpenCRVS.\n\nOpenCRVS has started up fully when the terminal logs slow and stop. \n\nBrowse to this URL in Chrome to check the status:\033[32m\n\nhttps://is-my-opencrvs-up.netlify.app\033[0m \n\nIf your OpenCRVS database is not seeded, open another terminal window and cd into opencrvs-core.  Run this command in the opencrvs-core directory \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m in order to seed the database with data: \033[32m\n\nyarn seed:dev\033[0m\n\n"
+echo -e "This command starts the OpenCRVS Core development environment, which consists of multiple NodeJS microservices running in parallel on many ports.  OpenCRVS requires a companion country configuration server to also be running. \n\nIf you ran our setup command, the country configuration server exists in the directory opencrvs-countryconfig alongside this directory, otherwise you may have cloned or forked it somewhere else.\n\nSo, before we start...\n\n1. Copy this command: \033[32mpnpm dev \033[0m\n\n2. Create another terminal window.\n\n3. cd into your country config directory and prepare to run the command in that terminal window \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m\n\nin order to start the country config server and be able to use OpenCRVS.\n\nOpenCRVS has started up fully when the terminal logs slow and stop. \n\nBrowse to this URL in Chrome to check the status:\033[32m\n\nhttps://is-my-opencrvs-up.netlify.app\033[0m \n\nIf your OpenCRVS database is not seeded, open another terminal window and cd into opencrvs-core.  Run this command in the opencrvs-core directory \033[32mWHEN OPENCRVS CORE HAS FULLY STARTED UP\033[0m in order to seed the database with data: \033[32m\n\npnpm seed:dev\033[0m\n\n"
 echo
 
 sleep 3
@@ -115,5 +115,5 @@ echo -e "\033[32m:::::::::: PLEASE WAIT for @opencrvs/client ::::::::::\033[0m"
 echo
 sleep 10
 
-yarn dev:secrets:gen
-concurrently "yarn run start" "yarn run compose:deps"
+pnpm dev:secrets:gen
+concurrently "pnpm run start" "pnpm run compose:deps"
