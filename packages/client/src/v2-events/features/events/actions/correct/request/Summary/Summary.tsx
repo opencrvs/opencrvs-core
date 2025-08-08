@@ -194,7 +194,7 @@ export function Summary() {
       transactionId: generateTransactionId(),
       annotation: annotationForm
     })
-    eventFormNavigation.goToHome()
+    eventFormNavigation.closeActionView()
   }, [
     form,
     fields,
@@ -226,7 +226,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.goToHome()}
+        goHome={() => eventFormNavigation.closeActionView()}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
