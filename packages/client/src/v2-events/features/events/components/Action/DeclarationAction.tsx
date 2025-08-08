@@ -229,16 +229,6 @@ function DeclarationActionComponent({ children, actionType }: Props) {
 
     setAnnotation(initialAnnotation)
 
-    return () => {
-      /*
-       * When user leaves the action, remove all
-       * staged drafts the user has for this event id and type
-       */
-      setLocalDraft(null)
-      clearForm()
-      clearAnnotation()
-    }
-
     /*
      * This is fine to only run once on mount and unmount as
      * At the point of this code being run, there absolutely must be an event that has already been
