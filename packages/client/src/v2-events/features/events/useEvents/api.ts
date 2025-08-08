@@ -222,6 +222,7 @@ async function deleteEventData(updatedEvent: EventDocument) {
   queryClient.removeQueries({
     queryKey: trpcOptionsProxy.event.get.queryKey(id)
   })
+
   await removeCachedFiles(updatedEvent)
 }
 

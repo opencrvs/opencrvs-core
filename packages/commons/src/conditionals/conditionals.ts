@@ -381,10 +381,11 @@ export function createFieldConditionals(fieldId: string) {
         properties: {
           [fieldId]: {
             type: 'string',
+            minLength: 1,
             pattern:
-              "^[\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*( [\\p{Script=Latin}0-9'._-]*(\\([\\p{Script=Latin}0-9'._-]+\\))?[\\p{Script=Latin}0-9'._-]*)*$",
+              "^[\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*( [\\p{Script=Latin}0-9'.-]*(\\([\\p{Script=Latin}0-9'.-]+\\))?[\\p{Script=Latin}0-9'.-]*)*$",
             description:
-              "Name must contain only letters, numbers, and allowed special characters ('._-). No double spaces."
+              "Name must contain only letters, numbers, and allowed special characters ('.-). No double spaces."
           }
         }
       }),

@@ -14,7 +14,7 @@ import {
   EventConfig,
   FieldType,
   getAllUniqueFields,
-  Inferred,
+  FieldConfig,
   QueryExpression,
   QueryType,
   DateCondition,
@@ -69,10 +69,13 @@ function generateQuery(
   event: QueryInputType,
   eventConfigs: EventConfig[]
 ): estypes.QueryDslQueryContainer {
-  const allEventFields = eventConfigs.reduce<Inferred[]>((acc, eventConfig) => {
-    const fields = getAllUniqueFields(eventConfig)
-    return acc.concat(fields)
-  }, [])
+  const allEventFields = eventConfigs.reduce<FieldConfig[]>(
+    (acc, eventConfig) => {
+      const fields = getAllUniqueFields(eventConfig)
+      return acc.concat(fields)
+    },
+    []
+  )
 
   const nameFieldIds = allEventFields
     .filter((field) => field.type === FieldType.NAME)
