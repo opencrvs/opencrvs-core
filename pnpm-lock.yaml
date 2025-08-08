@@ -18,9 +18,6 @@ importers:
 
   .:
     dependencies:
-      '@types/react-signature-canvas':
-        specifier: ^1.0.2
-        version: 1.0.7
       license-check-and-add:
         specifier: ^3.0.3
         version: 3.0.5
@@ -30,9 +27,6 @@ importers:
       postinstall-postinstall:
         specifier: ^2.0.0
         version: 2.1.0
-      react-signature-canvas:
-        specifier: ^1.0.6
-        version: 1.0.7(prop-types@15.8.1)(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
     devDependencies:
       '@eslint/eslintrc':
         specifier: ^3.3.1
@@ -23903,7 +23897,7 @@ snapshots:
       '@types/istanbul-lib-coverage': 2.0.6
       collect-v8-coverage: 1.0.2
 
-  '@jest/test-sequencer@26.6.3(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3))':
+  '@jest/test-sequencer@26.6.3':
     dependencies:
       '@jest/test-result': 26.6.2
       graceful-fs: 4.2.11
@@ -23911,11 +23905,7 @@ snapshots:
       jest-runner: 26.6.3(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3))
       jest-runtime: 26.6.3(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3))
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   '@jest/test-sequencer@29.7.0':
     dependencies:
@@ -34222,7 +34212,7 @@ snapshots:
       jest-util: 29.7.0
       p-limit: 3.1.0
 
-  jest-circus@26.6.0(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3)):
+  jest-circus@26.6.0:
     dependencies:
       '@babel/traverse': 7.27.4(supports-color@8.1.1)
       '@jest/environment': 26.6.2
@@ -34246,11 +34236,7 @@ snapshots:
       stack-utils: 2.0.6
       throat: 5.0.0
     transitivePeerDependencies:
-      - bufferutil
-      - canvas
       - supports-color
-      - ts-node
-      - utf-8-validate
 
   jest-circus@29.7.0(babel-plugin-macros@3.1.0):
     dependencies:
@@ -34324,7 +34310,7 @@ snapshots:
   jest-config@26.6.3(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3)):
     dependencies:
       '@babel/core': 7.27.4
-      '@jest/test-sequencer': 26.6.3(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3))
+      '@jest/test-sequencer': 26.6.3
       '@jest/types': 26.6.2
       babel-jest: 26.6.3(@babel/core@7.27.4)
       chalk: 4.1.2
@@ -38529,7 +38515,7 @@ snapshots:
       html-webpack-plugin: 4.5.0(webpack@4.44.2)
       identity-obj-proxy: 3.0.0
       jest: 26.6.0(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3))
-      jest-circus: 26.6.0(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3))
+      jest-circus: 26.6.0
       jest-resolve: 26.6.0
       jest-watch-typeahead: 0.6.1(jest@26.6.0(ts-node@10.9.2(@swc/core@1.11.31(@swc/helpers@0.5.17))(@types/node@22.15.29)(typescript@5.6.3)))
       mini-css-extract-plugin: 0.11.3(webpack@4.44.2)
