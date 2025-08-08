@@ -119,8 +119,6 @@ function NameInput(props: Props) {
     surname: { required: true }
   }
 
-  console.log('mid', nameConfig.middlename)
-
   const defaultNameOrder = [
     'firstname',
     ...(nameConfig.middlename ? ['middlename'] : []),
