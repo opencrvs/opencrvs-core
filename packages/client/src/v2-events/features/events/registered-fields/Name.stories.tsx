@@ -99,3 +99,60 @@ export const FirstNameLastNameRequiredMiddleNameOptional: StoryObj<
     )
   }
 }
+
+export const NameWithAllOptions: StoryObj<typeof FormFieldGenerator> = {
+  name: 'With custom label and field ordering',
+  parameters: {
+    layout: 'centered'
+  },
+  render: function Component(args) {
+    return (
+      <StyledFormFieldGenerator
+        fields={[
+          {
+            id: 'storybook.name',
+            type: FieldType.NAME,
+            label: {
+              id: 'storybook.name.label',
+              defaultMessage: 'Name',
+              description: 'The title for the name input'
+            },
+            configuration: {
+              order: ['surname', 'firstname', 'middlename'],
+              name: {
+                firstname: {
+                  required: false,
+                  label: {
+                    id: 'storybook.name.custom.firstname.label',
+                    defaultMessage: 'My firstname label',
+                    description: 'The title for the name input'
+                  }
+                },
+                middlename: {
+                  required: false,
+                  label: {
+                    id: 'storybook.name.custom.middlename.label',
+                    defaultMessage: 'My middlename label',
+                    description: 'The title for the name input'
+                  }
+                },
+                surname: {
+                  required: false,
+                  label: {
+                    id: 'storybook.name.custom.surname.label',
+                    defaultMessage: 'My surname label',
+                    description: 'The title for the name input'
+                  }
+                }
+              }
+            }
+          }
+        ]}
+        id="my-form"
+        onChange={(data) => {
+          args.onChange(data)
+        }}
+      />
+    )
+  }
+}

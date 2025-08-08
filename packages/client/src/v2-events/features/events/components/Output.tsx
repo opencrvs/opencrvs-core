@@ -70,7 +70,13 @@ const Deleted = styled.del`
  *
  *  @returns sensible default value for the field type given the field configuration.
  */
-export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
+export function ValueOutput(
+  field: {
+    config: FieldConfig
+    value: FieldValue
+  },
+  searchMode?: boolean
+) {
   if (
     isEmailFieldType(field) ||
     isIdFieldType(field) ||
@@ -133,7 +139,19 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
   if (isAddressFieldType(field)) {
     return Address.Output({
       value: field.value,
-      searchMode: field.config.configuration?.searchMode
+      fields: searchMode
+        ? [
+            'country',
+            'province',
+            'district',
+            'state',
+            'district2',
+            'urbanOrRural',
+            'town',
+            'village'
+          ]
+        : undefined,
+      lineSeparator: searchMode ? ', ' : undefined
     })
   }
 

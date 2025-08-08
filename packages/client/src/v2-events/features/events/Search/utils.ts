@@ -376,10 +376,7 @@ function applySearchFieldOverridesToFieldConfig(
   if (field.type === FieldType.ADDRESS) {
     return {
       ...field,
-      ...commonConfig,
-      configuration: {
-        searchMode: true
-      }
+      ...commonConfig
     }
   }
   if (field.type === FieldType.NAME) {
@@ -388,7 +385,20 @@ function applySearchFieldOverridesToFieldConfig(
       ...commonConfig,
       configuration: {
         ...field.configuration,
-        searchMode: true
+        name: {
+          firstname: {
+            ...field.configuration?.name?.firstname,
+            required: false
+          },
+          surname: {
+            ...field.configuration?.name?.surname,
+            required: false
+          },
+          middlename: {
+            ...field.configuration?.name?.middlename,
+            required: false
+          }
+        }
       }
     }
   }

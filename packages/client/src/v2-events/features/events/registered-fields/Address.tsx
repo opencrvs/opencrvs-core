@@ -44,6 +44,7 @@ type FieldConfigWithoutAddress = Exclude<
 type Props = FieldProps<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
+  fields?: Array<AddressFieldIdentifier>
 }
 
 function addDefaultValue<T extends FieldConfigWithoutAddress>(
@@ -446,25 +447,14 @@ const ALL_ADDRESS_INPUT_FIELDS = [
   ...GENERIC_ADDRESS_FIELDS
 ] satisfies Array<FieldConfigWithoutAddress>
 
-const SEARCH_MODE_FIELDS: Array<
-  (typeof ALL_ADDRESS_INPUT_FIELDS)[number]['id']
-> = [
-  'country',
-  'province',
-  'district',
-  'state',
-  'district2',
-  'urbanOrRural',
-  'town',
-  'village'
-]
+type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
 
-function getFilteredFields(searchMode: boolean) {
-  if (!searchMode) {
+function getFilteredFields(fieldsToShow?: Array<string>) {
+  if (!fieldsToShow) {
     return ALL_ADDRESS_INPUT_FIELDS
   }
   return ALL_ADDRESS_INPUT_FIELDS.filter((field) =>
-    SEARCH_MODE_FIELDS.includes(field.id)
+    fieldsToShow.includes(field.id)
   )
 }
 
@@ -478,14 +468,8 @@ function getFilteredFields(searchMode: boolean) {
  * - In search mode, only displays admin structure and town/village fields.
  */
 function AddressInput(props: Props) {
-  const {
-    onChange,
-    defaultValue,
-    configuration: { searchMode = false } = {},
-    value = {},
-    ...otherProps
-  } = props
-  const fields = getFilteredFields(searchMode)
+  const { onChange, defaultValue, value = {}, ...otherProps } = props
+  const fields = getFilteredFields(props.fields)
   const fieldsWithDefaults = defaultValue
     ? fields.map(addDefaultValue(defaultValue))
     : fields
@@ -503,16 +487,18 @@ function AddressInput(props: Props) {
 
 function AddressOutput({
   value,
-  searchMode = false
+  lineSeparator,
+  fields
 }: {
   value?: AddressFieldValue
-  searchMode?: boolean
+  lineSeparator?: React.ReactNode
+  fields?: Array<AddressFieldIdentifier>
 }) {
   if (!value) {
     return ''
   }
 
-  const fields = getFilteredFields(searchMode)
+  const fieldsToShow = getFilteredFields(fields)
     .map((field) => ({
       field,
       value: value[field.id as keyof typeof value]
@@ -523,33 +509,16 @@ function AddressOutput({
         isFieldDisplayedOnReview(field.field satisfies FieldConfig, value)
     )
 
-  if (searchMode) {
-    return (
-      <>
-        {fields.map((field, index) => (
-          <React.Fragment key={field.field.id}>
-            <Output
-              field={field.field}
-              showPreviouslyMissingValuesAsChanged={false}
-              value={field.value}
-            />
-            {index < fields.length - 1 && ', '}
-          </React.Fragment>
-        ))}
-      </>
-    )
-  }
-
   return (
     <>
-      {fields.map((field) => (
+      {fieldsToShow.map((field, index) => (
         <React.Fragment key={field.field.id}>
           <Output
             field={field.field}
             showPreviouslyMissingValuesAsChanged={false}
             value={field.value}
           />
-          <br />
+          {index < fieldsToShow.length - 1 && (lineSeparator || <br />)}
         </React.Fragment>
       ))}
     </>
