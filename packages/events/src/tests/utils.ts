@@ -14,6 +14,7 @@ import * as jwt from 'jsonwebtoken'
 import {
   ActionType,
   createPrng,
+  EventDocument,
   generateRandomSignature,
   getUUID,
   Scope,
@@ -202,12 +203,23 @@ export const setupTestCase = async (rngSeed?: number) => {
 function actionToClientAction(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
+  action: Extract<ActionType, 'CREATE'>
+): () => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
+  action: Exclude<ActionType, 'CREATE'>
+): (eventId: string) => Promise<EventDocument>
+function actionToClientAction(
+  client: ReturnType<typeof createTestClient>,
+  generator: ReturnType<typeof payloadGenerator>,
   action: ActionType
-) {
+):
+  | (() => Promise<EventDocument>)
+  | ((eventId: string) => Promise<EventDocument>) {
   switch (action) {
     case ActionType.CREATE:
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      return async (_: string) => client.event.create(generator.event.create())
+      return async () => client.event.create(generator.event.create())
     case ActionType.DECLARE:
       return async (eventId: string) =>
         client.event.actions.declare.request(
@@ -269,14 +281,17 @@ function actionToClientAction(
 
 /**
  * Create event based on actions to be used in tests.
- * Created through API to make sure it get indexed properly. (To seed directly to database we need: https://github.com/opencrvs/opencrvs-core/issues/8884)
+ * Created through API to make sure it get indexed properly.
+
+ * To seed directly to database we need:
+ * https://github.com/opencrvs/opencrvs-core/issues/8884
  */
 export async function createEvent(
   client: ReturnType<typeof createTestClient>,
   generator: ReturnType<typeof payloadGenerator>,
-  actions?: Exclude<ActionType, typeof ActionType.CREATE>[]
+  actions: Exclude<ActionType, typeof ActionType.CREATE>[]
 ): Promise<ReturnType<typeof client.event.create>> {
-  let createdEvent: Awaited<ReturnType<typeof client.event.create>> | undefined
+  let createdEvent: EventDocument | undefined
 
   // Always first create the event
   const createAction = actionToClientAction(
@@ -285,9 +300,9 @@ export async function createEvent(
     ActionType.CREATE
   )
 
-  createdEvent = await createAction('')
+  createdEvent = await createAction()
 
-  for (const action of actions ?? []) {
+  for (const action of actions) {
     const clientAction = actionToClientAction(client, generator, action)
     createdEvent = await clientAction(createdEvent.id)
   }
