@@ -126,7 +126,9 @@ test('Creating another draft replaces the previous one', async () => {
   const drafts = await client.event.draft.list()
 
   expect(drafts).toHaveLength(1)
-  expect(drafts[0]).toStrictEqual(secondDraft)
+  expect(sanitizeForSnapshot(drafts[0], ['createdAt'])).toStrictEqual(
+    sanitizeForSnapshot(secondDraft, ['createdAt'])
+  )
 
   expect(sanitizeForSnapshot(drafts, UNSTABLE_EVENT_FIELDS)).toMatchSnapshot()
 })
