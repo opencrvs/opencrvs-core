@@ -77,7 +77,7 @@ interface DraftStore {
   getLocalDraftOrDefault: (draft: Draft) => Draft
 }
 
-const localDraftStore = create<DraftStore>()(
+export const localDraftStore = create<DraftStore>()(
   persist(
     (set, get) => ({
       draft: null,
