@@ -26,7 +26,8 @@ import {
   alwaysTrue,
   AddressType,
   never,
-  isFieldDisplayedOnReview
+  isFieldDisplayedOnReview,
+  AddressField
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -44,7 +45,7 @@ type FieldConfigWithoutAddress = Exclude<
 type Props = FieldProps<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
-  fields?: Array<AddressFieldIdentifier>
+  configuration?: AddressField['configuration']
 }
 
 function addDefaultValue<T extends FieldConfigWithoutAddress>(
@@ -469,7 +470,7 @@ function getFilteredFields(fieldsToShow?: Array<string>) {
  */
 function AddressInput(props: Props) {
   const { onChange, defaultValue, value = {}, ...otherProps } = props
-  const fields = getFilteredFields(props.fields)
+  const fields = getFilteredFields(props.configuration?.fields)
   const fieldsWithDefaults = defaultValue
     ? fields.map(addDefaultValue(defaultValue))
     : fields

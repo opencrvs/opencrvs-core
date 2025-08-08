@@ -466,6 +466,35 @@ export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
+  configuration: z
+    .object({
+      lineSeparator: z.string().optional(),
+      fields: z
+        .array(
+          z.enum([
+            'number',
+            'country',
+            'province',
+            'addressType',
+            'district',
+            'urbanOrRural',
+            'town',
+            'residentialArea',
+            'street',
+            'zipCode',
+            'village',
+            'state',
+            'district2',
+            'cityOrTown',
+            'addressLine1',
+            'addressLine2',
+            'addressLine3',
+            'postcodeOrZip'
+          ])
+        )
+        .optional()
+    })
+    .optional(),
   defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 

@@ -376,7 +376,20 @@ function applySearchFieldOverridesToFieldConfig(
   if (field.type === FieldType.ADDRESS) {
     return {
       ...field,
-      ...commonConfig
+      ...commonConfig,
+      configuration: {
+        ...field.configuration,
+        fields: [
+          'country',
+          'province',
+          'district',
+          'state',
+          'district2',
+          'urbanOrRural',
+          'town',
+          'village'
+        ]
+      }
     }
   }
   if (field.type === FieldType.NAME) {

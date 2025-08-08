@@ -404,6 +404,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
             {...field.config}
+            configuration={field.config.configuration}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
