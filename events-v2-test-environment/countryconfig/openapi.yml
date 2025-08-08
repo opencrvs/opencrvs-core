@@ -240,6 +240,7 @@ components:
                                 - fuzzy
                                 - exact
                                 - range
+                                - within
                               description: Determines the type of field
                           required:
                             - type
@@ -387,15 +388,15 @@ components:
                             Sometimes there might be need to search a value
                             against multiple field of same FormField type. For
                             example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we 
+                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
                                   add a one field as fieldId, and accomodate others in alternateFieldIds
                         excludeInSearchQuery:
                           type: boolean
                           default: false
                           description: >-
                             Sometimes there will be search fields which are used
-                            to 
-                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth 
+                            to
+                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth
                                 is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
                                 related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
                                 In such case, populate this field (excludeInSearchQuery) with boolean true
@@ -546,11 +547,11 @@ components:
                         fieldId:
                           type: string
                           enum:
-                            - trackingId
-                            - status
-                            - legalStatuses.REGISTERED.acceptedAt
-                            - legalStatuses.REGISTERED.createdAtLocation
-                            - updatedAt
+                            - event.trackingId
+                            - event.status
+                            - event.legalStatuses.REGISTERED.acceptedAt
+                            - event.legalStatuses.REGISTERED.createdAtLocation
+                            - event.updatedAt
                         fieldType:
                           type: string
                           const: event
@@ -1833,15 +1834,44 @@ components:
                 firstname:
                   type: string
                   minLength: 1
+                middlename:
+                  type: string
+                  minLength: 1
                 surname:
                   type: string
                   minLength: 1
-              required:
-                - firstname
-                - surname
             configuration:
               type: object
               properties:
+                name:
+                  type: object
+                  properties:
+                    firstname:
+                      type: object
+                      properties:
+                        required:
+                          type: boolean
+                      required:
+                        - required
+                    middlename:
+                      type: object
+                      properties:
+                        required:
+                          type: boolean
+                      required:
+                        - required
+                    surname:
+                      type: object
+                      properties:
+                        required:
+                          type: boolean
+                      required:
+                        - required
+                  default:
+                    firstname:
+                      required: true
+                    surname:
+                      required: true
                 maxLength:
                   type: number
                   description: Maximum length of the text
@@ -1849,12 +1879,14 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
-                includeMiddlename:
-                  type: boolean
-                  default: false
-                  description: To make middle name visible in Name form field
                 searchMode:
                   type: boolean
+              default:
+                name:
+                  firstname:
+                    required: true
+                  surname:
+                    required: true
           required:
             - id
             - label
@@ -4053,17 +4085,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -4238,17 +4269,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -4476,17 +4506,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -4661,17 +4690,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -4895,17 +4923,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -5080,17 +5107,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -5327,17 +5353,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -5512,17 +5537,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -5746,17 +5770,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -5931,17 +5954,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -6178,17 +6200,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -6363,17 +6384,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -6597,17 +6617,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -6782,17 +6801,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -7018,17 +7036,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -7203,17 +7220,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -7437,17 +7453,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -7622,17 +7637,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -7859,17 +7873,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -8044,17 +8057,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -8278,17 +8290,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -8463,17 +8474,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -8700,17 +8710,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -8885,17 +8894,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -8912,6 +8920,18 @@ components:
           const: REJECT_CORRECTION
         requestId:
           type: string
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -8923,6 +8943,7 @@ components:
         - status
         - type
         - requestId
+        - reason
     UnassignedAction:
       type: object
       properties:
@@ -9122,17 +9143,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -9307,17 +9327,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -9541,17 +9560,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -9726,17 +9744,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -9751,6 +9768,13 @@ components:
         type:
           type: string
           const: PRINT_CERTIFICATE
+        content:
+          type:
+            - object
+            - "null"
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
@@ -9960,17 +9984,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         annotation:
           type:
@@ -10145,17 +10168,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         status:
           type: string
@@ -10376,17 +10398,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default:
             &a13 {}
@@ -10561,17 +10582,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -10769,17 +10789,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -10953,17 +10972,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -11161,17 +11179,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -11345,17 +11362,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -11551,17 +11567,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -11735,17 +11750,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -11761,7 +11775,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 2d40583a-ef93-47c6-84f8-5d8347b4b9a4
+        transactionId: 0939282c-c4e3-4521-b9e4-579ae39e8d89
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -11944,17 +11958,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -12128,17 +12141,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -12331,17 +12343,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -12515,17 +12526,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -12731,17 +12741,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -12915,17 +12924,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -13118,17 +13126,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -13302,17 +13309,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -13518,17 +13524,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -13702,17 +13707,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -13908,17 +13912,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -14092,17 +14095,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -14298,17 +14300,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -14482,17 +14483,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -14503,6 +14503,11 @@ components:
           type: string
           const: PRINT_CERTIFICATE
           default: PRINT_CERTIFICATE
+        content:
+          type: object
+          properties:
+            templateId:
+              type: string
       required:
         - eventId
         - transactionId
@@ -14685,17 +14690,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -14869,17 +14873,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -15072,17 +15075,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -15256,17 +15258,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -15279,10 +15280,23 @@ components:
           type: string
           const: REJECT_CORRECTION
           default: REJECT_CORRECTION
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - eventId
         - transactionId
         - requestId
+        - reason
     ApproveCorrectionActionInput:
       type: object
       properties:
@@ -15462,17 +15476,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -15646,17 +15659,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
@@ -15852,17 +15864,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
           default: *a13
         annotation:
@@ -16036,17 +16047,16 @@ components:
                       - type: object
                         properties:
                           firstname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           surname:
-                            type:
-                              - string
-                              - "null"
+                            type: string
                           middlename:
                             type:
                               - string
                               - "null"
+                        required:
+                          - firstname
+                          - surname
                       - type: "null"
         originalActionId:
           type: string
