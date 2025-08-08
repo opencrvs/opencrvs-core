@@ -109,6 +109,8 @@ function FocusNameInputsOnHash({
   return null
 }
 
+const DEFAULT_FIELD_ORDER = ['firstname', 'middlename', 'surname']
+
 function NameInput(props: Props) {
   const { id, onChange, value = {}, configuration } = props
 
@@ -120,7 +122,7 @@ function NameInput(props: Props) {
     surname: { required: true }
   }
   const validators = props.validation || []
-  const defaultOrder = order || ['firstname', 'middlename', 'surname']
+  const defaultOrder = order || DEFAULT_FIELD_ORDER
 
   const fields: TextField[] = defaultOrder.map((field) => {
     switch (field) {
@@ -190,8 +192,22 @@ function stringify(value?: NameFieldValue) {
 
 export const Name = {
   Input: NameInput,
-  Output: ({ value }: { value?: NameFieldValue }) => (
-    <>{joinValues([value?.firstname, value?.middlename, value?.surname])}</>
-  ),
+  Output: ({
+    value,
+    configuration
+  }: {
+    value?: NameFieldValue
+    configuration?: NameField
+  }) => {
+    const order = configuration?.configuration?.order || DEFAULT_FIELD_ORDER
+
+    return (
+      <>
+        {joinValues(
+          order.map((field) => value?.[field as keyof NameFieldValue])
+        )}
+      </>
+    )
+  },
   stringify
 }

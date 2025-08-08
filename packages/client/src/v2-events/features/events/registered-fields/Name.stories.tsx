@@ -13,9 +13,10 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
-import { FieldType } from '@opencrvs/commons/client'
+import { FieldType, NameField, NameFieldValue } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { TRPCProvider } from '@client/v2-events/trpc'
+import { Output, ValueOutput } from '../components/Output'
 
 const meta: Meta<typeof FormFieldGenerator> = {
   title: 'Inputs/Name',
@@ -106,53 +107,66 @@ export const NameWithAllOptions: StoryObj<typeof FormFieldGenerator> = {
     layout: 'centered'
   },
   render: function Component(args) {
-    return (
-      <StyledFormFieldGenerator
-        fields={[
-          {
-            id: 'storybook.name',
-            type: FieldType.NAME,
+    const [formState, setFormState] = React.useState<
+      NameFieldValue | undefined
+    >(undefined)
+
+    const field: NameField = {
+      id: 'storybook.name',
+      type: FieldType.NAME,
+      label: {
+        id: 'storybook.name.label',
+        defaultMessage: 'Name',
+        description: 'The title for the name input'
+      },
+      configuration: {
+        order: ['surname', 'firstname', 'middlename'],
+        name: {
+          firstname: {
+            required: false,
             label: {
-              id: 'storybook.name.label',
-              defaultMessage: 'Name',
+              id: 'storybook.name.custom.firstname.label',
+              defaultMessage: 'My firstname label',
               description: 'The title for the name input'
-            },
-            configuration: {
-              order: ['surname', 'firstname', 'middlename'],
-              name: {
-                firstname: {
-                  required: false,
-                  label: {
-                    id: 'storybook.name.custom.firstname.label',
-                    defaultMessage: 'My firstname label',
-                    description: 'The title for the name input'
-                  }
-                },
-                middlename: {
-                  required: false,
-                  label: {
-                    id: 'storybook.name.custom.middlename.label',
-                    defaultMessage: 'My middlename label',
-                    description: 'The title for the name input'
-                  }
-                },
-                surname: {
-                  required: false,
-                  label: {
-                    id: 'storybook.name.custom.surname.label',
-                    defaultMessage: 'My surname label',
-                    description: 'The title for the name input'
-                  }
-                }
-              }
+            }
+          },
+          middlename: {
+            required: false,
+            label: {
+              id: 'storybook.name.custom.middlename.label',
+              defaultMessage: 'My middlename label',
+              description: 'The title for the name input'
+            }
+          },
+          surname: {
+            required: false,
+            label: {
+              id: 'storybook.name.custom.surname.label',
+              defaultMessage: 'My surname label',
+              description: 'The title for the name input'
             }
           }
-        ]}
-        id="my-form"
-        onChange={(data) => {
-          args.onChange(data)
-        }}
-      />
+        }
+      }
+    }
+
+    return (
+      <div>
+        <strong>{'Current Value:'}</strong>
+        <ValueOutput config={field} value={formState} />
+        <br />
+        <br />
+        <strong>{'Form:'}</strong>
+
+        <StyledFormFieldGenerator
+          fields={[field]}
+          id="storybook.name"
+          onChange={(data) => {
+            setFormState(data['storybook.name'] as NameFieldValue)
+            args.onChange(data)
+          }}
+        />
+      </div>
     )
   }
 }

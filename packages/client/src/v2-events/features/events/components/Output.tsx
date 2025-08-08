@@ -163,7 +163,7 @@ export function ValueOutput(
   }
 
   if (isNameFieldType(field)) {
-    return Name.Output({ value: field.value })
+    return Name.Output({ value: field.value, configuration: field.config })
   }
 
   if (isAdministrativeAreaFieldType(field)) {
