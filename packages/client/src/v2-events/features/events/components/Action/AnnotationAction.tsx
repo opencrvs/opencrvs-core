@@ -107,7 +107,7 @@ function AnnotationActionComponent({ children, actionType }: Props) {
     ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
     : localDraftWithAdjustedTimestamp
 
-  const actionAnnotation = deepDropNulls(mergedDraft.action.annotation) || {}
+  const actionAnnotation = deepDropNulls(mergedDraft.action.annotation)
 
   useEffect(() => {
     // Use the annotation values from the zustand state, so that filled form state is not lost

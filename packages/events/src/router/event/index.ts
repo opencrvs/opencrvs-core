@@ -57,6 +57,7 @@ import {
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { UserContext } from '../../context'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -172,11 +173,13 @@ export const eventRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { eventId, type } = input
 
+        // Consecutive middlewares lose some of the typing.
+        const user = UserContext.parse(ctx.user)
         await throwConflictIfActionNotAllowed(eventId, type, ctx.token)
 
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
-          ctx.user.id,
+          user.id,
           input.type
         )
 
@@ -186,8 +189,7 @@ export const eventRouter = router({
 
         const currentDraft = await createDraft(input, {
           eventId,
-          // @ts-expect-error - @todo: should system be able to create drafts?
-          user: ctx.user,
+          user,
           transactionId: input.transactionId
         })
 
