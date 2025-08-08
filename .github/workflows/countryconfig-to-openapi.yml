@@ -39,7 +39,7 @@ jobs:
           max_attempts: 3
           command: pnpm install
       - name: Generate OpenAPI
-        run: bash build.sh
+        run: pnpm build
         working-directory: packages/api-docs
 
       - name: Deploy to GitHub Pages
