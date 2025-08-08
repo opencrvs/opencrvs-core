@@ -34,17 +34,17 @@ const messages = defineMessages({
 })
 
 export default function RetryButton({ event }: { event: EventIndex }) {
+  const intl = useIntl()
   const outbox = useOutbox()
   const queryClient = useQueryClient()
 
   const hasActionFailed = outbox.some(
     (failedEvent) => failedEvent.id === event.id
   )
-  const intl = useIntl()
 
   const mutations = queryClient.getMutationCache().findAll({
     status: 'pending',
-    predicate: (mutation: Mutation<unknown, Error, unknown, unknown>) =>
+    predicate: (mutation) =>
       typeof mutation.state.variables === 'object' &&
       mutation.state.variables !== null &&
       'eventId' in mutation.state.variables &&

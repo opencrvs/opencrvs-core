@@ -32,7 +32,7 @@ const availableToasts: Record<ToastKey, MessageDescriptor> = {
   [ToastKey.SOMETHING_WENT_WRONG]: {
     id: 'v2.errors.somethingWentWrong',
     defaultMessage: 'Something went wrong. Please try again.',
-    description: 'User not assigned error toast message'
+    description: 'Error toast message for general errors'
   }
 }
 

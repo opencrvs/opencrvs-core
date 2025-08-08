@@ -308,9 +308,11 @@ export const SearchResultComponent = ({
             <ActionComponent actionType={actionType} event={event} />
           )
         }))
-        .concat({
-          actionComponent: <RetryButton event={event} />
-        })
+        .concat(
+          slug === CoreWorkqueues.OUTBOX
+            ? { actionComponent: <RetryButton event={event} /> }
+            : []
+        )
         .concat({
           actionComponent: (
             <DownloadButton
