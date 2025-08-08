@@ -180,14 +180,13 @@ export function useEventFormNavigation() {
 
     if (deleteConfirm) {
       deleteEvent.mutate({ eventId })
-      goToHome()
+      closeActionView()
     }
   }
 
   return {
     exit,
     modal,
-    goToHome,
     createNewDeclaration,
     deleteDeclaration,
     closeActionView
