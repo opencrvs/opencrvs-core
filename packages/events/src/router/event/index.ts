@@ -177,7 +177,7 @@ export const eventRouter = router({
         const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
           ctx.user.id,
-          input.type as any
+          input.type
         )
 
         if (previousDraft?.transactionId === input.transactionId) {

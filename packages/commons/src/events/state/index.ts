@@ -267,7 +267,6 @@ export function dangerouslyGetCurrentEventStateWithDrafts({
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  console.log('draft', draft)
   const draftAction =
     draft.action.type === ActionType.REQUEST_CORRECTION
       ? /*
@@ -315,8 +314,8 @@ export function applyDeclarationToEventIndex(
 /**
  * Applies draft to the event index following internal business rules.
  *
- * Ensure only necessary fields are updated based on the draft (declaration, updatedAt, flags).
- * Note: When naively applying draft, it leads to incorrect event state, since drafts are
+ * Ensures only necessary fields are updated based on the draft (declaration, updatedAt, flags).
+ * NOTE: When naively applying draft, it leads to incorrect event state, since drafts are 'Accepted' by default.
  *
  */
 export function applyDraftToEventIndex(
@@ -327,8 +326,6 @@ export function applyDraftToEventIndex(
   const indexedAt = eventIndex.updatedAt
 
   const activeDraft = draft && draft.createdAt >= indexedAt ? draft : undefined
-
-  console.log('activeDraft', activeDraft)
 
   if (!activeDraft) {
     return eventIndex
