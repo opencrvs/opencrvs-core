@@ -240,6 +240,7 @@ components:
                                 - fuzzy
                                 - exact
                                 - range
+                                - within
                               description: Determines the type of field
                           required:
                             - type
@@ -9764,6 +9765,13 @@ components:
         type:
           type: string
           const: PRINT_CERTIFICATE
+        content:
+          type:
+            - object
+            - "null"
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
@@ -11774,7 +11782,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 0cf469c8-c8ea-40c4-bd62-76bd2c3a3eea
+        transactionId: 468300d9-1c66-496c-bbe6-877c16efec7a
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -14516,6 +14524,11 @@ components:
           type: string
           const: PRINT_CERTIFICATE
           default: PRINT_CERTIFICATE
+        content:
+          type: object
+          properties:
+            templateId:
+              type: string
       required:
         - eventId
         - transactionId
