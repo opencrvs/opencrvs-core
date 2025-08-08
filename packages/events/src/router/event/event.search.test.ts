@@ -19,6 +19,7 @@ import {
   getCurrentEventState,
   getMixedPath,
   getUUID,
+  InherentFlags,
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
@@ -494,7 +495,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
   expect(fetchedEvents).toHaveLength(2)
 })
 
-test('properly returns search by name even when there is an undercore in someones name', async () => {
+test('Should not match partially when searching with emails against name field', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user, [
     'search[event=tennis-club-membership,access=all]',
@@ -504,7 +505,7 @@ test('properly returns search by name even when there is an undercore in someone
 
   const record1 = {
     'applicant.name': {
-      firstname: 'Matt_Johnson',
+      firstname: 'Matt',
       surname: 'Doe'
     },
     'applicant.dob': '2000-01-01',
@@ -529,14 +530,16 @@ test('properly returns search by name even when there is an undercore in someone
 
   const fetchedEvents = await client.event.search({
     type: 'and',
-    clauses: [{ data: { 'applicant.name': { type: 'fuzzy', term: 'Matt' } } }]
+    clauses: [
+      {
+        data: {
+          'applicant.name': { type: 'fuzzy', term: 'matt.doe@gmail.com' }
+        }
+      }
+    ]
   })
 
-  expect(fetchedEvents).toHaveLength(1)
-
-  expect(
-    getMixedPath(fetchedEvents[0].declaration, 'applicant.name.firstname')
-  ).toBe('Matt_Johnson')
+  expect(fetchedEvents).toHaveLength(0)
 })
 test('Returns events that match date of birth of applicant', async () => {
   const { user, generator } = await setupTestCase()
@@ -1163,19 +1166,25 @@ test('Returns relevant events in right order', async () => {
     sanitizeForSnapshot(declaredEvents[0], UNSTABLE_EVENT_FIELDS)
   ).toMatchSnapshot()
 
-  const registeredEvents = await client.event.search({
+  const registeredEventsPendingCertification = await client.event.search({
     type: 'and',
     clauses: [
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
-        status: { type: 'exact', term: EventStatus.enum.REGISTERED }
+        status: { type: 'exact', term: EventStatus.enum.REGISTERED },
+        flags: {
+          anyOf: [InherentFlags.PENDING_CERTIFICATION]
+        }
       }
     ]
   })
 
-  expect(registeredEvents).toHaveLength(1)
+  expect(registeredEventsPendingCertification).toHaveLength(1)
   expect(
-    sanitizeForSnapshot(registeredEvents[0], UNSTABLE_EVENT_FIELDS)
+    sanitizeForSnapshot(
+      registeredEventsPendingCertification[0],
+      UNSTABLE_EVENT_FIELDS
+    )
   ).toMatchSnapshot()
 
   // 3. Search by past timestamp, which should not match to any event.
@@ -1251,7 +1260,7 @@ test('User with my-jurisdiction scope only sees events from their primary office
 
   const ownOfficeId = user.primaryOfficeId
 
-  await createEvent(client, generator)
+  await createEvent(client, generator, [ActionType.DECLARE])
 
   const OTHER_OFFICE_ID = locations[1].id // using different location id for a different user
   // Create another user from a different office
@@ -1267,7 +1276,7 @@ test('User with my-jurisdiction scope only sees events from their primary office
   ])
 
   // Create an event from another office
-  await createEvent(otherClient, otherGen)
+  await createEvent(otherClient, otherGen, [ActionType.DECLARE])
 
   // Test user should only see their own event
   const events = await client.event.search({
@@ -1289,7 +1298,7 @@ test('User without an event in the scope should not be able to view events of th
     'search[event=v2.birth,access=my-jurisdiction]'
   ])
 
-  await createEvent(client, generator)
+  await createEvent(client, generator, [ActionType.DECLARE])
 
   // Create another user from a different office
   const { user: otherUser, generator: otherGen } = await setupTestCase(5542)
@@ -1304,7 +1313,7 @@ test('User without an event in the scope should not be able to view events of th
   ])
 
   // Create an event from another office
-  await createEvent(otherClient, otherGen)
+  await createEvent(otherClient, otherGen, [ActionType.DECLARE])
 
   // Test user should only see their own event
   const events = await client.event.search({
@@ -1335,7 +1344,7 @@ test('User with my-jurisdiction scope can see events from other offices based on
   ])
 
   // Only user B creates event
-  await createEvent(clientB, generatorB)
+  await createEvent(clientB, generatorB, [ActionType.DECLARE])
 
   // user A should see nothing
   const eventsA = await clientA.event.search({
@@ -1367,7 +1376,7 @@ test('Does not return events of tennis club membership when scopes are not avail
     'record.declare-birth'
   ])
 
-  await createEvent(client, generator)
+  await createEvent(client, generator, [ActionType.DECLARE])
 
   const resultEvent = await client.event.search({
     type: 'and',
@@ -1390,8 +1399,8 @@ test('User with "all" scope sees events from all offices', async () => {
     'search[event=tennis-club-membership,access=my-jurisdiction]'
   ])
 
-  await createEvent(clientA, generatorA)
-  await createEvent(clientB, generatorB)
+  await createEvent(clientA, generatorA, [ActionType.DECLARE])
+  await createEvent(clientB, generatorB, [ActionType.DECLARE])
 
   const events = await clientA.event.search({
     type: 'and',
@@ -1418,8 +1427,8 @@ test('User with both "all" and "my-jurisdiction" scopes sees all matching events
     'search[event=tennis-club-membership,access=my-jurisdiction]'
   ])
 
-  await createEvent(client, generator)
-  await createEvent(otherClient, tennisGen)
+  await createEvent(client, generator, [ActionType.DECLARE])
+  await createEvent(otherClient, tennisGen, [ActionType.DECLARE])
 
   const events = await client.event.search({
     type: 'and',
@@ -1439,8 +1448,8 @@ test('User only sees tennis club membership events within their jurisdiction', a
   ])
 
   // Create 2 events in user's own jurisdiction
-  await createEvent(client, generator)
-  await createEvent(client, generator)
+  await createEvent(client, generator, [ActionType.DECLARE])
+  await createEvent(client, generator, [ActionType.DECLARE])
 
   const otherOfficeId = locations[1].id // using different location id for a different user
   const userOtherOffice = { ...user, primaryOfficeId: otherOfficeId }
@@ -1449,7 +1458,7 @@ test('User only sees tennis club membership events within their jurisdiction', a
     'search[event=tennis-club-membership,access=all]'
   ])
 
-  await createEvent(clientOtherOffice, generator)
+  await createEvent(clientOtherOffice, generator, [ActionType.DECLARE])
 
   // User should only see the 2 events from their own office
   const events = await client.event.search({

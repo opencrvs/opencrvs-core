@@ -45,6 +45,6 @@ export const DefaultSearchResult: Story = {
   name: 'SearchCriteriaPanel',
   args: {
     eventConfig: tennisClubMembershipEvent,
-    searchParams: mockSearchParams
+    formValues: mockSearchParams
   }
 }

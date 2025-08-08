@@ -24,9 +24,11 @@ import {
   isFieldVisible,
   AddressType,
   TranslationConfig,
-  IndexMap
+  IndexMap,
+  joinValues
 } from '@opencrvs/commons/client'
 import {
+  FIELD_SEPARATOR,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -67,6 +69,7 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
+  parentId?: string
 } & UsedFormikProps
 
 /**
@@ -147,7 +150,8 @@ export function FormSectionComponent({
   validateAllFields,
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
-  isCorrection = false
+  isCorrection = false,
+  parentId
 }: AllProps) {
   const intl = useIntl()
   const prevValuesRef = useRef(values)
@@ -335,7 +339,18 @@ export function FormSectionComponent({
                   fieldDefinition={field}
                   form={completeForm}
                   readonlyMode={readonlyMode}
-                  touched={touched[field.id] ?? false}
+                  touched={
+                    /**
+                     * We check the full path so that,
+                     * touching `child____name____firstname`
+                     * does not make `mother____name____firstname` dirty
+                     */
+                    (parentId
+                      ? touched[
+                          joinValues([parentId, FIELD_SEPARATOR, field.id], '')
+                        ] || touched[parentId]
+                      : touched[field.id]) ?? false
+                  }
                   value={formikField.value}
                   onBlur={formikField.onBlur}
                   onFieldValueChange={onFieldValueChange}

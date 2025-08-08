@@ -32,13 +32,14 @@ import {
   deepDropNulls,
   omitHiddenFields,
   EventState,
-  Inferred,
+  FieldConfig,
   isFieldVisible,
   errorMessages,
   runFieldValidations,
   ActionInputWithType,
   ApproveCorrectionActionInput,
-  RejectCorrectionActionInput
+  RejectCorrectionActionInput,
+  runStructuralValidations
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
@@ -51,7 +52,7 @@ import {
 } from './utils'
 
 export function getFieldErrors(
-  fields: Inferred[],
+  fields: FieldConfig[],
   data: ActionUpdate,
   declaration: EventState = {}
 ) {
@@ -233,7 +234,7 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
+      const fieldErrors = runStructuralValidations({
         field,
         values: annotation
       })
@@ -258,7 +259,7 @@ function validateNotifyAction({
         }
       }
 
-      const fieldErrors = runFieldValidations({
+      const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
         values: declaration
       })

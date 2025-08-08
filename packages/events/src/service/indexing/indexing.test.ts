@@ -21,7 +21,7 @@ import {
   withJurisdictionFilters
 } from './query'
 
-test('records are automatically indexed when they are created', async () => {
+test('records are not indexed when they are created', async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -37,7 +37,7 @@ test('records are automatically indexed when they are created', async () => {
     }
   })
 
-  expect(body.hits.hits).toHaveLength(1)
+  expect(body.hits.hits).toHaveLength(0)
 })
 const RANDOM_UUID = '650a711b-a725-48f9-a92f-794b4a04fea6'
 const exactStatusPayload: QueryType = {

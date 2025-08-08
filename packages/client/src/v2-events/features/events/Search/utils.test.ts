@@ -11,28 +11,23 @@
 
 import {
   EventStatus,
-  joinValues,
-  tennisClubMembershipEvent,
-  VisibleStatus
+  tennisClubMembershipEvent
 } from '@opencrvs/commons/client'
-import { FIELD_SEPARATOR } from '@client/v2-events/components/forms/utils'
 import {
   getAdvancedSearchFieldErrors,
-  flattenFieldErrors,
   getMetadataFieldConfigs,
   buildSearchQuery,
   serializeSearchParams,
   deserializeSearchParams,
-  buildQuickSearchQuery
+  buildQuickSearchQuery,
+  resolveAdvancedSearchConfig
 } from './utils'
 
 describe('getAdvancedSearchFieldErrors', () => {
   it('should return no errors for empty values', () => {
     const mockFormValues = { 'applicant.dob': '3' }
-    const errors = getAdvancedSearchFieldErrors(
-      tennisClubMembershipEvent,
-      mockFormValues
-    )
+    const sections = resolveAdvancedSearchConfig(tennisClubMembershipEvent)
+    const errors = getAdvancedSearchFieldErrors(sections, mockFormValues)
     expect(errors).toEqual({
       'applicant.name': {
         errors: []
@@ -51,44 +46,22 @@ describe('getAdvancedSearchFieldErrors', () => {
               description: 'Error message when date field is invalid',
               id: 'v2.error.invalidDate'
             }
-          },
-          {
-            message: {
-              id: 'v2.event.tennis-club-membership.action.declare.form.section.who.field.dob.error',
-              defaultMessage: 'Please enter a valid date',
-              description: 'This is the error message for invalid date'
-            }
           }
         ]
+      },
+      'event.legalStatuses.REGISTERED.acceptedAt': {
+        errors: []
+      },
+      'event.legalStatuses.REGISTERED.createdAtLocation': {
+        errors: []
+      },
+      'event.status': {
+        errors: []
+      },
+      'event.updatedAt': {
+        errors: []
       }
     })
-  })
-})
-
-describe('flattenFieldErrors', () => {
-  it('should flatten nested field errors into a single array', () => {
-    const errors = {
-      'event.status': {
-        errors: [{ message: { defaultMessage: 'Invalid status' } }]
-      },
-      'event.trackingId': {
-        errors: [{ message: { defaultMessage: 'Tracking ID too short' } }]
-      }
-    }
-    const flat = flattenFieldErrors(errors)
-
-    expect(flat).toEqual([
-      {
-        message: {
-          defaultMessage: 'Invalid status'
-        }
-      },
-      {
-        message: {
-          defaultMessage: 'Tracking ID too short'
-        }
-      }
-    ])
   })
 })
 
@@ -106,22 +79,24 @@ describe('getDefaultSearchFields', () => {
 })
 
 describe('buildDataCondition', () => {
+  const fields = resolveAdvancedSearchConfig(tennisClubMembershipEvent).flatMap(
+    (section) => section.fields
+  )
+  const searchConfigs = tennisClubMembershipEvent.advancedSearch.flatMap(
+    (section) => section.fields
+  )
   it('should return anyOf condition for status=ALL', () => {
     const state = { 'event.status': 'ALL' }
-    const result = buildSearchQuery(state, tennisClubMembershipEvent)
-    const eventStatusField = joinValues(
-      'event.status'.split('.'),
-      FIELD_SEPARATOR
-    )
+    const result = buildSearchQuery(state, fields, searchConfigs)
     //@ts-ignore
-    expect(result[eventStatusField]).toEqual({
+    expect(result['event.status']).toEqual({
       type: 'anyOf',
       terms: [
+        EventStatus.enum.CREATED,
         EventStatus.enum.NOTIFIED,
         EventStatus.enum.DECLARED,
         EventStatus.enum.VALIDATED,
         EventStatus.enum.REGISTERED,
-        EventStatus.enum.CERTIFIED,
         EventStatus.enum.ARCHIVED
       ]
     })
@@ -131,17 +106,43 @@ describe('buildDataCondition', () => {
     const state = {
       'event.legalStatuses.REGISTERED.createdAtLocation': 'ABC123'
     }
-    const result = buildSearchQuery(state, tennisClubMembershipEvent)
-    const field = joinValues(
-      'event.legalStatuses.REGISTERED.createdAtLocation'.split('.'),
-      FIELD_SEPARATOR
-    )
+    const result = buildSearchQuery(state, fields, searchConfigs)
     expect(
       //@ts-ignore
-      result[field]
+      result['event.legalStatuses.REGISTERED.createdAtLocation']
     ).toEqual({
       type: 'exact',
       term: 'ABC123'
+    })
+  })
+
+  it('should generate range match condition for DATE_RANGE fields when range is selected', () => {
+    const state = {
+      'applicant.dob': { start: '1996-01-01', end: '1996-12-31' }
+    }
+    const result = buildSearchQuery(state, fields, searchConfigs)
+    expect(
+      //@ts-ignore
+      result['applicant.dob']
+    ).toEqual({
+      type: 'range',
+      gte: '1996-01-01',
+      lte: '1996-12-31'
+    })
+  })
+
+  it('should generate range match condition for DATE_RANGE fields even if exact date is selected', () => {
+    const state = {
+      'applicant.dob': '1996-01-01'
+    }
+    const result = buildSearchQuery(state, fields, searchConfigs)
+    expect(
+      //@ts-ignore
+      result['applicant.dob']
+    ).toEqual({
+      type: 'range',
+      gte: '1996-01-01',
+      lte: '1996-01-01'
     })
   })
 })
