@@ -362,6 +362,9 @@ export const FilledPagesVisibleInReview: Story = {
         event: [
           tRPCMsw.event.get.query(() => {
             return undeclaredDraftEvent
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return []
           })
         ]
       }
