@@ -19,7 +19,6 @@ import {
   EventConfig
 } from '@opencrvs/commons/client'
 import { trpcClient } from '@client/v2-events/trpc'
-import { useEventConfigurations } from '../features/events/useEventConfiguration'
 
 // Defines custom API functions that are not part of the generated API from TRPC.
 
