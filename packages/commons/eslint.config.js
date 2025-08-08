@@ -22,7 +22,7 @@ module.exports = defineConfig([
     languageOptions: {
       sourceType: 'commonjs',
       parserOptions: {
-        project: [path.resolve(__dirname, './tsconfig.json')]
+        projectService: true
       }
     },
     settings: {
