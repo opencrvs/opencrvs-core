@@ -9,21 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import Ajv from 'ajv'
+import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
-import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
 import { formatISO, isAfter, isBefore } from 'date-fns'
-import { EventState, ActionUpdate } from '../events/ActionDocument'
+import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType, FieldConditional } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true,
-  allowUnionTypes: true
+  allowUnionTypes: true,
+  strict: false // Allow minContains and other newer features
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -454,4 +455,13 @@ export function getValidatorsForField(
       }
     })
     .filter((x) => x !== null) as NonNullable<FieldConfig['validation']>
+}
+
+export function areCertificateConditionsMet(
+  conditions: FieldConditional[],
+  values: Record<string, unknown>
+) {
+  return conditions.every((condition) => {
+    return ajv.validate(condition.conditional, values)
+  })
 }
