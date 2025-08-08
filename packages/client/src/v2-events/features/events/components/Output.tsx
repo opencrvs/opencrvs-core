@@ -151,7 +151,7 @@ export function ValueOutput(
             'village'
           ]
         : undefined,
-      lineSeparator: searchMode ? ', ' : undefined
+      lineSeparator: searchMode === true ? ', ' : undefined
     })
   }
 
