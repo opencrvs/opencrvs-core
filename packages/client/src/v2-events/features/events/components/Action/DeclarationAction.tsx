@@ -167,7 +167,7 @@ function DeclarationActionComponent({ children, actionType }: Props) {
     /*
      * If params.eventId changes (from tmp id to concrete id) then change the local draft id
      */
-    eventId: event.id, // @TODO: Can this accidentally change from actual id to another id?
+    eventId: event.id,
     action: {
       ...localDraft.action,
       createdAt: new Date().toISOString()

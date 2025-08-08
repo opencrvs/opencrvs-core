@@ -443,7 +443,6 @@ export function eventPayloadGenerator(rng: () => number) {
         type: ActionType.ARCHIVE,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
-        // @TODO: Check whether generator is needed?
         annotation: {},
         duplicates: [],
         eventId,
