@@ -735,6 +735,34 @@ components:
             type:
               type: string
               const: ADDRESS
+            configuration:
+              type: object
+              properties:
+                lineSeparator:
+                  type: string
+                fields:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - number
+                      - country
+                      - province
+                      - addressType
+                      - district
+                      - urbanOrRural
+                      - town
+                      - residentialArea
+                      - street
+                      - zipCode
+                      - village
+                      - state
+                      - district2
+                      - cityOrTown
+                      - addressLine1
+                      - addressLine2
+                      - addressLine3
+                      - postcodeOrZip
             defaultValue:
               anyOf:
                 - oneOf:
@@ -11491,7 +11519,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: a2296807-ae5b-44b1-af20-d37aa05dfd25
+        transactionId: 3556b657-adde-4e84-9664-1e582421481c
         declaration: {}
         annotation: {}
         type: NOTIFY
