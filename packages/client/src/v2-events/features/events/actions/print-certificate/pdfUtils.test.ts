@@ -67,7 +67,11 @@ describe('stringifyEventMetadata', () => {
     ] satisfies User[]
 
     const stringified = stringifyEventMetadata({
-      metadata: { ...metadata, modifiedAt: new Date(2000, 1, 2).toISOString() },
+      metadata: {
+        ...metadata,
+        modifiedAt: new Date(2000, 1, 2).toISOString(),
+        copiesPrintedForTemplate: 1
+      },
       locations,
       users,
       intl: createIntl({ locale: 'en' })
