@@ -10,15 +10,10 @@
  */
 
 import React from 'react'
-
-import { noop } from 'lodash'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
-import {
-  applyDraftsToEventIndex,
-  deepDropNulls
-} from '@opencrvs/commons/client'
+import { applyDraftToEventIndex, deepDropNulls } from '@opencrvs/commons/client'
 import {
   AppBar,
   Button,
@@ -61,8 +56,8 @@ export function EventOverviewLayout({
 }) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.OVERVIEW)
   const { searchEventById } = useEvents()
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(eventId)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(eventId)
   const allEvents = useEventConfigurations()
   const navigate = useNavigate()
   const intl = useIntl()
@@ -120,7 +115,7 @@ export function EventOverviewLayout({
             eventConfiguration.title,
             flattenEventIndex(
               deepDropNulls(
-                applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
+                applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
               )
             )
           )}

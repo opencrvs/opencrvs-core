@@ -30,6 +30,7 @@ export const countryConfigApi: ZodOpenApiPathsObject = {
       }
     }
   },
+
   '/events/{eventType}/actions/{actionType}': {
     post: {
       tags: ['Events'],

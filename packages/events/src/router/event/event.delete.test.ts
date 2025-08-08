@@ -146,7 +146,7 @@ describe('check unreferenced draft attachments are deleted while final action su
       }
     }
 
-    // declaring 5 drafts with  4 different file attachments
+    // declaring 5 drafts with 4 different file attachments
     await client.event.draft.create(getDraft(1))
     await client.event.draft.create(getDraft(2))
     await client.event.draft.create(getDraft(3))

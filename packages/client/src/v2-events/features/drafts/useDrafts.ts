@@ -84,9 +84,12 @@ export const localDraftStore = create<DraftStore>()(
       setDraft: (draft: Draft | null) => set({ draft }),
       getLocalDraftOrDefault: (defaultDraft: Draft) => {
         const draft = get().draft
-        if (draft) {
+
+        // If we do not explicitly check for eventId, we might accidentally return previous draft when creating separate drafts in a row.
+        if (draft && draft.eventId === defaultDraft.eventId) {
           return draft
         }
+
         return defaultDraft
       }
     }),
@@ -232,13 +235,21 @@ export function useDrafts() {
       })
     },
     getAllRemoteDrafts: findAllRemoteDrafts,
-    getRemoteDrafts: function useDraftList(
+    getRemoteDraftByEventId: function useDraftList(
       eventId: string,
       additionalOptions: QueryOptions<typeof trpc.event.draft.list> = {}
-    ): Draft[] {
-      return findAllRemoteDrafts(additionalOptions).filter(
+    ): Draft | undefined {
+      const eventDrafts = findAllRemoteDrafts(additionalOptions).filter(
         (draft) => draft.eventId === eventId
       )
+
+      if (eventDrafts.length > 1) {
+        throw new Error(
+          `Multiple drafts found for event ${eventId}. This should not happen.`
+        )
+      }
+
+      return eventDrafts[0]
     }
   }
 }

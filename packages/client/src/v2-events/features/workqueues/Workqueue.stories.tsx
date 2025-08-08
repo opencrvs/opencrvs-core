@@ -14,10 +14,15 @@ import React from 'react'
 import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import {
+  ActionType,
   eventQueryDataGenerator,
   EventStatus,
+  generateEventDocument,
+  generateEventDraftDocument,
+  generateUuid,
   generateWorkqueues,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import { libraryMembershipEvent } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -273,6 +278,90 @@ export const NoResults: Story = {
             return []
           })
         ]
+      }
+    }
+  }
+}
+
+const createdEvent = {
+  ...generateEventDocument({
+    configuration: tennisClubMembershipEvent,
+    actions: [ActionType.CREATE]
+  })
+}
+
+const createdDraft = generateEventDraftDocument({
+  eventId: createdEvent.id,
+  actionType: ActionType.DECLARE,
+  declaration: {
+    'applicant.name': {
+      firstname: 'Draft for',
+      surname: 'Declare'
+    }
+  }
+})
+
+/**
+ * Shows draft action based on the event rather than the draft. (action is based on the CREATED state rather than DECLARED state of draft)
+ */
+export const Draft: Story = {
+  parameters: {
+    mockingDate: new Date(2024, 7, 12),
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({
+        slug: 'draft'
+      })
+    },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            const [recent] = generateWorkqueues('draft')
+            return [
+              {
+                ...recent,
+                emptyMessage: {
+                  id: 'v2.workqueues.recent.emptyMessage',
+                  defaultMessage: 'No recent records',
+                  description: 'Empty message for recent workqueue'
+                }
+              }
+            ]
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: 1 }
+            }, {})
+          })
+        ],
+        events: [
+          tRPCMsw.event.list.query(() => {
+            return []
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return []
+          })
+        ],
+        event: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [createdDraft]
+          }),
+          tRPCMsw.event.get.query(() => {
+            return createdEvent
+          }),
+          tRPCMsw.event.search.query((input) => {
+            return []
+          })
+        ],
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [createdDraft]
+          })
+        ],
+        offline: {
+          drafts: [createdDraft]
+        }
       }
     }
   }

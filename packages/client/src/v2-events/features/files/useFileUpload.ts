@@ -11,7 +11,7 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { FullDocumentPath, joinURLPaths } from '@opencrvs/commons/client'
+import { FullDocumentPath, joinUrlPaths } from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
 import {
@@ -49,6 +49,13 @@ async function uploadFile({
   return response
 }
 
+/**
+ * NOTE: This function is used to delete a file from the server.
+ * There are two worrying cases:
+ * 1. User deletes a file but does not save the changes when they leave. We try to access the file later and it is not there.
+ * 2. Documents service includes "fail-safe" for users other than the creator of the file. If a user tries to delete a file that they do not own, it will fail (silently). Given the above scenario, the file would still be there.
+ *
+ */
 async function deleteFile({ filename }: { filename: string }): Promise<void> {
   const response = await fetch('/api/files/' + filename, {
     method: 'DELETE',
@@ -58,7 +65,21 @@ async function deleteFile({ filename }: { filename: string }): Promise<void> {
   })
 
   if (!response.ok) {
-    throw new Error('File deletation upload failed')
+    if (response.status === 403) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Unable to hard-delete the file ${filename}. Only the creator can remove it.`
+      )
+    }
+
+    if (response.status === 404) {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `Unable to hard-delete the file ${filename}. File not found.`
+      )
+    }
+
+    throw new Error('File deletion failed', { cause: response.status })
   }
 
   return
@@ -68,7 +89,7 @@ const UPLOAD_MUTATION_KEY = 'uploadFile'
 const DELETE_MUTATION_KEY = 'deleteFile'
 
 async function getPresignedUrl(filePath: FullDocumentPath) {
-  const url = joinURLPaths('/api/presigned-url', filePath)
+  const url = joinUrlPaths('/api/presigned-url', filePath)
 
   const response = await fetch(url, {
     method: 'GET',
@@ -85,13 +106,26 @@ export async function precacheFile(path: FullDocumentPath) {
   const presignedUrl = (await getPresignedUrl(path)).presignedURL
 
   const file = await fetchFileFromUrl(presignedUrl, path)
-  const url = getUnsignedFileUrl(path)
 
-  await cacheFile({ url, file })
+  if (file) {
+    const url = getUnsignedFileUrl(path)
+
+    await cacheFile({ url, file })
+  }
 }
 
 queryClient.setMutationDefaults([DELETE_MUTATION_KEY], {
-  retry: true,
+  // @ts-ignore
+  retry: (_, error) => {
+    if (error.cause === 403) {
+      return false
+    }
+    if (error.cause === 404) {
+      return false
+    }
+
+    return true
+  },
   retryDelay: 5000,
   mutationFn: deleteFile
 })

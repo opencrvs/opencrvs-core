@@ -172,17 +172,23 @@ export const setupTestCase = async (rngSeed?: number) => {
   await seed.locations(generator.locations.set(5))
 
   const locations = await getLocations()
-  const user = seed.user(
+  const defaultUser = seed.user(
     generator.user.create({
       primaryOfficeId: locations[0].id
     })
   )
-  const users = [user]
+  const secondaryUser = seed.user(
+    generator.user.create({
+      primaryOfficeId: locations[1].id
+    })
+  )
+
+  const users = [defaultUser, secondaryUser]
 
   return {
     locations,
     user: {
-      ...user,
+      ...defaultUser,
       signature: generateRandomSignature(rng)
     },
     eventsDb,

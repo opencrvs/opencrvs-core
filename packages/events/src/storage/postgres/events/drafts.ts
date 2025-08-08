@@ -58,7 +58,7 @@ export async function createDraft(draft: NewEventActionDrafts) {
     // .executeTakeFirstOrThrow()
 
     .onConflict((oc) =>
-      oc.columns(['transactionId', 'actionType']).doUpdateSet({
+      oc.columns(['eventId', 'createdBy']).doUpdateSet({
         declaration: sql`EXCLUDED.declaration`,
         annotation: sql`EXCLUDED.annotation`,
         createdAt: sql`NOW()`
@@ -75,6 +75,7 @@ export async function getDraftsByUserId(createdBy: string) {
   const drafts = await db
     .selectFrom('eventActionDrafts')
     .where('createdBy', '=', createdBy)
+    .orderBy('createdAt', 'asc')
     .selectAll()
     .execute()
   const draftDocuments = drafts.map(toDraftDocument)
@@ -82,22 +83,27 @@ export async function getDraftsByUserId(createdBy: string) {
   return z.array(Draft).parse(draftDocuments satisfies Draft[])
 }
 
-export async function getDraftsForAction(
+export async function findLatestDraftForAction(
   eventId: UUID,
   createdBy: string,
   actionType: ActionType
 ) {
   const db = getClient()
-  const drafts = await db
+  const draft = await db
     .selectFrom('eventActionDrafts')
     .where('eventId', '=', eventId)
     .where('createdBy', '=', createdBy)
     .where('actionType', '=', actionType)
+    .orderBy('createdAt', 'desc')
     .selectAll()
-    .execute()
-  const draftDocuments = drafts.map(toDraftDocument)
+    .executeTakeFirst()
 
-  return z.array(Draft).parse(draftDocuments satisfies Draft[])
+  if (draft) {
+    const draftDocument = toDraftDocument(draft)
+    return Draft.parse(draftDocument satisfies Draft)
+  }
+
+  return undefined
 }
 
 export async function deleteDraftsByEventId(eventId: UUID) {

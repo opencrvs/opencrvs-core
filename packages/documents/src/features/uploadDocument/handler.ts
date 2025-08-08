@@ -79,12 +79,28 @@ export async function fileExistsHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
 ) {
+  // Ensure file is still in the desired format. forwarding url from gateway,
+  // '/files/{filePath*}' --> files//ocrvs/filename.jpg and the double slash is removed.
   const filePath = FullDocumentPath.parse(request.params.filePath)
-  const exists = await minioClient.statObject(
-    MINIO_BUCKET,
-    toDocumentPath(filePath)
-  )
-  if (!exists) {
+
+  let stat
+
+  const documentPath = toDocumentPath(filePath)
+  try {
+    stat = await minioClient.statObject(MINIO_BUCKET, documentPath)
+  } catch (error) {
+    if (error.code === 'NotFound') {
+      return h
+        .response(
+          `request failed: document ${documentPath} does not exist in bucket ${MINIO_BUCKET}`
+        )
+        .code(404)
+    }
+
+    throw error
+  }
+
+  if (!stat) {
     return notFound('File not found')
   }
   return h.response().code(200)

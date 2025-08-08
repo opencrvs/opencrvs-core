@@ -15,9 +15,9 @@ import { useIntl } from 'react-intl'
 import {
   EventDocument,
   getCurrentEventState,
-  getCurrentEventStateWithDrafts,
+  dangerouslyGetCurrentEventStateWithDrafts,
   EventIndex,
-  applyDraftsToEventIndex,
+  applyDraftToEventIndex,
   deepDropNulls,
   EventStatus
 } from '@opencrvs/commons/client'
@@ -57,16 +57,18 @@ function EventOverviewFull({
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
   const { status } = eventIndex
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(eventIndex.id, {
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(eventIndex.id, {
     refetchOnMount: 'always'
   })
+  const eventWithDrafts = draft
+    ? dangerouslyGetCurrentEventStateWithDrafts({
+        event,
+        draft,
+        configuration: eventConfiguration
+      })
+    : getCurrentEventState(event, eventConfiguration)
 
-  const eventWithDrafts = getCurrentEventStateWithDrafts({
-    event,
-    drafts,
-    configuration: eventConfiguration
-  })
   const { getUser } = useUsers()
   const intl = useIntl()
 
@@ -127,12 +129,15 @@ function EventOverviewProtected({
 }) {
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const { status } = eventIndex
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(eventIndex.id)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(eventIndex.id)
 
-  const eventWithDrafts = deepDropNulls(
-    applyDraftsToEventIndex(eventIndex, drafts, eventConfiguration)
-  )
+  const eventWithDrafts = draft
+    ? deepDropNulls(
+        applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
+      )
+    : eventIndex
+
   const { getUser } = useUsers()
   const intl = useIntl()
 

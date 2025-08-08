@@ -48,13 +48,16 @@ import { unassignRecord } from '@events/service/events/actions/unassign'
 import { createDraft, getDraftsByUserId } from '@events/service/events/drafts'
 import {
   addAction,
+  deleteUnreferencedFilesFromPreviousDrafts,
   createEvent,
   deleteEvent,
   getEventById,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
+import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import { UserContext } from '../../context'
 import { getDefaultActionProcedures } from './actions'
 
 extendZodWithOpenApi(z)
@@ -148,6 +151,10 @@ export const eventRouter = router({
     .input(DeleteActionInput)
     .use(middleware.requireAssignment)
     .mutation(async ({ input, ctx }) => {
+      if (ctx.isDuplicateAction) {
+        return ctx.event
+      }
+
       await throwConflictIfActionNotAllowed(
         input.eventId,
         ActionType.DELETE,
@@ -161,16 +168,47 @@ export const eventRouter = router({
     }),
     create: publicProcedure
       .input(DraftInput)
+      .use(middleware.requireAssignment)
       .output(Draft)
       .mutation(async ({ input, ctx }) => {
-        const { eventId } = input
-        await getEventById(eventId)
+        const { eventId, type } = input
 
-        return createDraft(input, {
+        // Consecutive middlewares lose some of the typing.
+        const user = UserContext.parse(ctx.user)
+        await throwConflictIfActionNotAllowed(eventId, type, ctx.token)
+
+        const previousDraft = await draftsRepo.findLatestDraftForAction(
           eventId,
-          user: ctx.user,
+          user.id,
+          input.type
+        )
+
+        if (previousDraft?.transactionId === input.transactionId) {
+          return previousDraft
+        }
+
+        const currentDraft = await createDraft(input, {
+          eventId,
+          user,
           transactionId: input.transactionId
         })
+
+        const event = await getEventById(eventId)
+        const configuration = await getEventConfigurationById({
+          token: ctx.token,
+          eventType: event.type
+        })
+
+        if (previousDraft) {
+          await deleteUnreferencedFilesFromPreviousDrafts(ctx.token, {
+            event,
+            configuration,
+            currentDraft,
+            previousDraft
+          })
+        }
+
+        return currentDraft
       })
   }),
   actions: router({

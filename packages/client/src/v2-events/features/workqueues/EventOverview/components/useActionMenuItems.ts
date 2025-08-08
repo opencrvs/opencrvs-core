@@ -153,6 +153,7 @@ export function useAction(event: EventIndex) {
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
+
   return {
     config: {
       [ActionType.READ]: {

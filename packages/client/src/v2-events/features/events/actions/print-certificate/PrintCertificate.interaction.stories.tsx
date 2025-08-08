@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
-import { http, graphql, HttpResponse } from 'msw'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
 

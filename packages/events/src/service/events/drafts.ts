@@ -29,17 +29,14 @@ export const createDraft = async (
   const draft = await draftsRepo.createDraft({
     eventId,
     transactionId,
-    // @TODO: Extract DELETE from ActionTypes. It's not an action that's stored!
-    // Type '"DELETE"' is not assignable to type 'ActionType'.
-    actionType: input.type as Exclude<DraftInput['type'], 'DELETE'>,
+    actionType: input.type,
     declaration: input.declaration,
     annotation: input.annotation,
     createdBy: user.id,
     createdByRole: user.role,
     createdByUserType: user.type,
     createdAtLocation: user.primaryOfficeId,
-    createdBySignature: user.signature,
-    createdAt: new Date().toISOString()
+    createdBySignature: user.signature
   })
 
   if (!draft) {

@@ -10,7 +10,7 @@
  */
 
 import { env } from '@auth/environment'
-import { fetchJSON, joinURL, logger, Roles } from '@opencrvs/commons'
+import { fetchJSON, joinUrl, logger, Roles } from '@opencrvs/commons'
 import {
   DEFAULT_ROLES_DEFINITION,
   Scope
@@ -18,7 +18,7 @@ import {
 
 export async function getUserRoleScopeMapping() {
   const roles = await fetchJSON<Roles>(
-    joinURL(env.COUNTRY_CONFIG_URL_INTERNAL, '/roles')
+    joinUrl(env.COUNTRY_CONFIG_URL_INTERNAL, '/roles')
   )
 
   logger.info(

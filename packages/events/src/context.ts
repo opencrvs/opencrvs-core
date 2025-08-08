@@ -26,7 +26,7 @@ import {
 } from '@opencrvs/commons'
 import { env } from './environment'
 
-const UserContext = z.object({
+export const UserContext = z.object({
   id: z.string(),
   primaryOfficeId: UUID,
   role: z.string(),
