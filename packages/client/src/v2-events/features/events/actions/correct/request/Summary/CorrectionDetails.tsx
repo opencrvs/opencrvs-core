@@ -82,6 +82,24 @@ export function CorrectionDetails({
     )?.correctionForm.pages || []
 
   const correctionDetails = correctionFormPages.flatMap((page) => {
+    // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
+    // instead of being tied to individual field IDs. We pull it directly from `annotation[page.id]`.
+    if (page.type === 'VERIFICATION') {
+      // value can only be boolean
+      const value = annotation[page.id]
+      return [
+        {
+          id: page.id,
+          label: page.title,
+          valueDisplay: value
+            ? intl.formatMessage(messages.verifyIdentity)
+            : intl.formatMessage(messages.cancelVerifyIdentity),
+          pageId: page.id
+        }
+      ]
+    }
+
+    // Default handling for other pages: values keyed by field.id
     const pageFields = page.fields
       .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
       .map((field) => {
@@ -91,7 +109,12 @@ export function CorrectionDetails({
           showPreviouslyMissingValuesAsChanged: false
         })
 
-        return { ...field, valueDisplay, pageId: page.id }
+        return {
+          label: field.label,
+          id: field.id,
+          valueDisplay,
+          pageId: page.id
+        }
       })
       .filter((f) => f.valueDisplay)
 
