@@ -149,14 +149,13 @@ jobs:
     needs: generate_stack_name_and_branch
     uses: ./.github/workflows/build-images-from-branch.yml
     with:
-      branch_name: ${{  needs.generate_stack_name_and_branch.outputs.branch_name  }}
+      branch_tag_name: ${{ needs.generate_stack_name_and_branch.outputs.branch_name }}
     secrets: inherit
 
   trigger-e2e:
-    if: ${{ (github.event_name == 'workflow_dispatch') || (!contains(github.actor, 'bot') && github.event.pull_request.head.repo.fork == false) }}
+    if: always() && needs.trigger-build.outputs.build_status == 'success'
     runs-on: ubuntu-24.04
-    needs: generate_stack_name_and_branch
-    environment: ${{  needs.generate_stack_name_and_branch.outputs.slugified_branch  }}
+    needs: [generate_stack_name_and_branch, trigger-build]
     outputs:
       run_id: ${{ steps.dispatch_e2e.outputs.run_id }}
       deployment_link: ${{ steps.print-links.outputs.deployment_link }}

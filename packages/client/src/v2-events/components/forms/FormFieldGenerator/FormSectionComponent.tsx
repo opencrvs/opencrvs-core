@@ -65,6 +65,10 @@ type AllProps = {
    * this callback is called with success true if all fields are valid, or false if there are any validation errors.
    */
   onAllFieldsValidated?: (success: boolean) => void
+  /**
+   * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
+   */
+  isCorrection?: boolean
   parentId?: string
 } & UsedFormikProps
 
@@ -146,6 +150,7 @@ export function FormSectionComponent({
   validateAllFields,
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
+  isCorrection = false,
   parentId
 }: AllProps) {
   const intl = useIntl()
@@ -313,7 +318,10 @@ export function FormSectionComponent({
           return null
         }
 
-        const isDisabled = !isFieldEnabled(field, completeForm)
+        const isDisabled =
+          !isFieldEnabled(field, completeForm) ||
+          (isCorrection && field.uncorrectable)
+
         const visibleError = errors[field.id]?.errors[0]?.message
         const error = visibleError ? intl.formatMessage(visibleError) : ''
 

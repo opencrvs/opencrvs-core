@@ -147,9 +147,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.printCertificate.request, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.request.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.correction.request
+    trpcOptionsProxy.event.actions.correction.request.request
   ),
   retry: retryUnlessConflict,
   retryDelay: 10000,
@@ -160,9 +160,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.request, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.correction.approve
+    trpcOptionsProxy.event.actions.correction.approve.request
   ),
   retry: retryUnlessConflict,
   retryDelay: 10000,
@@ -173,9 +173,9 @@ setMutationDefaults(trpcOptionsProxy.event.actions.correction.approve, {
   }
 })
 
-setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject, {
+setMutationDefaults(trpcOptionsProxy.event.actions.correction.reject.request, {
   mutationFn: createEventActionMutationFn(
-    trpcOptionsProxy.event.actions.correction.reject
+    trpcOptionsProxy.event.actions.correction.reject.request
   ),
   retry: retryUnlessConflict,
   retryDelay: 10000,
@@ -216,7 +216,8 @@ setMutationDefaults(trpcOptionsProxy.event.actions.assignment.unassign, {
 export const customMutationKeys = {
   validateOnDeclare: [['validateOnDeclare']],
   registerOnDeclare: [['registerOnDeclare']],
-  registerOnValidate: [['registerOnValidate']]
+  registerOnValidate: [['registerOnValidate']],
+  makeCorrectionOnRequest: [['makeCorrectionOnRequest']]
 } as const
 
 queryClient.setMutationDefaults(customMutationKeys.validateOnDeclare, {
@@ -249,6 +250,17 @@ queryClient.setMutationDefaults(customMutationKeys.registerOnValidate, {
   onError: errorToastOnConflict,
   meta: {
     actionType: ActionType.REGISTER
+  }
+})
+
+queryClient.setMutationDefaults(customMutationKeys.makeCorrectionOnRequest, {
+  mutationFn: waitUntilEventIsCreated(customApi.makeCorrectionOnRequest),
+  retry: retryUnlessConflict,
+  retryDelay: 10000,
+  onSuccess: updateLocalEvent,
+  onError: errorToastOnConflict,
+  meta: {
+    actionType: ActionType.APPROVE_CORRECTION
   }
 })
 

@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/*  eslint-disable max-lines */
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
@@ -20,7 +21,8 @@ import {
   TextValue,
   DateRangeFieldValue,
   SignatureFieldValue,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  TimeValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -38,8 +40,6 @@ export const FieldReference = z
   })
   .describe('Reference to a field by its ID')
 
-const ParentReference = FieldReference.optional()
-
 export const ValidationConfig = z.object({
   validator: Conditional,
   message: TranslationConfig
@@ -49,15 +49,24 @@ export type ValidationConfig = z.infer<typeof ValidationConfig>
 
 const BaseField = z.object({
   id: FieldId,
-  parent: ParentReference,
-  conditionals: z.array(FieldConditional).default([]).optional(),
+  label: TranslationConfig,
+  parent: FieldReference.optional().describe(
+    'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
+  ),
   required: z.boolean().default(false).optional(),
+  conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
   placeholder: TranslationConfig.optional(),
   validation: z.array(ValidationConfig).default([]).optional(),
-  label: TranslationConfig,
   helperText: TranslationConfig.optional(),
-  hideLabel: z.boolean().default(false).optional()
+  hideLabel: z.boolean().default(false).optional(),
+  uncorrectable: z
+    .boolean()
+    .default(false)
+    .optional()
+    .describe(
+      'Indicates if the field can be changed during a record correction.'
+    )
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -175,10 +184,21 @@ const DateField = BaseField.extend({
 
 export type DateField = z.infer<typeof DateField>
 
-/**
- * For internal use only. Needed for search functionality.
- */
-export const DateRangeField = BaseField.extend({
+const TimeField = BaseField.extend({
+  type: z.literal(FieldType.TIME),
+  defaultValue: TimeValue.optional(),
+  configuration: z
+    .object({
+      notice: TranslationConfig.describe(
+        'Text to display above the time input'
+      ).optional()
+    })
+    .optional()
+}).describe('A single date input (HH-mm)')
+
+export type TimeField = z.infer<typeof TimeField>
+
+const DateRangeField = BaseField.extend({
   type: z.literal(FieldType.DATE_RANGE),
   defaultValue: DateRangeFieldValue.optional(),
   configuration: z
@@ -205,18 +225,28 @@ const HtmlFontVariant = z.enum([
 
 export type HtmlFontVariant = z.infer<typeof HtmlFontVariant>
 
+const ParagraphConfiguration = z
+  .object({
+    styles: z
+      .object({
+        fontVariant: HtmlFontVariant.optional().describe(
+          'Font variant to use for the paragraph text'
+        ),
+        hint: z
+          .boolean()
+          .optional()
+          .describe('When true, paragraph is styled as a hint with grey color')
+      })
+      .optional()
+  })
+  .default({})
+
+export type ParagraphConfiguration = z.infer<typeof ParagraphConfiguration>
+
 const Paragraph = BaseField.extend({
   type: z.literal(FieldType.PARAGRAPH),
   defaultValue: NonEmptyTextValue.optional(),
-  configuration: z
-    .object({
-      styles: z
-        .object({
-          fontVariant: HtmlFontVariant.optional()
-        })
-        .optional()
-    })
-    .default({})
+  configuration: ParagraphConfiguration
 }).describe('A read-only HTML <p> paragraph')
 
 export type Paragraph = z.infer<typeof Paragraph>
@@ -525,6 +555,7 @@ export type FieldConfig =
   | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
   | z.infer<typeof DateField>
+  | z.infer<typeof TimeField>
   | z.infer<typeof DateRangeField>
   | z.infer<typeof SelectDateRangeField>
   | z.infer<typeof Paragraph>
@@ -555,6 +586,7 @@ export const FieldConfig = z
     NumberField,
     TextAreaField,
     DateField,
+    TimeField,
     DateRangeField,
     SelectDateRangeField,
     Paragraph,

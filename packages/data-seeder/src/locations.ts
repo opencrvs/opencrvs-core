@@ -166,6 +166,7 @@ function locationBundleToIdentifier(
 /**
  * Get the externally defined id for location. Defined in country-config.
  */
+
 const getExternalIdFromIdentifier = (
   identifiers: fhir3.Location['identifier']
 ) =>
@@ -261,7 +262,6 @@ export async function seedLocationsForV2Events(token: string) {
           .then((bundle: fhir3.Bundle<fhir3.Location>) =>
             bundleToLocationEntries(bundle).map((location) => ({
               id: location.id,
-              externalId: getExternalIdFromIdentifier(location.identifier),
               name: location.name,
               partOf: location?.partOf?.reference
                 ? updateLocationPartOf(location?.partOf?.reference)
@@ -283,11 +283,12 @@ export async function seedLocationsForV2Events(token: string) {
   })
 
   if (!res.ok) {
-    // eslint-disable-next-line no-console
-    console.error(
+    const msg =
       'Unable to seed locations for v2 events. Ensure events service is running.'
-    )
+    // eslint-disable-next-line no-console
+    console.error(msg)
     // eslint-disable-next-line no-console
     console.error(JSON.stringify(await res.json()))
+    raise(msg)
   }
 }

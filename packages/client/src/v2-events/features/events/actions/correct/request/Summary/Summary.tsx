@@ -10,77 +10,54 @@
  */
 
 import * as React from 'react'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useSelector } from 'react-redux'
 import { useNavigate } from 'react-router-dom'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
-  ActionType,
+  useTypedParams,
+  useTypedSearchParams
+} from 'react-router-typesafe-routes/dom'
+import {
   FieldConfig,
   generateTransactionId,
-  Scope,
   SCOPES,
   isFieldVisible,
   getDeclarationFields,
-  getDeclaration,
-  getCurrentEventState
+  getCurrentEventState,
+  ActionType,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
 import { Content } from '@opencrvs/components/lib/Content'
 import { Dialog } from '@opencrvs/components/lib/Dialog/Dialog'
-import { Table } from '@opencrvs/components/lib/Table'
-import { Text } from '@opencrvs/components/lib/Text'
 import { SecondaryButton } from '@opencrvs/components/lib/buttons'
-import { ColumnContentAlignment } from '@opencrvs/components/lib/common-types'
 import { Check } from '@opencrvs/components/lib/icons'
+import { Text } from '@opencrvs/components/lib/Text'
 import { messages as registerMessages } from '@client/i18n/messages/views/register'
 import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
-import { useFormDataStringifier } from '@client/v2-events/hooks/useFormDataStringifier'
 import { ROUTES } from '@client/v2-events/routes'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
+import { hasFieldChanged } from '../../utils'
+import { CorrectionDetails } from './CorrectionDetails'
 
-function shouldBeShownAsAValue(field: FieldConfig) {
-  if (field.type === 'PAGE_HEADER' || field.type === 'PARAGRAPH') {
-    return false
+const messages = defineMessages({
+  submitCorrectionRequest: {
+    id: 'v2-events.buttons.submitCorrectionRequest',
+    defaultMessage: 'Submit correction request',
+    description: 'Submit correction request button text'
+  },
+  makeCorrection: {
+    id: 'v2-events.buttons.makeCorrection',
+    defaultMessage: 'Correct record',
+    description: 'Record corrected button text'
   }
-  return true
-}
-
-function ContinueButton({
-  onClick,
-  disabled = false,
-  scopes
-}: {
-  disabled?: boolean
-  onClick: () => void
-  scopes: Scope[] | null
-}) {
-  const intl = useIntl()
-
-  return (
-    <Button
-      key="make_correction"
-      disabled={disabled}
-      id="make_correction"
-      size="large"
-      type="positive"
-      onClick={onClick}
-    >
-      <Check />
-
-      {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
-        ? intl.formatMessage(buttonMessages.makeCorrection)
-        : intl.formatMessage(buttonMessages.sendForApproval)}
-    </Button>
-  )
-}
+})
 
 /**
  * Used for ensuring that the object has all the properties. For example, intl expects object with well defined properties for translations.
@@ -98,128 +75,84 @@ function setEmptyValuesForFields(fields: FieldConfig[]) {
 }
 
 export function Summary() {
-  const { eventId } = useTypedParams(
-    ROUTES.V2.EVENTS.REQUEST_CORRECTION.SUMMARY
+  const { eventId } = useTypedParams(ROUTES.V2.EVENTS.CORRECTION.SUMMARY)
+
+  const [{ workqueue }] = useTypedSearchParams(
+    ROUTES.V2.EVENTS.CORRECTION.SUMMARY
   )
-
   const scopes = useSelector(getScope)
-
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
-
   const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event: EventDocument = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
   const previousFormValues = eventIndex.declaration
   const getFormValues = useEventFormData((state) => state.getFormValues)
 
-  const stringifyFormData = useFormDataStringifier()
-
   const form = getFormValues()
-  const formConfig = getDeclaration(eventConfiguration)
-
-  const actionConfig = eventConfiguration.actions.find(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
-  )
-
-  if (!actionConfig) {
-    throw new Error(
-      `No action configuration found for ${ActionType.REQUEST_CORRECTION} found. This should never happen`
-    )
-  }
   const fields = getDeclarationFields(eventConfiguration)
-
-  const allFields = [
-    ...fields,
-    ...actionConfig.onboardingForm.flatMap((page) => page.fields),
-    ...actionConfig.additionalDetailsForm.flatMap((page) => page.fields)
-  ]
-
-  const stringifiedForm = stringifyFormData(allFields, form)
-  const stringifiedPreviousForm = stringifyFormData(
-    allFields,
-    previousFormValues
-  )
-
-  const annotation = useActionAnnotation()
-
-  const annotationForm = annotation.getAnnotation()
-
-  const stringiedRequestData = stringifyFormData(allFields, annotationForm)
-
-  const onboardingFormPages =
-    eventConfiguration.actions.find(
-      (action) => action.type === ActionType.REQUEST_CORRECTION
-    )?.onboardingForm || []
-
-  const additionalDetailsFormPages =
-    eventConfiguration.actions.find(
-      (action) => action.type === ActionType.REQUEST_CORRECTION
-    )?.additionalDetailsForm || []
+  const { getAnnotation } = useActionAnnotation()
+  const annotation = getAnnotation()
 
   const submitCorrection = React.useCallback(() => {
-    const formWithOnlyChangedValues = Object.entries(form).reduce<typeof form>(
-      (acc, [key, value]) => {
-        if (value !== previousFormValues[key]) {
-          acc[key] = value
+    const formWithOnlyChangedValues = Object.fromEntries(
+      Object.entries(form).filter(([key, value]) => {
+        const field = fields.find((f) => f.id === key)
+        if (!field) {
+          return false
         }
-        return acc
-      },
-      {}
+
+        return hasFieldChanged(field, form, previousFormValues)
+      })
     )
 
     const valuesThatGotHidden = fields.filter((field) => {
       const wasVisible = isFieldVisible(field, previousFormValues)
       const isHidden = !isFieldVisible(field, form)
-
       return wasVisible && isHidden
     })
 
     const nullifiedHiddenValues = setEmptyValuesForFields(valuesThatGotHidden)
 
-    events.actions.correction.request.mutate({
+    const mutationPayload = {
       eventId,
-      // @TODO:
-      // @ts-ignore
       declaration: {
         ...formWithOnlyChangedValues,
         ...nullifiedHiddenValues
       },
       transactionId: generateTransactionId(),
-      annotation: annotationForm
-    })
-    eventFormNavigation.closeActionView()
+      annotation
+    }
+    if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
+      events.customActions.makeCorrectionOnRequest.mutate({
+        ...mutationPayload,
+        fullEvent: event,
+        eventConfiguration
+      })
+    } else {
+      events.actions.correction.request.mutate(mutationPayload)
+    }
+
+    navigate(ROUTES.V2.EVENTS.OVERVIEW.buildPath({ eventId }))
   }, [
     form,
     fields,
+    event,
+    eventConfiguration,
+    scopes,
+    events.customActions.makeCorrectionOnRequest,
     events.actions.correction.request,
     eventId,
-    annotationForm,
-    eventFormNavigation,
-    previousFormValues
+    annotation,
+    previousFormValues,
+    navigate
   ])
-
-  const backToReviewButton = (
-    <SecondaryButton
-      key="back-to-review"
-      id="back-to-review"
-      onClick={() =>
-        navigate(
-          ROUTES.V2.EVENTS.REQUEST_CORRECTION.REVIEW.buildPath({
-            eventId
-          })
-        )
-      }
-    >
-      {intl.formatMessage(registerMessages.backToReviewButton)}
-    </SecondaryButton>
-  )
 
   return (
     <>
@@ -232,147 +165,45 @@ export function Summary() {
       >
         <Content
           bottomActionButtons={[
-            <ContinueButton
-              key={'make-correction'}
-              disabled={false /* @todo */}
-              scopes={scopes}
+            <Button
+              key="make-correction"
+              id="make-correction"
+              size="large"
+              type="primary"
               onClick={togglePrompt}
-            />
+            >
+              <Check />
+              {scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
+                ? intl.formatMessage(messages.makeCorrection)
+                : intl.formatMessage(messages.submitCorrectionRequest)}
+            </Button>
           ]}
           showTitleOnMobile={true}
           title={intl.formatMessage(correctionMessages.correctionSummaryTitle)}
-          topActionButtons={[backToReviewButton]}
-        >
-          {onboardingFormPages.map((page) => {
-            return (
-              <Table
-                key={page.id}
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    width: 34,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'fieldLabel'
-                  },
-                  {
-                    label: '',
-                    width: 64,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'collectedValue'
-                  }
-                ]}
-                content={page.fields
-                  .filter(shouldBeShownAsAValue)
-                  .map((field) => {
-                    return {
-                      fieldLabel: intl.formatMessage(field.label),
-                      collectedValue: stringiedRequestData[field.id] || ''
-                    }
-                  })}
-                hideTableBottomBorder={true}
-                id="onboarding"
-                isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              ></Table>
-            )
-          })}
-
-          {formConfig.pages.map((page) => {
-            const content = page.fields
-              .filter((field) => {
-                const visibilityChanged =
-                  isFieldVisible(field, previousFormValues) !==
-                  isFieldVisible(field, form)
-
-                return (
-                  stringifiedPreviousForm[field.id] !==
-                    stringifiedForm[field.id] || visibilityChanged
+          topActionButtons={[
+            <SecondaryButton
+              key="back-to-review"
+              id="back-to-review"
+              onClick={() =>
+                navigate(
+                  ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+                    eventId
+                  })
                 )
-              })
-              .map((field) => {
-                const wasHidden = !isFieldVisible(field, form)
-                return {
-                  item: intl.formatMessage(field.label),
-                  original: stringifiedPreviousForm[field.id] || '-',
-                  changed: wasHidden ? '-' : stringifiedForm[field.id]
-                }
-              })
-
-            if (content.length === 0) {
-              return null
-            }
-            return (
-              <Table
-                key={page.id}
-                noPagination
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    alignment: ColumnContentAlignment.LEFT,
-                    width: 34,
-                    key: 'item'
-                  },
-                  {
-                    label: intl.formatMessage(
-                      correctionMessages.correctionSummaryOriginal
-                    ),
-                    width: 33,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'original'
-                  },
-                  {
-                    label: intl.formatMessage(
-                      correctionMessages.correctionSummaryCorrection
-                    ),
-                    width: 33,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'changed'
-                  }
-                ]}
-                content={content}
-                hideTableBottomBorder={true}
-                id="diff"
-                isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              ></Table>
-            )
-          })}
-
-          {additionalDetailsFormPages.map((page) => {
-            return (
-              <Table
-                key={page.id}
-                columns={[
-                  {
-                    label: intl.formatMessage(page.title),
-                    width: 34,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'fieldLabel'
-                  },
-                  {
-                    label: '',
-                    width: 64,
-                    alignment: ColumnContentAlignment.LEFT,
-                    key: 'collectedValue'
-                  }
-                ]}
-                content={page.fields
-                  .filter(shouldBeShownAsAValue)
-                  .map((field) => {
-                    return {
-                      fieldLabel: intl.formatMessage(field.label),
-                      collectedValue: stringiedRequestData[field.id] || ''
-                    }
-                  })}
-                hideTableBottomBorder={true}
-                id="additional-details"
-                isLoading={false}
-                noResultText={intl.formatMessage(constantsMessages.noResults)}
-              ></Table>
-            )
-          })}
-
-          {/* @todo fees select */}
+              }
+            >
+              {intl.formatMessage(registerMessages.backToReviewButton)}
+            </SecondaryButton>
+          ]}
+        >
+          <CorrectionDetails
+            annotation={annotation}
+            editable={true}
+            event={event}
+            form={form}
+            requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
+            workqueue={workqueue}
+          />
         </Content>
       </ActionPageLight>
       <Dialog
@@ -405,7 +236,7 @@ export function Summary() {
         title={intl.formatMessage(
           scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
             ? correctionMessages.correctRecordDialogTitle
-            : correctionMessages.correctionForApprovalDialogTitle
+            : correctionMessages.correctionApprovalDialogTitle
         )}
         onClose={togglePrompt}
       >

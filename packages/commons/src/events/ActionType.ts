@@ -48,7 +48,10 @@ export const ConfirmableActions = [
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
-  ActionType.PRINT_CERTIFICATE
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION
 ] as const
 
 /** Testing building types from enums as an alternative */
@@ -71,6 +74,13 @@ export const ActionTypes = z.enum([
   'ASSIGN',
   'UNASSIGN'
 ])
+
+export const ExclusiveActions = {
+  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
+} as const
+
+export type ExclusiveActionTypes =
+  (typeof ExclusiveActions)[keyof typeof ExclusiveActions]
 
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
@@ -116,11 +126,12 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.REJECT,
   ActionType.MARKED_AS_DUPLICATE,
   ActionType.ARCHIVE,
-  ActionType.REQUEST_CORRECTION,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION
 ])
+
 export type WorkqueueActionType = z.infer<typeof workqueueActions>
+export type DisplayableAction = ActionType | ExclusiveActionTypes
 
 const META_ACTIONS: ActionType[] = [
   ActionType.ASSIGN,

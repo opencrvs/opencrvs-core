@@ -49,7 +49,8 @@ import {
   getValidatorsForField,
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  isTimeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -67,7 +68,8 @@ import {
   Divider,
   PageHeader,
   Paragraph,
-  SelectDateRangeField
+  SelectDateRangeField,
+  TimeField
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -230,6 +232,20 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isTimeFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TimeField.Input
+            {...inputProps}
+            value={field.value}
+            onChange={(val: string) =>
+              onFieldValueChange(fieldDefinition.id, val)
+            }
+          />
+        </InputField>
+      )
+    }
+
     if (isDateRangeFieldType(field)) {
       const parsed = DateRangeFieldValue.safeParse(field.value)
       return (
@@ -277,7 +293,7 @@ export const GeneratedInputField = React.memo(
 
       return (
         <Paragraph.Input
-          fontVariant={field.config.configuration.styles?.fontVariant}
+          configuration={field.config.configuration}
           message={message}
         />
       )

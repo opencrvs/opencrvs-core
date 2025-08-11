@@ -32,7 +32,8 @@ import {
   EventConfig,
   EventStatus,
   getAvailableActionsForEvent,
-  getCurrentEventState
+  getCurrentEventState,
+  DisplayableAction
 } from '@opencrvs/commons/events'
 import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
@@ -111,7 +112,7 @@ export async function throwConflictIfActionNotAllowed(
   })
   const eventStatus = getStatusFromActions(event.actions)
 
-  const allowedActions: ActionType[] = getAvailableActionsForEvent(
+  const allowedActions: DisplayableAction[] = getAvailableActionsForEvent(
     getCurrentEventState(event, eventConfig)
   )
 
@@ -262,6 +263,8 @@ export async function addAction(
     }
   }
 
+  const content = ('content' in input && input.content) || undefined
+
   if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
@@ -269,6 +272,7 @@ export async function addAction(
       actionType: ActionType.MARKED_AS_DUPLICATE,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,
@@ -288,6 +292,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
@@ -299,7 +304,9 @@ export async function addAction(
     })
   } else {
     const hasReason =
-      input.type === ActionType.ARCHIVE || input.type === ActionType.REJECT
+      input.type === ActionType.ARCHIVE ||
+      input.type === ActionType.REJECT ||
+      input.type === ActionType.REJECT_CORRECTION
 
     const hasRequestId =
       input.type === ActionType.APPROVE_CORRECTION ||
@@ -315,6 +322,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,

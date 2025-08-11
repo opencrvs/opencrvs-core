@@ -21,19 +21,16 @@ fetch.enableMocks()
 const locations = [
   {
     id: '35391063-7dca-4e57-abd3-20dcc8538a64' as UUID,
-    externalId: '2OKicPQMNI',
     name: 'HQ Office',
     partOf: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID
   },
   {
     id: 'f09c8dda-2156-420a-8215-2beda4c81d66' as UUID,
-    externalId: 'BxrIbNW7f3K',
     name: 'Embe',
     partOf: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID
   },
   {
     id: '7ef2b9c7-5e6d-49f6-ae05-656207d0fc64' as UUID,
-    externalId: 'B1u1bVtIA92',
     name: 'Pualula',
     partOf: null
   }
@@ -70,7 +67,11 @@ describe('stringifyEventMetadata', () => {
     ] satisfies User[]
 
     const stringified = stringifyEventMetadata({
-      metadata: { ...metadata, modifiedAt: new Date(2000, 1, 2).toISOString() },
+      metadata: {
+        ...metadata,
+        modifiedAt: new Date(2000, 1, 2).toISOString(),
+        copiesPrintedForTemplate: 1
+      },
       locations,
       users,
       intl: createIntl({ locale: 'en' })

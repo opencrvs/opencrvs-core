@@ -22,12 +22,16 @@ import {
   EventStatus,
   isMetaAction,
   getAvailableActionsForEvent,
-  InherentFlags
+  InherentFlags,
+  ExclusiveActions,
+  DisplayableAction
 } from '@opencrvs/commons/client'
+import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 
@@ -67,7 +71,8 @@ function getAvailableAssignmentActions(
 }
 interface ActionConfig {
   label: TranslationConfig
-  onClick: (eventId: string) => Promise<void> | void
+  icon: IconProps['name']
+  onClick: (workqueue?: string) => Promise<void> | void
   disabled?: boolean
   shouldHide?: (actions: ActionType[]) => boolean
 }
@@ -115,10 +120,21 @@ export const actionLabels = {
     defaultMessage: 'Delete',
     description: 'Label for delete button in dropdown menu',
     id: 'v2.event.birth.action.delete.label'
+  },
+  [ActionType.REQUEST_CORRECTION]: {
+    defaultMessage: 'Correct record',
+    description: 'Label for request correction button in dropdown menu',
+    id: 'v2.event.birth.action.request-correction.label'
+  },
+  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+    defaultMessage: 'Review',
+    description: 'Label for review correction button in dropdown menu',
+    id: 'v2.event.action.review-correction.label'
   }
 } as const
 
 export function useAction(event: EventIndex) {
+  const scopes = useSelector(getScope) ?? []
   const events = useEvents()
   const navigate = useNavigate()
   const drafts = useDrafts()
@@ -133,6 +149,7 @@ export function useAction(event: EventIndex) {
   const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
 
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   if (!authentication) {
     throw new Error('Authentication is not available but is required')
@@ -148,6 +165,10 @@ export function useAction(event: EventIndex) {
     .find((draft) => draft.eventId === event.id)
 
   const hasDeclarationDraftOpen = openDraft?.action.type === ActionType.DECLARE
+  const eventIsWaitingForCorrection = event.flags.includes(
+    InherentFlags.CORRECTION_REQUESTED
+  )
+  const eventId = event.id
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -157,24 +178,30 @@ export function useAction(event: EventIndex) {
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
-        onClick: (workqueue?: string) =>
-          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+        icon: 'Eye',
+        onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
-        onClick: async (workqueue?: string) => {
+        icon: 'PushPin',
+        onClick: async () => {
           await events.actions.assignment.assign.mutate({
-            eventId: event.id,
+            eventId,
             assignedTo: authentication.sub,
             refetchEvent
           })
-        }
+        },
+        disabled:
+          // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
+          eventIsWaitingForCorrection &&
+          !scopes.includes(SCOPES.RECORD_REGISTRATION_CORRECT)
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
-        onClick: async (workqueue?: string) => {
+        icon: 'ArrowCircleDown',
+        onClick: async () => {
           await events.actions.assignment.unassign.mutateAsync({
-            eventId: event.id,
+            eventId,
             transactionId: getUUID(),
             assignedTo: null
           })
@@ -182,10 +209,11 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
-        onClick: (workqueue?: string) =>
+        icon: 'PencilLine',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -195,10 +223,11 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
-        onClick: (workqueue?: string) =>
+        icon: 'PencilLine',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -206,10 +235,11 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
-        onClick: (workqueue?: string) =>
+        icon: 'PencilLine',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
@@ -217,27 +247,70 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        onClick: (workqueue?: string) =>
+        icon: 'Printer',
+        onClick: (workqueue?) =>
           navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           ),
-        disabled: !eventIsAssignedToSelf
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
+        shouldHide: () => eventIsWaitingForCorrection
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
-        onClick: (workqueue?: string) => {
-          deleteEvent({
-            eventId: event.id
-          })
+        icon: 'Trash',
+        onClick: (workqueue?) => {
+          deleteEvent({ eventId })
           if (!workqueue) {
             navigate(ROUTES.V2.buildPath({}))
           }
         }
+      },
+      [ActionType.REQUEST_CORRECTION]: {
+        label: actionLabels[ActionType.REQUEST_CORRECTION],
+        icon: 'NotePencil',
+        onClick: () => {
+          const correctionPages = eventConfiguration.actions.find(
+            (action) => action.type === ActionType.REQUEST_CORRECTION
+          )?.correctionForm.pages
+
+          if (!correctionPages) {
+            throw new Error('No page ID found for request correction')
+          }
+
+          // If no pages are configured, skip directly to review page
+          if (correctionPages.length === 0) {
+            navigate(ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId }))
+            return
+          }
+
+          // If pages are configured, navigate to first page
+          navigate(
+            ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
+              eventId,
+              pageId: correctionPages[0].id
+            })
+          )
+        },
+        disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
+        shouldHide: () => eventIsWaitingForCorrection
+      },
+      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+        label: actionLabels[ExclusiveActions.REVIEW_CORRECTION_REQUEST],
+        icon: 'NotePencil',
+        onClick: () => {
+          navigate(
+            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+              eventId
+            })
+          )
+        },
+        disabled: !eventIsAssignedToSelf,
+        shouldHide: () => !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>,
+    } satisfies Partial<Record<DisplayableAction, ActionConfig>>,
     authentication
   }
 }
@@ -288,7 +361,7 @@ export function useActionMenuItems(event: EventIndex) {
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
-    (action): action is keyof typeof config =>
+    (action): action is WorkqueueActionType =>
       Object.keys(config).includes(action)
   )
 
@@ -300,7 +373,7 @@ export function useActionMenuItems(event: EventIndex) {
       : hasAnyOfScopes(scopes, requiredScopes)
   })
 
-  // Filter out actions which are not visible based on the action config
+  // Filter out actions which are not visible based on the action config 'shouldHide' function
   const visibleActions = allowedActions.filter((a) => {
     const actionConfig = config[a]
 
