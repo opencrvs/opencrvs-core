@@ -47,8 +47,7 @@ test('Creates single location', async () => {
     {
       id: generateUuid(),
       partOf: null,
-      name: 'Location foobar',
-      externalId: 'foo-bar'
+      name: 'Location foobar'
     }
   ]
 

@@ -29,7 +29,7 @@ import { UUID } from '../../uuid'
 import {
   DocumentPath,
   FullDocumentPath,
-  FullDocumentURL
+  FullDocumentUrl
 } from '../../documents'
 
 export function getStatusFromActions(actions: Array<Action>) {
@@ -50,7 +50,6 @@ export function getStatusFromActions(actions: Array<Action>) {
         case ActionType.NOTIFY:
           return EventStatus.enum.NOTIFIED
         case ActionType.PRINT_CERTIFICATE:
-          return EventStatus.enum.CERTIFIED
         case ActionType.ASSIGN:
         case ActionType.UNASSIGN:
         case ActionType.REJECT:
@@ -139,7 +138,7 @@ type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny chan
       ? T
       : T extends DocumentPath
         ? T
-        : T extends FullDocumentURL
+        : T extends FullDocumentUrl
           ? T
           : T extends (infer U)[]
             ? NonNullableDeep<U>[]

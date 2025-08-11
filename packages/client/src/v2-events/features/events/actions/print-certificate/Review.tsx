@@ -185,7 +185,7 @@ export function Review() {
   const { eventConfiguration } = useEventConfiguration(fullEvent.type)
   const formConfig = getPrintForm(eventConfiguration)
 
-  const { svgCode, handleCertify } = usePrintableCertificate({
+  const { svgCode, preparePdfCertificate } = usePrintableCertificate({
     event: fullEvent,
     config: eventConfiguration,
     locations,
@@ -259,8 +259,13 @@ export function Review() {
       </ResponsiveModal>
     ))
 
+    /**
+     * NOTE: We have separated the preparing and printing of the PDF certificate. Without the separation, user is already unassigned from the event and cache is cleared. @see preparePdfCertificate for more details.
+     */
     if (confirmed) {
       try {
+        const printCertificate = await preparePdfCertificate(fullEvent)
+
         await onlineActions.printCertificate.mutateAsync({
           fullEvent,
           eventId: fullEvent.id,
@@ -271,7 +276,7 @@ export function Review() {
           type: ActionType.PRINT_CERTIFICATE
         })
 
-        await handleCertify(fullEvent)
+        printCertificate()
 
         toast.custom(
           <Toast
