@@ -178,10 +178,8 @@ export const GeneratedInputField = React.memo(
         // We are showing errors to underlying text input, so we need to ignore them here
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Name.Input
+            configuration={field.config.configuration}
             id={fieldDefinition.id}
-            maxLength={field.config.configuration?.maxLength}
-            nameConfig={field.config.configuration?.name}
-            searchMode={field.config.configuration?.searchMode}
             validation={validation}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
@@ -406,6 +404,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
             {...field.config}
+            configuration={field.config.configuration}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.
             // @ts-ignore
