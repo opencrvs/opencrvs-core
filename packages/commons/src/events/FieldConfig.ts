@@ -630,3 +630,14 @@ export type SelectOption = z.infer<typeof SelectOption>
 export type AdministrativeAreaConfiguration = z.infer<
   typeof AdministrativeAreaConfiguration
 >
+
+/**
+ * Union of file-related fields. Using common type should help with compiler to know where to add new cases.
+ */
+export const AnyFileField = z.discriminatedUnion('type', [
+  SignatureField,
+  File,
+  FileUploadWithOptions
+])
+
+export type AnyFileField = z.infer<typeof AnyFileField>
