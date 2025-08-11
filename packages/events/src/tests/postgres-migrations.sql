@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.4 (Debian 17.4-1.pgdg120+2)
--- Dumped by pg_dump version 17.4 (Debian 17.4-1.pgdg120+2)
+-- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
+-- Dumped by pg_dump version 17.5
+
+-- Started on 2025-08-06 14:43:51 EEST
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -237,19 +239,19 @@ ALTER TABLE ONLY app.pgmigrations ALTER COLUMN id SET DEFAULT nextval('app.pgmig
 
 
 --
+-- Name: event_action_drafts event_action_drafts_event_id_created_by_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+--
+
+ALTER TABLE ONLY app.event_action_drafts
+    ADD CONSTRAINT event_action_drafts_event_id_created_by_key UNIQUE (event_id, created_by);
+
+
+--
 -- Name: event_action_drafts event_action_drafts_pkey; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.event_action_drafts
     ADD CONSTRAINT event_action_drafts_pkey PRIMARY KEY (id);
-
-
---
--- Name: event_action_drafts event_action_drafts_transaction_id_action_type_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
---
-
-ALTER TABLE ONLY app.event_action_drafts
-    ADD CONSTRAINT event_action_drafts_transaction_id_action_type_key UNIQUE (transaction_id, action_type);
 
 
 --
@@ -406,6 +408,8 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.events TO events_app;
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
+
+-- Completed on 2025-08-06 14:43:52 EEST
 
 --
 -- PostgreSQL database dump complete

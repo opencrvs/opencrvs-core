@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import fetch from 'node-fetch'
-import { FullDocumentPath, joinURLPaths } from '@opencrvs/commons'
+import { FullDocumentPath, joinUrlPaths } from '@opencrvs/commons'
 import { env } from '@events/environment'
 
 export async function deleteFile(path: FullDocumentPath, token: string) {
   const res = await fetch(
-    new URL(joinURLPaths('/files', path), env.DOCUMENTS_URL),
+    new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
     {
       method: 'DELETE',
       headers: {
@@ -22,11 +22,12 @@ export async function deleteFile(path: FullDocumentPath, token: string) {
       }
     }
   )
+
   return res.ok
 }
 export async function fileExists(path: FullDocumentPath, token: string) {
   const res = await fetch(
-    new URL(joinURLPaths('/files', path), env.DOCUMENTS_URL),
+    new URL(joinUrlPaths('/files', path), env.DOCUMENTS_URL),
     {
       method: 'HEAD',
       headers: {

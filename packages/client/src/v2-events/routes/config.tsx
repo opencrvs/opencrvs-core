@@ -10,7 +10,7 @@
  */
 
 import React, { useEffect } from 'react'
-import { Outlet, RouteObject, Routes } from 'react-router-dom'
+import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
 import { ActionType } from '@opencrvs/commons/client'
