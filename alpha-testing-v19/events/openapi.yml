@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: d83cb39b-113e-4ee8-b867-6ee7d78a8ade
+                transactionId: baed4a1f-9ff6-4feb-85ec-3adaf4d1a8af
                 type: v2.birth
       responses:
         "200":
@@ -482,7 +482,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: bdc277a5-8161-4507-8ffd-38483875c8fb
+                transactionId: 3dba5acb-8b4a-443b-b9ef-7fe2cd9ca595
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1378,6 +1378,34 @@ components:
               type: string
               enum:
                 - ADDRESS
+            configuration:
+              type: object
+              properties:
+                lineSeparator:
+                  type: string
+                fields:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - number
+                      - country
+                      - province
+                      - addressType
+                      - district
+                      - urbanOrRural
+                      - town
+                      - residentialArea
+                      - street
+                      - zipCode
+                      - village
+                      - state
+                      - district2
+                      - cityOrTown
+                      - addressLine1
+                      - addressLine2
+                      - addressLine3
+                      - postcodeOrZip
             defaultValue:
               anyOf:
                 - oneOf:
@@ -1464,11 +1492,6 @@ components:
                     - addressType
                     - state
                     - district2
-            configuration:
-              type: object
-              properties:
-                searchMode:
-                  type: boolean
           required:
             - id
             - label
@@ -2372,6 +2395,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     middlename:
@@ -2379,6 +2404,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     surname:
@@ -2386,6 +2413,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                   default:
@@ -2393,6 +2422,14 @@ components:
                       required: true
                     surname:
                       required: true
+                order:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - firstname
+                      - middlename
+                      - surname
                 maxLength:
                   type: number
                   description: Maximum length of the text
@@ -2400,8 +2437,6 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
-                searchMode:
-                  type: boolean
               default:
                 name:
                   firstname:
