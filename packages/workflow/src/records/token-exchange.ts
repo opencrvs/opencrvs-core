@@ -28,7 +28,9 @@ export async function getRecordSpecificToken(
   const res = await fetch(authUrl, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      // TODO : uncomment when we implement a OAuth2.0 standard token exchange
+      // with request body https://datatracker.ietf.org/doc/html/rfc8693#name-request
+      // 'Content-Type': 'application/json',
       ...headers
     }
   })
