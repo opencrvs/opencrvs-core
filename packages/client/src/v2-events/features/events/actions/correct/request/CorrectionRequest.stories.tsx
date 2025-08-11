@@ -192,7 +192,8 @@ export const Review: Story = {
 export const Summary: Story = {
   parameters: {
     offline: {
-      drafts: [draft]
+      drafts: [draft],
+      events: [tennisClubMembershipEventDocument]
     },
     reactRouter: {
       router: {
@@ -203,15 +204,6 @@ export const Summary: Story = {
       initialPath: ROUTES.V2.EVENTS.CORRECTION.SUMMARY.buildPath({
         eventId: tennisClubMembershipEventDocument.id
       })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
     }
   },
   play: async ({ canvasElement, step }) => {
