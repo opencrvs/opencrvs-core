@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: cce08416-0888-4265-9f21-12df1bdc72ab
+                transactionId: 2a4d6ed9-03c9-4df1-968b-eba31a593b5e
                 type: v2.birth
       responses:
         "200":
@@ -124,6 +124,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -293,7 +295,7 @@ paths:
                                   - firstname
                                   - surname
                               - type: "null"
-                  default: {}
+                  default: &a2 {}
                 annotation:
                   type: object
                   additionalProperties:
@@ -302,6 +304,8 @@ paths:
                       - type: string
                         format: date
                         description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
                       - anyOf:
                           - type: object
                             properties:
@@ -482,10 +486,1274 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 3f31f19e-ea73-4b58-9b6e-69e9bf9520be
+                transactionId: fd9841ba-eb49-48e1-a819-374c73decee4
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/correction/request:
+    post:
+      operationId: event-actions-correction-request-request
+      summary: Request correction for an event
+      tags:
+        - events
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  type: string
+                  format: uuid
+                transactionId:
+                  type: string
+                declaration:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: *a1
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - path
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
+                  default: *a2
+                annotation:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: *a1
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - path
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
+                originalActionId:
+                  type: string
+                  format: uuid
+                keepAssignment:
+                  type: boolean
+                type:
+                  type: string
+                  enum:
+                    - REQUEST_CORRECTION
+                  default: REQUEST_CORRECTION
+              required:
+                - eventId
+                - transactionId
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/correction/approve:
+    post:
+      operationId: event-actions-correction-approve-request
+      summary: Approve correction for an event
+      tags:
+        - events
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  type: string
+                  format: uuid
+                transactionId:
+                  type: string
+                declaration:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: *a1
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - path
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
+                  default: *a2
+                annotation:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: *a1
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - path
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
+                originalActionId:
+                  type: string
+                  format: uuid
+                keepAssignment:
+                  type: boolean
+                requestId:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - APPROVE_CORRECTION
+                  default: APPROVE_CORRECTION
+              required:
+                - eventId
+                - transactionId
+                - requestId
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EventDocument"
+        "400":
+          description: Invalid input data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/correction/reject:
+    post:
+      operationId: event-actions-correction-reject-request
+      summary: Reject correction for an event
+      tags:
+        - events
+      security:
+        - Authorization: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                eventId:
+                  type: string
+                  format: uuid
+                transactionId:
+                  type: string
+                declaration:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: *a1
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - path
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
+                  default: *a2
+                annotation:
+                  type: object
+                  additionalProperties:
+                    anyOf:
+                      - type: string
+                      - type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      - type: string
+                        pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+                      - anyOf:
+                          - type: object
+                            properties:
+                              start:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                              end:
+                                type: string
+                                format: date
+                                description: Date in the format YYYY-MM-DD
+                            required:
+                              - start
+                              - end
+                          - type: string
+                            format: date
+                            description: Date in the format YYYY-MM-DD
+                        description: Date range with start and end dates in the format YYYY-MM-DD.
+                          Inclusive start, exclusive end.
+                      - type: string
+                        enum: *a1
+                      - type: boolean
+                      - type: number
+                      - type: object
+                        properties:
+                          path:
+                            type: string
+                            description: A full absolute path with bucket name, starting from the root of
+                              the S3 server, /bucket-name/document-id.jpg
+                          originalFilename:
+                            type: string
+                          type:
+                            type: string
+                        required:
+                          - path
+                          - originalFilename
+                          - type
+                      - type: array
+                        items:
+                          type: object
+                          properties:
+                            path:
+                              type: string
+                              description: A full absolute path with bucket name, starting from the root of
+                                the S3 server, /bucket-name/document-id.jpg
+                            originalFilename:
+                              type: string
+                            type:
+                              type: string
+                            option:
+                              type: string
+                          required:
+                            - path
+                            - originalFilename
+                            - type
+                            - option
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - URBAN
+                          town:
+                            type: string
+                            nullable: true
+                          residentialArea:
+                            type: string
+                            nullable: true
+                          street:
+                            type: string
+                            nullable: true
+                          number:
+                            type: string
+                            nullable: true
+                          zipCode:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - DOMESTIC
+                          province:
+                            type: string
+                          district:
+                            type: string
+                          urbanOrRural:
+                            type: string
+                            enum:
+                              - RURAL
+                          village:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - province
+                          - district
+                          - urbanOrRural
+                      - type: object
+                        properties:
+                          country:
+                            type: string
+                          addressType:
+                            type: string
+                            enum:
+                              - INTERNATIONAL
+                          state:
+                            type: string
+                          district2:
+                            type: string
+                          cityOrTown:
+                            type: string
+                            nullable: true
+                          addressLine1:
+                            type: string
+                            nullable: true
+                          addressLine2:
+                            type: string
+                            nullable: true
+                          addressLine3:
+                            type: string
+                            nullable: true
+                          postcodeOrZip:
+                            type: string
+                            nullable: true
+                        required:
+                          - country
+                          - addressType
+                          - state
+                          - district2
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  firstname:
+                                    type: string
+                                  surname:
+                                    type: string
+                                  middlename:
+                                    type: string
+                                    nullable: true
+                                required:
+                                  - firstname
+                                  - surname
+                              - type: "null"
+                originalActionId:
+                  type: string
+                  format: uuid
+                keepAssignment:
+                  type: boolean
+                requestId:
+                  type: string
+                type:
+                  type: string
+                  enum:
+                    - REJECT_CORRECTION
+                  default: REJECT_CORRECTION
+                reason:
+                  type: object
+                  properties:
+                    message:
+                      type: string
+                      minLength: 1
+                      description: Message describing reason for rejection or archiving
+                    isDuplicate:
+                      type: boolean
+                      description: If a declaration is duplicated
+                  required:
+                    - message
+              required:
+                - eventId
+                - transactionId
+                - requestId
+                - reason
       responses:
         "200":
           description: Successful response
@@ -549,7 +1817,7 @@ paths:
               - eventType: tennis-club-membership
                 status:
                   type: anyOf
-                  terms: &a14
+                  terms: &a15
                     - CREATED
                     - NOTIFIED
                     - DECLARED
@@ -641,7 +1909,7 @@ paths:
                             type: string
                           createdByUserType:
                             type: string
-                            enum: &a11
+                            enum: &a12
                               - user
                               - system
                           createdAt:
@@ -671,7 +1939,7 @@ paths:
                               or accepted by 3rd party integration.
                           type:
                             type: string
-                            enum: &a12
+                            enum: &a13
                               - NOTIFY
                               - DECLARE
                               - VALIDATE
@@ -679,6 +1947,9 @@ paths:
                               - REJECT
                               - ARCHIVE
                               - PRINT_CERTIFICATE
+                              - REQUEST_CORRECTION
+                              - APPROVE_CORRECTION
+                              - REJECT_CORRECTION
                         required:
                           - id
                           - transactionId
@@ -782,7 +2053,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: &a2 []
+                        default: &a3 []
                       id:
                         type: string
                         description: Id of summary field
@@ -818,7 +2089,7 @@ components:
                             - conditional
                           description: If 'SHOW' conditional is defined, the component is shown to the
                             user only if the condition is met
-                        default: *a2
+                        default: *a3
                       fieldId:
                         type: string
                       label:
@@ -899,7 +2170,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: &a3
+                              enum: &a4
                                 - fuzzy
                                 - exact
                                 - range
@@ -980,7 +2251,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: &a4 []
+                          default: &a5 []
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -1022,7 +2293,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: &a5 []
+                          default: &a6 []
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -1062,7 +2333,7 @@ components:
                           properties:
                             type:
                               type: string
-                              enum: *a3
+                              enum: *a4
                               description: Determines the type of field
                           required:
                             - type
@@ -1139,7 +2410,7 @@ components:
                           type: array
                           items:
                             $ref: "#/components/schemas/FieldConditional"
-                          default: *a4
+                          default: *a5
                           description: "
 
                             \       In advanced search, we sometimes need to
@@ -1181,7 +2452,7 @@ components:
                             required:
                               - validator
                               - message
-                          default: *a5
+                          default: *a6
                           description: In advanced search, we sometimes need to override the default field
                             validations.
                         fieldId:
@@ -1297,7 +2568,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: &a10 []
+          default: &a11 []
         draft:
           type: boolean
         type:
@@ -1332,6 +2603,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1340,15 +2613,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: &a6 []
-            required:
-              type: boolean
-              default: false
+              default: &a7 []
             secured:
               type: boolean
               default: false
@@ -1366,46 +2640,20 @@ components:
                 required:
                   - validator
                   - message
-              default: &a7 []
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: &a8 []
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
                 - ADDRESS
-            configuration:
-              type: object
-              properties:
-                lineSeparator:
-                  type: string
-                fields:
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                      - number
-                      - country
-                      - province
-                      - addressType
-                      - district
-                      - urbanOrRural
-                      - town
-                      - residentialArea
-                      - street
-                      - zipCode
-                      - village
-                      - state
-                      - district2
-                      - cityOrTown
-                      - addressLine1
-                      - addressLine2
-                      - addressLine3
-                      - postcodeOrZip
             defaultValue:
               anyOf:
                 - oneOf:
@@ -1492,6 +2740,11 @@ components:
                     - addressType
                     - state
                     - district2
+            configuration:
+              type: object
+              properties:
+                searchMode:
+                  type: boolean
           required:
             - id
             - label
@@ -1502,6 +2755,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1510,15 +2765,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -1536,14 +2792,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1578,6 +2836,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1586,15 +2846,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -1612,14 +2873,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1649,6 +2912,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1657,15 +2922,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -1683,14 +2949,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1726,6 +2994,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1734,15 +3004,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -1760,14 +3031,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1793,6 +3066,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1801,15 +3076,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -1827,14 +3103,87 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            type:
+              type: string
+              enum:
+                - TIME
+            defaultValue:
+              type: string
+              pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+            configuration:
+              type: object
+              properties:
+                notice:
+                  description: Text to display above the time input
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+          required:
+            - id
+            - label
+            - type
+          description: A single date input (HH-mm)
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a7
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a8
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1876,6 +3225,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1884,15 +3235,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -1910,14 +3262,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -1953,6 +3307,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -1961,15 +3317,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -1987,14 +3344,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2010,7 +3369,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: &a8
+                      enum: &a9
                         - reg12
                         - reg14
                         - reg16
@@ -2019,6 +3378,10 @@ components:
                         - h3
                         - h2
                         - h1
+                      description: Font variant to use for the paragraph text
+                    hint:
+                      type: boolean
+                      description: When true, paragraph is styled as a hint with grey color
               default: {}
           required:
             - id
@@ -2031,6 +3394,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2039,15 +3404,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2065,14 +3431,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2117,6 +3485,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2125,15 +3495,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2151,14 +3522,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2178,7 +3551,7 @@ components:
                   properties:
                     fontVariant:
                       type: string
-                      enum: *a8
+                      enum: *a9
               default: {}
           required:
             - id
@@ -2192,6 +3565,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2200,15 +3575,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2226,14 +3602,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2251,6 +3629,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2259,15 +3639,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2285,14 +3666,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2326,6 +3709,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2334,15 +3719,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2360,14 +3746,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2395,8 +3783,6 @@ components:
                       properties:
                         required:
                           type: boolean
-                        label:
-                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     middlename:
@@ -2404,8 +3790,6 @@ components:
                       properties:
                         required:
                           type: boolean
-                        label:
-                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     surname:
@@ -2413,8 +3797,6 @@ components:
                       properties:
                         required:
                           type: boolean
-                        label:
-                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                   default:
@@ -2422,14 +3804,6 @@ components:
                       required: true
                     surname:
                       required: true
-                order:
-                  type: array
-                  items:
-                    type: string
-                    enum:
-                      - firstname
-                      - middlename
-                      - surname
                 maxLength:
                   type: number
                   description: Maximum length of the text
@@ -2437,6 +3811,8 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
+                searchMode:
+                  type: boolean
               default:
                 name:
                   firstname:
@@ -2453,6 +3829,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2461,15 +3839,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2487,14 +3866,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             defaultValue:
               type: string
               minLength: 1
@@ -2512,6 +3893,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2520,15 +3903,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2546,14 +3930,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             defaultValue:
               type: string
               minLength: 1
@@ -2571,6 +3957,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2579,15 +3967,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2605,14 +3994,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2629,6 +4020,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2637,15 +4030,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2663,14 +4057,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2701,7 +4097,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: &a9
+                    enum: &a10
                       - image/png
                       - image/jpg
                       - image/jpeg
@@ -2734,6 +4130,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2742,15 +4140,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2768,14 +4167,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2793,6 +4194,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2801,15 +4204,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2827,14 +4231,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2873,6 +4279,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2881,15 +4289,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2907,14 +4316,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2928,6 +4339,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -2936,15 +4349,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -2962,14 +4376,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -2998,6 +4414,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3006,15 +4424,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -3032,14 +4451,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3057,6 +4478,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3065,15 +4488,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -3091,14 +4515,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3116,6 +4542,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3124,15 +4552,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -3150,14 +4579,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3179,7 +4610,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a9
+                    enum: *a10
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -3197,6 +4628,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3205,15 +4638,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -3231,14 +4665,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3263,6 +4699,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3271,15 +4709,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -3297,14 +4736,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3356,7 +4797,7 @@ components:
                   type: array
                   items:
                     type: string
-                    enum: *a9
+                    enum: *a10
                   description: List of allowed file formats for the signature
               required:
                 - maxFileSize
@@ -3373,6 +4814,8 @@ components:
             id:
               type: string
               description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
             parent:
               type: object
               properties:
@@ -3381,15 +4824,16 @@ components:
                   description: Unique identifier for the field
               required:
                 - $$field
-              description: Reference to a field by its ID
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
             conditionals:
               type: array
               items:
                 $ref: "#/components/schemas/FieldConditional"
-              default: *a6
-            required:
-              type: boolean
-              default: false
+              default: *a7
             secured:
               type: boolean
               default: false
@@ -3407,14 +4851,16 @@ components:
                 required:
                   - validator
                   - message
-              default: *a7
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
+              default: *a8
             helperText:
               $ref: "#/components/schemas/TranslationConfig"
             hideLabel:
               type: boolean
               default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
             type:
               type: string
               enum:
@@ -3534,7 +4980,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3597,7 +5043,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3660,7 +5106,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3706,7 +5152,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3752,7 +5198,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3798,7 +5244,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3861,7 +5307,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -3907,7 +5353,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -4047,71 +5493,54 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
           type: string
           enum:
             - REQUEST_CORRECTION
-        onboardingForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
-        additionalDetailsForm:
-          type: array
-          items:
-            oneOf:
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - FORM
-                    default: FORM
-                required:
-                  - type
-              - allOf:
-                  - $ref: "#/components/schemas/FormPageConfig"
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - VERIFICATION
-                  actions:
-                    $ref: "#/components/schemas/VerificationActionConfig"
-                required:
-                  - type
-                  - actions
+        correctionForm:
+          type: object
+          properties:
+            label:
+              description: Human readable description of the form
+              allOf:
+                - $ref: "#/components/schemas/TranslationConfig"
+            pages:
+              type: array
+              items:
+                oneOf:
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - FORM
+                        default: FORM
+                    required:
+                      - type
+                  - allOf:
+                      - $ref: "#/components/schemas/FormPageConfig"
+                    properties:
+                      type:
+                        type: string
+                        enum:
+                          - VERIFICATION
+                      actions:
+                        $ref: "#/components/schemas/VerificationActionConfig"
+                    required:
+                      - type
+                      - actions
+          required:
+            - label
+            - pages
       required:
         - label
         - conditionals
         - type
-        - onboardingForm
-        - additionalDetailsForm
+        - correctionForm
     RejectCorrectionActionConfig:
       type: object
       properties:
@@ -4147,7 +5576,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -4193,7 +5622,7 @@ components:
                   - conditional
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
-          default: *a10
+          default: *a11
         draft:
           type: boolean
         type:
@@ -4453,7 +5882,7 @@ components:
                     type: string
                   createdByUserType:
                     type: string
-                    enum: *a11
+                    enum: *a12
                   createdAt:
                     type: string
                     format: date-time
@@ -4481,7 +5910,7 @@ components:
                       or accepted by 3rd party integration.
                   type:
                     type: string
-                    enum: *a12
+                    enum: *a13
                 required:
                   - id
                   - transactionId
@@ -4545,7 +5974,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -4569,6 +5998,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -4743,6 +6174,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -4910,7 +6343,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: &a13
+          enum: &a14
             - Requested
             - Accepted
             - Rejected
@@ -4944,7 +6377,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -4968,6 +6401,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5142,6 +6577,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5309,7 +6746,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -5340,7 +6777,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -5364,6 +6801,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5538,6 +6977,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5705,7 +7146,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -5749,7 +7190,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -5773,6 +7214,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -5947,6 +7390,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6114,7 +7559,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -6145,7 +7590,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -6169,6 +7614,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6343,6 +7790,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6510,7 +7959,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -6554,7 +8003,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -6578,6 +8027,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6752,6 +8203,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -6919,7 +8372,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -6950,7 +8403,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -6974,6 +8427,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7148,6 +8603,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7315,7 +8772,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -7348,7 +8805,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -7372,6 +8829,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7546,6 +9005,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7713,7 +9174,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -7744,7 +9205,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -7768,6 +9229,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -7942,6 +9405,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8109,7 +9574,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -8143,7 +9608,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -8167,6 +9632,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8341,6 +9808,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8508,7 +9977,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -8539,7 +10008,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -8563,6 +10032,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8737,6 +10208,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -8904,7 +10377,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -8938,7 +10411,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -8962,6 +10435,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9136,6 +10611,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9303,7 +10780,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -9316,6 +10793,18 @@ components:
             - REJECT_CORRECTION
         requestId:
           type: string
+        reason:
+          type: object
+          properties:
+            message:
+              type: string
+              minLength: 1
+              description: Message describing reason for rejection or archiving
+            isDuplicate:
+              type: boolean
+              description: If a declaration is duplicated
+          required:
+            - message
       required:
         - id
         - transactionId
@@ -9327,6 +10816,7 @@ components:
         - status
         - type
         - requestId
+        - reason
     UnassignedAction:
       type: object
       properties:
@@ -9337,7 +10827,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -9361,6 +10851,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9535,6 +11027,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9702,7 +11196,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -9733,7 +11227,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -9757,6 +11251,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -9931,6 +11427,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10098,7 +11596,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -10109,6 +11607,12 @@ components:
           type: string
           enum:
             - PRINT_CERTIFICATE
+        content:
+          type: object
+          nullable: true
+          properties:
+            templateId:
+              type: string
       required:
         - id
         - transactionId
@@ -10129,7 +11633,7 @@ components:
           type: string
         createdByUserType:
           type: string
-          enum: *a11
+          enum: *a12
         createdAt:
           type: string
           format: date-time
@@ -10153,6 +11657,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10327,6 +11833,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
@@ -10494,7 +12002,7 @@ components:
                       - type: "null"
         status:
           type: string
-          enum: *a13
+          enum: *a14
         originalActionId:
           type: string
           nullable: true
@@ -10606,7 +12114,7 @@ components:
           type: array
           items:
             type: string
-            enum: *a14
+            enum: *a15
       required:
         - type
         - terms
@@ -10619,7 +12127,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a14
+          enum: *a15
       required:
         - type
         - term
@@ -10713,7 +12221,7 @@ components:
             - exact
         term:
           type: string
-          enum: *a11
+          enum: *a12
       required:
         - type
         - term
@@ -10815,7 +12323,7 @@ components:
           description: The type of event, such as birth, death, or marriage.
         status:
           type: string
-          enum: *a14
+          enum: *a15
         legalStatuses:
           type: object
           properties:
@@ -10979,6 +12487,8 @@ components:
               - type: string
                 format: date
                 description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
               - anyOf:
                   - type: object
                     properties:
