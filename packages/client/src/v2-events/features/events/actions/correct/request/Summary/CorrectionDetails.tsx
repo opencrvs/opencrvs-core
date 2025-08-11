@@ -20,7 +20,8 @@ import {
   EventState,
   getCurrentEventState,
   getDeclaration,
-  isFieldVisible
+  isFieldVisible,
+  isPageVisible
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
@@ -81,45 +82,47 @@ export function CorrectionDetails({
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
-  const correctionDetails = correctionFormPages.flatMap((page) => {
-    // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
-    // instead of being tied to individual field IDs. We pull it directly from `annotation[page.id]`.
-    if (page.type === 'VERIFICATION') {
-      // value can only be boolean
-      const value = annotation[page.id]
-      return [
-        {
-          id: page.id,
-          label: page.title,
-          valueDisplay: value
-            ? intl.formatMessage(messages.verifyIdentity)
-            : intl.formatMessage(messages.cancelVerifyIdentity),
-          pageId: page.id
-        }
-      ]
-    }
+  const correctionDetails = correctionFormPages
+    .filter((page) => isPageVisible(page, annotation))
+    .flatMap((page) => {
+      // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
+      // instead of being tied to individual field IDs. We pull it directly from `annotation[page.id]`.
+      if (page.type === 'VERIFICATION') {
+        // value can only be boolean
+        const value = annotation[page.id]
+        return [
+          {
+            id: page.id,
+            label: page.title,
+            valueDisplay: value
+              ? intl.formatMessage(messages.verifyIdentity)
+              : intl.formatMessage(messages.cancelVerifyIdentity),
+            pageId: page.id
+          }
+        ]
+      }
 
-    // Default handling for other pages: values keyed by field.id
-    const pageFields = page.fields
-      .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
-      .map((field) => {
-        const valueDisplay = Output({
-          field,
-          value: annotation[field.id],
-          showPreviouslyMissingValuesAsChanged: false
+      // Default handling for other pages: values keyed by field.id
+      const pageFields = page.fields
+        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .map((field) => {
+          const valueDisplay = Output({
+            field,
+            value: annotation[field.id],
+            showPreviouslyMissingValuesAsChanged: false
+          })
+
+          return {
+            label: field.label,
+            id: field.id,
+            valueDisplay,
+            pageId: page.id
+          }
         })
+        .filter((f) => f.valueDisplay)
 
-        return {
-          label: field.label,
-          id: field.id,
-          valueDisplay,
-          pageId: page.id
-        }
-      })
-      .filter((f) => f.valueDisplay)
-
-    return pageFields
-  })
+      return pageFields
+    })
 
   return (
     <>
