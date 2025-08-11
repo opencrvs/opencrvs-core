@@ -281,7 +281,7 @@ export function eventPayloadGenerator(rng: () => number) {
         annotation
       }: {
         eventId: UUID
-        actionType: ActionType
+        actionType: Draft['action']['type']
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         annotation?: Record<string, any>
       },
@@ -452,7 +452,6 @@ export function eventPayloadGenerator(rng: () => number) {
         type: ActionType.ARCHIVE,
         transactionId: input.transactionId ?? getUUID(),
         declaration: {},
-        // @TODO: Check whether generator is needed?
         annotation: {},
         duplicates: [],
         eventId,
@@ -754,12 +753,14 @@ export function generateEventDraftDocument({
   actionType: ActionType
   rng?: () => number
   declaration?: EventState
+  annotation?: EventState
 }): Draft {
   const action = generateActionDocument({
     configuration: tennisClubMembershipEvent,
     action: actionType,
     rng
   })
+
   return {
     id: getUUID(),
     transactionId: getUUID(),
@@ -768,7 +769,8 @@ export function generateEventDraftDocument({
       declaration: {
         ...action.declaration,
         ...declaration
-      }
+      },
+      annotation: action.annotation
     },
     createdAt: new Date().toISOString(),
     eventId
@@ -917,7 +919,12 @@ export const generateWorkqueues = (
         type: 'and',
         clauses: [{ eventType: tennisClubMembershipEvent.id }]
       },
-      actions: [],
+      actions: [
+        {
+          type: 'DEFAULT',
+          conditionals: []
+        }
+      ],
       icon: 'Draft'
     }
   ])
