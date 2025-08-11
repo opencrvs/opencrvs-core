@@ -38,7 +38,7 @@ import {
 import { TokenUserType, UUID } from '@opencrvs/commons'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { deleteFile, fileExists } from '@events/service/files'
-import { deleteEventIndex, indexEvent } from '@events/service/indexing/indexing'
+import { indexEvent } from '@events/service/indexing/indexing'
 import * as eventsRepo from '@events/storage/postgres/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { TrpcUserContext } from '@events/context'
@@ -138,7 +138,6 @@ export async function deleteEvent(eventId: UUID, { token }: { token: string }) {
 
   const { id } = event
   await deleteEventAttachments(token, event)
-  await deleteEventIndex(event)
   await draftsRepo.deleteDraftsByEventId(id)
   await eventsRepo.deleteEventById(id)
 
@@ -162,8 +161,7 @@ function generateTrackingId(): string {
 export async function createEvent({
   eventInput,
   user,
-  transactionId,
-  config
+  transactionId
 }: {
   eventInput: z.infer<typeof EventInput>
   user: TrpcUserContext
@@ -186,8 +184,6 @@ export async function createEvent({
     createdBySignature: user.signature,
     createdAtLocation: user.primaryOfficeId
   })
-
-  await indexEvent(event, config)
 
   return event
 }
@@ -267,6 +263,8 @@ export async function addAction(
     }
   }
 
+  const content = ('content' in input && input.content) || undefined
+
   if (input.type === ActionType.ARCHIVE && input.reason.isDuplicate) {
     await eventsRepo.createAction({
       eventId,
@@ -274,6 +272,7 @@ export async function addAction(
       actionType: ActionType.MARKED_AS_DUPLICATE,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,
@@ -293,6 +292,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status: ActionStatus.Accepted,
       createdBy: user.id,
       createdByRole: user.role,
@@ -322,6 +322,7 @@ export async function addAction(
       actionType: input.type,
       declaration: input.declaration,
       annotation: input.annotation,
+      content: content,
       status,
       createdBy: user.id,
       createdByRole: user.role,

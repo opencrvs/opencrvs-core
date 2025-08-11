@@ -10,7 +10,7 @@
  */
 
 import format from 'date-fns/format'
-import startOfMonth from 'date-fns/startOfDay'
+import startOfMonth from 'date-fns/startOfMonth'
 import * as React from 'react'
 import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useState } from 'react'

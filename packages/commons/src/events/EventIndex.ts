@@ -177,6 +177,9 @@ export const QueryExpression = z
     createdAt: z.optional(DateCondition),
     updatedAt: z.optional(DateCondition),
     'legalStatuses.REGISTERED.acceptedAt': z.optional(DateCondition),
+    'legalStatuses.DECLARED.createdAtLocation': z.optional(
+      z.union([Within, Exact])
+    ),
     'legalStatuses.REGISTERED.createdAtLocation': z.optional(
       z.union([Within, Exact])
     ),

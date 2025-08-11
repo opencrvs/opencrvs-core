@@ -8,8 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
-/* eslint-disable max-lines */
+/*  eslint-disable max-lines */
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
@@ -77,7 +76,7 @@ const Divider = BaseField.extend({
 })
 export type Divider = z.infer<typeof Divider>
 
-const TextField = BaseField.extend({
+export const TextField = BaseField.extend({
   type: z.literal(FieldType.TEXT),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z
@@ -353,25 +352,39 @@ export const SelectDateRangeField = BaseField.extend({
 
 export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
+export const NameConfig = z.object({
+  firstname: z.object({ required: z.boolean() }).optional(),
+  middlename: z.object({ required: z.boolean() }).optional(),
+  surname: z.object({ required: z.boolean() }).optional()
+})
+
+export type NameConfig = z.infer<typeof NameConfig>
+
 const NameField = BaseField.extend({
   type: z.literal(FieldType.NAME),
   defaultValue: z
     .object({
-      firstname: NonEmptyTextValue,
-      surname: NonEmptyTextValue
+      firstname: NonEmptyTextValue.optional(),
+      middlename: NonEmptyTextValue.optional(),
+      surname: NonEmptyTextValue.optional()
     })
     .optional(),
   configuration: z
     .object({
+      name: NameConfig.default({
+        firstname: { required: true },
+        surname: { required: true }
+      }).optional(),
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
       postfix: TranslationConfig.optional(),
-      includeMiddlename: z
-        .boolean()
-        .default(false)
-        .optional()
-        .describe('To make middle name visible in Name form field'),
       searchMode: z.boolean().optional()
+    })
+    .default({
+      name: {
+        firstname: { required: true },
+        surname: { required: true }
+      }
     })
     .optional()
 }).describe('Name input field')
@@ -506,8 +519,7 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
-/** @knipignore */
-export type Inferred =
+export type FieldConfig =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
@@ -536,39 +548,6 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
-
-/** @knipignore */
-/**
- * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
- */
-export type InferredInput =
-  | z.input<typeof Address>
-  | z.input<typeof TextField>
-  | z.input<typeof NumberField>
-  | z.input<typeof TextAreaField>
-  | z.input<typeof DateField>
-  | z.input<typeof TimeField>
-  | z.input<typeof DateRangeField>
-  | z.input<typeof Paragraph>
-  | z.input<typeof RadioGroup>
-  | z.input<typeof BulletList>
-  | z.input<typeof PageHeader>
-  | z.input<typeof Select>
-  | z.input<typeof NameField>
-  | z.input<typeof PhoneField>
-  | z.input<typeof IdField>
-  | z.input<typeof Checkbox>
-  | z.input<typeof File>
-  | z.input<typeof FileUploadWithOptions>
-  | z.input<typeof Country>
-  | z.input<typeof AdministrativeArea>
-  | z.input<typeof Divider>
-  | z.input<typeof Location>
-  | z.input<typeof Facility>
-  | z.input<typeof Office>
-  | z.input<typeof SignatureField>
-  | z.input<typeof EmailField>
-  | z.input<typeof DataField>
 
 export const FieldConfig = z
   .discriminatedUnion('type', [
@@ -614,8 +593,6 @@ export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
-
-export type FieldConfig = Inferred
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
