@@ -29,6 +29,8 @@ export const FullName = z.object({
   given: z.array(z.string())
 })
 
+export type FullName = z.infer<typeof FullName>
+
 export const Recipient = z.object({
   name: z.array(FullName),
   mobile: z.string().optional(),
