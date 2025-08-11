@@ -10,15 +10,15 @@
  */
 import * as React from 'react'
 import { useIntl } from 'react-intl'
-import { Header } from '@client/components/Header/Header'
 import { ListViewSimplified } from '@opencrvs/components/lib/ListViewSimplified'
+import { Content } from '@opencrvs/components/lib/Content'
+import { Frame } from '@opencrvs/components/lib/Frame'
 import {
   constantsMessages,
   userMessages as messages
 } from '@client/i18n/messages'
 import { Navigation } from '@client/components/interface/Navigation'
-import { Content } from '@opencrvs/components/lib/Content'
-import { Frame } from '@opencrvs/components/lib/Frame'
+import { Header } from '@client/components/Header/Header'
 import {
   Name,
   Role,
@@ -28,21 +28,16 @@ import {
   PhoneNumber,
   ProfileImage
 } from '@client/views/Settings/items'
-import { EmailAddress } from './items/EmailAddress'
+import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
+import { EmailAddress } from '@client/views/Settings/items/EmailAddress'
 
 export function SettingsPage() {
   const intl = useIntl()
   return (
-    <Frame
-      header={<Header title={intl.formatMessage(messages.settingsTitle)} />}
-      navigation={<Navigation />}
-      skipToContentText={intl.formatMessage(
-        constantsMessages.skipToMainContent
-      )}
-    >
+    <WorkqueueLayout>
       <Content
-        title={intl.formatMessage(messages.settingsTitle)}
         showTitleOnMobile={true}
+        title={intl.formatMessage(messages.settingsTitle)}
       >
         <ListViewSimplified>
           <Name />
@@ -55,6 +50,6 @@ export function SettingsPage() {
           <ProfileImage />
         </ListViewSimplified>
       </Content>
-    </Frame>
+    </WorkqueueLayout>
   )
 }
