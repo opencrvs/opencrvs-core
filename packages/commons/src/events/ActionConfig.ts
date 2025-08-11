@@ -8,15 +8,15 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { z } from 'zod'
 import { EnableConditional, ShowConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
 import { ActionType } from './ActionType'
 import { FieldConfig } from './FieldConfig'
 import { ActionFormConfig } from './FormConfig'
-
+import { DeduplicationConfig } from './DeduplicationConfig'
 import { extendZodWithOpenApi } from 'zod-openapi'
+
 extendZodWithOpenApi(z)
 
 /**
@@ -43,6 +43,7 @@ export type ReviewPageConfig = z.infer<typeof DeclarationReviewConfig>
 export const ActionConfigBase = z.object({
   label: TranslationConfig,
   conditionals: z.array(ActionConditional).optional().default([]),
+  deduplication: DeduplicationConfig.optional(),
   draft: z.boolean().optional()
 })
 
