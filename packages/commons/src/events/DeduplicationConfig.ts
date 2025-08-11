@@ -57,7 +57,8 @@ const StrictMatcher = Matcher.extend({
 const DateRangeMatcher = Matcher.extend({
   type: z.literal('dateRange'),
   options: z.object({
-    days: z.number(),
+    daysBefore: z.number(),
+    daysAfter: z.number(),
     origin: FieldReference,
     boost: z.number().optional().default(1)
   })
