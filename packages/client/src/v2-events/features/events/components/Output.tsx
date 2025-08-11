@@ -12,6 +12,7 @@
 import React from 'react'
 import styled from 'styled-components'
 import * as _ from 'lodash'
+import { isUndefined } from 'lodash'
 import {
   FieldConfig,
   FieldValue,
@@ -41,7 +42,9 @@ import {
   isPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  EventState,
+  FormConfig
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -197,23 +200,84 @@ export function ValueOutput(
   }
 }
 
+function findPreviousValueWithSameLabel(
+  field: FieldConfig,
+  previousForm: EventState,
+  formConfig: FormConfig
+): { value?: FieldValue; field?: FieldConfig } {
+  const allFieldsOfCurrentPage =
+    formConfig.pages.find((page) => page.fields.some((f) => f.id === field.id))
+      ?.fields || []
+
+  const formValuesWithSameLabel = allFieldsOfCurrentPage
+    .filter(
+      (f) =>
+        f.label.id === field.label.id &&
+        f.id !== field.id &&
+        previousForm[f.id] !== undefined &&
+        previousForm[f.id] !== null &&
+        previousForm[f.id] !== ''
+    )
+    .map((f) => ({
+      value: previousForm[f.id],
+      field: f
+    }))
+
+  // Most likely there is only one field with the same label
+  // at a time, so we take the first match
+  if (formValuesWithSameLabel.length > 0) {
+    return {
+      value: formValuesWithSameLabel[0].value,
+      field: formValuesWithSameLabel[0].field
+    }
+  }
+
+  return { value: undefined, field: undefined }
+}
+
 export function Output({
   field,
   value,
   previousValue,
-  showPreviouslyMissingValuesAsChanged = true
+  showPreviouslyMissingValuesAsChanged = true,
+  previousForm,
+  formConfig
 }: {
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
+  previousForm?: EventState
+  formConfig?: FormConfig
 }) {
   // Explicitly check for nil, so that e.g. number 0 is considered a value
   const hasValue = !_.isNil(value)
 
+  let previousValueField: FieldConfig | undefined
+
+  if (isUndefined(previousValue) && previousForm && formConfig) {
+    // Multiple fields can share the same label but have different IDs
+    // (e.g. "child.birthLocation" and "child.address.privateHome" share the label "Location of birth").
+    // In correction view, if the previous form had a value for "child.birthLocation"
+    // and the correction form populates "child.address.privateHome", only the latter
+    // will be visible while the previous value is hidden due to conditionals.
+    // When comparing to a previous form, check all fields with the same label and compare
+    // their values to detect changes, even if the active field ID is different.
+    const previousValueWithSameLabel = findPreviousValueWithSameLabel(
+      field,
+      previousForm,
+      formConfig
+    )
+    previousValue = previousValueWithSameLabel.value
+    previousValueField = previousValueWithSameLabel.field
+  }
+
   if (!hasValue) {
     if (previousValue) {
-      return ValueOutput({ config: field, value: previousValue })
+      return ValueOutput({
+        config: previousValueField ?? field,
+        value: previousValue
+      })
     }
 
     return ValueOutput({ config: field, value: '' })
@@ -233,7 +297,7 @@ export function Output({
     }
 
     const previousValueOutput = ValueOutput({
-      config: field,
+      config: previousValueField ?? field,
       value: previousValue
     })
 
@@ -242,7 +306,10 @@ export function Output({
         {previousValueOutput !== null && (
           <>
             <Deleted>
-              <ValueOutput config={field} value={previousValue} />
+              <ValueOutput
+                config={previousValueField ?? field}
+                value={previousValue}
+              />
             </Deleted>
             <br />
           </>
