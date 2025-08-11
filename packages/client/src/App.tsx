@@ -77,7 +77,7 @@ import VSExport from './views/SysAdmin/Vsexports/VSExport'
 import { UserAudit } from './views/UserAudit/UserAudit'
 import { config } from './config'
 import { CreateUser } from './views/SysAdmin/Team/user/userCreation/CreateUser'
-import { UpdateUser } from './views/SysAdmin/Team/user/userCreation/UpdateUser'
+import { UpdateUser } from './views/SysAdmin/Team/user/userUpdate/UpdateUser'
 
 // Injecting global styles for the body tag - used only once
 const GlobalStyle = createGlobalStyle`
@@ -256,19 +256,19 @@ export const routesConfig = config.FEATURES.V2_EVENTS
           },
           {
             path: routes.CREATE_USER_ON_LOCATION,
-            element: <CreateNewUser />
+            element: <CreateUser />
           },
           {
             path: routes.CREATE_USER_SECTION,
-            element: <CreateNewUser />
+            element: <CreateUser />
           },
           {
             path: routes.REVIEW_USER_FORM,
-            element: <CreateNewUser />
+            element: <UpdateUser />
           },
           {
             path: routes.REVIEW_USER_DETAILS,
-            element: <CreateNewUser />
+            element: <UpdateUser />
           }
         ]
       }

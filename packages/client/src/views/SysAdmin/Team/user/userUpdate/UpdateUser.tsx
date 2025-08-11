@@ -23,7 +23,7 @@ import {
   RouteComponentProps,
   withRouter
 } from '@client/components/WithRouterProps'
-import { UserFormPage } from './UserFormPage'
+import { UserFormPage } from '../commons/UserFormPage'
 
 interface IDispatchProps {
   clearUserFormData: typeof clearUserFormData

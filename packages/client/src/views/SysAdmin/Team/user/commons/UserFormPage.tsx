@@ -12,7 +12,6 @@ import {
 } from '@client/user/userReducer'
 import { replaceInitialValues } from '@client/views/RegisterForm/RegisterForm'
 import { UserForm } from '@client/views/SysAdmin/Team/user/userCreation/UserForm'
-import { UserReviewForm } from '@client/views/SysAdmin/Team/user/userCreation/UserReviewForm'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { ApolloClient } from '@apollo/client'
@@ -32,6 +31,8 @@ import {
   generateUserReviewFormUrl
 } from '@client/navigation'
 import { Scope, SCOPES, UUID } from '@opencrvs/commons/client'
+import UpdateUserReviewForm from '../userUpdate/UpdateUserReviewForm'
+import CreateUserReviewForm from '../userCreation/CreateUserReviewForm'
 
 type UserFormPageProps = {
   userId?: string
@@ -45,7 +46,7 @@ type UserFormPageProps = {
   loadingRoles?: boolean
 }
 
-interface IDispatchProps {
+type IDispatchProps = {
   clearUserFormData: typeof clearUserFormData
   fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
@@ -131,7 +132,24 @@ export const UserFormPageComponent = (props: WithApolloClient<Props>) => {
   }
 
   if (section.viewType === 'preview') {
-    return <UserReviewForm client={client as ApolloClient<any>} {...props} />
+    return userId ? (
+      <UpdateUserReviewForm
+        userId={userId}
+        section={section}
+        formData={props.formData}
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        client={client as ApolloClient<any>}
+        title={title}
+      />
+    ) : (
+      <CreateUserReviewForm
+        section={section}
+        formData={props.formData}
+        /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
+        client={client as ApolloClient<any>}
+        title={title}
+      />
+    )
   }
 
   return null
