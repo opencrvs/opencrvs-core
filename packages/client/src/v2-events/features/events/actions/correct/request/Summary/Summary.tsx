@@ -166,6 +166,7 @@ export function Summary() {
           bottomActionButtons={[
             <Button
               key="make-correction"
+              fullWidth
               id="make-correction"
               size="large"
               type="primary"
