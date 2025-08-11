@@ -268,21 +268,24 @@ export function dangerouslyGetCurrentEventStateWithDrafts({
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const draftAction =
+  const draftActions: ActionDocument[] =
     draft.action.type === ActionType.REQUEST_CORRECTION
       ? /*
          * If the action encountered is "REQUEST_CORRECTION", we want to pretend like it was approved
          * so previews etc are shown correctly
          */
-        ({
-          id: getUUID(),
-          ...draft.action,
-          type: ActionType.APPROVE_CORRECTION
-        } as ActionDocument)
-      : ({ ...draft.action, id: getUUID() } as ActionDocument)
+        [
+          draft.action as ActionDocument,
+          {
+            id: getUUID(),
+            ...draft.action,
+            type: ActionType.APPROVE_CORRECTION
+          } as ActionDocument
+        ]
+      : [{ ...draft.action, id: getUUID() } as ActionDocument]
 
   const actionsWithDraft = orderBy(
-    [...actions, draftAction],
+    [...actions, ...draftActions],
     ['createdAt'],
     'asc'
   )
