@@ -8,13 +8,14 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { logger } from '@opencrvs/commons'
+import { buildUserEventTrigger, logger } from '@opencrvs/commons'
 import {
   Extension,
   findExtension,
   OPENCRVS_SPECIFICATION_URL
 } from '@opencrvs/commons/types'
 import {
+  COUNTRY_CONFIG_URL,
   DOCUMENTS_URL,
   FHIR_URL,
   NOTIFICATION_SERVICE_URL
@@ -276,19 +277,22 @@ export async function sendCredentialsNotification(
   msisdn?: string,
   email?: string
 ) {
-  const url = `${NOTIFICATION_SERVICE_URL}${
-    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }userCredentialsInvite`
+  const COUNTRY_CONFIG_URL_TRIMMED = COUNTRY_CONFIG_URL.endsWith('/')
+    ? COUNTRY_CONFIG_URL.slice(0, -1)
+    : COUNTRY_CONFIG_URL
   try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        msisdn,
+    const { path, ...trigger } = buildUserEventTrigger('user-created', {
+      recipient: {
+        name: userFullName,
         email,
-        username,
-        password,
-        userFullName
-      }),
+        mobile: msisdn
+      },
+      username,
+      temporaryPassword: password
+    })
+
+    await fetch(`${COUNTRY_CONFIG_URL_TRIMMED}${path}`, {
+      ...trigger,
       headers: {
         'Content-Type': 'application/json',
         ...authHeader
