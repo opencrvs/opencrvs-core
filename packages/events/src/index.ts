@@ -41,6 +41,7 @@ export async function main() {
       process.exit(1)
     }
     setTimeout(() => void main(), 5000)
+
     return
   }
   server().listen(5555)

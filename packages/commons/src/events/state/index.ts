@@ -10,6 +10,7 @@
  */
 
 import { ActionType } from '../ActionType'
+import { orderBy, findLast } from 'lodash'
 import {
   Action,
   ActionDocument,
@@ -25,7 +26,7 @@ import { deepMerge } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
-import { UUID } from '../../uuid'
+import { getUUID, UUID } from '../../uuid'
 import {
   DocumentPath,
   FullDocumentPath,
@@ -247,47 +248,50 @@ export function getCurrentEventState(
 }
 
 /**
- * @returns the future state of the event with drafts applied
+ * @returns the future state of the event with drafts applied to all fields.
+ *
+ * NOTE: We treat the draft as a new action that is applied to the event. This means that even the status of the is changed as if draft has been accepted.
+ * @see applyDraftToEventIndex to apply the draft to the event without changing the status.
+ *
  */
-export function getCurrentEventStateWithDrafts({
+export function dangerouslyGetCurrentEventStateWithDrafts({
   event,
-  drafts,
+  draft,
   configuration
 }: {
   event: EventDocument
-  drafts: Draft[]
+  draft: Draft
   configuration: EventConfig
 }): EventIndex {
   const actions = event.actions
     .slice()
     .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
 
-  const activeDrafts = drafts
-    .map((draft) => draft.action)
-    .flatMap((action) => {
-      /*
-       * If the action encountered is "REQUEST_CORRECTION", we want to pretend like it was approved
-       * so previews etc are shown correctly
-       */
-      if (action.type === ActionType.REQUEST_CORRECTION) {
-        return [
-          action,
-          {
-            ...action,
-            type: ActionType.APPROVE_CORRECTION
-          }
-        ] as ActionDocument[]
-      }
-      return [action] as ActionDocument[]
-    })
+  const draftAction =
+    draft.action.type === ActionType.REQUEST_CORRECTION
+      ? /*
+         * If the action encountered is "REQUEST_CORRECTION", we want to pretend like it was approved
+         * so previews etc are shown correctly
+         */
+        ({
+          id: getUUID(),
+          ...draft.action,
+          type: ActionType.APPROVE_CORRECTION
+        } as ActionDocument)
+      : ({ ...draft.action, id: getUUID() } as ActionDocument)
 
-  const actionWithDrafts = [...actions, ...activeDrafts].sort()
-  const withDrafts: EventDocument = {
+  const actionsWithDraft = orderBy(
+    [...actions, draftAction],
+    ['createdAt'],
+    'asc'
+  )
+
+  const eventWithDraft: EventDocument = {
     ...event,
-    actions: actionWithDrafts
+    actions: actionsWithDraft
   }
 
-  return getCurrentEventState(withDrafts, configuration)
+  return getCurrentEventState(eventWithDraft, configuration)
 }
 
 export function applyDeclarationToEventIndex(
@@ -307,28 +311,32 @@ export function applyDeclarationToEventIndex(
   }
 }
 
-export function applyDraftsToEventIndex(
+/**
+ * Applies draft to the event index following internal business rules.
+ *
+ * Ensures only necessary fields are updated based on the draft (declaration, updatedAt, flags).
+ * NOTE: When naively applying draft, it leads to incorrect event state, since drafts are 'Accepted' by default.
+ *
+ */
+export function applyDraftToEventIndex(
   eventIndex: EventIndex,
-  drafts: Draft[],
+  draft: Draft | undefined,
   eventConfiguration: EventConfig
 ) {
   const indexedAt = eventIndex.updatedAt
 
-  const activeDrafts = drafts
-    .filter(({ createdAt }) => new Date(createdAt) > new Date(indexedAt))
-    .map((draft) => draft.action)
-    .sort()
+  const activeDraft = draft && draft.createdAt >= indexedAt ? draft : undefined
 
-  if (activeDrafts.length === 0) {
+  if (!activeDraft) {
     return eventIndex
   }
 
   return applyDeclarationToEventIndex(
     {
       ...eventIndex,
-      updatedAt: activeDrafts[activeDrafts.length - 1].createdAt
+      updatedAt: activeDraft.createdAt
     },
-    activeDrafts[activeDrafts.length - 1].declaration,
+    activeDraft.action.declaration,
     eventConfiguration
   )
 }
@@ -352,25 +360,24 @@ export function getAnnotationFromDrafts(drafts: Draft[]) {
 export function getActionAnnotation({
   event,
   actionType,
-  drafts = []
+  draft
 }: {
   event: EventDocument
   actionType: ActionType
-  drafts?: Draft[]
+  draft?: Draft
 }): EventState {
   const activeActions = getAcceptedActions(event)
-  const action = activeActions.find(
-    (activeAction) => actionType === activeAction.type
+
+  const action = findLast(activeActions, (a) => a.type === actionType)
+  const matchingDraft = draft?.action.type === actionType ? draft : undefined
+
+  const sortedActions = orderBy(
+    [action, matchingDraft?.action].filter((a) => a !== undefined),
+    'createdAt',
+    'asc'
   )
 
-  const eventDrafts = drafts.filter((draft) => draft.eventId === event.id)
-
-  const sorted = [
-    ...(action ? [action] : []),
-    ...eventDrafts.map((draft) => draft.action)
-  ].sort()
-
-  const annotation = sorted.reduce((ann, sortedAction) => {
+  const annotation = sortedActions.reduce((ann, sortedAction) => {
     return deepMerge(ann, sortedAction.annotation ?? {})
   }, {})
 

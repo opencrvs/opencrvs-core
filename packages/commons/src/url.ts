@@ -9,12 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-export function joinURL(base: string, path: string) {
+export function joinUrl(base: string, path: string) {
   const baseWithSlash = base.endsWith('/') ? base : base + '/'
   return new URL(path, baseWithSlash)
 }
 
-export function joinURLPaths(base: string, path: string) {
+export function joinUrlPaths(base: string, path: string) {
   const baseWithSlash = base.endsWith('/') ? base : base + '/'
   return baseWithSlash + path.replace(/^\//, '')
 }
