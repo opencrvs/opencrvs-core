@@ -1,0 +1,90 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+
+import { User } from '../events'
+import { z } from 'zod'
+
+export const TriggerEvent = {
+  USER_CREATED: 'user-created',
+  USER_UPDATED: 'user-updated',
+  USERNAME_REMINDER: 'username-reminder',
+  RESET_PASSWORD: 'reset-password',
+  RESET_PASSWORD_BY_ADMIN: 'reset-password-by-admin',
+  TWO_FA: '2fa'
+} as const
+
+export type TriggerEvent = (typeof TriggerEvent)[keyof typeof TriggerEvent]
+
+export const FullName = z.object({
+  use: z.string(),
+  family: z.string(),
+  given: z.array(z.string())
+})
+
+export const Recipient = z.object({
+  name: z.array(FullName),
+  mobile: z.string().optional(),
+  email: z.string().optional()
+})
+
+export type Recipient = z.infer<typeof Recipient>
+
+export const BasePayload = z.object({
+  recipient: Recipient
+})
+
+export type BasePayload = z.infer<typeof BasePayload>
+
+export const TriggerPayload = {
+  [TriggerEvent.USER_CREATED]: BasePayload.extend({
+    username: z.string(),
+    temporaryPassword: z.string()
+  }),
+  [TriggerEvent.USER_UPDATED]: BasePayload.extend({
+    username: z.string()
+  }),
+  [TriggerEvent.USERNAME_REMINDER]: BasePayload.extend({
+    username: z.string()
+  }),
+  [TriggerEvent.RESET_PASSWORD]: BasePayload.extend({
+    temporaryPassword: z.string()
+  }),
+  [TriggerEvent.RESET_PASSWORD_BY_ADMIN]: BasePayload.extend({
+    temporaryPassword: z.string(),
+    admin: User
+  }),
+  [TriggerEvent.TWO_FA]: BasePayload.extend({
+    code: z.string()
+  })
+} as const
+
+export type TriggerPayload = {
+  [K in TriggerEvent]: z.infer<(typeof TriggerPayload)[K]>
+}
+
+export function buildUserEventTrigger<T extends TriggerEvent>(
+  event: T,
+  payload: TriggerPayload[T]
+) {
+  return {
+    path: `/triggers/user/${event}`,
+    method: 'POST',
+    body: JSON.stringify(payload)
+  }
+}
+
+export function parseUserEventTrigger<T extends TriggerEvent>(
+  event: T,
+  body: unknown
+): TriggerPayload[T] {
+  const schema = TriggerPayload[event]
+  return schema.parse(body) as TriggerPayload[T]
+}
