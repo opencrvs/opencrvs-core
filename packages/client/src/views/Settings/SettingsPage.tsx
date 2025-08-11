@@ -29,9 +29,33 @@ import {
   ProfileImage
 } from '@client/views/Settings/items'
 import { EmailAddress } from './items/EmailAddress'
+import { WorkqueueLayout } from '@client/v2-events/layouts/workqueues'
+import { config } from '@client/config'
 
 export function SettingsPage() {
   const intl = useIntl()
+  const content = (
+    <Content
+      title={intl.formatMessage(messages.settingsTitle)}
+      showTitleOnMobile={true}
+    >
+      <ListViewSimplified>
+        <Name />
+        <PhoneNumber />
+        <EmailAddress />
+        <Role />
+        <Language />
+        <Password />
+        <PIN />
+        <ProfileImage />
+      </ListViewSimplified>
+    </Content>
+  )
+
+  if (config.FEATURES.V2_EVENTS) {
+    return <WorkqueueLayout>{content}</WorkqueueLayout>
+  }
+
   return (
     <Frame
       header={<Header title={intl.formatMessage(messages.settingsTitle)} />}
@@ -40,21 +64,7 @@ export function SettingsPage() {
         constantsMessages.skipToMainContent
       )}
     >
-      <Content
-        title={intl.formatMessage(messages.settingsTitle)}
-        showTitleOnMobile={true}
-      >
-        <ListViewSimplified>
-          <Name />
-          <PhoneNumber />
-          <EmailAddress />
-          <Role />
-          <Language />
-          <Password />
-          <PIN />
-          <ProfileImage />
-        </ListViewSimplified>
-      </Content>
+      {content}
     </Frame>
   )
 }
