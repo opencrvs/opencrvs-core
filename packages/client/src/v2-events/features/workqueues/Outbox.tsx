@@ -46,6 +46,7 @@ export function Outbox() {
     <SearchResultComponent
       columns={outboxColumns}
       eventConfigs={eventConfigs}
+      isOutbox={true}
       queryData={outbox}
       title={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
       {...searchParams}
