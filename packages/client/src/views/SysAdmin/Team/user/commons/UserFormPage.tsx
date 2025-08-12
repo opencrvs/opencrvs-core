@@ -54,6 +54,8 @@ type UserFormPageProps = {
   submitting: boolean
   userDetailsStored?: boolean
   loadingRoles?: boolean
+  title: string
+  loadingMessage: string
 }
 
 type IDispatchProps = {
@@ -61,16 +63,10 @@ type IDispatchProps = {
   fetchAndStoreUserData: typeof fetchAndStoreUserData
 }
 
-type Titleprops = {
-  title: string
-  loadingMessage: string
-}
-
 type Props = RouteComponentProps &
   UserFormPageProps &
   IDispatchProps &
-  IntlShapeProps &
-  Titleprops
+  IntlShapeProps
 
 const Container = styled.div`
   display: flex;
@@ -92,7 +88,7 @@ const SpinnerWrapper = styled.div`
   flex-direction: column;
   align-items: center;
 `
-export const UserFormPageComponent = (props: WithApolloClient<Props>) => {
+const UserFormPageComponent = (props: WithApolloClient<Props>) => {
   const {
     title,
     loadingMessage,
