@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 0a307e57-bec9-458c-9a72-9de077a54582
+                transactionId: f9c79213-3a96-4ff4-8fd7-47f8887095fa
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5754b82c-3cbc-476d-aba7-12001d09d71f
+                transactionId: 6ce1ff99-9581-4c14-82d6-d8ee2348d78c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2678,45 +2678,13 @@ components:
             options:
               type: object
               properties:
-                daysBefore:
-                  type: number
-                daysAfter:
-                  type: number
-                origin:
-                  type: string
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - daysBefore
-                - daysAfter
-                - origin
-                - boost
-            type:
-              type: string
-              enum:
-                - dateRange
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
                 days:
                   type: number
-                origin:
-                  type: string
                 boost:
                   type: number
                   default: 1
               required:
                 - days
-                - origin
                 - boost
             type:
               type: string

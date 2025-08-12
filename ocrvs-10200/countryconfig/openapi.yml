@@ -759,44 +759,13 @@ components:
             options:
               type: object
               properties:
-                daysBefore:
-                  type: number
-                daysAfter:
-                  type: number
-                origin:
-                  type: string
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - daysBefore
-                - daysAfter
-                - origin
-                - boost
-            type:
-              type: string
-              const: dateRange
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
                 days:
                   type: number
-                origin:
-                  type: string
                 boost:
                   type: number
                   default: 1
               required:
                 - days
-                - origin
                 - boost
             type:
               type: string
@@ -11920,7 +11889,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: e62be776-6fce-4f6c-a0bd-ad4ef92fab0e
+        transactionId: eb8619a7-cd4c-4492-ab60-7e1541d7c96d
         declaration: {}
         annotation: {}
         type: NOTIFY
