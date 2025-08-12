@@ -110,7 +110,7 @@ describe('User credentials notification', () => {
       '01730037449'
     )
 
-    expect(spy).not.toHaveBeenCalled()
+    expect(spy).toHaveBeenCalled()
   })
 
   it('thows error when operation is not successful', async () => {
