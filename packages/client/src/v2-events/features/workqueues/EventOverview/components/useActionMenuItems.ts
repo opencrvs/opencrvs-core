@@ -30,6 +30,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -123,6 +124,7 @@ export function useAction(event: EventIndex) {
   const navigate = useNavigate()
   const drafts = useDrafts()
   const authentication = useAuthentication()
+  const { clearEphemeralFormState } = useEventFormNavigation()
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
 
@@ -183,48 +185,56 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
-        onClick: (workqueue?: string) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
               { eventId: event.id },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen),
         // Action menu should not show DECLARE if the user can perform VALIDATE
         shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
-        onClick: (workqueue?: string) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
               { eventId: event.id },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
-        onClick: (workqueue?: string) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
               { eventId: event.id },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
-        onClick: (workqueue?: string) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
               { eventId: event.id },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.DELETE]: {
