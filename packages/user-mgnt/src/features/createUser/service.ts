@@ -277,9 +277,6 @@ export async function sendCredentialsNotification(
   msisdn?: string,
   email?: string
 ) {
-  const COUNTRY_CONFIG_URL_TRIMMED = COUNTRY_CONFIG_URL.endsWith('/')
-    ? COUNTRY_CONFIG_URL.slice(0, -1)
-    : COUNTRY_CONFIG_URL
   try {
     await triggerUserEventNotification({
       event: 'user-created',
@@ -292,7 +289,7 @@ export async function sendCredentialsNotification(
         username,
         temporaryPassword: password
       },
-      countryConfigUrl: COUNTRY_CONFIG_URL_TRIMMED,
+      countryConfigUrl: COUNTRY_CONFIG_URL,
       authHeader
     })
   } catch (err) {
