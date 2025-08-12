@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 9a11f435-8cf3-4a49-9fa5-24d8a199b1fe
+                transactionId: 0a307e57-bec9-458c-9a72-9de077a54582
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 51d7cc3c-cd5c-49de-8c92-5a70d07b1893
+                transactionId: 5754b82c-3cbc-476d-aba7-12001d09d71f
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2638,7 +2638,9 @@ components:
               required:
                 - fuzziness
                 - boost
-              default: {}
+              default:
+                fuzziness: AUTO:4,7
+                boost: 1
             type:
               type: string
               enum:
@@ -2659,7 +2661,8 @@ components:
                   default: 1
               required:
                 - boost
-              default: {}
+              default:
+                boost: 1
             type:
               type: string
               enum:

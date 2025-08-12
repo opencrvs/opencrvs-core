@@ -721,7 +721,9 @@ components:
               required:
                 - fuzziness
                 - boost
-              default: {}
+              default:
+                fuzziness: AUTO:4,7
+                boost: 1
             type:
               type: string
               const: fuzzy
@@ -741,7 +743,8 @@ components:
                   default: 1
               required:
                 - boost
-              default: {}
+              default:
+                boost: 1
             type:
               type: string
               const: strict
@@ -11917,7 +11920,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 53e04672-429f-4ad7-962b-8290c0a32fee
+        transactionId: e62be776-6fce-4f6c-a0bd-ad4ef92fab0e
         declaration: {}
         annotation: {}
         type: NOTIFY
