@@ -57,7 +57,7 @@ export const TriggerPayload = {
     username: z.string()
   }),
   [TriggerEvent.RESET_PASSWORD]: BasePayload.extend({
-    temporaryPassword: z.string()
+    code: z.string()
   }),
   [TriggerEvent.RESET_PASSWORD_BY_ADMIN]: BasePayload.extend({
     temporaryPassword: z.string(),
