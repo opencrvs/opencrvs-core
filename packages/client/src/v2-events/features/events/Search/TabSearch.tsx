@@ -215,7 +215,6 @@ export function TabSearch({
     if (typeof value === 'object') {
       return Object.entries(value).reduce<number>((count, [key, val]) => {
         const field = fields.find((f) => f.id === key)
-        const defaultIncrement = count + (val ? 1 : 0)
 
         if (!field) {
           return count
