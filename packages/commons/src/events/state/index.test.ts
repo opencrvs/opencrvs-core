@@ -456,7 +456,10 @@ describe('getCurrentEventState()', () => {
 
     expect(
       getCurrentEventState(event1, tennisClubMembershipEvent).flags
-    ).toEqual([InherentFlags.CORRECTION_REQUESTED])
+    ).toEqual([
+      InherentFlags.PENDING_CERTIFICATION,
+      InherentFlags.CORRECTION_REQUESTED
+    ])
 
     const event2 = generateEventDocument({
       configuration: tennisClubMembershipEvent,
