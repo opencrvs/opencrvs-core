@@ -25,7 +25,7 @@ import {
 } from '@client/tests/util'
 import { waitForElement } from '@client/tests/wait-for-element'
 import { modifyUserFormData } from '@client/user/userReducer'
-import { CreateNewUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateNewUser'
+import { CreateUser } from '@client/views/SysAdmin/Team/user/userCreation/CreateUser'
 import { ReactWrapper } from 'enzyme'
 import * as React from 'react'
 import { roleQueries } from '@client/forms/user/query/queries'
@@ -51,7 +51,7 @@ describe('signature upload tests', () => {
     beforeEach(async () => {
       ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
       ;({ component: testComponent, router } = await createTestComponent(
-        <CreateNewUser />,
+        <CreateUser />,
         {
           store,
           path: CREATE_USER_SECTION,
@@ -136,7 +136,7 @@ describe('signature upload tests', () => {
       await flushPromises()
       store.dispatch(modifyUserFormData(mockDataWithRegistarRoleSelected))
       ;({ component: testComponent } = await createTestComponent(
-        <CreateNewUser />,
+        <CreateUser />,
         {
           store,
           path: CREATE_USER_SECTION,
