@@ -72,15 +72,25 @@ export type TriggerPayload = {
   [K in TriggerEvent]: z.infer<(typeof TriggerPayload)[K]>
 }
 
-export function buildUserEventTrigger<T extends TriggerEvent>(
-  event: T,
+export async function triggerUserEventNotification<T extends TriggerEvent>({
+  event,
+  payload,
+  countryConfigUrl,
+  authHeader
+}: {
+  event: T
   payload: TriggerPayload[T]
-) {
-  return {
-    path: `/triggers/user/${event}`,
+  countryConfigUrl: string
+  authHeader: { Authorization: string }
+}) {
+  return await fetch(`${countryConfigUrl}/triggers/user/${event}`, {
     method: 'POST',
-    body: JSON.stringify(payload)
-  }
+    body: JSON.stringify(payload),
+    headers: {
+      'Content-Type': 'application/json',
+      ...authHeader
+    }
+  })
 }
 
 export function parseUserEventTrigger<T extends TriggerEvent>(

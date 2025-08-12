@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { buildUserEventTrigger, logger } from '@opencrvs/commons'
+import { triggerUserEventNotification, logger } from '@opencrvs/commons'
 import {
   Extension,
   findExtension,
@@ -281,22 +281,19 @@ export async function sendCredentialsNotification(
     ? COUNTRY_CONFIG_URL.slice(0, -1)
     : COUNTRY_CONFIG_URL
   try {
-    const { path, ...trigger } = buildUserEventTrigger('user-created', {
-      recipient: {
-        name: userFullName,
-        email,
-        mobile: msisdn
+    await triggerUserEventNotification({
+      event: 'user-created',
+      payload: {
+        recipient: {
+          name: userFullName,
+          email,
+          mobile: msisdn
+        },
+        username,
+        temporaryPassword: password
       },
-      username,
-      temporaryPassword: password
-    })
-
-    await fetch(`${COUNTRY_CONFIG_URL_TRIMMED}${path}`, {
-      ...trigger,
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
+      countryConfigUrl: COUNTRY_CONFIG_URL_TRIMMED,
+      authHeader
     })
   } catch (err) {
     logger.error(`Unable to send notification for error : ${err}`)
