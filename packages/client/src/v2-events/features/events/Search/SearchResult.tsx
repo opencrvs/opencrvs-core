@@ -245,7 +245,7 @@ export const SearchResultComponent = ({
   tabBarContent,
   actions = [],
   emptyMessage,
-  isOutbox
+  allowRetry
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -253,7 +253,7 @@ export const SearchResultComponent = ({
   limit?: number
   offset?: number
   title: string
-  isOutbox?: boolean
+  allowRetry?: boolean
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
   emptyMessage?: TranslationConfig
@@ -328,7 +328,7 @@ export const SearchResultComponent = ({
           )
         }))
         .concat(
-          isOutbox ? { actionComponent: <RetryButton event={event} /> } : []
+          allowRetry ? { actionComponent: <RetryButton event={event} /> } : []
         )
         .concat({
           actionComponent: (
