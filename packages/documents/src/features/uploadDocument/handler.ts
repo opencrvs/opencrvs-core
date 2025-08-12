@@ -16,6 +16,7 @@ import { fromBuffer } from 'file-type'
 import {
   FullDocumentPath,
   getUserId,
+  joinValues,
   logger,
   toDocumentPath
 } from '@opencrvs/commons'
@@ -50,9 +51,13 @@ const FileSchema = z
 
 const Payload = z.object({
   file: FileSchema,
-  transactionId: z.string()
+  transactionId: z.string(),
+  eventId: z.string().min(1).optional()
 })
 
+/**
+ * V2 version of the file upload handler.
+ */
 export async function fileUploadHandler(
   request: Hapi.Request,
   h: Hapi.ResponseToolkit
@@ -60,19 +65,22 @@ export async function fileUploadHandler(
   const userId = getUserId(request.headers.authorization)
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
+    console.log(error)
     throw badRequest('Invalid payload')
   })
 
-  const { file, transactionId } = payload
+  const { file, transactionId, eventId } = payload
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
 
-  await minioClient.putObject(MINIO_BUCKET, filename, file, {
+  const filePath = joinValues([eventId, filename], '/')
+
+  await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId
   })
 
-  return `/${MINIO_BUCKET}/${filename}` as FullDocumentPath
+  return `/${MINIO_BUCKET}/${filePath}` as FullDocumentPath
 }
 
 export async function fileExistsHandler(
