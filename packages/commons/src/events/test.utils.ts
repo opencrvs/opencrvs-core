@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -148,6 +147,8 @@ export function mapFieldTypeToMockValue(
     case FieldType.PHONE:
     case FieldType.ID:
     case FieldType.OFFICE:
+    case FieldType.HTTP:
+    case FieldType.BUTTON:
       return `${field.id}-${field.type}-${i}`
     case FieldType.NAME:
       return generateRandomName(rng)

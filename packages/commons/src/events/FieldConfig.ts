@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-/* eslint-disable max-lines */
 import { z } from 'zod'
 import { Conditional, FieldConditional } from './Conditional'
 import { TranslationConfig } from './TranslationConfig'
@@ -506,6 +505,37 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
+const ButtonField = BaseField.extend({
+  type: z.literal(FieldType.BUTTON),
+  configuration: z.object({
+    onClick: FieldReference,
+    icon: z
+      .string()
+      .optional()
+      .describe(
+        'Icon for the button. Use icon names from the OpenCRVS UI-Kit.'
+      ),
+    shouldHandleLoadingState: z.boolean().default(false).optional(),
+    buttonLabel: TranslationConfig,
+    loadingLabel: TranslationConfig.optional()
+  })
+}).describe('Button for triggering HTTP requests')
+
+export type ButtonField = z.infer<typeof ButtonField>
+
+const HttpField = BaseField.extend({
+  type: z.literal(FieldType.HTTP),
+  configuration: z.object({
+    method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
+    headers: z.record(z.string()).optional(),
+    body: z.record(z.string()).optional(),
+    params: z.record(z.string()).optional(),
+    url: z.string().describe('URL to send the HTTP request to')
+  })
+}).describe('HTTP request function triggered by a button click')
+
+export type HttpField = z.infer<typeof HttpField>
+
 /** @knipignore */
 export type Inferred =
   | z.infer<typeof Address>
@@ -536,6 +566,8 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
+  | z.infer<typeof ButtonField>
+  | z.infer<typeof HttpField>
 
 /** @knipignore */
 /**
@@ -569,6 +601,8 @@ export type InferredInput =
   | z.input<typeof SignatureField>
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
+  | z.input<typeof ButtonField>
+  | z.input<typeof HttpField>
 
 export const FieldConfig = z
   .discriminatedUnion('type', [
@@ -599,7 +633,9 @@ export const FieldConfig = z
     SignatureField,
     EmailField,
     FileUploadWithOptions,
-    DataField
+    DataField,
+    ButtonField,
+    HttpField
   ])
   .openapi({
     description: 'Form field configuration',

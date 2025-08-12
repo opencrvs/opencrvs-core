@@ -39,7 +39,9 @@ import {
   IdField,
   DateRangeField,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  ButtonField,
+  HttpField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -54,7 +56,8 @@ import {
   DataFieldValue,
   DateRangeFieldValue,
   SelectDateRangeValue,
-  TimeValue
+  TimeValue,
+  ButtonFieldValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -145,6 +148,12 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.NAME:
       schema = required ? NameFieldValue : NameFieldUpdateValue
       break
+    case FieldType.BUTTON:
+      schema = ButtonFieldValue
+      break
+    case FieldType.HTTP:
+      schema = ButtonFieldValue
+      break
   }
 
   return required ? schema : schema.nullish()
@@ -189,6 +198,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATA:
+    case FieldType.BUTTON:
+    case FieldType.HTTP:
     case FieldType.NAME:
     case FieldType.PHONE:
     case FieldType.ID:
@@ -419,6 +430,20 @@ export const isDataFieldType = (field: {
   value: FieldValue
 }): field is { value: undefined; config: DataField } => {
   return field.config.type === FieldType.DATA
+}
+
+export const isButtonFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: ButtonField } => {
+  return field.config.type === FieldType.BUTTON
+}
+
+export const isHttpFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is { value: undefined; config: HttpField } => {
+  return field.config.type === FieldType.HTTP
 }
 
 export type NonInteractiveFieldType =

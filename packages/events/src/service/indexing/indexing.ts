@@ -162,6 +162,10 @@ function mapFieldTypeToElasticsearch(field: FieldConfig) {
           option: { type: 'keyword' }
         }
       }
+    // non-searchable fields, these are written into another form fields such as TEXT
+    case FieldType.BUTTON:
+    case FieldType.HTTP:
+      return { type: 'keyword' }
     // @TODO: other option would be to throw an error, since these should not be used in declaration form.
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:

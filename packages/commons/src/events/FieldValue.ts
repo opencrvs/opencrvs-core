@@ -80,6 +80,12 @@ export type DataFieldValue = z.infer<typeof DataFieldValue>
 export const SignatureFieldValue = z.string()
 export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
+export const ButtonFieldValue = z.undefined()
+export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
+
+export const HttpFieldValue = z.undefined()
+export type HttpFieldValue = z.infer<typeof HttpFieldValue>
+
 export const FieldValue = z.union([
   TextValue,
   DateValue,

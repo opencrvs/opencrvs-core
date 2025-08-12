@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+/* eslint-disable max-lines */
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import {
@@ -49,7 +49,11 @@ import {
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
   SelectDateRangeValue,
-  isTimeFieldType
+  isTimeFieldType,
+  isButtonFieldType,
+  isHttpFieldType,
+  HttpField,
+  FieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -68,7 +72,8 @@ import {
   PageHeader,
   Paragraph,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  FetchButton
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -586,6 +591,41 @@ export const GeneratedInputField = React.memo(
           formData={form}
         />
       )
+    }
+
+    if (isButtonFieldType(field)) {
+      // If no event config or declare form fields found, don't render the data field.
+      // This should never actually happen, but we don't want to throw an error either.
+      if (!eventConfig) {
+        return null
+      }
+
+      const allFields = eventConfig.declaration.pages.flatMap(
+        (page) => page.fields
+      )
+      const httpConfiguration = allFields.find(
+        (pageField) =>
+          pageField.type === FieldType.HTTP &&
+          pageField.id === field.config.configuration.onClick.$$field
+      )
+
+      return (
+        <InputField {...field.inputFieldProps}>
+          <FetchButton.Input
+            buttonLabel={field.config.configuration.buttonLabel}
+            httpConfiguration={httpConfiguration as HttpField}
+            icon={field.config.configuration.icon}
+            loadingLabel={field.config.configuration.loadingLabel}
+            shouldHandleLoadingState={
+              field.config.configuration.shouldHandleLoadingState
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isHttpFieldType(field)) {
+      return null
     }
 
     throw new Error(`Unsupported field ${JSON.stringify(fieldDefinition)}`)
