@@ -1,0 +1,221 @@
+/*
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this
+ * file, You can obtain one at https://mozilla.org/MPL/2.0/.
+ *
+ * OpenCRVS is also distributed under the terms of the Civil Registration
+ * & Healthcare Disclaimer located at http://opencrvs.org/license.
+ *
+ * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
+ */
+import { FormFieldGenerator } from '@client/components/form'
+import { ISelectFormFieldWithOptions, UserSection } from '@client/forms'
+import { roleQueries } from '@client/forms/user/query/queries'
+import { formatUrl } from '@client/navigation'
+import {
+  CREATE_USER_ON_LOCATION,
+  CREATE_USER_SECTION,
+  REVIEW_USER_DETAILS,
+  REVIEW_USER_FORM
+} from '@client/navigation/routes'
+import { offlineDataReady } from '@client/offline/actions'
+import { AppStore, createStore } from '@client/store'
+import { GET_USER } from '@client/user/queries'
+import {
+  createTestComponent,
+  flushPromises,
+  mockOfflineDataDispatch,
+  mockRoles,
+  setScopes
+} from '@client/tests/util'
+import { waitForElement } from '@client/tests/wait-for-element'
+import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
+import { ReactWrapper } from 'enzyme'
+import * as React from 'react'
+import { vi, Mock, describe, expect } from 'vitest'
+import { GetUserQuery, Status } from '@client/utils/gateway'
+import { SCOPES } from '@opencrvs/commons/client'
+import { createMemoryRouter } from 'react-router-dom'
+import { UpdateUser } from '@client/views/SysAdmin/Team/user/userUpdate/UpdateUser'
+
+describe('edit user tests', () => {
+  const { store } = createStore()
+  let component: ReactWrapper<{}, {}>
+  let router: ReturnType<typeof createMemoryRouter>
+  const submitMock: Mock = vi.fn()
+
+  const graphqlMocks = [
+    {
+      request: {
+        query: GET_USER,
+        variables: { userId: '5e835e4d81fbf01e4dc554db' }
+      },
+      result: {
+        data: {
+          getUser: {
+            id: '5e835e4d81fbf01e4dc554db',
+            userMgntUserID: '5e835e4d81fbf01e4dc554db',
+            name: [
+              {
+                use: 'bn',
+                firstNames: 'Jeff',
+                familyName: 'মায়ের পারিবারিক নাম ',
+                __typename: 'HumanName'
+              },
+              {
+                use: 'en',
+                firstNames: 'Jeff',
+                familyName: 'Shakib al Hasan',
+                __typename: 'HumanName'
+              }
+            ],
+            username: 'shakib1',
+            mobile: '+8801662132163',
+            email: 'jeff@gmail.com',
+            role: {
+              id: '63ef9466f708ea080777c27a',
+              label: {
+                defaultMessage: 'State Registrar',
+                description: 'Name for user role State Registrar',
+                id: 'userRole.stateRegistrar'
+              }
+            },
+            status: Status.Active,
+            underInvestigation: false,
+            practitionerId: '94429795-0a09-4de8-8e1e-27dab01877d2',
+            primaryOffice: {
+              id: '895cc945-94a9-4195-9a29-22e9310f3385',
+              name: 'Narsingdi Paurasabha',
+              alias: ['নরসিংদী পৌরসভা'],
+              __typename: 'Location'
+            },
+            // without signature confirm button stays disabled
+            signature: new File(['(⌐□_□)'], 'chucknorris.png', {
+              type: 'image/png'
+            }),
+            creationDate: '2019-03-31T18:00:00.000Z',
+            __typename: 'User'
+          } satisfies GetUserQuery['getUser']
+        }
+      }
+    }
+  ]
+
+  beforeEach(async () => {
+    setScopes(
+      [
+        SCOPES.USER_CREATE,
+        'user.create[role=FIELD_AGENT|REGISTRATION_AGENT]',
+        'user.edit[role=LOCAL_REGISTRAR]'
+      ],
+      store
+    )
+    ;(roleQueries.fetchRoles as Mock).mockReturnValue(mockRoles)
+    store.dispatch(offlineDataReady(mockOfflineDataDispatch))
+    await flushPromises()
+  })
+
+  it('should only generate allowed roles in the options', async () => {
+    const section = store
+      .getState()
+      .userForm.userForm?.sections.find((section) => section.id === 'user')
+    const group = section!.groups.find(
+      (group) => group.id === 'user-view-group'
+    )!
+    const field = group.fields.find(
+      (field) => field.name === 'role'
+    ) as ISelectFormFieldWithOptions
+    expect(field.options.map((o) => o.value)).toEqual([
+      'FIELD_AGENT',
+      'REGISTRATION_AGENT',
+      'LOCAL_REGISTRAR'
+    ])
+  })
+
+  describe('when user is in update form page', () => {
+    beforeEach(async () => {
+      const { component: testComponent, router: testRouter } =
+        await createTestComponent(<UpdateUser />, {
+          store,
+          graphqlMocks: graphqlMocks,
+          path: REVIEW_USER_FORM,
+          initialEntries: [
+            formatUrl(REVIEW_USER_FORM, {
+              userId: '5e835e4d81fbf01e4dc554db',
+              sectionId: UserSection.User,
+              groupId: 'user-view-group'
+            })
+          ]
+        })
+
+      component = testComponent
+      router = testRouter
+    })
+
+    it('clicking on continue button takes user signature attachment page', async () => {
+      const continueButtonElement = await waitForElement(
+        component,
+        '#confirm_form'
+      )
+
+      continueButtonElement.hostNodes().simulate('click')
+      component.update()
+      await flushPromises()
+
+      // this will have to be updated after signature page is updated for new user roles structure
+      expect(router.state.location.pathname).toContain(
+        '/user/5e835e4d81fbf01e4dc554db/preview/preview-registration-office'
+      )
+    })
+  })
+
+  describe('when user is in review page', () => {
+    beforeEach(async () => {
+      ;({ component, router } = await createTestComponent(
+        <UpdateUser
+          // @ts-ignore
+          submitForm={submitMock}
+        />,
+        {
+          store,
+          graphqlMocks,
+          path: REVIEW_USER_DETAILS,
+          initialEntries: [
+            formatUrl(REVIEW_USER_DETAILS, {
+              userId: '5e835e4d81fbf01e4dc554db',
+              sectionId: UserSection.Preview
+            })
+          ]
+        }
+      ))
+
+      component.update()
+    })
+
+    it('loads page without crashing', async () => {
+      const actionPageElement = await waitForElement(component, ActionPageLight)
+      expect(actionPageElement.prop('title')).toBe('Edit details')
+    })
+
+    it('clicking on any change button takes user to form', async () => {
+      const changeButtonOfType = await waitForElement(
+        component,
+        '#btn_change_device'
+      )
+      changeButtonOfType.hostNodes().first().simulate('click')
+      await flushPromises()
+      expect(router.state.location.hash).toBe('#device')
+    })
+
+    it('clicking confirm button starts submitting the form', async () => {
+      const submitButton = await waitForElement(
+        component,
+        '#submit-edit-user-form'
+      )
+
+      submitButton.hostNodes().simulate('click')
+
+      expect(store.getState().userForm.submitting).toBe(true)
+    })
+  })
+})
