@@ -449,11 +449,16 @@ export const SearchResultComponent = ({
       if (!eventConfig) {
         throw new Error('Event configuration not found for event:' + event.type)
       }
+      const draft = first(drafts.filter((d) => d.eventId === event.id))
+
+      if (!draft) {
+        return event
+      }
       return deepDropNulls(
         applyDraftToEventIndex(
           event,
           // there should be only one draft per event
-          first(drafts.filter((d) => d.eventId === event.id)),
+          draft,
           eventConfig
         )
       )
