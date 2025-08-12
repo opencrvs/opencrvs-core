@@ -32,7 +32,7 @@ interface UploadFileParams {
   file: File
   meta: {
     transactionId: string
-    eventId?: string
+    path?: string
     referenceId: string
   }
 }
@@ -45,8 +45,8 @@ async function uploadFile({
   formData.append('file', file)
   formData.append('transactionId', meta.transactionId)
 
-  if (meta.eventId) {
-    formData.append('eventId', meta.eventId)
+  if (meta.path) {
+    formData.append('path', meta.path)
   }
 
   const response = await fetch('/api/upload', {
@@ -167,13 +167,13 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
 
   const upload = useMutation({
     mutationFn: async (variables: UploadFileParams) =>
-      uploadFile({ ...variables, meta: { ...variables.meta, eventId } }),
+      uploadFile({ ...variables, meta: { ...variables.meta, path: eventId } }),
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
     onMutate: async ({ file, meta }) => {
       const extension = file.name.split('.').pop()
       const temporaryFilename = `${meta.transactionId}.${extension}`
       const filePathWithDirectory = joinValues(
-        [meta.eventId, temporaryFilename],
+        [meta.path, temporaryFilename],
         '/'
       )
       const path = getFullDocumentPath(filePathWithDirectory)
@@ -216,7 +216,7 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
         meta: {
           transactionId: uuid(),
           referenceId,
-          eventId
+          path: eventId
         }
       })
     }

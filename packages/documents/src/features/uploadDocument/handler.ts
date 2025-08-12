@@ -52,7 +52,7 @@ const FileSchema = z
 const Payload = z.object({
   file: FileSchema,
   transactionId: z.string(),
-  eventId: z.string().min(1).optional()
+  path: z.string().min(1).optional()
 })
 
 /**
@@ -65,16 +65,15 @@ export async function fileUploadHandler(
   const userId = getUserId(request.headers.authorization)
   const payload = await Payload.parseAsync(request.payload).catch((error) => {
     logger.error(error)
-    console.log(error)
     throw badRequest('Invalid payload')
   })
 
-  const { file, transactionId, eventId } = payload
+  const { file, transactionId, path } = payload
 
   const extension = file.hapi.filename.split('.').pop()
   const filename = `${transactionId}.${extension}`
 
-  const filePath = joinValues([eventId, filename], '/')
+  const filePath = joinValues([path, filename], '/')
 
   await minioClient.putObject(MINIO_BUCKET, filePath, file, {
     'created-by': userId
