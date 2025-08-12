@@ -21,7 +21,8 @@ import {
   getCurrentEventState,
   getDeclaration,
   isFieldVisible,
-  isPageVisible
+  isPageVisible,
+  PageTypes
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
@@ -87,9 +88,9 @@ export function CorrectionDetails({
     .flatMap((page) => {
       // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
       // instead of being tied to individual field IDs. We pull it directly from `annotation[page.id]`.
-      if (page.type === 'VERIFICATION') {
+      if (page.type === PageTypes.enum.VERIFICATION) {
         // value can only be boolean
-        const value = annotation[page.id]
+        const value = !!annotation[page.id]
         return [
           {
             id: page.id,
