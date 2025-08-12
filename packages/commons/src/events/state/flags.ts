@@ -24,6 +24,9 @@ function isPendingCertification(actions: Action[]) {
     if (type === ActionType.PRINT_CERTIFICATE) {
       return false
     }
+    if (type === ActionType.REQUEST_CORRECTION) {
+      return false
+    }
     if (type === ActionType.APPROVE_CORRECTION) {
       return true
     }
