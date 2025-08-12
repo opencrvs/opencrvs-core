@@ -34,6 +34,7 @@ import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -139,6 +140,7 @@ export function useAction(event: EventIndex) {
   const navigate = useNavigate()
   const drafts = useDrafts()
   const authentication = useAuthentication()
+  const { clearEphemeralFormState } = useEventFormNavigation()
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
 
@@ -211,13 +213,15 @@ export function useAction(event: EventIndex) {
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
         icon: 'PencilLine',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen),
         // Action menu should not show DECLARE if the user can perform VALIDATE
         shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
@@ -225,37 +229,43 @@ export function useAction(event: EventIndex) {
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
         icon: 'PencilLine',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
         icon: 'PencilLine',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
         icon: 'Printer',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
         shouldHide: () => eventIsWaitingForCorrection
       },
@@ -281,6 +291,8 @@ export function useAction(event: EventIndex) {
             throw new Error('No page ID found for request correction')
           }
 
+          clearEphemeralFormState()
+
           // If no pages are configured, skip directly to review page
           if (correctionPages.length === 0) {
             navigate(ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId }))
@@ -302,6 +314,7 @@ export function useAction(event: EventIndex) {
         label: actionLabels[ExclusiveActions.REVIEW_CORRECTION_REQUEST],
         icon: 'NotePencil',
         onClick: () => {
+          clearEphemeralFormState()
           navigate(
             ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
               eventId

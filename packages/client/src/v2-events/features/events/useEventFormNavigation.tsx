@@ -189,6 +189,7 @@ export function useEventFormNavigation() {
     modal,
     createNewDeclaration,
     deleteDeclaration,
-    closeActionView
+    closeActionView,
+    clearEphemeralFormState
   }
 }
