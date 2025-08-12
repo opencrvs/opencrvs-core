@@ -9,7 +9,6 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as elasticsearch from '@elastic/elasticsearch'
-import { DateTime } from 'luxon'
 import { get } from 'lodash'
 import {
   EventIndex,
@@ -109,24 +108,6 @@ function generateElasticsearchQuery(
       return {
         match_phrase: {
           [queryKey]: queryValue.toString()
-        }
-      }
-    }
-    case 'dateRange': {
-      const origin = encodeFieldId(queryInput.options.origin)
-      return {
-        range: {
-          [queryKey]: {
-            // @TODO: Improve types for origin field to be sure it returns a string when accessing data
-            gte: DateTime.fromJSDate(new Date(queryValue.toString()))
-              .minus({ days: queryInput.options.daysBefore })
-              .toISO(),
-            lte: DateTime.fromJSDate(
-              new Date(eventIndex.declaration[origin] as string)
-            )
-              .plus({ days: queryInput.options.daysAfter })
-              .toISO()
-          }
         }
       }
     }

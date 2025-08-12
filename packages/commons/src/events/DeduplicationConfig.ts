@@ -16,7 +16,13 @@ extendZodWithOpenApi(z)
 const FieldReference = z.string()
 
 const Matcher = z.object({
-  fieldId: z.string(),
+  /**
+   * The reference to the field to match against.
+   *
+   * For `dateDistance` type matcher the value of this field will
+   * be used as the origin date to calculate the distance from.
+   */
+  fieldId: FieldReference,
   options: z
     .object({
       boost: z.number().optional()
@@ -61,21 +67,10 @@ const StrictMatcher = Matcher.extend({
     })
 })
 
-const DateRangeMatcher = Matcher.extend({
-  type: z.literal('dateRange'),
-  options: z.object({
-    daysBefore: z.number(),
-    daysAfter: z.number(),
-    origin: FieldReference,
-    boost: z.number().optional().default(1)
-  })
-})
-
 const DateDistanceMatcher = Matcher.extend({
   type: z.literal('dateDistance'),
   options: z.object({
     days: z.number(),
-    origin: FieldReference,
     boost: z.number().optional().default(1)
   })
 })
@@ -117,7 +112,6 @@ export type ClauseInput =
   | OrInput
   | z.input<typeof FuzzyMatcher>
   | z.input<typeof StrictMatcher>
-  | z.input<typeof DateRangeMatcher>
   | z.input<typeof DateDistanceMatcher>
 
 export type ClauseOutput =
@@ -125,7 +119,6 @@ export type ClauseOutput =
   | OrOutput
   | z.output<typeof FuzzyMatcher>
   | z.output<typeof StrictMatcher>
-  | z.output<typeof DateRangeMatcher>
   | z.output<typeof DateDistanceMatcher>
 
 /**
@@ -143,7 +136,6 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
       Or,
       FuzzyMatcher,
       StrictMatcher,
-      DateRangeMatcher,
       DateDistanceMatcher
     ])
   )
