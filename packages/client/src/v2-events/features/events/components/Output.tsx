@@ -263,6 +263,7 @@ export function Output({
     // will be visible while the previous value is hidden due to conditionals.
     // When comparing to a previous form, check all fields with the same label and compare
     // their values to detect changes, even if the active field ID is different.
+    // IMPROVEMENT TODO: https://github.com/opencrvs/opencrvs-core/issues/10206
     const previousValueWithSameLabel = findPreviousValueWithSameLabel(
       field,
       previousForm,
