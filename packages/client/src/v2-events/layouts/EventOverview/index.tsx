@@ -115,7 +115,13 @@ export function EventOverviewLayout({
             eventConfiguration.title,
             flattenEventIndex(
               deepDropNulls(
-                applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
+                draft
+                  ? applyDraftToEventIndex(
+                      eventIndex,
+                      draft,
+                      eventConfiguration
+                    )
+                  : eventIndex
               )
             )
           )}
