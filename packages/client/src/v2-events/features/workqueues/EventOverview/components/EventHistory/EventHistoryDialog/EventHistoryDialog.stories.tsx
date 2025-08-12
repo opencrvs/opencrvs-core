@@ -53,7 +53,8 @@ const requestCorrectionAction = {
     }
   },
   annotation: {
-    'correction.request.reason': 'My reason'
+    'correction.request.reason': 'My reason',
+    'identity-check': true
   }
 }
 
@@ -108,6 +109,7 @@ export const Read: Story = {
 export const Declared: Story = {
   args: { ...argbase, action: { ...argbase.action, type: ActionType.DECLARE } }
 }
+
 export const Validated: Story = {
   args: { ...argbase, action: { ...argbase.action, type: ActionType.VALIDATE } }
 }
