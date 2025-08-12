@@ -12,7 +12,7 @@
 import {
   ActionInputWithType,
   ActionStatus,
-  EventIndex,
+  ActionType,
   getCurrentEventState
 } from '@opencrvs/commons/events'
 
@@ -44,8 +44,21 @@ export async function validate(
     )
   }
 
-  let duplicates: EventIndex[] = []
+  const dedupConfig = config.actions.find(
+    ({ type }) => type === ActionType.VALIDATE
+  )?.deduplication
 
+  if (!dedupConfig) {
+    return addAction(
+      { ...input, duplicates: [] },
+      {
+        eventId,
+        user,
+        token,
+        status: ActionStatus.Accepted
+      }
+    )
+  }
   const createdByDetails = {
     createdBy: user.id,
     createdByUserType: user.type,
@@ -71,35 +84,14 @@ export async function validate(
     config
   )
 
-  const resultsFromAllRules = await Promise.all(
-    config.deduplication.map(async (deduplication) => {
-      const matches = await searchForDuplicates(
-        futureEventState,
-        deduplication,
-        config
-      )
-      return matches
-    })
+  const duplicates = await searchForDuplicates(
+    futureEventState,
+    dedupConfig,
+    config
   )
 
-  /*
-   * Takes all hits using all possible deduplication rules and
-   * sorts them by score. Then removes duplicates from the list.
-   */
-
-  duplicates = resultsFromAllRules
-    .flat()
-    // Sort results to ascending order
-    .sort((a, b) => b.score - a.score)
-    .filter((hit): hit is { score: number; event: EventIndex } => !!hit.event)
-    .map((hit) => hit.event)
-    // Remove duplicates
-    .filter((event, index, self) => {
-      return self.findIndex((t) => t.id === event.id) === index
-    })
-
   return addAction(
-    { ...input, duplicates: duplicates.map((d) => d.id) },
+    { ...input, duplicates: duplicates.map((d) => d.event.id) },
     {
       eventId,
       user,

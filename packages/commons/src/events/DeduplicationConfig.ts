@@ -22,7 +22,9 @@ const Matcher = z.object({
       boost: z.number().optional()
     })
     .optional()
-    .default({})
+    .default({
+      boost: 1
+    })
 })
 
 const FuzzyMatcher = Matcher.extend({
@@ -41,7 +43,10 @@ const FuzzyMatcher = Matcher.extend({
       boost: z.number().optional().default(1)
     })
     .optional()
-    .default({})
+    .default({
+      fuzziness: 'AUTO:4,7',
+      boost: 1
+    })
 })
 
 const StrictMatcher = Matcher.extend({
@@ -51,7 +56,9 @@ const StrictMatcher = Matcher.extend({
       boost: z.number().optional().default(1)
     })
     .optional()
-    .default({})
+    .default({
+      boost: 1
+    })
 })
 
 const DateRangeMatcher = Matcher.extend({
@@ -152,4 +159,5 @@ export const DeduplicationConfig = z.object({
   query: Clause
 })
 
+export type DeduplicationConfigInput = z.input<typeof DeduplicationConfig>
 export type DeduplicationConfig = z.infer<typeof DeduplicationConfig>

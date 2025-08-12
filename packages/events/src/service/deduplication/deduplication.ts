@@ -123,12 +123,12 @@ function generateElasticsearchQuery(
             gte: DateTime.fromJSDate(
               new Date(eventIndex.declaration[origin] as string)
             )
-              .minus({ days: configuration.options.days })
+              .minus({ days: configuration.options.daysBefore })
               .toISO(),
             lte: DateTime.fromJSDate(
               new Date(eventIndex.declaration[origin] as string)
             )
-              .plus({ days: configuration.options.days })
+              .plus({ days: configuration.options.daysAfter })
               .toISO()
           }
         }
@@ -152,7 +152,7 @@ export async function searchForDuplicates(
   eventIndex: EventIndex,
   configuration: DeduplicationConfig,
   eventConfig: EventConfig
-): Promise<{ score: number; event: EventIndex | undefined }[]> {
+): Promise<{ score: number; event: EventIndex }[]> {
   const esClient = getOrCreateClient()
   const query = Clause.parse(configuration.query)
 
@@ -179,6 +179,6 @@ export async function searchForDuplicates(
     .filter((hit) => hit._source)
     .map((hit) => ({
       score: hit._score || 0,
-      event: hit._source && decodeEventIndex(eventConfig, hit._source)
+      event: decodeEventIndex(eventConfig, hit._source as EventIndex)
     }))
 }

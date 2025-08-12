@@ -14,7 +14,8 @@ import {
   EventIndex,
   getUUID,
   UUID,
-  TokenUserType
+  TokenUserType,
+  DeduplicationConfigInput
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
@@ -51,7 +52,8 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
             type: 'dateRange',
             fieldId: 'mother.DoB',
             options: {
-              days: 365,
+              daysBefore: 365,
+              daysAfter: 365,
               origin: 'mother.DoB'
             }
           },
@@ -62,7 +64,8 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
                 type: 'dateRange',
                 fieldId: 'child.DoB',
                 options: {
-                  days: 273,
+                  daysBefore: 273,
+                  daysAfter: 273,
                   origin: 'child.DoB'
                 }
               },
@@ -111,7 +114,8 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
             type: 'dateRange',
             fieldId: 'mother.DoB',
             options: {
-              days: 365,
+              daysBefore: 365,
+              daysAfter: 365,
               origin: 'mother.DoB'
             }
           },
@@ -122,7 +126,8 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
                 type: 'dateRange',
                 fieldId: 'child.DoB',
                 options: {
-                  days: 273,
+                  daysBefore: 273,
+                  daysAfter: 273,
                   origin: 'child.DoB'
                 }
               },
@@ -140,7 +145,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       }
     ]
   }
-}
+} satisfies DeduplicationConfigInput
 
 async function findDuplicates(
   registrationComparison: Record<string, string[]>
