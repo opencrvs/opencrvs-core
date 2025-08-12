@@ -162,7 +162,8 @@ export const ROUTES = {
           limit: zod(z.number().min(1).max(100)).default(10),
           offset: zod(z.number().min(0)).default(0)
         }
-      })
+      }),
+      SETTINGS: route('settings', {})
     }
   )
 }

@@ -41,6 +41,7 @@ import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyVie
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
 import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
@@ -231,6 +232,10 @@ export const routesConfig = {
           <QuickSearchIndex />
         </SearchLayout>
       )
+    },
+    {
+      path: ROUTES.V2.SETTINGS.path,
+      element: <SettingsPage />
     }
   ]
 } satisfies RouteObject
