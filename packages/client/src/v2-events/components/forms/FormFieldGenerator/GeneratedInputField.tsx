@@ -50,7 +50,7 @@ import {
   isSelectDateRangeFieldType,
   SelectDateRangeValue,
   isTimeFieldType,
-  isButtonFieldType,
+  isHttpButtonFieldType,
   isHttpFieldType,
   HttpField,
   FieldType
@@ -82,7 +82,10 @@ import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileIn
 import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
-import { makeFormikFieldIdOpenCRVSCompatible } from '../utils'
+import {
+  makeFormFieldIdFormikCompatible,
+  makeFormikFieldIdOpenCRVSCompatible
+} from '../utils'
 import { SignatureField } from '../inputs/SignatureField'
 import { makeFormikFieldIdsOpenCRVSCompatible } from './utils'
 
@@ -593,20 +596,21 @@ export const GeneratedInputField = React.memo(
       )
     }
 
-    if (isButtonFieldType(field)) {
+    if (isHttpButtonFieldType(field)) {
       // If no event config or declare form fields found, don't render the data field.
       // This should never actually happen, but we don't want to throw an error either.
       if (!eventConfig) {
         return null
       }
 
+      const httpFieldId = field.config.configuration.onClick.$$field
+
       const allFields = eventConfig.declaration.pages.flatMap(
         (page) => page.fields
       )
       const httpConfiguration = allFields.find(
         (pageField) =>
-          pageField.type === FieldType.HTTP &&
-          pageField.id === field.config.configuration.onClick.$$field
+          pageField.type === FieldType.HTTP && pageField.id === httpFieldId
       )
 
       return (
@@ -618,6 +622,12 @@ export const GeneratedInputField = React.memo(
             loadingLabel={field.config.configuration.loadingLabel}
             shouldHandleLoadingState={
               field.config.configuration.shouldHandleLoadingState
+            }
+            onChange={(val) =>
+              onFieldValueChange(
+                makeFormFieldIdFormikCompatible(httpFieldId),
+                val
+              )
             }
           />
         </InputField>

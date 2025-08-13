@@ -17,9 +17,11 @@ import {
   Icon
 } from '@opencrvs/components/lib'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
-import { HttpField, TranslationConfig } from '@opencrvs/commons/client'
-import { getOfflineData } from '@client/offline/selectors'
-import { getUserDetails } from '@client/profile/profileSelectors'
+import {
+  HttpField,
+  HttpFieldValue,
+  TranslationConfig
+} from '@opencrvs/commons/client'
 import { useHttpFieldRequest } from './useHttpFieldRequest'
 
 export function handleUnsupportedIcon(iconName?: string) {
@@ -40,22 +42,22 @@ interface FetchButtonProps {
   buttonLabel: TranslationConfig
   /** Label for the loading state on the button */
   loadingLabel?: TranslationConfig
+  /** Emits when the fetch status changes */
+  onChange: ({ loading, error, data }: HttpFieldValue) => void
 }
 
 export function Button({
   httpConfiguration,
   shouldHandleLoadingState,
   icon,
+  onChange,
   buttonLabel,
   loadingLabel
 }: FetchButtonProps) {
   const intl = useIntl()
   const { call, loading } = useHttpFieldRequest(
     httpConfiguration,
-    (props) => {
-      // eslint-disable-next-line no-console
-      console.log(props)
-    },
+    onChange,
     {},
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     {} as any,

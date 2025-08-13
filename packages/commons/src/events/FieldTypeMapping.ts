@@ -40,7 +40,7 @@ import {
   DateRangeField,
   SelectDateRangeField,
   TimeField,
-  ButtonField,
+  HttpButtonField,
   HttpField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
@@ -57,7 +57,7 @@ import {
   DateRangeFieldValue,
   SelectDateRangeValue,
   TimeValue,
-  ButtonFieldValue
+  HttpButtonFieldValue
 } from './FieldValue'
 
 import { FullDocumentPath } from '../documents'
@@ -69,7 +69,8 @@ import {
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue
 } from './CompositeFieldValue'
 
 /**
@@ -94,6 +95,12 @@ type NullishFieldValueSchema = z.ZodOptional<
 export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
   let schema: FieldUpdateValueSchema | NullishFieldValueSchema
   switch (type) {
+    case FieldType.HTTP_BUTTON:
+      schema = HttpButtonFieldValue
+      break
+    case FieldType.HTTP:
+      schema = HttpFieldUpdateValue
+      break
     case FieldType.DATE:
       schema = DateValue
       break
@@ -148,12 +155,6 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.NAME:
       schema = required ? NameFieldValue : NameFieldUpdateValue
       break
-    case FieldType.BUTTON:
-      schema = ButtonFieldValue
-      break
-    case FieldType.HTTP:
-      schema = ButtonFieldValue
-      break
   }
 
   return required ? schema : schema.nullish()
@@ -198,7 +199,7 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
     case FieldType.DATA:
-    case FieldType.BUTTON:
+    case FieldType.HTTP_BUTTON:
     case FieldType.HTTP:
     case FieldType.NAME:
     case FieldType.PHONE:
@@ -432,11 +433,11 @@ export const isDataFieldType = (field: {
   return field.config.type === FieldType.DATA
 }
 
-export const isButtonFieldType = (field: {
+export const isHttpButtonFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: undefined; config: ButtonField } => {
-  return field.config.type === FieldType.BUTTON
+}): field is { value: undefined; config: HttpButtonField } => {
+  return field.config.type === FieldType.HTTP_BUTTON
 }
 
 export const isHttpFieldType = (field: {

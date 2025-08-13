@@ -27,7 +27,8 @@ import {
 import {
   AddressFieldValue,
   FileFieldValue,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  HttpFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
@@ -505,8 +506,8 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
-const ButtonField = BaseField.extend({
-  type: z.literal(FieldType.BUTTON),
+const HttpButtonField = BaseField.extend({
+  type: z.literal(FieldType.HTTP_BUTTON),
   configuration: z.object({
     onClick: FieldReference,
     icon: z
@@ -521,10 +522,11 @@ const ButtonField = BaseField.extend({
   })
 }).describe('Button for triggering HTTP requests')
 
-export type ButtonField = z.infer<typeof ButtonField>
+export type HttpButtonField = z.infer<typeof HttpButtonField>
 
 const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
+  defaultValue: HttpFieldValue.optional(),
   configuration: z.object({
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
@@ -566,7 +568,7 @@ export type Inferred =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
-  | z.infer<typeof ButtonField>
+  | z.infer<typeof HttpButtonField>
   | z.infer<typeof HttpField>
 
 /** @knipignore */
@@ -601,7 +603,7 @@ export type InferredInput =
   | z.input<typeof SignatureField>
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
-  | z.input<typeof ButtonField>
+  | z.input<typeof HttpButtonField>
   | z.input<typeof HttpField>
 
 export const FieldConfig = z
@@ -634,7 +636,7 @@ export const FieldConfig = z
     EmailField,
     FileUploadWithOptions,
     DataField,
-    ButtonField,
+    HttpButtonField,
     HttpField
   ])
   .openapi({

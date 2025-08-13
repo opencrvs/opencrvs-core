@@ -148,7 +148,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.ID:
     case FieldType.OFFICE:
     case FieldType.HTTP:
-    case FieldType.BUTTON:
+    case FieldType.HTTP_BUTTON:
       return `${field.id}-${field.type}-${i}`
     case FieldType.NAME:
       return generateRandomName(rng)

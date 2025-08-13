@@ -21,7 +21,9 @@ import {
   GenericAddressValue,
   GenericAddressUpdateValue,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldValue,
+  HttpFieldUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -80,11 +82,8 @@ export type DataFieldValue = z.infer<typeof DataFieldValue>
 export const SignatureFieldValue = z.string()
 export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
-export const ButtonFieldValue = z.undefined()
-export type ButtonFieldValue = z.infer<typeof ButtonFieldValue>
-
-export const HttpFieldValue = z.undefined()
-export type HttpFieldValue = z.infer<typeof HttpFieldValue>
+export const HttpButtonFieldValue = z.undefined()
+export type HttpButtonFieldValue = z.infer<typeof HttpButtonFieldValue>
 
 export const FieldValue = z.union([
   TextValue,
@@ -101,7 +100,8 @@ export const FieldValue = z.union([
   DataFieldValue,
   GenericAddressValue,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldValue
 ])
 
 export type FieldValue = z.infer<typeof FieldValue>
@@ -120,7 +120,8 @@ export const FieldUpdateValue = z.union([
   RuralAddressUpdateValue,
   DataFieldValue,
   GenericAddressUpdateValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  HttpFieldUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
@@ -136,6 +137,7 @@ export type FieldValueSchema =
   | typeof NumberFieldValue
   | typeof DataFieldValue
   | typeof NameFieldValue
+  | typeof HttpFieldValue
   | z.ZodString
   | z.ZodBoolean
 /**
@@ -154,5 +156,6 @@ export type FieldUpdateValueSchema =
   | typeof DataFieldValue
   | typeof NameFieldValue
   | typeof NameFieldUpdateValue
+  | typeof HttpFieldUpdateValue
   | z.ZodString
   | z.ZodBoolean
