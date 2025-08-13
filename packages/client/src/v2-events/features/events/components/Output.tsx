@@ -75,7 +75,7 @@ export function ValueOutput(
     config: FieldConfig
     value: FieldValue
   },
-  searchMode?: boolean
+  searchMode?: {} | boolean
 ) {
   if (
     isEmailFieldType(field) ||
@@ -139,18 +139,19 @@ export function ValueOutput(
   if (isAddressFieldType(field)) {
     return Address.Output({
       value: field.value,
-      fields: searchMode
-        ? [
-            'country',
-            'province',
-            'district',
-            'state',
-            'district2',
-            'urbanOrRural',
-            'town',
-            'village'
-          ]
-        : undefined,
+      fields:
+        searchMode === true
+          ? [
+              'country',
+              'province',
+              'district',
+              'state',
+              'district2',
+              'urbanOrRural',
+              'town',
+              'village'
+            ]
+          : undefined,
       lineSeparator: searchMode === true ? ', ' : undefined
     })
   }

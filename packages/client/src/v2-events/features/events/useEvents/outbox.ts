@@ -12,7 +12,6 @@
 import { hashKey, MutationKey, useMutationState } from '@tanstack/react-query'
 import * as z from 'zod'
 import {
-  deepMerge,
   getCurrentEventState,
   applyDeclarationToEventIndex
 } from '@opencrvs/commons/client'

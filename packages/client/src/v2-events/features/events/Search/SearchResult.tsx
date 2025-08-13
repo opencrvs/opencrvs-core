@@ -12,7 +12,7 @@ import React, { useState, PropsWithChildren } from 'react'
 import { defineMessages, useIntl } from 'react-intl'
 import { useTheme } from 'styled-components'
 import { useNavigate } from 'react-router-dom'
-import { orderBy } from 'lodash'
+import { orderBy, first } from 'lodash'
 import styled from 'styled-components'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
@@ -21,7 +21,7 @@ import {
   defaultWorkqueueColumns,
   WorkqueueColumn,
   deepDropNulls,
-  applyDraftsToEventIndex,
+  applyDraftToEventIndex,
   WorkqueueActionsWithDefault,
   isMetaAction,
   TranslationConfig
@@ -236,7 +236,7 @@ function ActionComponent({
 
 export const SearchResultComponent = ({
   columns,
-  queryData,
+  queryData: events,
   eventConfigs,
   limit = 10,
   offset = 0,
@@ -310,14 +310,14 @@ export const SearchResultComponent = ({
     }
   }
 
-  const mapEventsToWorkqueueRows = (
-    eventData: (EventIndex & {
+  const mapEventsToResultRows = (
+    eventsWithDraft: (EventIndex & {
       title: string | null
       useFallbackTitle: boolean
       meta?: Record<string, unknown>
     })[]
   ) => {
-    return eventData.map(({ meta, ...event }) => {
+    return eventsWithDraft.map(({ meta, ...event }) => {
       const actionConfigs = actions
         .map((actionType) => ({
           actionComponent: (
@@ -439,7 +439,7 @@ export const SearchResultComponent = ({
     }
   }
 
-  const dataWithDraft = queryData
+  const dataWithDraft = events
     /*
      * Apply pending drafts to the event index.
      * This is necessary to show the most up to date information in the workqueue.
@@ -449,10 +449,16 @@ export const SearchResultComponent = ({
       if (!eventConfig) {
         throw new Error('Event configuration not found for event:' + event.type)
       }
+      const draft = first(drafts.filter((d) => d.eventId === event.id))
+
+      if (!draft) {
+        return event
+      }
       return deepDropNulls(
-        applyDraftsToEventIndex(
+        applyDraftToEventIndex(
           event,
-          drafts.filter((d) => d.eventId === event.id),
+          // there should be only one draft per event
+          draft,
           eventConfig
         )
       )
@@ -470,7 +476,7 @@ export const SearchResultComponent = ({
 
   const sortedResult = orderBy(dataWithTitle, sortedCol, sortOrder)
 
-  const allResults = mapEventsToWorkqueueRows(sortedResult)
+  const allResults = mapEventsToResultRows(sortedResult)
 
   const currentPageNumber = Math.floor(offset / limit) + 1
 
@@ -479,7 +485,7 @@ export const SearchResultComponent = ({
     limit * currentPageNumber
   )
 
-  const totalPages = queryData.length ? Math.ceil(queryData.length / limit) : 0
+  const totalPages = events.length ? Math.ceil(events.length / limit) : 0
 
   const isShowPagination = totalPages > 1
 
@@ -505,7 +511,7 @@ export const SearchResultComponent = ({
         error={false}
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
-        noContent={queryData.length === 0}
+        noContent={events.length === 0}
         noResultText={
           emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
         }

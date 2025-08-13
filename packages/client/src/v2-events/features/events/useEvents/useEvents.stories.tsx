@@ -75,7 +75,7 @@ const router = {
         queryClient.invalidateQueries({
           queryKey: trpcOptionsProxy.event.draft.list.queryKey()
         })
-        useDrafts().getRemoteDrafts(createdEvent.id)
+        useDrafts().getRemoteDraftByEventId(createdEvent.id)
 
         return (
           <TRPCProvider>

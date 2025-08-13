@@ -85,7 +85,7 @@ export function SingleDocumentPreview({
             id="preview_delete"
             size="small"
             type="icon"
-            onClick={() => onDelete && onDelete(attachment)}
+            onClick={() => onDelete?.(attachment)}
           >
             <Icon color="red" name="Trash" size="small" />
           </Button>
