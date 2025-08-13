@@ -27,7 +27,8 @@ import {
   AddressType,
   never,
   isFieldDisplayedOnReview,
-  AddressField
+  AddressField,
+  field
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -304,6 +305,7 @@ const GENERIC_ADDRESS_FIELDS = [
         conditional: isInternationalAddress()
       }
     ],
+    parent: field('country'),
     required: true,
     label: {
       id: 'v2.field.address.state.label',
@@ -314,6 +316,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'district2',
+    parent: field('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -330,6 +333,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'cityOrTown',
+    parent: field('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -346,6 +350,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'addressLine1',
+    parent: field('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -362,6 +367,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'addressLine2',
+    parent: field('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -378,6 +384,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'addressLine3',
+    parent: field('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -394,6 +401,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'postcodeOrZip',
+    parent: field('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,

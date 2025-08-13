@@ -156,6 +156,22 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
         '3300'
       )
     })
+
+    await step('Change country to Sweden', async () => {
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Sweden')
+    })
+
+    await step('Expect address fields to be reset', async () => {
+      await expect(canvas.queryByTestId('text__state')).toHaveValue('')
+      await expect(canvas.queryByTestId('text__district2')).toHaveValue('')
+      await expect(canvas.queryByTestId('text__cityOrTown')).toHaveValue('')
+      await expect(canvas.queryByTestId('text__addressLine1')).toHaveValue('')
+      await expect(canvas.queryByTestId('text__addressLine2')).toHaveValue('')
+      await expect(canvas.queryByTestId('text__addressLine3')).toHaveValue('')
+      await expect(canvas.queryByTestId('text__postcodeOrZip')).toHaveValue('')
+    })
   },
   render: function Component(args) {
     return (
