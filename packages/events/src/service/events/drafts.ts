@@ -25,7 +25,6 @@ export const createDraft = async (
     transactionId: string
   }
 ): Promise<Draft> => {
-  const createdAt = new Date().toISOString()
   const draft = await draftsRepo.createDraft({
     eventId,
     transactionId,
@@ -46,11 +45,11 @@ export const createDraft = async (
   return {
     id: draft.id,
     transactionId: draft.transactionId,
-    createdAt,
+    createdAt: draft.createdAt,
     eventId: draft.eventId,
     action: {
       transactionId: draft.transactionId,
-      createdAt: createdAt,
+      createdAt: draft.createdAt,
       createdBy: user.id,
       createdByRole: user.role,
       createdByUserType: user.type,
