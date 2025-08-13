@@ -126,6 +126,24 @@ function countFilledFieldsForInputType(
   return value && value !== '' ? 1 : 0
 }
 
+function isFieldExcludedFromSearch(
+  field: FieldConfig,
+  currentEvent: EventConfig
+): boolean {
+  const fieldSearchConfig = currentEvent.advancedSearch
+    .flatMap((s) => s.fields)
+    .find((f) => f.fieldId === field.id)
+
+  if (
+    fieldSearchConfig?.fieldType === 'field' &&
+    fieldSearchConfig.excludeInSearchQuery
+  ) {
+    return true
+  }
+
+  return false
+}
+
 export function TabSearch({
   currentEvent,
   fieldValues,
@@ -219,9 +237,13 @@ export function TabSearch({
         if (!field) {
           return count
         }
-        if (!isFieldVisible(field, formValues)) {
+        if (
+          !isFieldVisible(field, formValues) ||
+          isFieldExcludedFromSearch(field, currentEvent)
+        ) {
           return count
         }
+
         return count + countFilledFieldsForInputType(field, val)
       }, 0)
     }
