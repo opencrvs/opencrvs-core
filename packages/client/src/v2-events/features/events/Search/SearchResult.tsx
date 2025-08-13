@@ -227,7 +227,7 @@ function ActionComponent({
     <Button
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
-      onClick={async () => await config.onClick(slug)}
+      onClick={async () => config.onClick(slug)}
     >
       {intl.formatMessage(config.label)}
     </Button>
