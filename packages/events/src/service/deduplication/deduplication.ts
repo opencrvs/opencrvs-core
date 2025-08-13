@@ -65,10 +65,13 @@ function generateElasticsearchQuery(
   }
   const rawFieldId = queryInput.fieldId
   const fieldConfig = getDeclarationFieldById(eventConfig, rawFieldId)
+  const encodedFieldId = encodeFieldId(rawFieldId)
   const valuePath =
-    fieldConfig.type === 'NAME' ? `${rawFieldId}.__fullname` : rawFieldId
+    fieldConfig.type === 'NAME'
+      ? `${encodedFieldId}.__fullname`
+      : encodedFieldId
 
-  const queryKey = declarationReference(encodeFieldId(valuePath))
+  const queryKey = declarationReference(encodedFieldId)
   const queryValue = get(eventIndex.declaration, valuePath)
   if (!queryValue) {
     return null
