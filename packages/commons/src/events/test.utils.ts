@@ -312,6 +312,7 @@ export function eventPayloadGenerator(rng: () => number) {
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
               'correction.request.reason': "Child's name was incorrect",
+              'identity-check': true,
               ...annotation
             },
             createdAt: new Date().toISOString(),
