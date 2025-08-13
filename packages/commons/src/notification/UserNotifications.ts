@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { joinURL } from 'src/url'
+import { joinURL } from '../url'
 import { User } from '../events'
 import { z } from 'zod'
 
