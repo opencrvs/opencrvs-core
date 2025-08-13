@@ -48,6 +48,7 @@ function LocationSearchInput({
   onChange,
   value,
   searchableResource,
+  onBlur,
   ...props
 }: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
@@ -64,8 +65,22 @@ function LocationSearchInput({
     <LocationSearchComponent
       buttonLabel="Health facility"
       locationList={locationList}
-      searchHandler={(location: SearchLocation) => onChange(location.id)}
+      searchHandler={(location: SearchLocation) => {
+        if (location.id === '0') {
+          onChange(undefined)
+          return
+        }
+
+        onChange(location.id)
+      }}
       selectedLocation={selectedLocation}
+      onBlur={(...args) => {
+        /*
+         * This is here purely for legacy reasons.
+         * As without passing this in, onChange will not trigger.
+         */
+        onBlur?.(...args)
+      }}
       {...props}
     />
   )
