@@ -10,7 +10,7 @@
  */
 export * from './Address'
 export * from './BulletList'
-export * from './FetchButton'
+export * from './HttpButton'
 export * from './Checkbox'
 export * from './DateField'
 export * from './TimeField'

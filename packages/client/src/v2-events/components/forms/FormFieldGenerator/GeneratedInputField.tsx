@@ -73,7 +73,7 @@ import {
   Paragraph,
   SelectDateRangeField,
   TimeField,
-  FetchButton
+  HttpButton
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -615,7 +615,7 @@ export const GeneratedInputField = React.memo(
 
       return (
         <InputField {...field.inputFieldProps}>
-          <FetchButton.Input
+          <HttpButton.Input
             buttonLabel={field.config.configuration.buttonLabel}
             httpConfiguration={httpConfiguration as HttpField}
             icon={field.config.configuration.icon}

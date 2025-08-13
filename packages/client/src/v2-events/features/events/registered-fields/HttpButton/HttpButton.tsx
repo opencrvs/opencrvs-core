@@ -31,7 +31,7 @@ export function handleUnsupportedIcon(iconName?: string) {
   return null
 }
 
-interface FetchButtonProps {
+interface HttpButtonProps {
   /** HttpField includes the configuration for the fetch function that is being triggered from button call */
   httpConfiguration: HttpField
   /** Should the FetchButton show an spinner while loading */
@@ -53,7 +53,7 @@ export function Button({
   onChange,
   buttonLabel,
   loadingLabel
-}: FetchButtonProps) {
+}: HttpButtonProps) {
   const intl = useIntl()
   const { call, loading } = useHttpFieldRequest(
     httpConfiguration,
@@ -112,7 +112,7 @@ export function Button({
   )
 }
 
-export const FetchButton = {
+export const HttpButton = {
   Input: Button,
   Output: null
 }
