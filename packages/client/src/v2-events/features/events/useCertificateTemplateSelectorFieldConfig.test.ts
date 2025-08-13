@@ -24,7 +24,7 @@ import {
   tennisClubMembershipReplacementCertificate,
   testDeclarationFormData,
   testEventDocument
-} from './testData'
+} from '../../../tests/v2-events/certificateTestData'
 
 // Mock templates array
 let mockTemplates: CertificateTemplateConfig[] = []
