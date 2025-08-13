@@ -51,7 +51,7 @@ const reviewCorrectionMessages = defineMessages({
   actionModalDescription: {
     id: 'v2.actionModal.description',
     defaultMessage:
-      'The declarant will be notified of this action and a record of this decision will be recorded',
+      'The informant will be notified of this decision and a record of this decision will be recorded',
     description: 'The description for action modal'
   },
   approveCorrection: {
