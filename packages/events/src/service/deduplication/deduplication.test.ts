@@ -15,13 +15,17 @@ import {
   DeduplicationConfigInput,
   FieldValue,
   eventQueryDataGenerator,
-  ClauseInput
+  ClauseInput,
+  Clause
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
-import { searchForDuplicates } from './deduplication'
+import {
+  generateElasticsearchQuery,
+  searchForDuplicates
+} from './deduplication'
 
 const similarNamedChild: ClauseInput = {
   type: 'fuzzy',
@@ -150,6 +154,116 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
 
   return results
 }
+
+describe('deduplication query input conversion', () => {
+  it('should convert similar child name to fuzzy query', () => {
+    const encodedEventIndex = encodeEventIndex(
+      eventQueryDataGenerator({
+        declaration: {
+          'child.name': { firstname: 'John', surname: 'Smith' }
+        }
+      }),
+      v2BirthEvent
+    )
+    expect(
+      generateElasticsearchQuery(
+        encodedEventIndex,
+        Clause.parse(similarNamedChild),
+        v2BirthEvent
+      )
+    ).toMatchSnapshot()
+  })
+
+  it('should convert childDobWithin5Days to dateDistance query', () => {
+    const encodedEventIndex = encodeEventIndex(
+      eventQueryDataGenerator({
+        declaration: {
+          'child.dob': '2011-11-11'
+        }
+      }),
+      v2BirthEvent
+    )
+    expect(
+      generateElasticsearchQuery(
+        encodedEventIndex,
+        Clause.parse(childDobWithin5Days),
+        v2BirthEvent
+      )
+    ).toMatchSnapshot()
+  })
+
+  it('should convert similarNamedMother to fuzzy query', () => {
+    const encodedEventIndex = encodeEventIndex(
+      eventQueryDataGenerator({
+        declaration: {
+          'mother.name': { firstname: 'Janet', surname: 'Smith' }
+        }
+      }),
+      v2BirthEvent
+    )
+    expect(
+      generateElasticsearchQuery(
+        encodedEventIndex,
+        Clause.parse(similarNamedMother),
+        v2BirthEvent
+      )
+    ).toMatchSnapshot()
+  })
+
+  it('should convert similarAgedMother to dateDistance query', () => {
+    const encodedEventIndex = encodeEventIndex(
+      eventQueryDataGenerator({
+        declaration: {
+          'mother.dob': '1999-11-11'
+        }
+      }),
+      v2BirthEvent
+    )
+    expect(
+      generateElasticsearchQuery(
+        encodedEventIndex,
+        Clause.parse(similarAgedMother),
+        v2BirthEvent
+      )
+    ).toMatchSnapshot()
+  })
+
+  it('should convert sameMotherNid to strict query', () => {
+    const encodedEventIndex = encodeEventIndex(
+      eventQueryDataGenerator({
+        declaration: {
+          'mother.nid': '1232314352'
+        }
+      }),
+      v2BirthEvent
+    )
+    expect(
+      generateElasticsearchQuery(
+        encodedEventIndex,
+        Clause.parse(sameMotherNid),
+        v2BirthEvent
+      )
+    ).toMatchSnapshot()
+  })
+
+  it('should convert exactNamedChild to strict query', () => {
+    const encodedEventIndex = encodeEventIndex(
+      eventQueryDataGenerator({
+        declaration: {
+          'child.name': { firstname: 'John', surname: 'Smith' }
+        }
+      }),
+      v2BirthEvent
+    )
+    expect(
+      generateElasticsearchQuery(
+        encodedEventIndex,
+        Clause.parse(exactNamedChild),
+        v2BirthEvent
+      )
+    ).toMatchSnapshot()
+  })
+})
 
 describe('deduplication tests', () => {
   it('does not find duplicates with completely different details', async () => {

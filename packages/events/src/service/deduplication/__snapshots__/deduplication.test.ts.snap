@@ -1,0 +1,61 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`deduplication query input conversion > should convert childDobWithin5Days to dateDistance query 1`] = `
+{
+  "distance_feature": {
+    "field": "declaration.child____dob",
+    "origin": 2011-11-11T00:00:00.000Z,
+    "pivot": "5d",
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert exactNamedChild to strict query 1`] = `
+{
+  "match_phrase": {
+    "declaration.child____name.__fullname": "John Smith",
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert sameMotherNid to strict query 1`] = `
+{
+  "match_phrase": {
+    "declaration.mother____nid": "1232314352",
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similar child name to fuzzy query 1`] = `
+{
+  "match": {
+    "declaration.child____name.__fullname": {
+      "boost": 1,
+      "fuzziness": "AUTO:4,7",
+      "query": "John Smith",
+    },
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similarAgedMother to dateDistance query 1`] = `
+{
+  "distance_feature": {
+    "field": "declaration.mother____dob",
+    "origin": 1999-11-11T00:00:00.000Z,
+    "pivot": "365d",
+  },
+}
+`;
+
+exports[`deduplication query input conversion > should convert similarNamedMother to fuzzy query 1`] = `
+{
+  "match": {
+    "declaration.mother____name.__fullname": {
+      "boost": 1,
+      "fuzziness": "AUTO:4,7",
+      "query": "Janet Smith",
+    },
+  },
+}
+`;
