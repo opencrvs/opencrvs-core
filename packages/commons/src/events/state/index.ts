@@ -323,23 +323,15 @@ export function applyDeclarationToEventIndex(
  */
 export function applyDraftToEventIndex(
   eventIndex: EventIndex,
-  draft: Draft | undefined,
+  draft: Draft,
   eventConfiguration: EventConfig
 ) {
-  const indexedAt = eventIndex.updatedAt
-
-  const activeDraft = draft && draft.createdAt >= indexedAt ? draft : undefined
-
-  if (!activeDraft) {
-    return eventIndex
-  }
-
   return applyDeclarationToEventIndex(
     {
       ...eventIndex,
-      updatedAt: activeDraft.createdAt
+      updatedAt: draft.createdAt
     },
-    activeDraft.action.declaration,
+    draft.action.declaration,
     eventConfiguration
   )
 }

@@ -64,7 +64,14 @@ export async function createDraft(draft: NewEventActionDrafts) {
         createdAt: sql`NOW()`
       })
     )
-    .returning(['id', 'eventId', 'transactionId', 'declaration', 'annotation'])
+    .returning([
+      'id',
+      'eventId',
+      'transactionId',
+      'declaration',
+      'annotation',
+      'createdAt'
+    ])
     .executeTakeFirst()
 
   return result
