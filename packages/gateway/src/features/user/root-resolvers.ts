@@ -288,6 +288,10 @@ export const resolvers: GQLResolver = {
     verifyPasswordById: rateLimitedResolver(
       { requestsPerMinute: 10 },
       async (_, { id, password }, { headers: authHeader }) => {
+        const userId: string = getUserId(authHeader)
+        if (userId !== id) {
+          throw new Error('Unauthorized to verify password of this user')
+        }
         const res = await fetch(`${USER_MANAGEMENT_URL}verifyPasswordById`, {
           method: 'POST',
           body: JSON.stringify({ id, password }),

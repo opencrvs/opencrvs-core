@@ -23,7 +23,7 @@ import {
   SCOPES
 } from '@opencrvs/commons/authentication'
 import { fetchJSON } from '@opencrvs/commons'
-
+import * as userUtils from '@gateway/features/user/utils'
 let container: StartedTestContainer
 
 jest.mock('@opencrvs/commons', () => {
@@ -655,6 +655,19 @@ describe('User root resolvers', () => {
       } catch (e) {
         expect(e.message).toBe('Unauthorized to verify password')
       }
+    })
+
+    it('throws error if userId from token does not match id arg', async () => {
+      jest.spyOn(userUtils, 'getUserId').mockReturnValue('some-other-id')
+
+      await expect(
+        resolvers.Query!.verifyPasswordById(
+          {},
+          { id: '123', password: 'test' },
+          { headers: authHeaderUser },
+          { fieldName: 'verifyPasswordById' }
+        )
+      ).rejects.toThrow('Unauthorized to verify password of this user')
     })
   })
   describe('activateUser mutation', () => {
