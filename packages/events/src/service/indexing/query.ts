@@ -10,7 +10,6 @@
  */
 import { estypes } from '@elastic/elasticsearch'
 import {
-  AddressFieldValue,
   EventConfig,
   FieldType,
   getAllUniqueFields,
@@ -23,7 +22,7 @@ import {
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
 import { getChildLocations } from '../locations/locations'
-import { encodeFieldId, generateQueryForAddressField } from './utils'
+import { encodeFieldId } from './utils'
 
 /** Convert API date clause format to elastic syntax */
 function dateClauseToElasticQuery(
