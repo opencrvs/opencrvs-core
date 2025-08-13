@@ -8,20 +8,72 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import {
   DeduplicationConfig,
-  EventIndex,
   getUUID,
   UUID,
-  TokenUserType,
-  DeduplicationConfigInput
+  DeduplicationConfigInput,
+  FieldValue,
+  eventQueryDataGenerator,
+  ClauseInput
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
 import { searchForDuplicates } from './deduplication'
+
+const similarNamedChild: ClauseInput = {
+  type: 'fuzzy',
+  fieldId: 'child.name'
+}
+
+const childDobWithin5Days: ClauseInput = {
+  type: 'dateDistance',
+  fieldId: 'child.dob',
+  options: {
+    days: 5
+  }
+}
+
+const similarNamedMother: ClauseInput = {
+  type: 'fuzzy',
+  fieldId: 'mother.name'
+}
+
+const similarAgedMother: ClauseInput = {
+  type: 'dateDistance',
+  fieldId: 'mother.dob',
+  options: {
+    days: 365
+  }
+}
+
+const sameMotherNid: ClauseInput = {
+  type: 'strict',
+  fieldId: 'mother.nid'
+}
+
+const childDobWithin9Months: ClauseInput = {
+  type: 'dateDistance',
+  fieldId: 'child.dob',
+  options: {
+    days: 273
+  }
+}
+
+const childDobWithin3Years: ClauseInput = {
+  type: 'dateDistance',
+  fieldId: 'child.dob',
+  options: {
+    days: 1095
+  }
+}
+
+const exactNamedChild: ClauseInput = {
+  type: 'strict',
+  fieldId: 'child.name'
+}
 
 const LEGACY_BIRTH_DEDUPLICATION_RULES = {
   id: 'Legacy birth deduplication check',
@@ -36,132 +88,43 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       {
         type: 'and',
         clauses: [
-          {
-            type: 'strict',
-            fieldId: 'mother.identifier'
-          },
-          {
-            type: 'fuzzy',
-            fieldId: 'mother.firstNames'
-          },
-          {
-            type: 'fuzzy',
-            fieldId: 'mother.familyName'
-          },
-          {
-            type: 'dateRange',
-            fieldId: 'mother.DoB',
-            options: {
-              daysBefore: 365,
-              daysAfter: 365,
-              origin: 'mother.DoB'
-            }
-          },
-          {
-            type: 'and',
-            clauses: [
-              {
-                type: 'dateRange',
-                fieldId: 'child.DoB',
-                options: {
-                  daysBefore: 273,
-                  daysAfter: 273,
-                  origin: 'child.DoB'
-                }
-              },
-              {
-                type: 'dateDistance',
-                fieldId: 'child.DoB',
-                options: {
-                  days: 273,
-                  origin: 'child.DoB'
-                }
-              }
-            ]
-          }
+          similarNamedChild,
+          childDobWithin5Days,
+          similarAgedMother,
+          similarAgedMother,
+          sameMotherNid
         ]
       },
       {
         type: 'and',
         clauses: [
-          {
-            type: 'fuzzy',
-            fieldId: 'child.firstNames',
-            options: {
-              fuzziness: 1
-            }
-          },
-          {
-            type: 'fuzzy',
-            fieldId: 'child.familyName',
-            options: {
-              fuzziness: 1
-            }
-          },
-          {
-            type: 'strict',
-            fieldId: 'mother.identifier'
-          },
-          {
-            type: 'fuzzy',
-            fieldId: 'mother.firstNames'
-          },
-          {
-            type: 'fuzzy',
-            fieldId: 'mother.familyName'
-          },
-          {
-            type: 'dateRange',
-            fieldId: 'mother.DoB',
-            options: {
-              daysBefore: 365,
-              daysAfter: 365,
-              origin: 'mother.DoB'
-            }
-          },
-          {
-            type: 'or',
-            clauses: [
-              {
-                type: 'dateRange',
-                fieldId: 'child.DoB',
-                options: {
-                  daysBefore: 273,
-                  daysAfter: 273,
-                  origin: 'child.DoB'
-                }
-              },
-              {
-                type: 'dateDistance',
-                fieldId: 'child.DoB',
-                options: {
-                  days: 365,
-                  origin: 'child.DoB'
-                }
-              }
-            ]
-          }
+          similarNamedMother,
+          similarAgedMother,
+          sameMotherNid,
+          childDobWithin9Months
+        ]
+      },
+      {
+        type: 'and',
+        clauses: [
+          exactNamedChild,
+          childDobWithin3Years,
+          similarNamedMother,
+          similarAgedMother,
+          sameMotherNid
         ]
       }
     ]
   }
 } satisfies DeduplicationConfigInput
 
-async function findDuplicates(
-  registrationComparison: Record<string, string[]>
-) {
+async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
   const esClient = getOrCreateClient()
-  const existingComposition = Object.fromEntries(
-    Object.entries(registrationComparison).map(([key, values]) => [
-      key,
-      values[0]
-    ])
+  const existingEvent = Object.fromEntries(
+    Object.entries(eventComparison).map(([key, values]) => [key, values[0]])
   )
-  const newComposition = Object.fromEntries(
-    Object.entries(registrationComparison).map(([key, values]) => [
-      key,
-      values[1]
-    ])
+  const newEvent = Object.fromEntries(
+    Object.entries(eventComparison).map(([key, values]) => [key, values[1]])
   )
 
   await esClient.update({
@@ -169,12 +132,9 @@ async function findDuplicates(
     id: getUUID(),
     body: {
       doc: encodeEventIndex(
-        {
-          id: getUUID(),
-          transactionId: getUUID(),
-          type: 'v2-birth',
-          declaration: existingComposition
-        } as unknown as EventIndex,
+        eventQueryDataGenerator({
+          declaration: existingEvent
+        }),
         v2BirthEvent
       ),
       doc_as_upsert: true
@@ -183,25 +143,7 @@ async function findDuplicates(
   })
 
   const results = await searchForDuplicates(
-    {
-      declaration: newComposition,
-      // Random field values that should not affect the search
-      id: getUUID(),
-      type: 'birth',
-      status: 'CREATED',
-      createdAt: '2025-01-01',
-      createdBy: 'test',
-      createdByUserType: TokenUserType.Enum.user,
-      createdAtLocation: 'test' as UUID,
-      updatedAtLocation: 'test' as UUID,
-      legalStatuses: {},
-      assignedTo: 'test',
-      updatedAt: '2025-01-01',
-      updatedBy: 'test',
-      trackingId: 'TEST12',
-      updatedByUserRole: 'test',
-      flags: []
-    },
+    eventQueryDataGenerator({ declaration: newEvent }),
     DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
     v2BirthEvent
   )
@@ -213,100 +155,80 @@ describe('deduplication tests', () => {
   it('does not find duplicates with completely different details', async () => {
     await expect(
       findDuplicates({
-        // Similar child's firstname(s)
-        'child.firstNames': ['John', 'Riku'],
-        // Similar child's lastname
-        'child.familyName': ['Smith', 'Rouvila'],
-        // Date of birth within 5 days
-        'child.DoB': ['2011-11-11', '2000-10-13'],
-        // Similar Mother’s firstname(s)
-        'mother.firstNames': ['Mother', 'Sofia'],
-        // Similar Mother’s lastname.
-        'mother.familyName': ['Smith', 'Matthews'],
-        // Similar Mother’s date of birth or Same Age of mother
-        'mother.DoB': ['2000-11-11', '1980-09-02'],
-        // Same mother’s NID
-        'mother.identifier': ['23412387', '8653434']
-      })
-    ).resolves.toStrictEqual([])
-  })
-  it('does not find duplicates with completely different details', async () => {
-    await expect(
-      findDuplicates({
-        // Similar child's firstname(s)
-        'child.firstNames': ['John', 'Riku'],
-        // Similar child's lastname
-        'child.familyName': ['Smith', 'Rouvila'],
-        // Date of birth within 5 days
-        'child.DoB': ['2011-11-11', '2000-10-13'],
-        // Similar Mother’s firstname(s)
-        'mother.firstNames': ['Mother', 'Sofia'],
-        // Similar Mother’s lastname.
-        'mother.familyName': ['Smith', 'Matthews'],
-        // Similar Mother’s date of birth or Same Age of mother
-        'mother.DoB': ['2000-11-11', '1980-09-02'],
-        // Same mother’s NID
-        'mother.identifier': ['23412387', '8653434']
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'Riku', surname: 'Rouvila' }
+        ],
+        'child.dob': ['2011-11-11', '2000-10-13'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Sofia', surname: 'Matthews' }
+        ],
+        'mother.dob': ['2000-11-11', '1980-09-02'],
+        'mother.nid': ['23412387', '8653434']
       })
     ).resolves.toStrictEqual([])
   })
   it('does not find duplicates with the same id', async () => {
     const esClient = getOrCreateClient()
 
+    const event = eventQueryDataGenerator({
+      id: '123-123-123-123' as UUID,
+      declaration: { 'child.dob': '2011-11-11' }
+    })
+
     await esClient.update({
       index: getEventIndexName(),
-      id: getUUID(),
+      id: event.id,
       body: {
-        doc: {
-          id: '123-123-123-123'
-        },
+        doc: encodeEventIndex(event, v2BirthEvent),
         doc_as_upsert: true
       },
       refresh: 'wait_for'
     })
 
-    const results = await searchForDuplicates(
-      {
-        declaration: {},
-        // Random field values that should not affect the search
-        id: '123-123-123-123' as UUID,
-        type: 'birth',
-        status: 'CREATED',
-        createdAt: '2025-01-01',
-        createdBy: 'test',
-        createdByUserType: TokenUserType.Enum.user,
-        createdAtLocation: 'test' as UUID,
-        updatedAtLocation: 'test' as UUID,
-        legalStatuses: {},
-        assignedTo: 'test',
-        updatedAt: '2025-01-01',
-        updatedBy: 'test',
-        trackingId: 'TEST12',
-        updatedByUserRole: 'test',
-        flags: []
-      },
+    const duplicateEvent = eventQueryDataGenerator({
+      declaration: { 'child.dob': '2011-11-11' }
+    })
+
+    const matchResultForDuplicateEvent = await searchForDuplicates(
+      duplicateEvent,
       DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
       v2BirthEvent
     )
-    expect(results).toHaveLength(0)
+    expect(matchResultForDuplicateEvent).toHaveLength(1)
+
+    const duplicateEventWithSameId = eventQueryDataGenerator({
+      id: '123-123-123-123' as UUID,
+      declaration: { 'child.dob': '2011-11-11' }
+    })
+
+    const matchResultForEventWithSameId = await searchForDuplicates(
+      duplicateEventWithSameId,
+      DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
+      v2BirthEvent
+    )
+    expect(matchResultForEventWithSameId).toHaveLength(0)
   })
   it('finds a duplicate with very similar details', async () => {
     await expect(
       findDuplicates({
         // Similar child's firstname(s)
-        'child.firstNames': ['John', 'John'],
-        // Similar child's lastname
-        'child.familyName': ['Smith', 'Smith'],
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
         // Date of birth within 5 days
-        'child.DoB': ['2011-11-11', '2011-11-11'],
+        'child.dob': ['2011-11-11', '2011-11-11'],
         // Similar Mother’s firstname(s)
-        'mother.firstNames': ['Mother', 'Mothera'],
-        // Similar Mother’s lastname.
-        'mother.familyName': ['Smith', 'Smith'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mothera', surname: 'Smith' }
+        ],
         // Similar Mother’s date of birth or Same Age of mother
-        'mother.DoB': ['2000-11-11', '2000-11-12'],
+        'mother.dob': ['2000-11-11', '2000-11-12'],
         // Same mother’s NID
-        'mother.identifier': ['23412387', '23412387']
+        'mother.nid': ['23412387', '23412387']
       })
     ).resolves.toHaveLength(1)
   })
@@ -314,14 +236,18 @@ describe('deduplication tests', () => {
   it('finds no duplicate with different mother nid', async () => {
     await expect(
       findDuplicates({
-        'child.firstNames': ['John', 'John'],
-        'child.familyName': ['Smith', 'Smith'],
-        'child.DoB': ['2011-11-11', '2011-11-11'],
-        'mother.firstNames': ['Mother', 'Mother'],
-        'mother.familyName': ['Smith', 'Smith'],
-        'mother.DoB': ['2000-11-12', '2000-11-12'],
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
+        'child.dob': ['2011-11-11', '2011-11-11'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mother', surname: 'Smith' }
+        ],
+        'mother.dob': ['2000-11-12', '2000-11-12'],
         // Different mother’s NID
-        'mother.identifier': ['23412387', '23412388']
+        'mother.nid': ['23412387', '23412388']
       })
     ).resolves.toHaveLength(0)
   })
@@ -329,13 +255,17 @@ describe('deduplication tests', () => {
   it('finds no duplicates with very different details', async () => {
     await expect(
       findDuplicates({
-        'child.firstNames': ['John', 'Mathew'],
-        'child.familyName': ['Smith', 'Wilson'],
-        'child.DoB': ['2011-11-11', '1980-11-11'],
-        'mother.firstNames': ['Mother', 'Harriet'],
-        'mother.familyName': ['Smith', 'Wilson'],
-        'mother.DoB': ['2000-11-12', '1992-11-12'],
-        'mother.identifier': ['23412387', '123123']
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'Mathew', surname: 'Wilson' }
+        ],
+        'child.dob': ['2011-11-11', '1980-11-11'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Harriet', surname: 'Wilson' }
+        ],
+        'mother.dob': ['2000-11-12', '1992-11-12'],
+        'mother.nid': ['23412387', '123123']
       })
     ).resolves.toHaveLength(0)
   })
@@ -343,12 +273,16 @@ describe('deduplication tests', () => {
   it('finds a duplicate even if the firstName of child is not given', async () => {
     await expect(
       findDuplicates({
-        'child.firstNames': ['John', ''],
-        'child.familyName': ['Smith', 'Smiht'],
-        'child.DoB': ['2011-11-11', '2011-11-01'],
-        'mother.firstNames': ['Mother', 'Mother'],
-        'mother.familyName': ['Smith', 'Smith'],
-        'mother.DoB': ['2000-11-12', '2000-11-12']
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: '', surname: 'Smiht' }
+        ],
+        'child.dob': ['2011-11-11', '2011-11-01'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mother', surname: 'Smith' }
+        ],
+        'mother.dob': ['2000-11-12', '2000-11-12']
       })
     ).resolves.toHaveLength(1)
   })
@@ -357,13 +291,14 @@ describe('deduplication tests', () => {
     it('finds a duplicate with same mother two births within 9 months', async () => {
       await expect(
         findDuplicates({
-          'child.firstNames': ['John', 'Janet'],
-          'child.familyName': ['Smith', 'Smith'],
-          'child.DoB': ['2011-11-11', '2011-12-01'],
-          'mother.firstNames': ['Mother', 'Mother'],
-          'mother.familyName': ['Smith', 'Smith'],
-          'mother.DoB': ['2000-11-12', '2000-11-12'],
-          'mother.identifier': ['23412387', '23412387']
+          'child.name': [
+            { firstname: 'John', surname: 'Smith' },
+            { firstname: 'Janet', surname: 'Smith' }
+          ],
+          'child.dob': ['2011-11-11', '2011-12-01'],
+          'mother.name': ['Mother', 'Mother'],
+          'mother.dob': ['2000-11-12', '2000-11-12'],
+          'mother.nid': ['23412387', '23412387']
         })
       ).resolves.toHaveLength(1)
     })
@@ -371,13 +306,17 @@ describe('deduplication tests', () => {
     it('births more than 9 months apart', async () => {
       await expect(
         findDuplicates({
-          'child.firstNames': ['John', 'Janet'],
-          'child.familyName': ['Smith', 'Smith'],
-          'child.DoB': ['2011-11-11', '2010-10-01'],
-          'mother.firstNames': ['Mother', 'Mother'],
-          'mother.familyName': ['Smith', 'Smith'],
-          'mother.DoB': ['2000-11-12', '2000-11-12'],
-          'mother.identifier': ['23412387', '23412387']
+          'child.name': [
+            { firstname: 'John', surname: 'Smith' },
+            { firstname: 'Janet', surname: 'Smith' }
+          ],
+          'child.dob': ['2011-11-11', '2010-10-01'],
+          'mother.name': [
+            { firstname: 'Mother', surname: 'Smith' },
+            { firstname: 'Mother', surname: 'Smith' }
+          ],
+          'mother.dob': ['2000-11-12', '2000-11-12'],
+          'mother.nid': ['23412387', '23412387']
         })
       ).resolves.toStrictEqual([])
     })
@@ -386,13 +325,14 @@ describe('deduplication tests', () => {
   it('finds a duplicate for even there is a 3 year gap', async () => {
     await expect(
       findDuplicates({
-        'child.DoB': ['2011-11-11', '2014-11-01'],
-        'child.firstNames': ['John', 'John'],
-        'child.familyName': ['Smith', 'Smith'],
-        'mother.firstNames': ['Mother', 'Mother'],
-        'mother.familyName': ['Smith', 'Smith'],
-        'mother.DoB': ['2000-11-12', '2000-11-12'],
-        'mother.identifier': ['23412387', '23412387']
+        'child.dob': ['2011-11-11', '2014-11-01'],
+        'child.name': ['John', 'John'],
+        'mother.name': [
+          { firstname: 'Mother', surname: 'Smith' },
+          { firstname: 'Mother', surname: 'Smith' }
+        ],
+        'mother.dob': ['2000-11-12', '2000-11-12'],
+        'mother.nid': ['23412387', '23412387']
       })
     ).resolves.toHaveLength(1)
   })

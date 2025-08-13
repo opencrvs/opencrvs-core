@@ -8,7 +8,6 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { defineConfig } from '../events/defineConfig'
 import {
   defineFormPage,
@@ -28,33 +27,24 @@ const child = defineFormPage({
   },
   fields: [
     {
-      id: 'child.firstNames',
-      type: FieldType.TEXT,
+      id: 'child.name',
+      type: FieldType.NAME,
       required: true,
       configuration: { maxLength: 32 },
       hideLabel: true,
       label: {
-        defaultMessage: "Child's  first name",
+        defaultMessage: "Child's name",
         description: 'This is the label for the field',
         id: 'v2.event.birth.action.declare.form.section.child.field.name.label'
-      }
+      },
+      validation: []
     },
     {
-      id: 'child.familyName',
-      type: FieldType.TEXT,
-      required: true,
-      configuration: { maxLength: 32 },
-      hideLabel: true,
-      label: {
-        defaultMessage: "Child's last name",
-        description: 'This is the label for the field',
-        id: 'v2.event.birth.action.declare.form.section.child.field.name.label'
-      }
-    },
-    {
-      id: 'child.DoB',
+      id: 'child.dob',
       type: 'DATE',
       required: true,
+      secured: true,
+      validation: [],
       label: {
         defaultMessage: 'Date of birth',
         description: 'This is the label for the field',
@@ -74,46 +64,43 @@ const mother = defineFormPage({
   },
   fields: [
     {
-      id: 'mother.firstNames',
-      configuration: { maxLength: 32 },
-      type: FieldType.TEXT,
+      id: 'mother.name',
+      type: FieldType.NAME,
       required: true,
+      configuration: { maxLength: 32 },
+      hideLabel: true,
       label: {
-        defaultMessage: 'First name(s)',
+        defaultMessage: "Mother's name",
         description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.firstname.label`
-      }
+        id: 'v2.event.birth.action.declare.form.section.mother.field.name.label'
+      },
+      conditionals: [],
+      validation: []
     },
     {
-      id: `mother.familyName`,
-      configuration: { maxLength: 32 },
-      type: FieldType.TEXT,
-      required: true,
-      label: {
-        defaultMessage: 'Last name',
-        description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.surname.label`
-      }
-    },
-    {
-      id: `mother.DoB`,
+      id: 'mother.dob',
       type: 'DATE',
       required: true,
+      secured: true,
+      validation: [],
       label: {
         defaultMessage: 'Date of birth',
         description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.dob.label`
-      }
+        id: 'v2.event.birth.action.declare.form.section.person.field.dob.label'
+      },
+      conditionals: []
     },
     {
-      id: 'mother.identifier',
+      id: 'mother.nid',
       type: FieldType.ID,
       required: true,
       label: {
         defaultMessage: 'ID Number',
         description: 'This is the label for the field',
-        id: `v2.event.birth.action.declare.form.section.person.field.nid.label`
-      }
+        id: 'v2.event.birth.action.declare.form.section.person.field.nid.label'
+      },
+      conditionals: [],
+      validation: []
     }
   ]
 })
