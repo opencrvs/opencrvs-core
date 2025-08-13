@@ -10,6 +10,7 @@
  */
 export * from './Address'
 export * from './BulletList'
+export * from './Button'
 export * from './Checkbox'
 export * from './DateField'
 export * from './TimeField'

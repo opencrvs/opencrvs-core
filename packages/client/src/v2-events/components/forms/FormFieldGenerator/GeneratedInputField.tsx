@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { omit } from 'lodash'
@@ -53,6 +55,7 @@ import {
   isTimeFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
+import { isButtonFieldType } from '@opencrvs/commons/client'
 import { InputField } from '@client/components/form/InputField'
 import {
   BulletList,
@@ -69,7 +72,8 @@ import {
   PageHeader,
   Paragraph,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  Button
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -587,6 +591,18 @@ export const GeneratedInputField = React.memo(
           declarationFields={getDeclarationFields(eventConfig)}
           formData={form}
         />
+      )
+    }
+
+    if (isButtonFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <Button.Input
+            configuration={field.config.configuration}
+            value={field.value}
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
       )
     }
 

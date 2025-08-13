@@ -27,7 +27,8 @@ import {
 import {
   AddressFieldValue,
   FileFieldValue,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  HttpFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
@@ -519,6 +520,39 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
+const ButtonField = BaseField.extend({
+  type: z.literal(FieldType.BUTTON),
+  configuration: z.object({
+    icon: z
+      .string()
+      .optional()
+      .describe(
+        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
+      ),
+    loading: z
+      .boolean()
+      .optional()
+      .describe('Whether the button is in a loading state and shows a spinner'),
+    text: TranslationConfig.describe('Text to display on the button')
+  })
+}).describe('Generic button without any built-in functionality')
+
+export type ButtonField = z.infer<typeof ButtonField>
+
+const HttpField = BaseField.extend({
+  type: z.literal(FieldType.HTTP),
+  defaultValue: HttpFieldValue.optional(),
+  configuration: z.object({
+    method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
+    headers: z.record(z.string()).optional(),
+    body: z.record(z.string()).optional(),
+    params: z.record(z.string()).optional(),
+    url: z.string().describe('URL to send the HTTP request to')
+  })
+}).describe('HTTP request function triggered by a button click')
+
+export type HttpField = z.infer<typeof HttpField>
+
 export type FieldConfig =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
@@ -548,6 +582,8 @@ export type FieldConfig =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
+  | z.infer<typeof ButtonField>
+  | z.infer<typeof HttpField>
 
 export const FieldConfig = z
   .discriminatedUnion('type', [
@@ -578,7 +614,9 @@ export const FieldConfig = z
     SignatureField,
     EmailField,
     FileUploadWithOptions,
-    DataField
+    DataField,
+    ButtonField,
+    HttpField
   ])
   .openapi({
     description: 'Form field configuration',

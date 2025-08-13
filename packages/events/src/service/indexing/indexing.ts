@@ -106,6 +106,8 @@ function mapFieldTypeToElasticsearch(
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.HTTP:
+    case FieldType.BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
       return { type: 'keyword' }

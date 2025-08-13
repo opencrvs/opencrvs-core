@@ -154,6 +154,8 @@ export function mapFieldTypeToMockValue(
       return generateRandomName(rng)
     case FieldType.NUMBER:
       return 19
+    case FieldType.BUTTON:
+      return 1
     case FieldType.EMAIL:
       return 'test@opencrvs.org'
     case FieldType.ADDRESS:
@@ -189,6 +191,7 @@ export function mapFieldTypeToMockValue(
       } satisfies FileFieldValue
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
+    case FieldType.HTTP:
       return undefined
   }
 }
