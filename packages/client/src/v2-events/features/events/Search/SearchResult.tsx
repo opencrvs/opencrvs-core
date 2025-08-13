@@ -42,6 +42,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
 import { CoreWorkqueues } from '@client/v2-events/utils'
+import RetryButton from '@client/v2-events/components/RetryButton'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   useAction,
@@ -243,7 +244,8 @@ export const SearchResultComponent = ({
   title: contentTitle,
   tabBarContent,
   actions = [],
-  emptyMessage
+  emptyMessage,
+  allowRetry
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -251,6 +253,7 @@ export const SearchResultComponent = ({
   limit?: number
   offset?: number
   title: string
+  allowRetry?: boolean
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
   emptyMessage?: TranslationConfig
@@ -324,6 +327,9 @@ export const SearchResultComponent = ({
             <ActionComponent actionType={actionType} event={event} />
           )
         }))
+        .concat(
+          allowRetry ? { actionComponent: <RetryButton event={event} /> } : []
+        )
         .concat({
           actionComponent: (
             <DownloadButton
