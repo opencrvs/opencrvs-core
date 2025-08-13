@@ -18,7 +18,7 @@ import {
   FieldValue,
   EventConfig,
   getDeclarationFieldById,
-  DatetimeValue
+  DateValue
 } from '@opencrvs/commons/events'
 import {
   getOrCreateClient,
@@ -32,7 +32,7 @@ import {
   encodeFieldId
 } from '@events/service/indexing/utils'
 
-function generateElasticsearchQuery(
+export function generateElasticsearchQuery(
   eventIndex: EncodedEventIndex,
   queryInput: ClauseOutput,
   eventConfig: EventConfig
@@ -115,7 +115,7 @@ function generateElasticsearchQuery(
       }
     }
     case 'dateDistance': {
-      const dateValue = DatetimeValue.safeParse(queryValue)
+      const dateValue = DateValue.safeParse(queryValue)
       if (!dateValue.success) {
         return null
       }
