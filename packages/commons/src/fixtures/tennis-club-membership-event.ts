@@ -182,46 +182,45 @@ export const tennisClubMembershipEvent = defineConfig({
           },
           {
             id: 'identity-check',
-            type: PageTypes.enum.FORM,
+            type: PageTypes.enum.VERIFICATION,
             title: {
-              id: 'event.tennis-club-membership.action.requestCorrection.form.section.verify',
-              defaultMessage: 'Verify their identity',
+              id: 'v2.event.birth.action.correction.form.section.requester.identity.verify.title',
+              defaultMessage: 'Verify ID',
               description: 'This is the title of the section'
             },
-            fields: [
-              {
-                id: 'correction.identity-check.instructions',
-                type: 'PAGE_HEADER',
+            fields: [],
+            actions: {
+              verify: {
                 label: {
-                  id: 'correction.corrector.identity.instruction',
-                  defaultMessage:
-                    'Please verify the identity of the person making this request',
-                  description: 'The title for the corrector form'
+                  defaultMessage: 'Verified',
+                  description: 'This is the label for the verification button',
+                  id: 'v2.event.birth.action.correction.form.verify'
                 }
               },
-              {
-                id: 'correction.identity-check.verified',
-                type: 'RADIO_GROUP',
+              cancel: {
                 label: {
-                  id: 'correction.corrector.identity.verified.label',
-                  defaultMessage: 'Identity verified',
-                  description: 'The title for the corrector form'
+                  defaultMessage: 'Identity does not match',
+                  description:
+                    'This is the label for the verification cancellation button',
+                  id: 'v2.event.birth.action.correction.form.cancel'
                 },
-                defaultValue: '',
-                required: true,
-                options: [
-                  {
-                    value: 'VERIFIED',
-                    label: {
-                      id: 'correction.corrector.identity.verified',
-                      defaultMessage: 'I have verified their identity',
-                      description:
-                        'Label for verified option in corrector identity check page'
-                    }
+                confirmation: {
+                  title: {
+                    defaultMessage: 'Correct without proof of ID?',
+                    description:
+                      'This is the title for the verification cancellation modal',
+                    id: 'v2.event.birth.action.correction.form.cancel.confirmation.title'
+                  },
+                  body: {
+                    defaultMessage:
+                      'Please be aware that if you proceed, you will be responsible for making a change to this record without the necessary proof of identification',
+                    description:
+                      'This is the body for the verification cancellation modal',
+                    id: 'v2.event.birth.action.correction.form.cancel.confirmation.body'
                   }
-                ]
+                }
               }
-            ]
+            }
           },
           {
             id: 'correction-request.supporting-documents',
