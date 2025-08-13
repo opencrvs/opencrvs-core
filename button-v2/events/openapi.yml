@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 1d4e7f5b-63b8-4ac2-99af-2266c8ea67c1
+                transactionId: bd2a4447-eafe-4b35-8574-5e5119189e95
                 type: v2.birth
       responses:
         "200":
@@ -294,6 +294,27 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: &a2 {}
                 annotation:
                   type: object
@@ -469,6 +490,27 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                 originalActionId:
                   type: string
                   format: uuid
@@ -484,7 +526,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 5c865e99-70b2-467f-8364-5f533a81ad32
+                transactionId: bb59578d-842e-42fb-b2c8-a1e2c75f158a
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -713,6 +755,27 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: *a2
                 annotation:
                   type: object
@@ -886,6 +949,27 @@ paths:
                                     nullable: true
                                   middlename:
                                     type: string
+                                    nullable: true
+                              - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
                                     nullable: true
                               - type: "null"
                 originalActionId:
@@ -1126,6 +1210,27 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: *a2
                 annotation:
                   type: object
@@ -1299,6 +1404,27 @@ paths:
                                     nullable: true
                                   middlename:
                                     type: string
+                                    nullable: true
+                              - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
                                     nullable: true
                               - type: "null"
                 originalActionId:
@@ -1542,6 +1668,27 @@ paths:
                                     type: string
                                     nullable: true
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: *a2
                 annotation:
                   type: object
@@ -1715,6 +1862,27 @@ paths:
                                     nullable: true
                                   middlename:
                                     type: string
+                                    nullable: true
+                              - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
                                     nullable: true
                               - type: "null"
                 originalActionId:
@@ -4916,7 +5084,7 @@ components:
             type:
               type: string
               enum:
-                - BUTTON
+                - HTTP_BUTTON
             configuration:
               type: object
               properties:
@@ -5004,6 +5172,26 @@ components:
               type: string
               enum:
                 - HTTP
+            defaultValue:
+              type: object
+              properties:
+                loading:
+                  type: boolean
+                error:
+                  type: object
+                  nullable: true
+                  properties:
+                    statusCode:
+                      type: number
+                    message:
+                      type: string
+                  required:
+                    - statusCode
+                    - message
+                data: {}
+              required:
+                - loading
+                - error
             configuration:
               type: object
               properties:
@@ -6303,6 +6491,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -6476,6 +6685,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -6704,6 +6934,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -6877,6 +7128,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -7102,6 +7374,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -7275,6 +7568,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -7513,6 +7827,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -7686,6 +8021,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -7911,6 +8267,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8084,6 +8461,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -8322,6 +8720,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8495,6 +8914,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -8720,6 +9160,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8893,6 +9354,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -9120,6 +9602,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -9293,6 +9796,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -9518,6 +10042,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -9691,6 +10236,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -9919,6 +10485,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -10092,6 +10679,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -10317,6 +10925,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -10490,6 +11119,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -10718,6 +11368,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -10891,6 +11562,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -11132,6 +11824,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -11305,6 +12018,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -11530,6 +12264,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -11703,6 +12458,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -11934,6 +12710,27 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -12107,6 +12904,27 @@ components:
                             nullable: true
                           middlename:
                             type: string
+                            nullable: true
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
                             nullable: true
                       - type: "null"
         status:
@@ -12764,6 +13582,25 @@ components:
                             type: string
                             nullable: true
                       - type: "null"
+              - type: object
+                properties:
+                  loading:
+                    type: boolean
+                  error:
+                    type: object
+                    nullable: true
+                    properties:
+                      statusCode:
+                        type: number
+                      message:
+                        type: string
+                    required:
+                      - statusCode
+                      - message
+                  data: {}
+                required:
+                  - loading
+                  - error
       required:
         - id
         - type
