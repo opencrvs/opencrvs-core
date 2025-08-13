@@ -88,20 +88,6 @@ function generateQuery(
   const alternateFieldMap = getAlternateFieldMap(eventConfigs)
 
   const must = Object.entries(event)
-    // Exclude fields from Search query that are meant to
-    .filter(([fieldId]) => {
-      const fieldSearchConfig = eventConfigs
-        .flatMap((x) => x.advancedSearch)
-        .flatMap((s) => s.fields)
-        .find((f) => f.fieldId === fieldId)
-      if (
-        fieldSearchConfig?.fieldType === 'field' &&
-        fieldSearchConfig.excludeInSearchQuery
-      ) {
-        return false
-      }
-      return true
-    })
     .map(([fieldId, search]) => {
       const field = `declaration.${encodeFieldId(fieldId)}`
 

@@ -357,7 +357,7 @@ export async function getIndexedEvents(
     })
 }
 
-export async function getIndex(
+export async function findRecordsByQuery(
   eventParams: QueryType,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
@@ -407,7 +407,7 @@ export async function getEventCount(
       await Promise.all(
         queries.map(async ({ slug, query }) => {
           const count = (
-            await getIndex(query, eventConfigs, options, userOfficeId)
+            await findRecordsByQuery(query, eventConfigs, options, userOfficeId)
           ).length
           return { slug, count }
         })
