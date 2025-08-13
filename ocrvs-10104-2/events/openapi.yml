@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 21230b51-0274-4e4c-95e8-cc764f5a377c
+                transactionId: d400fb40-7c5e-49ed-ab8f-cb7da0955c81
                 type: v2.birth
       responses:
         "200":
@@ -482,7 +482,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e9dd10fa-52f4-430b-b0f0-bc33968a737c
+                transactionId: c8f65444-488b-4d81-9bf1-65453c5d571c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1031,16 +1031,6 @@ components:
                           type: string
                           enum:
                             - field
-                        alternateFieldIds:
-                          type: array
-                          items:
-                            type: string
-                          description: >-
-                            Sometimes there might be need to search a value
-                            against multiple field of same FormField type. For
-                            example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
-                                  add a one field as fieldId, and accomodate others in alternateFieldIds
                       required:
                         - config
                         - fieldId

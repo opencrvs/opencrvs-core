@@ -380,16 +380,6 @@ components:
                         fieldType:
                           type: string
                           const: field
-                        alternateFieldIds:
-                          type: array
-                          items:
-                            type: string
-                          description: >-
-                            Sometimes there might be need to search a value
-                            against multiple field of same FormField type. For
-                            example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
-                                  add a one field as fieldId, and accomodate others in alternateFieldIds
                       required:
                         - config
                         - fieldId
@@ -11509,7 +11499,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 9cf24e0f-7a70-4e12-94a9-bc29ca10338b
+        transactionId: fd78a273-a98d-41e6-9fa1-73494de550fa
         declaration: {}
         annotation: {}
         type: NOTIFY
