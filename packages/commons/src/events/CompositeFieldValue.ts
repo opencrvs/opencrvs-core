@@ -105,6 +105,13 @@ export const AddressFieldValue = z
   .discriminatedUnion('urbanOrRural', [UrbanAddressValue, RuralAddressValue])
   .or(GenericAddressValue)
 
+export const ConfigurableAddressFieldValue = z.object({
+  country: z.string(),
+  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL])
+  /* administrativeArea: z.string().uuid(),
+  streetLevelDetails: z.record(z.string(), z.string()) */
+})
+
 export const GenericAddressUpdateValue = z.object({
   country: z.string(),
   addressType: z.literal(AddressType.INTERNATIONAL),
@@ -128,7 +135,17 @@ export const AddressFieldUpdateValue = z
   ])
   .or(GenericAddressUpdateValue)
 
+export const ConfigurableAddressFieldUpdateValue = z.object({
+  country: z.string(),
+  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL])
+  /* administrativeArea: z.string().uuid().nullish(),
+  streetLevelDetails: z.record(z.string(), z.string()).nullish() */
+})
+
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
+export type ConfigurableAddressFieldValue = z.infer<
+  typeof ConfigurableAddressFieldValue
+>
 
 export const FileFieldValueWithOption = z.object({
   path: FullDocumentPath,

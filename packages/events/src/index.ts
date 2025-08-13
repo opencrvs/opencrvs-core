@@ -16,6 +16,7 @@ import { getAnonymousToken } from './service/auth'
 import { getEventConfigurations } from './service/config/config'
 import { ensureIndexExists } from './service/indexing/indexing'
 import { server } from './server'
+//
 
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const path = require('path')

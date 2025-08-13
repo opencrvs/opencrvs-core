@@ -14,6 +14,7 @@ export const FieldType = {
   PHONE: 'PHONE',
   ID: 'ID',
   ADDRESS: 'ADDRESS',
+  CONFIGURABLE_ADDRESS: 'CONFIGURABLE_ADDRESS',
   TEXT: 'TEXT',
   NUMBER: 'NUMBER',
   TEXTAREA: 'TEXTAREA',
@@ -49,6 +50,7 @@ export type FieldType = (typeof fieldTypes)[number]
 export const compositeFieldTypes = [
   FieldType.DATE_RANGE,
   FieldType.ADDRESS,
+  FieldType.CONFIGURABLE_ADDRESS,
   FieldType.FILE_WITH_OPTIONS,
   FieldType.FILE
 ]

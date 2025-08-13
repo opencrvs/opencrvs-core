@@ -26,6 +26,7 @@ import {
 } from './FieldValue'
 import {
   AddressFieldValue,
+  ConfigurableAddressFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue
 } from './CompositeFieldValue'
@@ -498,6 +499,20 @@ const Address = BaseField.extend({
     .optional()
 }).describe('Address input field – a combination of location and text fields')
 
+const ConfigurableAddress = BaseField.extend({
+  type: z.literal(FieldType.CONFIGURABLE_ADDRESS),
+  defaultValue: ConfigurableAddressFieldValue.optional(),
+  configuration: z
+    .object({
+      searchMode: z.boolean().optional(),
+      administrativeLevels: z.array(z.string()).optional(),
+      streetAddressForm: z.array(z.string(), z.string()).optional()
+    })
+    .optional()
+}).describe(
+  'Configurable Address input field – a combination of location and text fields'
+)
+
 export const DataEntry = z.union([
   z.object({
     label: TranslationConfig,
@@ -521,6 +536,7 @@ export type DataField = z.infer<typeof DataField>
 
 export type FieldConfig =
   | z.infer<typeof Address>
+  | z.infer<typeof ConfigurableAddress>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
   | z.infer<typeof TextAreaField>
@@ -552,6 +568,7 @@ export type FieldConfig =
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
+    ConfigurableAddress,
     TextField,
     NumberField,
     TextAreaField,
@@ -592,6 +609,7 @@ export type IdField = z.infer<typeof IdField>
 export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
+export type ConfigurableAddressField = z.infer<typeof ConfigurableAddress>
 export type NumberField = z.infer<typeof NumberField>
 
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>

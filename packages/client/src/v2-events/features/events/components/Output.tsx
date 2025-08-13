@@ -40,7 +40,8 @@ import {
   isIdFieldType,
   isPhoneFieldType,
   isSelectDateRangeFieldType,
-  isLocationFieldType
+  isLocationFieldType,
+  isConfigurableAddressFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -57,7 +58,8 @@ import {
   Paragraph,
   Number,
   Text,
-  TimeField
+  TimeField,
+  ConfigurableAddress
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
@@ -144,6 +146,13 @@ export function ValueOutput(field: { config: FieldConfig; value: FieldValue }) {
 
   if (isAddressFieldType(field)) {
     return Address.Output({
+      value: field.value,
+      searchMode: field.config.configuration?.searchMode
+    })
+  }
+
+  if (isConfigurableAddressFieldType(field)) {
+    return ConfigurableAddress.Output({
       value: field.value,
       searchMode: field.config.configuration?.searchMode
     })

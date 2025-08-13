@@ -11,6 +11,7 @@
 export * from './Address'
 export * from './BulletList'
 export * from './Checkbox'
+export * from './ConfigurableAddress'
 export * from './DateField'
 export * from './TimeField'
 export * from './AdministrativeArea'

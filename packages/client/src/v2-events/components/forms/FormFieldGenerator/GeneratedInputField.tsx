@@ -50,7 +50,8 @@ import {
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
   SelectDateRangeValue,
-  isTimeFieldType
+  isTimeFieldType,
+  isConfigurableAddressFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -69,7 +70,8 @@ import {
   PageHeader,
   Paragraph,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  ConfigurableAddress
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -421,6 +423,20 @@ export const GeneratedInputField = React.memo(
         // We are showing errors to underlying inputs, so we need to ignore them here
         <InputField {...omit(field.inputFieldProps, 'error')}>
           <Address.Input
+            {...field.config}
+            value={field.value}
+            //@TODO: We need to come up with a general solution for complex types.
+            // @ts-ignore
+            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+          />
+        </InputField>
+      )
+    }
+    if (isConfigurableAddressFieldType(field)) {
+      return (
+        // We are showing errors to underlying inputs, so we need to ignore them here
+        <InputField {...omit(field.inputFieldProps, 'error')}>
+          <ConfigurableAddress.Input
             {...field.config}
             value={field.value}
             //@TODO: We need to come up with a general solution for complex types.

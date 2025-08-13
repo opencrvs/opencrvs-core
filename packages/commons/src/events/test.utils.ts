@@ -169,6 +169,11 @@ export function mapFieldTypeToMockValue(
         number: '55',
         zipCode: '123456'
       }
+    case FieldType.CONFIGURABLE_ADDRESS:
+      return {
+        country: 'FAR',
+        addressType: AddressType.DOMESTIC
+      }
     case FieldType.DATE:
       return '2021-01-01'
     case FieldType.TIME:

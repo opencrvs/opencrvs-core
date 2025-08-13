@@ -136,6 +136,14 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: addressProperties
       }
+    case FieldType.CONFIGURABLE_ADDRESS:
+      return {
+        type: 'object',
+        properties: {
+          country: { type: 'keyword' },
+          addressType: { type: 'keyword' }
+        }
+      }
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {

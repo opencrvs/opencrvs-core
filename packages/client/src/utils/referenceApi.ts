@@ -20,6 +20,8 @@ import {
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { EventType, System } from '@client/utils/gateway'
+import { FieldConditional, FieldType } from '@opencrvs/commons/client'
+
 import { IntlShape } from 'react-intl'
 
 export interface ILocationDataResponse {
@@ -112,6 +114,15 @@ export interface IApplicationConfigAnonymous {
   PHONE_NUMBER_PATTERN: RegExp
 }
 
+export interface AdminStructureItem {
+  id: string
+  label: {
+    id: string
+    defaultMessage: string
+    description: string
+  }
+}
+
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -120,6 +131,7 @@ export interface IApplicationConfig {
     PRINT_IN_ADVANCE: boolean
   }
   COUNTRY_LOGO: ICountryLogo
+  ADMIN_STRUCTURE: AdminStructureItem[]
   CURRENCY: ICurrency
   DEATH: {
     REGISTRATION_TARGET: number

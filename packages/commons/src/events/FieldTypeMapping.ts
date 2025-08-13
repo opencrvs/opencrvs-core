@@ -39,7 +39,8 @@ import {
   IdField,
   DateRangeField,
   SelectDateRangeField,
-  TimeField
+  TimeField,
+  ConfigurableAddressField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -66,7 +67,9 @@ import {
   FileFieldWithOptionValue,
   AddressType,
   NameFieldValue,
-  NameFieldUpdateValue
+  NameFieldUpdateValue,
+  ConfigurableAddressFieldUpdateValue,
+  ConfigurableAddressFieldValue
 } from './CompositeFieldValue'
 
 /**
@@ -139,6 +142,9 @@ export function mapFieldTypeToZod(type: FieldType, required?: boolean) {
     case FieldType.ADDRESS:
       schema = AddressFieldUpdateValue
       break
+    case FieldType.CONFIGURABLE_ADDRESS:
+      schema = ConfigurableAddressFieldUpdateValue
+      break
     case FieldType.DATA:
       schema = DataFieldValue
       break
@@ -205,6 +211,11 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
         street: null,
         number: null,
         zipCode: null
+      }
+    case FieldType.CONFIGURABLE_ADDRESS:
+      return {
+        country: null,
+        addressType: AddressType.DOMESTIC
       }
     case FieldType.SIGNATURE:
     case FieldType.FILE:
@@ -356,6 +367,16 @@ export const isAddressFieldType = (field: {
   value: FieldValue
 }): field is { value: AddressFieldValue; config: AddressField } => {
   return field.config.type === FieldType.ADDRESS
+}
+
+export const isConfigurableAddressFieldType = (field: {
+  config: FieldConfig
+  value: FieldValue
+}): field is {
+  value: ConfigurableAddressFieldValue
+  config: ConfigurableAddressField
+} => {
+  return field.config.type === FieldType.CONFIGURABLE_ADDRESS
 }
 
 export const isCountryFieldType = (field: {

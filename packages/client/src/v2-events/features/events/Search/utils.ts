@@ -382,6 +382,15 @@ function applySearchFieldOverridesToFieldConfig(
       }
     }
   }
+  if (field.type === FieldType.CONFIGURABLE_ADDRESS) {
+    return {
+      ...field,
+      ...commonConfig,
+      configuration: {
+        searchMode: true
+      }
+    }
+  }
   if (field.type === FieldType.NAME) {
     return {
       ...field,
