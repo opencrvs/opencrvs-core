@@ -15,11 +15,8 @@ import { useIntl } from 'react-intl'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
-import { ActionType } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
-import { useModal } from '@client/hooks/useModal'
-import { AssignModal } from '@client/components/interface/DownloadButton'
 import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({
@@ -43,8 +40,7 @@ export function ActionMenu({
 
   const eventState = eventIndex
 
-  const actionMenuItems = useActionMenuItems(eventState)
-  const [modal, openModal] = useModal()
+  const [modal, actionMenuItems] = useActionMenuItems(eventState)
 
   return (
     <>
@@ -64,14 +60,6 @@ export function ActionMenu({
                 key={action.type}
                 disabled={'disabled' in action ? action.disabled : false}
                 onClick={async () => {
-                  if (action.type === ActionType.ASSIGN) {
-                    const assign = await openModal<boolean>((close) => (
-                      <AssignModal close={close} />
-                    ))
-                    if (!assign) {
-                      return
-                    }
-                  }
                   await action.onClick()
                   onAction?.()
                 }}

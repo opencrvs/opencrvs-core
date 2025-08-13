@@ -210,7 +210,7 @@ function ActionComponent({
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const { config: configs } = useAction(event)
-  const actionMenuItems = useActionMenuItems(event)
+  const [_, actionMenuItems] = useActionMenuItems(event)
 
   const intl = useIntl()
 
@@ -227,7 +227,7 @@ function ActionComponent({
     <Button
       disabled={'disabled' in config && Boolean(config.disabled)}
       type="primary"
-      onClick={async () => config.onClick(slug)}
+      onClick={async () => await config.onClick(slug)}
     >
       {intl.formatMessage(config.label)}
     </Button>

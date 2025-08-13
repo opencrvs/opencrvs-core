@@ -89,7 +89,7 @@ const LOADING_STATUSES = [
   DOWNLOAD_STATUS.UNASSIGNING
 ]
 
-export const AssignModal: React.FC<{
+const AssignModal: React.FC<{
   close: (result: boolean) => void
 }> = ({ close }) => {
   const intl = useIntl()
