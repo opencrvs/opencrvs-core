@@ -20,7 +20,6 @@ export function createFieldConfig(
   fieldId: string,
   options: {
     options?: SelectOption[]
-    alternateFieldIds?: string[]
     conditionals?: FieldConditional[]
     validations?: ValidationConfig[]
     searchCriteriaLabelPrefix?: TranslationConfig

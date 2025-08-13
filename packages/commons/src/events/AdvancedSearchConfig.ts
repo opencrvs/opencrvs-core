@@ -82,15 +82,7 @@ export type SearchQueryParams = z.infer<typeof SearchQueryParams>
 
 export const FieldConfigSchema = BaseField.extend({
   fieldId: z.string(),
-  fieldType: z.literal('field'),
-  alternateFieldIds: z
-    .array(z.string())
-    .optional()
-    .describe(
-      `Sometimes there might be need to search a value against multiple field of same FormField type. For example
-      search Country, Province, District against child.address.private and child.address.other. In such case, we
-      add a one field as fieldId, and accomodate others in alternateFieldIds`
-    )
+  fieldType: z.literal('field')
 })
 
 /**
