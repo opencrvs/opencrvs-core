@@ -11,7 +11,13 @@
 
 import { useMutation } from '@tanstack/react-query'
 import { v4 as uuid } from 'uuid'
-import { FullDocumentPath, joinUrlPaths } from '@opencrvs/commons/client'
+import { useParams } from 'react-router-dom'
+import {
+  DocumentPath,
+  FullDocumentPath,
+  joinUrlPaths,
+  joinValues
+} from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
 import { queryClient } from '@client/v2-events/trpc'
 import {
@@ -22,17 +28,26 @@ import {
 } from '@client/v2-events/cache'
 import { fetchFileFromUrl } from '@client/utils/imageUtils'
 
+interface UploadFileParams {
+  file: File
+  meta: {
+    transactionId: string
+    path?: string
+    referenceId: string
+  }
+}
+
 async function uploadFile({
   file,
-  transactionId
-}: {
-  file: File
-  transactionId: string
-  id: string
-}): Promise<{ url: string }> {
+  meta
+}: UploadFileParams): Promise<{ url: string }> {
   const formData = new FormData()
   formData.append('file', file)
-  formData.append('transactionId', transactionId)
+  formData.append('transactionId', meta.transactionId)
+
+  if (meta.path) {
+    formData.append('path', meta.path)
+  }
 
   const response = await fetch('/api/upload', {
     method: 'POST',
@@ -145,22 +160,34 @@ interface Options {
 }
 
 export function useFileUpload(fieldId: string, options: Options = {}) {
+  // Introduce `eventId` to the params to allow uploading files related to a specific event.
+  // Main goal is to allow uploading files in the context of an event, which is helpful when we need to clean up orphans.
+  // Start with good enough: Components do not need to pass `eventId` explicitly, it is automatically derived from the URL params without forcing low-level components to know about events concept.
+  const { eventId } = useParams()
+
   const upload = useMutation({
-    mutationFn: uploadFile,
+    mutationFn: async (variables: UploadFileParams) =>
+      uploadFile({ ...variables, meta: { ...variables.meta, path: eventId } }),
     mutationKey: [UPLOAD_MUTATION_KEY, fieldId],
-    onMutate: async ({ file, transactionId, id }) => {
+    onMutate: async ({ file, meta }) => {
       const extension = file.name.split('.').pop()
-      const temporaryFilename = `${transactionId}.${extension}`
-      const path = getFullDocumentPath(temporaryFilename)
+      const temporaryFilename = `${meta.transactionId}.${extension}`
+      const filePathWithDirectory = joinValues(
+        [meta.path, temporaryFilename],
+        '/'
+      )
+      const path = getFullDocumentPath(filePathWithDirectory)
       const url = getUnsignedFileUrl(path)
       await cacheFile({ url, file })
 
+      // NOTE: In the long run, client should not reverse-engineer the file path.
+      // It should be read from the server response.
       options.onSuccess?.({
         ...file,
         originalFilename: file.name,
         type: file.type,
         path,
-        id
+        id: meta.referenceId
       })
     }
   })
@@ -181,13 +208,16 @@ export function useFileUpload(fieldId: string, options: Options = {}) {
      * Uploads a file with an optional identifier.
      *
      * @param file - The file to be uploaded.
-     * @param id An optional identifier for the file. Allows the caller to track the file when its upload completes.
+     * @param referenceId An optional identifier for the file. Allows the caller to track the file when its upload completes.
      */
-    uploadFile: (file: File, id = 'default') => {
+    uploadFile: (file: File, referenceId = 'default') => {
       return upload.mutate({
         file,
-        transactionId: uuid(),
-        id
+        meta: {
+          transactionId: uuid(),
+          referenceId,
+          path: eventId
+        }
       })
     }
   }
