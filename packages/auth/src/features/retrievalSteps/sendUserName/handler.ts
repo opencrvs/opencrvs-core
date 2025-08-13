@@ -13,13 +13,12 @@ import * as Joi from 'joi'
 
 import { unauthorized } from '@hapi/boom'
 
-import { sendUserName } from '@auth/features/retrievalSteps/sendUserName/service'
 import {
   getRetrievalStepInformation,
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { logger } from '@opencrvs/commons'
+import { logger, triggerUserEventNotification } from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@auth/metrics'
 import { env } from '@auth/environment'
 
@@ -56,12 +55,19 @@ export default async function sendUserNameHandler(
         })}`
     )
   } else {
-    await sendUserName(
-      retrievalStepInformation.username,
-      retrievalStepInformation.userFullName,
-      retrievalStepInformation.mobile,
-      retrievalStepInformation.email
-    )
+    await triggerUserEventNotification({
+      event: 'username-reminder',
+      payload: {
+        recipient: {
+          name: retrievalStepInformation.userFullName,
+          mobile: retrievalStepInformation.mobile,
+          email: retrievalStepInformation.email
+        },
+        username: retrievalStepInformation.username
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: request.headers.authorization }
+    })
   }
 
   try {
