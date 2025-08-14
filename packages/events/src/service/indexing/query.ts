@@ -22,7 +22,7 @@ import {
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
 import { getChildLocations } from '../locations/locations'
-import { encodeFieldId } from './utils'
+import { encodeFieldId, generateQueryForAddressField } from './utils'
 
 /** Convert API date clause format to elastic syntax */
 function dateClauseToElasticQuery(
@@ -72,43 +72,49 @@ function generateQuery(
     []
   )
 
-  const nameFieldIds = allEventFields
-    .filter((field) => field.type === FieldType.NAME)
-    .map((f) => f.id)
-
   const must = Object.entries(event).map(([fieldId, search]) => {
-    const field = `declaration.${encodeFieldId(fieldId)}`
-
-    if (search.type === 'exact') {
-      // default exact match
-      return {
-        match: {
-          [field]: search.term
-        }
-      }
+    const esFieldName = `declaration.${encodeFieldId(fieldId)}`
+    const field = allEventFields.find((f) => f.id === fieldId)
+    if (!field) {
+      throw new Error(
+        `Tried to search with a field id ${fieldId} but it is not found in event configuration`
+      )
     }
 
-    // Step 3: Fuzzy
-    if (search.type === 'fuzzy') {
-      /**
-       * If the current field is a NAME-type field (determined by checking its ID against known name field IDs),
-       * return a match query on the `${field}.__fullname` subfield. This allows Elasticsearch to perform
-       * a fuzzy search on the full name, improving matching for name-related fields (e.g., handling typos or variations).
-       */
-      if (nameFieldIds.includes(fieldId)) {
+    if (field.type === FieldType.ADDRESS) {
+      return generateQueryForAddressField(fieldId, search)
+    }
+
+    if (field.type === FieldType.NAME) {
+      if (search.type === 'fuzzy') {
         return {
           match: {
-            [`${field}.__fullname`]: {
+            [`${esFieldName}.__fullname`]: {
               query: search.term,
               fuzziness: 'AUTO'
             }
           }
         }
       }
-
       return {
         match: {
-          [field]: {
+          [esFieldName]: search.term
+        }
+      }
+    }
+
+    if (search.type === 'exact') {
+      return {
+        match: {
+          [esFieldName]: search.term
+        }
+      }
+    }
+
+    if (search.type === 'fuzzy') {
+      return {
+        match: {
+          [esFieldName]: {
             query: search.term,
             fuzziness: 'AUTO'
           }
@@ -119,7 +125,7 @@ function generateQuery(
     if (search.type === 'anyOf') {
       return {
         terms: {
-          [field]: search.terms
+          [esFieldName]: search.terms
         }
       }
     }
@@ -127,7 +133,7 @@ function generateQuery(
     if (search.type === 'range') {
       return {
         range: {
-          [field]: {
+          [esFieldName]: {
             gte: search.gte,
             lte: search.lte
           }
