@@ -114,7 +114,7 @@ const fullAndPayload: QueryType = {
         location: RANDOM_UUID
       },
       data: {
-        name: { type: 'exact', term: 'John Doe' }
+        'applicant.name': { type: 'exact', term: 'John Doe' }
       }
     }
   ]
@@ -243,7 +243,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
               ]
             }
           },
-          { match: { 'declaration.name': 'John Doe' } }
+          { match: { 'declaration.applicant____name': 'John Doe' } }
         ])
       }
     })
