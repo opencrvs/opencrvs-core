@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 7b220f66-e61f-45e2-8afc-e982e2a086d2
+                transactionId: 52d0eeed-cf75-48bd-8348-339dce6e7003
                 type: v2.birth
       responses:
         "200":
@@ -308,6 +308,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -505,6 +506,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -528,7 +530,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ac6ae055-9c4d-4497-a51b-76f75ec618d5
+                transactionId: 7c163929-39a6-4ba3-b772-2427d61e9427
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -771,6 +773,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -968,6 +971,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -1228,6 +1232,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -1425,6 +1430,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -1688,6 +1694,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -1885,6 +1892,7 @@ paths:
                                     properties:
                                       statusCode:
                                         type: number
+                                        nullable: true
                                       message:
                                         type: string
                                     required:
@@ -5211,18 +5219,34 @@ components:
                   properties:
                     statusCode:
                       type: number
+                      nullable: true
                     message:
                       type: string
                   required:
                     - statusCode
                     - message
                 data: {}
+                trackingValue:
+                  type: string
+                  description: If the tracking value changes, the field will be re-fetched
               required:
                 - loading
                 - error
             configuration:
               type: object
               properties:
+                trigger:
+                  type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                url:
+                  type: string
+                  description: URL to send the HTTP request to
                 method:
                   type: string
                   enum:
@@ -5242,12 +5266,15 @@ components:
                   type: object
                   additionalProperties:
                     type: string
-                url:
-                  type: string
-                  description: URL to send the HTTP request to
+                timeout:
+                  type: number
+                  default: 15000
+                  description: Request timeout in milliseconds
               required:
-                - method
+                - trigger
                 - url
+                - method
+                - timeout
           required:
             - id
             - label
@@ -6533,6 +6560,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -6730,6 +6758,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -6978,6 +7007,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -7175,6 +7205,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -7420,6 +7451,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -7617,6 +7649,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -7875,6 +7908,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -8072,6 +8106,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -8317,6 +8352,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -8514,6 +8550,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -8772,6 +8809,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -8969,6 +9007,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -9214,6 +9253,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -9411,6 +9451,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -9658,6 +9699,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -9855,6 +9897,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -10100,6 +10143,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -10297,6 +10341,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -10545,6 +10590,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -10742,6 +10788,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -10987,6 +11034,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -11184,6 +11232,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -11432,6 +11481,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -11629,6 +11679,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -11890,6 +11941,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -12087,6 +12139,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -12332,6 +12385,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -12529,6 +12583,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -12780,6 +12835,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -12977,6 +13033,7 @@ components:
                             properties:
                               statusCode:
                                 type: number
+                                nullable: true
                               message:
                                 type: string
                             required:
@@ -13650,12 +13707,16 @@ components:
                     properties:
                       statusCode:
                         type: number
+                        nullable: true
                       message:
                         type: string
                     required:
                       - statusCode
                       - message
                   data: {}
+                  trackingValue:
+                    type: string
+                    description: If the tracking value changes, the field will be re-fetched
                 required:
                   - loading
                   - error
