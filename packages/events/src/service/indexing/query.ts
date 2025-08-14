@@ -21,6 +21,7 @@ import {
   SearchScopeAccessLevels,
   timePeriodToDateRange
 } from '@opencrvs/commons/events'
+import { getOrThrow } from '@opencrvs/commons'
 import { getChildLocations } from '../locations/locations'
 import { encodeFieldId, generateQueryForAddressField } from './utils'
 
@@ -74,12 +75,10 @@ function generateQuery(
 
   const must = Object.entries(event).map(([fieldId, search]) => {
     const esFieldName = `declaration.${encodeFieldId(fieldId)}`
-    const field = allEventFields.find((f) => f.id === fieldId)
-    if (!field) {
-      throw new Error(
-        `Tried to search with a field id ${fieldId} but it is not found in event configuration`
-      )
-    }
+    const field = getOrThrow(
+      allEventFields.find((f) => f.id === fieldId),
+      `Tried to search with a field id ${fieldId} but it is not found in event configuration`
+    )
 
     if (field.type === FieldType.ADDRESS) {
       return generateQueryForAddressField(fieldId, search)
