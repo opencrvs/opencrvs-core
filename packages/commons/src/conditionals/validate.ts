@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import Ajv from 'ajv/dist/2019'
+import Ajv, { KeywordDefinition } from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 import { formatISO, isAfter, isBefore } from 'date-fns'
@@ -21,14 +21,15 @@ import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
-const ajv = new Ajv({
+const AJV_OPTIONS = {
   $data: true,
   allowUnionTypes: true,
+  // This must be here to prevent memory leaks
+  // https://www.poberezkin.com/posts/2021-02-11-ajv-version-7-big-changes-and-improvements.html#caching-compiled-schemas
+  // https://github.com/ajv-validator/ajv/issues/1413
+  addUsedSchema: false,
   strict: false // Allow minContains and other newer features
-})
-
-// https://ajv.js.org/packages/ajv-formats.html
-addFormats(ajv)
+}
 
 /*
  * Custom keyword validator for date strings so the dates could be validated dynamically
@@ -48,7 +49,8 @@ addFormats(ajv)
  *    }
  * }
  */
-ajv.addKeyword({
+
+const daysFromNow: KeywordDefinition = {
   keyword: 'daysFromNow',
   type: 'string',
   schemaType: 'object',
@@ -89,9 +91,16 @@ ajv.addKeyword({
       ? isAfter(date, offsetDate)
       : isBefore(date, offsetDate)
   }
-})
+}
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
+  const ajv = new Ajv(AJV_OPTIONS)
+
+  // https://ajv.js.org/packages/ajv-formats.html
+  addFormats(ajv)
+
+  ajv.addKeyword(daysFromNow)
+
   return ajv.validate(schema, data)
 }
 
@@ -461,6 +470,12 @@ export function areCertificateConditionsMet(
   conditions: FieldConditional[],
   values: Record<string, unknown>
 ) {
+  const ajv = new Ajv(AJV_OPTIONS)
+
+  // https://ajv.js.org/packages/ajv-formats.html
+  addFormats(ajv)
+
+  ajv.addKeyword(daysFromNow)
   return conditions.every((condition) => {
     return ajv.validate(condition.conditional, values)
   })
