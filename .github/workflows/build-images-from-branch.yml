@@ -121,7 +121,7 @@ jobs:
 
   merge-manifest:
     needs: [base]
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -196,45 +196,6 @@ jobs:
             cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:${{ needs.base.outputs.branch }}${{ steps.arch_label.outputs.arch }}
             cache-to: type=inline
 
-  build-dashboards:
-    needs: [base, merge-manifest]
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v4
-        if: github.event_name == 'workflow_dispatch'
-        with:
-          ref: '${{ github.event.inputs.branch_tag_name }}'
-
-      - uses: actions/checkout@v4
-        if: github.event_name == 'push' || github.event_name == 'pull_request'
-        with:
-          ref: ${{ github.event.pull_request.head.sha }}
-
-      - name: Log in to GitHub Container Registry
-        uses: docker/login-action@v3
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
-
-      - name: Build and push
-        uses: Wandalen/wretry.action@v3.8.0
-        with:
-          attempt_limit: 3
-          action: docker/build-push-action@v6
-          with: |
-            file: packages/dashboards/Dockerfile
-            build-args: |
-              VERSION=${{ needs.base.outputs.version }}
-              BRANCH=${{ needs.base.outputs.branch }}
-            push: true
-            context: .
-            tags: |
-              ghcr.io/opencrvs/ocrvs-dashboards:${{ needs.base.outputs.version }}
-              ghcr.io/opencrvs/ocrvs-dashboards:${{ needs.base.outputs.branch }}
-            cache-from: type=registry,ref=ghcr.io/opencrvs/ocrvs-dashboards:${{ needs.base.outputs.branch }}
-            cache-to: type=inline
-
   merge-services-manifest:
     needs: [base, build]
     strategy:
@@ -245,7 +206,7 @@ jobs:
           # metabase/metabase:v0.50.30.1 doesn't support arm arch
           # https://discourse.metabase.com/t/install-with-docker-on-arm/18501
           - service: 'dashboards'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
@@ -262,6 +223,26 @@ jobs:
               ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-amd64 \
               ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
+          done
+
+  merge-dashboards-manifest:
+    needs: [base, build]
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GHCR_PUBLISH_TOKEN }}
+
+      - name: Create and push multi-arch (bare-bones tag) manifest
+        run: |
+          for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
+            echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-dashboards:$TAG"
+            docker manifest create ghcr.io/opencrvs/ocrvs-dashboards:$TAG \
+              ghcr.io/opencrvs/ocrvs-dashboards:$TAG-amd64
+            docker manifest push ghcr.io/opencrvs/ocrvs-dashboards:$TAG
           done
 
   security-scans-pr:
