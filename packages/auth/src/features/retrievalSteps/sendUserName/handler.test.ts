@@ -14,9 +14,23 @@ import {
   storeRetrievalStepInformation,
   RetrievalSteps
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { logger } from '@opencrvs/commons'
 
 const fetch = fetchAny as fetchAny.FetchMock
+
+let capturedEvent = 'none'
+
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn(
+      ({ event }: { event: string; [key: string]: any }, ...rest) => {
+        capturedEvent = event
+      }
+    )
+  }
+})
 
 describe('username reminder', () => {
   let server: AuthServer
@@ -54,8 +68,8 @@ describe('username reminder', () => {
 
       expect(res.statusCode).toBe(200)
     })
-    it('calls notification service to send the username', async () => {
-      const spy = jest.spyOn(logger, 'info')
+    it('Triggers `username-reminder` event in countryconfig', async () => {
+      capturedEvent = 'none'
       await server.server.inject({
         method: 'POST',
         url: '/sendUserName',
@@ -63,8 +77,7 @@ describe('username reminder', () => {
           nonce: '12345'
         }
       })
-
-      expect(spy.mock.calls).toHaveLength(1)
+      expect(capturedEvent).toBe('username-reminder')
     })
   })
   describe('when an invalid nonce is supplied', () => {

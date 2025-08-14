@@ -83,7 +83,7 @@ describe('resend handler receives a request', () => {
         scope: ['demo'],
         mobile: '+8801712323234'
       })
-      const spy = jest.spyOn(codeService, 'sendVerificationCode')
+      const spy = jest.spyOn(codeService, 'generateVerificationCode')
 
       const res = await server.server.inject({
         method: 'POST',
