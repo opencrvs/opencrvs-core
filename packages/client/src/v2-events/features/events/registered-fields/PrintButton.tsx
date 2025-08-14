@@ -33,7 +33,6 @@ const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
 
 export const PrintButton = {
   Input: ({ id, template, buttonLabel, disabled }: PrintButtonProps) => {
-    console.log('Entering PrintButton --------->')
     const intl = useIntl()
     const { eventId } = useParams()
     const { getEvent } = useEvents()
@@ -71,9 +70,6 @@ export const PrintButton = {
     const certificateConfig = certificateTemplates.find(
       (cert) => cert.id === template
     )
-
-    console.log('users', users)
-    console.log('locations', locations)
 
     const { handleCertify } = usePrintableCertificate({
       event,

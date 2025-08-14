@@ -38,26 +38,31 @@ async function replaceMinioUrlWithBase64(
   declaration: Record<string, any>,
   config: EventConfig
 ) {
+  // Why a cloned copy? to avoid mutating the original declaration
+  const declarationClone: Record<string, any> = JSON.parse(
+    JSON.stringify(declaration)
+  )
+
   const fileFieldIds = config.declaration.pages
     .flatMap((page) => page.fields)
     .filter((field) => field.type === FieldType.FILE)
     .map((field) => field.id)
 
   for (const fieldId of fileFieldIds) {
-    const fieldValue = declaration[fieldId]
+    const fieldValue = declarationClone[fieldId]
     if (
       fieldValue &&
       typeof fieldValue === 'object' &&
       'filename' in fieldValue &&
       isMinioUrl(fieldValue.filename)
     ) {
-      declaration[fieldId].filename = await fetchImageAsBase64(
+      declarationClone[fieldId].filename = await fetchImageAsBase64(
         // this should be a presigned minio url
         fieldValue.filename
       )
     }
   }
-  return declaration
+  return declarationClone
 }
 
 export const usePrintableCertificate = ({
@@ -111,8 +116,6 @@ export const usePrintableCertificate = ({
     ? ((localDeclaration ?? declaration) as EventState)
     : declaration
 
-  console.log('declarationToUse :>> ', declarationToUse)
-
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
@@ -128,8 +131,15 @@ export const usePrintableCertificate = ({
   const handleCertify = async (updatedEvent: EventDocument) => {
     const { declaration: updatedDeclaration, ...updatedMetadata } =
       getCurrentEventState(updatedEvent, eventConfiguration)
+    // Same fallback logic used for preview: if server-side declaration is empty,
+    // use the local draft (declarationToUse)
+    const updatedDeclarationToUse =
+      Object.keys(updatedDeclaration).length === 0
+        ? declarationToUse
+        : updatedDeclaration
+
     const declarationWithResolvedImages = await replaceMinioUrlWithBase64(
-      updatedDeclaration,
+      updatedDeclarationToUse,
       config
     )
 

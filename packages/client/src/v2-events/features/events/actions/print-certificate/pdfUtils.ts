@@ -250,8 +250,6 @@ export function compileSvg({
     cache
   )
 
-  console.log('$declaration :>> ', $declaration)
-
   const customHelpers = getHandlebarHelpers()
 
   for (const helperName of Object.keys(customHelpers)) {
@@ -413,19 +411,16 @@ export function compileSvg({
   )
 
   const template = Handlebars.compile(templateString)
-  $declaration = formatAllNonStringValues($declaration, intl)
+  const printableDeclaration = formatAllNonStringValues($declaration, intl)
 
   const data = {
-    $declaration,
+    $declaration: printableDeclaration,
     $metadata,
     $references: {
       locations,
       users
     }
   }
-
-  console.log('PDFUtils >>>>>>> data >>>>>>> ', data)
-
   const output = template(data)
   return output
 }
