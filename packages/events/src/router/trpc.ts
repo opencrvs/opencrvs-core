@@ -12,39 +12,44 @@
 import { initTRPC, TRPCError } from '@trpc/server'
 import superjson from 'superjson'
 import { OpenApiMeta } from 'trpc-to-openapi'
+import * as Sentry from '@sentry/node'
 import { logger, TokenUserType } from '@opencrvs/commons'
 import { TrpcContext } from '@events/context'
 
 export const t = initTRPC.context<TrpcContext>().meta<OpenApiMeta>().create({
   transformer: superjson
 })
-
+const sentryMiddleware = t.middleware(
+  Sentry.trpcMiddleware({ attachRpcInput: true })
+)
 export const router = t.router
 
 /**
  * System procedures are available to both system (API key) users and
  * human users depending on the scopes they have
  */
-export const systemProcedure = t.procedure
+export const systemProcedure = t.procedure.use(sentryMiddleware)
 
 /**
  * Public procedures are only available to human users
  * and will throw an error if a system user tries to access them
  */
-export const publicProcedure = t.procedure.use(async (opts) => {
-  const { user } = opts.ctx
+export const publicProcedure = t.procedure
+  .use(sentryMiddleware)
+  .use(async (opts) => {
+    const { user } = opts.ctx
 
-  if (user.type === TokenUserType.enum.system) {
-    logger.error(
-      `System user tried to access public procedure. User id: '${user.id}'`
-    )
-    throw new TRPCError({ code: 'FORBIDDEN' })
-  }
-
-  return opts.next({
-    ctx: {
-      ...opts.ctx,
-      user
+    if (user.type === TokenUserType.enum.system) {
+      logger.error(
+        `System user tried to access public procedure. User id: '${user.id}'`
+      )
+      throw new TRPCError({ code: 'FORBIDDEN' })
     }
+
+    return opts.next({
+      ctx: {
+        ...opts.ctx,
+        user
+      }
+    })
   })
-})

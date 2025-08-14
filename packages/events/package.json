@@ -20,6 +20,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "8.16.2",
     "@opencrvs/commons": "^1.7.0",
+    "@sentry/node": "^10.5.0",
     "@trpc/server": "11.4.3",
     "@types/luxon": "^3.6.2",
     "@types/pg": "^8.15.4",
