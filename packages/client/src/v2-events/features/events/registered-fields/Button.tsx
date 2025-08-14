@@ -25,7 +25,7 @@ function throwIfUnsupportedIcon(icon: string) {
   )
 }
 
-export const ButtonInput = ({
+function ButtonInput({
   configuration: { icon, loading = false, text },
   value = 0,
   onChange
@@ -38,7 +38,7 @@ export const ButtonInput = ({
   value?: number
   /** Represents the amount of times the button has been pressed */
   onChange: (val: number) => void
-}) => {
+}) {
   const intl = useIntl()
 
   const handleClick = () => {

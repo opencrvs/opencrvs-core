@@ -144,14 +144,22 @@ export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
 
 export const HttpFieldValue = z.object({
   loading: z.boolean(),
-  error: z.object({ statusCode: z.number(), message: z.string() }).nullable(),
-  data: z.any()
+  error: z
+    .object({ statusCode: z.number().nullable(), message: z.string() })
+    .nullable(),
+  data: z.any(),
+  trackingValue: z
+    .string()
+    .optional()
+    .describe('If the tracking value changes, the field will be re-fetched')
 })
 export type HttpFieldValue = z.infer<typeof HttpFieldValue>
 export const HttpFieldUpdateValue = z
   .object({
     loading: z.boolean().nullish(),
-    error: z.object({ statusCode: z.number(), message: z.string() }).nullish(),
+    error: z
+      .object({ statusCode: z.number().nullable(), message: z.string() })
+      .nullish(),
     data: z.any().nullish()
   })
   .or(z.null())

@@ -52,10 +52,11 @@ import {
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
   SelectDateRangeValue,
-  isTimeFieldType
+  isTimeFieldType,
+  isButtonFieldType,
+  isHttpFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
-import { isButtonFieldType } from '@opencrvs/commons/client'
 import { InputField } from '@client/components/form/InputField'
 import {
   BulletList,
@@ -73,7 +74,8 @@ import {
   Paragraph,
   SelectDateRangeField,
   TimeField,
-  Button
+  Button,
+  Http
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -603,6 +605,17 @@ export const GeneratedInputField = React.memo(
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
         </InputField>
+      )
+    }
+
+    if (isHttpFieldType(field)) {
+      return (
+        <Http.Input
+          key={fieldDefinition.id}
+          configuration={field.config.configuration}
+          parentValue={form[field.config.configuration.trigger.$$field]}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+        />
       )
     }
 

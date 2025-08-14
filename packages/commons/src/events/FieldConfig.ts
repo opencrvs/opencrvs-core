@@ -543,11 +543,16 @@ const HttpField = BaseField.extend({
   type: z.literal(FieldType.HTTP),
   defaultValue: HttpFieldValue.optional(),
   configuration: z.object({
+    trigger: FieldReference,
+    url: z.string().describe('URL to send the HTTP request to'),
     method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
     headers: z.record(z.string()).optional(),
     body: z.record(z.string()).optional(),
     params: z.record(z.string()).optional(),
-    url: z.string().describe('URL to send the HTTP request to')
+    timeout: z
+      .number()
+      .default(15000)
+      .describe('Request timeout in milliseconds')
   })
 }).describe('HTTP request function triggered by a button click')
 
