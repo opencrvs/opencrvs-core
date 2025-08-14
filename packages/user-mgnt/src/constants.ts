@@ -16,7 +16,6 @@ export const DEFAULT_TIMEOUT = 600000
 export const HOST = env.HOST
 export const PORT = env.PORT
 export const MONGO_URL = env.MONGO_URL
-export const NOTIFICATION_SERVICE_URL = env.NOTIFICATION_SERVICE_URL
 export const APPLICATION_CONFIG_URL = env.APPLICATION_CONFIG_URL
 export const COUNTRY_CONFIG_URL = env.COUNTRY_CONFIG_URL
 export const DOCUMENTS_URL = env.DOCUMENTS_URL
