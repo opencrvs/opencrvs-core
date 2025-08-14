@@ -175,7 +175,7 @@ jobs:
           if [[ "${{ matrix.runner }}" == "ubuntu-24.04-arm" ]]; then
             echo "arch=-arm64" >> $GITHUB_OUTPUT
           else
-            echo "arch=" >> $GITHUB_OUTPUT
+            echo "arch=-amd64" >> $GITHUB_OUTPUT
           fi
 
       - name: Build and push
@@ -220,7 +220,7 @@ jobs:
           for TAG in ${{ needs.base.outputs.branch }} ${{ needs.base.outputs.version }}; do
             echo "[🔁 pushing ] ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG"
             docker manifest create ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
-              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG \
+              ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-amd64 \
               ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG-arm64
             docker manifest push ghcr.io/opencrvs/ocrvs-${{ matrix.service }}:$TAG
           done
