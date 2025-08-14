@@ -90,6 +90,14 @@ const daysFromNow: KeywordDefinition = {
 }
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
+  /*
+   * Ajv quite aggressively caches the compiled schemas. In our use case,
+   * often the schemas being used change on runtime which, in the long term,
+   * can lead to memory leaks.
+   * To avoid this, we create a new Ajv instance for each validation.
+   * This is not the most performant solution, but it is the most memory efficient.
+   * https://www.poberezkin.com/posts/2021-02-11-ajv-version-7-big-changes-and-improvements.html#caching-compiled-schemas
+   */
   const ajv = new Ajv(AJV_OPTIONS)
 
   // https://ajv.js.org/packages/ajv-formats.html
