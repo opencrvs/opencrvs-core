@@ -22,13 +22,10 @@ import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 
-const ajv = new Ajv({
+const AJV_OPTIONS = {
   $data: true,
   allowUnionTypes: true
-})
-
-// https://ajv.js.org/packages/ajv-formats.html
-addFormats(ajv)
+}
 
 /*
  * Custom keyword validator for date strings so the dates could be validated dynamically
@@ -48,7 +45,8 @@ addFormats(ajv)
  *    }
  * }
  */
-ajv.addKeyword({
+
+const daysFromNow: KeywordDefinition = {
   keyword: 'daysFromNow',
   type: 'string',
   schemaType: 'object',
@@ -89,9 +87,16 @@ ajv.addKeyword({
       ? isAfter(date, offsetDate)
       : isBefore(date, offsetDate)
   }
-})
+}
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
+  const ajv = new Ajv(AJV_OPTIONS)
+
+  // https://ajv.js.org/packages/ajv-formats.html
+  addFormats(ajv)
+
+  ajv.addKeyword(daysFromNow)
+
   return ajv.validate(schema, data)
 }
 
