@@ -41,34 +41,24 @@ export default async function sendUserNameHandler(
     return h.response().code(401)
   }
 
-  const isDemoUser = retrievalStepInformation.scope.indexOf('demo') > -1
   const remoteAddress =
     request.headers['x-real-ip'] || request.info.remoteAddress
   const userAgent =
     request.headers['x-real-user-agent'] || request.headers['user-agent']
-  if (!env.isProd || isDemoUser) {
-    logger.info(
-      `Sending a verification SMS,
-        ${JSON.stringify({
-          mobile: retrievalStepInformation.mobile,
-          username: retrievalStepInformation.username
-        })}`
-    )
-  } else {
-    await triggerUserEventNotification({
-      event: 'username-reminder',
-      payload: {
-        recipient: {
-          name: retrievalStepInformation.userFullName,
-          mobile: retrievalStepInformation.mobile,
-          email: retrievalStepInformation.email
-        },
-        username: retrievalStepInformation.username
+
+  await triggerUserEventNotification({
+    event: 'username-reminder',
+    payload: {
+      recipient: {
+        name: retrievalStepInformation.userFullName,
+        mobile: retrievalStepInformation.mobile,
+        email: retrievalStepInformation.email
       },
-      countryConfigUrl: env.COUNTRY_CONFIG_URL,
-      authHeader: { Authorization: request.headers.authorization }
-    })
-  }
+      username: retrievalStepInformation.username
+    },
+    countryConfigUrl: env.COUNTRY_CONFIG_URL,
+    authHeader: { Authorization: request.headers.authorization }
+  })
 
   try {
     await postUserActionToMetrics(

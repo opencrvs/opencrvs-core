@@ -212,28 +212,13 @@ export async function generateAndSendVerificationCode(
     verificationCode = await generateVerificationCode(nonce)
   }
 
-  if (!env.isProd || env.QA_ENV) {
-    logger.info(
-      `Sending a verification to,
-          ${JSON.stringify({
-            mobile: mobile,
-            email: email,
-            verificationCode
-          })}`
-    )
-  } else {
-    if (isDemoUser) {
-      throw unauthorized()
-    } else {
-      await sendVerificationCode(
-        verificationCode,
-        notificationEvent,
-        userFullName,
-        mobile,
-        email
-      )
-    }
-  }
+  await sendVerificationCode(
+    verificationCode,
+    notificationEvent,
+    userFullName,
+    mobile,
+    email
+  )
 }
 
 const tokenPayload = t.type({
