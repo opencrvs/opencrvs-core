@@ -49,7 +49,10 @@ import {
   hasScope,
   SCOPES
 } from '@opencrvs/commons/authentication'
-import { UserInputError } from '@gateway/utils/graphql-errors'
+import {
+  AuthenticationError,
+  UserInputError
+} from '@gateway/utils/graphql-errors'
 
 export const resolvers: GQLResolver = {
   Query: {
@@ -290,7 +293,9 @@ export const resolvers: GQLResolver = {
       async (_, { id, password }, { headers: authHeader }) => {
         const userId: string = getUserId(authHeader)
         if (userId !== id) {
-          throw new Error('Unauthorized to verify password of this user')
+          throw new AuthenticationError(
+            'Unauthorized to verify password of this user'
+          )
         }
         const res = await fetch(`${USER_MANAGEMENT_URL}verifyPasswordById`, {
           method: 'POST',
