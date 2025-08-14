@@ -24,6 +24,10 @@ import { TranslationConfig } from '../events/TranslationConfig'
 const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true,
+  // This must be here to prevent memory leaks
+  // https://www.poberezkin.com/posts/2021-02-11-ajv-version-7-big-changes-and-improvements.html#caching-compiled-schemas
+  // https://github.com/ajv-validator/ajv/issues/1413
+  addUsedSchema: false,
   strict: false // Allow minContains and other newer features
 })
 
