@@ -759,6 +759,8 @@ components:
             options:
               type: object
               properties:
+                pivot:
+                  type: number
                 days:
                   type: number
                 boost:
@@ -11889,7 +11891,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 552212c4-dbe5-406b-ad49-d90965dd3f2d
+        transactionId: cf51b091-2910-44c7-84ae-d8320ce189bc
         declaration: {}
         annotation: {}
         type: NOTIFY
