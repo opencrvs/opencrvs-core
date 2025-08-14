@@ -250,6 +250,8 @@ export function compileSvg({
     cache
   )
 
+  console.log('$declaration :>> ', $declaration)
+
   const customHelpers = getHandlebarHelpers()
 
   for (const helperName of Object.keys(customHelpers)) {
@@ -324,13 +326,13 @@ export function compileSvg({
       this: any,
       ...args: [...(string | undefined)[], Handlebars.HelperOptions]
     ) {
-      // If even one of the parts is undefined, then return empty string
+      // If even one of the parts is undefined or null, then return empty string
       const idParts = args.slice(0, -1)
-      if (idParts.some((part) => part === undefined)) {
+      if (idParts.some((part) => part == null)) {
         return ''
       }
 
-      const id = idParts.map((part) => part?.toString().toLowerCase()).join('.')
+      const id = idParts.map((part) => String(part).toLowerCase()).join('.')
 
       return intl.formatMessage({
         id,
@@ -421,6 +423,8 @@ export function compileSvg({
       users
     }
   }
+
+  console.log('PDFUtils >>>>>>> data >>>>>>> ', data)
 
   const output = template(data)
   return output

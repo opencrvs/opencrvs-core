@@ -29,8 +29,11 @@ interface PrintButtonProps {
   disabled?: boolean
 }
 
+const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
+
 export const PrintButton = {
   Input: ({ id, template, buttonLabel, disabled }: PrintButtonProps) => {
+    console.log('Entering PrintButton --------->')
     const intl = useIntl()
     const { eventId } = useParams()
     const { getEvent } = useEvents()
@@ -41,19 +44,17 @@ export const PrintButton = {
         <Button
           disabled={true}
           id={id}
-          size="small"
+          size="large"
           style={{ cursor: 'pointer' }}
           type="secondary"
         >
-          {intl.formatMessage({
-            id: 'print.certificate',
-            defaultMessage: 'Print Certificate'
-          })}
+          {intl.formatMessage(addedButtonLabel)}
         </Button>
       )
     }
 
     const event = getEvent.getFromCache(eventId)
+
     const { eventConfiguration } = useEventConfiguration(event.type)
 
     const { getUsers } = useUsers()
@@ -71,6 +72,9 @@ export const PrintButton = {
       (cert) => cert.id === template
     )
 
+    console.log('users', users)
+    console.log('locations', locations)
+
     const { handleCertify } = usePrintableCertificate({
       event,
       config: eventConfiguration,
@@ -81,6 +85,9 @@ export const PrintButton = {
     })
 
     const handlePrint = async () => {
+      if (!certificateConfig || !language) {
+        return
+      }
       if (event && eventConfiguration && typeof handleCertify === 'function') {
         await handleCertify(event)
       }
@@ -88,17 +95,13 @@ export const PrintButton = {
 
     const label = buttonLabel
       ? intl.formatMessage(buttonLabel)
-      : intl.formatMessage({
-          id: 'print.certificate',
-          defaultMessage: 'Print Certificate'
-        })
+      : intl.formatMessage(addedButtonLabel)
 
     return (
       <Button
-        disabled={false}
-        // disabled={disabled || !certificateConfig}
+        disabled={disabled || !certificateConfig}
         id={id}
-        size="small"
+        size="large"
         type="secondary"
         onClick={handlePrint}
       >

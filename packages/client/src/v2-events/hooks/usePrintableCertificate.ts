@@ -18,8 +18,10 @@ import {
   CertificateTemplateConfig,
   LanguageConfig,
   EventConfig,
-  FieldType
+  FieldType,
+  findActiveDrafts
 } from '@opencrvs/commons/client'
+import { EventState } from '@opencrvs/commons/client'
 import {
   addFontsToSvg,
   compileSvg,
@@ -28,6 +30,8 @@ import {
 } from '@client/v2-events/features/events/actions/print-certificate/pdfUtils'
 import { fetchImageAsBase64 } from '@client/utils/imageUtils'
 import { useEventConfiguration } from '../features/events/useEventConfiguration'
+import { useDrafts } from '../features/drafts/useDrafts'
+import { getEventDrafts } from '../features/events/components/Action/utils'
 
 async function replaceMinioUrlWithBase64(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -77,6 +81,17 @@ export const usePrintableCertificate = ({
     eventConfiguration
   )
 
+  // Offline flow
+  const { getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
+  const drafts = getRemoteDrafts(event.id)
+  const activeDraft = findActiveDrafts(event, drafts)[0]
+  const localDraft = getLocalDraftOrDefault(activeDraft)
+
+  const eventDrafts = getEventDrafts(event.id, localDraft, drafts)
+  const localDeclaration = eventDrafts[0]?.action?.declaration as
+    | EventState
+    | undefined
+
   const modifiedMetadata = {
     ...metadata,
     // Temporarily add `modifiedAt` to the last action's data to display
@@ -91,11 +106,17 @@ export const usePrintableCertificate = ({
   }
 
   const certificateFonts = certificateConfig.fonts ?? {}
+  const isEmptyDeclaration = Object.keys(declaration).length === 0
+  const declarationToUse: EventState = isEmptyDeclaration
+    ? ((localDeclaration ?? declaration) as EventState)
+    : declaration
+
+  console.log('declarationToUse :>> ', declarationToUse)
 
   const svgWithoutFonts = compileSvg({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
-    $declaration: declaration,
+    $declaration: declarationToUse,
     locations,
     users,
     language,

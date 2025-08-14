@@ -452,6 +452,7 @@ export const isNonInteractiveFieldType = (
     field.type === FieldType.PAGE_HEADER ||
     field.type === FieldType.PARAGRAPH ||
     field.type === FieldType.BULLET_LIST ||
-    field.type === FieldType.DATA
+    field.type === FieldType.DATA ||
+    field.type === FieldType.PRINT_BUTTON
   )
 }
