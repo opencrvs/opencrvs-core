@@ -309,7 +309,7 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
   }
 }
 
-export const ReviewForRegistratinAgentRejectInteraction: Story = {
+export const ReviewForRegistrationAgentRejectInteraction: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
@@ -332,7 +332,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.registrationAgent()
               }
             })
           }),

@@ -79,7 +79,7 @@ function DocumentUploaderWithOption({
   acceptedFileTypes?: MimeType[]
   options: SelectOption[]
   value: FileFieldWithOptionValue
-  onChange: (file?: FileFieldValueWithOption[]) => void
+  onChange: (file: FileFieldValueWithOption[]) => void
   error?: string
   hideOnEmptyOption?: boolean
   autoSelectOnlyOption?: boolean
@@ -144,8 +144,13 @@ function DocumentUploaderWithOption({
   })
 
   const onDeleteFile = (path: FullDocumentPath) => {
-    setFiles((prevFiles) => prevFiles.filter((file) => file.path !== path))
-    onChange(files.filter((file) => file.path !== path))
+    setFiles((prevFiles) => {
+      const updatedFiles = prevFiles.filter((file) => file.path !== path)
+      onChange(updatedFiles)
+
+      return updatedFiles
+    })
+
     setPreviewImage(null)
   }
 

@@ -31,7 +31,7 @@ function FileInput({
   acceptedFileTypes?: MimeType[]
   maxFileSize: number
   value: FileFieldValue | undefined
-  onChange: (file?: FileFieldValue) => void
+  onChange: (file: FileFieldValue | null) => void
   name: string
   description?: string
   error?: string
@@ -81,7 +81,7 @@ function FileInput({
           setFile(undefined)
         }
         setFile(undefined)
-        onChange(undefined)
+        onChange(null)
       }}
     />
   )
