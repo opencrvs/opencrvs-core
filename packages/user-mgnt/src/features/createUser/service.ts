@@ -17,8 +17,7 @@ import {
 import {
   COUNTRY_CONFIG_URL,
   DOCUMENTS_URL,
-  FHIR_URL,
-  NOTIFICATION_SERVICE_URL
+  FHIR_URL
 } from '@user-mgnt/constants'
 import User, {
   ISignature,
@@ -291,35 +290,6 @@ export async function sendCredentialsNotification(
       },
       countryConfigUrl: COUNTRY_CONFIG_URL,
       authHeader
-    })
-  } catch (err) {
-    logger.error(`Unable to send notification for error : ${err}`)
-  }
-}
-
-export async function sendUpdateUsernameNotification(
-  userFullName: IUserName[],
-  username: string,
-  authHeader: { Authorization: string },
-  msisdn?: string,
-  email?: string
-) {
-  const url = `${NOTIFICATION_SERVICE_URL}${
-    NOTIFICATION_SERVICE_URL.endsWith('/') ? '' : '/'
-  }updateUserNameSMS`
-  try {
-    await fetch(url, {
-      method: 'POST',
-      body: JSON.stringify({
-        msisdn,
-        email,
-        username,
-        userFullName
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-        ...authHeader
-      }
     })
   } catch (err) {
     logger.error(`Unable to send notification for error : ${err}`)

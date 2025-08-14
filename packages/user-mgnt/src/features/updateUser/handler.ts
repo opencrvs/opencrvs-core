@@ -9,7 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import * as Hapi from '@hapi/hapi'
-import { logger, isBase64FileString } from '@opencrvs/commons'
+import {
+  logger,
+  isBase64FileString,
+  triggerUserEventNotification
+} from '@opencrvs/commons'
 import {
   Practitioner,
   findExtension,
@@ -24,12 +28,12 @@ import {
   getFromFhir,
   postFhir,
   rollbackUpdateUser,
-  sendUpdateUsernameNotification,
   uploadSignatureToMinio
 } from '@user-mgnt/features/createUser/service'
 import User, { IUser, IUserModel } from '@user-mgnt/model/user'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import * as _ from 'lodash'
+import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 
 export default async function updateUser(
   request: Hapi.Request,
@@ -158,15 +162,19 @@ export default async function updateUser(
   }
 
   if (userNameChanged) {
-    sendUpdateUsernameNotification(
-      user.name,
-      existingUser.username,
-      {
-        Authorization: request.headers.authorization
+    triggerUserEventNotification({
+      event: 'user-updated',
+      payload: {
+        recipient: {
+          name: user.name,
+          email: user.emailForNotification,
+          mobile: user.mobile
+        },
+        username: existingUser.username
       },
-      user.mobile,
-      user.emailForNotification
-    )
+      countryConfigUrl: COUNTRY_CONFIG_URL,
+      authHeader: { Authorization: request.headers.authorization }
+    })
   }
   const resUser = _.omit(existingUser, ['passwordHash', 'salt'])
 
