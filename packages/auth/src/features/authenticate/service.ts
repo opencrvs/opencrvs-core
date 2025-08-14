@@ -23,7 +23,6 @@ import {
   storeVerificationCode
 } from '@auth/features/verifyCode/service'
 import { logger, UUID } from '@opencrvs/commons'
-import { unauthorized } from '@hapi/boom'
 import * as F from 'fp-ts'
 import { Scope, TokenUserType } from '@opencrvs/commons/authentication'
 const { chainW, tryCatch } = F.either
