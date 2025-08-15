@@ -304,6 +304,7 @@ const GENERIC_ADDRESS_FIELDS = [
         conditional: isInternationalAddress()
       }
     ],
+    parent: createFieldCondition('country'),
     required: true,
     label: {
       id: 'v2.field.address.state.label',
@@ -314,6 +315,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'district2',
+    parent: createFieldCondition('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -330,6 +332,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'cityOrTown',
+    parent: createFieldCondition('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -346,6 +349,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'addressLine1',
+    parent: createFieldCondition('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -362,6 +366,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'addressLine2',
+    parent: createFieldCondition('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -378,6 +383,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'addressLine3',
+    parent: createFieldCondition('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -394,6 +400,7 @@ const GENERIC_ADDRESS_FIELDS = [
   },
   {
     id: 'postcodeOrZip',
+    parent: createFieldCondition('country'),
     conditionals: [
       {
         type: ConditionalType.SHOW,
