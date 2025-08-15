@@ -1228,3 +1228,15 @@ describe('Matches conditional validation', () => {
     ).toBe(false)
   })
 })
+
+describe('Subfield nesting', () => {
+  it('allows you to validate nested fields of more complex data', () => {
+    const params = {
+      $form: { 'applicant.http': { success: true } },
+      $now: formatISO(new Date(), { representation: 'date' })
+    }
+    expect(
+      validate(field('applicant.http').get('success').isEqualTo(true), params)
+    ).toBe(true)
+  })
+})

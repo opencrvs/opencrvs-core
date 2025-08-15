@@ -125,6 +125,21 @@ export function never(): JSONSchema {
   return not(alwaysTrue())
 }
 
+function wrapToPath(condition: Record<string, unknown>, path: string[]) {
+  if (path.length === 0) {
+    return condition
+  }
+  return path.reduceRight((conditionNow, part) => {
+    return {
+      type: 'object',
+      properties: {
+        [part]: conditionNow
+      },
+      required: [part]
+    }
+  }, condition)
+}
+
 /**
  *
  * Generate conditional rules for user.
@@ -242,6 +257,16 @@ export function createFieldConditionals(fieldId: string) {
      * @private Internal property used for field reference tracking.
      */
     $$field: fieldId,
+    /**
+     * @private Internal property used for solving a object path within field's value
+     */
+    $$subfield: [],
+    get(fieldPath: string) {
+      return {
+        ...this,
+        $$subfield: fieldPath.split('.')
+      }
+    },
     isAfter: () => ({
       days: (days: number) => ({
         inPast: () => defineFormConditional(getDayRange(-days, 'after')),
@@ -286,7 +311,7 @@ export function createFieldConditionals(fieldId: string) {
       now: () =>
         defineFormConditional(getDateRange({ $data: '/$now' }, 'formatMaximum'))
     }),
-    isEqualTo: (value: string | boolean | FieldReference) => {
+    isEqualTo(value: string | boolean | FieldReference) {
       // If the value is a reference to another field, the JSON schema uses the field reference as the 'const' value we compare to
       if (isFieldReference(value)) {
         const comparedFieldId = value.$$field
@@ -304,17 +329,19 @@ export function createFieldConditionals(fieldId: string) {
         })
       }
 
-      // In the 'default' case, we compare the value of the field with the hard coded value
       return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            oneOf: [
-              { type: 'string', const: value },
-              { type: 'boolean', const: value }
-            ],
-            const: value
-          }
+          [fieldId]: wrapToPath(
+            {
+              oneOf: [
+                { type: 'string', const: value },
+                { type: 'boolean', const: value }
+              ],
+              const: value
+            },
+            this.$$subfield
+          )
         },
         required: [fieldId]
       })
@@ -351,19 +378,23 @@ export function createFieldConditionals(fieldId: string) {
           }
         ]
       }),
-    isUndefined: () =>
-      defineFormConditional({
+    isUndefined() {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
-            type: 'string',
-            enum: ['undefined']
-          }
+          [fieldId]: wrapToPath(
+            {
+              type: 'string',
+              enum: ['undefined']
+            },
+            this.$$subfield
+          )
         },
         not: {
           required: [fieldId]
         }
-      }),
+      })
+    },
     inArray: (values: string[]) =>
       defineFormConditional({
         type: 'object',
