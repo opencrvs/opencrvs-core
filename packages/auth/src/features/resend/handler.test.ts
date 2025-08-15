@@ -14,6 +14,14 @@ import {
 } from '@auth/tests/util'
 import { AuthServer, createServer } from '@auth/server'
 
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn()
+  }
+})
+
 describe('resend handler receives a request', () => {
   let server: AuthServer
 
