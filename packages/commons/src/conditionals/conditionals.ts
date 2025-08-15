@@ -260,7 +260,7 @@ export function createFieldConditionals(fieldId: string) {
     /**
      * @private Internal property used for solving a object path within field's value
      */
-    $$subfield: [],
+    $$subfield: [] as string[],
     get(fieldPath: string) {
       return {
         ...this,

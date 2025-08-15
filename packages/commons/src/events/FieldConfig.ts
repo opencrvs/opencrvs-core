@@ -40,10 +40,10 @@ export const FieldReference = z
   .object({
     $$field: FieldId,
     $$subfield: z
-      .string()
+      .array(z.string())
       .optional()
       .describe(
-        'If the FieldValue is an object, subfield can be used to refer to e.g. `foo.bar` in `{ foo: { bar: 3 } }`'
+        'If the FieldValue is an object, subfield can be used to refer to e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
       )
   })
   .describe('Reference to a field by its ID')
@@ -79,7 +79,8 @@ const BaseField = z.object({
     ),
   value: FieldReference.optional().describe(
     'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
-  )
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) as any
 })
 
 export type BaseField = z.infer<typeof BaseField>

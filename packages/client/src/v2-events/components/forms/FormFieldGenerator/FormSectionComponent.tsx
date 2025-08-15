@@ -193,11 +193,7 @@ export function FormSectionComponent({
   )
 
   const onFieldValueChange = useCallback(
-    (
-      formikFieldId: string,
-      value: FieldValue | undefined,
-      config: FieldConfig
-    ) => {
+    (formikFieldId: string, value: FieldValue | undefined) => {
       const updatedValues = cloneDeep(values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
@@ -210,23 +206,26 @@ export function FormSectionComponent({
 
       // reset the children values of the changed field. (e.g. When changing informant.relation, empty out phone number, email and others.)
       for (const childId of childIds) {
-        let referencedValue = config.value?.$$field
-          ? updatedValues[config.value.$$field]
-          : undefined
+        // @TODO --> Beautify, or move this logic elsewhere!
+        const valueParentId = fieldsWithDotSeparator.find(
+          (f) => f.id === childId
+        )?.value
 
-        if (referencedValue && config.value?.$$subfield) {
-          referencedValue = get(
-            updatedValues[config.value.$$field],
-            config.value?.$$subfield
-          )
+        let val: undefined | FieldValue
+
+        if (valueParentId.$$field) {
+          val =
+            updatedValues[
+              makeFormFieldIdFormikCompatible(valueParentId.$$field)
+            ]
         }
 
-        set(
-          updatedValues,
-          makeFormFieldIdFormikCompatible(childId),
-          // set the field value to `undefined`, unless the FieldConfig['value'] is a FieldReference
-          referencedValue
-        )
+        if (valueParentId.$$subfield) {
+          val = get(val, valueParentId.$$subfield)
+        }
+        // @TODO <-- Beautify!
+
+        set(updatedValues, makeFormFieldIdFormikCompatible(childId), val)
         set(updatedErrors, childId, { errors: [] })
       }
 
@@ -261,6 +260,7 @@ export function FormSectionComponent({
       setTouched,
       touched,
       errorsWithDotSeparator,
+      fieldsWithDotSeparator,
       setErrors,
       setAllTouchedFields
     ]
@@ -373,9 +373,7 @@ export function FormSectionComponent({
                   }
                   value={formikField.value}
                   onBlur={formikField.onBlur}
-                  onFieldValueChange={(name, value) =>
-                    onFieldValueChange(name, value, field)
-                  }
+                  onFieldValueChange={onFieldValueChange}
                 />
               )}
             </Field>
