@@ -212,6 +212,8 @@ export const Summary: Story = {
       const button = (await canvas.findAllByRole('button')).find(
         (x) => x.innerText === "Applicant's profile picture"
       )
+      await expect(canvas.getByText('Verify ID')).toBeInTheDocument()
+      await expect(canvas.getByText('Yes')).toBeInTheDocument()
       await expect(button).toBeInTheDocument()
 
       if (!button) {
