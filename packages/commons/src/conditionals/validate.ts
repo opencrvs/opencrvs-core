@@ -23,7 +23,8 @@ import { TranslationConfig } from '../events/TranslationConfig'
 
 const ajv = new Ajv({
   $data: true,
-  allowUnionTypes: true
+  allowUnionTypes: true,
+  strict: false // Allow minContains and other newer features
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
