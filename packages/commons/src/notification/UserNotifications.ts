@@ -52,7 +52,8 @@ export const TriggerPayload = {
     temporaryPassword: z.string()
   }),
   [TriggerEvent.USER_UPDATED]: BasePayload.extend({
-    username: z.string()
+    oldUsername: z.string(),
+    newUsername: z.string()
   }),
   [TriggerEvent.USERNAME_REMINDER]: BasePayload.extend({
     username: z.string()

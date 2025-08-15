@@ -129,8 +129,10 @@ export default async function updateUser(
   }
   // Updating user in user-mgnt db
   let userNameChanged = false
+  const oldUsername = existingUser.username
+  let newUserName = existingUser.username
   try {
-    const newUserName = await generateUsername(
+    newUserName = await generateUsername(
       existingUser.name,
       existingUser.username
     )
@@ -170,7 +172,8 @@ export default async function updateUser(
           email: user.emailForNotification,
           mobile: user.mobile
         },
-        username: existingUser.username
+        oldUsername,
+        newUsername: newUserName
       },
       countryConfigUrl: COUNTRY_CONFIG_URL,
       authHeader: { Authorization: request.headers.authorization }
