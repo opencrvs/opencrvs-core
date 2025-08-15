@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 79dcb3f2-98f0-4cb2-b904-4a9c0e663fdf
+                transactionId: 031f2b37-5fbd-4c42-9851-6f89f713d88f
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: e6235d38-26e8-41fc-8b0d-85ad9982ceb6
+                transactionId: 14ee5b2c-632a-438b-bdcf-0ddc02191c02
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2691,7 +2691,7 @@ components:
             type:
               type: string
               enum:
-                - dateDistance
+                - dateRange
           required:
             - fieldId
             - options
