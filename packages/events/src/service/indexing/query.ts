@@ -97,7 +97,7 @@ function generateQuery(
       }
       return {
         match: {
-          [esFieldName]: search.term
+          [`${esFieldName}.__fullname`]: search.term
         }
       }
     }
