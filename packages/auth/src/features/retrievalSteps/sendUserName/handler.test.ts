@@ -17,18 +17,11 @@ import {
 
 const fetch = fetchAny as fetchAny.FetchMock
 
-let capturedEvent = 'none'
-
 jest.mock('@opencrvs/commons', () => {
   const actual = jest.requireActual('@opencrvs/commons')
-
   return {
     ...actual,
-    triggerUserEventNotification: jest.fn(
-      ({ event }: { event: string; [key: string]: any }, ...rest) => {
-        capturedEvent = event
-      }
-    )
+    triggerUserEventNotification: jest.fn()
   }
 })
 
@@ -69,7 +62,7 @@ describe('username reminder', () => {
       expect(res.statusCode).toBe(200)
     })
     it('Triggers `username-reminder` event in countryconfig', async () => {
-      capturedEvent = 'none'
+      const { triggerUserEventNotification } = await import('@opencrvs/commons')
       await server.server.inject({
         method: 'POST',
         url: '/sendUserName',
@@ -77,7 +70,9 @@ describe('username reminder', () => {
           nonce: '12345'
         }
       })
-      expect(capturedEvent).toBe('username-reminder')
+      expect(triggerUserEventNotification).toHaveBeenCalledWith(
+        expect.objectContaining({ event: 'username-reminder' })
+      )
     })
   })
   describe('when an invalid nonce is supplied', () => {
