@@ -44,10 +44,10 @@ export function field(fieldId: string) {
         type: 'strict',
         options
       }) satisfies ClauseInput,
-    dateDistanceMatches: (options: DateRangeMatcherOptions) =>
+    dateRangeMatches: (options: DateRangeMatcherOptions) =>
       ({
         fieldId,
-        type: 'dateDistance',
+        type: 'dateRange',
         options
       }) satisfies ClauseInput
   }

@@ -28,14 +28,14 @@ import {
 } from './deduplication'
 
 const similarNamedChild = field('child.name').fuzzyMatches()
-const childDobWithin5Days = field('child.dob').dateDistanceMatches({ days: 5 })
+const childDobWithin5Days = field('child.dob').dateRangeMatches({ days: 5 })
 const similarNamedMother = field('mother.name').fuzzyMatches()
-const similarAgedMother = field('mother.dob').dateDistanceMatches({ days: 365 })
+const similarAgedMother = field('mother.dob').dateRangeMatches({ days: 365 })
 const sameMotherNid = field('mother.nid').strictMatches()
-const childDobWithin9Months = field('child.dob').dateDistanceMatches({
+const childDobWithin9Months = field('child.dob').dateRangeMatches({
   days: 270
 })
-const childDobWithin3Years = field('child.dob').dateDistanceMatches({
+const childDobWithin3Years = field('child.dob').dateRangeMatches({
   days: 1095
 })
 const exactNamedChild = field('child.name').strictMatches()
@@ -129,7 +129,7 @@ describe('deduplication query input conversion', () => {
     ).toMatchSnapshot()
   })
 
-  it('should convert childDobWithin5Days to dateDistance query', () => {
+  it('should convert childDobWithin5Days to dateRange query', () => {
     const encodedEventIndex = encodeEventIndex(
       eventQueryDataGenerator({
         declaration: {
@@ -165,7 +165,7 @@ describe('deduplication query input conversion', () => {
     ).toMatchSnapshot()
   })
 
-  it('should convert similarAgedMother to dateDistance query', () => {
+  it('should convert similarAgedMother to dateRange query', () => {
     const encodedEventIndex = encodeEventIndex(
       eventQueryDataGenerator({
         declaration: {

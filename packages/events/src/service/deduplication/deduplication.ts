@@ -115,7 +115,7 @@ export function generateElasticsearchQuery(
         }
       }
     }
-    case 'dateDistance': {
+    case 'dateRange': {
       const dateValue = DateValue.safeParse(queryValue)
       if (!dateValue.success) {
         return null

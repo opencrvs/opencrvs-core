@@ -1,6 +1,6 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`deduplication query input conversion > should convert childDobWithin5Days to dateDistance query 1`] = `
+exports[`deduplication query input conversion > should convert childDobWithin5Days to dateRange query 1`] = `
 {
   "bool": {
     "must": [
@@ -54,7 +54,7 @@ exports[`deduplication query input conversion > should convert similar child nam
 }
 `;
 
-exports[`deduplication query input conversion > should convert similarAgedMother to dateDistance query 1`] = `
+exports[`deduplication query input conversion > should convert similarAgedMother to dateRange query 1`] = `
 {
   "bool": {
     "must": [

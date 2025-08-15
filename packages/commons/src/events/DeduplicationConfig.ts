@@ -19,7 +19,7 @@ const Matcher = z.object({
   /**
    * The reference to the field to match against.
    *
-   * For `dateDistance` type matcher the value of this field will
+   * For `dateRange` type matcher the value of this field will
    * be used as the origin date to calculate the distance from.
    */
   fieldId: FieldReference,
@@ -76,7 +76,7 @@ export type StrictMatcherOptions = NonNullable<
 >
 
 const DateRangeMatcher = Matcher.extend({
-  type: z.literal('dateDistance'),
+  type: z.literal('dateRange'),
   options: z.object({
     /**
      * The distance pivot in days. Distance from the origin (the value of
