@@ -70,7 +70,7 @@ interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
-  shouldHide?: (actions: ActionType[]) => boolean
+  shouldHide?: (actions: ActionType[], eventState: EventIndex) => boolean
 }
 
 export const actionLabels = {
@@ -156,6 +156,8 @@ export function useAction(event: EventIndex) {
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
 
+  console.log('event', event)
+
   return {
     config: {
       [ActionType.READ]: {
@@ -184,7 +186,10 @@ export function useAction(event: EventIndex) {
         }
       },
       [ActionType.DECLARE]: {
-        label: actionLabels[ActionType.DECLARE],
+        label:
+          event.status === EventStatus.enum.NOTIFIED
+            ? actionLabels[ActionType.VALIDATE]
+            : actionLabels[ActionType.DECLARE],
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
@@ -196,7 +201,16 @@ export function useAction(event: EventIndex) {
         },
         disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen),
         // Action menu should not show DECLARE if the user can perform VALIDATE
-        shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
+        shouldHide: (actions, eventState) => {
+          console.log('avaiable', getAvailableActionsForEvent(eventState))
+          return (
+            actions.includes(ActionType.VALIDATE) &&
+            // Do not show VALIDATE if it can't be performed.
+            getAvailableActionsForEvent(eventState).includes(
+              ActionType.VALIDATE
+            )
+          )
+        }
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
@@ -275,14 +289,10 @@ export function useActionMenuItems(event: EventIndex) {
     authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
   )
 
+  console.log('eventti??', event)
+
   // Find actions available based on the event status
-  const availableActions =
-    !event.flags.includes(InherentFlags.REJECTED) &&
-    event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-      ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
-          event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-        ]
-      : getAvailableActionsForEvent(event)
+  const availableActions = getAvailableActionsForEvent(event)
 
   const drafts = useDrafts()
 
@@ -316,7 +326,7 @@ export function useActionMenuItems(event: EventIndex) {
     const actionConfig = config[a]
 
     return 'shouldHide' in actionConfig
-      ? !actionConfig.shouldHide(allowedActions)
+      ? !actionConfig.shouldHide(allowedActions, event)
       : true
   })
 

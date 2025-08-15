@@ -12,6 +12,7 @@
 import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import {
   Draft,
   createEmptyDraft,
@@ -23,7 +24,15 @@ import {
   Action,
   deepMerge,
   getUUID,
-  mergeDrafts
+  mergeDrafts,
+  DeclarationActionType,
+  DeclarationActions,
+  EventDocument,
+  EventConfig,
+  getAvailableActionsForEvent,
+  getCurrentEventState,
+  ACTION_ALLOWED_SCOPES,
+  hasAnyOfScopes
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -35,6 +44,7 @@ import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { useEventConfiguration } from '../../useEventConfiguration'
+import { getScope } from '../../../../../profile/profileSelectors'
 
 type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
 
@@ -74,6 +84,49 @@ function getPreviousDeclarationActionType(
   return
 }
 
+function getDeclarationRoute(actionType: DeclarationActionType) {
+  switch (actionType) {
+    case DeclarationActions.enum.DECLARE:
+      return ROUTES.V2.EVENTS.DECLARE
+    case DeclarationActions.enum.VALIDATE:
+      return ROUTES.V2.EVENTS.VALIDATE
+    case DeclarationActions.enum.REGISTER:
+      return ROUTES.V2.EVENTS.REGISTER
+    default:
+      throw new Error(`Unknown action type: ${actionType}`)
+  }
+}
+
+function useActionGuard(
+  actionType: DeclarationUpdateActionType,
+  event: EventDocument,
+  configuration: EventConfig
+) {
+  const userScopes = useSelector(getScope) ?? []
+
+  const eventState = getCurrentEventState(event, configuration)
+
+  const availableActions = getAvailableActionsForEvent(eventState)
+
+  const isActionAllowed = availableActions.includes(actionType)
+  if (!isActionAllowed) {
+    // If the action is not available for the event, redirect to the overview page
+    throw new Error(
+      `Action ${actionType} not available for the event ${event.id} with status ${getCurrentEventState(event, configuration).status}`
+    )
+  }
+
+  const requiredScopes = ACTION_ALLOWED_SCOPES[actionType]
+
+  const canUserPerformAction = hasAnyOfScopes(userScopes, requiredScopes)
+
+  if (!canUserPerformAction) {
+    // If the user cannot perform the action, redirect to the unauthorized page
+    throw new Error(
+      `User does not have permission to perform action ${actionType} on event ${event.id}`
+    )
+  }
+}
 /**
  * Creates a wrapper component for the declaration action.
  * Manages the state of the declaration action and its local draft.
@@ -110,6 +163,8 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
+
+  useActionGuard(actionType, event, configuration)
 
   const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
 

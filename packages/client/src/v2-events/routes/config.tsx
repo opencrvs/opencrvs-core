@@ -45,6 +45,7 @@ import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
 import { useWorkqueues } from '../hooks/useWorkqueue'
+import { DeclarationActionGuard } from '../features/events/components/Action/DeclarationActionGuard'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
@@ -123,9 +124,11 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.DECLARE.path,
       element: (
-        <DeclarationAction actionType={ActionType.DECLARE}>
-          <Outlet />
-        </DeclarationAction>
+        <DeclarationActionGuard actionType={ActionType.DECLARE}>
+          <DeclarationAction actionType={ActionType.DECLARE}>
+            <Outlet />
+          </DeclarationAction>
+        </DeclarationActionGuard>
       ),
       children: [
         {
@@ -145,9 +148,11 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.VALIDATE.path,
       element: (
-        <DeclarationAction actionType={ActionType.VALIDATE}>
-          <Outlet />
-        </DeclarationAction>
+        <DeclarationActionGuard actionType={ActionType.VALIDATE}>
+          <DeclarationAction actionType={ActionType.VALIDATE}>
+            <Outlet />
+          </DeclarationAction>
+        </DeclarationActionGuard>
       ),
       children: [
         {
@@ -168,9 +173,11 @@ export const routesConfig = {
     {
       path: ROUTES.V2.EVENTS.REGISTER.path,
       element: (
-        <DeclarationAction actionType={ActionType.REGISTER}>
-          <Outlet />
-        </DeclarationAction>
+        <DeclarationActionGuard actionType={ActionType.REGISTER}>
+          <DeclarationAction actionType={ActionType.REGISTER}>
+            <Outlet />
+          </DeclarationAction>
+        </DeclarationActionGuard>
       ),
       children: [
         {

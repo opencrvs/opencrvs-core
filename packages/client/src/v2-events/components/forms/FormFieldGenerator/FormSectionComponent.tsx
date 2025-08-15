@@ -188,7 +188,7 @@ export function FormSectionComponent({
   )
 
   const onFieldValueChange = useCallback(
-    (formikFieldId: string, value: FieldValue | undefined) => {
+    async (formikFieldId: string, value: FieldValue | undefined) => {
       const updatedValues = cloneDeep(values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
@@ -223,9 +223,9 @@ export function FormSectionComponent({
       const updatedTouched = omit(touched, formikChildIds)
 
       // @TODO: Formik does not type errors well. Actual error message differs from the type.
+      await setValues(updatedValues)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       void setErrors(updatedErrors as any)
-      void setValues(updatedValues)
       void setTouched(updatedTouched)
       void setAllTouchedFields(updatedTouched)
     },

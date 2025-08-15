@@ -53,13 +53,20 @@ export const getAvailableActionsForEvent = (
   event: EventIndex
 ): ActionType[] => {
   if (event.flags.includes(InherentFlags.REJECTED)) {
-    return [
-      ActionType.READ,
-      event.status === EventStatus.Enum.VALIDATED
-        ? ActionType.VALIDATE
-        : ActionType.DECLARE,
-      ActionType.ARCHIVE
-    ]
+    switch (event.status) {
+      case EventStatus.Enum.ARCHIVED:
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+      case EventStatus.Enum.CREATED:
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
+      case EventStatus.Enum.NOTIFIED:
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.CREATED]
+      case EventStatus.Enum.DECLARED:
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.NOTIFIED]
+      case EventStatus.Enum.VALIDATED:
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.NOTIFIED]
+      case EventStatus.Enum.REGISTERED:
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.VALIDATED]
+    }
   }
 
   return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]

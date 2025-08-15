@@ -223,6 +223,8 @@ function ActionComponent({
     return null
   }
 
+  console.log(actionMenuItems, 'actionMenuItems')
+  console.log('actionType, ', actionType)
   return (
     <Button
       disabled={'disabled' in config && Boolean(config.disabled)}

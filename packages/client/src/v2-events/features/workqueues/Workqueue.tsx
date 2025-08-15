@@ -59,6 +59,8 @@ function ConfigurableWorkqueue({ workqueueSlug }: { workqueueSlug: string }) {
   }
 
   const actions = workqueueConfig.actions.map(({ type }) => type)
+
+  console.log('actions', actions)
   return (
     <SearchResultComponent
       key={`${workqueueSlug}-${outbox.length}`}
