@@ -39,7 +39,11 @@ export function Draft() {
 
   const { getAllRemoteDrafts } = useDrafts()
 
-  const drafts = getAllRemoteDrafts({ refetchOnMount: 'always', staleTime: 0 })
+  const drafts = getAllRemoteDrafts({
+    refetchOnMount: 'always',
+    staleTime: 0,
+    refetchInterval: 20000
+  })
 
   const eventsWithDrafts = drafts
     .map(({ eventId }) => findLocalEventDocument(eventId))
