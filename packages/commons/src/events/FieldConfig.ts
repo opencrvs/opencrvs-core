@@ -506,7 +506,16 @@ const ConfigurableAddress = BaseField.extend({
     .object({
       searchMode: z.boolean().optional(),
       administrativeLevels: z.array(z.string()).optional(),
-      streetAddressForm: z.array(z.string(), z.string()).optional()
+      streetAddressForm: z
+        .array(
+          z.object({
+            id: z.string(),
+            required: z.boolean(),
+            label: TranslationConfig,
+            type: z.literal(FieldType.TEXT)
+          })
+        )
+        .optional()
     })
     .optional()
 }).describe(

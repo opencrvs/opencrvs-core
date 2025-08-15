@@ -27,7 +27,9 @@ import {
   alwaysTrue,
   AddressType,
   isFieldDisplayedOnReview,
-  ConfigurableAddressField
+  ConfigurableAddressField,
+  TranslationConfig,
+  never
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -37,7 +39,7 @@ import {
 } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
 // ADDRESS field may not contain another ADDRESS field
-type FieldConfigWithoutAddress = Exclude<
+export type FieldConfigWithoutAddress = Exclude<
   FieldConfig,
   { type: typeof FieldType.CONFIGURABLE_ADDRESS }
 >
@@ -181,7 +183,7 @@ const RURAL_FIELDS = [
     type: FieldType.TEXT
   }
 ] as const satisfies FieldConfigWithoutAddress[]
-let NEW_ADMIN_STRUCTURE = []
+
 function populateAdminStructure(
   locationLevel1: {
     id: string
@@ -189,7 +191,7 @@ function populateAdminStructure(
   },
   locationLevel2: {
     id: string
-    label: { id: string; defaultMessage: string; description: string }
+    label: TranslationConfig
   }
 ) {
   return [
@@ -213,6 +215,7 @@ function populateAdminStructure(
         }
       ],
       required: true,
+      parent: createFieldCondition('country'),
       label: locationLevel1.label,
       type: FieldType.ADMINISTRATIVE_AREA,
       configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
@@ -230,12 +233,59 @@ function populateAdminStructure(
         }
       ],
       required: true,
+      parent: createFieldCondition('country'),
       label: locationLevel2.label,
       configuration: {
         type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
         partOf: {
           $declaration: locationLevel1.id
         }
+      }
+    },
+    {
+      id: 'urbanOrRural',
+      conditionals: [
+        {
+          type: ConditionalType.DISPLAY_ON_REVIEW,
+          conditional: never()
+        },
+        {
+          type: ConditionalType.SHOW,
+          conditional: and(
+            isDomesticAddress(),
+            not(createFieldCondition('zone').isUndefined())
+          )
+        }
+      ],
+      required: false,
+      label: {
+        id: 'v2.field.address.urbanOrRural.label',
+        defaultMessage: 'Urban or Rural',
+        description: 'This is the label for the field'
+      },
+      hideLabel: true,
+      type: FieldType.RADIO_GROUP,
+      options: [
+        {
+          value: GeographicalArea.URBAN,
+          label: {
+            id: 'v2.field.address.label.urban',
+            defaultMessage: 'Urban',
+            description: 'Label for form field checkbox option Urban'
+          }
+        },
+        {
+          value: GeographicalArea.RURAL,
+          label: {
+            id: 'v2.field.address.label.rural',
+            defaultMessage: 'Rural',
+            description: 'Label for form field checkbox option Rural'
+          }
+        }
+      ],
+      defaultValue: GeographicalArea.URBAN,
+      configuration: {
+        styles: { size: 'NORMAL' }
       }
     }
   ]
@@ -484,30 +534,38 @@ function AddressInput(props: Props) {
   } = props
   const { config } = useSelector(getOfflineData)
   const MY_ADMIN_STRUCTURE = config.ADMIN_STRUCTURE
-  // maps through MY_ADMIN_STRUCTURE and other properties to each array
-  // properties to add required, type, configuration, conditionals
-  NEW_ADMIN_STRUCTURE = populateAdminStructure(
+
+  const NEW_ADMIN_STRUCTURE = populateAdminStructure(
     MY_ADMIN_STRUCTURE[0],
     MY_ADMIN_STRUCTURE[1]
-  )
+  ) as FieldConfigWithoutAddress[]
+
   const searchMode = configuration?.searchMode || false
-  const addressConfig = configuration?.administrativeLevels
-  const streetAddress = configuration?.streetAddressForm
+  const administrativeLevelsCutoff = configuration?.administrativeLevels
+  // If administrativeLevelsCutoff is provided, only show admin levels till/before provided administrativeLevelsCutoff
+  console.log('administrativeLevelsCutoff', administrativeLevelsCutoff)
+
+  const additionalAddressFields =
+    configuration?.streetAddressForm as FieldConfigWithoutAddress[]
+  // If custom address fields are provided, then only render those; otherwise render default form
+  console.log('additionalAddressFields', additionalAddressFields)
+
   const fields = getFilteredFields(searchMode, NEW_ADMIN_STRUCTURE)
+
   const fieldsWithDefaults = defaultValue
     ? fields.map(addDefaultValue(defaultValue))
     : fields
-  console.log('fieldsWithDefaults', fieldsWithDefaults)
-  console.log('defaultValue', defaultValue)
+
   console.log('value', value)
+
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fieldsWithDefaults}
+      fields={[...fieldsWithDefaults /* , ...additionalAddressFields */]}
       initialValues={{ ...defaultValue, ...value }}
       onChange={(values) => {
         console.log('onChange values', values)
-        return onChange(values as ConfigurableAddressFieldValue)
+        return onChange(values.zone as ConfigurableAddressFieldValue)
       }}
     />
   )
@@ -523,8 +581,17 @@ function AddressOutput({
     return ''
   }
   console.log('AddressOutput value', value)
-  console.log('AddressOutput searchMode', searchMode)
-  const fields = getFilteredFields(searchMode, ALL_ADDRESS_INPUT_FIELDS)
+  const { config } = useSelector(getOfflineData)
+  const MY_ADMIN_STRUCTURE = config.ADMIN_STRUCTURE
+
+  const NEW_ADMIN_STRUCTURE = populateAdminStructure(
+    MY_ADMIN_STRUCTURE[0],
+    MY_ADMIN_STRUCTURE[1]
+  ) as FieldConfigWithoutAddress[]
+
+  console.log('NEW_ADMIN_STRUCTURE in AddressOutput', NEW_ADMIN_STRUCTURE)
+
+  const fields = getFilteredFields(searchMode, NEW_ADMIN_STRUCTURE)
     .map((field) => ({
       field,
       value: value[field.id as keyof typeof value]

@@ -107,7 +107,12 @@ export const AddressFieldValue = z
 
 export const ConfigurableAddressFieldValue = z.object({
   country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL])
+  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
+  region: z.string().optional(),
+  zone: z.string().optional()
+  /*
+  adminLevel1: z.string(),
+  adminLevel2: z.string().optional() */
   /* administrativeArea: z.string().uuid(),
   streetLevelDetails: z.record(z.string(), z.string()) */
 })
@@ -137,7 +142,9 @@ export const AddressFieldUpdateValue = z
 
 export const ConfigurableAddressFieldUpdateValue = z.object({
   country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL])
+  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
+  region: z.string().nullish(),
+  zone: z.string().nullish()
   /* administrativeArea: z.string().uuid().nullish(),
   streetLevelDetails: z.record(z.string(), z.string()).nullish() */
 })
