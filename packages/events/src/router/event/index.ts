@@ -56,7 +56,10 @@ import {
 } from '@events/service/events/events'
 import * as draftsRepo from '@events/storage/postgres/events/drafts'
 import { importEvent } from '@events/service/events/import'
-import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
+import {
+  findRecordsByQuery,
+  getIndexedEvents
+} from '@events/service/indexing/indexing'
 import { UserContext } from '../../context'
 import { getDefaultActionProcedures } from './actions'
 
@@ -339,7 +342,7 @@ export const eventRouter = router({
         throw new Error('No search scope provided')
       }
       const searchScopeOptions = searchScope.options
-      return getIndex(
+      return findRecordsByQuery(
         input,
         eventConfigs,
         searchScopeOptions,

@@ -92,7 +92,11 @@ ajv.addKeyword({
 })
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
-  return ajv.validate(schema, data)
+  const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
+
+  const result = validator(data) as boolean
+
+  return result
 }
 
 export function isConditionMet(
@@ -441,6 +445,7 @@ export function getValidatorsForField(
         message,
         validator: {
           ...jsonSchema,
+          $id: jsonSchema.$id + '.' + fieldId,
           properties: {
             $form: {
               type: 'object',

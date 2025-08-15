@@ -136,27 +136,6 @@ export function declarationReference(fieldName: string) {
   return `declaration.${fieldName}`
 }
 
-// Build map of fieldId -> alternateFieldIds[]
-export function getAlternateFieldMap(
-  eventConfigs: EventConfig[]
-): Record<string, string[]> {
-  const alternateFieldMap: Record<string, string[]> = {}
-  eventConfigs.forEach((eventConfig) => {
-    eventConfig.advancedSearch.forEach((section) => {
-      section.fields.forEach((field) => {
-        if (
-          'alternateFieldIds' in field &&
-          Array.isArray(field.alternateFieldIds) &&
-          field.alternateFieldIds.length > 0
-        ) {
-          alternateFieldMap[field.fieldId] = field.alternateFieldIds
-        }
-      })
-    })
-  })
-  return alternateFieldMap
-}
-
 export function generateQueryForAddressField(
   fieldId: string,
   value: AddressFieldValue
