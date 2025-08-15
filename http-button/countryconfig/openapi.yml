@@ -89,6 +89,12 @@ components:
             $$field:
               type: string
               description: Unique identifier for the field
+            $$subfield:
+              type: array
+              items:
+                type: string
+              description: 'If the FieldValue is an object, subfield can be used to refer to
+                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
           required:
             - $$field
           description: Reference to a field by its ID
@@ -696,6 +702,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -737,6 +749,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: ADDRESS
@@ -844,6 +872,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -883,6 +917,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: TEXT
@@ -924,6 +974,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -963,6 +1019,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: NUMBER
@@ -999,6 +1071,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1038,6 +1116,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: TEXTAREA
@@ -1080,6 +1174,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1119,6 +1219,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DATE
@@ -1150,6 +1266,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1189,6 +1311,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: TIME
@@ -1219,6 +1357,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1258,6 +1402,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DATE_RANGE
@@ -1305,6 +1465,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1344,6 +1510,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: SELECT_DATE_RANGE
@@ -1390,6 +1572,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1429,6 +1617,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: PARAGRAPH
@@ -1477,6 +1681,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1516,6 +1726,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: RADIO_GROUP
@@ -1566,6 +1792,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1605,6 +1837,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: BULLET_LIST
@@ -1645,6 +1893,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1684,6 +1938,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: PAGE_HEADER
@@ -1708,6 +1978,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1747,6 +2023,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: SELECT
@@ -1786,6 +2078,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1825,6 +2123,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: NAME
@@ -1905,6 +2219,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -1944,6 +2264,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             defaultValue:
               type: string
               minLength: 1
@@ -1968,6 +2304,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2007,6 +2349,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             defaultValue:
               type: string
               minLength: 1
@@ -2031,6 +2389,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2070,6 +2434,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: CHECKBOX
@@ -2093,6 +2473,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2132,6 +2518,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: FILE
@@ -2203,6 +2605,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2242,6 +2650,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: COUNTRY
@@ -2266,6 +2690,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2305,6 +2735,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: ADMINISTRATIVE_AREA
@@ -2350,6 +2796,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2389,6 +2841,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DIVIDER
@@ -2409,6 +2877,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2448,6 +2922,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: LOCATION
@@ -2483,6 +2973,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2522,6 +3018,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: FACILITY
@@ -2546,6 +3058,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2585,6 +3103,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: OFFICE
@@ -2609,6 +3143,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2648,6 +3188,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: SIGNATURE
@@ -2693,6 +3249,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2732,6 +3294,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: EMAIL
@@ -2763,6 +3341,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2802,6 +3386,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: FILE_WITH_OPTIONS
@@ -2876,6 +3476,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2915,6 +3521,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: DATA
@@ -2965,6 +3587,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3004,9 +3632,27 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: BUTTON
+            defaultValue:
+              type: number
             configuration:
               type: object
               properties:
@@ -3040,6 +3686,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3079,6 +3731,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               const: HTTP
@@ -3117,6 +3785,12 @@ components:
                     $$field:
                       type: string
                       description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
                   required:
                     - $$field
                   description: Reference to a field by its ID
@@ -12930,7 +13604,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: d56e6909-f89d-4d4e-9e3c-ca22b7deff1c
+        transactionId: 24c91583-6e74-451a-9ef8-c8a633ce7e9a
         declaration: {}
         annotation: {}
         type: NOTIFY
