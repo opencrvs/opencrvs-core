@@ -94,7 +94,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
         clauses: [
           similarNamedChild,
           childDobWithin5Days,
-          similarAgedMother,
+          similarNamedMother,
           similarAgedMother,
           sameMotherNid
         ]
