@@ -2,10 +2,26 @@
 
 exports[`deduplication query input conversion > should convert childDobWithin5Days to dateDistance query 1`] = `
 {
-  "distance_feature": {
-    "field": "declaration.child____dob",
-    "origin": 2011-11-11T00:00:00.000Z,
-    "pivot": "5d",
+  "bool": {
+    "must": [
+      {
+        "range": {
+          "declaration.child____dob": {
+            "gte": "2011-11-06T00:00:00.000Z",
+            "lte": "2011-11-16T00:00:00.000Z",
+          },
+        },
+      },
+    ],
+    "should": [
+      {
+        "distance_feature": {
+          "field": "declaration.child____dob",
+          "origin": 2011-11-11T00:00:00.000Z,
+          "pivot": "3d",
+        },
+      },
+    ],
   },
 }
 `;
@@ -40,10 +56,26 @@ exports[`deduplication query input conversion > should convert similar child nam
 
 exports[`deduplication query input conversion > should convert similarAgedMother to dateDistance query 1`] = `
 {
-  "distance_feature": {
-    "field": "declaration.mother____dob",
-    "origin": 1999-11-11T00:00:00.000Z,
-    "pivot": "365d",
+  "bool": {
+    "must": [
+      {
+        "range": {
+          "declaration.mother____dob": {
+            "gte": "1998-11-11T00:00:00.000Z",
+            "lte": "2000-11-10T00:00:00.000Z",
+          },
+        },
+      },
+    ],
+    "should": [
+      {
+        "distance_feature": {
+          "field": "declaration.mother____dob",
+          "origin": 1999-11-11T00:00:00.000Z,
+          "pivot": "243d",
+        },
+      },
+    ],
   },
 }
 `;

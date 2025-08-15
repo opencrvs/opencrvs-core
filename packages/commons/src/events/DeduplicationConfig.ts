@@ -67,9 +67,14 @@ const StrictMatcher = Matcher.extend({
     })
 })
 
-const DateDistanceMatcher = Matcher.extend({
+const DateRangeMatcher = Matcher.extend({
   type: z.literal('dateDistance'),
   options: z.object({
+    /**
+     * The distance pivot in days. Distance from the origin (the value of
+     * fieldId) at which relevance scores receive half of the boost value
+     */
+    pivot: z.number().optional(),
     days: z.number(),
     boost: z.number().optional().default(1)
   })
@@ -112,14 +117,14 @@ export type ClauseInput =
   | OrInput
   | z.input<typeof FuzzyMatcher>
   | z.input<typeof StrictMatcher>
-  | z.input<typeof DateDistanceMatcher>
+  | z.input<typeof DateRangeMatcher>
 
 export type ClauseOutput =
   | AndOutput
   | OrOutput
   | z.output<typeof FuzzyMatcher>
   | z.output<typeof StrictMatcher>
-  | z.output<typeof DateDistanceMatcher>
+  | z.output<typeof DateRangeMatcher>
 
 /**
  * Defines a deduplication clause. Clauses are either matcher clauses or logical clauses. Logical clauses (and, or) are used to combine multiple clauses.
@@ -136,7 +141,7 @@ export const Clause: z.ZodType<ClauseOutput, z.ZodTypeDef, ClauseInput> = z
       Or,
       FuzzyMatcher,
       StrictMatcher,
-      DateDistanceMatcher
+      DateRangeMatcher
     ])
   )
   .openapi({

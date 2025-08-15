@@ -10,6 +10,7 @@
  */
 import * as elasticsearch from '@elastic/elasticsearch'
 import { get } from 'lodash'
+import { DateTime } from 'luxon'
 import {
   EventIndex,
   DeduplicationConfig,
@@ -120,10 +121,30 @@ export function generateElasticsearchQuery(
         return null
       }
       return {
-        distance_feature: {
-          field: queryKey,
-          pivot: `${queryInput.options.days}d`,
-          origin: new Date(dateValue.data)
+        bool: {
+          must: [
+            {
+              range: {
+                [queryKey]: {
+                  gte: DateTime.fromJSDate(new Date(dateValue.data))
+                    .minus({ days: queryInput.options.days })
+                    .toISO(),
+                  lte: DateTime.fromJSDate(new Date(dateValue.data))
+                    .plus({ days: queryInput.options.days })
+                    .toISO()
+                }
+              }
+            }
+          ],
+          should: [
+            {
+              distance_feature: {
+                field: queryKey,
+                pivot: `${queryInput.options.pivot ?? Math.floor((queryInput.options.days * 2) / 3)}d`,
+                origin: new Date(dateValue.data)
+              }
+            }
+          ]
         }
       }
     }

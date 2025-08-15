@@ -131,14 +131,20 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
     Object.entries(eventComparison).map(([key, values]) => [key, values[1]])
   )
 
+  const id = getUUID()
+
   await esClient.update({
     index: getEventIndexName(),
-    id: getUUID(),
+    id,
     body: {
       doc: encodeEventIndex(
-        eventQueryDataGenerator({
-          declaration: existingEvent
-        }),
+        eventQueryDataGenerator(
+          {
+            id,
+            declaration: existingEvent
+          },
+          73
+        ),
         v2BirthEvent
       ),
       doc_as_upsert: true
@@ -147,7 +153,7 @@ async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
   })
 
   const results = await searchForDuplicates(
-    eventQueryDataGenerator({ declaration: newEvent }),
+    eventQueryDataGenerator({ declaration: newEvent }, 37),
     DeduplicationConfig.parse(LEGACY_BIRTH_DEDUPLICATION_RULES),
     v2BirthEvent
   )
@@ -384,7 +390,7 @@ describe('deduplication tests', () => {
     ).resolves.toHaveLength(0)
   })
 
-  it('finds a duplicate even if the firstName of child is not given', async () => {
+  it('finds a duplicate even if the firstname of child is not given', async () => {
     await expect(
       findDuplicates({
         'child.name': [
@@ -410,7 +416,10 @@ describe('deduplication tests', () => {
             { firstname: 'Janet', surname: 'Smith' }
           ],
           'child.dob': ['2011-11-11', '2011-12-01'],
-          'mother.name': ['Mother', 'Mother'],
+          'mother.name': [
+            { firstname: 'Mother', surname: 'Smith' },
+            { firstname: 'Mother', surname: 'Smith' }
+          ],
           'mother.dob': ['2000-11-12', '2000-11-12'],
           'mother.nid': ['23412387', '23412387']
         })
@@ -440,7 +449,10 @@ describe('deduplication tests', () => {
     await expect(
       findDuplicates({
         'child.dob': ['2011-11-11', '2014-11-01'],
-        'child.name': ['John', 'John'],
+        'child.name': [
+          { firstname: 'John', surname: 'Smith' },
+          { firstname: 'John', surname: 'Smith' }
+        ],
         'mother.name': [
           { firstname: 'Mother', surname: 'Smith' },
           { firstname: 'Mother', surname: 'Smith' }
