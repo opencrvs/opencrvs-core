@@ -22,7 +22,8 @@ import {
   DateRangeFieldValue,
   SignatureFieldValue,
   SelectDateRangeValue,
-  TimeValue
+  TimeValue,
+  ButtonFieldValue
 } from './FieldValue'
 import {
   AddressFieldValue,
@@ -37,9 +38,17 @@ const FieldId = z.string().describe('Unique identifier for the field')
 
 export const FieldReference = z
   .object({
-    $$field: FieldId
+    $$field: FieldId,
+    $$subfield: z
+      .string()
+      .optional()
+      .describe(
+        'If the FieldValue is an object, subfield can be used to refer to e.g. `foo.bar` in `{ foo: { bar: 3 } }`'
+      )
   })
   .describe('Reference to a field by its ID')
+
+export type FieldReference = z.infer<typeof FieldReference>
 
 export const ValidationConfig = z.object({
   validator: Conditional,
@@ -67,7 +76,10 @@ const BaseField = z.object({
     .optional()
     .describe(
       'Indicates if the field can be changed during a record correction.'
-    )
+    ),
+  value: FieldReference.optional().describe(
+    'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
+  )
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -108,7 +120,7 @@ const NumberField = BaseField.extend({
 
 const TextAreaField = BaseField.extend({
   type: z.literal(FieldType.TEXTAREA),
-  defaultValue: NonEmptyTextValue.optional(),
+  defaultValue: NonEmptyTextValue.or(FieldReference).optional(),
   configuration: z
     .object({
       maxLength: z.number().optional().describe('Maximum length of the text'),
@@ -522,6 +534,7 @@ export type DataField = z.infer<typeof DataField>
 
 const ButtonField = BaseField.extend({
   type: z.literal(FieldType.BUTTON),
+  defaultValue: ButtonFieldValue.optional(),
   configuration: z.object({
     icon: z
       .string()

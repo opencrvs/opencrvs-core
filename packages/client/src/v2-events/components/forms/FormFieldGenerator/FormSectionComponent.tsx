@@ -11,7 +11,7 @@
 
 import React, { useCallback, useEffect, useMemo, useRef } from 'react'
 import { Field, FieldProps, FormikProps, FormikTouched } from 'formik'
-import { cloneDeep, isEqual, set, groupBy, omit } from 'lodash'
+import { cloneDeep, isEqual, set, groupBy, omit, get } from 'lodash'
 import { useIntl } from 'react-intl'
 import styled, { keyframes } from 'styled-components'
 import {
@@ -193,7 +193,11 @@ export function FormSectionComponent({
   )
 
   const onFieldValueChange = useCallback(
-    (formikFieldId: string, value: FieldValue | undefined) => {
+    (
+      formikFieldId: string,
+      value: FieldValue | undefined,
+      config: FieldConfig
+    ) => {
       const updatedValues = cloneDeep(values)
       const updatedErrors = cloneDeep(errorsWithDotSeparator)
 
@@ -206,8 +210,23 @@ export function FormSectionComponent({
 
       // reset the children values of the changed field. (e.g. When changing informant.relation, empty out phone number, email and others.)
       for (const childId of childIds) {
-        console.log('reset child field', childId)
-        set(updatedValues, makeFormFieldIdFormikCompatible(childId), undefined)
+        let referencedValue = config.value?.$$field
+          ? updatedValues[config.value.$$field]
+          : undefined
+
+        if (referencedValue && config.value?.$$subfield) {
+          referencedValue = get(
+            updatedValues[config.value.$$field],
+            config.value?.$$subfield
+          )
+        }
+
+        set(
+          updatedValues,
+          makeFormFieldIdFormikCompatible(childId),
+          // set the field value to `undefined`, unless the FieldConfig['value'] is a FieldReference
+          referencedValue
+        )
         set(updatedErrors, childId, { errors: [] })
       }
 
@@ -354,7 +373,9 @@ export function FormSectionComponent({
                   }
                   value={formikField.value}
                   onBlur={formikField.onBlur}
-                  onFieldValueChange={onFieldValueChange}
+                  onFieldValueChange={(name, value) =>
+                    onFieldValueChange(name, value, field)
+                  }
                 />
               )}
             </Field>

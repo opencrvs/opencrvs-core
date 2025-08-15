@@ -41,7 +41,8 @@ import {
   SelectDateRangeField,
   TimeField,
   HttpField,
-  ButtonField
+  ButtonField,
+  FieldReference
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
@@ -228,6 +229,10 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
     case FieldType.FILE_WITH_OPTIONS:
       return [] satisfies FileFieldWithOptionValue
   }
+}
+
+export function isFieldReference(value: unknown): value is FieldReference {
+  return typeof value === 'object' && value !== null && '$$field' in value
 }
 
 export const isParagraphFieldType = (field: {
