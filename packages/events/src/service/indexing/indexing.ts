@@ -10,6 +10,7 @@
  */
 
 import { type estypes } from '@elastic/elasticsearch'
+import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -357,7 +358,7 @@ export async function getIndexedEvents(
     })
 }
 
-export async function getIndex(
+export async function findRecordsByQuery(
   eventParams: QueryType,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
@@ -395,26 +396,51 @@ export async function getIndex(
   return events
 }
 
+/*
+ * The types provided by the Elasticsearch client library.
+ * Left the code having to check for almost all fields.
+ */
+const MsearchResponseSchema = z.object({
+  status: z.number(),
+  hits: z.object({
+    total: z.object({
+      value: z.number()
+    })
+  })
+})
+
 export async function getEventCount(
   queries: WorkqueueCountInput,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
-  return (
-    //  @TODO: write a query that does everything in one go.
-    (
-      await Promise.all(
-        queries.map(async ({ slug, query }) => {
-          const count = (
-            await getIndex(query, eventConfigs, options, userOfficeId)
-          ).length
-          return { slug, count }
-        })
-      )
-    ).reduce((acc: Record<string, number>, { slug, count }) => {
-      acc[slug] = count
-      return acc
-    }, {})
+  const esClient = getOrCreateClient()
+
+  const esQueries = queries.map(async (query) =>
+    buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
+
+  const filteredQueries = (await Promise.all(esQueries)).map((query) =>
+    withJurisdictionFilters(query, options, userOfficeId)
+  )
+  const { responses } = await esClient.msearch({
+    searches: filteredQueries.flatMap((query) => [
+      { index: getEventAliasName() },
+      { size: 0, track_total_hits: true, query }
+    ])
+  })
+
+  return responses.reduce((acc: Record<string, number>, response, index) => {
+    const slug = queries[index].slug
+
+    const validatedResponse = MsearchResponseSchema.safeParse(response)
+
+    return {
+      ...acc,
+      [slug]: validatedResponse.success
+        ? validatedResponse.data.hits.total.value
+        : 0
+    }
+  }, {})
 }
