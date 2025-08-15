@@ -35,7 +35,8 @@ mkdir -p ./dist/commons/api
 cp -r ../events/build/types/router/router.d.ts ./dist/commons/api
 
 # Build deduplication api
-npx esbuild src/api/index.ts --bundle --format=cjs --outdir=./dist/api --allow-overwrite --packages=external
+npx esbuild src/events/deduplication.ts --bundle --format=cjs --outdir=./dist/events --allow-overwrite --packages=external
+cp -r ../commons/build/dist/common/events/deduplication.d.ts ./dist/events/deduplication.d.ts
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
   sed -i '' 's|@opencrvs/events/build/types|../commons/api|g' dist/api/index.d.ts

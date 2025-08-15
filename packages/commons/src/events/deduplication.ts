@@ -14,7 +14,7 @@ import {
   DateRangeMatcherOptions,
   FuzzyMatcherOptions,
   StrictMatcherOptions
-} from '@opencrvs/commons/events'
+} from '.'
 
 export function and(...clauses: ClauseInput[]): ClauseInput {
   return {

@@ -15,10 +15,10 @@ import {
   DeduplicationConfigInput,
   FieldValue,
   eventQueryDataGenerator,
-  ClauseInput,
   Clause
 } from '@opencrvs/commons'
 import { v2BirthEvent } from '@opencrvs/commons/fixtures'
+import { field, and, or } from '@opencrvs/commons/events/deduplication'
 import { getOrCreateClient } from '@events/storage/elasticsearch'
 import { getEventIndexName } from '@events/storage/__mocks__/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
@@ -27,57 +27,18 @@ import {
   searchForDuplicates
 } from './deduplication'
 
-const similarNamedChild: ClauseInput = {
-  type: 'fuzzy',
-  fieldId: 'child.name'
-}
-
-const childDobWithin5Days: ClauseInput = {
-  type: 'dateDistance',
-  fieldId: 'child.dob',
-  options: {
-    days: 5
-  }
-}
-
-const similarNamedMother: ClauseInput = {
-  type: 'fuzzy',
-  fieldId: 'mother.name'
-}
-
-const similarAgedMother: ClauseInput = {
-  type: 'dateDistance',
-  fieldId: 'mother.dob',
-  options: {
-    days: 365
-  }
-}
-
-const sameMotherNid: ClauseInput = {
-  type: 'strict',
-  fieldId: 'mother.nid'
-}
-
-const childDobWithin9Months: ClauseInput = {
-  type: 'dateDistance',
-  fieldId: 'child.dob',
-  options: {
-    days: 273
-  }
-}
-
-const childDobWithin3Years: ClauseInput = {
-  type: 'dateDistance',
-  fieldId: 'child.dob',
-  options: {
-    days: 1095
-  }
-}
-
-const exactNamedChild: ClauseInput = {
-  type: 'strict',
-  fieldId: 'child.name'
-}
+const similarNamedChild = field('child.name').fuzzyMatches()
+const childDobWithin5Days = field('child.dob').dateDistanceMatches({ days: 5 })
+const similarNamedMother = field('mother.name').fuzzyMatches()
+const similarAgedMother = field('mother.dob').dateDistanceMatches({ days: 365 })
+const sameMotherNid = field('mother.nid').strictMatches()
+const childDobWithin9Months = field('child.dob').dateDistanceMatches({
+  days: 270
+})
+const childDobWithin3Years = field('child.dob').dateDistanceMatches({
+  days: 1095
+})
+const exactNamedChild = field('child.name').strictMatches()
 
 const LEGACY_BIRTH_DEDUPLICATION_RULES = {
   id: 'Legacy birth deduplication check',
@@ -86,40 +47,28 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
     defaultMessage: 'Legacy birth deduplication check',
     description: 'Legacy birth deduplication check'
   },
-  query: {
-    type: 'or',
-    clauses: [
-      {
-        type: 'and',
-        clauses: [
-          similarNamedChild,
-          childDobWithin5Days,
-          similarNamedMother,
-          similarAgedMother,
-          sameMotherNid
-        ]
-      },
-      {
-        type: 'and',
-        clauses: [
-          similarNamedMother,
-          similarAgedMother,
-          sameMotherNid,
-          childDobWithin9Months
-        ]
-      },
-      {
-        type: 'and',
-        clauses: [
-          exactNamedChild,
-          childDobWithin3Years,
-          similarNamedMother,
-          similarAgedMother,
-          sameMotherNid
-        ]
-      }
-    ]
-  }
+  query: or(
+    and(
+      similarNamedChild,
+      childDobWithin5Days,
+      similarNamedMother,
+      similarAgedMother,
+      sameMotherNid
+    ),
+    and(
+      similarNamedMother,
+      similarAgedMother,
+      sameMotherNid,
+      childDobWithin9Months
+    ),
+    and(
+      exactNamedChild,
+      childDobWithin3Years,
+      similarNamedMother,
+      similarAgedMother,
+      sameMotherNid
+    )
+  )
 } satisfies DeduplicationConfigInput
 
 async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
