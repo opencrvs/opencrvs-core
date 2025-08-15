@@ -17,9 +17,9 @@ const FieldReference = z.string()
 
 const Matcher = z.object({
   /**
-   * The reference to the field to match against.
+   * Reference to the field used in matching.
    *
-   * For `dateRange` type matcher the value of this field will
+   * For `dateRange` type matcher the value of this field will also
    * be used as the origin date to calculate the distance from.
    */
   fieldId: FieldReference,
