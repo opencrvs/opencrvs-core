@@ -271,6 +271,12 @@ describe('deduplication query input conversion', () => {
   })
 })
 
+/*
+ * @todo
+ * The current implementation will flag quite a few false positives
+ * for incomplete data. A minimum thresold for relevance score needs
+ * to be implemented to avoid this.
+ */
 describe('deduplication tests', () => {
   it('does not find duplicates with completely different details', async () => {
     await expect(
