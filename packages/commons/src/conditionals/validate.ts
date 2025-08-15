@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import Ajv from 'ajv'
+import Ajv, { KeywordDefinition } from 'ajv'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 
@@ -22,13 +22,10 @@ import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 
-const ajv = new Ajv({
+const AJV_OPTIONS = {
   $data: true,
   allowUnionTypes: true
-})
-
-// https://ajv.js.org/packages/ajv-formats.html
-addFormats(ajv)
+}
 
 /*
  * Custom keyword validator for date strings so the dates could be validated dynamically
@@ -48,7 +45,8 @@ addFormats(ajv)
  *    }
  * }
  */
-ajv.addKeyword({
+
+const daysFromNow: KeywordDefinition = {
   keyword: 'daysFromNow',
   type: 'string',
   schemaType: 'object',
@@ -89,9 +87,24 @@ ajv.addKeyword({
       ? isAfter(date, offsetDate)
       : isBefore(date, offsetDate)
   }
-})
+}
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
+  /*
+   * Ajv quite aggressively caches the compiled schemas. In our use case,
+   * often the schemas being used change on runtime which, in the long term,
+   * can lead to memory leaks.
+   * To avoid this, we create a new Ajv instance for each validation.
+   * This is not the most performant solution, but it is the most memory efficient.
+   * https://www.poberezkin.com/posts/2021-02-11-ajv-version-7-big-changes-and-improvements.html#caching-compiled-schemas
+   */
+  const ajv = new Ajv(AJV_OPTIONS)
+
+  // https://ajv.js.org/packages/ajv-formats.html
+  addFormats(ajv)
+
+  ajv.addKeyword(daysFromNow)
+
   return ajv.validate(schema, data)
 }
 
