@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import Ajv, { KeywordDefinition } from 'ajv'
+import Ajv from 'ajv'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 
@@ -22,10 +22,13 @@ import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 
-const AJV_OPTIONS = {
+const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true
-}
+})
+
+// https://ajv.js.org/packages/ajv-formats.html
+addFormats(ajv)
 
 /*
  * Custom keyword validator for date strings so the dates could be validated dynamically
@@ -45,8 +48,7 @@ const AJV_OPTIONS = {
  *    }
  * }
  */
-
-const daysFromNow: KeywordDefinition = {
+ajv.addKeyword({
   keyword: 'daysFromNow',
   type: 'string',
   schemaType: 'object',
@@ -87,25 +89,14 @@ const daysFromNow: KeywordDefinition = {
       ? isAfter(date, offsetDate)
       : isBefore(date, offsetDate)
   }
-}
+})
 
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
-  /*
-   * Ajv quite aggressively caches the compiled schemas. In our use case,
-   * often the schemas being used change on runtime which, in the long term,
-   * can lead to memory leaks.
-   * To avoid this, we create a new Ajv instance for each validation.
-   * This is not the most performant solution, but it is the most memory efficient.
-   * https://www.poberezkin.com/posts/2021-02-11-ajv-version-7-big-changes-and-improvements.html#caching-compiled-schemas
-   */
-  const ajv = new Ajv(AJV_OPTIONS)
+  const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
 
-  // https://ajv.js.org/packages/ajv-formats.html
-  addFormats(ajv)
+  const result = validator(data) as boolean
 
-  ajv.addKeyword(daysFromNow)
-
-  return ajv.validate(schema, data)
+  return result
 }
 
 export function isConditionMet(
@@ -454,6 +445,7 @@ export function getValidatorsForField(
         message,
         validator: {
           ...jsonSchema,
+          $id: jsonSchema.$id + '.' + fieldId,
           properties: {
             $form: {
               type: 'object',
