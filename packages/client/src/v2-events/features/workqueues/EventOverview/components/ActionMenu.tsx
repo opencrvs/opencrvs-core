@@ -17,7 +17,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
-import { useActionMenuItems } from './useActionMenuItems'
+import { useActionMenuItemConfigs } from './useActionMenuItems'
 
 export function ActionMenu({
   eventId,
@@ -40,7 +40,7 @@ export function ActionMenu({
 
   const eventState = eventIndex
 
-  const actionMenuItems = useActionMenuItems(eventState)
+  const actionMenuItems = useActionMenuItemConfigs(eventState)
 
   return (
     <>

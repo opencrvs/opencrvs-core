@@ -52,6 +52,10 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
 export const getAvailableActionsForEvent = (
   event: EventIndex
 ): ActionType[] => {
+  /** Pick previous action if the event is rejected.
+   * 1. This is to ensure that the user can still perform actions on the event after rejection.
+   * 2. In 1.9 we allow rejecting event in rejected state. No filtering of previous actions needed.
+   */
   if (event.flags.includes(InherentFlags.REJECTED)) {
     switch (event.status) {
       case EventStatus.Enum.ARCHIVED:

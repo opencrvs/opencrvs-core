@@ -25,8 +25,6 @@ import {
   deepMerge,
   getUUID,
   mergeDrafts,
-  DeclarationActionType,
-  DeclarationActions,
   EventDocument,
   EventConfig,
   getAvailableActionsForEvent,
@@ -84,19 +82,14 @@ function getPreviousDeclarationActionType(
   return
 }
 
-function getDeclarationRoute(actionType: DeclarationActionType) {
-  switch (actionType) {
-    case DeclarationActions.enum.DECLARE:
-      return ROUTES.V2.EVENTS.DECLARE
-    case DeclarationActions.enum.VALIDATE:
-      return ROUTES.V2.EVENTS.VALIDATE
-    case DeclarationActions.enum.REGISTER:
-      return ROUTES.V2.EVENTS.REGISTER
-    default:
-      throw new Error(`Unknown action type: ${actionType}`)
-  }
-}
-
+/**
+ *
+ * @param actionType Action type of the declaration action
+ * @param event Event document
+ * @param configuration Event configuration
+ *
+ * Throws an error if the action is not allowed for the event or if the user does not have permission to perform the action.
+ */
 function useActionGuard(
   actionType: DeclarationUpdateActionType,
   event: EventDocument,

@@ -45,7 +45,7 @@ import { CoreWorkqueues } from '@client/v2-events/utils'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   useAction,
-  useActionMenuItems
+  useActionMenuItemConfigs
 } from '../../workqueues/EventOverview/components/useActionMenuItems'
 import { deserializeSearchParams, serializeSearchParams } from './utils'
 
@@ -210,7 +210,7 @@ function ActionComponent({
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const { config: configs } = useAction(event)
-  const actionMenuItems = useActionMenuItems(event)
+  const actionMenuItems = useActionMenuItemConfigs(event)
 
   const intl = useIntl()
 

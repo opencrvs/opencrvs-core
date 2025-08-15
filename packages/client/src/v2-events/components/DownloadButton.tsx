@@ -32,7 +32,7 @@ import {
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
-import { useActionMenuItems } from '../features/workqueues/EventOverview/components/useActionMenuItems'
+import { useActionMenuItemConfigs } from '../features/workqueues/EventOverview/components/useActionMenuItems'
 
 interface DownloadButtonProps {
   id?: string
@@ -125,7 +125,7 @@ export function DownloadButton({
     enabled: !!event.assignedTo
   }).data
 
-  const actionMenuItems = useActionMenuItems(event)
+  const actionMenuItems = useActionMenuItemConfigs(event)
   const assignmentStatus = getAssignmentStatus(event, authentication?.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
