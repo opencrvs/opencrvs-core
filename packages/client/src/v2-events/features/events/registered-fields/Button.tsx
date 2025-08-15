@@ -27,6 +27,7 @@ function throwIfUnsupportedIcon(icon: string) {
 
 function ButtonInput({
   configuration: { icon, loading = false, text },
+  disabled,
   value = 0,
   onChange
 }: {
@@ -35,6 +36,7 @@ function ButtonInput({
     loading?: boolean
     text: TranslationConfig
   }
+  disabled?: boolean
   value?: number
   /** Represents the amount of times the button has been pressed */
   onChange: (val: number) => void
@@ -46,7 +48,12 @@ function ButtonInput({
   }
 
   return (
-    <UIButton loading={loading} type="secondary" onClick={handleClick}>
+    <UIButton
+      disabled={disabled}
+      loading={loading}
+      type="secondary"
+      onClick={handleClick}
+    >
       {icon && !loading && (
         <Icon
           color="currentColor"

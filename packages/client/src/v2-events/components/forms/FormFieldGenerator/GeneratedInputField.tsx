@@ -601,6 +601,7 @@ export const GeneratedInputField = React.memo(
         <InputField {...inputFieldProps}>
           <Button.Input
             configuration={field.config.configuration}
+            disabled={inputProps.disabled}
             value={field.value}
             onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
           />
