@@ -243,7 +243,7 @@ describe('test buildElasticQueryFromSearchPayload', () => {
               ]
             }
           },
-          { match: { 'declaration.applicant____name': 'John Doe' } }
+          { match: { 'declaration.applicant____name.__fullname': 'John Doe' } }
         ])
       }
     })
