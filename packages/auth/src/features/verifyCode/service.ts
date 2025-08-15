@@ -68,7 +68,10 @@ export async function sendVerificationCode(
   email?: string
 ): Promise<void> {
   await triggerUserEventNotification({
-    event: 'reset-password',
+    event:
+      notificationEvent === NotificationEvent.TWO_FACTOR_AUTHENTICATION
+        ? '2fa'
+        : 'reset-password',
     payload: {
       code: verificationCode,
       recipient: {
