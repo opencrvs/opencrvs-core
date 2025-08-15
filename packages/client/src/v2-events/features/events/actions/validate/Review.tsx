@@ -58,7 +58,7 @@ export function Review() {
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { redirectToOrigin } = useEventFormNavigation()
+  const { closeActionView } = useEventFormNavigation()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -164,7 +164,7 @@ export function Review() {
 
     if (confirmedValidation) {
       reviewActionConfiguration.onConfirm(eventId)
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -194,7 +194,7 @@ export function Review() {
           reason: { message, isDuplicate }
         })
       }
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -204,7 +204,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(slug)
+          closeActionView(slug)
         })
       }
     >

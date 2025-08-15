@@ -33,6 +33,8 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
+import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
+import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -136,7 +138,9 @@ export function useAction(event: EventIndex) {
   const scopes = useSelector(getScope) ?? []
   const events = useEvents()
   const navigate = useNavigate()
+  const drafts = useDrafts()
   const authentication = useAuthentication()
+  const { clearEphemeralFormState } = useEventFormNavigation()
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
 
@@ -158,6 +162,11 @@ export function useAction(event: EventIndex) {
   const eventIsAssignedToSelf =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
+  const openDraft = drafts
+    .getAllRemoteDrafts()
+    .find((draft) => draft.eventId === event.id)
+
+  const hasDeclarationDraftOpen = openDraft?.action.type === ActionType.DECLARE
   const eventIsWaitingForCorrection = event.flags.includes(
     InherentFlags.CORRECTION_REQUESTED
   )
@@ -167,6 +176,7 @@ export function useAction(event: EventIndex) {
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
+
   return {
     config: {
       [ActionType.READ]: {
@@ -203,51 +213,59 @@ export function useAction(event: EventIndex) {
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],
         icon: 'PencilLine',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
-        disabled: !eventIsAssignedToSelf,
+          )
+        },
+        disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen),
         // Action menu should not show DECLARE if the user can perform VALIDATE
         shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
         icon: 'PencilLine',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
         icon: 'PencilLine',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
         icon: 'Printer',
-        onClick: (workqueue?) =>
-          navigate(
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
               { eventId },
               { workqueue }
             )
-          ),
+          )
+        },
         disabled: !eventIsAssignedToSelf || eventIsWaitingForCorrection,
         shouldHide: () => eventIsWaitingForCorrection
       },
@@ -273,6 +291,8 @@ export function useAction(event: EventIndex) {
             throw new Error('No page ID found for request correction')
           }
 
+          clearEphemeralFormState()
+
           // If no pages are configured, skip directly to review page
           if (correctionPages.length === 0) {
             navigate(ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId }))
@@ -294,6 +314,7 @@ export function useAction(event: EventIndex) {
         label: actionLabels[ExclusiveActions.REVIEW_CORRECTION_REQUEST],
         icon: 'NotePencil',
         onClick: () => {
+          clearEphemeralFormState()
           navigate(
             ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
               eventId
@@ -339,7 +360,18 @@ export function useActionMenuItems(event: EventIndex) {
         ]
       : getAvailableActionsForEvent(event)
 
+  const drafts = useDrafts()
+
+  const openDraft = drafts
+    .getAllRemoteDrafts()
+    .find((draft) => draft.eventId === event.id)
+
   const actions = [...availableAssignmentActions, ...availableActions]
+    /*
+     * Ensure that if there is an open draft, that action is always included in the list
+     */
+    .concat(openDraft ? [openDraft.action.type] : [])
+    .filter((action, index, self) => self.indexOf(action) === index)
 
   // Filter out actions which are not configured
   const supportedActions = actions.filter(
