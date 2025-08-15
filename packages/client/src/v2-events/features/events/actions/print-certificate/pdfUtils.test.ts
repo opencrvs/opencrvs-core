@@ -65,7 +65,8 @@ describe('stringifyEventMetadata', () => {
             family: 'Musonda'
           }
         ],
-        role: 'NATIONAL_REGISTRAR'
+        role: 'NATIONAL_REGISTRAR',
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       }
     ] satisfies User[]
 

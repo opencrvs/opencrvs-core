@@ -18,7 +18,8 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -87,7 +88,8 @@ const mockUser = {
   ],
   role: 'SOCIAL_WORKER',
   signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
 
 const validateEventDocument = generateEventDocument({
