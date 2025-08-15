@@ -55,6 +55,10 @@ const FuzzyMatcher = Matcher.extend({
     })
 })
 
+export type FuzzyMatcherOptions = NonNullable<
+  z.input<typeof FuzzyMatcher>['options']
+>
+
 const StrictMatcher = Matcher.extend({
   type: z.literal('strict'),
   options: z
@@ -66,6 +70,10 @@ const StrictMatcher = Matcher.extend({
       boost: 1
     })
 })
+
+export type StrictMatcherOptions = NonNullable<
+  z.input<typeof StrictMatcher>['options']
+>
 
 const DateRangeMatcher = Matcher.extend({
   type: z.literal('dateDistance'),
@@ -79,6 +87,10 @@ const DateRangeMatcher = Matcher.extend({
     boost: z.number().optional().default(1)
   })
 })
+
+export type DateRangeMatcherOptions = NonNullable<
+  z.input<typeof DateRangeMatcher>['options']
+>
 
 export type AndInput = {
   type: 'and'
