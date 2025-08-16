@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { joinURL } from '../url'
+import { joinUrl } from '../url'
 import { User } from '../events'
 import { z } from 'zod'
 
@@ -85,7 +85,7 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   countryConfigUrl: string
   authHeader: { Authorization: string }
 }) {
-  return await fetch(joinURL(countryConfigUrl, `triggers/user/${event}`), {
+  return await fetch(joinUrl(countryConfigUrl, `triggers/user/${event}`), {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {
