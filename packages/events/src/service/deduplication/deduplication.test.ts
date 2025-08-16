@@ -12,7 +12,6 @@ import {
   DeduplicationConfig,
   getUUID,
   UUID,
-  DeduplicationConfigInput,
   FieldValue,
   eventQueryDataGenerator,
   Clause
@@ -69,7 +68,7 @@ const LEGACY_BIRTH_DEDUPLICATION_RULES = {
       sameMotherNid
     )
   )
-} satisfies DeduplicationConfigInput
+}
 
 async function findDuplicates(eventComparison: Record<string, FieldValue[]>) {
   const esClient = getOrCreateClient()
