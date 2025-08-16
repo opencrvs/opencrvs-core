@@ -1138,7 +1138,7 @@ export const handlers = {
       return HttpResponse.json({
         data: {
           getUser: {
-            id: '679397db138339c63cdc24e1',
+            id: testDataGenerator().user.id.localRegistrar,
             userMgntUserID: '679397db138339c63cdc24e1',
             creationDate: '1737725915295',
             username: 'k.mweene',
