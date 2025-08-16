@@ -22,17 +22,14 @@ import {
   getRandomDatetime,
   tennisClubMembershipEvent,
   getCurrentEventState,
-  UUID
+  UUID,
+  SystemRole
 } from '@opencrvs/commons/client'
-import { SystemRole } from '@opencrvs/commons/client'
-import {
-  AppRouter,
-  trpcOptionsProxy,
-  TRPCProvider
-} from '@client/v2-events/trpc'
+import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
-import { setEventData, addLocalEventConfig } from '../../events/useEvents/api'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+import { setEventData } from '../../events/useEvents/api'
 import { EventOverviewIndex } from './EventOverview'
 
 const meta: Meta<typeof EventOverviewIndex> = {
@@ -150,8 +147,8 @@ export const WithRejectedAction: Story = {
           transactionId: getUUID(),
           createdAt: new Date().toISOString(),
           createdByUserType: 'user',
-          createdBy: '123',
-          createdAtLocation: '123' as UUID,
+          createdBy: testDataGenerator().user.id.localRegistrar,
+          createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {},
           reason: { message: 'Archived', isDuplicate: true }
@@ -263,9 +260,9 @@ export const WithSystemUserActions: Story = {
             new Date('2024-05-01'),
             new Date('2024-06-01')
           ),
-          createdBy: '123',
+          createdBy: testDataGenerator().user.id.localRegistrar,
           createdByUserType: 'user' as const,
-          createdAtLocation: '123' as UUID,
+          createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
           createdByRole: 'LOCAL_REGISTRAR',
           declaration: {}
         }
