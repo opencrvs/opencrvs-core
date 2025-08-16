@@ -14,7 +14,7 @@ import { z } from 'zod'
 import { parseGQLResponse, raise, delay } from './utils'
 import { print } from 'graphql'
 import gql from 'graphql-tag'
-import { EventConfig, joinURL } from '@opencrvs/commons'
+import { EventConfig, joinUrl } from '@opencrvs/commons'
 import { parseScope } from '@opencrvs/commons/authentication'
 import { fromZodError } from 'zod-validation-error'
 
@@ -122,8 +122,8 @@ async function getUsers(token: string) {
 
   const userRoles = parsedUsers.data.map((user) => user.role)
 
-  const rolesUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'roles')
-  const eventsUrl = joinURL(env.COUNTRY_CONFIG_HOST, 'events')
+  const rolesUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'roles')
+  const eventsUrl = joinUrl(env.COUNTRY_CONFIG_HOST, 'events')
 
   const [rolesResponse, eventsResponse] = await Promise.all([
     fetch(rolesUrl),

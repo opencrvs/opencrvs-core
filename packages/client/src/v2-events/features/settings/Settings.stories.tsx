@@ -8,13 +8,23 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import type { Meta, StoryObj } from '@storybook/react'
+import { ROUTES, routesConfig } from '@client/v2-events/routes'
+import { SettingsPage } from './Settings'
 
-export function joinUrl(base: string, path: string) {
-  const baseWithSlash = base.endsWith('/') ? base : base + '/'
-  return new URL(path, baseWithSlash)
+const meta: Meta<typeof SettingsPage> = {
+  title: 'Settings'
 }
 
-export function joinUrlPaths(base: string, path: string) {
-  const baseWithSlash = base.endsWith('/') ? base : base + '/'
-  return baseWithSlash + path.replace(/^\//, '')
+export default meta
+
+type Story = StoryObj<typeof SettingsPage>
+
+export const Default: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.SETTINGS.buildPath({})
+    }
+  }
 }

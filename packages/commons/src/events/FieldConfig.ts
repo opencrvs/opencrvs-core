@@ -353,9 +353,15 @@ export const SelectDateRangeField = BaseField.extend({
 export type SelectDateRangeField = z.infer<typeof SelectDateRangeField>
 
 export const NameConfig = z.object({
-  firstname: z.object({ required: z.boolean() }).optional(),
-  middlename: z.object({ required: z.boolean() }).optional(),
-  surname: z.object({ required: z.boolean() }).optional()
+  firstname: z
+    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .optional(),
+  middlename: z
+    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .optional(),
+  surname: z
+    .object({ required: z.boolean(), label: TranslationConfig.optional() })
+    .optional()
 })
 
 export type NameConfig = z.infer<typeof NameConfig>
@@ -375,10 +381,10 @@ const NameField = BaseField.extend({
         firstname: { required: true },
         surname: { required: true }
       }).optional(),
+      order: z.array(z.enum(['firstname', 'middlename', 'surname'])).optional(),
       maxLength: z.number().optional().describe('Maximum length of the text'),
       prefix: TranslationConfig.optional(),
-      postfix: TranslationConfig.optional(),
-      searchMode: z.boolean().optional()
+      postfix: TranslationConfig.optional()
     })
     .default({
       name: {
@@ -490,12 +496,36 @@ export type Office = z.infer<typeof Office>
 
 const Address = BaseField.extend({
   type: z.literal(FieldType.ADDRESS),
-  defaultValue: AddressFieldValue.optional(),
   configuration: z
     .object({
-      searchMode: z.boolean().optional()
+      lineSeparator: z.string().optional(),
+      fields: z
+        .array(
+          z.enum([
+            'number',
+            'country',
+            'province',
+            'addressType',
+            'district',
+            'urbanOrRural',
+            'town',
+            'residentialArea',
+            'street',
+            'zipCode',
+            'village',
+            'state',
+            'district2',
+            'cityOrTown',
+            'addressLine1',
+            'addressLine2',
+            'addressLine3',
+            'postcodeOrZip'
+          ])
+        )
+        .optional()
     })
-    .optional()
+    .optional(),
+  defaultValue: AddressFieldValue.optional()
 }).describe('Address input field – a combination of location and text fields')
 
 export const DataEntry = z.union([
@@ -600,3 +630,14 @@ export type SelectOption = z.infer<typeof SelectOption>
 export type AdministrativeAreaConfiguration = z.infer<
   typeof AdministrativeAreaConfiguration
 >
+
+/**
+ * Union of file-related fields. Using common type should help with compiler to know where to add new cases.
+ */
+export const AnyFileField = z.discriminatedUnion('type', [
+  SignatureField,
+  File,
+  FileUploadWithOptions
+])
+
+export type AnyFileField = z.infer<typeof AnyFileField>

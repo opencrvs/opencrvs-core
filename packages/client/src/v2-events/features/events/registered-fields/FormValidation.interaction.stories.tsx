@@ -77,10 +77,7 @@ const parameters = {
           return [getCurrentEventState(createdEvent, tennisClubMembershipEvent)]
         })
       ],
-      event: [
-        tRPCMsw.event.get.query(() => {
-          return createdEvent
-        }),
+      workqueues: [
         tRPCMsw.workqueue.config.list.query(() => {
           return generateWorkqueues()
         }),
@@ -88,6 +85,11 @@ const parameters = {
           return input.reduce((acc, { slug }) => {
             return { ...acc, [slug]: 7 }
           }, {})
+        })
+      ],
+      event: [
+        tRPCMsw.event.get.query(() => {
+          return createdEvent
         }),
         tRPCMsw.event.search.query((input) => {
           return [getCurrentEventState(createdEvent, tennisClubMembershipEvent)]

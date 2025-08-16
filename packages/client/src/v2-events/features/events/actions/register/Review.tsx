@@ -63,7 +63,7 @@ export function Review() {
   const drafts = useDrafts()
   const [modal, openModal] = useModal()
   const navigate = useNavigate()
-  const { redirectToOrigin } = useEventFormNavigation()
+  const { closeActionView: closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
 
@@ -153,7 +153,7 @@ export function Review() {
         transactionId: uuid(),
         annotation
       })
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -184,7 +184,7 @@ export function Review() {
         })
       }
 
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -194,7 +194,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(slug)
+          closeActionView(slug)
         })
       }
     >
