@@ -16,7 +16,7 @@ import {
   getCurrentEventState
 } from '@opencrvs/commons/events'
 
-import { getUUID, UUID } from '@opencrvs/commons'
+import { getUUID } from '@opencrvs/commons'
 import { getEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
@@ -25,17 +25,15 @@ import { TrpcUserContext } from '@events/context'
 export async function validate(
   input: Omit<Extract<ActionInputWithType, { type: 'VALIDATE' }>, 'duplicates'>,
   {
-    eventId,
     user,
     token
   }: {
-    eventId: UUID
     user: TrpcUserContext
     token: string
   }
 ) {
   const configs = await getEventConfigurations(token)
-  const storedEvent = await getEventById(eventId)
+  const storedEvent = await getEventById(input.eventId)
   const config = configs.find((c) => c.id === storedEvent.type)
 
   if (!config) {
@@ -52,7 +50,6 @@ export async function validate(
     return addAction(
       { ...input, duplicates: [] },
       {
-        eventId,
         user,
         token,
         status: ActionStatus.Accepted
@@ -93,7 +90,6 @@ export async function validate(
   return addAction(
     { ...input, duplicates: duplicates.map((d) => d.event.id) },
     {
-      eventId,
       user,
       token,
       status: ActionStatus.Accepted

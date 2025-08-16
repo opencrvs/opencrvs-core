@@ -135,7 +135,6 @@ export const eventRouter = router({
           declaration: {}
         },
         {
-          eventId: event.id,
           user: ctx.user,
           token: ctx.token,
           status: ActionStatus.Accepted
@@ -235,7 +234,6 @@ export const eventRouter = router({
         .use(middleware.validateAction)
         .mutation(async (options) => {
           return unassignRecord(options.input, {
-            eventId: options.input.eventId,
             user: options.ctx.user,
             token: options.ctx.token
           })

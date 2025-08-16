@@ -269,7 +269,6 @@ export function getDefaultActionProcedures(
         return addAction(
           { ...input, ...parsedBody },
           {
-            eventId,
             user,
             token,
             status
@@ -314,7 +313,6 @@ export function getDefaultActionProcedures(
         return addAction(
           { ...input, originalActionId: actionId },
           {
-            eventId,
             user,
             token,
             status: ActionStatus.Accepted
