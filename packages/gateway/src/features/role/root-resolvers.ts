@@ -10,13 +10,13 @@
  */
 import { COUNTRY_CONFIG_URL } from '@gateway/constants'
 import { GQLResolver } from '@gateway/graphql/schema'
-import { fetchJSON, joinURL, Roles } from '@opencrvs/commons'
+import { fetchJSON, joinUrl, Roles } from '@opencrvs/commons'
 
 export const resolvers: GQLResolver = {
   Query: {
     async getUserRoles(_, __, { headers: authHeader }) {
       const roles = await fetchJSON<Roles[]>(
-        joinURL(COUNTRY_CONFIG_URL, `/roles`),
+        joinUrl(COUNTRY_CONFIG_URL, `/roles`),
         {
           headers: {
             'Content-Type': 'application/json',

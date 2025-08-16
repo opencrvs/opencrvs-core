@@ -323,7 +323,6 @@ export const isFileFieldType = (field: {
   config: FieldConfig
   value: FieldValue
 }): field is { value: FileFieldValue; config: File } => {
-  // @TODO?
   return field.config.type === FieldType.FILE
 }
 
