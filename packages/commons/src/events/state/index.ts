@@ -22,7 +22,11 @@ import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import { deepMerge } from '../utils'
+import {
+  aggregateActionDeclarations,
+  deepMerge,
+  getAcceptedActions
+} from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
@@ -93,44 +97,6 @@ export function getAssignedUserSignatureFromActions(
   }, null)
 }
 
-function aggregateActionDeclarations(
-  actions: Array<ActionDocument>
-): EventState {
-  /** Types that are not taken into the aggregate values (e.g. while printing certificate)
-   * stop auto filling collector form with previous print action data)
-   */
-
-  const excludedActions = [
-    ActionType.REQUEST_CORRECTION,
-    ActionType.PRINT_CERTIFICATE,
-    ActionType.REJECT_CORRECTION
-  ]
-
-  return actions.reduce((declaration, action) => {
-    if (
-      excludedActions.some((excludedAction) => excludedAction === action.type)
-    ) {
-      return declaration
-    }
-
-    /*
-     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
-     * details in the correction. To do this, we find the original request that this
-     * approval is for and merge its details with the current data of the record.
-     */
-
-    if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = actions.find(({ id }) => id === action.requestId)
-      if (!requestAction) {
-        return declaration
-      }
-      return deepMerge(declaration, requestAction.declaration)
-    }
-
-    return deepMerge(declaration, action.declaration)
-  }, {})
-}
-
 type NonNullableDeep<T> = T extends [unknown, ...unknown[]] // <-- ✨ tiny change: handle tuples first
   ? { [K in keyof T]: NonNullableDeep<NonNullable<T[K]>> }
   : T extends UUID
@@ -175,11 +141,6 @@ export function deepDropNulls<T>(obj: T): NonNullableDeep<T> {
 
 export function isUndeclaredDraft(status: EventStatus): boolean {
   return status === EventStatus.enum.CREATED
-}
-export function getAcceptedActions(event: EventDocument): ActionDocument[] {
-  return event.actions.filter(
-    (a): a is ActionDocument => a.status === ActionStatus.Accepted
-  )
 }
 
 export const DEFAULT_DATE_OF_EVENT_PROPERTY =

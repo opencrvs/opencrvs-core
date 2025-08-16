@@ -20,7 +20,8 @@ import {
   isNil,
   uniqBy,
   cloneDeep,
-  orderBy
+  orderBy,
+  groupBy
 } from 'lodash'
 import {
   ActionType,
@@ -32,6 +33,7 @@ import { EventConfig } from './EventConfig'
 import { FieldConfig } from './FieldConfig'
 import {
   Action,
+  ActionDocument,
   ActionStatus,
   ActionUpdate,
   EventState
@@ -457,4 +459,79 @@ export function mergeDrafts(currentDraft: Draft, incomingDraft: Draft): Draft {
       )
     }
   }
+}
+
+function isRequestedAction(a: Action): a is ActionDocument {
+  return a.status === ActionStatus.Requested
+}
+function isAcceptedAction(a: Action): a is ActionDocument {
+  return a.status === ActionStatus.Accepted
+}
+
+export function getAcceptedActions(event: EventDocument): ActionDocument[] {
+  return event.actions.filter(isAcceptedAction)
+}
+
+export function getPendingActions(actions: Action[]): ActionDocument[] {
+  const actionGroups: Record<string, Action[]> = groupBy(
+    actions,
+    ({ transactionId, type }: Action) => `${transactionId}::${type}`
+  )
+
+  const pendingActions = Object.values(actionGroups)
+    .filter((actionsInGroup) => actionsInGroup.length === 1)
+    .map((actionsInGroup) => actionsInGroup[0])
+    .filter(isRequestedAction)
+
+  return pendingActions
+}
+
+export function getPendingAction(actions: Action[]): ActionDocument {
+  const pendingActions = getPendingActions(actions)
+
+  if (pendingActions.length !== 1) {
+    throw new Error(
+      `Expected exactly one pending action, but found ${pendingActions.length}`
+    )
+  }
+
+  return pendingActions[0]
+}
+
+export function aggregateActionDeclarations(
+  actions: Array<ActionDocument>
+): EventState {
+  /** Types that are not taken into the aggregate values (e.g. while printing certificate)
+   * stop auto filling collector form with previous print action data)
+   */
+
+  const excludedActions = [
+    ActionType.REQUEST_CORRECTION,
+    ActionType.PRINT_CERTIFICATE,
+    ActionType.REJECT_CORRECTION
+  ]
+
+  return actions.reduce((declaration, action) => {
+    if (
+      excludedActions.some((excludedAction) => excludedAction === action.type)
+    ) {
+      return declaration
+    }
+
+    /*
+     * If the action encountered is "APPROVE_CORRECTION", we want to apply the changed
+     * details in the correction. To do this, we find the original request that this
+     * approval is for and merge its details with the current data of the record.
+     */
+
+    if (action.type === ActionType.APPROVE_CORRECTION) {
+      const requestAction = actions.find(({ id }) => id === action.requestId)
+      if (!requestAction) {
+        return declaration
+      }
+      return deepMerge(declaration, requestAction.declaration)
+    }
+
+    return deepMerge(declaration, action.declaration)
+  }, {})
 }
