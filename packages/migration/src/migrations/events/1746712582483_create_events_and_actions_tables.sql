@@ -72,7 +72,7 @@ CREATE TABLE event_actions (
   request_id text,
   status action_status NOT NULL,
   transaction_id text NOT NULL,
-  UNIQUE (transaction_id, action_type),
+  UNIQUE (transaction_id, action_type, status),
   CHECK (
     (
       action_type = 'ASSIGN'

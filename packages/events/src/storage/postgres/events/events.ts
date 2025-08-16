@@ -103,7 +103,7 @@ export async function createEventInTrx(event: NewEvents, trx: Kysely<Schema>) {
 
 /**
  * Creates a new action in the event_actions table
- * @idempotent with `transactionId, actionType`
+ * @idempotent with `transactionId, actionType, status`
  * @returns action id
  */
 export async function createActionInTrx(
@@ -113,7 +113,9 @@ export async function createActionInTrx(
   await trx
     .insertInto('eventActions')
     .values(action)
-    .onConflict((oc) => oc.columns(['transactionId', 'actionType']).doNothing())
+    .onConflict((oc) =>
+      oc.columns(['transactionId', 'actionType', 'status']).doNothing()
+    )
     .execute()
 
   return trx
@@ -121,6 +123,7 @@ export async function createActionInTrx(
     .select('id')
     .where('transactionId', '=', action.transactionId)
     .where('actionType', '=', action.actionType)
+    .where('status', '=', action.status)
     .executeTakeFirstOrThrow()
 }
 
