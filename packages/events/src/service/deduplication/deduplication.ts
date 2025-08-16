@@ -21,6 +21,7 @@ import {
   getDeclarationFieldById,
   DateValue
 } from '@opencrvs/commons/events'
+import { logger } from '@opencrvs/commons'
 import {
   getOrCreateClient,
   getEventIndexName
@@ -75,9 +76,11 @@ export function generateElasticsearchQuery(
   const queryKey = declarationReference(valuePath)
   const queryValue = get(eventIndex.declaration, valuePath)
   if (!queryValue) {
+    logger.warn(
+      `No value found for field ${rawFieldId} in the current event. Skipping query clause.`
+    )
     return null
   }
-  // @TODO: When implementing deduplication revisit this. For now, we just want to use the right types for es.
   const isPrimitiveQueryValue = (
     value: FieldValue
   ): value is string | number | boolean => {
@@ -91,6 +94,10 @@ export function generateElasticsearchQuery(
   switch (queryInput.type) {
     case 'fuzzy': {
       if (!isPrimitiveQueryValue(queryValue)) {
+        logger.warn(
+          queryValue,
+          `Invalid query value for found for fuzzy matching ${rawFieldId}. Expected string, number or boolean`
+        )
         return null
       }
 
@@ -106,6 +113,10 @@ export function generateElasticsearchQuery(
     }
     case 'strict': {
       if (!isPrimitiveQueryValue(queryValue)) {
+        logger.warn(
+          queryValue,
+          `Invalid query value for found for strict matching ${rawFieldId}. Expected string, number or boolean`
+        )
         return null
       }
 
@@ -118,6 +129,10 @@ export function generateElasticsearchQuery(
     case 'dateRange': {
       const dateValue = DateValue.safeParse(queryValue)
       if (!dateValue.success) {
+        logger.warn(
+          queryValue,
+          `Invalid query value for found for dateRange matching ${rawFieldId}. Expected date in YYYY-MM-DD format`
+        )
         return null
       }
       return {
