@@ -24,7 +24,8 @@ import {
   isFieldVisible,
   getDeclarationFields,
   getCurrentEventState,
-  ActionType
+  ActionType,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { ActionPageLight } from '@opencrvs/components/lib/ActionPageLight'
 import { Button } from '@opencrvs/components/lib/Button'
@@ -82,12 +83,12 @@ export function Summary() {
   const scopes = useSelector(getScope)
   const [showPrompt, setShowPrompt] = React.useState(false)
   const togglePrompt = () => setShowPrompt(!showPrompt)
-  const { goToHome } = useEventFormNavigation()
+  const eventFormNavigation = useEventFormNavigation()
   const navigate = useNavigate()
   const intl = useIntl()
 
   const events = useEvents()
-  const event = events.getEvent.getFromCache(eventId)
+  const event: EventDocument = events.getEvent.getFromCache(eventId)
   const { eventConfiguration } = useEventConfiguration(event.type)
   const eventIndex = getCurrentEventState(event, eventConfiguration)
 
@@ -158,7 +159,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={goToHome}
+        goHome={() => eventFormNavigation.closeActionView()}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >

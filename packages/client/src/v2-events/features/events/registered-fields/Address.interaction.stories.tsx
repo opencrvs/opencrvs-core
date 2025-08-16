@@ -11,7 +11,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import { expect, fn } from '@storybook/test'
-import { userEvent, within } from '@storybook/testing-library'
+import { userEvent, waitFor, within } from '@storybook/testing-library'
 import React from 'react'
 import * as selectEvent from 'react-select-event'
 import styled from 'styled-components'
@@ -155,6 +155,26 @@ export const GenericAddressFields: StoryObj<typeof FormFieldGenerator> = {
         await canvas.findByTestId('text__postcodeOrZip'),
         '3300'
       )
+    })
+
+    await step('Change country to Sweden', async () => {
+      const country = await canvas.findByTestId('location__country')
+      await userEvent.click(country)
+      await selectEvent.select(country, 'Sweden')
+    })
+
+    await step('Expect address fields to be reset', async () => {
+      await waitFor(async () => {
+        await expect(canvas.queryByTestId('text__state')).toHaveValue('')
+        await expect(canvas.queryByTestId('text__district2')).toHaveValue('')
+        await expect(canvas.queryByTestId('text__cityOrTown')).toHaveValue('')
+        await expect(canvas.queryByTestId('text__addressLine1')).toHaveValue('')
+        await expect(canvas.queryByTestId('text__addressLine2')).toHaveValue('')
+        await expect(canvas.queryByTestId('text__addressLine3')).toHaveValue('')
+        await expect(canvas.queryByTestId('text__postcodeOrZip')).toHaveValue(
+          ''
+        )
+      })
     })
   },
   render: function Component(args) {

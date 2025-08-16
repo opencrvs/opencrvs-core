@@ -10,7 +10,7 @@
  */
 
 import React, { useEffect } from 'react'
-import { Outlet, RouteObject, Routes } from 'react-router-dom'
+import { Outlet, RouteObject } from 'react-router-dom'
 
 import { useSelector } from 'react-redux'
 import { ActionType } from '@opencrvs/commons/client'
@@ -41,17 +41,26 @@ import { ReadonlyViewIndex } from '@client/v2-events/features/events/ReadOnlyVie
 import { AnnotationAction } from '@client/v2-events/features/events/components/Action/AnnotationAction'
 import { QuickSearchIndex } from '@client/v2-events/features/events/Search/QuickSearchIndex'
 import { getUserDetails } from '@client/profile/profileSelectors'
+import { SettingsPage } from '@client/v2-events/features/settings/Settings'
 import { RedirectToWorkqueue } from '../layouts/redirectToWorkqueue'
 import { SearchLayout } from '../layouts/search'
+import { useWorkqueues } from '../hooks/useWorkqueue'
 import { ROUTES } from './routes'
 import { Toaster } from './Toaster'
 
 function PrefetchQueries() {
+  const workqueues = useWorkqueues()
   useEffect(() => {
     void queryClient.prefetchQuery({
       queryKey: trpcOptionsProxy.locations.get.queryKey()
     })
-  }, [])
+
+    function prefetch() {
+      void workqueues.prefetch()
+    }
+
+    prefetch()
+  }, [workqueues])
 
   return null
 }
@@ -223,6 +232,10 @@ export const routesConfig = {
           <QuickSearchIndex />
         </SearchLayout>
       )
+    },
+    {
+      path: ROUTES.V2.SETTINGS.path,
+      element: <SettingsPage />
     }
   ]
 } satisfies RouteObject

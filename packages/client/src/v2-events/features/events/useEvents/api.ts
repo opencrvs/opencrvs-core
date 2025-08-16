@@ -161,14 +161,10 @@ function updateDraftsWithEvent(id: string, data: EventDocument) {
       draft.eventId === id ? { ...draft, eventId: data.id } : draft
     )
   )
-  // eslint-disable-next-line @typescript-eslint/no-floating-promises
-  queryClient.invalidateQueries({
-    queryKey: trpcOptionsProxy.event.draft.list.queryKey()
-  })
 }
 
-export function clearPendingDraftCreationRequests(eventId: string) {
-  queryClient
+function findAllPendingDraftCreationRequests() {
+  return queryClient
     .getMutationCache()
     .getAll()
     .filter((mutation) =>
@@ -183,6 +179,10 @@ export function clearPendingDraftCreationRequests(eventId: string) {
       (mutation) =>
         mutation as MutationType<typeof trpcOptionsProxy.event.draft.create>
     )
+}
+
+export function clearPendingDraftCreationRequests(eventId: string) {
+  findAllPendingDraftCreationRequests()
     .filter((mutation) => mutation.state.context?.eventId === eventId)
     .forEach((mutation) => {
       queryClient.getMutationCache().remove(mutation)

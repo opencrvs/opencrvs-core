@@ -10,6 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+import { DateTime } from 'luxon'
 import {
   ActionStatus,
   ActionType,
@@ -21,7 +22,8 @@ import {
   getUUID,
   InherentFlags,
   SCOPES,
-  TENNIS_CLUB_MEMBERSHIP
+  TENNIS_CLUB_MEMBERSHIP,
+  TEST_SYSTEM_IANA_TIMEZONE
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -301,8 +303,15 @@ test('Returns events based on the updatedAt column', async () => {
     )
   )
 
-  const today = new Date().toISOString()
-  const yesterday = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString()
+  const yesterday = DateTime.now()
+    .setZone(TEST_SYSTEM_IANA_TIMEZONE)
+    .startOf('day')
+    .toFormat('yyyy-MM-dd')
+
+  const today = DateTime.now()
+    .setZone(TEST_SYSTEM_IANA_TIMEZONE)
+    .endOf('day')
+    .toFormat('yyyy-MM-dd')
 
   const acceptedTodayResult = await client.event.search({
     type: 'and',
@@ -310,8 +319,8 @@ test('Returns events based on the updatedAt column', async () => {
       {
         updatedAt: {
           type: 'range',
-          gte: yesterday.split('T')[0],
-          lte: today.split('T')[0]
+          gte: yesterday,
+          lte: today
         }
       }
     ]
@@ -486,7 +495,7 @@ test.skip('Returns events that match the name field criteria of applicant', asyn
         data: {
           // @TODO: Fix when working on https://github.com/opencrvs/opencrvs-core/issues/9765
           'applicant.name.firstname': { type: 'exact', term: 'John' },
-          applicant____dob: { type: 'exact', term: '2000-01-01' }
+          'applicant.dob': { type: 'exact', term: '2000-01-01' }
         }
       }
     ]
@@ -603,7 +612,7 @@ test('Returns events that match date of birth of applicant', async () => {
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____dob: { type: 'exact', term: '2000-01-01' }
+          'applicant.dob': { type: 'exact', term: '2000-01-01' }
         }
       }
     ]
@@ -679,7 +688,7 @@ test('Does not return events when searching with a similar but different date of
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____dob: { type: 'exact', term: '1999-11-11' } // search with same day and month
+          'applicant.dob': { type: 'exact', term: '1999-11-11' } // search with same day and month
         }
       }
     ]
@@ -723,7 +732,7 @@ test('Returns single document after creation', async () => {
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____dob: {
+          'applicant.dob': {
             type: 'exact',
             term: '2000-11-11'
           }
@@ -815,7 +824,7 @@ test('Returns multiple documents after creation', async () => {
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____dob: {
+          'applicant.dob': {
             type: 'exact',
             term: '2000-11-11'
           }
@@ -968,14 +977,7 @@ test('Returns no documents when search params are not matched', async () => {
       {
         eventType: TENNIS_CLUB_MEMBERSHIP,
         data: {
-          applicant____firstname: {
-            type: 'exact',
-            term: 'Nothing'
-          },
-          applicant____surname: {
-            type: 'exact',
-            term: 'Matching'
-          }
+          'applicant.name': { type: 'exact', term: 'Nothing Matching' }
         }
       }
     ]
@@ -1021,7 +1023,7 @@ test('Throws error when search params are not matching proper schema', async () 
         {
           eventType: TENNIS_CLUB_MEMBERSHIP,
           data: {
-            applicant____firstname: 'Johnny' // invalid schema
+            'applicant.firstname': 'Johnny' // invalid schema
           }
         }
       ]
