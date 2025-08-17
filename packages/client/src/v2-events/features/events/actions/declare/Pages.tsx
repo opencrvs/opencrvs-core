@@ -15,10 +15,7 @@ import {
   useTypedParams,
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
-import {
-  getCurrentEventState,
-  getDeclarationPages
-} from '@opencrvs/commons/client'
+import { ActionType, getDeclarationPages } from '@opencrvs/commons/client'
 import { Pages as PagesComponent } from '@client/v2-events/features/events/components/Pages'
 
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -103,7 +100,7 @@ export function Pages() {
     >
       {modal}
       <PagesComponent
-        declaration={getCurrentEventState(event, configuration).declaration}
+        actionType={ActionType.DECLARE}
         eventConfig={configuration}
         form={formValues}
         formPages={declarationPages}
