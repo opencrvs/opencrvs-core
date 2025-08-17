@@ -156,8 +156,8 @@ describe('check unreferenced draft attachments are deleted while final action su
     // declaring final action submission
     await client.event.actions.declare.request(getDeclaration(6))
 
-    // file attachment exist api should be called once
-    expect(fileExistMock.mock.calls).toHaveLength(1)
+    // file attachment exist api should be called twice (status: "Requested" and "Accepted")
+    expect(fileExistMock.mock.calls).toHaveLength(2)
 
     // total 4 unreferenced draft attachments should be deleted
     expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toHaveLength(5)
@@ -168,7 +168,14 @@ describe('check unreferenced draft attachments are deleted while final action su
     expect(updatedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
       expect.objectContaining({ type: ActionType.ASSIGN }),
-      expect.objectContaining({ type: ActionType.DECLARE }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.DECLARE,
+        status: ActionStatus.Accepted
+      }),
       expect.objectContaining({ type: ActionType.UNASSIGN }),
       expect.objectContaining({ type: ActionType.READ })
     ])

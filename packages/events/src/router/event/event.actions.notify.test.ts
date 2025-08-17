@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import {
+  ActionStatus,
   ActionType,
   getAcceptedActions,
   getUUID,
@@ -179,7 +180,14 @@ describe('event.actions.notify', () => {
     expect(fetchedEvent.actions).toEqual([
       expect.objectContaining({ type: ActionType.CREATE }),
       expect.objectContaining({ type: ActionType.ASSIGN }),
-      expect.objectContaining({ type: ActionType.NOTIFY }),
+      expect.objectContaining({
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Requested
+      }),
+      expect.objectContaining({
+        type: ActionType.NOTIFY,
+        status: ActionStatus.Accepted
+      }),
       expect.objectContaining({ type: ActionType.UNASSIGN })
     ])
   })
@@ -226,10 +234,17 @@ describe('event.actions.notify', () => {
       client = createTestClient(user)
 
       const fetchedEvent = await client.event.get(event.id)
-      expect(fetchedEvent.actions.length).toEqual(3)
+      expect(fetchedEvent.actions.length).toEqual(4)
       expect(fetchedEvent.actions).toEqual([
         expect.objectContaining({ type: ActionType.CREATE }),
-        expect.objectContaining({ type: ActionType.NOTIFY }),
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Requested
+        }),
+        expect.objectContaining({
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted
+        }),
         expect.objectContaining({ type: ActionType.READ })
       ])
     })

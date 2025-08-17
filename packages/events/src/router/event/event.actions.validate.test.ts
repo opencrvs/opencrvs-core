@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   generateActionDeclarationInput,
@@ -287,12 +288,22 @@ test('valid action is appended to event actions', async () => {
     expect.objectContaining({ type: ActionType.CREATE }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.DECLARE
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({ type: ActionType.ASSIGN }),
     expect.objectContaining({
-      type: ActionType.VALIDATE
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN }),
     expect.objectContaining({

@@ -16,7 +16,6 @@ import {
   createPrng,
   EventDocument,
   generateRandomSignature,
-  getUUID,
   Scope,
   SCOPES,
   SystemRole,
@@ -250,8 +249,7 @@ function actionToClientAction(
       return async (eventId: string) =>
         client.event.actions.register.request(
           generator.event.actions.register(eventId, {
-            keepAssignment: true,
-            registrationNumber: getUUID()
+            keepAssignment: true
           })
         )
     case ActionType.PRINT_CERTIFICATE:

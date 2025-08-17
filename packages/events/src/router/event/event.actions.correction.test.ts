@@ -12,6 +12,7 @@
 import { TRPCError } from '@trpc/server'
 import { omit } from 'lodash'
 import {
+  ActionStatus,
   ActionType,
   AddressType,
   createPrng,
@@ -129,9 +130,14 @@ test('a correction request can be added to a registered event', async () => {
       generator.event.actions.correction.request(event.id)
     )
 
-  expect(withCorrectionRequest.actions.slice(-2)).toEqual([
+  expect(withCorrectionRequest.actions.slice(-3)).toEqual([
     expect.objectContaining({
-      type: ActionType.REQUEST_CORRECTION
+      type: ActionType.REQUEST_CORRECTION,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.REQUEST_CORRECTION,
+      status: ActionStatus.Accepted
     }),
     expect.objectContaining({ type: ActionType.UNASSIGN })
   ])
