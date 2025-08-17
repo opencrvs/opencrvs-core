@@ -113,6 +113,22 @@ export function useWorkqueues() {
             user,
             legacyUser?.primaryOffice.id
           )
+
+          const key = trpc.event.search.queryKey({
+            query: deserializedQuery,
+            limit: 10
+          })
+
+          const data = queryClient.getQueryData(key)
+          const isFetching =
+            queryClient.isFetching({
+              queryKey: key
+            }) > 0
+
+          if (data || isFetching) {
+            return
+          }
+
           return queryClient.prefetchQuery({
             ...trpc.event.search.queryOptions({
               query: deserializedQuery,
