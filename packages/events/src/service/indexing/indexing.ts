@@ -23,10 +23,10 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType,
   WorkqueueCountInput,
   getEventConfigById,
   SearchScopeAccessLevels,
+  SearchQuery,
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
@@ -38,7 +38,6 @@ import {
 } from '@events/storage/elasticsearch'
 import {
   decodeEventIndex,
-  DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
@@ -347,7 +346,7 @@ export async function getIndexedEvents(
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: DEFAULT_SIZE,
+    size: 10000,
     request_cache: false
   })
 
@@ -361,26 +360,46 @@ export async function getIndexedEvents(
     })
 }
 
+function valueFromTotal(total?: number | estypes.SearchTotalHits) {
+  if (!total) {
+    return 0
+  }
+  if (typeof total === 'number') {
+    return total
+  } else {
+    return total.value
+  }
+}
+
 export async function findRecordsByQuery(
-  eventParams: QueryType,
+  search: SearchQuery,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
 
-  const query = withJurisdictionFilters(
-    await buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+  const { query, limit, offset } = search
+
+  const esQuery = withJurisdictionFilters(
+    await buildElasticQueryFromSearchPayload(query, eventConfigs),
     options,
     userOfficeId
   )
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
-    size: DEFAULT_SIZE,
+    size: limit,
+    from: offset,
+    track_total_hits: true,
     request_cache: false,
-    query,
-    sort: {
+    query: esQuery,
+    sort: search.sort?.map((sort) => ({
+      [sort.field]: {
+        order: sort.direction,
+        unmapped_type: 'keyword'
+      }
+    })) || {
       _score: {
         order: 'desc'
       }
@@ -396,7 +415,7 @@ export async function findRecordsByQuery(
       return removeSecuredFields(eventConfig, decodedEventIndex)
     })
 
-  return events
+  return { results: events, total: valueFromTotal(response.hits.total) }
 }
 
 /*

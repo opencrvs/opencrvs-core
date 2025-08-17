@@ -27,9 +27,9 @@ import {
   EventDocument,
   EventIndex,
   EventInput,
+  SearchQuery,
   UnassignActionInput,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  QueryType
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -260,18 +260,23 @@ export const eventRouter = router({
       return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure
-    .meta({
-      openapi: {
-        summary: 'Search for events',
-        method: 'GET',
-        tags: ['Search'],
-        path: '/events/search'
-      }
-    })
+    // .meta({
+    //   openapi: {
+    //     summary: 'Search for events',
+    //     method: 'GET',
+    //     tags: ['Search'],
+    //     path: '/events/search'
+    //   }
+    // })
     // @todo: remove legacy scopes once all users are configured with new search scopes
     .use(requiresAnyOfScopes([], ['search']))
-    .input(QueryType)
-    .output(z.array(EventIndex))
+    .input(SearchQuery)
+    .output(
+      z.object({
+        results: z.array(EventIndex),
+        total: z.number()
+      })
+    )
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })

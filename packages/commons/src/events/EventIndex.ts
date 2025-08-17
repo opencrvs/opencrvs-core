@@ -251,6 +251,26 @@ export const QueryType = z
     ref: 'QueryType'
   })
 
+export const SearchQuery = z
+  .object({
+    query: QueryType,
+    limit: z.number().optional().default(100),
+    offset: z.number().optional().default(0),
+    sort: z
+      .array(
+        z.object({
+          field: z.string(),
+          direction: z.enum(['asc', 'desc']).default('asc')
+        })
+      )
+      .optional()
+  })
+  .openapi({
+    ref: 'SearchQuery'
+  })
+
+export type SearchQuery = z.infer<typeof SearchQuery>
+
 export type QueryType = z.infer<typeof QueryType>
 export type QueryExpression = z.infer<typeof QueryExpression>
 

@@ -57,7 +57,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
   }))
 
   return {
-    getResult: () => {
+    getResult: ({ offset, limit }: { offset: number; limit: number }) => {
       const deserializedQuery = getDeserializedQuery(
         workqueueConfig,
         user,
@@ -65,12 +65,28 @@ export const useWorkqueue = (workqueueSlug: string) => {
       )
       return {
         useSuspenseQuery: () =>
-          searchEvent.useSuspenseQuery(deserializedQuery, {
-            networkMode: 'offlineFirst',
-            refetchInterval: 20000
-          }),
+          searchEvent.useSuspenseQuery(
+            {
+              query: deserializedQuery,
+              offset,
+              limit,
+              sort: [{ field: 'updatedAt', direction: 'desc' }]
+            },
+            {
+              networkMode: 'offlineFirst',
+              refetchInterval: 20000
+            }
+          ),
         useQuery: () =>
-          searchEvent.useQuery(deserializedQuery, { refetchInterval: 10000 })
+          searchEvent.useQuery(
+            {
+              query: deserializedQuery,
+              offset,
+              limit,
+              sort: [{ field: 'updatedAt', direction: 'desc' }]
+            },
+            { refetchInterval: 10000 }
+          )
       }
     },
     getCount: {
@@ -98,7 +114,10 @@ export function useWorkqueues() {
             legacyUser?.primaryOffice.id
           )
           return queryClient.prefetchQuery({
-            ...trpc.event.search.queryOptions(deserializedQuery)
+            ...trpc.event.search.queryOptions({
+              query: deserializedQuery,
+              limit: 10
+            })
           })
         })
       )
