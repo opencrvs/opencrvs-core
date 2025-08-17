@@ -4047,11 +4047,7 @@ export interface DeathRegistrationToHistoryResolver<
 }
 
 export interface GQLEventRegistrationTypeResolver<TParent = any> {
-  (
-    parent: TParent,
-    context: Context,
-    info: GraphQLResolveInfo
-  ):
+  (parent: TParent, context: Context, info: GraphQLResolveInfo):
     | 'BirthRegistration'
     | 'DeathRegistration'
     | 'MarriageRegistration'

@@ -85,7 +85,7 @@ export function deleteDraft(id: string) {
   setDraftData((drafts) => drafts.filter(({ eventId }) => eventId !== id))
 }
 
-export function findLocalEventIndex(id: string) {
+export function findLocalEventIndex(id: string): EventIndex | undefined {
   const queries = getQueriesData(trpcOptionsProxy.event.search)
   const eventWithAMatchingId = queries
     .flatMap(([, data]) => data?.results || [])
