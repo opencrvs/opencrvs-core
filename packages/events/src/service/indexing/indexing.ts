@@ -358,7 +358,7 @@ export async function getIndexedEvents(
     })
 }
 
-export async function getIndex(
+export async function findRecordsByQuery(
   eventParams: QueryType,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
