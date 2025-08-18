@@ -13,15 +13,19 @@ import React, { PropsWithChildren, useEffect, useMemo } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { useNavigate } from 'react-router-dom'
 import {
+  Draft,
   createEmptyDraft,
-  findActiveDrafts,
-  getCurrentEventStateWithDrafts,
+  findActiveDraftForEvent,
+  dangerouslyGetCurrentEventStateWithDrafts,
   getActionAnnotation,
   DeclarationUpdateActionType,
   ActionType,
   Action,
   deepMerge,
-  getAnnotationFromDrafts
+  getAnnotationFromDrafts,
+  mergeDrafts,
+  getUUID,
+  deepDropNulls
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -88,7 +92,8 @@ function DeclarationActionComponent({
 
   const events = useEvents()
   const navigate = useNavigate()
-  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDrafts } = useDrafts()
+  const { setLocalDraft, getLocalDraftOrDefault, getRemoteDraftByEventId } =
+    useDrafts()
 
   const event = events.getEvent.findFromCache(eventId).data
 
@@ -110,23 +115,27 @@ function DeclarationActionComponent({
     event.type
   )
 
-  const drafts = getRemoteDrafts(event.id)
-  const activeDraft = findActiveDrafts(event, drafts)[0]
+  const remoteDraft: Draft | undefined = getRemoteDraftByEventId(event.id)
+
+  const activeRemoteDraft = remoteDraft
+    ? findActiveDraftForEvent(event, remoteDraft)
+    : undefined
+
   const localDraft = getLocalDraftOrDefault(
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-    activeDraft || createEmptyDraft(eventId, createTemporaryId(), actionType)
+    activeRemoteDraft
+      ? // new transactionId must be generated for the draft to be saved. Otherwise it will hit the "idempotency wall"
+        { ...activeRemoteDraft, transactionId: getUUID() }
+      : createEmptyDraft(eventId, createTemporaryId(), actionType)
   )
 
   /*
    * Keep the local draft updated as per the form changes
    */
-  const formValues = useEventFormData((state) => state.formValues)
-  const annotation = useActionAnnotation((state) => state.annotation)
-  const clearForm = useEventFormData((state) => state.clear)
-  const clearAnnotation = useActionAnnotation((state) => state.clear)
+  const currentDeclaration = useEventFormData((state) => state.formValues)
+  const currentAnnotation = useActionAnnotation((state) => state.annotation)
 
   useEffect(() => {
-    if (!formValues || !annotation) {
+    if (!currentDeclaration || !currentAnnotation) {
       return
     }
 
@@ -135,12 +144,12 @@ function DeclarationActionComponent({
       eventId: event.id,
       action: {
         ...localDraft.action,
-        declaration: formValues,
-        annotation
+        declaration: currentDeclaration,
+        annotation: currentAnnotation
       }
     })
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [formValues, annotation])
+  }, [currentDeclaration, currentAnnotation])
 
   /*
    * Initialize the form state
@@ -148,16 +157,37 @@ function DeclarationActionComponent({
   const setFormValues = useEventFormData((state) => state.setFormValues)
   const setAnnotation = useActionAnnotation((state) => state.setAnnotation)
 
-  const eventDrafts = getEventDrafts(event.id, localDraft, drafts)
+  const localDraftWithAdjustedTimestamp = {
+    ...localDraft,
+    /*
+     * Force the local draft always to be the latest
+     * This is to prevent a situation where the local draft gets created,
+     * then a CREATE action request finishes in the background and is stored with a later
+     * timestamp
+     */
+    createdAt: new Date().toISOString(),
+    /*
+     * If params.eventId changes (from tmp id to concrete id) then change the local draft id
+     */
+    eventId: event.id,
+    action: {
+      ...localDraft.action,
+      createdAt: new Date().toISOString()
+    }
+  }
+
+  const mergedDraft: Draft = activeRemoteDraft
+    ? mergeDrafts(activeRemoteDraft, localDraftWithAdjustedTimestamp)
+    : localDraftWithAdjustedTimestamp
 
   const eventStateWithDrafts = useMemo(
     () =>
-      getCurrentEventStateWithDrafts({
+      dangerouslyGetCurrentEventStateWithDrafts({
         event,
-        drafts: eventDrafts,
+        draft: mergedDraft,
         configuration
       }),
-    [eventDrafts, event, configuration]
+    [mergedDraft, event, configuration]
   )
 
   const actionAnnotation = useMemo(() => {
@@ -166,15 +196,15 @@ function DeclarationActionComponent({
       actionType === ActionType.REQUEST_CORRECTION &&
       !isLastActionCorrectionRequest(event)
     ) {
-      return getAnnotationFromDrafts(eventDrafts)
+      return deepDropNulls(mergedDraft.action.annotation || {})
     }
 
     return getActionAnnotation({
       event,
       actionType,
-      drafts: eventDrafts
+      draft: mergedDraft
     })
-  }, [eventDrafts, event, actionType])
+  }, [mergedDraft, event, actionType])
 
   const previousActionAnnotation = useMemo(() => {
     const previousActionType = getPreviousDeclarationActionType(
@@ -208,28 +238,18 @@ function DeclarationActionComponent({
     // If user e.g. enters the 'screen lock' flow while filling form.
     // Then use form values from drafts.
     const initialFormValues = deepMerge(
-      formValues || {},
+      currentDeclaration || {},
       eventStateWithDrafts.declaration
     )
 
     setFormValues(initialFormValues)
 
     const initialAnnotation = deepMerge(
-      deepMerge(annotation || {}, previousActionAnnotation),
+      deepMerge(currentAnnotation || {}, previousActionAnnotation),
       actionAnnotation
     )
 
     setAnnotation(initialAnnotation)
-
-    return () => {
-      /*
-       * When user leaves the action, remove all
-       * staged drafts the user has for this event id and type
-       */
-      setLocalDraft(null)
-      clearForm()
-      clearAnnotation()
-    }
 
     /*
      * This is fine to only run once on mount and unmount as

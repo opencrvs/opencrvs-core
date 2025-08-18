@@ -19,7 +19,8 @@ import {
   has,
   isNil,
   uniqBy,
-  cloneDeep
+  cloneDeep,
+  orderBy
 } from 'lodash'
 import {
   ActionType,
@@ -194,26 +195,34 @@ export function omitHiddenPaginatedFields(
   return omitHiddenFields(visiblePagesFormFields, declaration)
 }
 
-export function findActiveDrafts(event: EventDocument, drafts: Draft[]) {
-  const actions = event.actions
-    .slice()
-    .filter(({ type }) => type !== ActionType.READ)
-    .sort((a, b) => a.createdAt.localeCompare(b.createdAt))
+/**
+ *
+ * @returns a draft for the event that has been created since the last non-read action.
+ */
+export function findActiveDraftForEvent(
+  event: EventDocument,
+  draft: Draft
+): Draft | undefined {
+  const actions = orderBy(
+    event.actions.filter(({ type }) => type !== ActionType.READ),
+    ['createdAt'],
+    ['asc']
+  )
 
   const lastAction = actions[actions.length - 1]
-  return (
-    drafts
-      // Temporally allows equal timestamps as the generated demo data is not perfect yet
-      // should be > rather than >=
-      .filter(({ createdAt }) => createdAt >= lastAction.createdAt)
-      .filter(({ eventId }) => eventId === event.id)
-  )
+  // After migrations have been run, there should always be [0..1[ actions.
+  // Temporally allows equal timestamps as the generated demo data is not perfect yet
+  const isDraftActive = draft.createdAt >= lastAction.createdAt
+
+  const isDraftForEvent = event.id === draft.eventId
+
+  return isDraftActive && isDraftForEvent ? draft : undefined
 }
 
 export function createEmptyDraft(
   eventId: UUID,
   draftId: UUID,
-  actionType: ActionType
+  actionType: Exclude<ActionType, 'DELETE'>
 ): Draft {
   return {
     id: draftId,
@@ -291,6 +300,14 @@ export function omitHiddenAnnotationFields(
   )
 }
 
+/**
+ * Merges two documents together.
+ *
+ * @example deepMerge({'review.signature': { path: '/path.png', type: 'image/png' }}, { foo: 'bar'}) } => { 'review.signature': { path: '/path.png', type: 'image/png' }, foo: 'bar' }
+ *
+ * NOTE: When merging deep objects, the values from the second object will override the first one.
+ * @example { annotation: {'review.signature': { path: '/path.png', type: 'image/png' }}, { annotation: { foo: 'bar'}) } } => { annotation: { foo: 'bar' } }
+ */
 export function deepMerge<
   T extends Record<string, unknown>,
   K extends Record<string, unknown>
@@ -414,5 +431,30 @@ export function timePeriodToDateRange(value: SelectDateRangeValue) {
   return {
     startDate: startDate.toISOString(),
     endDate: new Date().toISOString()
+  }
+}
+
+export function mergeDrafts(currentDraft: Draft, incomingDraft: Draft): Draft {
+  if (currentDraft.eventId !== incomingDraft.eventId) {
+    throw new Error(
+      `Cannot merge drafts for different events: ${currentDraft.eventId} and ${incomingDraft.eventId}`
+    )
+  }
+
+  return {
+    ...currentDraft,
+    ...incomingDraft,
+    action: {
+      ...currentDraft.action,
+      ...incomingDraft.action,
+      declaration: deepMerge(
+        currentDraft.action.declaration,
+        incomingDraft.action.declaration
+      ),
+      annotation: deepMerge(
+        currentDraft.action.annotation ?? {},
+        incomingDraft.action.annotation ?? {}
+      )
+    }
   }
 }

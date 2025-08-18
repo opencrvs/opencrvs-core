@@ -1207,14 +1207,6 @@ export const handlers = {
     }),
     tRPCMsw.event.search.query((input) => {
       return []
-    }),
-    tRPCMsw.workqueue.config.list.query(() => {
-      return generateWorkqueues()
-    }),
-    tRPCMsw.workqueue.count.query((input) => {
-      return input.reduce((acc, { slug }) => {
-        return { ...acc, [slug]: 7 }
-      }, {})
     })
   ],
   locations: [
@@ -2218,6 +2210,16 @@ export const handlers = {
           'Content-Type': 'image/svg+xml'
         }
       })
+    })
+  ],
+  workqueues: [
+    tRPCMsw.workqueue.count.query((input) => {
+      return input.reduce((acc, { slug }) => {
+        return { ...acc, [slug]: 7 }
+      }, {})
+    }),
+    tRPCMsw.workqueue.config.list.query(() => {
+      return generateWorkqueues()
     })
   ]
 }

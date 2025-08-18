@@ -44,12 +44,16 @@ export function useEvents() {
     },
     getOutbox: useOutbox,
     searchEvent: {
-      useQuery: (query: QueryType) => {
+      useQuery: (
+        query: QueryType,
+        options: QueryOptions<typeof trpc.event.search> = {}
+      ) => {
         return useQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: true,
-          staleTime: 0
+          refetchOnMount: 'always',
+          staleTime: 0,
+          ...options
         })
       },
       useSuspenseQuery: (
@@ -59,7 +63,7 @@ export function useEvents() {
         return useSuspenseQuery({
           ...trpc.event.search.queryOptions(query),
           queryKey: trpc.event.search.queryKey(query),
-          refetchOnMount: true,
+          refetchOnMount: 'always',
           staleTime: 0,
           ...options
         }).data
@@ -79,7 +83,7 @@ export function useEvents() {
           queryKey: trpc.event.search.queryKey(query),
           enabled: !findLocalEventIndex(id),
           staleTime: 0,
-          refetchOnMount: true,
+          refetchOnMount: 'always',
           queryFn: async (...args) => {
             const queryFn = options.queryFn
             if (!queryFn) {
