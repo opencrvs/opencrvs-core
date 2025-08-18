@@ -48,6 +48,10 @@ import {
   withJurisdictionFilters
 } from './query'
 
+// Elasticsearch has a limit of 10,000 results for a query, and
+// trying to get beyond that will result in a “Result window is too large“ error
+const ELASTICSEARCH_MAXIMUM_QUERY_SIZE = 10000
+
 function eventToEventIndex(
   event: EventDocument,
   config: EventConfig
@@ -346,7 +350,7 @@ export async function getIndexedEvents(
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: 10000,
+    size: ELASTICSEARCH_MAXIMUM_QUERY_SIZE,
     request_cache: false
   })
 

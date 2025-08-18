@@ -260,14 +260,14 @@ export const eventRouter = router({
       return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure
-    // .meta({
-    //   openapi: {
-    //     summary: 'Search for events',
-    //     method: 'GET',
-    //     tags: ['Search'],
-    //     path: '/events/search'
-    //   }
-    // })
+    .meta({
+      openapi: {
+        summary: 'Search for events',
+        method: 'GET',
+        tags: ['Search'],
+        path: '/events/search'
+      }
+    })
     // @todo: remove legacy scopes once all users are configured with new search scopes
     .use(requiresAnyOfScopes([], ['search']))
     .input(SearchQuery)

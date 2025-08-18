@@ -135,7 +135,6 @@ test('Throws when searching without payload', async () => {
     'search[event=tennis-club-membership,access=all]'
   ])
 
-  // @ts-expect-error - Intentionally passing an empty object to trigger the error
   await expect(client.event.search({})).rejects.toMatchSnapshot()
 })
 
@@ -1565,9 +1564,10 @@ test('Returns paginated results when limit and size parameters are provided', as
     'record.declare-birth'
   ])
 
-  // Create 5 events
+  const totalNumberOfRecords = 5
+
   const events = []
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < totalNumberOfRecords; i++) {
     const event = await client.event.create(generator.event.create())
     const data = generator.event.actions.declare(event.id, {
       declaration: {
@@ -1609,7 +1609,7 @@ test('Returns paginated results when limit and size parameters are provided', as
   })
 
   expect(firstPage).toHaveLength(2)
-  expect(total).toEqual(5)
+  expect(total).toEqual(totalNumberOfRecords)
 
   // Test second page with limit 2
   const { results: secondPage } = await client.event.search({
@@ -1675,5 +1675,5 @@ test('Returns paginated results when limit and size parameters are provided', as
     offset: 0
   })
 
-  expect(allResults).toHaveLength(5)
+  expect(allResults).toHaveLength(totalNumberOfRecords)
 })
