@@ -224,7 +224,8 @@ export const ResolvedUser = z.object({
       given: z.array(z.string()),
       family: z.string()
     })
-  )
+  ),
+  primaryOfficeId: z.string()
 })
 
 export type ResolvedUser = z.infer<typeof ResolvedUser>
