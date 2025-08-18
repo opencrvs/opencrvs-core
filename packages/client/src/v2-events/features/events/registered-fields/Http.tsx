@@ -11,9 +11,16 @@
 
 import React, { useRef } from 'react'
 import { useMutation } from '@tanstack/react-query'
-import { isEqual } from 'lodash'
-import { FieldValue, HttpField, HttpFieldValue } from '@opencrvs/commons/client'
+import { get, isEqual } from 'lodash'
+import {
+  FieldValue,
+  HttpField,
+  HttpFieldValue,
+  isTemplateVariable,
+  SystemVariables
+} from '@opencrvs/commons/client'
 import { getToken } from '@client/utils/authUtils'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 
 async function fetchWithTimeout(
   input: RequestInfo | URL,
@@ -43,13 +50,22 @@ interface HttpError extends Error {
   statusCode?: number
 }
 
-async function fetchHttpFieldValue(cfg: HttpField['configuration']) {
+async function fetchHttpFieldValue(
+  cfg: HttpField['configuration'],
+  systemVariables: SystemVariables
+) {
   const baseUrl = window.location.origin
   const url = new URL(cfg.url, baseUrl)
 
   if (cfg.params) {
     for (const [k, v] of Object.entries(cfg.params)) {
       url.searchParams.append(k, String(v))
+    }
+  }
+
+  if (cfg.body) {
+    for (const [k, v] of Object.entries(cfg.body)) {
+      cfg.body[k] = isTemplateVariable(v) ? get(systemVariables, v) : v
     }
   }
 
@@ -78,11 +94,12 @@ export function HttpInput({
   configuration: HttpField['configuration']
   onChange: (val: HttpFieldValue) => void
 }) {
+  const systemVariables = useSystemVariables()
   const firstRunRef = useRef(true)
   const prevParentRef = useRef<FieldValue | undefined>(undefined)
 
   const mutation = useMutation<unknown, HttpError>({
-    mutationFn: async () => fetchHttpFieldValue(configuration),
+    mutationFn: async () => fetchHttpFieldValue(configuration, systemVariables),
     onMutate: () => {
       onChange({ loading: true, error: null, data: null })
     },
