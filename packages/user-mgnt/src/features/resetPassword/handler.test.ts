@@ -15,6 +15,14 @@ import { createServer } from '@user-mgnt/server'
 import User, { IUser } from '@user-mgnt/model/user'
 import { SCOPES } from '@opencrvs/commons/authentication'
 
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn()
+  }
+})
+
 const sysAdminToken = jwt.sign(
   { scope: [SCOPES.USER_UPDATE] },
   readFileSync('./test/cert.key'),

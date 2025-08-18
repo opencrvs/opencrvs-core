@@ -271,9 +271,12 @@ export function createStoriesFromScenarios(
           msw: {
             handlers: {
               event: [
-                tRPCMsw.event.search.query(() => [
-                  getCurrentEventState(event, tennisClubMembershipEvent)
-                ])
+                tRPCMsw.event.search.query(() => ({
+                  total: 1,
+                  results: [
+                    getCurrentEventState(event, tennisClubMembershipEvent)
+                  ]
+                }))
               ]
             }
           }

@@ -14,6 +14,14 @@ import * as retrievalService from '@auth/features/retrievalSteps/verifyUser/serv
 import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn()
+  }
+})
+
 describe('verifyNumber handler receives a request', () => {
   let server: AuthServer
 
