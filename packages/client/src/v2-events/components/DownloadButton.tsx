@@ -10,10 +10,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Button } from '@opencrvs/components/lib/Button'
-import { ResponsiveModal } from '@opencrvs/components/lib/ResponsiveModal'
 import { AvatarSmall } from '@client/components/Avatar'
-import { buttonMessages, constantsMessages } from '@client/i18n/messages'
-import { conflictsMessages } from '@client/i18n/messages/views/conflicts'
+import { constantsMessages } from '@client/i18n/messages'
 import { useOnlineStatus } from '@client/utils'
 import { Spinner } from '@opencrvs/components/lib/Spinner'
 import { Download, Downloaded } from '@opencrvs/components/lib/icons'
@@ -33,6 +31,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
 import { useActionMenuItems } from '../features/workqueues/EventOverview/components/useActionMenuItems'
+import { AssignModal } from './AssignModal'
 
 interface DownloadButtonProps {
   id?: string
@@ -71,42 +70,6 @@ const NoConnectionViewContainer = styled.div`
   }
 `
 
-function AssignModal({ close }: { close: (result: boolean) => void }) {
-  const intl = useIntl()
-
-  return (
-    <ResponsiveModal
-      autoHeight
-      preventClickOnParent
-      show
-      actions={[
-        <Button
-          key="assign-btn"
-          id="assign"
-          type="positive"
-          onClick={() => close(true)}
-        >
-          {intl.formatMessage(buttonMessages.assign)}
-        </Button>,
-        <Button
-          key="cancel-btn"
-          id="cancel"
-          type="tertiary"
-          onClick={() => close(false)}
-        >
-          {intl.formatMessage(buttonMessages.cancel)}
-        </Button>
-      ]}
-      handleClose={() => close(false)}
-      id="assignment"
-      responsive={false}
-      title={intl.formatMessage(conflictsMessages.assignTitle)}
-    >
-      {intl.formatMessage(conflictsMessages.assignDesc)}
-    </ResponsiveModal>
-  )
-}
-
 export function DownloadButton({
   id,
   className,
@@ -125,7 +88,7 @@ export function DownloadButton({
     enabled: !!event.assignedTo
   }).data
 
-  const actionMenuItems = useActionMenuItems(event)
+  const [_, actionMenuItems] = useActionMenuItems(event)
   const assignmentStatus = getAssignmentStatus(event, authentication?.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
