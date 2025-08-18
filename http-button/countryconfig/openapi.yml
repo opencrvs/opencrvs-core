@@ -386,26 +386,6 @@ components:
                         fieldType:
                           type: string
                           const: field
-                        alternateFieldIds:
-                          type: array
-                          items:
-                            type: string
-                          description: >-
-                            Sometimes there might be need to search a value
-                            against multiple field of same FormField type. For
-                            example
-                                  search Country, Province, District against child.address.private and child.address.other. In such case, we
-                                  add a one field as fieldId, and accomodate others in alternateFieldIds
-                        excludeInSearchQuery:
-                          type: boolean
-                          default: false
-                          description: >-
-                            Sometimes there will be search fields which are used
-                            to
-                                conditionally display another search field, but its not needed in search query. For example, child.placeOfBirth
-                                is select field, which has 3 options, FACILITY, PRIVATE_HOME, OTHER. Upon selecting any of the option, pops up another field
-                                related to the selected option, whose value is required in the search query. But child.placeOfBirth itself is not needed in the query.
-                                In such case, populate this field (excludeInSearchQuery) with boolean true
                       required:
                         - config
                         - fieldId
@@ -768,6 +748,34 @@ components:
             type:
               type: string
               const: ADDRESS
+            configuration:
+              type: object
+              properties:
+                lineSeparator:
+                  type: string
+                fields:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - number
+                      - country
+                      - province
+                      - addressType
+                      - district
+                      - urbanOrRural
+                      - town
+                      - residentialArea
+                      - street
+                      - zipCode
+                      - village
+                      - state
+                      - district2
+                      - cityOrTown
+                      - addressLine1
+                      - addressLine2
+                      - addressLine3
+                      - postcodeOrZip
             defaultValue:
               anyOf:
                 - oneOf:
@@ -849,11 +857,6 @@ components:
                     - addressType
                     - state
                     - district2
-            configuration:
-              type: object
-              properties:
-                searchMode:
-                  type: boolean
           required:
             - id
             - label
@@ -2165,6 +2168,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     middlename:
@@ -2172,6 +2177,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                     surname:
@@ -2179,6 +2186,8 @@ components:
                       properties:
                         required:
                           type: boolean
+                        label:
+                          $ref: "#/components/schemas/TranslationConfig"
                       required:
                         - required
                   default:
@@ -2186,6 +2195,14 @@ components:
                       required: true
                     surname:
                       required: true
+                order:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - firstname
+                      - middlename
+                      - surname
                 maxLength:
                   type: number
                   description: Maximum length of the text
@@ -2193,8 +2210,6 @@ components:
                   $ref: "#/components/schemas/TranslationConfig"
                 postfix:
                   $ref: "#/components/schemas/TranslationConfig"
-                searchMode:
-                  type: boolean
               default:
                 name:
                   firstname:
@@ -3770,9 +3785,6 @@ components:
                     - statusCode
                     - message
                 data: {}
-                trackingValue:
-                  type: string
-                  description: If the tracking value changes, the field will be re-fetched
               required:
                 - loading
                 - error
@@ -13604,7 +13616,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 71a62bdf-82bf-4ca9-9797-adf0477f2f58
+        transactionId: 9e567a98-b15c-40fb-b60e-4c3e161c43fb
         declaration: {}
         annotation: {}
         type: NOTIFY
