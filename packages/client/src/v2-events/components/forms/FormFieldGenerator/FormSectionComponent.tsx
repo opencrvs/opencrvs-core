@@ -206,7 +206,7 @@ export function FormSectionComponent({
 
       // reset the children values of the changed field. (e.g. When changing informant.relation, empty out phone number, email and others.)
       for (const childId of childIds) {
-        set(updatedValues, makeFormFieldIdFormikCompatible(childId), undefined)
+        set(updatedValues, makeFormFieldIdFormikCompatible(childId), null)
         set(updatedErrors, childId, { errors: [] })
       }
 

@@ -25,7 +25,9 @@ import {
   TranslationConfig,
   never,
   defineDeclarationForm,
-  footballClubMembershipEvent
+  footballClubMembershipEvent,
+  generateUuid,
+  generateActionDocument
 } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -35,6 +37,7 @@ import {
 } from '@client/v2-events/features/events/fixtures'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
+import { addLocalEventConfig, setEventData } from '../../../useEvents/api'
 import { router } from './router'
 import * as Request from './index'
 
@@ -120,11 +123,205 @@ const recommenderOtherThanClubMembers = and(
   not(field('recommender.relation').isFalsy())
 )
 
+const overridenEventConfig = {
+  ...tennisClubMembershipEvent,
+  id: 'overridenEventConfig',
+  declaration: defineDeclarationForm({
+    ...tennisClubMembershipEvent.declaration,
+    pages: [
+      {
+        id: 'recommender',
+        title: {
+          id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.title',
+          defaultMessage: 'Who is recommending the applicant?',
+          description: 'This is the title of the section'
+        },
+        fields: [
+          {
+            id: 'recommender.relation',
+            type: FieldType.SELECT,
+            required: true,
+            conditionals: [
+              {
+                type: ConditionalType.SHOW,
+                conditional: field('recommender.none').isFalsy()
+              }
+            ],
+            label: {
+              defaultMessage: 'Relationship to child',
+              description: 'This is the label for the field',
+              id: 'v2.event.birth.action.declare.form.section.recommender.field.relation.label'
+            },
+            options: recommenderOptions
+          },
+          {
+            id: 'recommender.name',
+            type: FieldType.NAME,
+            hideLabel: true,
+            required: true,
+            conditionals: [
+              {
+                type: ConditionalType.SHOW,
+                conditional: field('recommender.none').isFalsy()
+              }
+            ],
+            label: {
+              defaultMessage: "Recommender's name",
+              description: 'This is the label for the field',
+              id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
+            },
+            parent: field('recommender.relation')
+          },
+          {
+            id: 'recommender.dob',
+            type: 'DATE',
+            required: true,
+            validation: [
+              {
+                message: {
+                  defaultMessage: 'Must be a valid Birthdate',
+                  description: 'This is the error message for invalid date',
+                  id: 'v2.event.birth.action.declare.form.section.person.field.dob.error'
+                },
+                validator: field('recommender.dob').isBefore().now()
+              },
+              {
+                message: {
+                  defaultMessage:
+                    "Birth date must be before child's birth date",
+                  description:
+                    "This is the error message for a birth date after child's birth date",
+                  id: 'v2.event.birth.action.declare.form.section.person.dob.afterChild'
+                },
+                validator: field('recommender.dob')
+                  .isBefore()
+                  .date(field('child.dob'))
+              }
+            ],
+            label: {
+              defaultMessage: 'Date of birth',
+              description: 'This is the label for the field',
+              id: 'v2.event.birth.action.declare.form.section.person.field.dob.label'
+            },
+            conditionals: [
+              {
+                type: ConditionalType.SHOW,
+                conditional: and(
+                  not(field('recommender.dobUnknown').isEqualTo(true)),
+                  recommenderOtherThanClubMembers
+                )
+              }
+            ],
+            parent: field('recommender.relation')
+          },
+          {
+            id: 'recommender.dobUnknown',
+            type: FieldType.CHECKBOX,
+            label: {
+              defaultMessage: 'Exact date of birth unknown',
+              description: 'This is the label for the field',
+              id: 'v2.event.birth.action.declare.form.section.person.field.age.checkbox.label'
+            },
+            conditionals: [
+              {
+                type: ConditionalType.SHOW,
+                conditional: field('recommender.none').isFalsy()
+              },
+              {
+                type: ConditionalType.SHOW,
+                conditional: recommenderOtherThanClubMembers
+              },
+              {
+                type: ConditionalType.DISPLAY_ON_REVIEW,
+                conditional: never()
+              }
+            ],
+            parent: field('recommender.relation')
+          },
+          {
+            id: 'recommender.age',
+            type: FieldType.TEXT,
+            required: true,
+            label: {
+              defaultMessage: 'Age of recommender',
+              description: 'This is the label for the field',
+              id: 'v2.event.birth.action.declare.form.section.recommender.field.age.label'
+            },
+            configuration: {
+              postfix: {
+                defaultMessage: 'years',
+                description: 'This is the postfix for age field',
+                id: 'v2.event.birth.action.declare.form.section.person.field.age.postfix'
+              }
+            },
+            conditionals: [
+              {
+                type: ConditionalType.SHOW,
+                conditional: field('recommender.none').isFalsy()
+              },
+              {
+                type: ConditionalType.SHOW,
+                conditional: and(
+                  field('recommender.dobUnknown').isEqualTo(true),
+                  recommenderOtherThanClubMembers
+                )
+              }
+            ],
+            parent: field('recommender.relation')
+          }
+        ]
+      }
+    ]
+  })
+}
+
+const overridenActions = [
+  generateActionDocument({
+    configuration: overridenEventConfig,
+    action: ActionType.CREATE
+  }),
+  generateActionDocument({
+    configuration: overridenEventConfig,
+    action: ActionType.DECLARE,
+    defaults: {
+      declaration: {
+        'recommender.relation': 'Father',
+        'recommender.name': 'Mohammed Rahim',
+        'recommender.dob': '1978-05-12',
+        'recommender.dobUnknown': false,
+        'recommender.age': 47
+      }
+    }
+  }),
+  generateActionDocument({
+    configuration: overridenEventConfig,
+    action: ActionType.VALIDATE
+  }),
+  generateActionDocument({
+    configuration: overridenEventConfig,
+    action: ActionType.REGISTER
+  })
+]
+const overridenEvent = {
+  trackingId: generateUuid(),
+  type: overridenEventConfig.id,
+  actions: overridenActions,
+  createdAt: new Date(Date.now()).toISOString(),
+  id: generateUuid(),
+  updatedAt: new Date(Date.now()).toISOString()
+}
 export const FormFieldParentChildReset: Story = {
+  beforeEach: () => {
+    /*
+     * Ensure record is "downloaded offline" in the user's browser
+     */
+    addLocalEventConfig(overridenEventConfig)
+    setEventData(overridenEvent.id, overridenEvent)
+  },
   parameters: {
-    offline: {
-      drafts: [draft]
-    },
+    // offline: {
+    //   drafts: [draft]
+    // },
     reactRouter: {
       router: {
         path: '/',
@@ -132,223 +329,19 @@ export const FormFieldParentChildReset: Story = {
         children: [router]
       },
       initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
+        eventId: overridenEvent.id
       })
     },
     msw: {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [
-              {
-                ...tennisClubMembershipEvent,
-                declaration: defineDeclarationForm({
-                  ...tennisClubMembershipEvent.declaration,
-                  pages: {
-                    ...tennisClubMembershipEvent.declaration.pages.map(
-                      (x, i) => {
-                        if (i === 2) {
-                          return {
-                            ...x,
-                            fields: [
-                              {
-                                id: 'recommender.none',
-                                type: FieldType.CHECKBOX,
-                                required: false,
-                                conditionals: [],
-                                label: {
-                                  defaultMessage: 'No recommender',
-                                  description:
-                                    'This is the label for the field',
-                                  id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.none.label'
-                                }
-                              },
-                              {
-                                id: 'recommender.relation',
-                                type: FieldType.SELECT,
-                                required: true,
-                                conditionals: [
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional:
-                                      field('recommender.none').isFalsy()
-                                  }
-                                ],
-                                label: {
-                                  defaultMessage: 'Relationship to child',
-                                  description:
-                                    'This is the label for the field',
-                                  id: 'v2.event.birth.action.declare.form.section.recommender.field.relation.label'
-                                },
-                                options: recommenderOptions
-                              },
-                              {
-                                id: 'recommender.name',
-                                type: FieldType.NAME,
-                                hideLabel: true,
-                                required: true,
-                                conditionals: [
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional:
-                                      field('recommender.none').isFalsy()
-                                  }
-                                ],
-                                label: {
-                                  defaultMessage: "Recommender's name",
-                                  description:
-                                    'This is the label for the field',
-                                  id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
-                                },
-                                parent: field('recommender.relation')
-                              },
-                              {
-                                id: 'recommender.dob',
-                                type: 'DATE',
-                                required: true,
-                                validation: [
-                                  {
-                                    message: {
-                                      defaultMessage:
-                                        'Must be a valid Birthdate',
-                                      description:
-                                        'This is the error message for invalid date',
-                                      id: 'v2.event.birth.action.declare.form.section.person.field.dob.error'
-                                    },
-                                    validator: field('recommender.dob')
-                                      .isBefore()
-                                      .now()
-                                  },
-                                  {
-                                    message: {
-                                      defaultMessage:
-                                        "Birth date must be before child's birth date",
-                                      description:
-                                        "This is the error message for a birth date after child's birth date",
-                                      id: 'v2.event.birth.action.declare.form.section.person.dob.afterChild'
-                                    },
-                                    validator: field('recommender.dob')
-                                      .isBefore()
-                                      .date(field('child.dob'))
-                                  }
-                                ],
-                                label: {
-                                  defaultMessage: 'Date of birth',
-                                  description:
-                                    'This is the label for the field',
-                                  id: 'v2.event.birth.action.declare.form.section.person.field.dob.label'
-                                },
-                                conditionals: [
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional: and(
-                                      not(
-                                        field(
-                                          'recommender.dobUnknown'
-                                        ).isEqualTo(true)
-                                      ),
-                                      recommenderOtherThanClubMembers
-                                    )
-                                  }
-                                ],
-                                parent: field('recommender.relation')
-                              },
-                              {
-                                id: 'recommender.dobUnknown',
-                                type: FieldType.CHECKBOX,
-                                label: {
-                                  defaultMessage: 'Exact date of birth unknown',
-                                  description:
-                                    'This is the label for the field',
-                                  id: 'v2.event.birth.action.declare.form.section.person.field.age.checkbox.label'
-                                },
-                                conditionals: [
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional:
-                                      field('recommender.none').isFalsy()
-                                  },
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional: recommenderOtherThanClubMembers
-                                  },
-                                  {
-                                    type: ConditionalType.DISPLAY_ON_REVIEW,
-                                    conditional: never()
-                                  }
-                                ],
-                                parent: field('recommender.relation')
-                              },
-                              {
-                                id: 'recommender.age',
-                                type: FieldType.TEXT,
-                                required: true,
-                                label: {
-                                  defaultMessage: 'Age of recommender',
-                                  description:
-                                    'This is the label for the field',
-                                  id: 'v2.event.birth.action.declare.form.section.recommender.field.age.label'
-                                },
-                                configuration: {
-                                  postfix: {
-                                    defaultMessage: 'years',
-                                    description:
-                                      'This is the postfix for age field',
-                                    id: 'v2.event.birth.action.declare.form.section.person.field.age.postfix'
-                                  }
-                                },
-                                conditionals: [
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional:
-                                      field('recommender.none').isFalsy()
-                                  },
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional: and(
-                                      field('recommender.dobUnknown').isEqualTo(
-                                        true
-                                      ),
-                                      recommenderOtherThanClubMembers
-                                    )
-                                  }
-                                ],
-                                parent: field('recommender.relation')
-                              },
-                              {
-                                id: 'recommender.id',
-                                type: FieldType.TEXT,
-                                required: true,
-                                conditionals: [
-                                  {
-                                    type: ConditionalType.SHOW,
-                                    conditional:
-                                      field('recommender.none').isFalsy()
-                                  }
-                                ],
-                                label: {
-                                  defaultMessage: "Recommender's membership ID",
-                                  description:
-                                    'This is the label for the field',
-                                  id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.id.label'
-                                },
-                                parent: field('recommender.relation')
-                              }
-                            ]
-                          }
-                        }
-                        return x
-                      }
-                    )
-                  }
-                })
-              }
-            ]
+            return [overridenEventConfig]
           })
         ],
         event: [
           tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
+            return overridenEvent
           })
         ]
       }
