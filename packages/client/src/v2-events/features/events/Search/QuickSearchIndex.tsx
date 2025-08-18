@@ -31,14 +31,17 @@ function QuickSearchComponent({
   const eventConfigurations = useEventConfigurations()
 
   const query = buildQuickSearchQuery(searchParams, eventConfigurations)
-  const queryData = searchEvent.useSuspenseQuery(query)
+  const queryData = searchEvent.useSuspenseQuery({
+    query,
+    ...typedSearchParams
+  })
 
   return (
     <SearchResultComponent
       actions={['DEFAULT']}
       columns={mandatoryColumns}
       eventConfigs={eventConfigurations}
-      queryData={queryData}
+      queryData={queryData.results}
       title={intl.formatMessage(
         {
           id: 'v2.search.quickSearch.result.title',
@@ -49,6 +52,7 @@ function QuickSearchComponent({
           searchTerm: searchParams.keys
         }
       )}
+      totalResults={queryData.total}
       {...typedSearchParams}
     />
   )

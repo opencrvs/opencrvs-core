@@ -245,7 +245,8 @@ export const SearchResultComponent = ({
   tabBarContent,
   actions = [],
   emptyMessage,
-  allowRetry
+  allowRetry,
+  totalResults
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -254,6 +255,7 @@ export const SearchResultComponent = ({
   offset?: number
   title: string
   allowRetry?: boolean
+  totalResults: number
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
   emptyMessage?: TranslationConfig
@@ -486,12 +488,9 @@ export const SearchResultComponent = ({
 
   const currentPageNumber = Math.floor(offset / limit) + 1
 
-  const paginatedData = allResults.slice(
-    limit * (currentPageNumber - 1),
-    limit * currentPageNumber
-  )
+  const paginatedData = allResults
 
-  const totalPages = events.length ? Math.ceil(events.length / limit) : 0
+  const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0
 
   const isShowPagination = totalPages > 1
 
@@ -517,7 +516,7 @@ export const SearchResultComponent = ({
         error={false}
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
-        noContent={events.length === 0}
+        noContent={totalResults === 0}
         noResultText={
           emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
         }

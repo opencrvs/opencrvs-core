@@ -1206,7 +1206,7 @@ export const handlers = {
       return [tennisClubMembershipEventIndex]
     }),
     tRPCMsw.event.search.query((input) => {
-      return []
+      return { results: [], total: 0 }
     })
   ],
   locations: [
