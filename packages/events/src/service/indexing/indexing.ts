@@ -10,6 +10,7 @@
  */
 
 import { type estypes } from '@elastic/elasticsearch'
+import { z } from 'zod'
 import {
   ActionCreationMetadata,
   RegistrationCreationMetadata,
@@ -22,10 +23,10 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType,
   WorkqueueCountInput,
   getEventConfigById,
   SearchScopeAccessLevels,
+  SearchQuery,
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
@@ -37,7 +38,6 @@ import {
 } from '@events/storage/elasticsearch'
 import {
   decodeEventIndex,
-  DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
@@ -47,6 +47,10 @@ import {
   buildElasticQueryFromSearchPayload,
   withJurisdictionFilters
 } from './query'
+
+// Elasticsearch has a limit of 10,000 results for a query, and
+// trying to get beyond that will result in a “Result window is too large“ error
+const ELASTICSEARCH_MAXIMUM_QUERY_SIZE = 10000
 
 function eventToEventIndex(
   event: EventDocument,
@@ -348,7 +352,7 @@ export async function getIndexedEvents(
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: DEFAULT_SIZE,
+    size: ELASTICSEARCH_MAXIMUM_QUERY_SIZE,
     request_cache: false
   })
 
@@ -362,26 +366,46 @@ export async function getIndexedEvents(
     })
 }
 
-export async function getIndex(
-  eventParams: QueryType,
+function valueFromTotal(total?: number | estypes.SearchTotalHits) {
+  if (!total) {
+    return 0
+  }
+  if (typeof total === 'number') {
+    return total
+  } else {
+    return total.value
+  }
+}
+
+export async function findRecordsByQuery(
+  search: SearchQuery,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
 
-  const query = withJurisdictionFilters(
-    await buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+  const { query, limit, offset } = search
+
+  const esQuery = withJurisdictionFilters(
+    await buildElasticQueryFromSearchPayload(query, eventConfigs),
     options,
     userOfficeId
   )
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
-    size: DEFAULT_SIZE,
+    size: limit,
+    from: offset,
+    track_total_hits: true,
     request_cache: false,
-    query,
-    sort: {
+    query: esQuery,
+    sort: search.sort?.map((sort) => ({
+      [sort.field]: {
+        order: sort.direction,
+        unmapped_type: 'keyword'
+      }
+    })) || {
       _score: {
         order: 'desc'
       }
@@ -397,8 +421,21 @@ export async function getIndex(
       return removeSecuredFields(eventConfig, decodedEventIndex)
     })
 
-  return events
+  return { results: events, total: valueFromTotal(response.hits.total) }
 }
+
+/*
+ * The types provided by the Elasticsearch client library.
+ * Left the code having to check for almost all fields.
+ */
+const MsearchResponseSchema = z.object({
+  status: z.number(),
+  hits: z.object({
+    total: z.object({
+      value: z.number()
+    })
+  })
+})
 
 export async function getEventCount(
   queries: WorkqueueCountInput,
@@ -406,20 +443,32 @@ export async function getEventCount(
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
-  return (
-    //  @TODO: write a query that does everything in one go.
-    (
-      await Promise.all(
-        queries.map(async ({ slug, query }) => {
-          const count = (
-            await getIndex(query, eventConfigs, options, userOfficeId)
-          ).length
-          return { slug, count }
-        })
-      )
-    ).reduce((acc: Record<string, number>, { slug, count }) => {
-      acc[slug] = count
-      return acc
-    }, {})
+  const esClient = getOrCreateClient()
+
+  const esQueries = queries.map(async (query) =>
+    buildElasticQueryFromSearchPayload(query.query, eventConfigs)
   )
+
+  const filteredQueries = (await Promise.all(esQueries)).map((query) =>
+    withJurisdictionFilters(query, options, userOfficeId)
+  )
+  const { responses } = await esClient.msearch({
+    searches: filteredQueries.flatMap((query) => [
+      { index: getEventAliasName() },
+      { size: 0, track_total_hits: true, query }
+    ])
+  })
+
+  return responses.reduce((acc: Record<string, number>, response, index) => {
+    const slug = queries[index].slug
+
+    const validatedResponse = MsearchResponseSchema.safeParse(response)
+
+    return {
+      ...acc,
+      [slug]: validatedResponse.success
+        ? validatedResponse.data.hits.total.value
+        : 0
+    }
+  }, {})
 }

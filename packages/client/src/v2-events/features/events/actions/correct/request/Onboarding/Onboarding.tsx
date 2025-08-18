@@ -43,7 +43,7 @@ export function Onboarding() {
 
   const navigate = useNavigate()
   const intl = useIntl()
-  const { goToHome } = useEventFormNavigation()
+  const { closeActionView } = useEventFormNavigation()
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
@@ -82,7 +82,7 @@ export function Onboarding() {
     <ActionPageLight
       hideBackground
       goBack={() => navigate(-1)}
-      goHome={goToHome}
+      goHome={closeActionView}
       id="corrector_form"
       title={intl.formatMessage(messages.title)}
     >

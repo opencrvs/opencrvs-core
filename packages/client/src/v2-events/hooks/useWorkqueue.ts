@@ -19,6 +19,7 @@ import {
 import { getUserDetails } from '@client/profile/profileSelectors'
 import { useWorkqueueConfigurations } from '../features/events/useWorkqueueConfiguration'
 import { useEvents } from '../features/events/useEvents/useEvents'
+import { queryClient, useTRPC } from '../trpc'
 import { useUsers } from './useUsers'
 
 function getDeserializedQuery(
@@ -56,7 +57,7 @@ export const useWorkqueue = (workqueueSlug: string) => {
   }))
 
   return {
-    getResult: () => {
+    getResult: ({ offset, limit }: { offset: number; limit: number }) => {
       const deserializedQuery = getDeserializedQuery(
         workqueueConfig,
         user,
@@ -64,16 +65,78 @@ export const useWorkqueue = (workqueueSlug: string) => {
       )
       return {
         useSuspenseQuery: () =>
-          searchEvent.useSuspenseQuery(deserializedQuery, {
-            networkMode: 'offlineFirst'
-          }),
-        useQuery: () => searchEvent.useQuery(deserializedQuery)
+          searchEvent.useSuspenseQuery(
+            {
+              query: deserializedQuery,
+              offset,
+              limit,
+              sort: [{ field: 'updatedAt', direction: 'desc' }]
+            },
+            {
+              networkMode: 'offlineFirst',
+              refetchInterval: 20000
+            }
+          ),
+        useQuery: () =>
+          searchEvent.useQuery(
+            {
+              query: deserializedQuery,
+              offset,
+              limit,
+              sort: [{ field: 'updatedAt', direction: 'desc' }]
+            },
+            { refetchInterval: 10000 }
+          )
       }
     },
     getCount: {
       useSuspenseQuery: () =>
         useGetEventCounts().useSuspenseQuery(deSerializedQueries),
       useQuery: () => useGetEventCounts().useQuery(deSerializedQueries)
+    }
+  }
+}
+
+export function useWorkqueues() {
+  const legacyUser = useSelector(getUserDetails)
+  const { getUser } = useUsers()
+  const [user] = getUser.useSuspenseQuery(legacyUser?.id ?? '')
+  const workqueues = useWorkqueueConfigurations()
+  const trpc = useTRPC()
+
+  return {
+    prefetch: async () => {
+      return Promise.all(
+        workqueues.map(async (workqueueConfig) => {
+          const deserializedQuery = getDeserializedQuery(
+            workqueueConfig,
+            user,
+            legacyUser?.primaryOffice.id
+          )
+
+          const key = trpc.event.search.queryKey({
+            query: deserializedQuery,
+            limit: 10
+          })
+
+          const data = queryClient.getQueryData(key)
+          const isFetching =
+            queryClient.isFetching({
+              queryKey: key
+            }) > 0
+
+          if (data || isFetching) {
+            return
+          }
+
+          return queryClient.prefetchQuery({
+            ...trpc.event.search.queryOptions({
+              query: deserializedQuery,
+              limit: 10
+            })
+          })
+        })
+      )
     }
   }
 }

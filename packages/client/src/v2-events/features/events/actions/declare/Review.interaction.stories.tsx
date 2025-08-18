@@ -118,12 +118,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
         drafts: declarationTrpcMsw.drafts.handlers,
         events: [
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(
+                  declarationTrpcMsw.eventDocument,
+                  tennisClubMembershipEvent
+                )
+              ]
+            }
           }),
           ...declarationTrpcMsw.events.handlers
         ],
@@ -139,12 +142,15 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
             return [mockUser]
           }),
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  declarationTrpcMsw.eventDocument,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           }),
           tRPCMsw.user.get.query((id) => {
             return mockUser
@@ -198,12 +204,15 @@ const msw = {
     drafts: declarationTrpcMsw.drafts.handlers,
     events: [
       tRPCMsw.event.search.query((input) => {
-        return [
-          getCurrentEventState(
-            declarationTrpcMsw.eventDocument,
-            tennisClubMembershipEvent
-          )
-        ]
+        return {
+          results: [
+            getCurrentEventState(
+              declarationTrpcMsw.eventDocument,
+              tennisClubMembershipEvent
+            )
+          ],
+          total: 1
+        }
       }),
       ...declarationTrpcMsw.events.handlers
     ],
@@ -390,12 +399,15 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
         ],
         events: [
           tRPCMsw.event.search.query((input) => {
-            return [
-              getCurrentEventState(
-                declarationTrpcMsw.eventDocument,
-                tennisClubMembershipEvent
-              )
-            ]
+            return {
+              results: [
+                getCurrentEventState(
+                  declarationTrpcMsw.eventDocument,
+                  tennisClubMembershipEvent
+                )
+              ],
+              total: 1
+            }
           }),
           ...declarationTrpcMsw.events.handlers
         ],

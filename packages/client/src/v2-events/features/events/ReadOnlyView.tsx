@@ -15,7 +15,8 @@ import { noop } from 'lodash'
 import {
   ActionType,
   getActionReview,
-  getCurrentEventStateWithDrafts,
+  getCurrentEventState,
+  applyDraftToEventIndex,
   getDeclaration
 } from '@opencrvs/commons/client'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -30,18 +31,21 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 function ReadonlyView() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const events = useEvents()
-  const [event] = events.getEvent.viewEvent(eventId)
+  const event = events.getEvent.viewEvent(eventId)
 
-  const { getRemoteDrafts } = useDrafts()
-  const drafts = getRemoteDrafts(event.id)
+  const { getRemoteDraftByEventId } = useDrafts()
+  const draft = getRemoteDraftByEventId(event.id)
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
 
-  const eventStateWithDrafts = useMemo(
-    () => getCurrentEventStateWithDrafts({ event, drafts, configuration }),
-    [drafts, event, configuration]
-  )
+  const eventStateWithDraft = useMemo(() => {
+    const eventState = getCurrentEventState(event, configuration)
+
+    return draft
+      ? applyDraftToEventIndex(eventState, draft, configuration)
+      : eventState
+  }, [draft, event, configuration])
 
   const { title, fields } = getActionReview(configuration, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
@@ -52,10 +56,10 @@ function ReadonlyView() {
     <FormLayout route={ROUTES.V2.EVENTS.DECLARE}>
       <ReviewComponent.Body
         readonlyMode
-        form={eventStateWithDrafts.declaration}
+        form={eventStateWithDraft.declaration}
         formConfig={formConfig}
         reviewFields={fields}
-        title={formatMessage(title, eventStateWithDrafts.declaration)}
+        title={formatMessage(title, eventStateWithDraft.declaration)}
         onEdit={noop}
       >
         <></>
