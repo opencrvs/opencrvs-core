@@ -40,7 +40,7 @@ export function ActionMenu({
 
   const eventState = eventIndex
 
-  const actionMenuItems = useActionMenuItems(eventState)
+  const [modal, actionMenuItems] = useActionMenuItems(eventState)
 
   return (
     <>
@@ -70,6 +70,7 @@ export function ActionMenu({
           })}
         </DropdownMenu.Content>
       </DropdownMenu>
+      {modal}
     </>
   )
 }

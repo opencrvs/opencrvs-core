@@ -10,6 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import React from 'react'
 import {
   ActionType,
   EventIndex,
@@ -31,6 +32,8 @@ import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { useModal } from '@client/hooks/useModal'
+import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
@@ -129,6 +132,7 @@ export function useAction(event: EventIndex) {
   const { clearEphemeralFormState } = useEventFormNavigation()
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
+  const [modal, openModal] = useModal()
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -168,6 +172,12 @@ export function useAction(event: EventIndex) {
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         onClick: async (workqueue?: string) => {
+          const assign = await openModal<boolean>((close) => (
+            <AssignModal close={close} />
+          ))
+          if (!assign) {
+            return
+          }
           await events.actions.assignment.assign.mutate({
             eventId: event.id,
             assignedTo: authentication.sub,
@@ -253,7 +263,8 @@ export function useAction(event: EventIndex) {
         }
       }
     } satisfies Record<WorkqueueActionType, ActionConfig>,
-    authentication
+    authentication,
+    modal
   }
 }
 
@@ -266,12 +277,17 @@ const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
   ]
 } satisfies Partial<Record<EventStatus, ActionType[]>>
 
+interface ActionMenuItem
+  extends Partial<Record<WorkqueueActionType, ActionConfig>> {
+  type: ActionType
+}
 /**
- * @returns a list of action menu items based on the event state and scopes provided.
+ * @returns a tuple containing a modal (which must be rendered in the parent where this hook is called)
+ * and a list of action menu items based on the event state and scopes provided.
  */
 export function useActionMenuItems(event: EventIndex) {
   const scopes = useSelector(getScope) ?? []
-  const { config, authentication } = useAction(event)
+  const { config, authentication, modal } = useAction(event)
 
   const availableAssignmentActions = getAvailableAssignmentActions(
     event.status,
@@ -332,12 +348,18 @@ export function useActionMenuItems(event: EventIndex) {
 
   if (!hasOtherAllowedActions) {
     return [
-      {
-        ...config[ActionType.READ],
-        type: ActionType.READ
-      }
-    ]
+      modal,
+      [
+        {
+          ...config[ActionType.READ],
+          type: ActionType.READ
+        }
+      ]
+    ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
-  return visibleActions.map((a) => ({ ...config[a], type: a }))
+  return [
+    modal,
+    visibleActions.map((a) => ({ ...config[a], type: a }))
+  ] satisfies [React.ReactNode, ActionMenuItem[]]
 }

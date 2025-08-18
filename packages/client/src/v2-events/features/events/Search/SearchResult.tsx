@@ -211,7 +211,7 @@ function ActionComponent({
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
   const { config: configs } = useAction(event)
-  const actionMenuItems = useActionMenuItems(event)
+  const [_, actionMenuItems] = useActionMenuItems(event)
 
   const intl = useIntl()
 
