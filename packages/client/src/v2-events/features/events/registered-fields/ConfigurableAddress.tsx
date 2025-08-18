@@ -184,113 +184,7 @@ const RURAL_FIELDS = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-function populateAdminStructure(
-  locationLevel1: {
-    id: string
-    label: { id: string; defaultMessage: string; description: string }
-  },
-  locationLevel2: {
-    id: string
-    label: TranslationConfig
-  }
-) {
-  return [
-    {
-      id: 'country',
-      conditionals: [],
-      required: true,
-      label: {
-        id: 'v2.field.address.country.label',
-        defaultMessage: 'Country',
-        description: 'This is the label for the field'
-      },
-      type: FieldType.COUNTRY
-    },
-    {
-      id: locationLevel1.id,
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: isDomesticAddress()
-        }
-      ],
-      required: true,
-      parent: createFieldCondition('country'),
-      label: locationLevel1.label,
-      type: FieldType.ADMINISTRATIVE_AREA,
-      configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
-    },
-    {
-      id: locationLevel2.id,
-      type: FieldType.ADMINISTRATIVE_AREA,
-      conditionals: [
-        {
-          type: ConditionalType.SHOW,
-          conditional: and(
-            isDomesticAddress(),
-            not(createFieldCondition(locationLevel1.id).isUndefined())
-          )
-        }
-      ],
-      required: true,
-      parent: createFieldCondition('country'),
-      label: locationLevel2.label,
-      configuration: {
-        type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-        partOf: {
-          $declaration: locationLevel1.id
-        }
-      }
-    },
-    {
-      id: 'urbanOrRural',
-      conditionals: [
-        {
-          type: ConditionalType.DISPLAY_ON_REVIEW,
-          conditional: never()
-        },
-        {
-          type: ConditionalType.SHOW,
-          conditional: and(
-            isDomesticAddress(),
-            not(createFieldCondition('zone').isUndefined())
-          )
-        }
-      ],
-      required: false,
-      label: {
-        id: 'v2.field.address.urbanOrRural.label',
-        defaultMessage: 'Urban or Rural',
-        description: 'This is the label for the field'
-      },
-      hideLabel: true,
-      type: FieldType.RADIO_GROUP,
-      options: [
-        {
-          value: GeographicalArea.URBAN,
-          label: {
-            id: 'v2.field.address.label.urban',
-            defaultMessage: 'Urban',
-            description: 'Label for form field checkbox option Urban'
-          }
-        },
-        {
-          value: GeographicalArea.RURAL,
-          label: {
-            id: 'v2.field.address.label.rural',
-            defaultMessage: 'Rural',
-            description: 'Label for form field checkbox option Rural'
-          }
-        }
-      ],
-      defaultValue: GeographicalArea.URBAN,
-      configuration: {
-        styles: { size: 'NORMAL' }
-      }
-    }
-  ]
-}
-const ADMIN_STRUCTURE = [
+const COUNTRY_STRUCTURE = [
   {
     id: 'country',
     conditionals: [],
@@ -301,9 +195,12 @@ const ADMIN_STRUCTURE = [
       description: 'This is the label for the field'
     },
     type: FieldType.COUNTRY
-  },
+  }
+]
+
+const ADMIN_STRUCTURE_TEMPLATE = [
   {
-    id: 'province',
+    id: 'adminLevel1',
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -312,35 +209,35 @@ const ADMIN_STRUCTURE = [
     ],
     required: true,
     label: {
-      id: 'v2.field.address.province.label',
-      defaultMessage: 'Province',
-      description: 'This is the label for the field'
+      id: 'v2.field.address.adminLevel1.label',
+      defaultMessage: 'Administrative Level 1',
+      description: 'Label for adminLevel1 in address component'
     },
     type: FieldType.ADMINISTRATIVE_AREA,
     configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
   },
   {
-    id: 'district',
+    id: 'adminLevel2',
     type: FieldType.ADMINISTRATIVE_AREA,
     conditionals: [
       {
         type: ConditionalType.SHOW,
         conditional: and(
           isDomesticAddress(),
-          not(createFieldCondition('province').isUndefined())
+          not(createFieldCondition('adminLevel1').isUndefined())
         )
       }
     ],
     required: true,
     label: {
-      id: 'v2.field.address.district.label',
-      defaultMessage: 'District',
-      description: 'This is the label for the field'
+      id: 'v2.field.address.adminLevel2.label',
+      defaultMessage: 'Administrative Level 2',
+      description: 'Label for adminLevel2 in address component'
     },
     configuration: {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
       partOf: {
-        $declaration: 'province'
+        $declaration: 'adminLevel1'
       }
     }
   }
@@ -460,7 +357,7 @@ const GENERIC_ADDRESS_FIELDS = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 const ALL_ADDRESS_FIELDS = [
-  ...ADMIN_STRUCTURE,
+  ...ADMIN_STRUCTURE_TEMPLATE,
   ...URBAN_FIELDS,
   ...RURAL_FIELDS,
   ...GENERIC_ADDRESS_FIELDS,
@@ -487,7 +384,8 @@ type AllFields = (typeof ALL_ADDRESS_FIELDS)[number]['id']
   EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
 > */
 const ALL_ADDRESS_INPUT_FIELDS = [
-  ...ADMIN_STRUCTURE,
+  ...COUNTRY_STRUCTURE,
+  ...ADMIN_STRUCTURE_TEMPLATE,
   ...URBAN_FIELDS,
   ...RURAL_FIELDS,
   ...GENERIC_ADDRESS_FIELDS
@@ -533,24 +431,36 @@ function AddressInput(props: Props) {
     ...otherProps
   } = props
   const { config } = useSelector(getOfflineData)
-  const MY_ADMIN_STRUCTURE = config.ADMIN_STRUCTURE
+  const appConfigAdminLevels = config.ADMIN_STRUCTURE
+  console.log('MY_ADMIN_STRUCTURE', appConfigAdminLevels)
 
-  const NEW_ADMIN_STRUCTURE = populateAdminStructure(
-    MY_ADMIN_STRUCTURE[0],
-    MY_ADMIN_STRUCTURE[1]
-  ) as FieldConfigWithoutAddress[]
-
-  const searchMode = configuration?.searchMode || false
   const administrativeLevelsCutoff = configuration?.administrativeLevels
   // If administrativeLevelsCutoff is provided, only show admin levels till/before provided administrativeLevelsCutoff
+  //console.log('administrativeLevelsCutoff', administrativeLevelsCutoff)
+
   console.log('administrativeLevelsCutoff', administrativeLevelsCutoff)
+
+  const administrativeLevels =
+    Array.isArray(administrativeLevelsCutoff) &&
+    administrativeLevelsCutoff.length > 0
+      ? administrativeLevelsCutoff
+      : appConfigAdminLevels
+
+  const adminStructure = ADMIN_STRUCTURE_TEMPLATE.filter((item) =>
+    administrativeLevels.includes(item.id)
+  )
+
+  const searchMode = configuration?.searchMode || false
 
   const additionalAddressFields =
     configuration?.streetAddressForm as FieldConfigWithoutAddress[]
   // If custom address fields are provided, then only render those; otherwise render default form
-  console.log('additionalAddressFields', additionalAddressFields)
+  //console.log('additionalAddressFields', additionalAddressFields)
 
-  const fields = getFilteredFields(searchMode, NEW_ADMIN_STRUCTURE)
+  const fields = getFilteredFields(searchMode, [
+    ...COUNTRY_STRUCTURE,
+    ...adminStructure
+  ])
 
   const fieldsWithDefaults = defaultValue
     ? fields.map(addDefaultValue(defaultValue))
@@ -565,7 +475,8 @@ function AddressInput(props: Props) {
       initialValues={{ ...defaultValue, ...value }}
       onChange={(values) => {
         console.log('onChange values', values)
-        return onChange(values.zone as ConfigurableAddressFieldValue)
+        //transform the onChange values to country, addressType and administrativeArea
+        return onChange(values as ConfigurableAddressFieldValue)
       }}
     />
   )
@@ -584,14 +495,14 @@ function AddressOutput({
   const { config } = useSelector(getOfflineData)
   const MY_ADMIN_STRUCTURE = config.ADMIN_STRUCTURE
 
-  const NEW_ADMIN_STRUCTURE = populateAdminStructure(
-    MY_ADMIN_STRUCTURE[0],
-    MY_ADMIN_STRUCTURE[1]
-  ) as FieldConfigWithoutAddress[]
+  //What if
+  const anotherAdminStructure = ['country', 'adminLevel1', 'adminLevel2']
 
-  console.log('NEW_ADMIN_STRUCTURE in AddressOutput', NEW_ADMIN_STRUCTURE)
+  const filteredStructure = ADMIN_STRUCTURE_TEMPLATE.filter((item) =>
+    anotherAdminStructure.includes(item.id)
+  )
 
-  const fields = getFilteredFields(searchMode, NEW_ADMIN_STRUCTURE)
+  const fields = getFilteredFields(searchMode, filteredStructure)
     .map((field) => ({
       field,
       value: value[field.id as keyof typeof value]

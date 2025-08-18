@@ -114,15 +114,6 @@ export interface IApplicationConfigAnonymous {
   PHONE_NUMBER_PATTERN: RegExp
 }
 
-export interface AdminStructureItem {
-  id: string
-  label: {
-    id: string
-    defaultMessage: string
-    description: string
-  }
-}
-
 export interface IApplicationConfig {
   APPLICATION_NAME: string
   BIRTH: {
@@ -131,7 +122,7 @@ export interface IApplicationConfig {
     PRINT_IN_ADVANCE: boolean
   }
   COUNTRY_LOGO: ICountryLogo
-  ADMIN_STRUCTURE: AdminStructureItem[]
+  ADMIN_STRUCTURE: string[]
   CURRENCY: ICurrency
   DEATH: {
     REGISTRATION_TARGET: number
