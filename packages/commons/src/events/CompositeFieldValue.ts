@@ -147,11 +147,7 @@ export const HttpFieldValue = z.object({
   error: z
     .object({ statusCode: z.number().nullable(), message: z.string() })
     .nullable(),
-  data: z.any(),
-  trackingValue: z
-    .string()
-    .optional()
-    .describe('If the tracking value changes, the field will be re-fetched')
+  data: z.any()
 })
 export type HttpFieldValue = z.infer<typeof HttpFieldValue>
 export const HttpFieldUpdateValue = z

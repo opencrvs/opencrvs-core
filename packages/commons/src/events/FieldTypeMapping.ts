@@ -231,10 +231,6 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
   }
 }
 
-export function isFieldReference(value: unknown): value is FieldReference {
-  return typeof value === 'object' && value !== null && '$$field' in value
-}
-
 export const isParagraphFieldType = (field: {
   config: FieldConfig
   value: FieldValue
