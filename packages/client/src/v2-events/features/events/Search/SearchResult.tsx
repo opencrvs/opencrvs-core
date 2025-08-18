@@ -23,7 +23,6 @@ import {
   deepDropNulls,
   applyDraftToEventIndex,
   WorkqueueActionsWithDefault,
-  isMetaAction,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { useWindowSize } from '@opencrvs/components/src/hooks'
@@ -32,7 +31,7 @@ import {
   SORT_ORDER,
   Workqueue
 } from '@opencrvs/components/lib/Workqueue'
-import { Button, Link as TextButton } from '@opencrvs/components'
+import { Link as TextButton } from '@opencrvs/components'
 import { ROUTES } from '@client/v2-events/routes'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { WQContentWrapper } from '@client/v2-events/features/workqueues/components/ContentWrapper'
@@ -43,11 +42,8 @@ import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
 import { CoreWorkqueues } from '@client/v2-events/utils'
 import { useEventTitle } from '../useEvents/useEventTitle'
-import {
-  useAction,
-  useActionMenuItemConfigs
-} from '../../workqueues/EventOverview/components/useActionMenuItems'
 import { deserializeSearchParams, serializeSearchParams } from './utils'
+import { ActionComponent } from './ActionComponent'
 
 const WithTestId = styled.div.attrs({
   'data-testid': 'search-result'
@@ -200,42 +196,6 @@ const ExtendedEventStatuses = {
   DRAFT: 'DRAFT'
 } as const
 
-function ActionComponent({
-  event,
-  actionType
-}: {
-  event: EventIndex
-  actionType: WorkqueueActionsWithDefault
-}) {
-  const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
-
-  const { config: configs } = useAction(event)
-  const actionMenuItems = useActionMenuItemConfigs(event)
-
-  const intl = useIntl()
-
-  const config =
-    actionType === 'DEFAULT'
-      ? actionMenuItems.find(({ type }) => !isMetaAction(type))
-      : configs[actionType]
-
-  if (!config) {
-    return null
-  }
-
-  console.log(actionMenuItems, 'actionMenuItems')
-  console.log('actionType, ', actionType)
-  return (
-    <Button
-      disabled={'disabled' in config && Boolean(config.disabled)}
-      type="primary"
-      onClick={async () => config.onClick(slug)}
-    >
-      {intl.formatMessage(config.label)}
-    </Button>
-  )
-}
-
 export const SearchResultComponent = ({
   columns,
   queryData: events,
@@ -323,7 +283,11 @@ export const SearchResultComponent = ({
       const actionConfigs = actions
         .map((actionType) => ({
           actionComponent: (
-            <ActionComponent actionType={actionType} event={event} />
+            <ActionComponent
+              actionType={actionType}
+              event={event}
+              redirectParam={slug}
+            />
           )
         }))
         .concat({

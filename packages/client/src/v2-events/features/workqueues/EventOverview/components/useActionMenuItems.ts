@@ -22,12 +22,12 @@ import {
   EventStatus,
   isMetaAction,
   getAvailableActionsForEvent,
-  InherentFlags,
-  workqueueActions
+  workqueueActions,
+  Draft,
+  InherentFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { useAuthentication } from '@client/utils/userUtils'
 import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -125,11 +125,20 @@ export const actionLabels = {
   }
 } as const
 
-export function useAction(event: EventIndex) {
+/**
+ * Get viewable actions for event
+ * @param event The event to get actions for.
+ * @param authentication The user's authentication information.
+ * @returns A mapping of action types to their configurations. Not necessarily all actions are enabled without changes. (e.g. assignment is missing.)
+ */
+function useViewableActionConfigurations(
+  event: EventIndex,
+  authentication: ITokenPayload,
+  draft?: Draft
+) {
   const events = useEvents()
   const navigate = useNavigate()
-  const drafts = useDrafts()
-  const authentication = useAuthentication()
+
   const { clearEphemeralFormState } = useEventFormNavigation()
 
   const { findFromCache } = useEvents().getEvent
@@ -143,21 +152,17 @@ export function useAction(event: EventIndex) {
 
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
 
-  if (!authentication) {
-    throw new Error('Authentication is not available but is required')
-  }
-
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
-  const eventIsAssignedToSelf =
+  const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
-  const openDraft = drafts
-    .getAllRemoteDrafts()
-    .find((draft) => draft.eventId === event.id)
+  const hasDeclarationDraftOpen = draft?.action.type === ActionType.DECLARE
 
-  const hasDeclarationDraftOpen = openDraft?.action.type === ActionType.DECLARE
-
+  // What reads on the button is important but secondary. We need to perform the actions in certain order for them to succeed.
+  const shouldShowDeclareAsReview =
+    event.status === EventStatus.enum.NOTIFIED ||
+    event.flags.includes(InherentFlags.REJECTED)
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
@@ -191,10 +196,9 @@ export function useAction(event: EventIndex) {
       },
       [ActionType.DECLARE]: {
         // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
-        label:
-          event.status === EventStatus.enum.NOTIFIED
-            ? actionLabels[ActionType.VALIDATE]
-            : actionLabels[ActionType.DECLARE],
+        label: shouldShowDeclareAsReview
+          ? actionLabels[ActionType.VALIDATE]
+          : actionLabels[ActionType.DECLARE],
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
@@ -205,7 +209,7 @@ export function useAction(event: EventIndex) {
           )
         },
         // @todo: check what this case actually is.
-        disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen)
+        disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen)
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
@@ -218,7 +222,7 @@ export function useAction(event: EventIndex) {
             )
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
@@ -231,7 +235,7 @@ export function useAction(event: EventIndex) {
             )
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
@@ -244,7 +248,7 @@ export function useAction(event: EventIndex) {
             )
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
@@ -252,13 +256,13 @@ export function useAction(event: EventIndex) {
           deleteEvent({
             eventId: event.id
           })
+          // What if there is a workqueue?
           if (!workqueue) {
             navigate(ROUTES.V2.buildPath({}))
           }
         }
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>,
-    authentication: authentication satisfies ITokenPayload
+    } satisfies Record<WorkqueueActionType, ActionConfig>
   }
 }
 
@@ -268,9 +272,22 @@ export function useAction(event: EventIndex) {
  * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
  * Each action has their own route and will take care of the actions needed. If you "skip" action (e.g. showing 'VALIDATE' instead of 'DECLARE') by directing the user to the wrong route, it will fail at the end.
  */
-export function useActionMenuItemConfigs(event: EventIndex) {
+export function useAllowedActionConfigurations(
+  event: EventIndex,
+  authentication: ITokenPayload
+) {
   const scopes = useSelector(getScope) ?? []
-  const { config, authentication } = useAction(event)
+  const drafts = useDrafts()
+
+  const openDraft = drafts
+    .getAllRemoteDrafts()
+    .find((draft) => draft.eventId === event.id)
+
+  const { config } = useViewableActionConfigurations(
+    event,
+    authentication,
+    openDraft
+  )
 
   const availableAssignmentActions = getAvailableAssignmentActions(
     event,
@@ -278,18 +295,12 @@ export function useActionMenuItemConfigs(event: EventIndex) {
   )
   const availableEventActions = getAvailableActionsForEvent(event)
 
-  const drafts = useDrafts()
-
-  const openDraft = drafts
-    .getAllRemoteDrafts()
-    .find((draft) => draft.eventId === event.id)
-
-  const draft = openDraft ? [openDraft.action.type] : []
+  const openDraftAction = openDraft ? [openDraft.action.type] : []
 
   const allowedWorkqueueActions = [
     ...availableAssignmentActions,
     ...availableEventActions,
-    ...draft
+    ...openDraftAction
   ]
     // deduplicate after adding the draft
     .filter((action, index, self) => self.indexOf(action) === index)

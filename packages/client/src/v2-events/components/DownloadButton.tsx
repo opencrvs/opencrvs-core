@@ -23,7 +23,7 @@ import { useIntl } from 'react-intl'
 import ReactTooltip from 'react-tooltip'
 import { useModal } from '@client/hooks/useModal'
 import styled from 'styled-components'
-import { ActionType, EventIndex } from '@opencrvs/commons/client'
+import { ActionType, EventIndex, getOrThrow } from '@opencrvs/commons/client'
 import {
   AssignmentStatus,
   getAssignmentStatus,
@@ -32,7 +32,7 @@ import {
 import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
-import { useActionMenuItemConfigs } from '../features/workqueues/EventOverview/components/useActionMenuItems'
+import { useAllowedActionConfigurations } from '../features/workqueues/EventOverview/components/useActionMenuItems'
 
 interface DownloadButtonProps {
   id?: string
@@ -118,15 +118,20 @@ export function DownloadButton({
   const isOnline = useOnlineStatus()
 
   const [modal, openModal] = useModal()
-  const authentication = useAuthentication()
+  const maybeAuth = useAuthentication()
+  const authentication = getOrThrow(
+    maybeAuth,
+    'Authentication is not available but is required'
+  )
+
   const { getEvent, actions } = useEvents()
   const users = useUsers()
   const user = users.getUser.useQuery(event.assignedTo || '', {
     enabled: !!event.assignedTo
   }).data
 
-  const actionMenuItems = useActionMenuItemConfigs(event)
-  const assignmentStatus = getAssignmentStatus(event, authentication?.sub)
+  const actionMenuItems = useAllowedActionConfigurations(event, authentication)
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
   const isAssignMutationFetching = actions.assignment.assign.isAssigning(
@@ -163,9 +168,6 @@ export function DownloadButton({
     )
   }
 
-  if (!authentication) {
-    return null
-  }
   const isDownloadedToMe =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF &&
     eventDocument.isFetched

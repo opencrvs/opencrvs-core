@@ -65,9 +65,9 @@ export const getAvailableActionsForEvent = (
       case EventStatus.Enum.NOTIFIED:
         return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.CREATED]
       case EventStatus.Enum.DECLARED:
-        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.NOTIFIED]
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.CREATED]
       case EventStatus.Enum.VALIDATED:
-        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.NOTIFIED]
+        return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.DECLARED]
       case EventStatus.Enum.REGISTERED:
         return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.VALIDATED]
     }
