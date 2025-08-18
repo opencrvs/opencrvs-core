@@ -54,7 +54,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 const queryData = Array.from(
-  { length: 15 },
+  { length: 10 },
   (_, i) => eventQueryDataGenerator(undefined, i * 52) // quite literally a magic number. It gives a sample where the test workqueues are not empty
 )
 
@@ -67,13 +67,7 @@ export const SortWorkqueue: Story = {
     chromatic: { disableSnapshot: true },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          }),
-          tRPCMsw.event.list.query(() => {
-            return [tennisClubMembershipEventIndex]
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues('recent')
           }),
@@ -81,9 +75,20 @@ export const SortWorkqueue: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: queryData.length }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
-            return queryData
+            return {
+              results: queryData.slice(input.offset, input.limit),
+              total: queryData.length + 5
+            }
           })
         ]
       }

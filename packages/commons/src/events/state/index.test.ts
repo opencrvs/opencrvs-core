@@ -442,6 +442,48 @@ describe('getCurrentEventState()', () => {
       }
     } satisfies EventIndex)
   })
+
+  test('Flags are correctly set', () => {
+    const event1 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.REQUEST_CORRECTION
+      ]
+    })
+
+    expect(
+      getCurrentEventState(event1, tennisClubMembershipEvent).flags
+    ).toEqual([
+      InherentFlags.PENDING_CERTIFICATION,
+      InherentFlags.CORRECTION_REQUESTED
+    ])
+
+    const event2 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.REGISTER]
+    })
+
+    expect(
+      getCurrentEventState(event2, tennisClubMembershipEvent).flags
+    ).toEqual([InherentFlags.PENDING_CERTIFICATION])
+
+    const event3 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.PRINT_CERTIFICATE
+      ]
+    })
+
+    expect(
+      getCurrentEventState(event3, tennisClubMembershipEvent).flags.length
+    ).toEqual(0)
+  })
 })
 
 describe('correction requests', () => {

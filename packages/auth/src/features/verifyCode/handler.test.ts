@@ -16,6 +16,14 @@ import {
 } from '@opencrvs/commons/authentication'
 import * as fetchMock from 'jest-fetch-mock'
 
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn()
+  }
+})
+
 const fetch: fetchMock.FetchMock = fetchMock as fetchMock.FetchMock
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 

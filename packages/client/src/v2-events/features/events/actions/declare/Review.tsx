@@ -56,7 +56,7 @@ export function Review() {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
-  const { redirectToOrigin } = useEventFormNavigation()
+  const { closeActionView } = useEventFormNavigation()
   const { saveAndExitModal, handleSaveAndExit } = useSaveAndExitModal()
 
   const event = events.getEvent.getFromCache(eventId)
@@ -138,7 +138,7 @@ export function Review() {
 
     if (confirmedDeclaration) {
       reviewActionConfiguration.onConfirm(eventId)
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -168,7 +168,7 @@ export function Review() {
           reason: { message, isDuplicate }
         })
       }
-      redirectToOrigin(slug)
+      closeActionView(slug)
     }
   }
 
@@ -178,7 +178,7 @@ export function Review() {
       onSaveAndExit={async () =>
         handleSaveAndExit(() => {
           drafts.submitLocalDraft()
-          redirectToOrigin(slug)
+          closeActionView(slug)
         })
       }
     >

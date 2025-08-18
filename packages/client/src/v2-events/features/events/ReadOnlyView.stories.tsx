@@ -128,15 +128,7 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
     },
     msw: {
       handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return eventDocument
-          }),
-          tRPCMsw.event.search.query(() => {
-            return [
-              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
-            ]
-          }),
+        workqueues: [
           tRPCMsw.workqueue.config.list.query(() => {
             return generateWorkqueues()
           }),
@@ -144,6 +136,19 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return input.reduce((acc, { slug }) => {
               return { ...acc, [slug]: 7 }
             }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return eventDocument
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+              ]
+            }
           })
         ],
         drafts: [

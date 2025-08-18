@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
+import * as objectHash from 'object-hash'
 import { EventDocument } from '../events/EventDocument'
 import { EventState } from '../events/ActionDocument'
 import { ITokenPayload as TokenPayload, Scope } from '../authentication'
@@ -17,12 +17,16 @@ import { userSerializer } from '../events/serializers/user/serializer'
 
 /** @knipignore */
 export type JSONSchema = {
+  $id: string
   readonly __nominal__type: 'JSONSchema'
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function defineConditional(schema: any) {
-  return schema as JSONSchema
+  return {
+    $id: `https://opencrvs.org/conditionals/${objectHash.sha1(schema)}`,
+    ...schema
+  } as JSONSchema
 }
 
 export function defineFormConditional(schema: Record<string, unknown>) {

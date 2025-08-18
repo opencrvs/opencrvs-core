@@ -45,7 +45,8 @@ export function FormHeader({
   appbarIcon?: React.ReactNode
 }) {
   const intl = useIntl()
-  const { modal, exit, goToHome, deleteDeclaration } = useEventFormNavigation()
+  const { modal, exit, closeActionView, deleteDeclaration } =
+    useEventFormNavigation()
 
   const { eventId } = useTypedParams(route)
 
@@ -124,7 +125,7 @@ export function FormHeader({
               data-testid="exit-button"
               size="small"
               type="icon"
-              onClick={goToHome}
+              onClick={() => closeActionView()}
             >
               <Icon name="X" />
             </Button>
@@ -169,7 +170,7 @@ export function FormHeader({
               />
             </>
           ) : (
-            <Button size="small" type="icon" onClick={goToHome}>
+            <Button size="small" type="icon" onClick={() => closeActionView()}>
               <Icon name="X" />
             </Button>
           )}
