@@ -41,8 +41,7 @@ import {
   SelectDateRangeField,
   TimeField,
   HttpField,
-  ButtonField,
-  FieldReference
+  ButtonField
 } from './FieldConfig'
 import { FieldType } from './FieldType'
 import {
