@@ -79,6 +79,7 @@ const BaseField = z.object({
     ),
   value: FieldReference.optional().describe(
     'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
+    // @TODO: When Zod is upgraded to v4, remove this any to fix error TS7056
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ) as any
 })
