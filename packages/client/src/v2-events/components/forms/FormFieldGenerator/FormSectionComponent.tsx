@@ -192,6 +192,33 @@ export function FormSectionComponent({
     [setTouched]
   )
 
+  /** Sets the value for fields that listen to another field via `parent` and `value` properties */
+  const setValueOfValuePropListeners = useCallback(
+    (
+      fieldId: string,
+      fieldValues: Record<string, FieldValue>,
+      fieldErrors: AllProps['errors']
+    ) => {
+      const ref = fieldsWithDotSeparator.find((f) => f.id === fieldId)?.value
+      const targetKey = makeFormFieldIdFormikCompatible(fieldId)
+
+      if (!ref?.$$field) {
+        set(fieldValues, targetKey, undefined)
+        set(fieldErrors, fieldId, { errors: [] })
+        return
+      }
+
+      const parentKey = makeFormFieldIdFormikCompatible(ref.$$field)
+      const parentValue = ref.$$subfield
+        ? get(fieldValues[parentKey], ref.$$subfield)
+        : fieldValues[parentKey]
+
+      set(fieldValues, targetKey, parentValue)
+      set(fieldErrors, fieldId, { errors: [] })
+    },
+    [fieldsWithDotSeparator]
+  )
+
   const onFieldValueChange = useCallback(
     (formikFieldId: string, value: FieldValue | undefined) => {
       const updatedValues = cloneDeep(values)
@@ -206,27 +233,7 @@ export function FormSectionComponent({
 
       // reset the children values of the changed field. (e.g. When changing informant.relation, empty out phone number, email and others.)
       for (const childId of childIds) {
-        // @TODO --> Beautify, or move this logic elsewhere!
-        const valueParentId = fieldsWithDotSeparator.find(
-          (f) => f.id === childId
-        )?.value
-
-        let val: undefined | FieldValue
-
-        if (valueParentId.$$field) {
-          val =
-            updatedValues[
-              makeFormFieldIdFormikCompatible(valueParentId.$$field)
-            ]
-        }
-
-        if (valueParentId.$$subfield) {
-          val = get(val, valueParentId.$$subfield)
-        }
-        // @TODO <-- Beautify!
-
-        set(updatedValues, makeFormFieldIdFormikCompatible(childId), val)
-        set(updatedErrors, childId, { errors: [] })
+        setValueOfValuePropListeners(childId, updatedValues, updatedErrors)
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -260,9 +267,9 @@ export function FormSectionComponent({
       setTouched,
       touched,
       errorsWithDotSeparator,
-      fieldsWithDotSeparator,
       setErrors,
-      setAllTouchedFields
+      setAllTouchedFields,
+      setValueOfValuePropListeners
     ]
   )
 
