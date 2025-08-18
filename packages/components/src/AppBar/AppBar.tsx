@@ -44,6 +44,8 @@ const MobileLeft = styled.div`
   align-items: center;
   gap: 16px;
   grid-column: 1;
+  overflow: hidden;
+  min-width: 0;
 `
 
 const MobileCenter = styled.div`
