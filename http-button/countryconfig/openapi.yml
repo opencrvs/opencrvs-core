@@ -3776,9 +3776,7 @@ components:
                     - "null"
                   properties:
                     statusCode:
-                      type:
-                        - number
-                        - "null"
+                      type: number
                     message:
                       type: string
                   required:
@@ -5001,9 +4999,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -5210,9 +5206,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -5472,9 +5466,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -5681,9 +5673,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -5939,9 +5929,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -6148,9 +6136,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -6419,9 +6405,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -6628,9 +6612,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -6886,9 +6868,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -7095,9 +7075,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -7366,9 +7344,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -7575,9 +7551,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -7833,9 +7807,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -8042,9 +8014,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -8302,9 +8272,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -8511,9 +8479,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -8769,9 +8735,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -8978,9 +8942,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -9239,9 +9201,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -9448,9 +9408,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -9706,9 +9664,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -9915,9 +9871,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -10176,9 +10130,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -10385,9 +10337,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -10659,9 +10609,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -10868,9 +10816,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -11126,9 +11072,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -11335,9 +11279,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -11600,9 +11542,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -11809,9 +11749,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -12064,9 +12002,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -12273,9 +12209,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -12505,9 +12439,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -12713,9 +12645,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -12945,9 +12875,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -13153,9 +13081,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -13383,9 +13309,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -13591,9 +13515,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -13616,7 +13538,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 41a93cc0-443c-45c8-b5c3-9bb73d6a7b2c
+        transactionId: 8be2566f-1691-479f-b284-5bdb1a4d8140
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -13824,9 +13746,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -14032,9 +13952,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -14259,9 +14177,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -14467,9 +14383,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -14707,9 +14621,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -14915,9 +14827,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -15142,9 +15052,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -15350,9 +15258,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -15590,9 +15496,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -15798,9 +15702,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -16028,9 +15930,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -16236,9 +16136,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -16466,9 +16364,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -16674,9 +16570,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -16906,9 +16800,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -17114,9 +17006,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -17341,9 +17231,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -17549,9 +17437,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -17792,9 +17678,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -18000,9 +17884,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -18230,9 +18112,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
@@ -18438,9 +18318,7 @@ components:
                               - "null"
                             properties:
                               statusCode:
-                                type:
-                                  - number
-                                  - "null"
+                                type: number
                               message:
                                 type: string
                             required:
