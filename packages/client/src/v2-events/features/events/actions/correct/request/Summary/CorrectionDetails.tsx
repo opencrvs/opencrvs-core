@@ -10,11 +10,13 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { useIntl } from 'react-intl'
+import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
+  Action,
   ActionType,
   EventDocument,
   EventState,
@@ -22,15 +24,38 @@ import {
   getDeclaration,
   isFieldVisible,
   isPageVisible,
-  PageTypes
+  PageTypes,
+  TranslationConfig
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
-import { messages } from '@client/i18n/messages/views/correction'
+import { messages as correctionMessages } from '@client/i18n/messages/views/correction'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { Output } from '@client/v2-events/features/events/components/Output'
 import { ROUTES } from '@client/v2-events/routes'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { getUsersFullName } from '@client/v2-events/utils'
+import { getLocations } from '@client/offline/selectors'
+import { formattedDuration } from '@client/utils/date-formatting'
 import { hasFieldChanged } from '../../utils'
+
+const messages = defineMessages({
+  correctionSubmittedBy: {
+    id: 'v2.correction.submittedBy',
+    defaultMessage: 'Submitter',
+    description: 'Correction subbmitted by label'
+  },
+  correctionRequesterOffice: {
+    id: 'v2.correction.requesterOffice',
+    defaultMessage: 'Office',
+    description: 'Correction requester office label'
+  },
+  correctionSubmittedOn: {
+    id: 'v2.correction.submittedOn',
+    defaultMessage: 'Submitted on',
+    description: 'Correction subbmitted on label'
+  }
+})
 
 const CorrectionSectionTitle = styled(Text)`
   margin: 20px 0;
@@ -61,12 +86,14 @@ export function CorrectionDetails({
   annotation,
   requesting,
   editable = false,
-  workqueue
+  workqueue,
+  correctionRequestAction
 }: {
   event: EventDocument
   form: EventState
   annotation: EventState
   requesting: boolean
+  correctionRequestAction?: Action
   editable?: boolean
   workqueue?: string
 }) {
@@ -77,13 +104,21 @@ export function CorrectionDetails({
   const previousFormValues = eventIndex.declaration
   const formConfig = getDeclaration(eventConfiguration)
   const navigate = useNavigate()
+  const { getUser } = useUsers()
+  const users = getUser.getAllCached()
+  const locations = useSelector(getLocations)
 
   const correctionFormPages =
     eventConfiguration.actions.find(
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
-  const correctionDetails = correctionFormPages
+  const correctionDetails: {
+    label: TranslationConfig
+    id: string
+    valueDisplay: string | React.JSX.Element | null | undefined
+    pageId?: string
+  }[] = correctionFormPages
     .filter((page) => isPageVisible(page, annotation))
     .flatMap((page) => {
       // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
@@ -96,8 +131,8 @@ export function CorrectionDetails({
             id: page.id,
             label: page.title,
             valueDisplay: value
-              ? intl.formatMessage(messages.verifyIdentity)
-              : intl.formatMessage(messages.cancelVerifyIdentity),
+              ? intl.formatMessage(correctionMessages.verifyIdentity)
+              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
             pageId: page.id
           }
         ]
@@ -124,6 +159,33 @@ export function CorrectionDetails({
 
       return pageFields
     })
+
+  if (correctionRequestAction) {
+    const user = users.find((u) => u.id === correctionRequestAction.createdBy)
+    const location =
+      correctionRequestAction.createdAtLocation &&
+      locations[correctionRequestAction.createdAtLocation]
+
+    correctionDetails.unshift(
+      {
+        label: messages.correctionSubmittedBy,
+        id: 'correction.submitter',
+        valueDisplay: user ? getUsersFullName(user.name, intl.locale) : ''
+      },
+      {
+        label: messages.correctionRequesterOffice,
+        id: 'correction.requesterOffice',
+        valueDisplay: location?.name || ''
+      },
+      {
+        label: messages.correctionSubmittedOn,
+        id: 'correction.submittedOn',
+        valueDisplay: formattedDuration(
+          new Date(correctionRequestAction.createdAt)
+        )
+      }
+    )
+  }
 
   return (
     <>
@@ -160,19 +222,20 @@ export function CorrectionDetails({
                 font="reg14"
                 onClick={(e) => {
                   e.stopPropagation()
-                  navigate(
-                    ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath(
-                      {
-                        pageId,
-                        eventId: event.id
-                      },
-                      { workqueue },
-                      id ? makeFormFieldIdFormikCompatible(id) : undefined
+                  pageId &&
+                    navigate(
+                      ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath(
+                        {
+                          pageId,
+                          eventId: event.id
+                        },
+                        { workqueue },
+                        id ? makeFormFieldIdFormikCompatible(id) : undefined
+                      )
                     )
-                  )
                 }}
               >
-                {intl.formatMessage(messages.change)}
+                {intl.formatMessage(correctionMessages.change)}
               </Link>
             )
           })
@@ -184,8 +247,8 @@ export function CorrectionDetails({
 
       <CorrectionSectionTitle element="h3" variant="h3">
         {requesting
-          ? intl.formatMessage(messages.correctionSectionTitle)
-          : intl.formatMessage(messages.makeCorrectionSectionTitle)}
+          ? intl.formatMessage(correctionMessages.correctionSectionTitle)
+          : intl.formatMessage(correctionMessages.makeCorrectionSectionTitle)}
       </CorrectionSectionTitle>
 
       {formConfig.pages.map((page) => {
@@ -229,7 +292,9 @@ export function CorrectionDetails({
               {
                 label: (
                   <TableHeader>
-                    {intl.formatMessage(messages.correctionSummaryOriginal)}
+                    {intl.formatMessage(
+                      correctionMessages.correctionSummaryOriginal
+                    )}
                   </TableHeader>
                 ),
                 width: 33,
@@ -238,7 +303,9 @@ export function CorrectionDetails({
               {
                 label: (
                   <TableHeader>
-                    {intl.formatMessage(messages.correctionSummaryCorrection)}
+                    {intl.formatMessage(
+                      correctionMessages.correctionSummaryCorrection
+                    )}
                   </TableHeader>
                 ),
                 width: 33,
