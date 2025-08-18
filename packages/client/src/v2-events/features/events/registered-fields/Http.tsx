@@ -51,7 +51,7 @@ interface HttpError extends Error {
 }
 
 async function fetchHttpFieldValue(
-  cfg: HttpField['configuration'],
+  cfg: Omit<HttpField['configuration'], 'trigger'>,
   systemVariables: SystemVariables
 ) {
   const baseUrl = window.location.origin
@@ -91,7 +91,7 @@ export function HttpInput({
   onChange
 }: {
   parentValue?: FieldValue
-  configuration: HttpField['configuration']
+  configuration: Omit<HttpField['configuration'], 'trigger'>
   onChange: (val: HttpFieldValue) => void
 }) {
   const systemVariables = useSystemVariables()
