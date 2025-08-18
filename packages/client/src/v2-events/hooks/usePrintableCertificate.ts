@@ -86,7 +86,7 @@ export const usePrintableCertificate = ({
     // we actually print certificate, in this particular case, last action is PRINT_CERTIFICATE
   }
 
-  if (!language || !certificateConfig) {
+  if (!language || !certificateConfig?.svg) {
     return { svgCode: null }
   }
 
