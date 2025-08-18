@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: b79fd9e4-8bbc-4eb0-bd5b-d933c2e84c27
+                transactionId: 49714d2b-81d9-4017-af17-d2f47af065ce
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 212e69f6-5de4-486f-8123-f3098a3d459d
+                transactionId: fb316734-329a-404b-82d7-e4d7e680be3f
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1795,50 +1795,73 @@ paths:
         - Authorization: []
       parameters:
         - in: query
-          name: type
+          name: query
           schema:
-            anyOf:
-              - type: string
-                enum:
-                  - and
-              - type: string
-                enum:
-                  - or
-            default: and
+            allOf:
+              - $ref: "#/components/schemas/QueryType"
+            default:
+              type: and
+              clauses:
+                - eventType: tennis-club-membership
+                  status:
+                    type: anyOf
+                    terms: &a15
+                      - CREATED
+                      - NOTIFIED
+                      - DECLARED
+                      - VALIDATED
+                      - REGISTERED
+                      - ARCHIVED
+                  updatedAt:
+                    type: range
+                    gte: 2025-05-22
+                    lte: 2025-05-29
+                  data: {}
           required: true
         - in: query
-          name: clauses
+          name: limit
+          schema:
+            type: number
+            default: 100
+        - in: query
+          name: offset
+          schema:
+            type: number
+            default: 0
+        - in: query
+          name: sort
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/QueryExpression"
-            minItems: 1
-            default:
-              - eventType: tennis-club-membership
-                status:
-                  type: anyOf
-                  terms: &a15
-                    - CREATED
-                    - NOTIFIED
-                    - DECLARED
-                    - VALIDATED
-                    - REGISTERED
-                    - ARCHIVED
-                updatedAt:
-                  type: range
-                  gte: 2025-05-22
-                  lte: 2025-05-29
-                data: {}
-          required: true
+              type: object
+              properties:
+                field:
+                  type: string
+                direction:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+                  default: asc
+              required:
+                - field
       responses:
         "200":
           description: Successful response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EventIndex"
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EventIndex"
+                  total:
+                    type: number
+                required:
+                  - results
+                  - total
         "400":
           description: Invalid input data
           content:
@@ -12069,6 +12092,36 @@ components:
         code: BAD_REQUEST
         message: Invalid input data
         issues: []
+    QueryType:
+      type: object
+      properties:
+        type:
+          anyOf:
+            - type: string
+              enum:
+                - and
+            - type: string
+              enum:
+                - or
+          default: and
+        clauses:
+          type: array
+          items:
+            $ref: "#/components/schemas/QueryExpression"
+          minItems: 1
+          default:
+            - eventType: tennis-club-membership
+              status:
+                type: anyOf
+                terms: *a15
+              updatedAt:
+                type: range
+                gte: 2025-05-22
+                lte: 2025-05-29
+              data: {}
+      required:
+        - type
+        - clauses
     QueryExpression:
       type: object
       properties:
