@@ -39,6 +39,10 @@ async function fetchWithTimeout(
   }
 }
 
+interface HttpError extends Error {
+  statusCode?: number
+}
+
 async function fetchHttpFieldValue(cfg: HttpField['configuration']) {
   const baseUrl = window.location.origin
   const url = new URL(cfg.url, baseUrl)
@@ -57,9 +61,7 @@ async function fetchHttpFieldValue(cfg: HttpField['configuration']) {
   })
 
   if (!res.ok) {
-    const err = new Error(res.statusText || 'HTTP error') as Error & {
-      statusCode?: number
-    }
+    const err = new Error(res.statusText || 'HTTP error') as HttpError
     err.statusCode = res.status
     throw err
   }
@@ -79,7 +81,7 @@ export function HttpInput({
   const firstRunRef = useRef(true)
   const prevParentRef = useRef<FieldValue | undefined>(undefined)
 
-  const mutation = useMutation({
+  const mutation = useMutation<unknown, HttpError>({
     mutationFn: async () => fetchHttpFieldValue(configuration),
     onMutate: () => {
       onChange({ loading: true, error: null, data: null })
@@ -87,19 +89,18 @@ export function HttpInput({
     onSuccess: (data) => {
       onChange({ loading: false, error: null, data })
     },
-    onError: (error) => {
+    onError: (error: HttpError) => {
       if (error.name === 'AbortError') {
         onChange({
           loading: false,
-          error: { statusCode: null, message: 'The request timed out.' },
+          error: { statusCode: 408, message: 'The request timed out.' },
           data: null
         })
       } else {
         onChange({
           loading: false,
           error: {
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            statusCode: (error as any).statusCode,
+            statusCode: error.statusCode ?? null,
             message: error.message
           },
           data: null
