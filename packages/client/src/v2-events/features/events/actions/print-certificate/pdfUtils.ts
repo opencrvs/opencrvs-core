@@ -219,10 +219,12 @@ function formatAllNonStringValues(
         )
         .join(', ')
     } else if (typeof value === 'object' && value !== null) {
-      formattedData[key] = formatAllNonStringValues(
-        value satisfies EventState,
-        intl
-      ) as FieldValue
+      if ('error' in value) {
+        // HTTP field with a `{ data: any; error: any }` object within isn't a FieldValue for EventState.
+        continue
+      }
+
+      formattedData[key] = formatAllNonStringValues(value, intl) as FieldValue
     } else {
       formattedData[key] = String(value)
     }
