@@ -34,6 +34,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
+import { useOnlineStatus } from '@client/utils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -127,6 +128,7 @@ export function useAction(event: EventIndex) {
   const navigate = useNavigate()
   const drafts = useDrafts()
   const authentication = useAuthentication()
+  const isOnline = useOnlineStatus()
   const { clearEphemeralFormState } = useEventFormNavigation()
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
@@ -181,7 +183,8 @@ export function useAction(event: EventIndex) {
             assignedTo: authentication.sub,
             refetchEvent
           })
-        }
+        },
+        disabled: !isOnline
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
@@ -191,7 +194,8 @@ export function useAction(event: EventIndex) {
             transactionId: getUUID(),
             assignedTo: null
           })
-        }
+        },
+        disabled: !isOnline
       },
       [ActionType.DECLARE]: {
         label: actionLabels[ActionType.DECLARE],

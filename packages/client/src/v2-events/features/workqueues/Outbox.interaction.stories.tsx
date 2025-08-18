@@ -19,7 +19,8 @@ import {
   generateEventDocument,
   getCurrentEventState,
   footballClubMembershipEvent,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -101,7 +102,8 @@ const mockUser = {
   ],
   role: 'SOCIAL_WORKER',
   signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
 
 export const Outbox: Story = {
