@@ -85,7 +85,7 @@ async function fetchHttpFieldValue(
   return res.json()
 }
 
-export function HttpInput({
+function HttpInput({
   parentValue,
   configuration,
   onChange
