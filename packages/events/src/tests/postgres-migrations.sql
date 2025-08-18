@@ -272,11 +272,11 @@ ALTER TABLE ONLY app.event_actions
 
 
 --
--- Name: event_actions event_actions_transaction_id_action_type_status_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
+-- Name: event_actions event_actions_transaction_id_action_type_key; Type: CONSTRAINT; Schema: app; Owner: events_migrator
 --
 
 ALTER TABLE ONLY app.event_actions
-    ADD CONSTRAINT event_actions_transaction_id_action_type_status_key UNIQUE (transaction_id, action_type, status);
+    ADD CONSTRAINT event_actions_transaction_id_action_type_key UNIQUE (transaction_id, action_type);
 
 
 --
