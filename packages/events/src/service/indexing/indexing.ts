@@ -106,7 +106,6 @@ function mapFieldTypeToElasticsearch(
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
-    case FieldType.HTTP:
     case FieldType.BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
@@ -166,6 +165,15 @@ function mapFieldTypeToElasticsearch(
           type: { type: 'keyword' },
           option: { type: 'keyword' }
         }
+      }
+    case FieldType.HTTP:
+      /**
+       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+       * The field still lands in `_source`.
+       */
+      return {
+        type: 'object',
+        enabled: false
       }
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
