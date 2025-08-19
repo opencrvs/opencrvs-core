@@ -3,9 +3,7 @@
 --
 
 -- Dumped from database version 17.5 (Debian 17.5-1.pgdg120+1)
--- Dumped by pg_dump version 17.5
-
--- Started on 2025-08-06 14:43:51 EEST
+-- Dumped by pg_dump version 17.5 (Debian 17.5-1.pgdg120+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -51,9 +49,9 @@ CREATE TYPE app.action_type AS ENUM (
     'DECLARE',
     'VALIDATE',
     'REGISTER',
-    'DETECT_DUPLICATE',
+    'DUPLICATE_DETECTED',
     'REJECT',
-    'MARKED_AS_DUPLICATE',
+    'MARK_NOT_DUPLICATE',
     'ARCHIVE',
     'PRINT_CERTIFICATE',
     'REQUEST_CORRECTION',
@@ -401,8 +399,6 @@ GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.events TO events_app;
 
 GRANT SELECT,INSERT,DELETE,UPDATE ON TABLE app.locations TO events_app;
 
-
--- Completed on 2025-08-06 14:43:52 EEST
 
 --
 -- PostgreSQL database dump complete

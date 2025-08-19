@@ -81,9 +81,9 @@ const RejectDeclarationConfig = ActionConfigBase.merge(
   })
 )
 
-const MarkedAsDuplicateConfig = ActionConfigBase.merge(
+const MarkNotDuplicateConfig = ActionConfigBase.merge(
   z.object({
-    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
+    type: z.literal(ActionType.MARK_NOT_DUPLICATE)
   })
 )
 
@@ -137,7 +137,7 @@ export type AllActionConfigFields =
   | typeof DeclareConfig
   | typeof ValidateConfig
   | typeof RejectDeclarationConfig
-  | typeof MarkedAsDuplicateConfig
+  | typeof MarkNotDuplicateConfig
   | typeof ArchiveConfig
   | typeof RegisterConfig
   | typeof DeleteConfig
@@ -152,7 +152,7 @@ export type InferredActionConfig =
   | z.infer<typeof DeclareConfig>
   | z.infer<typeof ValidateConfig>
   | z.infer<typeof RejectDeclarationConfig>
-  | z.infer<typeof MarkedAsDuplicateConfig>
+  | z.infer<typeof MarkNotDuplicateConfig>
   | z.infer<typeof ArchiveConfig>
   | z.infer<typeof RegisterConfig>
   | z.infer<typeof DeleteConfig>
@@ -171,7 +171,7 @@ export const ActionConfig = z
     DeclareConfig.openapi({ ref: 'DeclareActionConfig' }),
     ValidateConfig.openapi({ ref: 'ValidateActionConfig' }),
     RejectDeclarationConfig.openapi({ ref: 'RejectDeclarationActionConfig' }),
-    MarkedAsDuplicateConfig.openapi({ ref: 'MarkedAsDuplicateActionConfig' }),
+    MarkNotDuplicateConfig.openapi({ ref: 'MarkNotDuplicateActionConfig' }),
     ArchiveConfig.openapi({ ref: 'ArchiveActionConfig' }),
     RegisterConfig.openapi({ ref: 'RegisterActionConfig' }),
     DeleteConfig.openapi({ ref: 'DeleteActionConfig' }),

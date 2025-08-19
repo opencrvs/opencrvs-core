@@ -664,7 +664,7 @@ export function generateActionDocument({
   switch (action) {
     case ActionType.READ:
       return { ...actionBase, type: action }
-    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.MARK_NOT_DUPLICATE:
       return { ...actionBase, type: action }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
@@ -706,7 +706,7 @@ export function generateActionDocument({
       }
 
     case ActionType.DELETE:
-    case ActionType.DETECT_DUPLICATE:
+    case ActionType.DUPLICATE_DETECTED:
     default:
       throw new Error(`Unsupported action type: ${action}`)
   }

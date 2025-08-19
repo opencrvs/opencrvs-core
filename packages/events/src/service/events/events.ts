@@ -315,7 +315,7 @@ function buildAction(
     case ActionType.NOTIFY:
     case ActionType.DECLARE:
     case ActionType.VALIDATE:
-    case ActionType.MARKED_AS_DUPLICATE:
+    case ActionType.MARK_NOT_DUPLICATE:
     case ActionType.REQUEST_CORRECTION: {
       return {
         ...commonAttributes

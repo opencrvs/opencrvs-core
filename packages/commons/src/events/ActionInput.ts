@@ -98,15 +98,15 @@ export type RejectDeclarationActionInput = z.infer<
   typeof RejectDeclarationActionInput
 >
 
-export const MarkedAsDuplicateActionInput = BaseActionInput.merge(
+export const MarkNotDuplicateActionInput = BaseActionInput.merge(
   z.object({
     type: z
-      .literal(ActionType.MARKED_AS_DUPLICATE)
-      .default(ActionType.MARKED_AS_DUPLICATE)
+      .literal(ActionType.MARK_NOT_DUPLICATE)
+      .default(ActionType.MARK_NOT_DUPLICATE)
   })
 )
-export type MarkedAsDuplicateActionInput = z.infer<
-  typeof MarkedAsDuplicateActionInput
+export type MarkNotDuplicateActionInput = z.infer<
+  typeof MarkNotDuplicateActionInput
 >
 
 export const ArchiveActionInput = BaseActionInput.merge(
@@ -203,8 +203,8 @@ export const ActionInput = z
     RejectDeclarationActionInput.openapi({
       ref: 'RejectDeclarationActionInput'
     }),
-    MarkedAsDuplicateActionInput.openapi({
-      ref: 'MarkedAsDuplicateActionInput'
+    MarkNotDuplicateActionInput.openapi({
+      ref: 'MarkNotDuplicateActionInput'
     }),
     ArchiveActionInput.openapi({ ref: 'ArchiveActionInput' }),
     AssignActionInput.openapi({ ref: 'AssignActionInput' }),
