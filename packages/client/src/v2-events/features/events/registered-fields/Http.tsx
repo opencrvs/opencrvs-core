@@ -47,7 +47,7 @@ async function fetchWithTimeout(
 }
 
 interface HttpError extends Error {
-  statusCode?: number
+  statusCode: number
 }
 
 async function fetchHttpFieldValue(
@@ -117,7 +117,7 @@ function HttpInput({
         onChange({
           loading: false,
           error: {
-            statusCode: error.statusCode ?? null,
+            statusCode: error.statusCode,
             message: error.message
           },
           data: null

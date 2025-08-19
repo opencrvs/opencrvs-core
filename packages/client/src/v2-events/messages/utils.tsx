@@ -49,6 +49,11 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
     } else if (typeof value === 'object' && value !== null) {
+      if ('error' in value) {
+        // HTTP field with a `{ data: any; error: any }` object within isn't a FieldValue for EventState.
+        continue
+      }
+
       Object.assign(result, convertDotToTripleUnderscore(value, newKey))
     } else {
       result[newKey] = !value ? EMPTY_TOKEN : value
