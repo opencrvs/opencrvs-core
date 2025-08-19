@@ -170,10 +170,17 @@ function useViewableActionConfigurations(
 
   const hasDeclarationDraftOpen = draft?.action.type === ActionType.DECLARE
 
+  const canReviewDeclaration = hasAnyOfScopes(
+    authentication.scope,
+    ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
+  )
+
   // What reads on the button is important but secondary. We need to perform the actions in certain order for them to succeed.
   const shouldShowDeclareAsReview =
-    event.status === EventStatus.enum.NOTIFIED ||
-    event.flags.includes(InherentFlags.REJECTED)
+    canReviewDeclaration &&
+    (event.status === EventStatus.enum.NOTIFIED ||
+      event.flags.includes(InherentFlags.REJECTED))
+
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
