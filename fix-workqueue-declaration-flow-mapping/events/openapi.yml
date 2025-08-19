@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: bf2c8eed-577c-4932-8b0b-772e0a1c5371
+                transactionId: f7a06f4f-0726-45de-831f-22d76bd5cf50
                 type: v2.birth
       responses:
         "200":
@@ -482,7 +482,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 220d7ac7-1121-4517-954c-c1e86bb9a6ff
+                transactionId: 33cb3f88-610d-46be-b28b-8a6ffa109e98
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1358,6 +1358,34 @@ components:
               type: string
               enum:
                 - ADDRESS
+            configuration:
+              type: object
+              properties:
+                lineSeparator:
+                  type: string
+                fields:
+                  type: array
+                  items:
+                    type: string
+                    enum:
+                      - number
+                      - country
+                      - province
+                      - addressType
+                      - district
+                      - urbanOrRural
+                      - town
+                      - residentialArea
+                      - street
+                      - zipCode
+                      - village
+                      - state
+                      - district2
+                      - cityOrTown
+                      - addressLine1
+                      - addressLine2
+                      - addressLine3
+                      - postcodeOrZip
             defaultValue:
               anyOf:
                 - oneOf:
@@ -1444,11 +1472,6 @@ components:
                     - addressType
                     - state
                     - district2
-            configuration:
-              type: object
-              properties:
-                searchMode:
-                  type: boolean
           required:
             - id
             - label
