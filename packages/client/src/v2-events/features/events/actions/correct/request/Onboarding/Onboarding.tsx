@@ -82,7 +82,7 @@ export function Onboarding() {
     <ActionPageLight
       hideBackground
       goBack={() => navigate(-1)}
-      goHome={closeActionView}
+      goHome={() => closeActionView()}
       id="corrector_form"
       title={intl.formatMessage(messages.title)}
     >
