@@ -177,8 +177,6 @@ function DeclarationActionComponent({ children, actionType }: Props) {
    */
   const currentDeclaration = useEventFormData((state) => state.formValues)
   const currentAnnotation = useActionAnnotation((state) => state.annotation)
-  const clearForm = useEventFormData((state) => state.clear)
-  const clearAnnotation = useActionAnnotation((state) => state.clear)
 
   useEffect(() => {
     if (!currentDeclaration || !currentAnnotation) {

@@ -18,8 +18,8 @@ import {
   getOrThrow
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
+import { useAuthentication } from '@client/utils/userUtils'
 import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useActionMenuItems'
-import { useAuthentication } from '../../../../utils/userUtils'
 
 export function ActionComponent({
   event,
