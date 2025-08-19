@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { defineMessages, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import format from 'date-fns/format'
 import { Table } from '@opencrvs/components/lib/Table'
 import { Text } from '@opencrvs/components/lib/Text'
 import {
@@ -36,7 +37,6 @@ import { ROUTES } from '@client/v2-events/routes'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getLocations } from '@client/offline/selectors'
-import { formattedDuration } from '@client/utils/date-formatting'
 import { hasFieldChanged } from '../../utils'
 
 const messages = defineMessages({
@@ -72,6 +72,20 @@ const TableHeader = styled.th`
   ${({ theme }) => theme.fonts.bold12}
   display: inline-block;
 `
+
+/**
+ * Represents the details of a correction entry shown in the UI.
+ * - `label`: i18n configuration for displaying the label
+ * - `id`: unique identifier for the detail
+ * - `valueDisplay`: what to render as the value (string, JSX, or nothing)
+ * - `pageId`: optional page reference if detail links to another page
+ */
+interface CorrectionDetail {
+  label: TranslationConfig
+  id: string
+  valueDisplay: string | React.JSX.Element | null | undefined
+  pageId?: string
+}
 
 /*
  * Correction details component which is used both on the correction request summary page,
@@ -113,12 +127,7 @@ export function CorrectionDetails({
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
-  const correctionDetails: {
-    label: TranslationConfig
-    id: string
-    valueDisplay: string | React.JSX.Element | null | undefined
-    pageId?: string
-  }[] = correctionFormPages
+  const correctionDetails: CorrectionDetail[] = correctionFormPages
     .filter((page) => isPageVisible(page, annotation))
     .flatMap((page) => {
       // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
@@ -180,8 +189,9 @@ export function CorrectionDetails({
       {
         label: messages.correctionSubmittedOn,
         id: 'correction.submittedOn',
-        valueDisplay: formattedDuration(
-          new Date(correctionRequestAction.createdAt)
+        valueDisplay: format(
+          new Date(correctionRequestAction.createdAt),
+          'MMMM dd, yyyy'
         )
       }
     )
