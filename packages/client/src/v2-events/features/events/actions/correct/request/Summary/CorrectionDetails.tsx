@@ -10,7 +10,7 @@
  */
 import * as React from 'react'
 import styled from 'styled-components'
-import { defineMessages, useIntl } from 'react-intl'
+import { defineMessages, IntlShape, useIntl } from 'react-intl'
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import format from 'date-fns/format'
@@ -25,8 +25,10 @@ import {
   getDeclaration,
   isFieldVisible,
   isPageVisible,
+  PageConfig,
   PageTypes,
-  TranslationConfig
+  TranslationConfig,
+  User
 } from '@opencrvs/commons/client'
 import { ColumnContentAlignment, Link } from '@opencrvs/components'
 import { makeFormFieldIdFormikCompatible } from '@client/v2-events/components/forms/utils'
@@ -72,6 +74,99 @@ const TableHeader = styled.th`
   ${({ theme }) => theme.fonts.bold12}
   display: inline-block;
 `
+
+/*
+ * If this correction was already requested, prepend metadata about the request itself.
+ * These entries (submitter, office, and submission date) are shown before the
+ * field-level correction details so the reviewer immediately sees who requested it and when.
+ */
+function getRequestActionDetails(
+  correctionRequestAction: Action,
+  users: User[],
+  locations: ReturnType<typeof getLocations>,
+  intl: IntlShape
+): CorrectionDetail[] {
+  const user = users.find((u) => u.id === correctionRequestAction.createdBy)
+  const location =
+    correctionRequestAction.createdAtLocation &&
+    locations[correctionRequestAction.createdAtLocation]
+
+  return [
+    {
+      label: messages.correctionSubmittedBy,
+      id: 'correction.submitter',
+      valueDisplay: user ? getUsersFullName(user.name, intl.locale) : ''
+    },
+    {
+      label: messages.correctionRequesterOffice,
+      id: 'correction.requesterOffice',
+      valueDisplay: location?.name || ''
+    },
+    {
+      label: messages.correctionSubmittedOn,
+      id: 'correction.submittedOn',
+      valueDisplay: format(
+        new Date(correctionRequestAction.createdAt),
+        'MMMM dd, yyyy'
+      )
+    }
+  ]
+}
+
+function buildCorrectionDetails(
+  correctionFormPages: PageConfig[],
+  annotation: EventState,
+  form: EventState,
+  intl: IntlShape,
+  users: User[],
+  locations: ReturnType<typeof getLocations>,
+  correctionRequestAction?: Action
+): CorrectionDetail[] {
+  const details: CorrectionDetail[] = correctionFormPages
+    .filter((page) => isPageVisible(page, annotation))
+    .flatMap((page) => {
+      if (page.type === PageTypes.enum.VERIFICATION) {
+        const value = !!annotation[page.id]
+        return [
+          {
+            id: page.id,
+            label: page.title,
+            valueDisplay: value
+              ? intl.formatMessage(correctionMessages.verifyIdentity)
+              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
+            pageId: page.id
+          }
+        ]
+      }
+
+      return page.fields
+        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .map((field) => ({
+          label: field.label,
+          id: field.id,
+          valueDisplay: Output({
+            field,
+            value: annotation[field.id],
+            showPreviouslyMissingValuesAsChanged: false
+          }),
+          pageId: page.id
+        }))
+        .filter((f) => f.valueDisplay)
+    })
+
+  if (correctionRequestAction) {
+    details.unshift(
+      ...getRequestActionDetails(
+        correctionRequestAction,
+        users,
+        locations,
+        intl
+      )
+    )
+  }
+
+  return details
+}
 
 /**
  * Represents the details of a correction entry shown in the UI.
@@ -127,75 +222,15 @@ export function CorrectionDetails({
       (action) => action.type === ActionType.REQUEST_CORRECTION
     )?.correctionForm.pages || []
 
-  const correctionDetails: CorrectionDetail[] = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation))
-    .flatMap((page) => {
-      // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
-      // instead of being tied to individual field IDs. We pull it directly from `annotation[page.id]`.
-      if (page.type === PageTypes.enum.VERIFICATION) {
-        // value can only be boolean
-        const value = !!annotation[page.id]
-        return [
-          {
-            id: page.id,
-            label: page.title,
-            valueDisplay: value
-              ? intl.formatMessage(correctionMessages.verifyIdentity)
-              : intl.formatMessage(correctionMessages.cancelVerifyIdentity),
-            pageId: page.id
-          }
-        ]
-      }
-
-      // Default handling for other pages: values keyed by field.id
-      const pageFields = page.fields
-        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
-        .map((field) => {
-          const valueDisplay = Output({
-            field,
-            value: annotation[field.id],
-            showPreviouslyMissingValuesAsChanged: false
-          })
-
-          return {
-            label: field.label,
-            id: field.id,
-            valueDisplay,
-            pageId: page.id
-          }
-        })
-        .filter((f) => f.valueDisplay)
-
-      return pageFields
-    })
-
-  if (correctionRequestAction) {
-    const user = users.find((u) => u.id === correctionRequestAction.createdBy)
-    const location =
-      correctionRequestAction.createdAtLocation &&
-      locations[correctionRequestAction.createdAtLocation]
-
-    correctionDetails.unshift(
-      {
-        label: messages.correctionSubmittedBy,
-        id: 'correction.submitter',
-        valueDisplay: user ? getUsersFullName(user.name, intl.locale) : ''
-      },
-      {
-        label: messages.correctionRequesterOffice,
-        id: 'correction.requesterOffice',
-        valueDisplay: location?.name || ''
-      },
-      {
-        label: messages.correctionSubmittedOn,
-        id: 'correction.submittedOn',
-        valueDisplay: format(
-          new Date(correctionRequestAction.createdAt),
-          'MMMM dd, yyyy'
-        )
-      }
-    )
-  }
+  const correctionDetails = buildCorrectionDetails(
+    correctionFormPages,
+    annotation,
+    form,
+    intl,
+    users,
+    locations,
+    correctionRequestAction
+  )
 
   return (
     <>
