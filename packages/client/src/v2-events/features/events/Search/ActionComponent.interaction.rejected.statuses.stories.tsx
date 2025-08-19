@@ -23,7 +23,7 @@ import {
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
-import { testDataGenerator } from '../../../../tests/test-data-generators'
+import { testDataGenerator } from '@client/tests/test-data-generators'
 import { addLocalEventConfig, setEventData } from '../useEvents/api'
 import { ActionComponent } from './ActionComponent'
 

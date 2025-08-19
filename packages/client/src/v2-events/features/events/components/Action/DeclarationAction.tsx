@@ -41,8 +41,8 @@ import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
+import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../../useEventConfiguration'
-import { getScope } from '../../../../../profile/profileSelectors'
 
 type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
 

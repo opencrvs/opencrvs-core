@@ -41,8 +41,7 @@ export function ActionComponent({
 
   const config =
     actionType === 'DEFAULT'
-      ? // Who guarantees the order?
-        allowedActionConfigs.find(({ type }) => !isMetaAction(type))
+      ? allowedActionConfigs.find(({ type }) => !isMetaAction(type))
       : // If action type is not allowed, we don't provide it.
         allowedActionConfigs.find((item) => item.type === actionType)
 

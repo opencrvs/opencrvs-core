@@ -32,7 +32,7 @@ import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
-import { ITokenPayload } from '../../../../../utils/authUtils'
+import { ITokenPayload } from '@client/utils/authUtils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
