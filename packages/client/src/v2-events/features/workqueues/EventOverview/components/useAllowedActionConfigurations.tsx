@@ -81,6 +81,7 @@ interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
+  hidden?: boolean
 }
 
 export const actionLabels = {
@@ -170,16 +171,20 @@ function useViewableActionConfigurations(
 
   const hasDeclarationDraftOpen = draft?.action.type === ActionType.DECLARE
 
-  const canReviewDeclaration = hasAnyOfScopes(
+  const hasScopeForValidate = hasAnyOfScopes(
     authentication.scope,
     ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
   )
-
+  const isRejected = event.flags.includes(InherentFlags.REJECTED)
+  const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
   // What reads on the button is important but secondary. We need to perform the actions in certain order for them to succeed.
   const shouldShowDeclareAsReview =
-    canReviewDeclaration &&
-    (event.status === EventStatus.enum.NOTIFIED ||
-      event.flags.includes(InherentFlags.REJECTED))
+    hasScopeForValidate && (isRejected || isNotifiedState)
+
+  // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
+  // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.
+  const shouldHideDeclareAction =
+    isNotifiedState && !hasScopeForValidate && !isRejected
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
@@ -208,6 +213,7 @@ function useViewableActionConfigurations(
             refetchEvent
           })
         },
+        hidden: isNotifiedState && !isRejected && !hasScopeForValidate,
         disabled: !isOnline
       },
       [ActionType.UNASSIGN]: {
@@ -235,8 +241,8 @@ function useViewableActionConfigurations(
             )
           )
         },
-        // @todo: check what this case actually is.
-        disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen)
+        disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
+        hidden: shouldHideDeclareAction
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
@@ -362,6 +368,8 @@ export function useAllowedActionConfigurations(
 
   return [
     modal,
-    allowedWorkqueueActions.map((a) => ({ ...config[a], type: a }))
+    allowedWorkqueueActions
+      .map((a) => ({ ...config[a], type: a }))
+      .filter((a: ActionConfig) => !a.hidden)
   ] satisfies [React.ReactNode, ActionMenuItem[]]
 }
