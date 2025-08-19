@@ -11,7 +11,7 @@
 
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { Icon, Button as UIButton } from '@opencrvs/components'
+import { Icon, Button as UiButton } from '@opencrvs/components'
 import * as SupportedIcons from '@opencrvs/components/lib/Icon/all-icons'
 import { TranslationConfig } from '@opencrvs/commons/client'
 
@@ -48,7 +48,7 @@ function ButtonInput({
   }
 
   return (
-    <UIButton
+    <UiButton
       disabled={disabled}
       loading={loading}
       type="secondary"
@@ -62,7 +62,7 @@ function ButtonInput({
         />
       )}
       {intl.formatMessage(text)}
-    </UIButton>
+    </UiButton>
   )
 }
 
