@@ -199,40 +199,6 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
   )
 }
 
-function formatAllNonStringValues(
-  templateData: EventState,
-  intl: IntlShape
-): EventState {
-  const formattedData: EventState = {}
-
-  for (const key of Object.keys(templateData)) {
-    const value = templateData[key]
-
-    if (isMessageDescriptor(value)) {
-      formattedData[key] = intl.formatMessage(value)
-    } else if (Array.isArray(value)) {
-      // Address field: country label is a MessageDescriptor but others are strings
-      formattedData[key] = value
-        .filter(Boolean)
-        .map((item) =>
-          isMessageDescriptor(item) ? intl.formatMessage(item) : item
-        )
-        .join(', ')
-    } else if (typeof value === 'object' && value !== null) {
-      if ('error' in value) {
-        // HTTP field with a `{ data: any; error: any }` object within isn't a FieldValue for EventState.
-        continue
-      }
-
-      formattedData[key] = formatAllNonStringValues(value, intl) as FieldValue
-    } else {
-      formattedData[key] = String(value)
-    }
-  }
-
-  return formattedData
-}
-
 const cache = createIntlCache()
 
 export function compileSvg({
@@ -265,6 +231,10 @@ export function compileSvg({
 
   const customHelpers = getHandlebarHelpers()
 
+  const stringifyDeclaration = getFormDataStringifier(intl, locations)
+  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+  const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
+
   for (const helperName of Object.keys(customHelpers)) {
     /*
      * Note for anyone adding new context variables to handlebar helpers:
@@ -292,10 +262,6 @@ export function compileSvg({
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
-    const stringifyDeclaration = getFormDataStringifier(intl, locations)
-    const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
-    const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
-
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
       intl,
@@ -476,10 +442,9 @@ export function compileSvg({
   )
 
   const template = Handlebars.compile(templateString)
-  $declaration = formatAllNonStringValues($declaration, intl)
 
   const data = {
-    $declaration,
+    $declaration: resolvedDeclaration,
     $metadata,
     $references: {
       locations,

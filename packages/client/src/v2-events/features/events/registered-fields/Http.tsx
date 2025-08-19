@@ -146,5 +146,6 @@ function HttpInput({
 
 export const Http = {
   Input: HttpInput,
-  Output: null
+  Output: null,
+  stringify: () => `[http response or error redacted]`
 }
