@@ -37,7 +37,7 @@ export function ActionComponent({
     'Authentication is not available but is required'
   )
 
-  const allowedActionConfigs = useAllowedActionConfigurations(event, auth)
+  const [, allowedActionConfigs] = useAllowedActionConfigurations(event, auth)
 
   const config =
     actionType === 'DEFAULT'
