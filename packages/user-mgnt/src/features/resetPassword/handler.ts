@@ -18,7 +18,11 @@ import {
 } from '@user-mgnt/utils/hash'
 import { getUserId, hasDemoScope, statuses } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
-import { logger, triggerUserEventNotification } from '@opencrvs/commons'
+import {
+  logger,
+  triggerUserEventNotification,
+  v1ToV2Name
+} from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
 interface IResendPasswordInvitePayload {
@@ -79,12 +83,12 @@ export default async function resetPasswordInviteHandler(
       payload: {
         temporaryPassword: randomPassword,
         recipient: {
-          name: user.name,
+          name: v1ToV2Name(user.name),
           email: user.emailForNotification,
           mobile: user.mobile
         },
         admin: {
-          name: systemAdminUser.name,
+          name: v1ToV2Name(systemAdminUser.name),
           id: systemAdminUser.id,
           role: systemAdminUser.role
         }

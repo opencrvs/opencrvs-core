@@ -18,7 +18,11 @@ import {
   RetrievalSteps,
   deleteRetrievalStepInformation
 } from '@auth/features/retrievalSteps/verifyUser/service'
-import { logger, triggerUserEventNotification } from '@opencrvs/commons'
+import {
+  logger,
+  triggerUserEventNotification,
+  v1ToV2Name
+} from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@auth/metrics'
 import { env } from '@auth/environment'
 
@@ -50,7 +54,7 @@ export default async function sendUserNameHandler(
     event: 'username-reminder',
     payload: {
       recipient: {
-        name: retrievalStepInformation.userFullName,
+        name: v1ToV2Name(retrievalStepInformation.userFullName),
         mobile: retrievalStepInformation.mobile,
         email: retrievalStepInformation.email
       },

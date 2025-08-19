@@ -12,7 +12,8 @@ import * as Hapi from '@hapi/hapi'
 import {
   logger,
   isBase64FileString,
-  triggerUserEventNotification
+  triggerUserEventNotification,
+  v1ToV2Name
 } from '@opencrvs/commons'
 import {
   Practitioner,
@@ -168,7 +169,7 @@ export default async function updateUser(
       event: 'user-updated',
       payload: {
         recipient: {
-          name: user.name,
+          name: v1ToV2Name(user.name),
           email: user.emailForNotification,
           mobile: user.mobile
         },

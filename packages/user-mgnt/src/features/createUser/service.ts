@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { triggerUserEventNotification, logger } from '@opencrvs/commons'
+import {
+  triggerUserEventNotification,
+  logger,
+  v1ToV2Name
+} from '@opencrvs/commons'
 import {
   Extension,
   findExtension,
@@ -281,7 +285,7 @@ export async function sendCredentialsNotification(
       event: 'user-created',
       payload: {
         recipient: {
-          name: userFullName,
+          name: v1ToV2Name(userFullName),
           email,
           mobile: msisdn
         },
