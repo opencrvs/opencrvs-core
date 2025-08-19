@@ -261,23 +261,23 @@ export function CorrectionDetails({
           ({ valueDisplay, label, pageId, id }) => ({
             firstColumn: <Label>{intl.formatMessage(label)}</Label>,
             secondColumn: valueDisplay,
-            change: (
+            // change button should not appear for details without pageId
+            change: pageId && (
               <Link
                 data-testid={`change-${id}`}
                 font="reg14"
                 onClick={(e) => {
                   e.stopPropagation()
-                  pageId &&
-                    navigate(
-                      ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath(
-                        {
-                          pageId,
-                          eventId: event.id
-                        },
-                        { workqueue },
-                        id ? makeFormFieldIdFormikCompatible(id) : undefined
-                      )
+                  navigate(
+                    ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath(
+                      {
+                        pageId,
+                        eventId: event.id
+                      },
+                      { workqueue },
+                      id ? makeFormFieldIdFormikCompatible(id) : undefined
                     )
+                  )
                 }}
               >
                 {intl.formatMessage(correctionMessages.change)}
