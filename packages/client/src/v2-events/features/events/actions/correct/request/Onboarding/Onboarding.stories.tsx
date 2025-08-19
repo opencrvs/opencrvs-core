@@ -42,7 +42,7 @@ export const Onboarding: Story = {
       ).toBeEnabled()
     })
 
-    await step('Change applicant values', async () => {
+    await step('Continue through correction form', async () => {
       await userEvent.click(canvas.getByText('Continue', { exact: true }))
       await userEvent.click(canvas.getByText('Verified', { exact: true }))
       await userEvent.click(canvas.getByText('Continue', { exact: true }))

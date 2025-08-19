@@ -88,7 +88,7 @@ export const ActionPageLight = ({
     return (
       goHome && (
         <CircleButton
-          data-testid="crcl-btn "
+          data-testid="crcl-btn"
           id="crcl-btn"
           onClick={goHome}
           key="crcl-btn"
