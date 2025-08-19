@@ -45,7 +45,7 @@ const messages = defineMessages({
   correctionSubmittedBy: {
     id: 'v2.correction.submittedBy',
     defaultMessage: 'Submitter',
-    description: 'Correction subbmitted by label'
+    description: 'Correction submitted by label'
   },
   correctionRequesterOffice: {
     id: 'v2.correction.requesterOffice',
@@ -55,7 +55,7 @@ const messages = defineMessages({
   correctionSubmittedOn: {
     id: 'v2.correction.submittedOn',
     defaultMessage: 'Submitted on',
-    description: 'Correction subbmitted on label'
+    description: 'Correction submitted on label'
   }
 })
 
