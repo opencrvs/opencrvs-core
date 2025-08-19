@@ -41,7 +41,8 @@ import {
 import {
   Draft,
   EventDocument,
-  tennisClubMembershipEvent
+  tennisClubMembershipEvent,
+  UUID
 } from '@opencrvs/commons/client'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
@@ -204,7 +205,8 @@ const preview: Preview = {
         name: [{ use: 'en', given: ['Kennedy'], family: 'Mweene' }],
         role: 'LOCAL_REGISTRAR',
         signature: undefined,
-        avatar: undefined
+        avatar: undefined,
+        primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline

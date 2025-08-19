@@ -19,7 +19,7 @@ import { getOrThrow } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
 import { useAuthentication } from '@client/utils/userUtils'
-import { useAllowedActionConfigurations } from './useActionMenuItems'
+import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
 
 export function ActionMenu({
   eventId,
@@ -48,7 +48,10 @@ export function ActionMenu({
 
   const eventState = eventIndex
 
-  const actionMenuItems = useAllowedActionConfigurations(eventState, auth)
+  const [modal, actionMenuItems] = useAllowedActionConfigurations(
+    eventState,
+    auth
+  )
 
   return (
     <>
@@ -78,6 +81,7 @@ export function ActionMenu({
           })}
         </DropdownMenu.Content>
       </DropdownMenu>
+      {modal}
     </>
   )
 }

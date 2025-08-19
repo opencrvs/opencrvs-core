@@ -10,6 +10,7 @@
  */
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import React from 'react'
 import {
   ActionType,
   EventIndex,
@@ -33,6 +34,9 @@ import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
 import { ITokenPayload } from '@client/utils/authUtils'
+import { useModal } from '@client/hooks/useModal'
+import { AssignModal } from '@client/v2-events/components/AssignModal'
+import { useOnlineStatus } from '@client/utils'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -125,6 +129,11 @@ export const actionLabels = {
   }
 } as const
 
+interface ActionMenuItem
+  extends Partial<Record<WorkqueueActionType, ActionConfig>> {
+  type: ActionType
+}
+
 /**
  * Get viewable actions for event
  * @param event The event to get actions for.
@@ -139,10 +148,12 @@ function useViewableActionConfigurations(
   const events = useEvents()
   const navigate = useNavigate()
 
+  const isOnline = useOnlineStatus()
   const { clearEphemeralFormState } = useEventFormNavigation()
 
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
+  const [modal, openModal] = useModal()
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -168,6 +179,7 @@ function useViewableActionConfigurations(
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
+    modal,
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
@@ -177,12 +189,19 @@ function useViewableActionConfigurations(
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
         onClick: async (workqueue?: string) => {
+          const assign = await openModal<boolean>((close) => (
+            <AssignModal close={close} />
+          ))
+          if (!assign) {
+            return
+          }
           await events.actions.assignment.assign.mutate({
             eventId: event.id,
             assignedTo: authentication.sub,
             refetchEvent
           })
-        }
+        },
+        disabled: !isOnline
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
@@ -192,7 +211,8 @@ function useViewableActionConfigurations(
             transactionId: getUUID(),
             assignedTo: null
           })
-        }
+        },
+        disabled: !isOnline
       },
       [ActionType.DECLARE]: {
         // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
@@ -267,10 +287,11 @@ function useViewableActionConfigurations(
 }
 
 /**
- * @returns a list of action menu item configurations based on the event state and scopes provided.
  *
  * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
  * Each action has their own route and will take care of the actions needed. If you "skip" action (e.g. showing 'VALIDATE' instead of 'DECLARE') by directing the user to the wrong route, it will fail at the end.
+ *
+ * @returns a tuple containing a modal (which must be rendered in the parent where this hook is called) and a list of action menu items based on the event state and scopes provided.
  */
 export function useAllowedActionConfigurations(
   event: EventIndex,
@@ -283,7 +304,7 @@ export function useAllowedActionConfigurations(
     .getAllRemoteDrafts()
     .find((draft) => draft.eventId === event.id)
 
-  const { config } = useViewableActionConfigurations(
+  const { config, modal } = useViewableActionConfigurations(
     event,
     authentication,
     openDraft
@@ -322,12 +343,18 @@ export function useAllowedActionConfigurations(
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
   if (hasOnlyMetaActions) {
     return [
-      {
-        ...config[ActionType.READ],
-        type: ActionType.READ
-      }
-    ]
+      modal,
+      [
+        {
+          ...config[ActionType.READ],
+          type: ActionType.READ
+        }
+      ]
+    ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
-  return allowedWorkqueueActions.map((a) => ({ ...config[a], type: a }))
+  return [
+    modal,
+    allowedWorkqueueActions.map((a) => ({ ...config[a], type: a }))
+  ] satisfies [React.ReactNode, ActionMenuItem[]]
 }

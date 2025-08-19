@@ -19,7 +19,7 @@ import {
 } from '@opencrvs/commons/client'
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
-import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useActionMenuItems'
+import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
 
 export function ActionComponent({
   event,
