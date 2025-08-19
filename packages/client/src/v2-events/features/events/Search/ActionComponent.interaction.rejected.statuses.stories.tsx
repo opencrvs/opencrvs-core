@@ -122,7 +122,7 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Declare'
     })
 
     await userEvent.click(actionButton)
@@ -196,7 +196,7 @@ export const DirectsRejectedDeclaredToDeclared: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
     const actionButton = await canvas.findByRole('button', {
-      name: 'Review'
+      name: 'Declare'
     })
 
     await userEvent.click(actionButton)

@@ -179,7 +179,7 @@ function useViewableActionConfigurations(
   const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
   // What reads on the button is important but secondary. We need to perform the actions in certain order for them to succeed.
   const shouldShowDeclareAsReview =
-    hasScopeForValidate && (isRejected || isNotifiedState)
+    hasScopeForValidate && !isRejected && isNotifiedState
 
   // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
   // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.

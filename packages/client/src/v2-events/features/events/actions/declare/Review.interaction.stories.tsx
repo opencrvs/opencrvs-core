@@ -40,26 +40,31 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const declareEventDocument = generateEventDocument({
+const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
+  actions: [ActionType.CREATE]
 })
 const declarationTrpcMsw = createDeclarationTrpcMsw(
   tRPCMsw,
-  declareEventDocument
+  createdEventDocument
 )
+
+const declaredEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE, ActionType.DECLARE]
+})
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   parameters: {
     offline: {
-      events: [declareEventDocument]
+      events: [createdEventDocument]
     }
   },
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(
-        declareEventDocument,
+        declaredEventDocument,
         tennisClubMembershipEvent
       ).declaration
     })
@@ -116,7 +121,12 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     offline: {
       events: [declarationTrpcMsw.eventDocument],
-      drafts: [declarationTrpcMsw.draft]
+      drafts: [
+        generateEventDraftDocument({
+          eventId: declarationTrpcMsw.eventDocument.id,
+          actionType: ActionType.DECLARE
+        })
+      ]
     },
     msw: {
       handlers: {
@@ -250,7 +260,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -307,7 +317,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -481,7 +491,7 @@ export const ReviewForIncompleteNameInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -520,13 +530,13 @@ export const ChangeFieldInReview: Story = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(declareEventDocument.id, declareEventDocument)
+    setEventData(createdEventDocument.id, createdEventDocument)
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -537,7 +547,7 @@ export const ChangeFieldInReview: Story = {
             return [
               generateEventDraftDocument({
                 eventId,
-                actionType: ActionType.REGISTER
+                actionType: ActionType.DECLARE
               })
             ]
           })
