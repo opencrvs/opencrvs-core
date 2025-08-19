@@ -207,14 +207,19 @@ export function getDefaultActionProcedures(
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
       .use(middleware.validateAction)
+      .use(middleware.detectDuplicate)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user, isDuplicateAction } = ctx
+        const { token, user, isDuplicateAction, duplicates } = ctx
         const { eventId } = input
         const actionId = getUUID()
 
         if (isDuplicateAction) {
           return ctx.event
+        }
+
+        if (duplicates.detected) {
+          return duplicates.event
         }
 
         await throwConflictIfActionNotAllowed(eventId, actionType, ctx.token)
