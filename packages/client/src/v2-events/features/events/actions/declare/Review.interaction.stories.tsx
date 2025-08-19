@@ -24,7 +24,7 @@ import {
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
@@ -44,7 +44,10 @@ const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE, ActionType.DECLARE]
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  declareEventDocument
+)
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',

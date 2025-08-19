@@ -39,14 +39,18 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
-const eventDocument = generateEventDocument({
+const declareEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE, ActionType.DECLARE]
 })
 
-const eventId = eventDocument.id
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  declareEventDocument
+)
+
+const eventId = declareEventDocument.id
 
 const meta: Meta<typeof Review> = {
   beforeEach: () => {
@@ -54,7 +58,7 @@ const meta: Meta<typeof Review> = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventDocument.id, eventDocument)
+    setEventData(eventId, declareEventDocument)
   },
   title: 'Validate/Review/Interaction/Local Registrar',
   loaders: [
@@ -93,11 +97,6 @@ const mockUser = {
   avatar: undefined,
   primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
-
-const declareEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE]
-})
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
