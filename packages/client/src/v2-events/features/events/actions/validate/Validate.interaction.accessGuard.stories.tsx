@@ -184,7 +184,7 @@ export const PreventAccessForRegistered: Story = {
     await waitFor(async () => {
       await expect(
         canvas.getByText(
-          `Action VALIDATE not available for the event ${registeredEventDocument.id} with status REGISTERED`
+          `Action VALIDATE not available for the event ${registeredEventDocument.id} with status REGISTERED (flags: pending-certification)`
         )
       ).toBeInTheDocument()
     })

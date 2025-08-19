@@ -586,8 +586,10 @@ export const ChangeFieldInReview: Story = {
       const backToReviewButton = await canvas.findByText('Back to review')
       await userEvent.click(backToReviewButton)
 
-      await canvas.findByText("Applicant's name")
-      await canvas.findByText('John Nileem-Rowa')
+      await waitFor(async () => {
+        await expect(canvas.getByText("Applicant's name")).toBeInTheDocument()
+        await expect(canvas.getByText('John Nileem-Rowa')).toBeInTheDocument()
+      })
     })
   }
 }
