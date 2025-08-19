@@ -3785,7 +3785,6 @@ components:
                 data: {}
               required:
                 - loading
-                - error
             configuration:
               type: object
               properties:
@@ -13538,7 +13537,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 2764a385-7848-4206-a0c9-9b4576408d33
+        transactionId: 12254615-60b0-42c4-90f0-c6fb6756f236
         declaration: {}
         annotation: {}
         type: NOTIFY
