@@ -105,14 +105,79 @@ export const AddressFieldValue = z
   .discriminatedUnion('urbanOrRural', [UrbanAddressValue, RuralAddressValue])
   .or(GenericAddressValue)
 
-export const ConfigurableAddressFieldValue = z.object({
+const DomesticAddressValue = z.object({
   country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
+  addressType: z.literal(AddressType.DOMESTIC),
   adminLevel1: z.string().optional(),
-  adminLevel2: z.string().optional()
-  /* administrativeArea: z.string().uuid(),
-  streetLevelDetails: z.record(z.string(), z.string()) */
+  adminLevel2: z.string().optional(),
+  adminLevel3: z.string().optional(),
+  adminLevel4: z.string().optional(),
+  adminLevel5: z.string().optional(),
+  adminLevel6: z.string().optional(),
+  addressLine1: z.string().optional(),
+  addressLine2: z.string().optional(),
+  addressLine3: z.string().optional(),
+  addressLine4: z.string().optional(),
+  addressLine5: z.string().optional()
 })
+
+export const DomesticAddressUpdateValue = z.object({
+  country: z.string(),
+  addressType: z.literal(AddressType.DOMESTIC),
+  adminLevel1: z.string().nullish(),
+  adminLevel2: z.string().nullish(),
+  adminLevel3: z.string().nullish(),
+  adminLevel4: z.string().nullish(),
+  adminLevel5: z.string().nullish(),
+  adminLevel6: z.string().nullish(),
+  addressLine1: z.string().nullish(),
+  addressLine2: z.string().nullish(),
+  addressLine3: z.string().nullish(),
+  addressLine4: z.string().nullish(),
+  addressLine5: z.string().nullish()
+})
+
+export type DomesticAddressUpdateValue = z.infer<
+  typeof DomesticAddressUpdateValue
+>
+
+const InternationalAddressValue = z.object({
+  country: z.string(),
+  addressType: z.literal(AddressType.INTERNATIONAL),
+  internationalAddressLine1: z.string().optional(),
+  internationalAddressLine2: z.string().optional(),
+  internationalAddressLine3: z.string().optional(),
+  internationalAddressLine4: z.string().optional(),
+  internationalAddressLine5: z.string().optional()
+})
+
+export const InternationalAddressUpdateValue = z.object({
+  country: z.string(),
+  addressType: z.literal(AddressType.INTERNATIONAL),
+  internationalAddressLine1: z.string().nullish(),
+  internationalAddressLine2: z.string().nullish(),
+  internationalAddressLine3: z.string().nullish(),
+  internationalAddressLine4: z.string().nullish(),
+  internationalAddressLine5: z.string().nullish()
+})
+
+export type InternationalAddressUpdateValue = z.infer<
+  typeof InternationalAddressUpdateValue
+>
+
+export const ConfigurableAddressFieldValue = z.union([
+  DomesticAddressValue,
+  InternationalAddressValue
+])
+
+export type ConfigurableAddressFieldValue = z.infer<
+  typeof ConfigurableAddressFieldValue
+>
+
+export const ConfigurableAddressFieldUpdateValue = z.union([
+  DomesticAddressUpdateValue,
+  InternationalAddressUpdateValue
+])
 
 export const GenericAddressUpdateValue = z.object({
   country: z.string(),
@@ -137,19 +202,7 @@ export const AddressFieldUpdateValue = z
   ])
   .or(GenericAddressUpdateValue)
 
-export const ConfigurableAddressFieldUpdateValue = z.object({
-  country: z.string(),
-  addressType: z.enum([AddressType.DOMESTIC, AddressType.INTERNATIONAL]),
-  adminLevel1: z.string().nullish(),
-  adminLevel2: z.string().nullish()
-  /* administrativeArea: z.string().uuid().nullish(),
-  streetLevelDetails: z.record(z.string(), z.string()).nullish() */
-})
-
 export type AddressFieldValue = z.infer<typeof AddressFieldValue>
-export type ConfigurableAddressFieldValue = z.infer<
-  typeof ConfigurableAddressFieldValue
->
 
 export const FileFieldValueWithOption = z.object({
   path: FullDocumentPath,

@@ -23,7 +23,9 @@ import {
   NameFieldValue,
   NameFieldUpdateValue,
   ConfigurableAddressFieldValue,
-  ConfigurableAddressFieldUpdateValue
+  ConfigurableAddressFieldUpdateValue,
+  DomesticAddressUpdateValue,
+  InternationalAddressUpdateValue
 } from './CompositeFieldValue'
 /**
  * FieldValues defined in this file are primitive field values.
@@ -118,7 +120,8 @@ export const FieldUpdateValue = z.union([
   DataFieldValue,
   GenericAddressUpdateValue,
   NameFieldUpdateValue,
-  ConfigurableAddressFieldUpdateValue
+  DomesticAddressUpdateValue,
+  InternationalAddressUpdateValue
 ])
 
 export type FieldUpdateValue = z.infer<typeof FieldUpdateValue>
