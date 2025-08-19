@@ -11,6 +11,7 @@
 
 import { TRPCError } from '@trpc/server'
 import { omit } from 'lodash'
+import { http, HttpResponse } from 'msw'
 import {
   ActionType,
   AddressType,
@@ -21,12 +22,17 @@ import {
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  v2BirthEvent
+} from '@opencrvs/commons/fixtures'
 import {
   createEvent,
   createTestClient,
   setupTestCase
 } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test(`${ActionType.REQUEST_CORRECTION} prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -479,4 +485,57 @@ test('a correction request is not allowed if the event is already waiting for co
       message: 'Event is waiting for correction'
     })
   )
+})
+
+describe.only('overwriting hidden field deciding field with undefined', () => {
+  beforeAll(() => {
+    // Mock the events config API
+    mswServer.use(
+      http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+        return HttpResponse.json([v2BirthEvent])
+      })
+    )
+  })
+
+  it('should create a birth event with dobUnknown set to true and show age field', async () => {
+    const { user, generator } = await setupTestCase()
+    const client = createTestClient(user)
+
+    const originalEvent = await client.event.create(generator.event.create())
+    console.log(originalEvent)
+    const birthDeclarationInput = generator.event.actions.declare(
+      originalEvent.id,
+      {
+        declaration: {
+          'child.firstNames': 'Mihirima',
+          'child.familyName': 'Aziz',
+          'child.DoB': '2025-01-01',
+          'mother.firstNames': 'Sultana',
+          'mother.familyName': 'Aziz',
+          'mother.DoB': '1990-05-05',
+          'mother.identifier': '1234567890',
+          'informant.relation': 'GRANDFATHER',
+          'informant.dobUnknown': true,
+          'informant.age': 70
+        }
+      }
+    )
+    console.log(birthDeclarationInput)
+    const event = await client.event.actions.declare.request(
+      birthDeclarationInput
+    )
+    console.log(event)
+    await client.event.actions.validate.request(
+      generator.event.actions.validate(event.id)
+    )
+    console.log('validate')
+    const data = generator.event.actions.register(event.id, {})
+    const registeredEvent = await client.event.actions.register.request(data)
+
+    console.log(registeredEvent)
+    expect(registeredEvent.id).toBeDefined()
+    // expect(createdEvent.declaration.informant.dobUnknown).toBe(true)
+    // expect(createdEvent.declaration.informant.age).toBe(70)
+    // expect(createdEvent.declaration.informant.dob).toBeUndefined()
+  })
 })
