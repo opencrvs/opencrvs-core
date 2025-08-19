@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 4e40d43f-4372-4550-9802-ba636268c406
+                transactionId: 42f9f121-781d-462a-a5c1-e944bda341a0
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a7f5aca8-c5d4-4be6-af66-6e45519dec35
+                transactionId: 17beb661-4206-4ce2-b5df-0e94e8a2e15b
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2473,7 +2473,7 @@ components:
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RejectDeclarationActionConfig"
-        - $ref: "#/components/schemas/MarkedAsDuplicateActionConfig"
+        - $ref: "#/components/schemas/MarkNotDuplicateActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/DeleteActionConfig"
@@ -2488,7 +2488,7 @@ components:
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REJECT: "#/components/schemas/RejectDeclarationActionConfig"
-          MARKED_AS_DUPLICATE: "#/components/schemas/MarkedAsDuplicateActionConfig"
+          MARK_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           DELETE: "#/components/schemas/DeleteActionConfig"
@@ -5271,7 +5271,7 @@ components:
         - label
         - conditionals
         - type
-    MarkedAsDuplicateActionConfig:
+    MarkNotDuplicateActionConfig:
       type: object
       properties:
         label:
@@ -5325,7 +5325,7 @@ components:
         type:
           type: string
           enum:
-            - MARKED_AS_DUPLICATE
+            - MARK_NOT_DUPLICATE
       required:
         - label
         - conditionals
@@ -6064,7 +6064,7 @@ components:
         - $ref: "#/components/schemas/CreatedAction"
         - $ref: "#/components/schemas/ValidateAction"
         - $ref: "#/components/schemas/RejectAction"
-        - $ref: "#/components/schemas/MarkAsDuplicateAction"
+        - $ref: "#/components/schemas/MarkNotDuplicateAction"
         - $ref: "#/components/schemas/ArchiveAction"
         - $ref: "#/components/schemas/NotifiedAction"
         - $ref: "#/components/schemas/RegisterAction"
@@ -6082,7 +6082,7 @@ components:
           CREATE: "#/components/schemas/CreatedAction"
           VALIDATE: "#/components/schemas/ValidateAction"
           REJECT: "#/components/schemas/RejectAction"
-          MARKED_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
+          MARK_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
           NOTIFY: "#/components/schemas/NotifiedAction"
           REGISTER: "#/components/schemas/RegisterAction"
@@ -7310,7 +7310,7 @@ components:
         - status
         - type
         - reason
-    MarkAsDuplicateAction:
+    MarkNotDuplicateAction:
       type: object
       properties:
         id:
@@ -7699,7 +7699,7 @@ components:
         type:
           type: string
           enum:
-            - MARKED_AS_DUPLICATE
+            - MARK_NOT_DUPLICATE
       required:
         - id
         - transactionId
@@ -12363,7 +12363,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
@@ -12375,7 +12375,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
@@ -12602,7 +12602,7 @@ components:
           items:
             anyOf:
               - type: string
-                pattern: ^(delete|create|notify|declare|validate|register|detect_duplicate|reject|marked_as_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
+                pattern: ^(delete|create|notify|declare|validate|register|duplicate_detected|reject|mark_not_duplicate|archive|print_certificate|request_correction|reject_correction|approve_correction|read|assign|unassign):(requested|accepted|rejected)$
               - type: string
                 enum:
                   - pending-certification
