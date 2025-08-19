@@ -23,11 +23,13 @@ import {
   isRadioGroupFieldType,
   isSelectFieldType,
   isNameFieldType,
-  isDateFieldType
+  isDateFieldType,
+  isConfigurableAddressFieldType
 } from '@opencrvs/commons/client'
 import {
   Address,
   AdministrativeArea,
+  ConfigurableAddress,
   RadioGroup,
   SelectCountry as Country,
   Select,
@@ -105,6 +107,10 @@ export const getFormDataStringifier = (
     const field = { config: fieldConfig, value }
     if (isAddressFieldType(field)) {
       return Address.stringify(intl, locations, field.value)
+    }
+
+    if (isConfigurableAddressFieldType(field)) {
+      return ConfigurableAddress.stringify(intl, locations, field.value)
     }
 
     if (isFacilityFieldType(field)) {

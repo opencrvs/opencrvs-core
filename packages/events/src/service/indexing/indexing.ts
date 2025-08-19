@@ -141,7 +141,10 @@ function mapFieldTypeToElasticsearch(
         type: 'object',
         properties: {
           country: { type: 'keyword' },
-          addressType: { type: 'keyword' }
+          addressType: { type: 'keyword' },
+          adminLevel1: { type: 'keyword' },
+          adminLevel2: { type: 'keyword' },
+          addressLine1: { type: 'keyword' }
         }
       }
     case FieldType.SIGNATURE:

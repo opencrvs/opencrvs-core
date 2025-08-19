@@ -512,7 +512,8 @@ const ConfigurableAddress = BaseField.extend({
             id: z.string(),
             required: z.boolean(),
             label: TranslationConfig,
-            type: z.literal(FieldType.TEXT)
+            type: z.literal(FieldType.TEXT),
+            conditionals: z.array(FieldConditional).default([]).optional()
           })
         )
         .optional()

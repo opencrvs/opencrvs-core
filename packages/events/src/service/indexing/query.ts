@@ -11,6 +11,7 @@
 import { estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
+  ConfigurableAddressFieldValue,
   EventConfig,
   FieldType,
   getAllUniqueFields,
@@ -26,6 +27,7 @@ import { getChildLocations } from '../locations/locations'
 import {
   encodeFieldId,
   generateQueryForAddressField,
+  generateQueryForConfigurableAddressField,
   getAlternateFieldMap
 } from './utils'
 
@@ -85,6 +87,10 @@ function generateQuery(
     .filter((field) => field.type === FieldType.ADDRESS)
     .map((f) => f.id)
 
+  const configurableAddressFieldIds = allEventFields
+    .filter((field) => field.type === FieldType.CONFIGURABLE_ADDRESS)
+    .map((f) => f.id)
+
   const alternateFieldMap = getAlternateFieldMap(eventConfigs)
 
   const must = Object.entries(event)
@@ -119,6 +125,18 @@ function generateQuery(
               )
               if (parsed.success) {
                 return generateQueryForAddressField(
+                  `declaration.${encodeFieldId(id)}`,
+                  parsed.data
+                )
+              }
+            }
+
+            if (configurableAddressFieldIds.includes(id)) {
+              const parsed = ConfigurableAddressFieldValue.safeParse(
+                JSON.parse(search.term)
+              )
+              if (parsed.success) {
+                return generateQueryForConfigurableAddressField(
                   `declaration.${encodeFieldId(id)}`,
                   parsed.data
                 )

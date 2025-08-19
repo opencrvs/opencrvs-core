@@ -12,6 +12,7 @@ import _ from 'lodash'
 import { estypes } from '@elastic/elasticsearch'
 import {
   AddressFieldValue,
+  ConfigurableAddressFieldValue,
   EventConfig,
   EventIndex,
   FieldValue,
@@ -211,6 +212,57 @@ export function generateQueryForAddressField(
         match: {
           [`${fieldId}.district2`]: {
             query: value.district2,
+            fuzziness: 'AUTO'
+          }
+        }
+      })
+    }
+  }
+
+  return {
+    bool: {
+      must: mustMatches,
+      should: undefined
+    }
+  } satisfies estypes.QueryDslQueryContainer
+}
+
+export function generateQueryForConfigurableAddressField(
+  fieldId: string,
+  value: ConfigurableAddressFieldValue
+) {
+  const { country, addressType } = value
+  const mustMatches = []
+
+  if (country) {
+    mustMatches.push({ match: { [`${fieldId}.country`]: country } })
+  }
+  if (addressType === 'DOMESTIC') {
+    if (value.adminLevel1) {
+      mustMatches.push({
+        match: { [`${fieldId}.adminLevel1`]: value.adminLevel1 }
+      })
+    }
+    if (value.adminLevel2) {
+      mustMatches.push({
+        match: { [`${fieldId}.adminLevel2`]: value.adminLevel2 }
+      })
+    }
+    if (value.addressLine1) {
+      mustMatches.push({
+        match: {
+          [`${fieldId}.addressLine1`]: {
+            query: value.addressLine1,
+            fuzziness: 'AUTO'
+          }
+        }
+      })
+    }
+    if (value.addressLine2) {
+      mustMatches.push({
+        match: {
+          [`${fieldId}.addressLine2`]: {
+            query: value.addressLine2,
             fuzziness: 'AUTO'
           }
         }

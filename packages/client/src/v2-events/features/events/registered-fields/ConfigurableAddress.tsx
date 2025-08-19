@@ -467,7 +467,7 @@ function AddressInput(props: Props) {
 
   const addressFields =
     customAddressFields.length > 0
-      ? customAddressFields
+      ? [...customAddressFields, ...INTERNATIONAL_ADDRESS_FIELDS]
       : [...DEFAULT_DOMESTIC_ADDRESS_FIELDS, ...INTERNATIONAL_ADDRESS_FIELDS]
 
   const fields = [...COUNTRY_STRUCTURE, ...adminStructure, ...addressFields]
