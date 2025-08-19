@@ -144,7 +144,7 @@ export type FileFieldWithOptionValue = z.infer<typeof FileFieldWithOptionValue>
 
 export const HttpFieldValue = z.object({
   loading: z.boolean(),
-  error: z.object({ statusCode: z.number(), message: z.string() }).nullable(),
+  error: z.object({ statusCode: z.number(), message: z.string() }).nullish(),
   data: z.any()
 })
 export type HttpFieldValue = z.infer<typeof HttpFieldValue>
