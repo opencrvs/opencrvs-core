@@ -299,3 +299,285 @@ export const WithSystemUserActions: Story = {
     }
   }
 }
+
+export const WithVariousUserRoles: Story = {
+  beforeEach: () => {
+    const rng = createPrng(5678)
+
+    const event = {
+      ...tennisClubMembershipEventDocument,
+      actions: [
+        {
+          type: ActionType.CREATE,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-01-01'),
+            new Date('2024-02-01')
+          ),
+          createdBy: testDataGenerator().user.id.localRegistrar, // not necessary for this test
+          createdAtLocation: 'loc-001' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'LOCAL_REGISTRAR', // testing role
+          declaration: {}
+        },
+        {
+          type: ActionType.ASSIGN,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-02-01'),
+            new Date('2024-03-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-002' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'SOCIAL_WORKER',
+          assignedTo: '010101',
+          declaration: {}
+        },
+        {
+          type: ActionType.NOTIFY,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'FIELD_AGENT',
+          declaration: {}
+        },
+        {
+          type: ActionType.REGISTER,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-05-01'),
+            new Date('2024-06-01')
+          ),
+          createdBy: 'system-123',
+          createdAtLocation: undefined,
+          createdByUserType: 'system' as const,
+          createdByRole: SystemRole.enum.IMPORT,
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'POLICE_OFFICER',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'LOCAL_LEADER',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'HOSPITAL_CLERK',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'LOCAL_SYSTEM_ADMIN',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'NATIONAL_REGISTRAR',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'NATIONAL_SYSTEM_ADMIN',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'COMMUNITY_LEADER',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'HEALTH',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'NATIONAL_ID',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'RECORD_SEARCH',
+          declaration: {}
+        },
+        {
+          type: ActionType.READ,
+          status: ActionStatus.Accepted,
+          id: getUUID(),
+          transactionId: getUUID(),
+          createdAt: getRandomDatetime(
+            rng,
+            new Date('2024-03-01'),
+            new Date('2024-04-01')
+          ),
+          createdBy: testDataGenerator().user.id.fieldAgent,
+          createdAtLocation: 'loc-003' as UUID,
+          createdByUserType: 'user' as const,
+          createdByRole: 'WEBHOOK',
+          declaration: {}
+        }
+      ]
+    }
+    setEventData(event.id, event)
+  },
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.EVENTS.OVERVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        drafts: [
+          tRPCMsw.event.draft.list.query(() => {
+            return [
+              generateEventDraftDocument({
+                eventId: tennisClubMembershipEventDocument.id,
+                actionType: ActionType.REGISTER,
+                declaration: {
+                  'applicant.name': {
+                    firstname: 'Sara',
+                    surname: 'Covers various roles'
+                  }
+                }
+              })
+            ]
+          })
+        ]
+      }
+    }
+  }
+}
