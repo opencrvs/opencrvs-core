@@ -74,7 +74,7 @@ export function EventOverviewLayout({
   const eventIndex = eventResults[0]
 
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
-  const event = draft
+  const eventIndexWithDraftApplied = draft
     ? applyDraftToEventIndex(eventIndex, draft, eventConfiguration)
     : eventIndex
 
@@ -106,14 +106,14 @@ export function EventOverviewLayout({
               <ActionMenu eventId={eventId} />
               <DownloadButton
                 key={`DownloadButton-${eventId}`}
-                event={event}
+                event={eventIndexWithDraftApplied}
                 isDraft={slug === CoreWorkqueues.DRAFT}
               />
             </>
           }
           mobileTitle={flattenedIntl.formatMessage(
             eventConfiguration.title,
-            flattenEventIndex(deepDropNulls(event))
+            flattenEventIndex(deepDropNulls(eventIndexWithDraftApplied))
           )}
         />
       }
