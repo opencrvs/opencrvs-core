@@ -62,7 +62,9 @@ const BaseField = z.object({
   label: TranslationConfig,
   parent: FieldReference.optional().describe(
     'Reference to a parent field. If a field has a parent, it will be reset when the parent field is changed.'
-  ),
+    // @TODO: When Zod is upgraded to v4, remove this any to fix error TS7056
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) as any,
   required: z.boolean().default(false).optional(),
   conditionals: z.array(FieldConditional).default([]).optional(),
   secured: z.boolean().default(false).optional(),
