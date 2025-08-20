@@ -471,10 +471,6 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 
 export const ReviewForIncompleteNameInteraction: Story = {
   name: 'Declaration shows as incomplete when surname is left out',
-  beforeEach: () => {
-    // For this test, we want to have empty form values in zustand state
-    useEventFormData.setState({ formValues: {} })
-  },
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
