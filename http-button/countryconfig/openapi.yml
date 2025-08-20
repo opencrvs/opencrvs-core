@@ -3820,9 +3820,7 @@ components:
                 body:
                   type: object
                   additionalProperties:
-                    type:
-                      - string
-                      - "null"
+                    type: string
                 params:
                   type: object
                   additionalProperties:
@@ -13539,7 +13537,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: cf100883-d84c-41e4-82a8-e4a03a75d165
+        transactionId: 077000cc-800f-44f5-8e8d-2f856a9eba8f
         declaration: {}
         annotation: {}
         type: NOTIFY
