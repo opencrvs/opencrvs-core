@@ -125,7 +125,7 @@ export function FormHeader({
               data-testid="exit-button"
               size="small"
               type="icon"
-              onClick={() => closeActionView()}
+              onClick={() => closeActionView(undefined)}
             >
               <Icon name="X" />
             </Button>
@@ -170,7 +170,11 @@ export function FormHeader({
               />
             </>
           ) : (
-            <Button size="small" type="icon" onClick={() => closeActionView()}>
+            <Button
+              size="small"
+              type="icon"
+              onClick={() => closeActionView(undefined)}
+            >
               <Icon name="X" />
             </Button>
           )}

@@ -84,7 +84,18 @@ export function useEventFormNavigation() {
     navigate(ROUTES.V2.EVENTS.CREATE.path)
   }
 
-  function closeActionView(workqueueToGoBackTo?: string) {
+  /**
+   * Accepts an optional workqueue slug to navigate to after closing the view.
+   *
+   * DO NOT pass this function directly to `onClick` handlers like `onClick={closeActionView}`
+   * because React will inject a MouseEvent as the first argument.
+   *
+   * Always wrap in an arrow function instead: `onClick={() => closeActionView(undefined)}`
+   *
+   * If you have a `string | undefined` (e.g. `slug`), you can pass it directly:
+   * `closeActionView(slug)`
+   */
+  function closeActionView(workqueueToGoBackTo: string | undefined) {
     workqueueToGoBackTo ? goToWorkqueue(workqueueToGoBackTo) : goToHome()
     clearEphemeralFormState()
   }
@@ -136,7 +147,7 @@ export function useEventFormNavigation() {
       deleteEvent.mutate({ eventId: event.id })
     }
 
-    closeActionView()
+    closeActionView(undefined)
   }
 
   async function deleteDeclaration(eventId: string) {
@@ -180,7 +191,7 @@ export function useEventFormNavigation() {
 
     if (deleteConfirm) {
       deleteEvent.mutate({ eventId })
-      closeActionView()
+      closeActionView(undefined)
     }
   }
 
