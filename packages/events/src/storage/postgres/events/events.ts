@@ -26,16 +26,11 @@ function toEventDocument(
   { eventType, ...event }: Events,
   actions: EventActions[]
 ) {
-  const notNullActions = actions.map(
-    ({ actionType, reasonIsDuplicate, reasonMessage, ...action }) =>
-      dropNulls({
-        ...action,
-        type: actionType,
-        reason: (reasonIsDuplicate || reasonMessage) && {
-          isDuplicate: reasonIsDuplicate,
-          message: reasonMessage
-        }
-      })
+  const notNullActions = actions.map(({ actionType, ...action }) =>
+    dropNulls({
+      ...action,
+      type: actionType
+    })
   )
 
   return EventDocument.parse({
@@ -164,9 +159,7 @@ async function getOrCreateEventInTrx(
       createdByRole: input.createdByRole,
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation,
-      reasonIsDuplicate: input.reasonIsDuplicate,
-      reasonMessage: input.reasonMessage
+      createdAtLocation: input.createdAtLocation
     },
     trx
   )
@@ -207,9 +200,7 @@ async function getOrCreateEventAndAssignInTrx(
       createdByRole: input.createdByRole,
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
-      createdAtLocation: input.createdAtLocation,
-      reasonIsDuplicate: input.reasonIsDuplicate,
-      reasonMessage: input.reasonMessage
+      createdAtLocation: input.createdAtLocation
     },
     trx
   )
@@ -225,9 +216,7 @@ async function getOrCreateEventAndAssignInTrx(
       createdByUserType: input.createdByUserType,
       createdBySignature: input.createdBySignature,
       createdAtLocation: input.createdAtLocation,
-      assignedTo: input.createdBy,
-      reasonIsDuplicate: input.reasonIsDuplicate,
-      reasonMessage: input.reasonMessage
+      assignedTo: input.createdBy
     },
     trx
   )

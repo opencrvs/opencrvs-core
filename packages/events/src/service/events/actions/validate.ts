@@ -43,7 +43,7 @@ export async function validate(
   }
 
   const dedupConfig = config.actions.find(
-    ({ type }) => type === ActionType.VALIDATE
+    (action) => action.type === ActionType.VALIDATE
   )?.deduplication
 
   if (!dedupConfig) {

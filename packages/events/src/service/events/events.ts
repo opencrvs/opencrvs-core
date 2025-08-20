@@ -264,14 +264,6 @@ function buildAction(
     originalActionId: input.originalActionId
   }
   switch (input.type) {
-    case ActionType.REJECT:
-    case ActionType.ARCHIVE: {
-      return {
-        ...commonAttributes,
-        reasonMessage: input.reason.message,
-        reasonIsDuplicate: input.reason.isDuplicate
-      }
-    }
     case ActionType.REGISTER: {
       return {
         ...commonAttributes,
@@ -301,9 +293,11 @@ function buildAction(
       return {
         ...commonAttributes,
         requestId: input.requestId,
-        reasonMessage: input.reason.message
+        content: input.content
       }
     }
+    case ActionType.REJECT:
+    case ActionType.ARCHIVE:
     case ActionType.PRINT_CERTIFICATE: {
       return {
         ...commonAttributes,

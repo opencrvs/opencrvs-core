@@ -14,7 +14,7 @@ import { ActionType } from './ActionType'
 import {
   PrintContent as PrintContent,
   ActionUpdate,
-  RejectionReason
+  ReasonContent
 } from './ActionDocument'
 import { extendZodWithOpenApi } from 'zod-openapi'
 import { UUID, getUUID } from '../uuid'
@@ -91,7 +91,7 @@ export type DeclareActionInput = z.infer<typeof DeclareActionInput>
 export const RejectDeclarationActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.REJECT).default(ActionType.REJECT),
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 export type RejectDeclarationActionInput = z.infer<
@@ -132,7 +132,7 @@ export type MarkNotDuplicateActionInput = z.infer<
 export const ArchiveActionInput = BaseActionInput.merge(
   z.object({
     type: z.literal(ActionType.ARCHIVE).default(ActionType.ARCHIVE),
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 export type ArchiveActionInput = z.infer<typeof ArchiveActionInput>
@@ -173,7 +173,7 @@ export const RejectCorrectionActionInput = BaseActionInput.merge(
     type: z
       .literal(ActionType.REJECT_CORRECTION)
       .default(ActionType.REJECT_CORRECTION),
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 

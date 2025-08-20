@@ -47,10 +47,6 @@ export default interface EventActionsTable {
   /** References the original action if this is an asynchronous confirmation of it. */
   originalActionId: ColumnType<UUID | null, UUID | null, UUID | null>
 
-  reasonIsDuplicate: ColumnType<boolean | null, boolean | null, boolean | null>
-
-  reasonMessage: ColumnType<string | null, string | null, string | null>
-
   registrationNumber: ColumnType<string | null, string | null, string | null>
 
   requestId: ColumnType<string | null, string | null, string | null>

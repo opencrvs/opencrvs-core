@@ -105,18 +105,17 @@ const ValidateAction = ActionBase.merge(
   })
 )
 
-export const RejectionReason = z.object({
-  message: z
+export const ReasonContent = z.object({
+  reason: z
     .string()
     .min(1, { message: 'Message cannot be empty' })
-    .describe('Message describing reason for rejection or archiving'),
-  isDuplicate: z.boolean().optional().describe('If a declaration is duplicated')
+    .describe('Message describing reason for rejection or archiving')
 })
 
 const RejectAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT),
-    reason: RejectionReason // TODO move into 'content' property
+    content: ReasonContent
   })
 )
 
@@ -135,7 +134,7 @@ const MarkAsDuplicateAction = ActionBase.merge(
 const ArchiveAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
-    reason: RejectionReason // TODO move into 'content' property
+    content: ReasonContent
   })
 )
 
@@ -187,7 +186,7 @@ const RejectedCorrectionAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.REJECT_CORRECTION),
     requestId: z.string(), // TODO move into 'content' property
-    reason: RejectionReason
+    content: ReasonContent
   })
 )
 
