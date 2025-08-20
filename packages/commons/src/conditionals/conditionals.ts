@@ -376,18 +376,21 @@ export function createFieldConditionals(fieldId: string) {
      * NOTE: For now, this only works with string, boolean, and null types. 0 is still allowed.
      *
      */
-    isFalsy: () =>
-      defineFormConditional({
+    isFalsy() {
+      return defineFormConditional({
         type: 'object',
         properties: {
-          [fieldId]: {
+          [fieldId]: wrapToPath(
+            {
             anyOf: [
               { const: 'undefined' },
               { const: false },
               { const: null },
               { const: '' }
             ]
-          }
+            },
+            this.$$subfield
+          )
         },
         anyOf: [
           {
@@ -399,7 +402,8 @@ export function createFieldConditionals(fieldId: string) {
             }
           }
         ]
-      }),
+      })
+    },
     isUndefined() {
       return defineFormConditional({
         type: 'object',
