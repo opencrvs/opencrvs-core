@@ -21,7 +21,8 @@ import {
   field,
   FieldType,
   ConditionalType,
-  never
+  never,
+  user
 } from '@opencrvs/commons/client'
 import { TRPCProvider } from '@client/v2-events/trpc'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
@@ -113,7 +114,10 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
             conditionals: [
               {
                 type: ConditionalType.ENABLE,
-                conditional: field('child.http-fetch').isUndefined()
+                conditional: and(
+                  field('child.http-fetch').isUndefined(),
+                  user.isOnline()
+                )
               },
               {
                 type: ConditionalType.SHOW,
