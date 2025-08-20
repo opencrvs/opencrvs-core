@@ -66,31 +66,39 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
-async function* processBatch(batch: any[]) {
+async function* processBatch(batch: Events[]) {
   const db = getClient()
-  const ids = batch.map((e) => e.id)
+  const ids = batch.map((event) => event.id)
   const actions = await db
     .selectFrom('eventActions')
     .selectAll()
     .where('eventId', 'in', ids)
     .execute()
 
-  const byEventId = actions.reduce<Record<string, any[]>>((m, a) => {
-    ;(m[a.eventId] ??= []).push(a)
-    return m
-  }, {})
+  const byEventId = actions.reduce<Record<string, EventActions[] | undefined>>(
+    (actionsByEventId, action) => ({
+      ...actionsByEventId,
+      [action.eventId]: (actionsByEventId[action.eventId] || []).concat(action)
+    }),
+    {}
+  )
 
-  for (const e of batch) {
-    yield toEventDocument(e, byEventId[e.id] ?? [])
+  for (const event of batch) {
+    yield toEventDocument(event, byEventId[event.id] ?? [])
   }
 }
 
-export async function* streamEventsWithActions() {
+/*
+ * Returns a stream of events directly from Postgres.
+ * Useful for cases where you want every event to be processed in bulk,
+ * for example, reindexing to ElasticSearch.
+ */
+export async function* streamEventDocuments() {
   const db = getClient()
-  const it = db.selectFrom('events').selectAll().stream() // AsyncIterable
-  let batch: any[] = []
+  const eventsStream = db.selectFrom('events').selectAll().stream()
+  let batch: Events[] = []
 
-  for await (const row of it) {
+  for await (const row of eventsStream) {
     batch.push(row)
     if (batch.length === 1000) {
       yield* processBatch(batch)

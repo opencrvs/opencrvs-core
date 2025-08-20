@@ -11,7 +11,7 @@
 import { Readable, Transform, PassThrough } from 'node:stream'
 import { EventDocument } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
-import { streamEventsWithActions } from '@events/storage/postgres/events/events'
+import { streamEventDocuments } from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
 import { indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
@@ -56,7 +56,7 @@ async function reindexSearch(token: string) {
 }
 
 export async function reindex(token: string) {
-  const objStream = Readable.from(streamEventsWithActions())
+  const objStream = Readable.from(streamEventDocuments())
 
   const tee1 = new PassThrough({ objectMode: true })
   const tee2 = new PassThrough({ objectMode: true })
