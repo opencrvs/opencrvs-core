@@ -165,7 +165,6 @@ export function useIntlFormatMessageWithFlattenedParams() {
   ): string {
     // Flatten the params to ensure all nested properties are accessible with dot notation
     const flattenedParams = flattenNestedObject(params ?? {})
-    console.log(flattenedParams)
     const variables = convertDotToTripleUnderscore(flattenedParams)
 
     const defaultMessage = convertDotInCurlyBraces(getDefaultMessage(message))
