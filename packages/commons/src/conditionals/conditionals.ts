@@ -168,6 +168,10 @@ export const user = Object.assign(userSerializer, {
         }
       },
       required: ['$user']
+    }),
+  isOnline: () =>
+    defineConditional({
+      online: true
     })
 })
 

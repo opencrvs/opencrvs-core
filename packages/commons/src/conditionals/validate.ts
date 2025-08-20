@@ -91,6 +91,29 @@ ajv.addKeyword({
   }
 })
 
+/**
+ * Custom keyword validator for if the user is online or offline
+ */
+ajv.addKeyword({
+  keyword: 'online',
+  schemaType: 'boolean',
+  errors: false,
+  validate: (flag: boolean) => {
+    if (!flag) {
+      return true
+    }
+
+    return (
+      // @ts-ignore
+      typeof window !== 'undefined' &&
+      // @ts-ignore
+      !!window.navigator &&
+      // @ts-ignore
+      window.navigator.onLine === true
+    )
+  }
+})
+
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
 

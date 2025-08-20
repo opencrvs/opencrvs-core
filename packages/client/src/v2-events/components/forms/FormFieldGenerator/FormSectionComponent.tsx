@@ -33,6 +33,7 @@ import {
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
 } from '@client/v2-events/components/forms/utils'
+import { useOnlineStatus } from '@client/utils'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -153,6 +154,9 @@ export function FormSectionComponent({
   isCorrection = false,
   parentId
 }: AllProps) {
+  // Conditionals need to be able to react to whether the user is online or not -
+  useOnlineStatus()
+
   const intl = useIntl()
   const prevValuesRef = useRef(values)
   const prevIdRef = useRef(id)
