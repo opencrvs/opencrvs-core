@@ -316,6 +316,7 @@ function buildAction(
     case ActionType.DECLARE:
     case ActionType.VALIDATE:
     case ActionType.MARK_NOT_DUPLICATE:
+    case ActionType.MARK_AS_DUPLICATE:
     case ActionType.DUPLICATE_DETECTED:
     case ActionType.REQUEST_CORRECTION: {
       return {

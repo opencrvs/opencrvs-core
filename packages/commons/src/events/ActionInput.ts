@@ -107,6 +107,17 @@ export const DuplicateDetectedActionInput = BaseActionInput.merge(
   })
 )
 
+export const MarkAsDuplicateActionInput = BaseActionInput.merge(
+  z.object({
+    type: z
+      .literal(ActionType.MARK_AS_DUPLICATE)
+      .default(ActionType.MARK_AS_DUPLICATE)
+  })
+)
+export type MarkAsDuplicateActionInput = z.infer<
+  typeof MarkAsDuplicateActionInput
+>
+
 export const MarkNotDuplicateActionInput = BaseActionInput.merge(
   z.object({
     type: z
@@ -214,6 +225,9 @@ export const ActionInput = z
     }),
     DuplicateDetectedActionInput.openapi({
       ref: 'DuplicateDetectedActionInput'
+    }),
+    MarkAsDuplicateActionInput.openapi({
+      ref: 'MarkAsDuplicateActionInput'
     }),
     MarkNotDuplicateActionInput.openapi({
       ref: 'MarkNotDuplicateActionInput'

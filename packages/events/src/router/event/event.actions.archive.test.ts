@@ -35,7 +35,7 @@ test(`allows access if required scope is present`, async () => {
   ).rejects.not.toMatchObject(new TRPCError({ code: 'FORBIDDEN' }))
 })
 
-test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} actions when marked as duplicate`, async () => {
+test(`contains both ${ActionType.MARK_AS_DUPLICATE} and ${ActionType.ARCHIVE} actions when marked as duplicate`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
@@ -66,7 +66,7 @@ test(`contains both ${ActionType.MARKED_AS_DUPLICATE} and ${ActionType.ARCHIVE} 
   ).actions.map(({ type }) => type)
 
   expect(actions.slice(-3)).toEqual([
-    ActionType.MARKED_AS_DUPLICATE,
+    ActionType.MARK_AS_DUPLICATE,
     ActionType.ARCHIVE,
     ActionType.UNASSIGN
   ])
@@ -103,7 +103,7 @@ test(`should only contain ${ActionType.ARCHIVE} action if not marked as duplicat
   ).actions.map(({ type }) => type)
 
   expect(actions.at(-2)).toStrictEqual(ActionType.ARCHIVE)
-  expect(actions.at(-3)).not.toStrictEqual(ActionType.MARKED_AS_DUPLICATE)
+  expect(actions.at(-3)).not.toStrictEqual(ActionType.MARK_AS_DUPLICATE)
 })
 
 test(`${ActionType.ARCHIVE} action is idempotent`, async () => {

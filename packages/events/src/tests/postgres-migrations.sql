@@ -51,7 +51,7 @@ CREATE TYPE app.action_type AS ENUM (
     'REGISTER',
     'DUPLICATE_DETECTED',
     'REJECT',
-    'MARK_NOT_DUPLICATE',
+    'MARK_AS_DUPLICATE',
     'ARCHIVE',
     'PRINT_CERTIFICATE',
     'REQUEST_CORRECTION',
@@ -60,7 +60,8 @@ CREATE TYPE app.action_type AS ENUM (
     'APPROVE_CORRECTION',
     'READ',
     'ASSIGN',
-    'UNASSIGN'
+    'UNASSIGN',
+    'MARK_NOT_DUPLICATE'
 );
 
 

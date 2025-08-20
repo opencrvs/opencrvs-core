@@ -666,6 +666,8 @@ export function generateActionDocument({
       return { ...actionBase, type: action }
     case ActionType.MARK_NOT_DUPLICATE:
       return { ...actionBase, type: action }
+    case ActionType.MARK_AS_DUPLICATE:
+      return { ...actionBase, type: action }
     case ActionType.DECLARE:
       return { ...actionBase, type: action }
     case ActionType.UNASSIGN:

@@ -126,6 +126,12 @@ const MarkNotDuplicateAction = ActionBase.merge(
   })
 )
 
+const MarkAsDuplicateAction = ActionBase.merge(
+  z.object({
+    type: z.literal(ActionType.MARK_AS_DUPLICATE)
+  })
+)
+
 const ArchiveAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.ARCHIVE),
@@ -197,6 +203,7 @@ export const ActionDocument = z
     ValidateAction.openapi({ ref: 'ValidateAction' }),
     RejectAction.openapi({ ref: 'RejectAction' }),
     MarkNotDuplicateAction.openapi({ ref: 'MarkNotDuplicateAction' }),
+    MarkAsDuplicateAction.openapi({ ref: 'MarkAsDuplicateAction' }),
     ArchiveAction.openapi({ ref: 'ArchiveAction' }),
     NotifiedAction.openapi({ ref: 'NotifiedAction' }),
     RegisterAction.openapi({ ref: 'RegisterAction' }),

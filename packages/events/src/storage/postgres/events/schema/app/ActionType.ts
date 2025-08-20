@@ -10,7 +10,7 @@ type ActionType =
   | 'REGISTER'
   | 'DUPLICATE_DETECTED'
   | 'REJECT'
-  | 'MARK_NOT_DUPLICATE'
+  | 'MARK_AS_DUPLICATE'
   | 'ARCHIVE'
   | 'PRINT_CERTIFICATE'
   | 'REQUEST_CORRECTION'
@@ -20,5 +20,6 @@ type ActionType =
   | 'READ'
   | 'ASSIGN'
   | 'UNASSIGN'
+  | 'MARK_NOT_DUPLICATE'
 
 export default ActionType

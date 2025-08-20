@@ -26,6 +26,7 @@ export const ActionType = {
   // Declaration system actions. Non-configurable.
   DUPLICATE_DETECTED: 'DUPLICATE_DETECTED',
   REJECT: 'REJECT', // REJECT_DECLARATION
+  MARK_AS_DUPLICATE: 'MARK_AS_DUPLICATE',
   MARK_NOT_DUPLICATE: 'MARK_NOT_DUPLICATE',
   ARCHIVE: 'ARCHIVE',
   // Record actions
@@ -64,6 +65,7 @@ export const ActionTypes = z.enum([
   'REGISTER',
   'DUPLICATE_DETECTED',
   'REJECT',
+  'MARK_AS_DUPLICATE',
   'MARK_NOT_DUPLICATE',
   'ARCHIVE',
   'PRINT_CERTIFICATE',
@@ -125,6 +127,7 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.DUPLICATE_DETECTED,
   ActionType.REJECT,
   ActionType.MARK_NOT_DUPLICATE,
+  ActionType.MARK_AS_DUPLICATE,
   ActionType.ARCHIVE,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION
