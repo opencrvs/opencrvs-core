@@ -34,10 +34,10 @@ export function ActionMenu({
 
   const eventResults = getEventQuery
 
-  if (eventResults.length === 0) {
+  if (eventResults.total === 0) {
     throw new Error(`Event ${eventId} not found`)
   }
-  const eventIndex = eventResults[0]
+  const eventIndex = eventResults.results[0]
 
   const eventState = eventIndex
 
