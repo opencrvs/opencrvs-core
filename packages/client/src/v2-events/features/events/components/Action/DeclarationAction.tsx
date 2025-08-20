@@ -46,32 +46,39 @@ import { useEventConfiguration } from '../../useEventConfiguration'
 
 type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
 
+/**
+ * Business requirement states that annotation must be prefilled from previous action.
+ * From architechtual perspective, each action has separate annotation of its own.
+ *
+ * @returns the previous declaration action type based on the current action type.
+ */
 function getPreviousDeclarationActionType(
   actions: Action[],
   currentActionType: DeclarationUpdateActionType
-): DeclarationUpdateActionType | undefined {
-  // If action type is DECLARE, there is no previous declaration action
+): DeclarationUpdateActionType | typeof ActionType.NOTIFY | undefined {
+  /** NOTE: If event is rejected before registration, there might be previous action of the same type present.
+   * Action arrays are intentionally ordered to get the latest prefilled annotation.
+   * */
+
+  let actionTypes: (DeclarationUpdateActionType | typeof ActionType.NOTIFY)[]
+
   if (currentActionType === ActionType.DECLARE) {
-    return
+    actionTypes = [ActionType.DECLARE, ActionType.NOTIFY]
   }
 
   // If action type is VALIDATE, we know that the previous declaration action is DECLARE
-  if (currentActionType === ActionType.VALIDATE) {
-    return ActionType.DECLARE
+  else if (currentActionType === ActionType.VALIDATE) {
+    actionTypes = [ActionType.VALIDATE, ActionType.DECLARE]
   }
 
   // If action type is REGISTER, we know that the previous declaration action is VALIDATE
-  if (currentActionType === ActionType.REGISTER) {
-    return ActionType.VALIDATE
+  else if (currentActionType === ActionType.REGISTER) {
+    actionTypes = [ActionType.VALIDATE]
+  } else {
+    // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
+    // Check for the most recent action type in order of precedence
+    actionTypes = [ActionType.REGISTER, ActionType.VALIDATE, ActionType.DECLARE]
   }
-
-  // If action type is REQUEST_CORRECTION, we want to get the 'latest' action type
-  // Check for the most recent action type in order of precedence
-  const actionTypes = [
-    ActionType.REGISTER,
-    ActionType.VALIDATE,
-    ActionType.DECLARE
-  ]
 
   for (const type of actionTypes) {
     if (actions.find((a) => a.type === type)) {
