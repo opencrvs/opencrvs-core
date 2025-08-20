@@ -311,11 +311,11 @@ export const eventRouter = router({
     .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
   reindex: systemProcedure
     .input(z.void())
-    // .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .use(requiresAnyOfScopes([SCOPES.REINDEX]))
     .output(z.void())
     .meta({
       openapi: {
-        summary: 'Import full event record',
+        summary: 'Reindex events',
         method: 'POST',
         path: '/events/reindex',
         tags: ['events']

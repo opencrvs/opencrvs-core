@@ -9,6 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import { Readable, Transform, PassThrough } from 'node:stream'
+import fetch from 'node-fetch'
 import { EventDocument } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import { streamEventDocuments } from '@events/storage/postgres/events/events'
@@ -17,6 +18,22 @@ import { indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
 
 const BATCH_SIZE = 1000
+
+function createJSONStringifierStream() {
+  return new Transform({
+    readableObjectMode: false,
+    writableObjectMode: true,
+    transform(obj, _, cb) {
+      try {
+        const chunk = Buffer.from(JSON.stringify(obj) + '\n')
+        cb(null, chunk)
+      } catch (err) {
+        cb(err as Error)
+      }
+    }
+  })
+}
+
 async function reindexSearch(token: string) {
   const configurations = await getEventConfigurations(token)
   let buffer: EventDocument[] = []
@@ -58,33 +75,28 @@ async function reindexSearch(token: string) {
 export async function reindex(token: string) {
   const objStream = Readable.from(streamEventDocuments())
 
-  const tee1 = new PassThrough({ objectMode: true })
-  const tee2 = new PassThrough({ objectMode: true })
-
-  // Stream to reindex endpoint in country config
-  objStream.pipe(tee1)
+  // Stream to reindex endpoint in country config. PassThrough forks the stream.
+  const eventDocumentStreamForCountryConfig = new PassThrough({
+    objectMode: true
+  })
+  objStream.pipe(eventDocumentStreamForCountryConfig)
 
   // Stream to ES indexing
-  objStream.pipe(tee2)
+  const eventDocumentStreamForSearch = new PassThrough({ objectMode: true })
+  objStream.pipe(eventDocumentStreamForSearch)
 
-  const jsonTransform = new Transform({
-    readableObjectMode: false,
-    writableObjectMode: true,
-    transform(obj, _, cb) {
-      try {
-        const chunk = Buffer.from(JSON.stringify(obj) + '\n')
-        cb(null, chunk)
-      } catch (err) {
-        cb(err as Error)
-      }
-    }
-  })
+  // Converts object stream to JSON string stream so that it can
+  // be sent to the country config reindex endpoint
+  const stream = eventDocumentStreamForCountryConfig.pipe(
+    createJSONStringifierStream()
+  )
 
-  const stream = tee1.pipe(jsonTransform)
-
-  const reindexer = await reindexSearch(token)
+  const searchIndexingStream = await reindexSearch(token)
   const searchIndexingPromise = new Promise((resolve, reject) => {
-    tee2.pipe(reindexer).on('finish', resolve).on('error', reject)
+    eventDocumentStreamForSearch
+      .pipe(searchIndexingStream)
+      .on('finish', resolve)
+      .on('error', reject)
   })
 
   const countryConfixIndexingPromise = fetch(
@@ -95,8 +107,7 @@ export async function reindex(token: string) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: stream,
-      duplex: 'half'
+      body: stream
     }
   )
 
