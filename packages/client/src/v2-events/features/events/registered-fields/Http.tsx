@@ -66,7 +66,9 @@ async function fetchHttpFieldValue(
 
   if (cfg.body) {
     for (const [k, v] of Object.entries(cfg.body)) {
-      cfg.body[k] = isTemplateVariable(v) ? getMixedPath(systemVariables, v) : v
+      cfg.body[k] = isTemplateVariable(v)
+        ? (getMixedPath(systemVariables, v) ?? v)
+        : v
     }
   }
 
