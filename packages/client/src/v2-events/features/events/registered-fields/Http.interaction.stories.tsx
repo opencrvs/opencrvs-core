@@ -58,11 +58,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
     msw: {
       handlers: {
         nidApi: [
-          http.post('/api/nid', async () => {
-            await new Promise((resolve) => setTimeout(resolve, 2000))
-
-            return HttpResponse.json({ nid: '1234567890' })
-          })
+          http.post('/api/nid', () => HttpResponse.json({ nid: '1234567890' }))
         ]
       }
     }
