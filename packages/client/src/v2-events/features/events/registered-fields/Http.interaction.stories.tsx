@@ -124,6 +124,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
               }
             ],
             configuration: {
+              icon: 'IdentificationCard',
               text: {
                 defaultMessage: 'Generate NID',
                 description: 'Generate NID',
