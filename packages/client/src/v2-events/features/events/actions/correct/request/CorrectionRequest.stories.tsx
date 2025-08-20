@@ -14,7 +14,13 @@ import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
 import { expect, waitFor, within, userEvent } from '@storybook/test'
-import { ActionType } from '@opencrvs/commons/client'
+import {
+  ActionType,
+  EventDocument,
+  generateUuid,
+  tennisClubMembershipEvent,
+  generateActionDocument
+} from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import {
@@ -48,22 +54,32 @@ const draft = testDataGenerator().event.draft({
   actionType: ActionType.REQUEST_CORRECTION
 })
 
-const draftWithoutImage = {
-  id: 'some-uuid',
-  type: 'tennis-club-membership',
+const declaration = {
+  'applicant.name': 'Max McLaren',
+  'applicant.dob': '2020-01-02'
+}
+
+const draftWithoutImage: EventDocument = {
+  id: generateUuid(),
+  trackingId: generateUuid(),
+  type: tennisClubMembershipEvent.id,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
   actions: [
-    {
-      id: 'some-action-uuid',
-      type: 'CREATE',
-      status: 'Requested',
-      declaration: {
-        'applicant.name': {
-          firstname: 'Max',
-          surname: 'McLaren'
-        },
-        'applicant.dob': '2020-01-02'
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.CREATE
+    }),
+    generateActionDocument({
+      configuration: tennisClubMembershipEvent,
+      action: ActionType.DECLARE,
+      defaults: {
+        createdByUserType: 'user',
+        createdBy: generateUuid(),
+        createdByRole: 'FIELD_AGENT',
+        declaration
       }
-    }
+    })
   ]
 }
 
