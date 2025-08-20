@@ -113,7 +113,7 @@ export function declareActionProcedures(): ActionProcedure {
         })
 
         const dedupConfig = config.actions.find(
-          ({ type }) => type === input.type
+          (action) => action.type === input.type
         )?.deduplication
 
         if (!dedupConfig) {

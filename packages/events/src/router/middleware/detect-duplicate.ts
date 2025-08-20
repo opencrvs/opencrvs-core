@@ -14,6 +14,7 @@ import {
   ActionInputWithType,
   ActionStatus,
   ActionType,
+  DeclarationActionConfig,
   DeclareActionInput,
   EventDocument,
   getCurrentEventState,
@@ -26,7 +27,7 @@ import { getEventConfigurations } from '@events/service/config/config'
 import { searchForDuplicates } from '@events/service/deduplication/deduplication'
 import { addAction, getEventById } from '@events/service/events/events'
 
-function isModifyAllowedActions(
+function isModifyAllowedAction(
   input: ActionInputWithType
 ): input is DeclareActionInput | ValidateActionInput | RegisterActionInput {
   const modifyAllowedActions: ActionType[] = [
@@ -53,7 +54,7 @@ export const detectDuplicate: MiddlewareFunction<
   },
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
-  if (!isModifyAllowedActions(input)) {
+  if (!isModifyAllowedAction(input)) {
     return next({
       ctx: {
         duplicates: {
@@ -74,7 +75,7 @@ export const detectDuplicate: MiddlewareFunction<
   }
 
   const dedupConfig = config.actions.find(
-    ({ type }) => type === input.type
+    (action): action is DeclarationActionConfig => action.type === input.type
   )?.deduplication
 
   if (!dedupConfig) {
