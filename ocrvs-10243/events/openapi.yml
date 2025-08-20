@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2d87c393-e7fd-49ae-b2c2-b6ef7d9ce4e7
+                transactionId: ea833de3-784b-455e-b875-b7f67a1e0309
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 4450c2a1-4a3d-48f4-bd60-dfb083f37f41
+                transactionId: 774067a2-7445-4b68-8483-d5ccb4fc261c
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -1737,23 +1737,20 @@ paths:
                   enum:
                     - REJECT_CORRECTION
                   default: REJECT_CORRECTION
-                reason:
+                content:
                   type: object
                   properties:
-                    message:
+                    reason:
                       type: string
                       minLength: 1
                       description: Message describing reason for rejection or archiving
-                    isDuplicate:
-                      type: boolean
-                      description: If a declaration is duplicated
                   required:
-                    - message
+                    - reason
               required:
                 - eventId
                 - transactionId
                 - requestId
-                - reason
+                - content
       responses:
         "200":
           description: Successful response
@@ -2473,7 +2470,6 @@ components:
         - $ref: "#/components/schemas/DeclareActionConfig"
         - $ref: "#/components/schemas/ValidateActionConfig"
         - $ref: "#/components/schemas/RejectDeclarationActionConfig"
-        - $ref: "#/components/schemas/MarkNotDuplicateActionConfig"
         - $ref: "#/components/schemas/ArchiveActionConfig"
         - $ref: "#/components/schemas/RegisterActionConfig"
         - $ref: "#/components/schemas/DeleteActionConfig"
@@ -2488,7 +2484,6 @@ components:
           DECLARE: "#/components/schemas/DeclareActionConfig"
           VALIDATE: "#/components/schemas/ValidateActionConfig"
           REJECT: "#/components/schemas/RejectDeclarationActionConfig"
-          MARK_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateActionConfig"
           ARCHIVE: "#/components/schemas/ArchiveActionConfig"
           REGISTER: "#/components/schemas/RegisterActionConfig"
           DELETE: "#/components/schemas/DeleteActionConfig"
@@ -2532,19 +2527,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: &a11 []
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -2572,110 +2554,6 @@ components:
         - conditionals
         - type
         - review
-    Clause:
-      oneOf:
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - and
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            type:
-              type: string
-              enum:
-                - or
-            clauses:
-              type: array
-              items:
-                $ref: "#/components/schemas/Clause"
-          required:
-            - type
-            - clauses
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                fuzziness:
-                  anyOf:
-                    - type: string
-                    - type: number
-                  default: AUTO:4,7
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - fuzziness
-                - boost
-              default:
-                fuzziness: AUTO:4,7
-                boost: 1
-            type:
-              type: string
-              enum:
-                - fuzzy
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - boost
-              default:
-                boost: 1
-            type:
-              type: string
-              enum:
-                - strict
-          required:
-            - fieldId
-            - options
-            - type
-        - type: object
-          properties:
-            fieldId:
-              type: string
-            options:
-              type: object
-              properties:
-                pivot:
-                  type: number
-                days:
-                  type: number
-                boost:
-                  type: number
-                  default: 1
-              required:
-                - days
-                - boost
-            type:
-              type: string
-              enum:
-                - dateRange
-          required:
-            - fieldId
-            - options
-            - type
     FieldConfig:
       oneOf:
         - type: object
@@ -5096,19 +4974,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5131,11 +4996,128 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
         - type
         - review
+    Clause:
+      oneOf:
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - and
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            type:
+              type: string
+              enum:
+                - or
+            clauses:
+              type: array
+              items:
+                $ref: "#/components/schemas/Clause"
+          required:
+            - type
+            - clauses
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                fuzziness:
+                  anyOf:
+                    - type: string
+                    - type: number
+                  default: AUTO:4,7
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - fuzziness
+                - boost
+              default:
+                fuzziness: AUTO:4,7
+                boost: 1
+            type:
+              type: string
+              enum:
+                - fuzzy
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - boost
+              default:
+                boost: 1
+            type:
+              type: string
+              enum:
+                - strict
+          required:
+            - fieldId
+            - options
+            - type
+        - type: object
+          properties:
+            fieldId:
+              type: string
+            options:
+              type: object
+              properties:
+                pivot:
+                  type: number
+                days:
+                  type: number
+                boost:
+                  type: number
+                  default: 1
+              required:
+                - days
+                - boost
+            type:
+              type: string
+              enum:
+                - dateRange
+          required:
+            - fieldId
+            - options
+            - type
     ValidateActionConfig:
       type: object
       properties:
@@ -5172,19 +5154,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5207,6 +5176,19 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
@@ -5248,84 +5230,12 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
           type: string
           enum:
             - REJECT
-      required:
-        - label
-        - conditionals
-        - type
-    MarkNotDuplicateActionConfig:
-      type: object
-      properties:
-        label:
-          $ref: "#/components/schemas/TranslationConfig"
-        conditionals:
-          type: array
-          items:
-            oneOf:
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - SHOW
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                description: If 'SHOW' conditional is defined, the component is shown to the
-                  user only if the condition is met
-              - type: object
-                properties:
-                  type:
-                    type: string
-                    enum:
-                      - ENABLE
-                  conditional:
-                    $ref: "#/components/schemas/Conditional"
-                required:
-                  - type
-                  - conditional
-                description: If 'ENABLE' conditional is defined, the component is enabled only
-                  if the condition is met
-          default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
-        draft:
-          type: boolean
-        type:
-          type: string
-          enum:
-            - MARK_NOT_DUPLICATE
       required:
         - label
         - conditionals
@@ -5366,19 +5276,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5425,19 +5322,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5460,6 +5344,19 @@ components:
             - title
             - fields
           description: Configuration for **declaration** review page.
+        deduplication:
+          type: object
+          properties:
+            id:
+              type: string
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            query:
+              $ref: "#/components/schemas/Clause"
+          required:
+            - id
+            - label
+            - query
       required:
         - label
         - conditionals
@@ -5501,19 +5398,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5560,19 +5444,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5713,19 +5584,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5809,19 +5667,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -5868,19 +5713,6 @@ components:
                 description: If 'ENABLE' conditional is defined, the component is enabled only
                   if the condition is met
           default: *a11
-        deduplication:
-          type: object
-          properties:
-            id:
-              type: string
-            label:
-              $ref: "#/components/schemas/TranslationConfig"
-            query:
-              $ref: "#/components/schemas/Clause"
-          required:
-            - id
-            - label
-            - query
         draft:
           type: boolean
         type:
@@ -7289,18 +7121,15 @@ components:
           type: string
           enum:
             - REJECT
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -7311,7 +7140,7 @@ components:
         - declaration
         - status
         - type
-        - reason
+        - content
     MarkNotDuplicateAction:
       type: object
       properties:
@@ -8502,18 +8331,15 @@ components:
           type: string
           enum:
             - ARCHIVE
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -8524,7 +8350,7 @@ components:
         - declaration
         - status
         - type
-        - reason
+        - content
     NotifiedAction:
       type: object
       properties:
@@ -11325,18 +11151,15 @@ components:
             - REJECT_CORRECTION
         requestId:
           type: string
-        reason:
+        content:
           type: object
           properties:
-            message:
+            reason:
               type: string
               minLength: 1
               description: Message describing reason for rejection or archiving
-            isDuplicate:
-              type: boolean
-              description: If a declaration is duplicated
           required:
-            - message
+            - reason
       required:
         - id
         - transactionId
@@ -11348,7 +11171,7 @@ components:
         - status
         - type
         - requestId
-        - reason
+        - content
     UnassignedAction:
       type: object
       properties:
