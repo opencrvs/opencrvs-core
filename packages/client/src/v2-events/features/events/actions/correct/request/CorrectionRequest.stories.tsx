@@ -48,6 +48,25 @@ const draft = testDataGenerator().event.draft({
   actionType: ActionType.REQUEST_CORRECTION
 })
 
+const draftWithoutImage = {
+  id: 'some-uuid',
+  type: 'tennis-club-membership',
+  actions: [
+    {
+      id: 'some-action-uuid',
+      type: 'CREATE',
+      status: 'Requested',
+      declaration: {
+        'applicant.name': {
+          firstname: 'Max',
+          surname: 'McLaren'
+        },
+        'applicant.dob': '2020-01-02'
+      }
+    }
+  ]
+}
+
 function FormClear() {
   const drafts = useDrafts()
   useEffect(() => {
@@ -150,6 +169,8 @@ export const Review: Story = {
           canvas.getByRole('button', { name: 'Continue' })
         ).toBeDisabled()
       })
+
+      await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
     })
 
     await step("Check applicant's profile picture", async () => {
@@ -293,5 +314,37 @@ export const ReviewCorrection: Story = {
     }
 
     await userEvent.click(canvas.getByTestId('close-dialog'))
+  }
+}
+
+export const ReviewNoImage: Story = {
+  parameters: {
+    offline: {
+      drafts: [draftWithoutImage]
+    },
+    reactRouter: {
+      router: {
+        path: '/',
+        element: <Outlet />,
+        children: [router]
+      },
+      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+        eventId: tennisClubMembershipEventDocument.id
+      })
+    },
+    msw: {
+      handlers: {
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          })
+        ]
+      }
+    }
+  },
+  play: async ({ canvasElement }) => {
+    const canvas = within(canvasElement)
+
+    await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
   }
 }
