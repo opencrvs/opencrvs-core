@@ -110,9 +110,9 @@ const recommenderOtherThanClubMembers = and(
   not(field('recommender.relation').isFalsy())
 )
 
-const overridenEventConfig = {
+const overriddenEventConfig = {
   ...tennisClubMembershipEvent,
-  id: 'overridenEventConfig',
+  id: 'overriddenEventConfig',
   declaration: defineDeclarationForm({
     ...tennisClubMembershipEvent.declaration,
     pages: [
@@ -240,11 +240,11 @@ const overridenEventConfig = {
 
 const overridenActions = [
   generateActionDocument({
-    configuration: overridenEventConfig,
+    configuration: overriddenEventConfig,
     action: ActionType.CREATE
   }),
   generateActionDocument({
-    configuration: overridenEventConfig,
+    configuration: overriddenEventConfig,
     action: ActionType.DECLARE,
     defaults: {
       declaration: {
@@ -256,19 +256,19 @@ const overridenActions = [
     }
   }),
   generateActionDocument({
-    configuration: overridenEventConfig,
+    configuration: overriddenEventConfig,
     action: ActionType.VALIDATE,
     defaults: { declaration: {} }
   }),
   generateActionDocument({
-    configuration: overridenEventConfig,
+    configuration: overriddenEventConfig,
     action: ActionType.REGISTER,
     defaults: { declaration: {} }
   })
 ]
 const overridenEvent = {
   trackingId: generateUuid(),
-  type: overridenEventConfig.id,
+  type: overriddenEventConfig.id,
   actions: overridenActions,
   createdAt: new Date(Date.now()).toISOString(),
   id: generateUuid(),
@@ -280,7 +280,7 @@ export const FormFieldParentChildReset: Story = {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
-    addLocalEventConfig(overridenEventConfig)
+    addLocalEventConfig(overriddenEventConfig)
     setEventData(overridenEvent.id, overridenEvent)
   },
   parameters: {
@@ -298,7 +298,7 @@ export const FormFieldParentChildReset: Story = {
       handlers: {
         events: [
           tRPCMsw.event.config.get.query(() => {
-            return [overridenEventConfig]
+            return [overriddenEventConfig]
           })
         ],
         event: [
