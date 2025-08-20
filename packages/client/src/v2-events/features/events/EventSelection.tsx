@@ -162,7 +162,7 @@ function EventSelection() {
               id="goBack"
               size="small"
               type="secondary"
-              onClick={() => closeActionView(undefined)}
+              onClick={() => closeActionView()}
             >
               <Icon name="X" />
               {intl.formatMessage(messages.exitButton)}
@@ -171,11 +171,7 @@ function EventSelection() {
           desktopTitle={intl.formatMessage(messages.registerNewEventTitle)}
           mobileLeft={<Icon name="Draft" size="large" />}
           mobileRight={
-            <Button
-              size="medium"
-              type="icon"
-              onClick={() => closeActionView(undefined)}
-            >
+            <Button size="medium" type="icon" onClick={() => closeActionView()}>
               <Icon name="X" />
             </Button>
           }

@@ -90,12 +90,12 @@ export function useEventFormNavigation() {
    * DO NOT pass this function directly to `onClick` handlers like `onClick={closeActionView}`
    * because React will inject a MouseEvent as the first argument.
    *
-   * Always wrap in an arrow function instead: `onClick={() => closeActionView(undefined)}`
+   * Always wrap in an arrow function instead: `onClick={() => closeActionView()}`
    *
    * If you have a `string | undefined` (e.g. `slug`), you can pass it directly:
    * `closeActionView(slug)`
    */
-  function closeActionView(workqueueToGoBackTo: string | undefined) {
+  function closeActionView(workqueueToGoBackTo?: string) {
     workqueueToGoBackTo ? goToWorkqueue(workqueueToGoBackTo) : goToHome()
     clearEphemeralFormState()
   }
@@ -147,7 +147,7 @@ export function useEventFormNavigation() {
       deleteEvent.mutate({ eventId: event.id })
     }
 
-    closeActionView(undefined)
+    closeActionView()
   }
 
   async function deleteDeclaration(eventId: string) {
@@ -191,7 +191,7 @@ export function useEventFormNavigation() {
 
     if (deleteConfirm) {
       deleteEvent.mutate({ eventId })
-      closeActionView(undefined)
+      closeActionView()
     }
   }
 

@@ -159,7 +159,7 @@ export function Summary() {
       <ActionPageLight
         hideBackground
         goBack={() => navigate(-1)}
-        goHome={() => eventFormNavigation.closeActionView(undefined)}
+        goHome={() => eventFormNavigation.closeActionView()}
         id="corrector_form"
         title={intl.formatMessage(correctionMessages.title)}
       >
