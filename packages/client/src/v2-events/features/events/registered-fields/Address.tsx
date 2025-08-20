@@ -11,6 +11,7 @@
 import React from 'react'
 import { IntlShape } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
+import { useSelector } from 'react-redux'
 import {
   EventState,
   AddressFieldValue,
@@ -35,6 +36,7 @@ import {
   formDataStringifierFactory,
   stringifySimpleField
 } from '@client/v2-events/hooks/useFormDataStringifier'
+import { getOfflineData } from '@client/offline/selectors'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -94,6 +96,33 @@ const displayWhenDistrictUrbanSelected = [
   }
 ]
 
+const displayWhenDomesticAddressSelected = [
+  {
+    type: ConditionalType.SHOW,
+    conditional: isDomesticAddress()
+  }
+]
+const displayWhenInternationalAddressSelected = [
+  {
+    type: ConditionalType.SHOW,
+    conditional: isInternationalAddress()
+  }
+]
+
+const COUNTRY_STRUCTURE = [
+  {
+    id: 'country',
+    conditionals: [],
+    required: true,
+    label: {
+      id: 'v2.field.address.country.label',
+      defaultMessage: 'Country',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.COUNTRY
+  }
+] as const satisfies FieldConfigWithoutAddress[]
+
 const addressTypeField = {
   id: 'addressType',
   conditionals: [
@@ -110,103 +139,9 @@ const addressTypeField = {
   type: FieldType.TEXT
 } as const satisfies FieldConfigWithoutAddress
 
-const URBAN_FIELDS = [
+const DEFAULT_DOMESTIC_ADMIN_STRUCTURE = [
   {
-    id: 'town',
-    conditionals: displayWhenDistrictUrbanSelected,
-    required: false,
-    label: {
-      id: 'v2.field.address.town.label',
-      defaultMessage: 'Town',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'residentialArea',
-    conditionals: displayWhenDistrictUrbanSelected,
-    required: false,
-    label: {
-      id: 'v2.field.address.residentialArea.label',
-      defaultMessage: 'Residential Area',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'street',
-    conditionals: displayWhenDistrictUrbanSelected,
-    required: false,
-    label: {
-      id: 'v2.field.address.street.label',
-      defaultMessage: 'Street',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'number',
-    conditionals: displayWhenDistrictUrbanSelected,
-    required: false,
-    label: {
-      id: 'v2.field.address.number.label',
-      defaultMessage: 'Number',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'zipCode',
-    conditionals: displayWhenDistrictUrbanSelected,
-    required: false,
-    label: {
-      id: 'v2.field.address.zipCode.label',
-      defaultMessage: 'Postcode / Zip',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  }
-] as const satisfies FieldConfigWithoutAddress[]
-
-const RURAL_FIELDS = [
-  {
-    id: 'village',
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: and(
-          isDomesticAddress(),
-          createFieldCondition('urbanOrRural').isEqualTo(
-            GeographicalArea.RURAL
-          ),
-          not(createFieldCondition('district').isUndefined())
-        )
-      }
-    ],
-    required: false,
-    label: {
-      id: 'v2.field.address.village.label',
-      defaultMessage: 'Village',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  }
-] as const satisfies FieldConfigWithoutAddress[]
-
-const ADMIN_STRUCTURE = [
-  {
-    id: 'country',
-    conditionals: [],
-    required: true,
-    label: {
-      id: 'v2.field.address.country.label',
-      defaultMessage: 'Country',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.COUNTRY
-  },
-  {
-    id: 'province',
+    id: 'adminLevel1',
     conditionals: [
       {
         type: ConditionalType.SHOW,
@@ -215,147 +150,208 @@ const ADMIN_STRUCTURE = [
     ],
     required: true,
     label: {
-      id: 'v2.field.address.province.label',
-      defaultMessage: 'Province',
-      description: 'This is the label for the field'
+      id: 'v2.field.address.adminLevel1.label',
+      defaultMessage: 'Administrative Level 1',
+      description: 'Label for adminLevel1 in address component'
     },
     type: FieldType.ADMINISTRATIVE_AREA,
     configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
   },
   {
-    id: 'district',
+    id: 'adminLevel2',
     type: FieldType.ADMINISTRATIVE_AREA,
     conditionals: [
       {
         type: ConditionalType.SHOW,
         conditional: and(
           isDomesticAddress(),
-          not(createFieldCondition('province').isUndefined())
+          not(createFieldCondition('adminLevel1').isUndefined())
         )
       }
     ],
     required: true,
     label: {
-      id: 'v2.field.address.district.label',
-      defaultMessage: 'District',
-      description: 'This is the label for the field'
+      id: 'v2.field.address.adminLevel2.label',
+      defaultMessage: 'Administrative Level 2',
+      description: 'Label for adminLevel2 in address component'
     },
     configuration: {
       type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
       partOf: {
-        $declaration: 'province'
+        $declaration: 'adminLevel1'
       }
     }
   },
   {
-    id: 'urbanOrRural',
+    id: 'adminLevel3',
+    type: FieldType.ADMINISTRATIVE_AREA,
     conditionals: [
-      {
-        type: ConditionalType.DISPLAY_ON_REVIEW,
-        conditional: never()
-      },
       {
         type: ConditionalType.SHOW,
         conditional: and(
           isDomesticAddress(),
-          not(createFieldCondition('district').isUndefined())
+          not(createFieldCondition('adminLevel2').isUndefined())
         )
       }
     ],
-    required: false,
+    required: true,
     label: {
-      id: 'v2.field.address.urbanOrRural.label',
-      defaultMessage: 'Urban or Rural',
-      description: 'This is the label for the field'
+      id: 'v2.field.address.adminLevel3.label',
+      defaultMessage: 'Administrative Level 3',
+      description: 'Label for adminLevel3 in address component'
     },
-    hideLabel: true,
-    type: FieldType.RADIO_GROUP,
-    options: [
+    configuration: {
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
+      partOf: {
+        $declaration: 'adminLevel2'
+      }
+    }
+  },
+  {
+    id: 'adminLevel4',
+    type: FieldType.ADMINISTRATIVE_AREA,
+    conditionals: [
       {
-        value: GeographicalArea.URBAN,
-        label: {
-          id: 'v2.field.address.label.urban',
-          defaultMessage: 'Urban',
-          description: 'Label for form field checkbox option Urban'
-        }
-      },
-      {
-        value: GeographicalArea.RURAL,
-        label: {
-          id: 'v2.field.address.label.rural',
-          defaultMessage: 'Rural',
-          description: 'Label for form field checkbox option Rural'
-        }
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('adminLevel3').isUndefined())
+        )
       }
     ],
-    defaultValue: GeographicalArea.URBAN,
+    required: true,
+    label: {
+      id: 'v2.field.address.adminLevel4.label',
+      defaultMessage: 'Administrative Level 4',
+      description: 'Label for adminLevel4 in address component'
+    },
     configuration: {
-      styles: { size: 'NORMAL' }
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
+      partOf: {
+        $declaration: 'adminLevel3'
+      }
+    }
+  },
+  {
+    id: 'adminLevel5',
+    type: FieldType.ADMINISTRATIVE_AREA,
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('adminLevel4').isUndefined())
+        )
+      }
+    ],
+    required: true,
+    label: {
+      id: 'v2.field.address.adminLevel5.label',
+      defaultMessage: 'Administrative Level 5',
+      description: 'Label for adminLevel5 in address component'
+    },
+    configuration: {
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
+      partOf: {
+        $declaration: 'adminLevel4'
+      }
+    }
+  },
+  {
+    id: 'adminLevel6',
+    type: FieldType.ADMINISTRATIVE_AREA,
+    conditionals: [
+      {
+        type: ConditionalType.SHOW,
+        conditional: and(
+          isDomesticAddress(),
+          not(createFieldCondition('adminLevel5').isUndefined())
+        )
+      }
+    ],
+    required: true,
+    label: {
+      id: 'v2.field.address.adminLevel6.label',
+      defaultMessage: 'Administrative Level 6',
+      description: 'Label for adminLevel6 in address component'
+    },
+    configuration: {
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
+      partOf: {
+        $declaration: 'adminLevel5'
+      }
     }
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-const GENERIC_ADDRESS_FIELDS = [
-  {
-    id: 'state',
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isInternationalAddress()
-      }
-    ],
-    parent: createFieldCondition('country'),
-    required: true,
-    label: {
-      id: 'v2.field.address.state.label',
-      defaultMessage: 'State',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'district2',
-    parent: createFieldCondition('country'),
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isInternationalAddress()
-      }
-    ],
-    required: true,
-    label: {
-      id: 'v2.field.address.district2.label',
-      defaultMessage: 'District',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'cityOrTown',
-    parent: createFieldCondition('country'),
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isInternationalAddress()
-      }
-    ],
-    required: false,
-    label: {
-      id: 'v2.field.address.cityOrTown.label',
-      defaultMessage: 'City / Town',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
+const DEFAULT_DOMESTIC_ADDRESS_FIELDS = [
   {
     id: 'addressLine1',
-    parent: createFieldCondition('country'),
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isInternationalAddress()
-      }
-    ],
+    conditionals: displayWhenDomesticAddressSelected,
+    required: false,
+    label: {
+      id: 'v2.field.address.domestic.addressLine1.label',
+      defaultMessage: 'Town',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine2',
+    conditionals: displayWhenDomesticAddressSelected,
+    required: false,
+    label: {
+      id: 'v2.field.address.domestic.addressLine2.label',
+      defaultMessage: 'Residential Area',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine3',
+    conditionals: displayWhenDomesticAddressSelected,
+    required: false,
+    label: {
+      id: 'v2.field.address.domestic.addressLine3.label',
+      defaultMessage: 'Street',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine4',
+    conditionals: displayWhenDomesticAddressSelected,
+    required: false,
+    label: {
+      id: 'v2.field.address.domestic.addressLine4.label',
+      defaultMessage: 'Number',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'addressLine5',
+    conditionals: displayWhenDomesticAddressSelected,
+    required: false,
+    label: {
+      id: 'v2.field.address.domestic.addressLine5.label',
+      defaultMessage: 'Postcode / Zip',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  }
+] as const satisfies FieldConfigWithoutAddress[]
+
+const ALL_DOMESTIC_FIELDS = [
+  ...COUNTRY_STRUCTURE,
+  ...DEFAULT_DOMESTIC_ADMIN_STRUCTURE,
+  ...DEFAULT_DOMESTIC_ADDRESS_FIELDS
+]
+
+const INTERNATIONAL_ADDRESS_FIELDS = [
+  {
+    id: 'internationalAddressLine1',
+    conditionals: displayWhenInternationalAddressSelected,
     required: false,
     label: {
       id: 'v2.field.address.addressLine1.label',
@@ -365,14 +361,8 @@ const GENERIC_ADDRESS_FIELDS = [
     type: FieldType.TEXT
   },
   {
-    id: 'addressLine2',
-    parent: createFieldCondition('country'),
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isInternationalAddress()
-      }
-    ],
+    id: 'internationalAddressLine2',
+    conditionals: displayWhenInternationalAddressSelected,
     required: false,
     label: {
       id: 'v2.field.address.addressLine2.label',
@@ -382,14 +372,8 @@ const GENERIC_ADDRESS_FIELDS = [
     type: FieldType.TEXT
   },
   {
-    id: 'addressLine3',
-    parent: createFieldCondition('country'),
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isInternationalAddress()
-      }
-    ],
+    id: 'internationalAddressLine3',
+    conditionals: displayWhenInternationalAddressSelected,
     required: false,
     label: {
       id: 'v2.field.address.addressLine3.label',
@@ -399,29 +383,37 @@ const GENERIC_ADDRESS_FIELDS = [
     type: FieldType.TEXT
   },
   {
-    id: 'postcodeOrZip',
-    parent: createFieldCondition('country'),
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isInternationalAddress()
-      }
-    ],
+    id: 'internationalAddressLine4',
+    conditionals: displayWhenInternationalAddressSelected,
     required: false,
     label: {
-      id: 'v2.field.address.postcodeOrZip.label',
-      defaultMessage: 'Postcode / Zip',
+      id: 'v2.field.address.addressLine4.label',
+      defaultMessage: 'Address Line 4',
+      description: 'This is the label for the field'
+    },
+    type: FieldType.TEXT
+  },
+  {
+    id: 'internationalAddressLine5',
+    conditionals: displayWhenInternationalAddressSelected,
+    required: false,
+    label: {
+      id: 'v2.field.address.addressLine5.label',
+      defaultMessage: 'Address Line 5',
       description: 'This is the label for the field'
     },
     type: FieldType.TEXT
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
+const ALL_INTERNATIONAL_FIELDS = [
+  ...COUNTRY_STRUCTURE,
+  ...INTERNATIONAL_ADDRESS_FIELDS
+] as const satisfies FieldConfigWithoutAddress[]
+
 const ALL_ADDRESS_FIELDS = [
-  ...ADMIN_STRUCTURE,
-  ...URBAN_FIELDS,
-  ...RURAL_FIELDS,
-  ...GENERIC_ADDRESS_FIELDS,
+  ...ALL_DOMESTIC_FIELDS,
+  ...ALL_INTERNATIONAL_FIELDS,
   addressTypeField
 ]
 
@@ -449,10 +441,8 @@ type _ExpectTrue = Expect<
 >
 
 const ALL_ADDRESS_INPUT_FIELDS = [
-  ...ADMIN_STRUCTURE,
-  ...URBAN_FIELDS,
-  ...RURAL_FIELDS,
-  ...GENERIC_ADDRESS_FIELDS
+  ...ALL_DOMESTIC_FIELDS,
+  ...ALL_INTERNATIONAL_FIELDS
 ] satisfies Array<FieldConfigWithoutAddress>
 
 type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
@@ -477,7 +467,35 @@ function getFilteredFields(fieldsToShow?: Array<string>) {
  */
 function AddressInput(props: Props) {
   const { onChange, defaultValue, value = {}, ...otherProps } = props
-  const fields = getFilteredFields(props.configuration?.fields)
+  const { config } = useSelector(getOfflineData)
+  const appConfigAdminLevels = config.ADMIN_STRUCTURE
+  const administrativeLevelsCutoff = props.configuration?.administrativeLevels
+
+  const administrativeLevels =
+    Array.isArray(administrativeLevelsCutoff) &&
+    administrativeLevelsCutoff.length > 0
+      ? administrativeLevelsCutoff
+      : appConfigAdminLevels
+
+  const adminStructure = DEFAULT_DOMESTIC_ADMIN_STRUCTURE.filter((item) =>
+    administrativeLevels.includes(item.id)
+  )
+
+  const customAddressFields = props.configuration
+    ?.streetAddressForm as FieldConfigWithoutAddress[]
+
+  const addressFields =
+    Array.isArray(customAddressFields) && customAddressFields.length > 0
+      ? [...customAddressFields, ...INTERNATIONAL_ADDRESS_FIELDS]
+      : [...DEFAULT_DOMESTIC_ADDRESS_FIELDS, ...INTERNATIONAL_ADDRESS_FIELDS]
+
+  /* const fields = getFilteredFields(props.configuration?.fields)
+  const fieldsWithDefaults = defaultValue
+    ? fields.map(addDefaultValue(defaultValue))
+    : fields */
+
+  const fields = [...COUNTRY_STRUCTURE, ...adminStructure, ...addressFields]
+
   const fieldsWithDefaults = defaultValue
     ? fields.map(addDefaultValue(defaultValue))
     : fields
@@ -506,7 +524,23 @@ function AddressOutput({
     return ''
   }
 
-  const fieldsToShow = getFilteredFields(fields)
+  const { config } = useSelector(getOfflineData)
+  const appConfigAdminLevels = config.ADMIN_STRUCTURE
+
+  const adminStructure = DEFAULT_DOMESTIC_ADMIN_STRUCTURE.filter((item) =>
+    appConfigAdminLevels.includes(item.id)
+  )
+
+  const addressFields = [
+    ...DEFAULT_DOMESTIC_ADDRESS_FIELDS,
+    ...INTERNATIONAL_ADDRESS_FIELDS
+  ]
+
+  const fieldsToShow = [
+    ...COUNTRY_STRUCTURE,
+    ...adminStructure,
+    ...addressFields
+  ]
     .map((field) => ({
       field,
       value: value[field.id as keyof typeof value]

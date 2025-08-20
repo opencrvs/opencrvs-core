@@ -119,6 +119,7 @@ export interface IApplicationConfig {
     LATE_REGISTRATION_TARGET: number
     PRINT_IN_ADVANCE: boolean
   }
+  ADMIN_STRUCTURE: string[]
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: {

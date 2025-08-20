@@ -14,12 +14,10 @@ import {
   AddressFieldUpdateValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  RuralAddressValue,
-  RuralAddressUpdateValue,
-  UrbanAddressValue,
-  UrbanAddressUpdateValue,
-  GenericAddressValue,
-  GenericAddressUpdateValue,
+  DomesticAddressValue,
+  DomesticAddressUpdateValue,
+  InternationalAddressValue,
+  InternationalAddressUpdateValue,
   NameFieldValue,
   NameFieldUpdateValue
 } from './CompositeFieldValue'
@@ -90,10 +88,9 @@ export const FieldValue = z.union([
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddressValue,
-  RuralAddressValue,
+  DomesticAddressValue,
+  InternationalAddressValue,
   DataFieldValue,
-  GenericAddressValue,
   NameFieldValue,
   NameFieldUpdateValue
 ])
@@ -110,10 +107,9 @@ export const FieldUpdateValue = z.union([
   NumberFieldValue,
   FileFieldValue,
   FileFieldWithOptionValue,
-  UrbanAddressUpdateValue,
-  RuralAddressUpdateValue,
+  DomesticAddressUpdateValue,
+  InternationalAddressUpdateValue,
   DataFieldValue,
-  GenericAddressUpdateValue,
   NameFieldUpdateValue
 ])
 

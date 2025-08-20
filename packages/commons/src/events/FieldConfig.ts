@@ -522,6 +522,18 @@ const Address = BaseField.extend({
             'postcodeOrZip'
           ])
         )
+        .optional(),
+      administrativeLevels: z.array(z.string()).optional(),
+      streetAddressForm: z
+        .array(
+          z.object({
+            id: z.string(),
+            required: z.boolean(),
+            label: TranslationConfig,
+            type: z.literal(FieldType.TEXT),
+            conditionals: z.array(FieldConditional).default([]).optional()
+          })
+        )
         .optional()
     })
     .optional(),

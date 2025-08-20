@@ -147,49 +147,31 @@ export function generateQueryForAddressField(
     mustMatches.push({ match: { [`${fieldId}.country`]: country } })
   }
   if (addressType === 'DOMESTIC') {
-    if (value.province) {
+    if (value.adminLevel1) {
       mustMatches.push({
-        match: { [`${fieldId}.province`]: value.province }
+        match: { [`${fieldId}.adminLevel1`]: value.adminLevel1 }
       })
     }
-    if (value.district) {
+    if (value.adminLevel2) {
       mustMatches.push({
-        match: { [`${fieldId}.district`]: value.district }
+        match: { [`${fieldId}.adminLevel2`]: value.adminLevel2 }
       })
     }
-    if (value.urbanOrRural === 'URBAN' && value.town) {
+    if (value.addressLine1) {
       mustMatches.push({
         match: {
-          [`${fieldId}.town`]: {
-            query: value.town,
+          [`${fieldId}.addressLine1`]: {
+            query: value.addressLine1,
             fuzziness: 'AUTO'
           }
         }
       })
     }
-    if (value.urbanOrRural === 'RURAL' && value.village) {
+    if (value.addressLine2) {
       mustMatches.push({
         match: {
-          [`${fieldId}.village`]: {
-            query: value.village,
-            fuzziness: 'AUTO'
-          }
-        }
-      })
-    }
-  } else {
-    if (value.state) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.state`]: { query: value.state, fuzziness: 'AUTO' }
-        }
-      })
-    }
-    if (value.district2) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.district2`]: {
-            query: value.district2,
+          [`${fieldId}.addressLine2`]: {
+            query: value.addressLine2,
             fuzziness: 'AUTO'
           }
         }

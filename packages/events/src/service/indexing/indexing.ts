@@ -114,22 +114,22 @@ function mapFieldTypeToElasticsearch(
       const addressProperties = {
         country: { type: 'keyword' },
         addressType: { type: 'keyword' },
-        province: { type: 'keyword' },
-        district: { type: 'keyword' },
-        urbanOrRural: { type: 'keyword' },
-        town: { type: 'keyword' },
-        residentialArea: { type: 'keyword' },
-        street: { type: 'keyword' },
-        number: { type: 'keyword' },
-        zipCode: { type: 'keyword' },
-        village: { type: 'keyword' },
-        state: { type: 'keyword' },
-        district2: { type: 'keyword' },
-        cityOrTown: { type: 'keyword' },
+        adminLevel1: { type: 'keyword' },
+        adminLevel2: { type: 'keyword' },
+        adminLevel3: { type: 'keyword' },
+        adminLevel4: { type: 'keyword' },
+        adminLevel5: { type: 'keyword' },
+        adminLevel6: { type: 'keyword' },
         addressLine1: { type: 'keyword' },
         addressLine2: { type: 'keyword' },
         addressLine3: { type: 'keyword' },
-        postcodeOrZip: { type: 'keyword' }
+        addressLine4: { type: 'keyword' },
+        addressLine5: { type: 'keyword' },
+        internationalAddressLine1: { type: 'keyword' },
+        internationalAddressLine2: { type: 'keyword' },
+        internationalAddressLine3: { type: 'keyword' },
+        internationalAddressLine4: { type: 'keyword' },
+        internationalAddressLine5: { type: 'keyword' }
       } satisfies {
         [K in keyof Required<AllFieldsUnion>]: estypes.MappingProperty
       }

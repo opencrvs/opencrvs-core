@@ -195,17 +195,20 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       return null
     case FieldType.ADDRESS:
       return {
-        country: null,
+        country: '',
         addressType: AddressType.DOMESTIC,
-        province: null,
-        district: null,
-        urbanOrRural: 'URBAN', // Default to urban needed for validation
-        town: null,
-        residentialArea: null,
-        street: null,
-        number: null,
-        zipCode: null
-      }
+        adminLevel1: '',
+        adminLevel2: '',
+        adminLevel3: '',
+        adminLevel4: '',
+        adminLevel5: '',
+        adminLevel6: '',
+        addressLine1: '',
+        addressLine2: '',
+        addressLine3: '',
+        addressLine4: '',
+        addressLine5: ''
+      } satisfies AddressFieldValue
     case FieldType.SIGNATURE:
     case FieldType.FILE:
       return {
