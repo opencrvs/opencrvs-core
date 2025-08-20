@@ -43,15 +43,18 @@ export function defineFormConditional(schema: Record<string, unknown>) {
 
 export type UserConditionalParameters = {
   $now: string
+  $online: boolean
   $user: TokenPayload
 }
 export type EventConditionalParameters = {
   $now: string
+  $online: boolean
   $event: EventDocument
 }
 // @TODO: Reconcile which types should be used. The same values are used within form and config. In form values can be undefined, for example.
 export type FormConditionalParameters = {
   $now: string
+  $online: boolean
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   $form: EventState | Record<string, any>
 }
@@ -171,8 +174,19 @@ export const user = Object.assign(userSerializer, {
     }),
   isOnline: () =>
     defineConditional({
-      online: true
+      type: 'object',
+      properties: {
+        $online: {
+          type: 'boolean',
+          const: true
+        }
+      },
+      required: ['$online']
     })
+  // isOnline: () =>
+  //   defineConditional({
+  //     online: true
+  //   })
 })
 
 /**
