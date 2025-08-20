@@ -9,12 +9,11 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import type { Meta, StoryFn, StoryObj } from '@storybook/react'
-import { fn, userEvent, within, expect } from '@storybook/test'
+import type { Meta, StoryObj } from '@storybook/react'
+import { fn, userEvent, within, expect, waitFor } from '@storybook/test'
 import React from 'react'
 import styled from 'styled-components'
 import { http, HttpResponse } from 'msw'
-import { times, random } from 'lodash'
 import {
   and,
   not,
@@ -73,10 +72,11 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
     await userEvent.click(
       await canvas.findByRole('button', { name: /generate nid/i })
     )
-
-    await expect(
-      canvasElement.querySelector('#child____http-text')
-    ).toHaveValue('1234567890')
+    await waitFor(async () => {
+      await expect(
+        canvas.queryByTestId('text__child____http-text')
+      ).toHaveValue('1234567890')
+    })
   },
   render: function Component(args) {
     return (
