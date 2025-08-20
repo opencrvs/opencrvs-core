@@ -49,8 +49,8 @@ function convertDotToTripleUnderscore(obj: EventState, parentKey = '') {
       })
       /* @TODO: Check if the typing is correct or is there a case where null could come in */
     } else if (typeof value === 'object' && value !== null) {
-      if ('error' in value) {
-        // HTTP field with a `{ data: any; error: any }` object within isn't a FieldValue for EventState.
+      if ('loading' in value) {
+        // HTTP field with a `{ loading: boolean; data: any; error: any }` object will not contain any keys that we want to convert
         continue
       }
 
@@ -165,6 +165,7 @@ export function useIntlFormatMessageWithFlattenedParams() {
   ): string {
     // Flatten the params to ensure all nested properties are accessible with dot notation
     const flattenedParams = flattenNestedObject(params ?? {})
+    console.log(flattenedParams)
     const variables = convertDotToTripleUnderscore(flattenedParams)
 
     const defaultMessage = convertDotInCurlyBraces(getDefaultMessage(message))
