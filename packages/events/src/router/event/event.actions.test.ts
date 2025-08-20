@@ -314,3 +314,60 @@ test('REGISTER action throws when content property is in payload', async () => {
     client.event.actions.register.request(registerActionWithDetails)
   ).rejects.toThrow()
 })
+
+test('Can not add action with same [transactionId, type, status]', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  const createAction = originalEvent.actions.filter(
+    (action) => action.type === ActionType.CREATE
+  )
+  const assignmentInput = generator.event.actions.assign(originalEvent.id, {
+    assignedTo: createAction[0].createdBy
+  })
+
+  const declarePayload = generator.event.actions.declare(originalEvent.id)
+  await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign({
+    ...assignmentInput,
+    transactionId: getUUID()
+  })
+
+  await client.event.actions.reject.request(
+    generator.event.actions.reject(originalEvent.id)
+  )
+
+  const eventBeforeDuplicateAttempt =
+    await client.event.actions.assignment.assign({
+      ...assignmentInput,
+      transactionId: getUUID()
+    })
+
+  const eventWithDuplicateAttempt = await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id, {
+      transactionId: declarePayload.transactionId
+    })
+  )
+  expect(eventBeforeDuplicateAttempt).toStrictEqual(eventWithDuplicateAttempt)
+
+  const updatedEvent = await client.event.actions.declare.request({
+    ...declarePayload,
+    transactionId: getUUID()
+  })
+
+  expect(updatedEvent.actions).toStrictEqual([
+    ...eventBeforeDuplicateAttempt.actions,
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.DECLARE,
+      status: ActionStatus.Accepted
+    }),
+    expect.objectContaining({ type: ActionType.UNASSIGN })
+  ])
+})

@@ -10,17 +10,22 @@
  */
 
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
   ActionStatus,
   ActionType,
   AddressType,
+  EventStatus,
   generateActionDeclarationInput,
   getAcceptedActions,
+  getCurrentEventState,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -336,4 +341,106 @@ test(`${ActionType.VALIDATE} is idempotent`, async () => {
     .execute()
   expect(databaseResultAfterFirst).toEqual(databaseResultAfterSecond)
   expect(firstResponse).toEqual(secondResponse)
+})
+
+test('Event status changes after validation action is accepted', async () => {
+  const { user, generator } = await setupTestCase(100)
+  const client = createTestClient(user)
+
+  const event = await client.event.create(generator.event.create())
+  const declarePayload = generator.event.actions.declare(event.id)
+  const eventAfterDeclareAction =
+    await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+  )
+  const validatePayload = generator.event.actions.validate(event.id, {
+    keepAssignment: true
+  })
+  const EventAfterValidatedAction =
+    await client.event.actions.validate.request(validatePayload)
+
+  const statusAfterDeclareAction = getCurrentEventState(
+    eventAfterDeclareAction,
+    tennisClubMembershipEvent
+  ).status
+  const statusAfterValidateAction = getCurrentEventState(
+    EventAfterValidatedAction,
+    tennisClubMembershipEvent
+  ).status
+
+  expect(EventAfterValidatedAction.actions).toStrictEqual([
+    ...eventAfterDeclareAction.actions,
+    expect.objectContaining({ type: ActionType.ASSIGN }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Accepted
+    })
+  ])
+
+  expect(statusAfterDeclareAction).toBe(EventStatus.Enum.DECLARED)
+  expect(statusAfterValidateAction).toBe(EventStatus.Enum.VALIDATED)
+})
+
+test('Event status does not change if validation action is rejected', async () => {
+  const { user, generator } = await setupTestCase(100)
+  const client = createTestClient(user)
+  mswServer.use(
+    http.post(
+      `${env.COUNTRY_CONFIG_URL}/trigger/events/tennis-club-membership/actions/validate`,
+      () => {
+        return HttpResponse.json(
+          { error: 'Simulating rejection' },
+          // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
+          { status: 400 }
+        )
+      }
+    )
+  )
+  const event = await client.event.create(generator.event.create())
+  const declarePayload = generator.event.actions.declare(event.id)
+  const eventAfterDeclareAction =
+    await client.event.actions.declare.request(declarePayload)
+
+  await client.event.actions.assignment.assign(
+    generator.event.actions.assign(event.id, {
+      assignedTo: user.id
+    })
+  )
+  const validatePayload = generator.event.actions.validate(event.id, {
+    keepAssignment: true
+  })
+  const EventAfterValidatedAction =
+    await client.event.actions.validate.request(validatePayload)
+
+  const statusAfterDeclareAction = getCurrentEventState(
+    eventAfterDeclareAction,
+    tennisClubMembershipEvent
+  ).status
+  const statusAfterValidateAction = getCurrentEventState(
+    EventAfterValidatedAction,
+    tennisClubMembershipEvent
+  ).status
+
+  expect(EventAfterValidatedAction.actions).toStrictEqual([
+    ...eventAfterDeclareAction.actions,
+    expect.objectContaining({ type: ActionType.ASSIGN }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Requested
+    }),
+    expect.objectContaining({
+      type: ActionType.VALIDATE,
+      status: ActionStatus.Rejected
+    })
+  ])
+
+  expect(statusAfterDeclareAction).toBe(statusAfterValidateAction)
 })
