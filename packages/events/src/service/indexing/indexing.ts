@@ -292,6 +292,18 @@ type _Combine<
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 
+export async function indexEventsInBulk(
+  batch: EventDocument[],
+  configs: EventConfig[]
+) {
+  const esClient = getOrCreateClient()
+  const body = batch.flatMap((doc) => [
+    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
+  ])
+  return esClient.bulk({ refresh: false, body })
+}
+
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)

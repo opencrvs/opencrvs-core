@@ -55,6 +55,7 @@ import {
   findRecordsByQuery,
   getIndexedEvents
 } from '@events/service/indexing/indexing'
+import { reindex } from '@events/service/events/reindex'
 import { UserContext } from '../../context'
 import { getDefaultActionProcedures } from './actions'
 
@@ -307,5 +308,20 @@ export const eventRouter = router({
     })
     .input(EventDocument)
     .output(EventDocument)
-    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token))
+    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
+  reindex: systemProcedure
+    .input(z.void())
+    // .use(requiresAnyOfScopes([SCOPES.RECORD_IMPORT]))
+    .output(z.void())
+    .meta({
+      openapi: {
+        summary: 'Import full event record',
+        method: 'POST',
+        path: '/events/reindex',
+        tags: ['events']
+      }
+    })
+    .mutation(async ({ ctx }) => {
+      await reindex(ctx.token)
+    })
 })

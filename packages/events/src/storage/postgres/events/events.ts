@@ -66,6 +66,42 @@ export async function getEventByIdInTrx(id: UUID, trx: Kysely<Schema>) {
   return toEventDocument(event, actions)
 }
 
+async function* processBatch(batch: any[]) {
+  const db = getClient()
+  const ids = batch.map((e) => e.id)
+  const actions = await db
+    .selectFrom('eventActions')
+    .selectAll()
+    .where('eventId', 'in', ids)
+    .execute()
+
+  const byEventId = actions.reduce<Record<string, any[]>>((m, a) => {
+    ;(m[a.eventId] ??= []).push(a)
+    return m
+  }, {})
+
+  for (const e of batch) {
+    yield toEventDocument(e, byEventId[e.id] ?? [])
+  }
+}
+
+export async function* streamEventsWithActions() {
+  const db = getClient()
+  const it = db.selectFrom('events').selectAll().stream() // AsyncIterable
+  let batch: any[] = []
+
+  for await (const row of it) {
+    batch.push(row)
+    if (batch.length === 1000) {
+      yield* processBatch(batch)
+      batch = []
+    }
+  }
+  if (batch.length) {
+    yield* processBatch(batch)
+  }
+}
+
 export const getEventById = async (id: UUID) => {
   const db = getClient()
   return db.transaction().execute(async (trx) => {
