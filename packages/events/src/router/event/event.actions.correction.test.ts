@@ -401,7 +401,7 @@ test(`${ActionType.APPROVE_CORRECTION} is idempotent`, async () => {
   expect(firstResponse).toEqual(secondResponse)
 })
 
-test.only(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
+test(`${ActionType.REJECT_CORRECTION} is idempotent`, async () => {
   const { user, generator } = await setupTestCase()
   const client = createTestClient(user)
 
