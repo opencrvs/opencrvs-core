@@ -26,30 +26,31 @@ function throwIfUnsupportedIcon(icon: string) {
 }
 
 function ButtonInput({
+  id,
   configuration: { icon, loading = false, text },
   disabled,
   value = 0,
   onChange
 }: {
+  id: string
   configuration: {
     icon?: string
     loading?: boolean
     text: TranslationConfig
   }
   disabled?: boolean
-  value?: number
   /** Represents the amount of times the button has been pressed */
-  onChange: (val: number) => void
+  value?: number
+  onChange: (amountOfClicks?: number) => void
 }) {
   const intl = useIntl()
 
-  const handleClick = () => {
-    onChange(value + 1)
-  }
+  const handleClick = () => onChange(value + 1)
 
   return (
     <UiButton
       disabled={disabled}
+      id={id}
       loading={loading}
       type="secondary"
       onClick={handleClick}

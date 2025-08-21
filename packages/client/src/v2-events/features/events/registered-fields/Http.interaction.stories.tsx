@@ -118,7 +118,7 @@ export const FetchNid: StoryObj<typeof FormFieldGenerator> = {
               {
                 type: ConditionalType.SHOW,
                 conditional: and(
-                  not(field('child.http-fetch').get('loading').isEqualTo(true)),
+                  field('child.http-fetch').get('loading').isFalsy(),
                   field('child.http-fetch').get('data').isFalsy()
                 )
               }

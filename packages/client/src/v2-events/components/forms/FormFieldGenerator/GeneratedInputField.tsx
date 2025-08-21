@@ -597,12 +597,17 @@ export const GeneratedInputField = React.memo(
 
     if (isButtonFieldType(field)) {
       return (
-        <InputField {...inputFieldProps}>
+        // Button can be always 'touched' to show errors.
+        // Button doesn't have a similar `onBlur -> FocusEvent -> touched -> errors` flow as other InputFields
+        <InputField {...inputFieldProps} touched={true}>
           <Button.Input
             configuration={field.config.configuration}
             disabled={inputProps.disabled}
+            id={field.config.id}
             value={field.value}
-            onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
+            onChange={(clicks) =>
+              onFieldValueChange(fieldDefinition.id, clicks)
+            }
           />
         </InputField>
       )

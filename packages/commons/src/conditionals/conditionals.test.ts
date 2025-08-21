@@ -591,7 +591,13 @@ describe('"field" conditionals', () => {
         'empty.string': '',
         'null.value': null,
         'undefined.value': undefined,
-        'false.value': false
+        'false.value': false,
+        'deep.value': {
+          foo: {
+            bar: false,
+            baz: true
+          }
+        }
       },
       $now: formatISO(new Date(), { representation: 'date' }),
       $online: false
@@ -608,6 +614,20 @@ describe('"field" conditionals', () => {
       true
     )
     expect(validate(field('false.value').isFalsy(), falsyFormParams)).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('foo.bar').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(
+        and(
+          field('deep.value').get('foo.bar').isFalsy(),
+          field('deep.value').get('foo.baz').isFalsy()
+        ),
+        falsyFormParams
+      )
+    ).toBe(true)
   })
 })
 
