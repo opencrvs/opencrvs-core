@@ -10,6 +10,7 @@
  */
 import { Readable, Transform, PassThrough } from 'node:stream'
 import fetch from 'node-fetch'
+import { JsonStreamStringify } from 'json-stream-stringify'
 import { EventDocument } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
 import { streamEventDocuments } from '@events/storage/postgres/events/events'
@@ -18,21 +19,6 @@ import { indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
 
 const BATCH_SIZE = 1000
-
-function createJSONStringifierStream() {
-  return new Transform({
-    readableObjectMode: false,
-    writableObjectMode: true,
-    transform(obj, _, cb) {
-      try {
-        const chunk = Buffer.from(JSON.stringify(obj) + '\n')
-        cb(null, chunk)
-      } catch (err) {
-        cb(err as Error)
-      }
-    }
-  })
-}
 
 async function reindexSearch(token: string) {
   const configurations = await getEventConfigurations(token)
@@ -85,12 +71,6 @@ export async function reindex(token: string) {
   const eventDocumentStreamForSearch = new PassThrough({ objectMode: true })
   objStream.pipe(eventDocumentStreamForSearch)
 
-  // Converts object stream to JSON string stream so that it can
-  // be sent to the country config reindex endpoint
-  const stream = eventDocumentStreamForCountryConfig.pipe(
-    createJSONStringifierStream()
-  )
-
   const searchIndexingStream = await reindexSearch(token)
   const searchIndexingPromise = new Promise((resolve, reject) => {
     eventDocumentStreamForSearch
@@ -99,7 +79,7 @@ export async function reindex(token: string) {
       .on('error', reject)
   })
 
-  const countryConfixIndexingPromise = fetch(
+  const countryConfigIndexingPromise = fetch(
     new URL('/reindex', env.COUNTRY_CONFIG_URL),
     {
       method: 'POST',
@@ -107,9 +87,23 @@ export async function reindex(token: string) {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`
       },
-      body: stream
+      // Converts object stream to JSON string stream so that it can
+      // be sent to the country config reindex endpoint
+      body: new JsonStreamStringify(eventDocumentStreamForCountryConfig)
     }
-  )
+  ).then((response) => {
+    if (!response.ok && response.status === 404) {
+      logger.warn(
+        `Country config reindex endpoint not found: ${env.COUNTRY_CONFIG_URL}`
+      )
+      return
+    }
+    if (!response.ok) {
+      throw new Error(
+        `Failed to reindex country config: ${response.status} ${response.statusText}`
+      )
+    }
+  })
 
-  return Promise.all([searchIndexingPromise, countryConfixIndexingPromise])
+  return Promise.all([searchIndexingPromise, countryConfigIndexingPromise])
 }

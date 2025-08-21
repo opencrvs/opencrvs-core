@@ -315,7 +315,8 @@ export const eventRouter = router({
     .output(z.void())
     .meta({
       openapi: {
-        summary: 'Reindex events',
+        summary:
+          'Triggers reindexing of search, workqueues and notifies country config',
         method: 'POST',
         path: '/events/reindex',
         tags: ['events']

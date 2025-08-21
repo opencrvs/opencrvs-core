@@ -297,10 +297,12 @@ export async function indexEventsInBulk(
   configs: EventConfig[]
 ) {
   const esClient = getOrCreateClient()
+
   const body = batch.flatMap((doc) => [
     { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
     eventToEventIndex(doc, getEventConfigById(configs, doc.type))
   ])
+
   return esClient.bulk({ refresh: false, body })
 }
 
