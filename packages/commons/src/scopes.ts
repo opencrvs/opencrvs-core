@@ -40,8 +40,6 @@ export const SCOPES = {
    */
   RECORD_DECLARE: 'record.declare-birth',
 
-  //
-
   // declare
   RECORD_DECLARE_BIRTH: 'record.declare-birth',
   RECORD_DECLARE_BIRTH_MY_JURISDICTION: 'record.declare-birth:my-jurisdiction',
