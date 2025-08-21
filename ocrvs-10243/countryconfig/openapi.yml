@@ -5532,6 +5532,11 @@ components:
         type:
           type: string
           const: DUPLICATE_DETECTED
+        duplicates:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
         - id
         - transactionId
@@ -5542,6 +5547,7 @@ components:
         - declaration
         - status
         - type
+        - duplicates
     MarkNotDuplicateAction:
       type: object
       properties:
@@ -12576,7 +12582,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: 2809ecd2-1eed-4241-a7a8-0007d7507119
+        transactionId: c296937c-8533-42ca-8a69-4f25cb96e242
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -13746,6 +13752,7 @@ components:
           type: array
           items:
             type: string
+            format: uuid
       required:
         - eventId
         - transactionId
