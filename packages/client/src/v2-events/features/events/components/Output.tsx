@@ -41,7 +41,6 @@ import {
   isPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
-  isFileFieldWithOptionType,
   FileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
