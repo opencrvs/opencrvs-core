@@ -22,6 +22,8 @@ import { EventActions, NewEventActions } from './schema/app/EventActions'
 import { Events, NewEvents } from './schema/app/Events'
 import Schema from './schema/Database'
 
+export const STREAM_BATCH_SIZE = 1000
+
 function toEventDocument(
   { eventType, ...event }: Events,
   actions: EventActions[]
@@ -100,7 +102,7 @@ export async function* streamEventDocuments() {
 
   for await (const row of eventsStream) {
     batch.push(row)
-    if (batch.length === 1000) {
+    if (batch.length === STREAM_BATCH_SIZE) {
       yield* processBatch(batch)
       batch = []
     }

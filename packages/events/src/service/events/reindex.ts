@@ -13,12 +13,13 @@ import fetch from 'node-fetch'
 import { JsonStreamStringify } from 'json-stream-stringify'
 import { EventDocument } from '@opencrvs/commons/events'
 import { logger } from '@opencrvs/commons'
-import { streamEventDocuments } from '@events/storage/postgres/events/events'
+import {
+  STREAM_BATCH_SIZE,
+  streamEventDocuments
+} from '@events/storage/postgres/events/events'
 import { env } from '@events/environment'
 import { indexEventsInBulk } from '../indexing/indexing'
 import { getEventConfigurations } from '../config/config'
-
-const BATCH_SIZE = 1000
 
 async function reindexSearch(token: string) {
   const configurations = await getEventConfigurations(token)
@@ -39,7 +40,7 @@ async function reindexSearch(token: string) {
     async transform(event: EventDocument, _, cb) {
       try {
         buffer.push(event)
-        if (buffer.length >= BATCH_SIZE) {
+        if (buffer.length >= STREAM_BATCH_SIZE) {
           await flush()
         }
         cb()
