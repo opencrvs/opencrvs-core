@@ -25,11 +25,14 @@ import {
   never,
   defineDeclarationForm,
   generateUuid,
-  generateActionDocument
+  generateActionDocument,
+  generateTranslationConfig
 } from '@opencrvs/commons/client'
 import { ROUTES } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
+import { EventOverviewLayout } from '@client/v2-events/layouts'
+import { EventOverviewIndex } from '@client/v2-events/features/workqueues/EventOverview/EventOverview'
 import { setEventData, addLocalEventConfig } from '../../../useEvents/api'
 import { router } from './router'
 import * as Request from './index'
@@ -60,43 +63,23 @@ const RecommenderType = {
 
 const recommenderOptions = [
   {
-    label: {
-      defaultMessage: 'Club Member',
-      description: 'Label for option club member',
-      id: 'v2.form.field.label.recommender.member'
-    },
+    label: generateTranslationConfig('Club Member'),
     value: 'MEMBER'
   },
   {
-    label: {
-      defaultMessage: 'Coach',
-      description: 'Label for option coach',
-      id: 'v2.form.field.label.recommender.coach'
-    },
+    label: generateTranslationConfig('Coach'),
     value: 'COACH'
   },
   {
-    label: {
-      defaultMessage: 'Friend',
-      description: 'Label for option friend',
-      id: 'v2.form.field.label.recommender.friend'
-    },
+    label: generateTranslationConfig('Friend'),
     value: 'FRIEND'
   },
   {
-    label: {
-      defaultMessage: 'Family',
-      description: 'Label for option family',
-      id: 'v2.form.field.label.recommender.family'
-    },
+    label: generateTranslationConfig('Family'),
     value: 'FAMILY'
   },
   {
-    label: {
-      defaultMessage: 'Other',
-      description: 'Label for option other',
-      id: 'v2.form.field.label.recommender.other'
-    },
+    label: generateTranslationConfig('Other'),
     value: 'OTHER'
   }
 ]
@@ -118,21 +101,13 @@ const overriddenEventConfig = {
     pages: [
       {
         id: 'recommender',
-        title: {
-          id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.title',
-          defaultMessage: 'Who is recommending the applicant?',
-          description: 'This is the title of the section'
-        },
+        title: generateTranslationConfig('Who is recommending the applicant?'),
         fields: [
           {
             id: 'recommender.relation',
             type: FieldType.SELECT,
             required: true,
-            label: {
-              defaultMessage: 'Relationship to child',
-              description: 'This is the label for the field',
-              id: 'v2.event.birth.action.declare.form.section.recommender.field.relation.label'
-            },
+            label: generateTranslationConfig('Relationship to child'),
             options: recommenderOptions
           },
           {
@@ -140,11 +115,7 @@ const overriddenEventConfig = {
             type: FieldType.NAME,
             hideLabel: true,
             required: true,
-            label: {
-              defaultMessage: "Recommender's name",
-              description: 'This is the label for the field',
-              id: 'v2.event.tennis-club-membership.action.declare.form.section.recommender.field.firstname.label'
-            },
+            label: generateTranslationConfig("Recommender's name"),
             parent: field('recommender.relation')
           },
           {
@@ -153,31 +124,19 @@ const overriddenEventConfig = {
             required: true,
             validation: [
               {
-                message: {
-                  defaultMessage: 'Must be a valid Birthdate',
-                  description: 'This is the error message for invalid date',
-                  id: 'v2.event.birth.action.declare.form.section.person.field.dob.error'
-                },
+                message: generateTranslationConfig('Must be a valid Birthdate'),
                 validator: field('recommender.dob').isBefore().now()
               },
               {
-                message: {
-                  defaultMessage:
-                    "Birth date must be before child's birth date",
-                  description:
-                    "This is the error message for a birth date after child's birth date",
-                  id: 'v2.event.birth.action.declare.form.section.person.dob.afterChild'
-                },
+                message: generateTranslationConfig(
+                  "Birth date must be before child's birth date"
+                ),
                 validator: field('recommender.dob')
                   .isBefore()
                   .date(field('child.dob'))
               }
             ],
-            label: {
-              defaultMessage: 'Date of birth',
-              description: 'This is the label for the field',
-              id: 'v2.event.birth.action.declare.form.section.person.field.dob.label'
-            },
+            label: generateTranslationConfig('Date of birth'),
             conditionals: [
               {
                 type: ConditionalType.SHOW,
@@ -191,11 +150,7 @@ const overriddenEventConfig = {
           {
             id: 'recommender.dobUnknown',
             type: FieldType.CHECKBOX,
-            label: {
-              defaultMessage: 'Exact date of birth unknown',
-              description: 'This is the label for the field',
-              id: 'v2.event.birth.action.declare.form.section.person.field.age.checkbox.label'
-            },
+            label: generateTranslationConfig('Exact date of birth unknown'),
             conditionals: [
               {
                 type: ConditionalType.SHOW,
@@ -212,17 +167,9 @@ const overriddenEventConfig = {
             id: 'recommender.age',
             type: FieldType.TEXT,
             required: true,
-            label: {
-              defaultMessage: 'Age of recommender',
-              description: 'This is the label for the field',
-              id: 'v2.event.birth.action.declare.form.section.recommender.field.age.label'
-            },
+            label: generateTranslationConfig('Age of recommender'),
             configuration: {
-              postfix: {
-                defaultMessage: 'years',
-                description: 'This is the postfix for age field',
-                id: 'v2.event.birth.action.declare.form.section.person.field.age.postfix'
-              }
+              postfix: generateTranslationConfig('years')
             },
             conditionals: [
               {
@@ -274,7 +221,6 @@ const overridenEvent = {
   id: generateUuid(),
   updatedAt: new Date(Date.now()).toISOString()
 }
-const generator = testDataGenerator()
 export const FormFieldParentChildReset: Story = {
   beforeEach: () => {
     /*
@@ -288,7 +234,17 @@ export const FormFieldParentChildReset: Story = {
       router: {
         path: '/',
         element: <Outlet />,
-        children: [router]
+        children: [
+          router,
+          {
+            path: ROUTES.V2.EVENTS.OVERVIEW.path,
+            element: (
+              <EventOverviewLayout>
+                <EventOverviewIndex />
+              </EventOverviewLayout>
+            )
+          }
+        ]
       },
       initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
         eventId: overridenEvent.id
@@ -305,6 +261,36 @@ export const FormFieldParentChildReset: Story = {
           tRPCMsw.event.get.query(() => {
             return overridenEvent
           })
+        ],
+        actions: [
+          tRPCMsw.event.actions.correction.request.request.mutation(
+            async (payload) => {
+              await expect(payload.declaration).toEqual({
+                'recommender.relation': 'FRIEND',
+                'recommender.name': {
+                  firstname: 'John',
+                  middlename: '',
+                  surname: 'Doe'
+                },
+                'recommender.dobUnknown': true,
+                'recommender.age': '36'
+              })
+              return {
+                ...overridenEvent,
+                actions: [
+                  ...overridenEvent.actions,
+                  generateActionDocument({
+                    configuration: overriddenEventConfig,
+                    action: ActionType.REQUEST_CORRECTION,
+                    defaults: {
+                      annotation: payload.annotation,
+                      declaration: payload.declaration
+                    }
+                  })
+                ]
+              }
+            }
+          )
         ]
       }
     }
@@ -395,6 +381,12 @@ export const FormFieldParentChildReset: Story = {
           canvas.getByRole('button', { name: 'Continue' })
         ).toBeEnabled()
       })
+
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Correct record' })
+      )
+      await userEvent.click(canvas.getByRole('button', { name: 'Confirm' }))
     })
   }
 }
