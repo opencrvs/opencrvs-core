@@ -164,10 +164,15 @@ const IntegrationScopes = z.union([
   z.literal(SCOPES.RECORDSEARCH)
 ])
 
+// Internal operations
+const InternalOperationsScopes = z.union([
+  z.literal(SCOPES.RECORD_IMPORT),
+  z.literal(SCOPES.REINDEX)
+])
+
 // Declare
 const DeclareScopes = z.union([
   z.literal(SCOPES.RECORD_DECLARE),
-  z.literal(SCOPES.RECORD_IMPORT),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH),
   z.literal(SCOPES.RECORD_DECLARE_BIRTH_MY_JURISDICTION),
   z.literal(SCOPES.RECORD_DECLARE_DEATH),
@@ -290,7 +295,8 @@ const LiteralScopes = z.union([
   OrganisationScopes,
   UserScopes,
   ConfigScope,
-  DataSeedingScope
+  DataSeedingScope,
+  InternalOperationsScopes
 ])
 
 // Configurable scopes are for example:
