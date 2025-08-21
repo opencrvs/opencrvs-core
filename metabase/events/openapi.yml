@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: ca5acc64-c735-4fa1-8ef2-05926b56f97c
+                transactionId: e1006d55-9e81-45f1-8096-22b414f3558e
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: 1cb0d23a-2817-4b15-9556-6c23644d0ae8
+                transactionId: a82391dc-3e96-42c1-8645-58edf71ecedc
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2025,7 +2025,7 @@ paths:
   /events/reindex:
     post:
       operationId: event-reindex
-      summary: Reindex events
+      summary: Triggers reindexing of search, workqueues and notifies country config
       tags:
         - events
       security:
