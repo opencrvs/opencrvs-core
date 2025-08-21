@@ -15,6 +15,7 @@ import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect } from '@storybook/test'
 import {
+  EventIndex,
   eventQueryDataGenerator,
   EventStatus,
   generateWorkqueues,
@@ -230,7 +231,7 @@ const eventsWithDifferentStatuses = EventStatus.options.map((status, i) =>
     },
     i * 123
   )
-)
+) satisfies EventIndex[]
 
 export const WorkqueueCtaByStatus: Story = {
   parameters: {
@@ -259,7 +260,10 @@ export const WorkqueueCtaByStatus: Story = {
             return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query(() => {
-            return eventsWithDifferentStatuses
+            return {
+              total: eventsWithDifferentStatuses.length,
+              results: eventsWithDifferentStatuses
+            }
           })
         ]
       }
@@ -301,7 +305,10 @@ export const WorkqueueCtaByStatusRejected: Story = {
             return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query(() => {
-            return rejectedEventsWithDifferentStatuses
+            return {
+              total: rejectedEventsWithDifferentStatuses.length,
+              results: rejectedEventsWithDifferentStatuses
+            }
           })
         ]
       }

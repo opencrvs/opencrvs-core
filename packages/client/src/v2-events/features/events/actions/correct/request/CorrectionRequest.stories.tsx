@@ -52,7 +52,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const generator = testDataGenerator()
 const draft = testDataGenerator().event.draft({
   eventId: tennisClubMembershipEventDocument.id,
   actionType: ActionType.REQUEST_CORRECTION
