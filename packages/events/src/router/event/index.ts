@@ -315,6 +315,7 @@ export const eventRouter = router({
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
       const eventConfigs = await getEventConfigurations(ctx.token)
+
       return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure

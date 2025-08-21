@@ -63,6 +63,7 @@ export const DefaultSearchResult: Story = {
     columns: mandatoryColumns
   }
 }
+
 export const SearchResultWithMultipleItems: Story = {
   name: 'Search Results With Multiple Items',
   parameters: {
