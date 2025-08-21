@@ -38,7 +38,9 @@ import {
   isIdFieldType,
   isPhoneFieldType,
   isSelectDateRangeFieldType,
-  isLocationFieldType
+  isLocationFieldType,
+  isFileFieldWithOptionType,
+  FileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -196,7 +198,12 @@ export function Output({
   showPreviouslyMissingValuesAsChanged: boolean
 }) {
   // Explicitly check for undefined, so that e.g. number 0 is considered a value
-  const hasValue = value !== undefined
+  const isFileOptionField = isFileFieldWithOptionType({ config: field, value })
+
+  // Without handling empty array, opening an event with files and deleting them, results to wrong interpretation of output (showing title when there should not be one.)
+  const hasValue = isFileOptionField
+    ? !_.isNil(value) && Array.isArray(value) && value.length > 0
+    : value !== undefined
 
   if (!hasValue) {
     if (previousValue) {

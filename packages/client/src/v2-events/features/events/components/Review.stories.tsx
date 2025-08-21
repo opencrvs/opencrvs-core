@@ -545,7 +545,7 @@ export const ReviewWithIncompleteName: Story = {
     },
     reactRouter: {
       router: routesConfig,
-      initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
+      initialPath: ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath({
         eventId: eventDocumentWithoutSurname.id
       })
     }

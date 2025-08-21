@@ -24,11 +24,12 @@ import {
   EventStatus,
   isMetaAction,
   getAvailableActionsForEvent,
+  workqueueActions,
+  Draft,
   InherentFlags
 } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { useAuthentication } from '@client/utils/userUtils'
 import {
   AssignmentStatus,
   getAssignmentStatus,
@@ -37,6 +38,7 @@ import {
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { ITokenPayload } from '@client/utils/authUtils'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'
@@ -53,10 +55,15 @@ const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
 ]
 
 function getAvailableAssignmentActions(
-  eventStatus: EventStatus,
-  assignmentStatus: keyof typeof AssignmentStatus,
-  mayUnassignOthers: boolean
+  event: EventIndex,
+  authentication: ITokenPayload
 ) {
+  const assignmentStatus = getAssignmentStatus(event, authentication.sub)
+  const eventStatus = event.status
+  const mayUnassignOthers = authentication.scope.includes(
+    SCOPES.RECORD_UNASSIGN_OTHERS
+  )
+
   if (!STATUSES_THAT_CAN_BE_ASSIGNED.includes(eventStatus)) {
     return []
   }
@@ -82,7 +89,7 @@ interface ActionConfig {
   label: TranslationConfig
   onClick: (eventId: string) => Promise<void> | void
   disabled?: boolean
-  shouldHide?: (actions: ActionType[]) => boolean
+  hidden?: boolean
 }
 
 export const actionLabels = {
@@ -131,13 +138,28 @@ export const actionLabels = {
   }
 } as const
 
-export function useAction(event: EventIndex) {
+interface ActionMenuItem
+  extends Partial<Record<WorkqueueActionType, ActionConfig>> {
+  type: ActionType
+}
+
+/**
+ * Get viewable actions for event
+ * @param event The event to get actions for.
+ * @param authentication The user's authentication information.
+ * @returns A mapping of action types to their configurations. Not necessarily all actions are enabled without changes. (e.g. assignment is missing.)
+ */
+function useViewableActionConfigurations(
+  event: EventIndex,
+  authentication: ITokenPayload,
+  draft?: Draft
+) {
   const events = useEvents()
   const navigate = useNavigate()
-  const drafts = useDrafts()
-  const authentication = useAuthentication()
+
   const isOnline = useOnlineStatus()
   const { clearEphemeralFormState } = useEventFormNavigation()
+
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
   const [modal, openModal] = useModal()
@@ -161,27 +183,34 @@ export function useAction(event: EventIndex) {
 
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
 
-  if (!authentication) {
-    throw new Error('Authentication is not available but is required')
-  }
-
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
-  const eventIsAssignedToSelf =
+  const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
 
-  const openDraft = drafts
-    .getAllRemoteDrafts()
-    .find((draft) => draft.eventId === event.id)
+  const hasDeclarationDraftOpen = draft?.action.type === ActionType.DECLARE
 
-  const hasDeclarationDraftOpen = openDraft?.action.type === ActionType.DECLARE
+  const hasScopeForValidate = hasAnyOfScopes(
+    authentication.scope,
+    ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
+  )
+  const isRejected = event.flags.includes(InherentFlags.REJECTED)
+  const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
+  // What reads on the button is important but secondary. We need to perform the actions in certain order for them to succeed.
+  const shouldShowDeclareAsReview =
+    hasScopeForValidate && !isRejected && isNotifiedState
+
+  // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
+  // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.
+  const shouldHideDeclareAction =
+    isNotifiedState && !hasScopeForValidate && !isRejected
 
   /**
    * Configuration should be kept simple. Actions should do one thing, or navigate to one place.
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
-
   return {
+    modal,
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
@@ -203,6 +232,7 @@ export function useAction(event: EventIndex) {
             refetchEvent
           })
         },
+        hidden: isNotifiedState && !isRejected && !hasScopeForValidate,
         disabled: !isOnline
       },
       [ActionType.UNASSIGN]: {
@@ -210,7 +240,7 @@ export function useAction(event: EventIndex) {
         onClick: async (workqueue?: string) => {
           const unassign = await openModal<boolean>((close) => (
             <UnassignModal
-              assignedSelf={eventIsAssignedToSelf}
+              assignedSelf={isDownloadedAndAssignedToUser}
               close={close}
               name={assignedUserFullName}
               officeName={assignedOfficeName}
@@ -228,7 +258,10 @@ export function useAction(event: EventIndex) {
         disabled: !isOnline
       },
       [ActionType.DECLARE]: {
-        label: actionLabels[ActionType.DECLARE],
+        // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
+        label: shouldShowDeclareAsReview
+          ? actionLabels[ActionType.VALIDATE]
+          : actionLabels[ActionType.DECLARE],
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
@@ -238,9 +271,8 @@ export function useAction(event: EventIndex) {
             )
           )
         },
-        disabled: !(eventIsAssignedToSelf || hasDeclarationDraftOpen),
-        // Action menu should not show DECLARE if the user can perform VALIDATE
-        shouldHide: (actions) => actions.includes(ActionType.VALIDATE)
+        disabled: !(isDownloadedAndAssignedToUser || hasDeclarationDraftOpen),
+        hidden: shouldHideDeclareAction
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
@@ -253,7 +285,7 @@ export function useAction(event: EventIndex) {
             )
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
@@ -266,7 +298,7 @@ export function useAction(event: EventIndex) {
             )
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
@@ -279,7 +311,7 @@ export function useAction(event: EventIndex) {
             )
           )
         },
-        disabled: !eventIsAssignedToSelf
+        disabled: !isDownloadedAndAssignedToUser
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
@@ -287,96 +319,72 @@ export function useAction(event: EventIndex) {
           deleteEvent({
             eventId: event.id
           })
+          // What if there is a workqueue?
           if (!workqueue) {
             navigate(ROUTES.V2.buildPath({}))
           }
         }
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>,
-    authentication,
-    modal
+    } satisfies Record<WorkqueueActionType, ActionConfig>
   }
 }
 
-const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
-  [EventStatus.enum.NOTIFIED]: [
-    ActionType.READ,
-    ActionType.VALIDATE,
-    ActionType.ARCHIVE,
-    ActionType.REJECT
-  ]
-} satisfies Partial<Record<EventStatus, ActionType[]>>
-
-interface ActionMenuItem
-  extends Partial<Record<WorkqueueActionType, ActionConfig>> {
-  type: ActionType
-}
 /**
- * @returns a tuple containing a modal (which must be rendered in the parent where this hook is called)
- * and a list of action menu items based on the event state and scopes provided.
+ *
+ * NOTE: In principle, you should never add new business rules to the `useAction` hook alone. All the actions are validated by the server and their order is enforced.
+ * Each action has their own route and will take care of the actions needed. If you "skip" action (e.g. showing 'VALIDATE' instead of 'DECLARE') by directing the user to the wrong route, it will fail at the end.
+ *
+ * @returns a tuple containing a modal (which must be rendered in the parent where this hook is called) and a list of action menu items based on the event state and scopes provided.
  */
-export function useActionMenuItems(event: EventIndex) {
+export function useAllowedActionConfigurations(
+  event: EventIndex,
+  authentication: ITokenPayload
+) {
   const scopes = useSelector(getScope) ?? []
-  const { config, authentication, modal } = useAction(event)
-
-  const availableAssignmentActions = getAvailableAssignmentActions(
-    event.status,
-    getAssignmentStatus(event, authentication.sub),
-    authentication.scope.includes(SCOPES.RECORD_UNASSIGN_OTHERS)
-  )
-
-  // Find actions available based on the event status
-  const availableActions =
-    !event.flags.includes(InherentFlags.REJECTED) &&
-    event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-      ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
-          event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-        ]
-      : getAvailableActionsForEvent(event)
-
   const drafts = useDrafts()
 
   const openDraft = drafts
     .getAllRemoteDrafts()
     .find((draft) => draft.eventId === event.id)
 
-  const actions = [...availableAssignmentActions, ...availableActions]
-    /*
-     * Ensure that if there is an open draft, that action is always included in the list
-     */
-    .concat(openDraft ? [openDraft.action.type] : [])
-    .filter((action, index, self) => self.indexOf(action) === index)
-
-  // Filter out actions which are not configured
-  const supportedActions = actions.filter(
-    (action): action is keyof typeof config =>
-      Object.keys(config).includes(action)
+  const { config, modal } = useViewableActionConfigurations(
+    event,
+    authentication,
+    openDraft
   )
 
-  // Filter out actions which are not allowed based on user scopes
-  const allowedActions = supportedActions.filter((a) => {
-    const requiredScopes = ACTION_ALLOWED_SCOPES[a]
-    return requiredScopes === null
-      ? true
-      : hasAnyOfScopes(scopes, requiredScopes)
-  })
+  const availableAssignmentActions = getAvailableAssignmentActions(
+    event,
+    authentication
+  )
+  const availableEventActions = getAvailableActionsForEvent(event)
 
-  // Filter out actions which are not visible based on the action config
-  const visibleActions = allowedActions.filter((a) => {
-    const actionConfig = config[a]
+  const openDraftAction = openDraft ? [openDraft.action.type] : []
 
-    return 'shouldHide' in actionConfig
-      ? !actionConfig.shouldHide(allowedActions)
-      : true
-  })
+  const allowedWorkqueueActions = [
+    ...availableAssignmentActions,
+    ...availableEventActions,
+    ...openDraftAction
+  ]
+    // deduplicate after adding the draft
+    .filter((action, index, self) => self.indexOf(action) === index)
+    .filter(
+      (action): action is WorkqueueActionType =>
+        workqueueActions.safeParse(action).success
+    )
+    .filter((a) => {
+      const requiredScopes = ACTION_ALLOWED_SCOPES[a]
+      return requiredScopes === null
+        ? true
+        : hasAnyOfScopes(scopes, requiredScopes)
+    })
 
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOtherAllowedActions = visibleActions.some((a) => !isMetaAction(a))
+  const hasOnlyMetaActions = allowedWorkqueueActions.every(isMetaAction)
 
   // If user has no other allowed actions, return only READ.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
-
-  if (!hasOtherAllowedActions) {
+  if (hasOnlyMetaActions) {
     return [
       modal,
       [
@@ -384,12 +392,14 @@ export function useActionMenuItems(event: EventIndex) {
           ...config[ActionType.READ],
           type: ActionType.READ
         }
-      ]
+      ].filter((a: ActionConfig) => !a.hidden)
     ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
   return [
     modal,
-    visibleActions.map((a) => ({ ...config[a], type: a }))
+    allowedWorkqueueActions
+      .map((a) => ({ ...config[a], type: a }))
+      .filter((a: ActionConfig) => !a.hidden)
   ] satisfies [React.ReactNode, ActionMenuItem[]]
 }

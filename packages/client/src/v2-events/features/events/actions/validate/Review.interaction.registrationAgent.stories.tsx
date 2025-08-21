@@ -45,7 +45,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  declareEventDocument
+)
 
 const meta: Meta<typeof Review> = {
   title: 'Validate/Review/Interaction/Registration Agent',
@@ -72,12 +75,7 @@ export default meta
 
 type Story = StoryObj<typeof Review>
 
-const eventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
-})
-
-const eventId = eventDocument.id
+const eventId = declareEventDocument.id
 
 const mockUser = {
   id: '67bda93bfc07dee78ae558cf',
@@ -311,13 +309,13 @@ export const ReviewForRegistrationAgentArchiveInteraction: Story = {
   }
 }
 
-export const ReviewForRegistratinAgentRejectInteraction: Story = {
+export const ReviewForRegistrationAgentRejectInteraction: Story = {
   beforeEach: () => {
     /*
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventId, eventDocument)
+    setEventData(eventId, declareEventDocument)
   },
   parameters: {
     reactRouter: {
@@ -334,7 +332,7 @@ export const ReviewForRegistratinAgentRejectInteraction: Story = {
           graphql.query('fetchUser', () => {
             return HttpResponse.json({
               data: {
-                getUser: generator.user.localRegistrar()
+                getUser: generator.user.registrationAgent()
               }
             })
           }),

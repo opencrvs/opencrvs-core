@@ -17,6 +17,7 @@ import {
   ActionBase,
   ActionDocument,
   ActionStatus,
+  ActionUpdate,
   EventState
 } from './ActionDocument'
 import {
@@ -617,7 +618,8 @@ export function generateActionDocument({
   action,
   rng = () => 0.1,
   defaults = {},
-  user = {}
+  user = {},
+  annotation
 }: {
   configuration: EventConfig
   action: ActionType
@@ -629,6 +631,7 @@ export function generateActionDocument({
     role: TestUserRole
     id: string
   }>
+  annotation?: ActionUpdate
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -641,7 +644,7 @@ export function generateActionDocument({
     createdAtLocation:
       user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
     declaration: generateActionDeclarationInput(configuration, action, rng),
-    annotation: {},
+    annotation: annotation ?? {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
     ...defaults
@@ -863,7 +866,7 @@ export const eventQueryDataGenerator = (
     assignedTo: overrides.assignedTo ?? null,
     updatedBy: overrides.updatedBy ?? generateUuid(rng),
     updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
-    flags: [],
+    flags: overrides.flags ?? [],
     legalStatuses: overrides.legalStatuses ?? {},
     declaration: overrides.declaration ?? generateRandomApplicant(rng),
     trackingId: overrides.trackingId ?? generateTrackingId(rng)
