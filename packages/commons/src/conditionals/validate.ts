@@ -254,7 +254,10 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
     }
 
     case 'invalid_type': {
-      if (issue.expected !== issue.received && issue.received === 'undefined') {
+      if (
+        issue.expected !== issue.received &&
+        (issue.received === 'undefined' || issue.received === 'null')
+      ) {
         return createIntlError(errorMessages.requiredField)
       }
 

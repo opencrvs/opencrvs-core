@@ -16,7 +16,9 @@ import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect } from '@storybook/test'
 import {
   eventQueryDataGenerator,
+  EventStatus,
   generateWorkqueues,
+  InherentFlags,
   NameFieldValue
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -210,5 +212,99 @@ export const SortWorkqueue: Story = {
       )
       await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
     })
+  }
+}
+
+const eventsWithDifferentStatuses = EventStatus.options.map((status, i) =>
+  eventQueryDataGenerator(
+    {
+      status,
+      declaration: {
+        'recommender.none': true,
+        'applicant.name': {
+          firstname: status,
+          surname: i.toString()
+        },
+        'applicant.dob': '2000-01-01'
+      }
+    },
+    i * 123
+  )
+)
+
+export const WorkqueueCtaByStatus: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          }),
+          tRPCMsw.event.search.query(() => {
+            return eventsWithDifferentStatuses
+          })
+        ]
+      }
+    }
+  }
+}
+
+const rejectedEventsWithDifferentStatuses = eventsWithDifferentStatuses.map(
+  (event) => ({
+    ...event,
+    flags: [InherentFlags.REJECTED]
+  })
+)
+
+export const WorkqueueCtaByStatusRejected: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          }),
+          tRPCMsw.event.search.query(() => {
+            return rejectedEventsWithDifferentStatuses
+          })
+        ]
+      }
+    }
   }
 }

@@ -9,24 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { User } from '../../User'
-import { z } from 'zod'
+import { SystemVariables } from '@opencrvs/commons/client'
+import { useUserAddress } from './useUserAddress'
 
-export const SerializedUserField = z.object({
-  $userField: z.enum([
-    'id',
-    'name',
-    'role',
-    'signature',
-    'avatar',
-    'primaryOfficeId'
-  ])
-})
+/**
+ * Exposes template variables such as `$user` for components to replace field values or other templates
+ */
+export function useSystemVariables() {
+  const user = useUserAddress()
 
-export type SerializedUserField = z.infer<typeof SerializedUserField>
+  const variables = {
+    $user: user
+  } satisfies SystemVariables
 
-export function userSerializer(userField: keyof User): SerializedUserField {
-  return {
-    $userField: userField
-  }
+  return variables
 }

@@ -14,7 +14,8 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   generateEventDraftDocument,
-  footballClubMembershipEvent
+  footballClubMembershipEvent,
+  EventDocument
 } from '@opencrvs/commons/client'
 import { AppRouter } from '@client/v2-events/trpc'
 import { tennisClubMembershipEventIndex } from '@client/v2-events/features/events/fixtures'
@@ -113,7 +114,8 @@ const draft = generateEventDraftDocument({
  * Shareable msw configuration for declaration action flows with spies.
  */
 export const createDeclarationTrpcMsw = (
-  trpcMsw: ReturnType<typeof createTRPCMsw<AppRouter>>
+  trpcMsw: ReturnType<typeof createTRPCMsw<AppRouter>>,
+  eventDocument: EventDocument
 ) => {
   return {
     eventDocument,
@@ -137,7 +139,11 @@ export const createDeclarationTrpcMsw = (
       {
         name: 'event.create',
         procedure: trpcMsw.event.create.mutation,
-        handler: () => eventDocument
+        handler: () =>
+          generateEventDocument({
+            configuration: tennisClubMembershipEvent,
+            actions: [ActionType.CREATE]
+          })
       },
       {
         name: 'event.actions.notify.request',

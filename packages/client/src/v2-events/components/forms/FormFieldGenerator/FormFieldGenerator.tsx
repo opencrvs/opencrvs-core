@@ -30,6 +30,7 @@ import {
   handleDefaultValue
 } from '@client/v2-events/components/forms/utils'
 import { getValidationErrorsForForm } from '@client/v2-events/components/forms/validation'
+import { useSystemVariables } from '@client/v2-events/hooks/useSystemVariables'
 import {
   makeFormFieldIdsFormikCompatible,
   makeFormikFieldIdsOpenCRVSCompatible
@@ -123,13 +124,11 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
-    const user = useUserAddress()
+    const systemVariables = useSystemVariables()
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(fields, {
-          $user: user
-        }),
+        ...mapFieldsToValues(fields, systemVariables),
         ...initialValues
       })
 
@@ -181,6 +180,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
+              systemVariables={systemVariables}
               touched={{ ...formikProps.touched, ...initialTouchedFields }}
               validateAllFields={validateAllFields}
               values={formikProps.values}
