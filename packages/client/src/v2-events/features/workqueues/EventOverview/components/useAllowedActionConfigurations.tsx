@@ -24,10 +24,9 @@ import {
   isMetaAction,
   getAvailableActionsForEvent,
   InherentFlags,
-  ExclusiveActions,
+  ClientSpecificAction,
   workqueueActions,
-  Draft,
-  ExclusiveActionTypes
+  Draft
 } from '@opencrvs/commons/client'
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -138,7 +137,7 @@ export const actionLabels = {
     description: 'Label for request correction button in dropdown menu',
     id: 'v2.event.birth.action.request-correction.label'
   },
-  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
     defaultMessage: 'Review',
     description: 'Label for review correction button in dropdown menu',
     id: 'v2.event.action.review-correction.label'
@@ -146,8 +145,10 @@ export const actionLabels = {
 } as const
 
 interface ActionMenuItem
-  extends Partial<Record<WorkqueueActionType, ActionConfig>> {
-  type: ActionType
+  extends Partial<
+    Record<WorkqueueActionType & ClientSpecificAction, ActionConfig>
+  > {
+  type: WorkqueueActionType | ClientSpecificAction
 }
 
 /**
@@ -161,6 +162,7 @@ function useViewableActionConfigurations(
   authentication: ITokenPayload,
   draft?: Draft
 ) {
+  console.log('authentication', authentication)
   const events = useEvents()
   const navigate = useNavigate()
 
@@ -184,12 +186,12 @@ function useViewableActionConfigurations(
 
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
-
   const hasDeclarationDraftOpen = draft?.action.type === ActionType.DECLARE
 
   const eventIsWaitingForCorrection = event.flags.includes(
     InherentFlags.CORRECTION_REQUESTED
   )
+
   const eventId = event.id
   const hasScopeForValidate = hasAnyOfScopes(
     authentication.scope,
@@ -359,8 +361,8 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser || eventIsWaitingForCorrection,
         hidden: eventIsWaitingForCorrection
       },
-      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
-        label: actionLabels[ExclusiveActions.REVIEW_CORRECTION_REQUEST],
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
+        label: actionLabels[ClientSpecificAction.REVIEW_CORRECTION_REQUEST],
         icon: 'NotePencil' as const,
         onClick: () => {
           clearEphemeralFormState()
@@ -373,7 +375,7 @@ function useViewableActionConfigurations(
         disabled: !isDownloadedAndAssignedToUser,
         hidden: !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType & ExclusiveActionTypes, ActionConfig>
+    } satisfies Record<WorkqueueActionType & ClientSpecificAction, ActionConfig>
   }
 }
 
@@ -389,6 +391,7 @@ export function useAllowedActionConfigurations(
   authentication: ITokenPayload
 ) {
   const scopes = useSelector(getScope) ?? []
+
   const drafts = useDrafts()
 
   const openDraft = drafts
@@ -409,7 +412,10 @@ export function useAllowedActionConfigurations(
 
   const openDraftAction = openDraft ? [openDraft.action.type] : []
 
-  const allowedWorkqueueActions = [
+  const allowedWorkqueueActions: (
+    | WorkqueueActionType
+    | ClientSpecificAction
+  )[] = [
     ...availableAssignmentActions,
     ...availableEventActions,
     ...openDraftAction
@@ -417,7 +423,8 @@ export function useAllowedActionConfigurations(
     // deduplicate after adding the draft
     .filter((action, index, self) => self.indexOf(action) === index)
     .filter(
-      (action): action is WorkqueueActionType =>
+      (action): action is WorkqueueActionType | ClientSpecificAction =>
+        ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
     .filter((a) => {

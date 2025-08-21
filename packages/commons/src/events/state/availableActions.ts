@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType, DisplayableAction, ExclusiveActions } from '../ActionType'
+import {
+  ActionType,
+  DisplayableAction,
+  ClientSpecificAction
+} from '../ActionType'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, InherentFlags } from '../EventMetadata'
 
@@ -43,7 +47,7 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
     ActionType.REQUEST_CORRECTION,
     ActionType.APPROVE_CORRECTION,
     ActionType.REJECT_CORRECTION,
-    ExclusiveActions.REVIEW_CORRECTION_REQUEST
+    ClientSpecificAction.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.ARCHIVED]: [
     ActionType.READ,

@@ -208,13 +208,8 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
 }) {
-  // Explicitly check for undefined, so that e.g. number 0 is considered a value
-  const isFileOptionField = isFileFieldWithOptionType({ config: field, value })
-
-  // Without handling empty array, opening an event with files and deleting them, results to wrong interpretation of output (showing title when there should not be one.)
-  const hasValue = isFileOptionField
-    ? !_.isNil(value) && Array.isArray(value) && value.length > 0
-    : value !== undefined
+  // Explicitly check for nil, so that e.g. number 0 is considered a value
+  const hasValue = !_.isNil(value)
 
   if (!hasValue) {
     if (previousValue) {

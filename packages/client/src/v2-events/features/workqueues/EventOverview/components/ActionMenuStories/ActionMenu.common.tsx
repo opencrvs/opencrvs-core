@@ -29,7 +29,7 @@ import {
   TranslationConfig,
   UUID,
   DisplayableAction,
-  ExclusiveActions
+  ClientSpecificAction
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -83,7 +83,7 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },
-  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },

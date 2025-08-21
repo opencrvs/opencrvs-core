@@ -10,7 +10,11 @@
  */
 import { intersection } from 'lodash'
 import { ConfigurableScopeType, Scope, SCOPES } from '../scopes'
-import { ExclusiveActions, ActionType, DisplayableAction } from './ActionType'
+import {
+  ClientSpecificAction,
+  ActionType,
+  DisplayableAction
+} from './ActionType'
 
 type RequiresNoScope = null
 type NotAvailableAsAction = [] // pseudo actions
@@ -72,7 +76,7 @@ export const ACTION_ALLOWED_SCOPES = {
     SCOPES.RECORD_REGISTRATION_REQUEST_CORRECTION,
     SCOPES.RECORD_REGISTRATION_CORRECT
   ],
-  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: [
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: [
     SCOPES.RECORD_REGISTRATION_CORRECT
   ],
   [ActionType.REJECT_CORRECTION]: [SCOPES.RECORD_REGISTRATION_CORRECT],
