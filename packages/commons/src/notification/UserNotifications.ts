@@ -85,7 +85,7 @@ export async function triggerUserEventNotification<T extends TriggerEvent>({
   countryConfigUrl: string
   authHeader: { Authorization: string }
 }) {
-  return await fetch(joinUrl(countryConfigUrl, `triggers/user/${event}`), {
+  return fetch(joinUrl(countryConfigUrl, `triggers/user/${event}`), {
     method: 'POST',
     body: JSON.stringify(payload),
     headers: {

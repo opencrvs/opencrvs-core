@@ -67,30 +67,34 @@ export async function sendVerificationCode(
   mobile?: string,
   email?: string
 ): Promise<void> {
-  await triggerUserEventNotification({
-    event:
-      notificationEvent === NotificationEvent.TWO_FACTOR_AUTHENTICATION
-        ? '2fa'
-        : 'reset-password',
-    payload: {
-      code: verificationCode,
-      recipient: {
-        name: userFullName,
-        mobile,
-        email
+  try {
+    await triggerUserEventNotification({
+      event:
+        notificationEvent === NotificationEvent.TWO_FACTOR_AUTHENTICATION
+          ? '2fa'
+          : 'reset-password',
+      payload: {
+        code: verificationCode,
+        recipient: {
+          name: userFullName,
+          mobile,
+          email
+        }
+      },
+      countryConfigUrl: env.COUNTRY_CONFIG_URL,
+      authHeader: {
+        Authorization: `Bearer ${await createToken(
+          'auth',
+          ['service'],
+          ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
+          JWT_ISSUER,
+          true
+        )}`
       }
-    },
-    countryConfigUrl: env.COUNTRY_CONFIG_URL,
-    authHeader: {
-      Authorization: `Bearer ${await createToken(
-        'auth',
-        ['service'],
-        ['opencrvs:notification-user', 'opencrvs:countryconfig-user'],
-        JWT_ISSUER,
-        true
-      )}`
-    }
-  })
+    })
+  } catch (error) {
+    console.error('Error sending verification code:', error)
+  }
   return undefined
 }
 
