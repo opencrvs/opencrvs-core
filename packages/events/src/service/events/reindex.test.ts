@@ -37,11 +37,7 @@ const postHandler = http.post(
     const body = await req.request.json()
     spy(body)
 
-    return HttpResponse.json(
-      {},
-      // @ts-expect-error - "For some reason the msw types here complain about the status, even though this is correct"
-      { status: 200 }
-    )
+    return HttpResponse.json({})
   }
 )
 
