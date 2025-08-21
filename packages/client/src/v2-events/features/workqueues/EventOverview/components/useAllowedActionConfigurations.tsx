@@ -362,7 +362,7 @@ export function useAllowedActionConfigurations(
           ...config[ActionType.READ],
           type: ActionType.READ
         }
-      ]
+      ].filter((a: ActionConfig) => !a.hidden)
     ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
