@@ -3826,6 +3826,7 @@ components:
         - $ref: "#/components/schemas/CreatedAction"
         - $ref: "#/components/schemas/ValidateAction"
         - $ref: "#/components/schemas/RejectAction"
+        - $ref: "#/components/schemas/DuplicateDetectedAction"
         - $ref: "#/components/schemas/MarkNotDuplicateAction"
         - $ref: "#/components/schemas/MarkAsDuplicateAction"
         - $ref: "#/components/schemas/ArchiveAction"
@@ -3845,6 +3846,7 @@ components:
           CREATE: "#/components/schemas/CreatedAction"
           VALIDATE: "#/components/schemas/ValidateAction"
           REJECT: "#/components/schemas/RejectAction"
+          DUPLICATE_DETECTED: "#/components/schemas/DuplicateDetectedAction"
           MARK_NOT_DUPLICATE: "#/components/schemas/MarkNotDuplicateAction"
           MARK_AS_DUPLICATE: "#/components/schemas/MarkAsDuplicateAction"
           ARCHIVE: "#/components/schemas/ArchiveAction"
@@ -5123,6 +5125,423 @@ components:
         - status
         - type
         - content
+    DuplicateDetectedAction:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        transactionId:
+          type: string
+        createdByUserType:
+          type: string
+          enum: *a11
+        createdAt:
+          type: string
+          format: date-time
+        createdBy:
+          type: string
+        createdByRole:
+          type: string
+        createdBySignature:
+          type:
+            - string
+            - "null"
+          description: Reference to signature of the user who created the action
+        createdAtLocation:
+          type:
+            - string
+            - "null"
+          format: uuid
+        declaration:
+          type: object
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a7
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: URBAN
+                  town:
+                    type:
+                      - string
+                      - "null"
+                  residentialArea:
+                    type:
+                      - string
+                      - "null"
+                  street:
+                    type:
+                      - string
+                      - "null"
+                  number:
+                    type:
+                      - string
+                      - "null"
+                  zipCode:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: RURAL
+                  village:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type:
+                      - string
+                      - "null"
+                  addressLine1:
+                    type:
+                      - string
+                      - "null"
+                  addressLine2:
+                    type:
+                      - string
+                      - "null"
+                  addressLine3:
+                    type:
+                      - string
+                      - "null"
+                  postcodeOrZip:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type:
+                              - string
+                              - "null"
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+        annotation:
+          type:
+            - object
+            - "null"
+          additionalProperties:
+            anyOf:
+              - type: string
+              - type: string
+                format: date
+                description: Date in the format YYYY-MM-DD
+              - type: string
+                pattern: ^([01][0-9]|2[0-3]):[0-5][0-9]$
+              - anyOf:
+                  - type: object
+                    properties:
+                      start:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                      end:
+                        type: string
+                        format: date
+                        description: Date in the format YYYY-MM-DD
+                    required:
+                      - start
+                      - end
+                  - type: string
+                    format: date
+                    description: Date in the format YYYY-MM-DD
+                description: Date range with start and end dates in the format YYYY-MM-DD.
+                  Inclusive start, exclusive end.
+              - type: string
+                enum: *a7
+              - type: boolean
+              - type: number
+              - type: object
+                properties:
+                  path:
+                    type: string
+                    description: A full absolute path with bucket name, starting from the root of
+                      the S3 server, /bucket-name/document-id.jpg
+                  originalFilename:
+                    type: string
+                  type:
+                    type: string
+                required:
+                  - path
+                  - originalFilename
+                  - type
+              - type: array
+                items:
+                  type: object
+                  properties:
+                    path:
+                      type: string
+                      description: A full absolute path with bucket name, starting from the root of
+                        the S3 server, /bucket-name/document-id.jpg
+                    originalFilename:
+                      type: string
+                    type:
+                      type: string
+                    option:
+                      type: string
+                  required:
+                    - path
+                    - originalFilename
+                    - type
+                    - option
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: URBAN
+                  town:
+                    type:
+                      - string
+                      - "null"
+                  residentialArea:
+                    type:
+                      - string
+                      - "null"
+                  street:
+                    type:
+                      - string
+                      - "null"
+                  number:
+                    type:
+                      - string
+                      - "null"
+                  zipCode:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: DOMESTIC
+                  province:
+                    type: string
+                  district:
+                    type: string
+                  urbanOrRural:
+                    type: string
+                    const: RURAL
+                  village:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - province
+                  - district
+                  - urbanOrRural
+              - type: object
+                properties:
+                  country:
+                    type: string
+                  addressType:
+                    type: string
+                    const: INTERNATIONAL
+                  state:
+                    type: string
+                  district2:
+                    type: string
+                  cityOrTown:
+                    type:
+                      - string
+                      - "null"
+                  addressLine1:
+                    type:
+                      - string
+                      - "null"
+                  addressLine2:
+                    type:
+                      - string
+                      - "null"
+                  addressLine3:
+                    type:
+                      - string
+                      - "null"
+                  postcodeOrZip:
+                    type:
+                      - string
+                      - "null"
+                required:
+                  - country
+                  - addressType
+                  - state
+                  - district2
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          firstname:
+                            type: string
+                          surname:
+                            type: string
+                          middlename:
+                            type:
+                              - string
+                              - "null"
+                        required:
+                          - firstname
+                          - surname
+                      - type: "null"
+        status:
+          type: string
+          enum: *a12
+        originalActionId:
+          type:
+            - string
+            - "null"
+          format: uuid
+          description: Reference to the original action that was asynchronously rejected
+            or accepted by 3rd party integration.
+        type:
+          type: string
+          const: DUPLICATE_DETECTED
+      required:
+        - id
+        - transactionId
+        - createdByUserType
+        - createdAt
+        - createdBy
+        - createdByRole
+        - declaration
+        - status
+        - type
     MarkNotDuplicateAction:
       type: object
       properties:
@@ -12157,7 +12576,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: bfb34b6f-915d-4cd2-96cc-d6047b907b62
+        transactionId: 2809ecd2-1eed-4241-a7a8-0007d7507119
         declaration: {}
         annotation: {}
         type: NOTIFY
