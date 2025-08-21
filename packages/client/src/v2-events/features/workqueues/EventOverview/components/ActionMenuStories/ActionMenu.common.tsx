@@ -96,7 +96,7 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.REJECT_CORRECTION,
     requestId: '827bf7e8-0e1e-66e71287a2c8-aee7-4cef',
-    reason: { message: 'No legal proof' }
+    content: { reason: 'No legal proof' }
   },
   [ActionType.DELETE]: {
     ...actionProps,
@@ -113,12 +113,12 @@ const mockActions: Record<
   [ActionType.ARCHIVE]: {
     ...actionProps,
     type: ActionType.ARCHIVE,
-    reason: { message: 'Archived' }
+    content: { reason: 'Archived' }
   },
   [ActionType.REJECT]: {
     ...actionProps,
     type: ActionType.REJECT,
-    reason: { message: 'Rejected' }
+    content: { reason: 'Rejected' }
   },
   [ActionType.ASSIGN]: {
     ...actionProps,

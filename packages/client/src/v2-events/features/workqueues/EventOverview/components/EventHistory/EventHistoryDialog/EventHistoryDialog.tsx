@@ -54,7 +54,7 @@ function prepareComments(history: ActionDocument) {
     history.type === ActionType.REJECT ||
     history.type === ActionType.ARCHIVE
   ) {
-    comments.push({ comment: history.reason.message })
+    comments.push({ comment: history.content.reason })
   }
 
   return comments
@@ -64,7 +64,7 @@ function prepareReason(history: ActionDocument) {
   const reason: { message?: string } = {}
 
   if (history.type === ActionType.REJECT_CORRECTION) {
-    reason.message = history.reason.message
+    reason.message = history.content.reason
   }
 
   return reason
