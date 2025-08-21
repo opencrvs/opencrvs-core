@@ -53,7 +53,7 @@ export default meta
 
 const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
 
-const eventDocument = generateEventDocument({
+const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE]
 })
@@ -78,7 +78,7 @@ const declarationTrpcMsw = {
     {
       name: 'event.create',
       procedure: tRPCMsw.event.create.mutation,
-      handler: () => eventDocument
+      handler: () => createdEventDocument
     },
     {
       name: 'event.actions.declare.request',
@@ -119,12 +119,12 @@ export const Outbox: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [eventDocument, declareEventDocument],
+      events: [createdEventDocument],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {

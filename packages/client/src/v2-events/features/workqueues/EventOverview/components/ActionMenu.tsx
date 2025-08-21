@@ -15,9 +15,11 @@ import { useIntl } from 'react-intl'
 import { CaretDown } from '@opencrvs/components/lib/Icon/all-icons'
 import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
+import { getOrThrow } from '@opencrvs/commons/client'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
-import { useActionMenuItems } from './useActionMenuItems'
+import { useAuthentication } from '@client/utils/userUtils'
+import { useAllowedActionConfigurations } from './useAllowedActionConfigurations'
 
 export function ActionMenu({
   eventId,
@@ -28,6 +30,12 @@ export function ActionMenu({
 }) {
   const intl = useIntl()
   const { searchEventById } = useEvents()
+
+  const maybeAuth = useAuthentication()
+  const auth = getOrThrow(
+    maybeAuth,
+    'Authentication is not available but is required'
+  )
 
   const getEventQuery = searchEventById.useSuspenseQuery(eventId)
 
@@ -40,7 +48,10 @@ export function ActionMenu({
 
   const eventState = eventIndex
 
-  const [modal, actionMenuItems] = useActionMenuItems(eventState)
+  const [modal, actionMenuItems] = useAllowedActionConfigurations(
+    eventState,
+    auth
+  )
 
   return (
     <>
