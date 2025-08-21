@@ -54,6 +54,18 @@ function isRejected(actions: Action[]): boolean {
   return actions.at(-1)?.type === ActionType.REJECT
 }
 
+function isPotentialDuplicate(actions: Action[]): boolean {
+  return actions.reduce<boolean>((prev, { type }) => {
+    if (type === ActionType.DUPLICATE_DETECTED) {
+      return true
+    }
+    if (type === ActionType.MARK_NOT_DUPLICATE) {
+      return false
+    }
+    return prev
+  }, false)
+}
+
 export function getFlagsFromActions(actions: Action[]): Flag[] {
   const sortedActions = actions
     .filter(({ type }) => !isMetaAction(type))
@@ -93,6 +105,9 @@ export function getFlagsFromActions(actions: Action[]): Flag[] {
   }
   if (isRejected(sortedActions)) {
     flags.push(InherentFlags.REJECTED)
+  }
+  if (isPotentialDuplicate(sortedActions)) {
+    flags.push(InherentFlags.POTENTIAL_DUPLICATE)
   }
 
   return flags

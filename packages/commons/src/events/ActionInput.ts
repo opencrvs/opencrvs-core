@@ -103,7 +103,7 @@ export const DuplicateDetectedActionInput = BaseActionInput.merge(
     type: z
       .literal(ActionType.DUPLICATE_DETECTED)
       .default(ActionType.DUPLICATE_DETECTED),
-    duplicates: z.array(z.string())
+    duplicates: z.array(UUID)
   })
 )
 
