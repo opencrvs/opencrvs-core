@@ -44,7 +44,7 @@ import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'
 import { UnassignModal } from '@client/v2-events/components/UnassignModal'
 import { useUsers } from '@client/v2-events/hooks/useUsers'
-import { getLocations } from '@client/offline/selectors'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -165,7 +165,8 @@ function useViewableActionConfigurations(
   const [modal, openModal] = useModal()
   const intl = useIntl()
   const { getUser } = useUsers()
-  const locations = useSelector(getLocations)
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
   const assignedToUser = getUser.useQuery(event.assignedTo || '', {
     enabled: !!event.assignedTo
   })
@@ -173,7 +174,8 @@ function useViewableActionConfigurations(
     ? getUsersFullName(assignedToUser.data.name, intl.locale)
     : null
   const assignedOffice = assignedToUser.data?.primaryOfficeId || ''
-  const assignedOfficeName = locations[assignedOffice]?.name || null
+  const assignedOfficeName =
+    locations.find((l) => l.id === assignedOffice)?.name || ''
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
