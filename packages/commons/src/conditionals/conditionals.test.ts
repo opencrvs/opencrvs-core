@@ -595,7 +595,7 @@ describe('"field" conditionals', () => {
         'deep.value': {
           foo: {
             bar: false,
-            baz: true
+            baz: null
           }
         }
       },
