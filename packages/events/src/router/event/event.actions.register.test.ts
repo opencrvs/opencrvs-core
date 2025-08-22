@@ -369,7 +369,7 @@ describe('Request and confirmation flow', () => {
       ])
     })
 
-    test('should not save action if notify API returns HTTP 500', async () => {
+    test(`should not save ${ActionStatus.Accepted} / ${ActionStatus.Rejected} action if notify API returns HTTP 500`, async () => {
       const { user, generator } = await setupTestCase()
       const client = createTestClient(user)
 
