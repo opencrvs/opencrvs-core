@@ -41,6 +41,7 @@ test('Returns user in correct format if found', async () => {
     id: user.id,
     name: user.name,
     role: user.role,
-    signature: user.signature
+    signature: user.signature,
+    primaryOfficeId: user.primaryOfficeId
   })
 })

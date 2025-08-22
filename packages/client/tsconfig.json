@@ -23,7 +23,8 @@
     "typings",
     "codegen.ts",
     "vite.config.ts",
-    ".storybook/**/*"
+    ".storybook/**/*",
+    "../preview.tsx"
   ],
   "extends": "./tsconfig.paths.json"
 }
