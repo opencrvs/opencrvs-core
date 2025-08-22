@@ -893,6 +893,7 @@ export const eventQueryDataGenerator = (
     updatedBy: overrides.updatedBy ?? generateUuid(rng),
     updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
     flags: [],
+    duplicates: [],
     legalStatuses: overrides.legalStatuses ?? {},
     declaration: overrides.declaration ?? generateRandomApplicant(rng),
     trackingId: overrides.trackingId ?? generateTrackingId(rng)

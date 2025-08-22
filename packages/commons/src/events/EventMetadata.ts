@@ -165,7 +165,6 @@ export const EventMetadata = z.object({
     ),
   duplicates: z
     .array(UUID)
-    .optional()
     .describe('List of event IDs that this event could be a duplicate of.'),
   flags: z.array(Flag)
 })
