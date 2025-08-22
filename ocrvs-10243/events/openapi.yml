@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 62aac344-fd82-4c18-b0ac-2aa38ca7b389
+                transactionId: de26a3f1-dfbf-4307-b2a8-f85acba8272f
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: dbb6c4fa-ec9d-4a38-af3e-104337365ebb
+                transactionId: 238d28d9-c12b-42e7-952e-d9c1663b5b28
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -7533,11 +7533,16 @@ components:
           type: string
           enum:
             - DUPLICATE_DETECTED
-        duplicates:
-          type: array
-          items:
-            type: string
-            format: uuid
+        content:
+          type: object
+          properties:
+            duplicates:
+              type: array
+              items:
+                type: string
+                format: uuid
+          required:
+            - duplicates
       required:
         - id
         - transactionId
@@ -7548,7 +7553,7 @@ components:
         - declaration
         - status
         - type
-        - duplicates
+        - content
     MarkNotDuplicateAction:
       type: object
       properties:

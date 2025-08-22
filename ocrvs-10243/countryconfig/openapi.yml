@@ -5532,11 +5532,16 @@ components:
         type:
           type: string
           const: DUPLICATE_DETECTED
-        duplicates:
-          type: array
-          items:
-            type: string
-            format: uuid
+        content:
+          type: object
+          properties:
+            duplicates:
+              type: array
+              items:
+                type: string
+                format: uuid
+          required:
+            - duplicates
       required:
         - id
         - transactionId
@@ -5547,7 +5552,7 @@ components:
         - declaration
         - status
         - type
-        - duplicates
+        - content
     MarkNotDuplicateAction:
       type: object
       properties:
@@ -11799,14 +11804,9 @@ components:
           type: string
           const: VALIDATE
           default: VALIDATE
-        duplicates:
-          type: array
-          items:
-            type: string
       required:
         - eventId
         - transactionId
-        - duplicates
     RegisterActionInput:
       type: object
       properties:
@@ -12582,7 +12582,7 @@ components:
         - transactionId
       default:
         eventId: <event-id-here>
-        transactionId: aeb019cb-6937-4934-8c90-6578b32dae37
+        transactionId: 49e73187-b6bf-4f2e-8a8e-e984c10697df
         declaration: {}
         annotation: {}
         type: NOTIFY
@@ -13748,15 +13748,20 @@ components:
           type: string
           const: DUPLICATE_DETECTED
           default: DUPLICATE_DETECTED
-        duplicates:
-          type: array
-          items:
-            type: string
-            format: uuid
+        content:
+          type: object
+          properties:
+            duplicates:
+              type: array
+              items:
+                type: string
+                format: uuid
+          required:
+            - duplicates
       required:
         - eventId
         - transactionId
-        - duplicates
+        - content
     MarkAsDuplicateActionInput:
       type: object
       properties:
