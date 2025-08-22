@@ -408,14 +408,12 @@ export function useAllowedActionConfigurations(
     event,
     authentication
   )
+
   const availableEventActions = getAvailableActionsForEvent(event)
 
   const openDraftAction = openDraft ? [openDraft.action.type] : []
 
-  const allowedWorkqueueActions: (
-    | WorkqueueActionType
-    | ClientSpecificAction
-  )[] = [
+  const allowedWorkqueueConfigs: ActionMenuItem[] = [
     ...availableAssignmentActions,
     ...availableEventActions,
     ...openDraftAction
@@ -433,9 +431,14 @@ export function useAllowedActionConfigurations(
         ? true
         : hasAnyOfScopes(scopes, requiredScopes)
     })
+    // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
+    .map((a) => ({ ...config[a], type: a }))
+    .filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOnlyMetaActions = allowedWorkqueueActions.every(isMetaAction)
+  const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
+    isMetaAction(type)
+  )
 
   // If user has no other allowed actions, return only READ.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
@@ -451,10 +454,8 @@ export function useAllowedActionConfigurations(
     ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
-  return [
-    modal,
-    allowedWorkqueueActions
-      .map((a) => ({ ...config[a], type: a }))
-      .filter((a: ActionConfig) => !a.hidden)
-  ] satisfies [React.ReactNode, ActionMenuItem[]]
+  return [modal, allowedWorkqueueConfigs] satisfies [
+    React.ReactNode,
+    ActionMenuItem[]
+  ]
 }
