@@ -23,6 +23,7 @@ export const FieldType = {
   DATE: 'DATE',
   DATE_RANGE: 'DATE_RANGE', // // Internal use, only for search functionality
   SELECT_DATE_RANGE: 'SELECT_DATE_RANGE', // Internal use, only for search functionality
+  TIME: 'TIME',
   PARAGRAPH: 'PARAGRAPH',
   PAGE_HEADER: 'PAGE_HEADER',
   RADIO_GROUP: 'RADIO_GROUP',
@@ -38,7 +39,9 @@ export const FieldType = {
   FACILITY: 'FACILITY',
   OFFICE: 'OFFICE',
   SIGNATURE: 'SIGNATURE',
-  DATA: 'DATA'
+  DATA: 'DATA',
+  BUTTON: 'BUTTON',
+  HTTP: 'HTTP'
 } as const
 
 /**

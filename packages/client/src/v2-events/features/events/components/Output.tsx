@@ -21,11 +21,13 @@ import {
   isCheckboxFieldType,
   isCountryFieldType,
   isDateFieldType,
+  isTimeFieldType,
   isDateRangeFieldType,
   isDividerFieldType,
   isEmailFieldType,
   isFacilityFieldType,
   isFileFieldType,
+  isFileFieldWithOptionType,
   isNumberFieldType,
   isOfficeFieldType,
   isPageHeaderFieldType,
@@ -39,7 +41,6 @@ import {
   isPhoneFieldType,
   isSelectDateRangeFieldType,
   isLocationFieldType,
-  isFileFieldWithOptionType,
   FileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
@@ -56,11 +57,13 @@ import {
   SelectCountry,
   Paragraph,
   Number,
-  Text
+  Text,
+  TimeField
 } from '@client/v2-events/features/events/registered-fields'
 import { File } from '@client/v2-events/components/forms/inputs/FileInput/FileInput'
 import { Name } from '@client/v2-events/features/events/registered-fields/Name'
 import { DateRangeField } from '@client/v2-events/features/events/registered-fields/DateRangeField'
+import { FileWithOption } from '@client/v2-events/components/forms/inputs/FileInput/DocumentUploaderWithOption'
 
 const Deleted = styled.del`
   color: ${({ theme }) => theme.colors.negative};
@@ -96,6 +99,10 @@ export function ValueOutput(
     return DateField.Output({ value: field.value })
   }
 
+  if (isTimeFieldType(field)) {
+    return TimeField.Output({ value: field.value })
+  }
+
   if (isDateRangeFieldType(field)) {
     return DateRangeField.Output({ value: field.value })
   }
@@ -109,11 +116,15 @@ export function ValueOutput(
   }
 
   if (isNumberFieldType(field)) {
-    return Number.Output({ value: field.value })
+    return Number.Output(field)
   }
 
   if (isFileFieldType(field)) {
-    return File.Output
+    return File.Output(field)
+  }
+
+  if (isFileFieldWithOptionType(field)) {
+    return FileWithOption.Output(field)
   }
 
   if (isBulletListFieldType(field)) {
@@ -195,15 +206,10 @@ export function Output({
   field: FieldConfig
   value?: FieldValue
   previousValue?: FieldValue
-  showPreviouslyMissingValuesAsChanged: boolean
+  showPreviouslyMissingValuesAsChanged?: boolean
 }) {
-  // Explicitly check for undefined, so that e.g. number 0 is considered a value
-  const isFileOptionField = isFileFieldWithOptionType({ config: field, value })
-
-  // Without handling empty array, opening an event with files and deleting them, results to wrong interpretation of output (showing title when there should not be one.)
-  const hasValue = isFileOptionField
-    ? !_.isNil(value) && Array.isArray(value) && value.length > 0
-    : value !== undefined
+  // Explicitly check for nil, so that e.g. number 0 is considered a value
+  const hasValue = !_.isNil(value)
 
   if (!hasValue) {
     if (previousValue) {

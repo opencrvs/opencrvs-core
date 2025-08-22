@@ -23,10 +23,10 @@ import {
   FieldType,
   getCurrentEventState,
   getDeclarationFields,
-  QueryType,
   WorkqueueCountInput,
   getEventConfigById,
   SearchScopeAccessLevels,
+  SearchQuery,
   DateRangeField,
   SelectDateRangeField
 } from '@opencrvs/commons/events'
@@ -38,7 +38,6 @@ import {
 } from '@events/storage/elasticsearch'
 import {
   decodeEventIndex,
-  DEFAULT_SIZE,
   EncodedEventIndex,
   encodeEventIndex,
   encodeFieldId,
@@ -48,6 +47,10 @@ import {
   buildElasticQueryFromSearchPayload,
   withJurisdictionFilters
 } from './query'
+
+// Elasticsearch has a limit of 10,000 results for a query, and
+// trying to get beyond that will result in a “Result window is too large“ error
+const ELASTICSEARCH_MAXIMUM_QUERY_SIZE = 10000
 
 function eventToEventIndex(
   event: EventDocument,
@@ -83,11 +86,14 @@ function mapFieldTypeToElasticsearch(
       return { type: 'double' }
     case FieldType.DATE:
       return { type: 'date' }
+    case FieldType.DATE_RANGE:
     case FieldType.TEXT:
     case FieldType.TEXTAREA:
     case FieldType.PARAGRAPH:
     case FieldType.BULLET_LIST:
     case FieldType.PAGE_HEADER:
+    case FieldType.EMAIL:
+    case FieldType.TIME:
       return { type: 'text' }
     case FieldType.EMAIL:
       return {
@@ -104,6 +110,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
       return { type: 'keyword' }
@@ -162,6 +169,15 @@ function mapFieldTypeToElasticsearch(
           type: { type: 'keyword' },
           option: { type: 'keyword' }
         }
+      }
+    case FieldType.HTTP:
+      /**
+       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+       * The field still lands in `_source`.
+       */
+      return {
+        type: 'object',
+        enabled: false
       }
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
@@ -286,6 +302,20 @@ type _Combine<
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
 
+export async function indexEventsInBulk(
+  batch: EventDocument[],
+  configs: EventConfig[]
+) {
+  const esClient = getOrCreateClient()
+
+  const body = batch.flatMap((doc) => [
+    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
+  ])
+
+  return esClient.bulk({ refresh: false, body })
+}
+
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()
   const indexName = getEventIndexName(event.type)
@@ -344,7 +374,7 @@ export async function getIndexedEvents(
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
     query,
-    size: DEFAULT_SIZE,
+    size: ELASTICSEARCH_MAXIMUM_QUERY_SIZE,
     request_cache: false
   })
 
@@ -358,26 +388,46 @@ export async function getIndexedEvents(
     })
 }
 
+function valueFromTotal(total?: number | estypes.SearchTotalHits) {
+  if (!total) {
+    return 0
+  }
+  if (typeof total === 'number') {
+    return total
+  } else {
+    return total.value
+  }
+}
+
 export async function findRecordsByQuery(
-  eventParams: QueryType,
+  search: SearchQuery,
   eventConfigs: EventConfig[],
   options: Record<string, SearchScopeAccessLevels>,
   userOfficeId: string | undefined
 ) {
   const esClient = getOrCreateClient()
 
-  const query = withJurisdictionFilters(
-    await buildElasticQueryFromSearchPayload(eventParams, eventConfigs),
+  const { query, limit, offset } = search
+
+  const esQuery = withJurisdictionFilters(
+    await buildElasticQueryFromSearchPayload(query, eventConfigs),
     options,
     userOfficeId
   )
 
   const response = await esClient.search<EncodedEventIndex>({
     index: getEventAliasName(),
-    size: DEFAULT_SIZE,
+    size: limit,
+    from: offset,
+    track_total_hits: true,
     request_cache: false,
-    query,
-    sort: {
+    query: esQuery,
+    sort: search.sort?.map((sort) => ({
+      [sort.field]: {
+        order: sort.direction,
+        unmapped_type: 'keyword'
+      }
+    })) || {
       _score: {
         order: 'desc'
       }
@@ -393,7 +443,7 @@ export async function findRecordsByQuery(
       return removeSecuredFields(eventConfig, decodedEventIndex)
     })
 
-  return events
+  return { results: events, total: valueFromTotal(response.hits.total) }
 }
 
 /*

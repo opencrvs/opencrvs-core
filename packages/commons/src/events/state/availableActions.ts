@@ -8,7 +8,11 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { ActionType } from '../ActionType'
+import {
+  ActionType,
+  DisplayableAction,
+  ClientSpecificAction
+} from '../ActionType'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, InherentFlags } from '../EventMetadata'
 
@@ -40,18 +44,21 @@ export const AVAILABLE_ACTIONS_BY_EVENT_STATUS = {
   [EventStatus.enum.REGISTERED]: [
     ActionType.READ,
     ActionType.PRINT_CERTIFICATE,
-    ActionType.REQUEST_CORRECTION
+    ActionType.REQUEST_CORRECTION,
+    ActionType.APPROVE_CORRECTION,
+    ActionType.REJECT_CORRECTION,
+    ClientSpecificAction.REVIEW_CORRECTION_REQUEST
   ],
   [EventStatus.enum.ARCHIVED]: [
     ActionType.READ,
     ActionType.ASSIGN,
     ActionType.UNASSIGN
   ]
-} as const satisfies Record<EventStatus, ActionType[]>
+} as const satisfies Record<EventStatus, DisplayableAction[]>
 
 export const getAvailableActionsForEvent = (
   event: EventIndex
-): ActionType[] => {
+): DisplayableAction[] => {
   /** Base available actions on previous status if the event is rejected.
    * 1. This is to ensure that the user can still perform actions on the event after rejection.
    * 2. In 1.9 we allow rejecting event in rejected state. No filtering of previous actions needed.

@@ -9,7 +9,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { merge, omitBy, isString } from 'lodash'
+import { merge, omitBy, isString, omit } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
@@ -17,15 +17,18 @@ import {
   ActionBase,
   ActionDocument,
   ActionStatus,
-  ActionUpdate,
-  EventState
+  EventState,
+  PrintCertificateAction,
+  ActionUpdate
 } from './ActionDocument'
 import {
+  ApproveCorrectionActionInput,
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
   NotifyActionInput,
   RegisterActionInput,
+  RejectCorrectionActionInput,
   RejectDeclarationActionInput,
   RequestCorrectionActionInput,
   UnassignActionInput,
@@ -53,7 +56,11 @@ import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { FieldType } from './FieldType'
-import { AddressType, FileFieldValue } from './CompositeFieldValue'
+import {
+  AddressType,
+  FileFieldValue,
+  HttpFieldValue
+} from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
@@ -138,6 +145,7 @@ export function mapFieldTypeToMockValue(
     case FieldType.PAGE_HEADER:
     case FieldType.LOCATION:
     case FieldType.SELECT:
+    case FieldType.SELECT_DATE_RANGE:
     case FieldType.COUNTRY:
     case FieldType.RADIO_GROUP:
     case FieldType.PARAGRAPH:
@@ -151,6 +159,8 @@ export function mapFieldTypeToMockValue(
       return generateRandomName(rng)
     case FieldType.NUMBER:
       return 19
+    case FieldType.BUTTON:
+      return 1
     case FieldType.EMAIL:
       return 'test@opencrvs.org'
     case FieldType.ADDRESS:
@@ -168,7 +178,8 @@ export function mapFieldTypeToMockValue(
       }
     case FieldType.DATE:
       return '2021-01-01'
-    case FieldType.SELECT_DATE_RANGE:
+    case FieldType.TIME:
+      return '09:33'
     case FieldType.DATE_RANGE:
       return {
         start: '2021-01-01',
@@ -183,6 +194,12 @@ export function mapFieldTypeToMockValue(
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
+    case FieldType.HTTP:
+      return {
+        error: null,
+        data: { nid: '1234567890' },
+        loading: false
+      } satisfies HttpFieldValue
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
       return undefined
@@ -299,11 +316,16 @@ export function eventPayloadGenerator(rng: () => number) {
                 surname: 'McLaren'
               },
               'applicant.dob': '2020-01-02',
-              'recommender.none': true
+              'applicant.image': {
+                path: '/ocrvs/e56d1dd3-2cd4-452a-b54e-bf3e2d830605.png',
+                originalFilename: 'Screenshot.png',
+                type: 'image/png'
+              }
             },
             annotation: {
               'correction.requester.relationship': 'ANOTHER_AGENT',
               'correction.request.reason': "Child's name was incorrect",
+              'identity-check': true,
               ...annotation
             },
             createdAt: new Date().toISOString(),
@@ -545,10 +567,13 @@ export function eventPayloadGenerator(rng: () => number) {
           transactionId: input.transactionId ?? getUUID(),
           declaration:
             input.declaration ??
-            generateActionDeclarationInput(
-              tennisClubMembershipEvent,
-              ActionType.REQUEST_CORRECTION,
-              rng
+            omit(
+              generateActionDeclarationInput(
+                tennisClubMembershipEvent,
+                ActionType.REQUEST_CORRECTION,
+                rng
+              ),
+              ['applicant.email']
             ),
           annotation:
             input.annotation ??
@@ -565,7 +590,7 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
+              ApproveCorrectionActionInput,
               'transactionId' | 'annotation' | 'keepAssignment'
             >
           > = {}
@@ -589,10 +614,10 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId: string,
           input: Partial<
             Pick<
-              RequestCorrectionActionInput,
-              'transactionId' | 'annotation' | 'keepAssignment'
+              RejectCorrectionActionInput,
+              'transactionId' | 'annotation' | 'keepAssignment' | 'reason'
             >
-          > = {}
+          >
         ) => ({
           type: ActionType.REJECT_CORRECTION,
           transactionId: input.transactionId ?? getUUID(),
@@ -606,7 +631,8 @@ export function eventPayloadGenerator(rng: () => number) {
             ),
           eventId,
           requestId,
-          keepAssignment: input.keepAssignment
+          keepAssignment: input.keepAssignment,
+          reason: input.reason ?? { message: '' }
         })
       }
     }
@@ -672,7 +698,11 @@ export function generateActionDocument({
     case ActionType.NOTIFY:
       return { ...actionBase, type: action }
     case ActionType.PRINT_CERTIFICATE:
-      return { ...actionBase, type: action }
+      return {
+        ...actionBase,
+        type: action,
+        content: (defaults as Partial<PrintCertificateAction>).content
+      }
     case ActionType.REQUEST_CORRECTION:
       return { ...actionBase, type: action }
     case ActionType.APPROVE_CORRECTION:
@@ -681,7 +711,8 @@ export function generateActionDocument({
       return {
         ...actionBase,
         requestId: getUUID(),
-        type: action
+        type: action,
+        reason: { message: 'Correction rejection' }
       }
     case ActionType.REGISTER:
       return {

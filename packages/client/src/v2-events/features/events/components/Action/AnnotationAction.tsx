@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { PropsWithChildren, useEffect, useMemo } from 'react'
+import React, { PropsWithChildren, useEffect } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   ActionType,
@@ -21,15 +21,11 @@ import {
 } from '@opencrvs/commons/client'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
-
-// @TODO: Update type to more strict once REQUEST_CORRECTION uses annotations
-type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
 
 /**
  * Creates a wrapper component for the annotation action.
@@ -41,7 +37,10 @@ type Props = PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>
  *
  * This differs from DeclarationAction, which is a series of one-time actions that modify the declaration.
  */
-function AnnotationActionComponent({ children, actionType }: Props) {
+function AnnotationActionComponent({
+  children,
+  actionType
+}: PropsWithChildren<{ actionType: Exclude<ActionType, 'DELETE'> }>) {
   const params = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const { getEvent } = useEvents()
@@ -61,7 +60,6 @@ function AnnotationActionComponent({ children, actionType }: Props) {
   )
 
   const annotation = useActionAnnotation((state) => state.annotation)
-  const clearAnnotation = useActionAnnotation((state) => state.clear)
 
   useEffect(() => {
     if (!annotation) {

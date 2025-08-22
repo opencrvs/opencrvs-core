@@ -62,7 +62,12 @@ export const Page: Story = {
           tRPCMsw.event.config.get.query(() => {
             return [tennisClubMembershipEvent]
           }),
-          tRPCMsw.event.search.query(() => [])
+          tRPCMsw.event.search.query(() => {
+            return {
+              results: [],
+              total: 0
+            }
+          })
         ]
       }
     }

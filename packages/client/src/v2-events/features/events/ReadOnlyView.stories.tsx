@@ -144,9 +144,12 @@ export const ViewRecordMenuItemInsideActionMenus: Story = {
             return eventDocument
           }),
           tRPCMsw.event.search.query(() => {
-            return [
-              getCurrentEventState(eventDocument, tennisClubMembershipEvent)
-            ]
+            return {
+              total: 1,
+              results: [
+                getCurrentEventState(eventDocument, tennisClubMembershipEvent)
+              ]
+            }
           })
         ],
         drafts: [

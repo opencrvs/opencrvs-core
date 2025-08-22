@@ -1,6 +1,6 @@
 {
   "name": "@opencrvs/toolkit",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "OpenCRVS toolkit for building country configurations",
   "license": "MPL-2.0",
   "exports": {
@@ -8,7 +8,8 @@
     "./api": "./dist/api/index.js",
     "./events": "./dist/events/index.js",
     "./scopes": "./dist/scopes/index.js",
-    "./conditionals": "./dist/conditionals/index.js"
+    "./conditionals": "./dist/conditionals/index.js",
+    "./notification": "./dist/notification/index.js"
   },
   "scripts": {
     "build": "./build.sh",

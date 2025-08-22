@@ -22,7 +22,9 @@ import {
   generateTranslationConfig,
   defineFormPage,
   PageTypes,
-  FieldType
+  FieldType,
+  EventDocument,
+  EventConfig
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -299,7 +301,7 @@ const multiFileConfig = {
       })
     ]
   }
-}
+} satisfies EventConfig
 
 const fileDeclareActions = [
   generateActionDocument({
@@ -341,9 +343,8 @@ const multiFileEvent = {
   actions: fileDeclareActions,
   createdAt: new Date(Date.now()).toISOString(),
   id: generateUuid(),
-
   updatedAt: new Date(Date.now()).toISOString()
-}
+} satisfies EventDocument
 
 export const RemovingMultipleFilesDeletesAll: Story = {
   beforeEach: () => {
@@ -389,10 +390,12 @@ export const RemovingMultipleFilesDeletesAll: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Check files are present in review', async () => {
-      selectEvent.openMenu(await canvas.findByText('single file'))
+      const singleFileRefs = await canvas.findAllByText('single file')
 
-      await canvas.findByText('multi file (multi file option 1)')
-      await canvas.findByText('multi file (multi file option 2)')
+      await expect(singleFileRefs).toHaveLength(3) // filename, title, option
+
+      await canvas.findByText('multi file option 1')
+      await canvas.findByText('multi file option 2')
     })
 
     await step('Remove all files', async () => {

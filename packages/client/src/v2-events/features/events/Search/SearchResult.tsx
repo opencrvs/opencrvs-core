@@ -41,6 +41,7 @@ import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
 import { CoreWorkqueues } from '@client/v2-events/utils'
+import RetryButton from '@client/v2-events/components/RetryButton'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import { deserializeSearchParams, serializeSearchParams } from './utils'
 import { ActionComponent } from './ActionComponent'
@@ -206,7 +207,9 @@ export const SearchResultComponent = ({
   title: contentTitle,
   tabBarContent,
   actions = [],
-  emptyMessage
+  emptyMessage,
+  allowRetry,
+  totalResults
 }: PropsWithChildren<{
   columns: WorkqueueColumn[]
   eventConfigs: EventConfig[]
@@ -214,6 +217,8 @@ export const SearchResultComponent = ({
   limit?: number
   offset?: number
   title: string
+  allowRetry?: boolean
+  totalResults: number
   tabBarContent?: React.ReactNode
   actions?: WorkqueueActionsWithDefault[]
   emptyMessage?: TranslationConfig
@@ -291,6 +296,9 @@ export const SearchResultComponent = ({
             />
           )
         }))
+        .concat(
+          allowRetry ? { actionComponent: <RetryButton event={event} /> } : []
+        )
         .concat({
           actionComponent: (
             <DownloadButton
@@ -439,12 +447,9 @@ export const SearchResultComponent = ({
 
   const currentPageNumber = Math.floor(offset / limit) + 1
 
-  const paginatedData = allResults.slice(
-    limit * (currentPageNumber - 1),
-    limit * currentPageNumber
-  )
+  const paginatedData = allResults
 
-  const totalPages = events.length ? Math.ceil(events.length / limit) : 0
+  const totalPages = totalResults ? Math.ceil(totalResults / limit) : 0
 
   const isShowPagination = totalPages > 1
 
@@ -491,7 +496,7 @@ export const SearchResultComponent = ({
         error={false}
         isMobileSize={windowWidth < theme.grid.breakpoints.lg}
         isShowPagination={isShowPagination}
-        noContent={events.length === 0}
+        noContent={totalResults === 0}
         noResultText={
           emptyMessage ? intl.formatMessage(emptyMessage) : noResultText
         }

@@ -65,7 +65,10 @@ export const Page: Story = {
             return validatedDocument
           }),
           tRPCMsw.event.search.query(() => {
-            return []
+            return {
+              results: [],
+              total: 0
+            }
           })
         ]
       }
@@ -87,7 +90,10 @@ export const Review: Story = {
             return validatedDocument
           }),
           tRPCMsw.event.search.query(() => {
-            return []
+            return {
+              results: [],
+              total: 0
+            }
           })
         ]
       }

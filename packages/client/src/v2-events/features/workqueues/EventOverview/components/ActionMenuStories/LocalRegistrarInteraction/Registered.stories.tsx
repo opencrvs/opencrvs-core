@@ -42,7 +42,8 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.ASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
   },
   {
@@ -59,7 +60,8 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.ENABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.ENABLED,
+      [ActionType.REQUEST_CORRECTION]: AssertType.ENABLED
     }
   },
   {
@@ -78,7 +80,8 @@ const registeredScenariosForLocalRegistrar: Scenario[] = [
       ...getHiddenActions(),
       [ActionType.UNASSIGN]: AssertType.ENABLED,
       [ActionType.READ]: AssertType.ENABLED,
-      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED
+      [ActionType.PRINT_CERTIFICATE]: AssertType.DISABLED,
+      [ActionType.REQUEST_CORRECTION]: AssertType.DISABLED
     }
   }
 ]

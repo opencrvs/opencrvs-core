@@ -20,7 +20,8 @@ import {
   generateTranslationConfig,
   getCurrentEventState,
   getUUID,
-  PageTypes
+  PageTypes,
+  PrintCertificateAction
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import {
@@ -435,4 +436,72 @@ describe('Action updates', () => {
       0
     )
   })
+})
+
+test('PRINT_CERTIFICATE action can include a valid content.templateId property in payload', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id, { keepAssignment: true })
+  )
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(originalEvent.id, { keepAssignment: true })
+  )
+
+  await client.event.actions.register.request(
+    generator.event.actions.register(originalEvent.id, { keepAssignment: true })
+  )
+
+  const basePrintAction = generator.event.actions.printCertificate(
+    originalEvent.id,
+    { keepAssignment: true }
+  )
+  const printActionWithDetails = {
+    ...basePrintAction,
+    content: {
+      templateId: 'birth-certificate-template'
+    }
+  }
+
+  const result = await client.event.actions.printCertificate.request(
+    printActionWithDetails
+  )
+  expect(result).toBeDefined()
+
+  const updatedEvent = await client.event.get(originalEvent.id)
+  const printAction = updatedEvent.actions.find(
+    (action) => action.type === ActionType.PRINT_CERTIFICATE
+  ) as PrintCertificateAction
+  expect(printAction.content?.templateId).toBeDefined()
+})
+
+test('REGISTER action throws when content property is in payload', async () => {
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const originalEvent = await client.event.create(generator.event.create())
+
+  await client.event.actions.declare.request(
+    generator.event.actions.declare(originalEvent.id, { keepAssignment: true })
+  )
+
+  await client.event.actions.validate.request(
+    generator.event.actions.validate(originalEvent.id, { keepAssignment: true })
+  )
+
+  const baseRegisterAction = generator.event.actions.register(originalEvent.id)
+  const registerActionWithDetails = {
+    ...baseRegisterAction,
+    content: {
+      templateId: 'some-template'
+    }
+  }
+
+  await expect(
+    client.event.actions.register.request(registerActionWithDetails)
+  ).rejects.toThrow()
 })

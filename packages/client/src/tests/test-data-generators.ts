@@ -15,7 +15,6 @@ import {
   SCOPES as Scopes
 } from '@opencrvs/commons/client'
 import { FetchUserQuery, Status } from '@client/utils/gateway'
-import { generateToken } from './util'
 
 const SCOPES = {
   ...Scopes,

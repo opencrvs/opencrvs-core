@@ -24,7 +24,6 @@ import {
   SystemVariables
 } from '@opencrvs/commons/client'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { useUserAddress } from '@client/v2-events/hooks/useUserAddress'
 import {
   FIELD_SEPARATOR,
   handleDefaultValue
@@ -70,6 +69,7 @@ interface FormFieldGeneratorProps {
   /** Default field values. Might equal to declaration, when a declaration form is rendered. */
   initialValues?: EventState
   onAllFieldsValidated?: (success: boolean) => void
+  isCorrection?: boolean
   parentId?: string // `child____name` part of `child____name____firstname`
 }
 
@@ -85,6 +85,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     readonlyMode,
     id,
     onAllFieldsValidated,
+    isCorrection = false,
     parentId
   }) => {
     const { setAllTouchedFields, touchedFields: initialTouchedFields } =
@@ -169,6 +170,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               fieldsToShowValidationErrors={fieldsToShowValidationErrors}
               id={id}
               initialValues={initialValues}
+              isCorrection={isCorrection}
               parentId={parentId}
               readonlyMode={readonlyMode}
               resetForm={formikProps.resetForm}

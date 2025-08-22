@@ -67,11 +67,11 @@ export function EventOverviewLayout({
 
   const eventResults = searchEventById.useSuspenseQuery(eventId)
 
-  if (eventResults.length === 0) {
+  if (eventResults.total === 0) {
     throw new Error(`Event details with id ${eventId} not found`)
   }
 
-  const eventIndex = eventResults[0]
+  const eventIndex = eventResults.results[0]
 
   const { eventConfiguration } = useEventConfiguration(eventIndex.type)
   const eventIndexWithDraftApplied = draft

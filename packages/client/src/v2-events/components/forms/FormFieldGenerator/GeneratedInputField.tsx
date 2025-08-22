@@ -9,6 +9,8 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
+/* eslint-disable max-lines */
+
 import React, { useCallback } from 'react'
 import { useIntl } from 'react-intl'
 import { omit } from 'lodash'
@@ -49,7 +51,10 @@ import {
   getValidatorsForField,
   DateRangeFieldValue,
   isSelectDateRangeFieldType,
-  SelectDateRangeValue
+  SelectDateRangeValue,
+  isTimeFieldType,
+  isButtonFieldType,
+  isHttpFieldType
 } from '@opencrvs/commons/client'
 import { TextArea } from '@opencrvs/components/lib/TextArea'
 import { InputField } from '@client/components/form/InputField'
@@ -67,7 +72,10 @@ import {
   Divider,
   PageHeader,
   Paragraph,
-  SelectDateRangeField
+  SelectDateRangeField,
+  TimeField,
+  Button,
+  Http
 } from '@client/v2-events/features/events/registered-fields'
 
 import { Address } from '@client/v2-events/features/events/registered-fields/Address'
@@ -230,6 +238,20 @@ export const GeneratedInputField = React.memo(
       )
     }
 
+    if (isTimeFieldType(field)) {
+      return (
+        <InputField {...inputFieldProps}>
+          <TimeField.Input
+            {...inputProps}
+            value={field.value}
+            onChange={(val: string) =>
+              onFieldValueChange(fieldDefinition.id, val)
+            }
+          />
+        </InputField>
+      )
+    }
+
     if (isDateRangeFieldType(field)) {
       const parsed = DateRangeFieldValue.safeParse(field.value)
       return (
@@ -277,7 +299,7 @@ export const GeneratedInputField = React.memo(
 
       return (
         <Paragraph.Input
-          fontVariant={field.config.configuration.styles?.fontVariant}
+          configuration={field.config.configuration}
           message={message}
         />
       )
@@ -569,6 +591,35 @@ export const GeneratedInputField = React.memo(
           {...field.config}
           declarationFields={getDeclarationFields(eventConfig)}
           formData={form}
+        />
+      )
+    }
+
+    if (isButtonFieldType(field)) {
+      return (
+        // Button can be always 'touched' to show errors.
+        // Button doesn't have a similar `onBlur -> FocusEvent -> touched -> errors` flow as other InputFields
+        <InputField {...inputFieldProps} touched={true}>
+          <Button.Input
+            configuration={field.config.configuration}
+            disabled={inputProps.disabled}
+            id={field.config.id}
+            value={field.value}
+            onChange={(clicks) =>
+              onFieldValueChange(fieldDefinition.id, clicks)
+            }
+          />
+        </InputField>
+      )
+    }
+
+    if (isHttpFieldType(field)) {
+      return (
+        <Http.Input
+          key={fieldDefinition.id}
+          configuration={field.config.configuration}
+          parentValue={form[field.config.configuration.trigger.$$field]}
+          onChange={(val) => onFieldValueChange(fieldDefinition.id, val)}
         />
       )
     }

@@ -24,10 +24,12 @@ import {
   EventStatus,
   isMetaAction,
   getAvailableActionsForEvent,
+  InherentFlags,
+  ClientSpecificAction,
   workqueueActions,
-  Draft,
-  InherentFlags
+  Draft
 } from '@opencrvs/commons/client'
+import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
 import {
@@ -35,6 +37,7 @@ import {
   getAssignmentStatus,
   getUsersFullName
 } from '@client/v2-events/utils'
+import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
@@ -87,7 +90,8 @@ function getAvailableAssignmentActions(
 }
 interface ActionConfig {
   label: TranslationConfig
-  onClick: (eventId: string) => Promise<void> | void
+  icon: IconProps['name']
+  onClick: (workqueue?: string) => Promise<void> | void
   disabled?: boolean
   hidden?: boolean
 }
@@ -135,12 +139,21 @@ export const actionLabels = {
     defaultMessage: 'Delete',
     description: 'Label for delete button in dropdown menu',
     id: 'v2.event.birth.action.delete.label'
+  },
+  [ActionType.REQUEST_CORRECTION]: {
+    defaultMessage: 'Correct record',
+    description: 'Label for request correction button in dropdown menu',
+    id: 'v2.event.birth.action.request-correction.label'
+  },
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
+    defaultMessage: 'Review',
+    description: 'Label for review correction button in dropdown menu',
+    id: 'v2.event.action.review-correction.label'
   }
 } as const
 
-interface ActionMenuItem
-  extends Partial<Record<WorkqueueActionType, ActionConfig>> {
-  type: ActionType
+interface ActionMenuItem extends ActionConfig {
+  type: WorkqueueActionType | ClientSpecificAction
 }
 
 /**
@@ -184,14 +197,19 @@ function useViewableActionConfigurations(
   const { refetch: refetchEvent } = events.getEvent.findFromCache(event.id)
 
   const { mutate: deleteEvent } = events.deleteEvent.useMutation()
+  const { eventConfiguration } = useEventConfiguration(event.type)
 
   const assignmentStatus = getAssignmentStatus(event, authentication.sub)
 
   const isDownloadedAndAssignedToUser =
     assignmentStatus === AssignmentStatus.ASSIGNED_TO_SELF && isDownloaded
-
   const hasDeclarationDraftOpen = draft?.action.type === ActionType.DECLARE
 
+  const eventIsWaitingForCorrection = event.flags.includes(
+    InherentFlags.CORRECTION_REQUESTED
+  )
+
+  const eventId = event.id
   const hasScopeForValidate = hasAnyOfScopes(
     authentication.scope,
     ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
@@ -216,11 +234,12 @@ function useViewableActionConfigurations(
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
-        onClick: (workqueue?: string) =>
-          navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId: event.id }))
+        icon: 'Eye' as const,
+        onClick: () => navigate(ROUTES.V2.EVENTS.VIEW.buildPath({ eventId }))
       },
       [ActionType.ASSIGN]: {
         label: actionLabels[ActionType.ASSIGN],
+        icon: 'PushPin' as const,
         onClick: async (workqueue?: string) => {
           const assign = await openModal<boolean>((close) => (
             <AssignModal close={close} />
@@ -229,17 +248,22 @@ function useViewableActionConfigurations(
             return
           }
           await events.actions.assignment.assign.mutate({
-            eventId: event.id,
+            eventId,
             assignedTo: authentication.sub,
             refetchEvent
           })
         },
-        hidden: isNotifiedState && !isRejected && !hasScopeForValidate,
-        disabled: !isOnline
+        disabled:
+          !isOnline ||
+          // User may not assign themselves if record is waiting for correction approval/rejection but user is not allowed to do that
+          (eventIsWaitingForCorrection &&
+            !authentication.scope.includes(SCOPES.RECORD_REGISTRATION_CORRECT)),
+        hidden: isNotifiedState && !isRejected && !hasScopeForValidate
       },
       [ActionType.UNASSIGN]: {
         label: actionLabels[ActionType.UNASSIGN],
-        onClick: async (workqueue?: string) => {
+        icon: 'ArrowCircleDown' as const,
+        onClick: async () => {
           const unassign = await openModal<boolean>((close) => (
             <UnassignModal
               assignedSelf={isDownloadedAndAssignedToUser}
@@ -252,7 +276,7 @@ function useViewableActionConfigurations(
             return
           }
           await events.actions.assignment.unassign.mutateAsync({
-            eventId: event.id,
+            eventId,
             transactionId: getUUID(),
             assignedTo: null
           })
@@ -260,6 +284,7 @@ function useViewableActionConfigurations(
         disabled: !isOnline
       },
       [ActionType.DECLARE]: {
+        icon: 'PencilLine' as const,
         // NOTE: Only label changes for convenience. Trying to actually VALIDATE before DECLARE will not work.
         label: shouldShowDeclareAsReview
           ? actionLabels[ActionType.VALIDATE]
@@ -268,7 +293,7 @@ function useViewableActionConfigurations(
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           )
@@ -278,11 +303,12 @@ function useViewableActionConfigurations(
       },
       [ActionType.VALIDATE]: {
         label: actionLabels[ActionType.VALIDATE],
+        icon: 'PencilLine' as const,
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.VALIDATE.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           )
@@ -291,11 +317,12 @@ function useViewableActionConfigurations(
       },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
+        icon: 'PencilLine' as const,
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.REGISTER.REVIEW.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           )
@@ -304,19 +331,22 @@ function useViewableActionConfigurations(
       },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
+        icon: 'Printer' as const,
         onClick: (workqueue?: string) => {
           clearEphemeralFormState()
           return navigate(
             ROUTES.V2.EVENTS.PRINT_CERTIFICATE.buildPath(
-              { eventId: event.id },
+              { eventId },
               { workqueue }
             )
           )
         },
-        disabled: !isDownloadedAndAssignedToUser
+        disabled: !isDownloadedAndAssignedToUser || eventIsWaitingForCorrection,
+        hidden: eventIsWaitingForCorrection
       },
       [ActionType.DELETE]: {
         label: actionLabels[ActionType.DELETE],
+        icon: 'Trash' as const,
         onClick: (workqueue?: string) => {
           deleteEvent({
             eventId: event.id
@@ -325,9 +355,55 @@ function useViewableActionConfigurations(
           if (!workqueue) {
             navigate(ROUTES.V2.buildPath({}))
           }
-        }
+        },
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      [ActionType.REQUEST_CORRECTION]: {
+        label: actionLabels[ActionType.REQUEST_CORRECTION],
+        icon: 'NotePencil' as const,
+        onClick: () => {
+          const correctionPages = eventConfiguration.actions.find(
+            (action) => action.type === ActionType.REQUEST_CORRECTION
+          )?.correctionForm.pages
+
+          if (!correctionPages) {
+            throw new Error('No page ID found for request correction')
+          }
+
+          clearEphemeralFormState()
+
+          // If no pages are configured, skip directly to review page
+          if (correctionPages.length === 0) {
+            navigate(ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({ eventId }))
+            return
+          }
+
+          // If pages are configured, navigate to first page
+          navigate(
+            ROUTES.V2.EVENTS.CORRECTION.ONBOARDING.buildPath({
+              eventId,
+              pageId: correctionPages[0].id
+            })
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser || eventIsWaitingForCorrection,
+        hidden: eventIsWaitingForCorrection
+      },
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
+        label: actionLabels[ClientSpecificAction.REVIEW_CORRECTION_REQUEST],
+        icon: 'NotePencil' as const,
+        onClick: () => {
+          clearEphemeralFormState()
+          navigate(
+            ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
+              eventId
+            })
+          )
+        },
+        disabled: !isDownloadedAndAssignedToUser,
+        hidden: !eventIsWaitingForCorrection
       }
-    } satisfies Record<WorkqueueActionType, ActionConfig>
+    } satisfies Record<WorkqueueActionType & ClientSpecificAction, ActionConfig>
   }
 }
 
@@ -343,6 +419,7 @@ export function useAllowedActionConfigurations(
   authentication: ITokenPayload
 ) {
   const scopes = useSelector(getScope) ?? []
+
   const drafts = useDrafts()
 
   const openDraft = drafts
@@ -359,11 +436,12 @@ export function useAllowedActionConfigurations(
     event,
     authentication
   )
+
   const availableEventActions = getAvailableActionsForEvent(event)
 
   const openDraftAction = openDraft ? [openDraft.action.type] : []
 
-  const allowedWorkqueueActions = [
+  const allowedWorkqueueConfigs: ActionMenuItem[] = [
     ...availableAssignmentActions,
     ...availableEventActions,
     ...openDraftAction
@@ -371,7 +449,8 @@ export function useAllowedActionConfigurations(
     // deduplicate after adding the draft
     .filter((action, index, self) => self.indexOf(action) === index)
     .filter(
-      (action): action is WorkqueueActionType =>
+      (action): action is WorkqueueActionType | ClientSpecificAction =>
+        ClientSpecificAction.REVIEW_CORRECTION_REQUEST === action ||
         workqueueActions.safeParse(action).success
     )
     .filter((a) => {
@@ -380,9 +459,14 @@ export function useAllowedActionConfigurations(
         ? true
         : hasAnyOfScopes(scopes, requiredScopes)
     })
+    // We need to transform data and filter out hidden actions to ensure hasOnlyMetaAction receives the correct values.
+    .map((a) => ({ ...config[a], type: a }))
+    .filter((a: ActionConfig) => !a.hidden)
 
   // Check if the user can perform any action other than READ, ASSIGN, or UNASSIGN
-  const hasOnlyMetaActions = allowedWorkqueueActions.every(isMetaAction)
+  const hasOnlyMetaActions = allowedWorkqueueConfigs.every(({ type }) =>
+    isMetaAction(type)
+  )
 
   // If user has no other allowed actions, return only READ.
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
@@ -398,10 +482,8 @@ export function useAllowedActionConfigurations(
     ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
-  return [
-    modal,
-    allowedWorkqueueActions
-      .map((a) => ({ ...config[a], type: a }))
-      .filter((a: ActionConfig) => !a.hidden)
-  ] satisfies [React.ReactNode, ActionMenuItem[]]
+  return [modal, allowedWorkqueueConfigs] satisfies [
+    React.ReactNode,
+    ActionMenuItem[]
+  ]
 }

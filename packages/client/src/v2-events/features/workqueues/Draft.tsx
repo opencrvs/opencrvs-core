@@ -69,6 +69,7 @@ export function Draft() {
       eventConfigs={eventConfigs}
       queryData={eventsWithDrafts}
       title={intl.formatMessage(WORKQUEUE_DRAFT.name)}
+      totalResults={eventsWithDrafts.length}
       {...searchParams}
     />
   )

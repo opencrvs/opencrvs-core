@@ -145,7 +145,7 @@ export const ROUTES = {
               })
             }
           ),
-          REQUEST_CORRECTION: correctionRoutes
+          CORRECTION: correctionRoutes
         }
       ),
       WORKQUEUES: workqueueRoutes,

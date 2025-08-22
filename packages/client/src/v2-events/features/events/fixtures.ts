@@ -10,6 +10,7 @@
  */
 
 import {
+  Action,
   ActionStatus,
   ActionType,
   EventDocument,
@@ -154,6 +155,38 @@ export const tennisClubMembershipEventDocument: EventDocument = {
       assignedTo: testDataGenerator().user.id.localRegistrar,
       transactionId: 'aasdk342-asdkj3423-kn234k26'
     }
+  ]
+}
+
+const correctionRequestAction: Action = {
+  id: '9e048856-8c4d-4f85-8b7f-5f13885d2374' as UUID,
+  status: ActionStatus.Accepted,
+  declaration: {
+    'applicant.name': {
+      firstname: 'Corrected',
+      surname: 'Name'
+    }
+  },
+  annotation: {
+    'correction.requester.relationship': 'ANOTHER_AGENT',
+    'correction.identity-check.verified': 'VERIFIED',
+    'correction.request.supportingDocuments': ''
+  },
+  type: ActionType.REQUEST_CORRECTION,
+  createdBy: localRegistrarId,
+  createdByRole: 'some-user-role',
+  createdByUserType: 'user' as const,
+  createdAt: '2025-01-23T05:35:27.689Z',
+  createdAtLocation: 'a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID,
+  transactionId: 'aasdk342-asdkj3423-kn234k26'
+}
+
+export const tennisClubMembershipEventWithCorrectionRequest: EventDocument = {
+  ...tennisClubMembershipEventDocument,
+  id: '0cb52901-00bf-4631-89dc-89ca506c5d9d' as UUID,
+  actions: [
+    ...tennisClubMembershipEventDocument.actions,
+    correctionRequestAction
   ]
 }
 

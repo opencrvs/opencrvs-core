@@ -223,10 +223,7 @@ export function Review() {
 
   const handleCorrection = () =>
     navigate(
-      ROUTES.V2.EVENTS.REQUEST_CORRECTION.buildPath(
-        { eventId },
-        { workqueue: slug }
-      )
+      ROUTES.V2.EVENTS.CORRECTION.buildPath({ eventId }, { workqueue: slug })
     )
 
   const handlePrint = async () => {
@@ -273,7 +270,8 @@ export function Review() {
           fullEvent,
           eventId: fullEvent.id,
           declaration: {},
-          annotation: { ...annotation, templateId },
+          annotation,
+          content: { templateId },
           transactionId: uuid(),
           type: ActionType.PRINT_CERTIFICATE
         })

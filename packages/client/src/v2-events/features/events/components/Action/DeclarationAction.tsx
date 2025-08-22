@@ -24,6 +24,7 @@ import {
   Action,
   deepMerge,
   getUUID,
+  deepDropNulls,
   mergeDrafts,
   EventDocument,
   EventConfig,
@@ -35,7 +36,6 @@ import {
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
 import { useActionAnnotation } from '@client/v2-events/features/events/useActionAnnotation'
-
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { createTemporaryId } from '@client/v2-events/utils'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -43,8 +43,7 @@ import { ROUTES } from '@client/v2-events/routes'
 import { NavigationStack } from '@client/v2-events/components/NavigationStack'
 import { getScope } from '@client/profile/profileSelectors'
 import { useEventConfiguration } from '../../useEventConfiguration'
-
-type Props = PropsWithChildren<{ actionType: DeclarationUpdateActionType }>
+import { isLastActionCorrectionRequest } from '../../actions/correct/utils'
 
 /**
  * Business requirement states that annotation must be prefilled from previous action.
@@ -136,7 +135,10 @@ function useActionGuard(
  *
  * This differs from AnnotationAction, which modify the annotation, and can be triggered multiple times.
  */
-function DeclarationActionComponent({ children, actionType }: Props) {
+function DeclarationActionComponent({
+  children,
+  actionType
+}: PropsWithChildren<{ actionType: DeclarationUpdateActionType }>) {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.PAGES)
 
   const events = useEvents()
@@ -242,6 +244,14 @@ function DeclarationActionComponent({ children, actionType }: Props) {
   )
 
   const actionAnnotation = useMemo(() => {
+    // For correction request, if we are not reviewing a correction, we don't want to use any previous action annotation
+    if (
+      actionType === ActionType.REQUEST_CORRECTION &&
+      !isLastActionCorrectionRequest(event)
+    ) {
+      return deepDropNulls(mergedDraft.action.annotation || {})
+    }
+
     return getActionAnnotation({
       event,
       actionType,

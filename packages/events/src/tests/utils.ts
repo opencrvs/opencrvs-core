@@ -261,10 +261,16 @@ function actionToClientAction(
             keepAssignment: true
           })
         )
+    case ActionType.REQUEST_CORRECTION:
+      return async (eventId: string) =>
+        client.event.actions.correction.request.request(
+          generator.event.actions.correction.request(eventId, {
+            keepAssignment: true
+          })
+        )
 
     case ActionType.NOTIFY:
     case ActionType.DETECT_DUPLICATE:
-    case ActionType.REQUEST_CORRECTION:
     case ActionType.APPROVE_CORRECTION:
     case ActionType.ASSIGN:
     case ActionType.UNASSIGN:

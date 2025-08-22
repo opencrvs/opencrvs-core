@@ -771,6 +771,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'applicant.email',
           type: 'EMAIL',
           required: false,
+          uncorrectable: true,
           conditionals: [],
           label: {
             defaultMessage: "Applicant's email",

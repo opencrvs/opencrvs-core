@@ -44,7 +44,10 @@ import {
   tennisClubMembershipEvent,
   UUID
 } from '@opencrvs/commons/client'
-import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventWithCorrectionRequest
+} from '@client/v2-events/features/events/fixtures'
 import { EventConfig } from '@opencrvs/commons/client'
 import { getUserDetails } from '@client/profile/profileSelectors'
 WebFont.load({
@@ -210,7 +213,10 @@ const preview: Preview = {
       })
 
       const offlineEvents: Array<EventDocument> = options.parameters?.offline
-        ?.events ?? [tennisClubMembershipEventDocument]
+        ?.events ?? [
+        tennisClubMembershipEventDocument,
+        tennisClubMembershipEventWithCorrectionRequest
+      ]
 
       offlineEvents.forEach((event) => {
         setEventData(event.id, event)

@@ -48,7 +48,10 @@ export const ConfirmableActions = [
   ActionType.REGISTER,
   ActionType.REJECT,
   ActionType.ARCHIVE,
-  ActionType.PRINT_CERTIFICATE
+  ActionType.PRINT_CERTIFICATE,
+  ActionType.REQUEST_CORRECTION,
+  ActionType.APPROVE_CORRECTION,
+  ActionType.REJECT_CORRECTION
 ] as const
 
 /** Testing building types from enums as an alternative */
@@ -71,6 +74,16 @@ export const ActionTypes = z.enum([
   'ASSIGN',
   'UNASSIGN'
 ])
+
+/**
+ * Non-persisted actions that are used in the client to control the UI.
+ */
+export const ClientSpecificAction = {
+  REVIEW_CORRECTION_REQUEST: 'REVIEW_CORRECTION_REQUEST'
+} as const
+
+export type ClientSpecificAction =
+  (typeof ClientSpecificAction)[keyof typeof ClientSpecificAction]
 
 const declarationActionValues = [
   ActionTypes.enum.DECLARE,
@@ -116,18 +129,19 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.REJECT,
   ActionType.MARKED_AS_DUPLICATE,
   ActionType.ARCHIVE,
-  ActionType.REQUEST_CORRECTION,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION
 ])
-export type WorkqueueActionType = z.infer<typeof workqueueActions>
 
-const META_ACTIONS: ActionType[] = [
+export type WorkqueueActionType = z.infer<typeof workqueueActions>
+export type DisplayableAction = ActionType | ClientSpecificAction
+
+const META_ACTIONS: DisplayableAction[] = [
   ActionType.ASSIGN,
   ActionType.UNASSIGN,
   ActionType.READ
 ]
 
-export function isMetaAction(actionType: ActionType) {
+export function isMetaAction(actionType: DisplayableAction) {
   return META_ACTIONS.includes(actionType)
 }

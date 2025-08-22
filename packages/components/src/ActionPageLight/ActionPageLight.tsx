@@ -13,6 +13,7 @@ import styled from 'styled-components'
 import { BackArrowDeepBlue, Cross } from '../icons'
 import { CircleButton } from '../buttons'
 import { AppBar, IAppBarProps } from '../AppBar'
+
 const ActionContainer = styled.div`
   width: 100%;
 `
@@ -86,7 +87,12 @@ export const ActionPageLight = ({
   const getHeaderRight = () => {
     return (
       goHome && (
-        <CircleButton id="crcl-btn" onClick={goHome} key="crcl-btn">
+        <CircleButton
+          data-testid="crcl-btn"
+          id="crcl-btn"
+          onClick={goHome}
+          key="crcl-btn"
+        >
           <Cross color="currentColor" />
         </CircleButton>
       )

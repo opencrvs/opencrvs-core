@@ -9,22 +9,22 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import Ajv from 'ajv'
+import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
-
 import { formatISO, isAfter, isBefore } from 'date-fns'
 import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
-import { EventState, ActionUpdate } from '../events/ActionDocument'
+import { ActionUpdate, EventState } from '../events/ActionDocument'
+import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
 import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
-import { ConditionalType, FieldConditional } from '../events/Conditional'
 
 const ajv = new Ajv({
   $data: true,
-  allowUnionTypes: true
+  allowUnionTypes: true,
+  strict: false // Allow minContains and other newer features
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -99,13 +99,22 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return result
 }
 
+export function isOnline() {
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    return navigator.onLine
+  }
+  // Server-side: assume always online
+  return true
+}
+
 export function isConditionMet(
   conditional: JSONSchema,
   values: Record<string, unknown>
 ) {
   return validate(conditional, {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline()
   })
 }
 
@@ -147,7 +156,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
-    })
+    }),
+    $online: isOnline()
   })
 
   return validConditionals.includes(conditionalType)
@@ -214,6 +224,11 @@ export const errorMessages = {
     defaultMessage: 'Unexpected field',
     description: 'Error message when field is not expected',
     id: 'v2.error.unexpectedField'
+  },
+  correctionNotAllowed: {
+    defaultMessage: 'Correction not allowed for field',
+    description: 'Error message when correction is not allowed for field',
+    id: 'v2.error.correctionNotAllowed'
   }
 }
 
@@ -327,13 +342,9 @@ export function validateFieldInput({
   field: FieldConfig
   value: FieldUpdateValue
 }) {
-  const rawError = mapFieldTypeToZod(field.type, field.required).safeParse(
-    value,
-    {
-      // @ts-expect-error
-      errorMap: zodToIntlErrorMap
-    }
-  )
+  const zodType = mapFieldTypeToZod(field.type, field.required)
+  // @ts-expect-error
+  const rawError = zodType.safeParse(value, { errorMap: zodToIntlErrorMap })
 
   // We have overridden the standard error messages
   return (rawError.error?.issues.map((issue) => issue.message) ??
@@ -386,7 +397,8 @@ export function runFieldValidations({
 
   const conditionalParameters = {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline()
   }
 
   const fieldValidationResult = validateFieldInput({
@@ -462,4 +474,13 @@ export function getValidatorsForField(
       }
     })
     .filter((x) => x !== null) as NonNullable<FieldConfig['validation']>
+}
+
+export function areCertificateConditionsMet(
+  conditions: FieldConditional[],
+  values: Record<string, unknown>
+) {
+  return conditions.every((condition) => {
+    return ajv.validate(condition.conditional, values)
+  })
 }

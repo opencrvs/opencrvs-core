@@ -35,6 +35,7 @@ import { useEventOverviewContext } from '@client/v2-events/features/workqueues/E
 import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
+import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
 import { usePermissions } from '@client/hooks/useAuthorization'
 import { ILocation } from '@client/offline/reducer'
 import {
@@ -196,6 +197,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const navigate = useNavigate()
   const [modal, openModal] = useModal()
   const { getUser, getLocation } = useEventOverviewContext()
+  const { getActionTypeForHistory } = useActionForHistory()
   const { canReadUser, canAccessOffice } = usePermissions()
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
@@ -216,6 +218,37 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   )
 
   const historyRows = visibleHistory
+    .map((x) => {
+      if (x.type === ActionType.REQUEST_CORRECTION) {
+        const immediateApprovedCorrection = visibleHistory.find(
+          (h) =>
+            h.type === ActionType.APPROVE_CORRECTION &&
+            h.requestId === x.id &&
+            h.annotation?.isImmediateCorrection &&
+            h.createdBy === x.createdBy
+        )
+        // Adding flag on immediately approved REQUEST_CORRECTION to show it
+        // as 'Record corrected' in history table
+        if (immediateApprovedCorrection) {
+          return {
+            ...x,
+            annotation: { ...x.annotation, isImmediateCorrection: true }
+          }
+        }
+      }
+      return x
+    })
+    .filter((x) => {
+      // removing immediately APPROVED_CORRECTION to since we only show
+      // associated REQUEST_CORRECTION as 'Record corrected'
+      if (
+        x.type === ActionType.APPROVE_CORRECTION &&
+        x.annotation?.isImmediateCorrection
+      ) {
+        return false
+      }
+      return true
+    })
     .slice(
       (currentPageNumber - 1) * DEFAULT_HISTORY_RECORD_PAGE_SIZE,
       currentPageNumber * DEFAULT_HISTORY_RECORD_PAGE_SIZE
@@ -259,7 +292,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
             onClick={() => onHistoryRowClick(action, userName)}
           >
             {intl.formatMessage(eventHistoryStatusMessage, {
-              status: action.type
+              status: getActionTypeForHistory(history, action)
             })}
           </Link>
         ),

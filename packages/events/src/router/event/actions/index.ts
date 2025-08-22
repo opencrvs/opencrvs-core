@@ -26,7 +26,10 @@ import {
   DeclareActionInput,
   ValidateActionInput,
   ACTION_ALLOWED_SCOPES,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
+  RequestCorrectionActionInput,
+  ApproveCorrectionActionInput,
+  RejectCorrectionActionInput
 } from '@opencrvs/commons/events'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -39,6 +42,7 @@ import {
   addAsyncRejectAction,
   throwConflictIfActionNotAllowed
 } from '@events/service/events/events'
+import { throwConflictIfWaitingForCorrection } from '@events/service/events/actions/correction'
 import {
   ActionConfirmationResponse,
   requestActionConfirmation
@@ -55,11 +59,17 @@ interface ActionProcedureConfig {
   inputSchema: z.ZodType
   notifyApiPayloadSchema: z.ZodType | undefined
   meta?: OpenApiMeta
+  allowIfWaitingForCorrection: boolean
 }
+
+const defaultConfig = {
+  notifyApiPayloadSchema: undefined,
+  allowIfWaitingForCorrection: true
+} as const
 
 const ACTION_PROCEDURE_CONFIG = {
   [ActionType.NOTIFY]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: NotifyActionInput,
     meta: {
       openapi: {
@@ -72,28 +82,70 @@ const ACTION_PROCEDURE_CONFIG = {
     }
   },
   [ActionType.DECLARE]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: DeclareActionInput
   },
   [ActionType.VALIDATE]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: ValidateActionInput
   },
   [ActionType.REGISTER]: {
+    ...defaultConfig,
     notifyApiPayloadSchema: z.object({ registrationNumber: z.string() }),
     inputSchema: RegisterActionInput
   },
   [ActionType.REJECT]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: RejectDeclarationActionInput
   },
   [ActionType.ARCHIVE]: {
-    notifyApiPayloadSchema: undefined,
+    ...defaultConfig,
     inputSchema: ArchiveActionInput
   },
   [ActionType.PRINT_CERTIFICATE]: {
-    notifyApiPayloadSchema: undefined,
-    inputSchema: PrintCertificateActionInput
+    ...defaultConfig,
+    inputSchema: PrintCertificateActionInput,
+    allowIfWaitingForCorrection: false
+  },
+  [ActionType.REQUEST_CORRECTION]: {
+    ...defaultConfig,
+    inputSchema: RequestCorrectionActionInput,
+    allowIfWaitingForCorrection: false,
+    meta: {
+      openapi: {
+        summary: 'Request correction for an event',
+        method: 'POST',
+        path: '/events/correction/request',
+        tags: ['events'],
+        protect: true
+      }
+    }
+  },
+  [ActionType.APPROVE_CORRECTION]: {
+    ...defaultConfig,
+    inputSchema: ApproveCorrectionActionInput,
+    meta: {
+      openapi: {
+        summary: 'Approve correction for an event',
+        method: 'POST',
+        path: '/events/correction/approve',
+        tags: ['events'],
+        protect: true
+      }
+    }
+  },
+  [ActionType.REJECT_CORRECTION]: {
+    ...defaultConfig,
+    inputSchema: RejectCorrectionActionInput,
+    meta: {
+      openapi: {
+        summary: 'Reject correction for an event',
+        method: 'POST',
+        path: '/events/correction/reject',
+        tags: ['events'],
+        protect: true
+      }
+    }
   }
 } satisfies Partial<Record<ActionType, ActionProcedureConfig>>
 
@@ -131,7 +183,8 @@ export function getDefaultActionProcedures(
 ): ActionProcedure {
   const actionConfig = ACTION_PROCEDURE_CONFIG[actionType]
 
-  const { notifyApiPayloadSchema, inputSchema } = actionConfig
+  const { notifyApiPayloadSchema, inputSchema, allowIfWaitingForCorrection } =
+    actionConfig
 
   let acceptInputFields = z.object({ actionId: UUID })
 
@@ -153,18 +206,23 @@ export function getDefaultActionProcedures(
       .input(inputSchema)
       .use(middleware.eventTypeAuthorization)
       .use(middleware.requireAssignment)
-      .use(middleware.validateAction(actionType))
+      .use(middleware.validateAction)
       .output(EventDocument)
       .mutation(async ({ ctx, input }) => {
-        const { token, user } = ctx
+        const { token, user, isDuplicateAction } = ctx
         const { eventId } = input
         const actionId = getUUID()
 
-        if (ctx.isDuplicateAction) {
+        if (isDuplicateAction) {
           return ctx.event
         }
 
         await throwConflictIfActionNotAllowed(eventId, actionType, ctx.token)
+
+        // Certain actions are not allowed if the event is waiting for correction
+        if (!allowIfWaitingForCorrection) {
+          await throwConflictIfWaitingForCorrection(eventId, token)
+        }
 
         const event = await getEventById(eventId)
 
@@ -222,7 +280,7 @@ export function getDefaultActionProcedures(
     accept: systemProcedure
       .use(requireScopesMiddleware)
       .input(inputSchema.merge(acceptInputFields))
-      .use(middleware.validateAction(actionType))
+      .use(middleware.validateAction)
       .mutation(async ({ ctx, input }) => {
         const { token, user } = ctx
         const { eventId, actionId } = input
