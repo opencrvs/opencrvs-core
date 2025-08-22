@@ -80,7 +80,7 @@ export async function sendVerificationCode(
         email
       }
     },
-    countryConfigUrl: env.COUNTRY_CONFIG_URL,
+    countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
     authHeader: {
       Authorization: `Bearer ${await createToken(
         'auth',

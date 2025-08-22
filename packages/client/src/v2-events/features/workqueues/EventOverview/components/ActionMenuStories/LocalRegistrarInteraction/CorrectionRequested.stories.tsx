@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta } from '@storybook/react'
-import { ActionType, ExclusiveActions } from '@opencrvs/commons/client'
+import { ActionType, ClientSpecificAction } from '@opencrvs/commons/client'
 import { AssignmentStatus } from '@client/v2-events/utils'
 import { ActionMenu } from '../../ActionMenu'
 import {
@@ -38,7 +38,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.REGISTER,
       ActionType.UNASSIGN,
       ActionType.REQUEST_CORRECTION,
-      ExclusiveActions.REVIEW_CORRECTION_REQUEST
+      ClientSpecificAction.REVIEW_CORRECTION_REQUEST
     ],
     expected: {
       ...getHiddenActions(),
@@ -46,7 +46,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
       [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
-      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
     }
   },
   {
@@ -59,7 +59,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.VALIDATE,
       ActionType.REGISTER,
       ActionType.REQUEST_CORRECTION,
-      ExclusiveActions.REVIEW_CORRECTION_REQUEST
+      ClientSpecificAction.REVIEW_CORRECTION_REQUEST
     ],
     expected: {
       ...getHiddenActions(),
@@ -67,7 +67,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
       [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
-      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: AssertType.ENABLED
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.ENABLED
     }
   },
   {
@@ -82,7 +82,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       ActionType.UNASSIGN,
       AssignmentStatus.ASSIGNED_TO_OTHERS,
       ActionType.REQUEST_CORRECTION,
-      ExclusiveActions.REVIEW_CORRECTION_REQUEST
+      ClientSpecificAction.REVIEW_CORRECTION_REQUEST
     ],
     expected: {
       ...getHiddenActions(),
@@ -90,7 +90,7 @@ const correctionRequestedScenariosForLocalRegistrar: Scenario[] = [
       [ActionType.READ]: AssertType.ENABLED,
       [ActionType.PRINT_CERTIFICATE]: AssertType.HIDDEN,
       [ActionType.REQUEST_CORRECTION]: AssertType.HIDDEN,
-      [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
+      [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: AssertType.DISABLED
     }
   }
 ]

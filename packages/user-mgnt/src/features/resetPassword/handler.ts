@@ -88,6 +88,7 @@ export default async function resetPasswordInviteHandler(
           mobile: user.mobile
         },
         admin: {
+          primaryOfficeId: systemAdminUser.primaryOfficeId,
           name: v1ToV2Name(systemAdminUser.name),
           id: systemAdminUser.id,
           role: systemAdminUser.role

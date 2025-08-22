@@ -60,7 +60,7 @@ export default async function sendUserNameHandler(
       },
       username: retrievalStepInformation.username
     },
-    countryConfigUrl: env.COUNTRY_CONFIG_URL,
+    countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
     authHeader: { Authorization: request.headers.authorization }
   })
 
