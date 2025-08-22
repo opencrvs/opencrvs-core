@@ -202,7 +202,7 @@ export function resolveDateOfEvent(
 function extractDuplicatesFromActions(actions: Action[]) {
   return actions.reduce<UUID[]>((duplicates, action) => {
     if (action.type === ActionType.DUPLICATE_DETECTED) {
-      duplicates = action.duplicates
+      duplicates = action.content.duplicates
     }
     if (action.type === ActionType.MARK_NOT_DUPLICATE) {
       duplicates = []

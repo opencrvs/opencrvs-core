@@ -256,6 +256,7 @@ function buildAction(
     status,
     declaration: input.declaration,
     annotation: input.annotation,
+    ...('content' in input ? { content: input.content } : {}),
     createdBy: user.id,
     createdByRole: user.role,
     createdByUserType: user.type,
@@ -292,18 +293,13 @@ function buildAction(
     case ActionType.REJECT_CORRECTION: {
       return {
         ...commonAttributes,
-        requestId: input.requestId,
-        content: input.content
+        requestId: input.requestId
       }
     }
     case ActionType.REJECT:
     case ActionType.ARCHIVE:
-    case ActionType.PRINT_CERTIFICATE: {
-      return {
-        ...commonAttributes,
-        content: input.content
-      }
-    }
+    case ActionType.DUPLICATE_DETECTED:
+    case ActionType.PRINT_CERTIFICATE:
     case ActionType.READ:
     case ActionType.CREATE:
     case ActionType.NOTIFY:

@@ -48,8 +48,7 @@ export type RegisterActionInput = z.infer<typeof RegisterActionInput>
 
 export const ValidateActionInput = BaseActionInput.merge(
   z.object({
-    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE),
-    duplicates: z.array(z.string())
+    type: z.literal(ActionType.VALIDATE).default(ActionType.VALIDATE)
   })
 )
 
@@ -103,7 +102,9 @@ export const DuplicateDetectedActionInput = BaseActionInput.merge(
     type: z
       .literal(ActionType.DUPLICATE_DETECTED)
       .default(ActionType.DUPLICATE_DETECTED),
-    duplicates: z.array(UUID)
+    content: z.object({
+      duplicates: z.array(UUID)
+    })
   })
 )
 

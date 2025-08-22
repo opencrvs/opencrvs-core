@@ -122,7 +122,9 @@ const RejectAction = ActionBase.merge(
 const DuplicateDetectedAction = ActionBase.merge(
   z.object({
     type: z.literal(ActionType.DUPLICATE_DETECTED),
-    duplicates: z.array(UUID)
+    content: z.object({
+      duplicates: z.array(UUID)
+    })
   })
 )
 
