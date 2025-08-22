@@ -183,10 +183,6 @@ export const user = Object.assign(userSerializer, {
       },
       required: ['$online']
     })
-  // isOnline: () =>
-  //   defineConditional({
-  //     online: true
-  //   })
 })
 
 /**
@@ -382,12 +378,12 @@ export function createFieldConditionals(fieldId: string) {
         properties: {
           [fieldId]: wrapToPath(
             {
-            anyOf: [
-              { const: 'undefined' },
-              { const: false },
-              { const: null },
-              { const: '' }
-            ]
+              anyOf: [
+                { const: 'undefined' },
+                { const: false },
+                { const: null },
+                { const: '' }
+              ]
             },
             this.$$subfield
           )
