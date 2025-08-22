@@ -28,7 +28,6 @@ export interface OnDeclareParams {
   transactionId: string
   annotation?: EventState
   fullEvent?: EventDocument
-  eventConfiguration?: EventConfig
 }
 /**
  * Runs a sequence of actions from declare to register.
