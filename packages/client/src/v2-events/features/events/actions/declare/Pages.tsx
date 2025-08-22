@@ -16,6 +16,7 @@ import {
   useTypedSearchParams
 } from 'react-router-typesafe-routes/dom'
 import {
+  getAvailableActionsForEvent,
   getCurrentEventState,
   getDeclarationPages
 } from '@opencrvs/commons/client'
