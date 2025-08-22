@@ -144,10 +144,7 @@ export const actionLabels = {
   }
 } as const
 
-interface ActionMenuItem
-  extends Partial<
-    Record<WorkqueueActionType & ClientSpecificAction, ActionConfig>
-  > {
+interface ActionMenuItem extends ActionConfig {
   type: WorkqueueActionType | ClientSpecificAction
 }
 
@@ -162,7 +159,6 @@ function useViewableActionConfigurations(
   authentication: ITokenPayload,
   draft?: Draft
 ) {
-  console.log('authentication', authentication)
   const events = useEvents()
   const navigate = useNavigate()
 
