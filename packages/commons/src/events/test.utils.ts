@@ -55,7 +55,11 @@ import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { FieldType } from './FieldType'
-import { AddressType, FileFieldValue } from './CompositeFieldValue'
+import {
+  AddressType,
+  FileFieldValue,
+  HttpFieldValue
+} from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
@@ -154,6 +158,8 @@ export function mapFieldTypeToMockValue(
       return generateRandomName(rng)
     case FieldType.NUMBER:
       return 19
+    case FieldType.BUTTON:
+      return 1
     case FieldType.EMAIL:
       return 'test@opencrvs.org'
     case FieldType.ADDRESS:
@@ -187,6 +193,12 @@ export function mapFieldTypeToMockValue(
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
+    case FieldType.HTTP:
+      return {
+        error: null,
+        data: { nid: '1234567890' },
+        loading: false
+      } satisfies HttpFieldValue
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
       return undefined

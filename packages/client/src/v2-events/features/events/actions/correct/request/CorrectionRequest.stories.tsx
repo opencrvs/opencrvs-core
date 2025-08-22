@@ -53,7 +53,7 @@ const draft = testDataGenerator().event.draft({
   eventId: tennisClubMembershipEventDocument.id,
   actionType: ActionType.REQUEST_CORRECTION,
   annotation: undefined,
-  omitFields: ['applicant.image', 'applicant.dob']
+  omitFields: ['applicant.image']
 })
 
 function FormClear() {
