@@ -203,7 +203,6 @@ test('partial declaration update accounts for conditional field values not in pa
 
   await client.event.actions.validate.request({
     type: ActionType.VALIDATE,
-    duplicates: [],
     declaration: {
       'applicant.dobUnknown': true,
       'applicant.age': 25

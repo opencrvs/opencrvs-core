@@ -89,8 +89,7 @@ export function useReviewActionConfig({
           eventId,
           declaration,
           annotation,
-          transactionId: uuid(),
-          duplicates: []
+          transactionId: uuid()
         })
       },
       messages: incomplete
