@@ -156,8 +156,8 @@ describe('check unreferenced draft attachments are deleted while final action su
     // declaring final action submission
     await client.event.actions.declare.request(getDeclaration(6))
 
-    // file attachment exist api should be called twice (status: "Requested" and "Accepted")
-    expect(fileExistMock.mock.calls).toHaveLength(2)
+    // file attachment exist api should be called once, only for (status: "Requested")
+    expect(fileExistMock.mock.calls).toHaveLength(1)
 
     // total 4 unreferenced draft attachments should be deleted
     expect(deleteUnreferencedDraftAttachmentsMock.mock.calls).toHaveLength(5)

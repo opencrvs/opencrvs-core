@@ -174,7 +174,7 @@ test('Skips required field validation when they are conditionally hidden', async
     }),
     expect.objectContaining({
       status: ActionStatus.Accepted,
-      declaration: data.declaration
+      declaration: {}
     })
   ])
 })
@@ -297,7 +297,7 @@ describe('Request and confirmation flow', () => {
 
       expect(savedAction).toMatchObject({
         status: ActionStatus.Accepted,
-        declaration: data.declaration,
+        declaration: {},
         registrationNumber: registrationNumber
       })
     })

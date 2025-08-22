@@ -18,7 +18,6 @@ import {
   createPrng,
   EventDocument,
   generateActionDeclarationInput,
-  getAcceptedActions,
   getUUID,
   SCOPES
 } from '@opencrvs/commons'
@@ -230,12 +229,17 @@ test(`${ActionType.REQUEST_CORRECTION} Skips required field validation when they
   })
 
   const response = await client.event.actions.correction.request.request(data)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.REQUEST_CORRECTION
+  const savedAction = response.actions.find(
+    ({ type, status }) =>
+      type === ActionType.REQUEST_CORRECTION &&
+      status === ActionStatus.Requested
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction?.status).toEqual(ActionStatus.Requested)
+  if (savedAction?.status === ActionStatus.Requested) {
+    expect(savedAction.declaration).toEqual(form)
+  }
 })
 
 test(`${ActionType.REQUEST_CORRECTION} Prevents adding birth date in future`, async () => {

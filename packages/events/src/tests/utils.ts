@@ -48,7 +48,8 @@ export const UNSTABLE_EVENT_FIELDS = [
   'updatedBy',
   'acceptedAt',
   'dateOfEvent',
-  'registrationNumber'
+  'registrationNumber',
+  'originalActionId'
 ]
 /**u
  * Cleans up unstable fields in data for snapshot testing.

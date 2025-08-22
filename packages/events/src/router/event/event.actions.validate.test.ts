@@ -17,7 +17,6 @@ import {
   AddressType,
   EventStatus,
   generateActionDeclarationInput,
-  getAcceptedActions,
   getCurrentEventState,
   getUUID,
   SCOPES
@@ -175,12 +174,17 @@ test('Skips required field validation when they are conditionally hidden', async
   })
 
   const response = await client.event.actions.validate.request(declaration)
-  const activeActions = getAcceptedActions(response)
 
-  const savedAction = activeActions.find(
-    (action) => action.type === ActionType.VALIDATE
+  const savedAction = response.actions.find(
+    (action) =>
+      action.type === ActionType.VALIDATE &&
+      action.status === ActionStatus.Accepted
   )
-  expect(savedAction?.declaration).toEqual(form)
+
+  expect(savedAction).toMatchObject({
+    status: ActionStatus.Accepted,
+    declaration: {}
+  })
 })
 
 test('Prevents adding birth date in future', async () => {

@@ -130,7 +130,10 @@ test('Event document contains all created actions', async () => {
       ActionType.UNASSIGN
     ]
 
-    if (actionsWithoutAnnotatation.every((ac) => ac !== action.type)) {
+    if (
+      actionsWithoutAnnotatation.every((ac) => ac !== action.type) &&
+      action.status !== ActionStatus.Accepted
+    ) {
       expect(action).toHaveProperty('annotation')
     }
   })
