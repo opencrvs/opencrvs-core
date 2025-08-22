@@ -25,10 +25,15 @@ import {
   AddressType,
   TranslationConfig,
   IndexMap,
-  joinValues
+  joinValues,
+  isNonInteractiveFieldType,
+  SystemVariables,
+  InteractiveFieldType,
+  FieldReference
 } from '@opencrvs/commons/client'
 import {
   FIELD_SEPARATOR,
+  handleDefaultValue,
   makeDatesFormatted,
   makeFormFieldIdFormikCompatible,
   makeFormikFieldIdOpenCRVSCompatible
@@ -70,6 +75,7 @@ type AllProps = {
    * If isCorrection is true, fields with configuration option 'uncorrectable' set to true will be disabled.
    */
   isCorrection?: boolean
+  systemVariables: SystemVariables
   parentId?: string
 } & UsedFormikProps
 
@@ -101,20 +107,20 @@ const FormItem = styled.div<{
 `
 
 /**
- * Given a parent field id, retrieve the ids of all its child field ids.
+ * Given a parent field id, retrieve all of the child configs.
  * Used to reset the values of child fields when a parent field changes.
  */
-function retrieveChildFieldIds(
+function retrieveChildFields(
   parentId: string,
   fieldParentMap: IndexMap<FieldConfig[]>
-): string[] {
+) {
   const childFields = fieldParentMap[parentId]
 
   if (!childFields) {
     return []
   }
 
-  return childFields.map((childField) => childField.id)
+  return childFields
 }
 
 function focusElementByHash() {
@@ -129,6 +135,36 @@ function focusElementByHash() {
 
   input?.focus()
   window.scrollTo(0, document.documentElement.scrollTop - 100)
+}
+
+function getUpdatedChildValueOnChange({
+  childField,
+  fieldReference,
+  fieldValues,
+  systemVariables
+}: {
+  childField: InteractiveFieldType
+  fieldReference: FieldReference | undefined
+  fieldValues: Record<string, FieldValue>
+  systemVariables: SystemVariables
+}) {
+  if (!fieldReference) {
+    // If there is no reference, we reset the value to the default value.
+    return (
+      handleDefaultValue({
+        field: childField,
+        systemVariables
+      }) ?? null
+    )
+  }
+
+  const referenceKeyInFormikFormat = makeFormFieldIdFormikCompatible(
+    fieldReference.$$field
+  )
+
+  return fieldReference.$$subfield
+    ? get(fieldValues[referenceKeyInFormikFormat], fieldReference.$$subfield)
+    : fieldValues[referenceKeyInFormikFormat]
 }
 
 // @TODO: Clarify and unify the naming of the props. What is from formik and what is from the state.
@@ -152,6 +188,7 @@ export function FormSectionComponent({
   fieldsToShowValidationErrors,
   onAllFieldsValidated,
   isCorrection = false,
+  systemVariables,
   parentId
 }: AllProps) {
   // Conditionals need to be able to react to whether the user is online or not -
@@ -197,30 +234,30 @@ export function FormSectionComponent({
   )
 
   /** Sets the value for fields that listen to another field via `parent` and `value` properties */
-  const setValueOfValuePropListeners = useCallback(
+  const setValuesForListenerFields = useCallback(
     (
-      fieldId: string,
+      childField: InteractiveFieldType,
       fieldValues: Record<string, FieldValue>,
       fieldErrors: AllProps['errors']
     ) => {
-      const ref = fieldsWithDotSeparator.find((f) => f.id === fieldId)?.value
-      const targetKey = makeFormFieldIdFormikCompatible(fieldId)
+      // this can be any field. Even though we call this only when parent triggers the change.
+      const referenceToAnotherField = fieldsWithDotSeparator.find(
+        (f) => f.id === childField.id
+      )?.value as FieldReference | undefined
 
-      if (!ref?.$$field) {
-        set(fieldValues, targetKey, undefined)
-        set(fieldErrors, fieldId, { errors: [] })
-        return
-      }
+      const childFieldFormikId = makeFormFieldIdFormikCompatible(childField.id)
 
-      const parentKey = makeFormFieldIdFormikCompatible(ref.$$field)
-      const parentValue = ref.$$subfield
-        ? get(fieldValues[parentKey], ref.$$subfield)
-        : fieldValues[parentKey]
+      const updatedValue = getUpdatedChildValueOnChange({
+        childField,
+        fieldReference: referenceToAnotherField,
+        fieldValues,
+        systemVariables
+      })
 
-      set(fieldValues, targetKey, parentValue)
-      set(fieldErrors, fieldId, { errors: [] })
+      set(fieldValues, childFieldFormikId, updatedValue)
+      set(fieldErrors, childField.id, { errors: [] })
     },
-    [fieldsWithDotSeparator]
+    [fieldsWithDotSeparator, systemVariables]
   )
 
   const onFieldValueChange = useCallback(
@@ -230,14 +267,17 @@ export function FormSectionComponent({
 
       const ocrvsFieldId = makeFormikFieldIdOpenCRVSCompatible(formikFieldId)
 
-      const childIds = retrieveChildFieldIds(ocrvsFieldId, fieldsByParentId)
+      const children = retrieveChildFields(ocrvsFieldId, fieldsByParentId)
+
+      const interactiveChildren = children.filter(
+        (c): c is InteractiveFieldType => !isNonInteractiveFieldType(c)
+      )
 
       // update the value of the field that was changed
       set(updatedValues, formikFieldId, value)
 
-      // reset the children values of the changed field. (e.g. When changing informant.relation, empty out phone number, email and others.)
-      for (const childId of childIds) {
-        setValueOfValuePropListeners(childId, updatedValues, updatedErrors)
+      for (const child of interactiveChildren) {
+        setValuesForListenerFields(child, updatedValues, updatedErrors)
       }
 
       // @TODO: we should not reference field id 'country' directly.
@@ -252,9 +292,10 @@ export function FormSectionComponent({
         )
       }
 
-      const formikChildIds = childIds.map((childId) =>
-        makeFormFieldIdFormikCompatible(childId)
+      const formikChildIds = children.map((child) =>
+        makeFormFieldIdFormikCompatible(child.id)
       )
+
       const updatedTouched = omit(touched, formikChildIds)
 
       // @TODO: Formik does not type errors well. Actual error message differs from the type.
@@ -273,7 +314,7 @@ export function FormSectionComponent({
       errorsWithDotSeparator,
       setErrors,
       setAllTouchedFields,
-      setValueOfValuePropListeners
+      setValuesForListenerFields
     ]
   )
 

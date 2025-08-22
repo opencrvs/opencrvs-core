@@ -36,6 +36,8 @@ import { getUsersFullName } from '@client/v2-events/utils'
 import { getOfflineData } from '@client/offline/selectors'
 import { serializeSearchParams } from '@client/v2-events/features/events/Search/utils'
 import { useActionForHistory } from '@client/v2-events/features/events/actions/correct/useActionForHistory'
+import { usePermissions } from '@client/hooks/useAuthorization'
+import { ILocation } from '@client/offline/reducer'
 import {
   EventHistoryDialog,
   eventHistoryStatusMessage
@@ -68,7 +70,7 @@ const messages = defineMessages({
   role: {
     id: 'v2.event.history.role',
     defaultMessage:
-      '{role, select, LOCAL_REGISTRAR {Local Registrar} SOCIAL_WORKER {Field Agent} REGISTRATION_AGENT {Registration Agent} HEALTH {Health integration} IMPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
+      '{role, select, LOCAL_REGISTRAR {Local Registrar} SOCIAL_WORKER {Social Worker} FIELD_AGENT {Field Agent} POLICE_OFFICER {Police Officer} REGISTRATION_AGENT {Registration Agent} HEALTHCARE_WORKER {Healthcare Worker} LOCAL_LEADER {Local Leader} HOSPITAL_CLERK {Hospital Clerk} LOCAL_SYSTEM_ADMIN {Administrator} NATIONAL_REGISTRAR {Registrar General} PERFORMANCE_MANAGER {Operations Manager} NATIONAL_SYSTEM_ADMIN {National Administrator} COMMUNITY_LEADER {Community Leader} HEALTH {Health integration} IMPORT {Import integration} NATIONAL_ID {National ID integration} RECORD_SEARCH {Record search integration} WEBHOOK {Webhook} other {Unknown}}',
     description: 'Role of the user in the event history'
   },
   systemDefaultName: {
@@ -112,9 +114,10 @@ function getUserAvatar(
   intl: IntlShape,
   name: string,
   navigate: NavigateFunction,
-  userId: string
+  userId: string,
+  isClickable: boolean
 ) {
-  return (
+  return isClickable ? (
     <Link
       font="bold14"
       id="profile-link"
@@ -127,6 +130,8 @@ function getUserAvatar(
         names={name}
       />
     </Link>
+  ) : (
+    <UserAvatar avatar={undefined} locale={intl.locale} names={name} />
   )
 }
 
@@ -138,6 +143,31 @@ function getSystemAvatar(name: string) {
       </div>
       {name}
     </SystemName>
+  )
+}
+
+function getEventLocation(
+  navigate: NavigateFunction,
+  location: ILocation | undefined,
+  action: ActionDocument,
+  isClickable: boolean
+) {
+  return isClickable ? (
+    <Link
+      font="bold14"
+      onClick={() => {
+        navigate({
+          pathname: routes.TEAM_USER_LIST,
+          search: serializeSearchParams({
+            locationId: action.createdAtLocation
+          })
+        })
+      }}
+    >
+      {location?.name}
+    </Link>
+  ) : (
+    <>{location?.name}</>
   )
 }
 
@@ -168,6 +198,7 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
   const [modal, openModal] = useModal()
   const { getUser, getLocation } = useEventOverviewContext()
   const { getActionTypeForHistory } = useActionForHistory()
+  const { canReadUser, canAccessOffice } = usePermissions()
 
   const onHistoryRowClick = (item: ActionDocument, userName: string) => {
     void openModal<void>((close) => (
@@ -231,12 +262,27 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         ? getLocation(action.createdAtLocation)
         : undefined
 
+      const canSeeOtherUserHistory = canReadUser({
+        id: user.id,
+        primaryOffice: { id: user.primaryOfficeId }
+      })
+
+      const canSeeHistoryUserOffice = canAccessOffice({
+        id: user.primaryOfficeId
+      })
+
       const userName = userAction
         ? getUsersFullName(user.name, intl.locale)
         : (system?.name ?? intl.formatMessage(messages.systemDefaultName))
 
       const userElement = userAction
-        ? getUserAvatar(intl, userName, navigate, action.createdBy)
+        ? getUserAvatar(
+            intl,
+            userName,
+            navigate,
+            action.createdBy,
+            canSeeOtherUserHistory
+          )
         : getSystemAvatar(userName)
 
       return {
@@ -256,20 +302,11 @@ export function EventHistory({ fullEvent }: { fullEvent: EventDocument }) {
         ),
         user: userElement,
         role: intl.formatMessage(messages.role, { role: action.createdByRole }),
-        location: (
-          <Link
-            font="bold14"
-            onClick={() => {
-              navigate({
-                pathname: routes.TEAM_USER_LIST,
-                search: serializeSearchParams({
-                  locationId: action.createdAtLocation
-                })
-              })
-            }}
-          >
-            {location?.name}
-          </Link>
+        location: getEventLocation(
+          navigate,
+          location,
+          action,
+          canSeeHistoryUserOffice
         )
       }
     })
