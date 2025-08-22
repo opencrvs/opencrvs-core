@@ -8,5 +8,19 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-export * from './FormFieldRenderer'
-export { useFormContext, FieldValues, get } from 'react-hook-form'
+
+import { SystemVariables } from '@opencrvs/commons/client'
+import { useUserAddress } from './useUserAddress'
+
+/**
+ * Exposes template variables such as `$user` for components to replace field values or other templates
+ */
+export function useSystemVariables() {
+  const user = useUserAddress()
+
+  const variables = {
+    $user: user
+  } satisfies SystemVariables
+
+  return variables
+}

@@ -39,7 +39,8 @@ const DEFAULT_FORM = {
 function getFieldParams(form: Record<string, unknown> = DEFAULT_FORM) {
   return {
     $form: form,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: false
   } satisfies ConditionalParameters
 }
 
@@ -590,9 +591,16 @@ describe('"field" conditionals', () => {
         'empty.string': '',
         'null.value': null,
         'undefined.value': undefined,
-        'false.value': false
+        'false.value': false,
+        'deep.value': {
+          foo: {
+            bar: false,
+            baz: null
+          }
+        }
       },
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     } satisfies FormConditionalParameters
 
     expect(
@@ -606,6 +614,20 @@ describe('"field" conditionals', () => {
       true
     )
     expect(validate(field('false.value').isFalsy(), falsyFormParams)).toBe(true)
+
+    expect(
+      validate(field('deep.value').get('foo.bar').isFalsy(), falsyFormParams)
+    ).toBe(true)
+
+    expect(
+      validate(
+        and(
+          field('deep.value').get('foo.bar').isFalsy(),
+          field('deep.value').get('foo.baz').isFalsy()
+        ),
+        falsyFormParams
+      )
+    ).toBe(true)
   })
 })
 
@@ -618,8 +640,14 @@ describe('"user" conditionals', () => {
       userType: TokenUserType.enum.user,
       sub: '677b33fea7efb08730f3abfa33'
     },
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: true
   } satisfies UserConditionalParameters
+
+  const offlineUserParams = {
+    ...userParams,
+    $online: false
+  }
 
   it('validates "user.hasScope" conditional', () => {
     expect(validate(user.hasScope(SCOPES.VALIDATE), userParams)).toBe(false)
@@ -627,6 +655,11 @@ describe('"user" conditionals', () => {
     expect(validate(user.hasScope(SCOPES.RECORD_REGISTER), userParams)).toBe(
       true
     )
+  })
+
+  it('validates "user.isOnline" conditional', () => {
+    expect(validate(user.isOnline(), userParams)).toBe(true)
+    expect(validate(user.isOnline(), offlineUserParams)).toBe(false)
   })
 })
 
@@ -655,7 +688,8 @@ describe('"event" conditionals', () => {
             transactionId: '123456'
           }
         ]
-      }
+      },
+      $online: false
     } satisfies EventConditionalParameters
 
     expect(validate(event.hasAction(ActionType.DECLARE), eventParams)).toBe(
@@ -705,7 +739,8 @@ describe('"event" conditionals', () => {
             declaration: {}
           }
         ]
-      }
+      },
+      $online: false
     } satisfies EventConditionalParameters
 
     it('returns true when minCount is met for a specific templateId', () => {
@@ -788,7 +823,8 @@ describe('"valid name" conditionals', () => {
       const validName = 'John'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -799,7 +835,8 @@ describe('"valid name" conditionals', () => {
       const validName = 'John Doe'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -810,7 +847,8 @@ describe('"valid name" conditionals', () => {
       const validName = 'Anne-Marie'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -821,7 +859,8 @@ describe('"valid name" conditionals', () => {
       const validName = '(John-Doe)'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -832,7 +871,8 @@ describe('"valid name" conditionals', () => {
       const validName = '(John) Doe'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -843,7 +883,8 @@ describe('"valid name" conditionals', () => {
       const validName = 'John (Denver) Doe'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -854,7 +895,8 @@ describe('"valid name" conditionals', () => {
       const validName = 'John (Doe)'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -865,7 +907,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = 'John_Doe'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -876,7 +919,8 @@ describe('"valid name" conditionals', () => {
       const validName = 'John 3rd'
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -887,7 +931,8 @@ describe('"valid name" conditionals', () => {
       const validName = "10th John The Alex'ander"
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -898,7 +943,8 @@ describe('"valid name" conditionals', () => {
       const validName = "John O'conor"
       const params = {
         $form: { 'child.firstName': validName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -911,7 +957,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = '()'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -922,7 +969,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = 'John Doe()'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -933,7 +981,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = 'John (Doe'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -944,7 +993,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = 'John (Doe))'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -955,7 +1005,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = 'John১'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -966,7 +1017,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = 'জন'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -977,7 +1029,8 @@ describe('"valid name" conditionals', () => {
       const invalidName = ',,,'
       const params = {
         $form: { 'child.firstName': invalidName },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.firstName').isValidEnglishName(), params)
@@ -992,7 +1045,8 @@ describe('"range number" conditional', () => {
       const validRange = 0
       const params = {
         $form: { 'child.weightAtBirth': validRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1003,7 +1057,8 @@ describe('"range number" conditional', () => {
       const validRange = 10
       const params = {
         $form: { 'child.weightAtBirth': validRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1014,7 +1069,8 @@ describe('"range number" conditional', () => {
       const validRange = 5
       const params = {
         $form: { 'child.weightAtBirth': validRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1027,7 +1083,8 @@ describe('"range number" conditional', () => {
       const invalidRange = -1
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1038,7 +1095,8 @@ describe('"range number" conditional', () => {
       const invalidRange = 11
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1051,7 +1109,8 @@ describe('"range number" conditional', () => {
       const validRange = 5.5
       const params = {
         $form: { 'child.weightAtBirth': validRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1062,7 +1121,8 @@ describe('"range number" conditional', () => {
       const invalidRange = -0.1
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1073,7 +1133,8 @@ describe('"range number" conditional', () => {
       const invalidRange = 10.1
       const params = {
         $form: { 'child.weightAtBirth': invalidRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('child.weightAtBirth').isBetween(0, 10), params)
@@ -1086,7 +1147,8 @@ describe('"range number" conditional', () => {
       const validRange = 7
       const params = {
         $form: { 'adult.heightInFeet': validRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('adult.heightInFeet').isBetween(5, 8), params)
@@ -1097,7 +1159,8 @@ describe('"range number" conditional', () => {
       const invalidRange = 4
       const params = {
         $form: { 'adult.heightInFeet': invalidRange },
-        $now: formatISO(new Date(), { representation: 'date' })
+        $now: formatISO(new Date(), { representation: 'date' }),
+        $online: false
       }
       expect(
         validate(field('adult.heightInFeet').isBetween(5, 8), params)
@@ -1111,7 +1174,8 @@ describe('Matches conditional validation', () => {
   it('should pass validation for existing phone number starting with 07', () => {
     const params = {
       $form: { 'applicant.phoneNo': '0733445566' },
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1121,7 +1185,8 @@ describe('Matches conditional validation', () => {
   it('should pass validation for different phone number starting with 09', () => {
     const params = {
       $form: { 'applicant.phoneNo': '0933445566' },
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1131,7 +1196,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number starting with 05', () => {
     const params = {
       $form: { 'applicant.phoneNo': '0533445566' },
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1141,7 +1207,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number shorter than 10 digits', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07334455' }, // Only 8 digits
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1151,7 +1218,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number longer than 10 digits', () => {
     const params = {
       $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1161,7 +1229,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number without leading 0', () => {
     const params = {
       $form: { 'applicant.phoneNo': '733445566' }, // Missing leading 0
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1171,7 +1240,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for non-numeric input', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07A3445566' }, // Contains a letter
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1181,7 +1251,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number not starting with 07 or 09', () => {
     const params = {
       $form: { 'applicant.phoneNo': '08334455667' }, // Invalid prefix
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1191,7 +1262,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number with incorrect length (too short)', () => {
     const params = {
       $form: { 'applicant.phoneNo': '073344556' }, // 9 digits only
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1201,7 +1273,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number with incorrect length (too long)', () => {
     const params = {
       $form: { 'applicant.phoneNo': '073344556677' }, // 12 digits
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1211,7 +1284,8 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number with spaces when strict regex is used', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07 334455667' }, // Spaces not allowed
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
@@ -1221,10 +1295,24 @@ describe('Matches conditional validation', () => {
   it('should fail validation for phone number containing non-numeric characters', () => {
     const params = {
       $form: { 'applicant.phoneNo': '07A34455667' }, // Contains letter
-      $now: formatISO(new Date(), { representation: 'date' })
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
     }
     expect(
       validate(field('applicant.phoneNo').matches(PHONE_NUMBER_REGEX), params)
     ).toBe(false)
+  })
+})
+
+describe('Subfield nesting', () => {
+  it('allows you to validate nested fields of more complex data', () => {
+    const params = {
+      $form: { 'applicant.http': { success: true } },
+      $now: formatISO(new Date(), { representation: 'date' }),
+      $online: false
+    }
+    expect(
+      validate(field('applicant.http').get('success').isEqualTo(true), params)
+    ).toBe(true)
   })
 })
