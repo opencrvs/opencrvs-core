@@ -199,38 +199,6 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
   )
 }
 
-function formatAllNonStringValues(
-  templateData: EventState,
-  intl: IntlShape
-): EventState {
-  const formattedData: EventState = {}
-
-  for (const key of Object.keys(templateData)) {
-    const value = templateData[key]
-
-    if (isMessageDescriptor(value)) {
-      formattedData[key] = intl.formatMessage(value)
-    } else if (Array.isArray(value)) {
-      // Address field: country label is a MessageDescriptor but others are strings
-      formattedData[key] = value
-        .filter(Boolean)
-        .map((item) =>
-          isMessageDescriptor(item) ? intl.formatMessage(item) : item
-        )
-        .join(', ')
-    } else if (typeof value === 'object' && value !== null) {
-      formattedData[key] = formatAllNonStringValues(
-        value satisfies EventState,
-        intl
-      ) as FieldValue
-    } else {
-      formattedData[key] = String(value)
-    }
-  }
-
-  return formattedData
-}
-
 const cache = createIntlCache()
 
 function isRecord(value: unknown): value is Record<string, unknown> {
@@ -283,6 +251,10 @@ export function compileSvg({
 
   const customHelpers = getHandlebarHelpers()
 
+  const stringifyDeclaration = getFormDataStringifier(intl, locations)
+  const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
+  const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
+
   for (const helperName of Object.keys(customHelpers)) {
     /*
      * Note for anyone adding new context variables to handlebar helpers:
@@ -310,29 +282,6 @@ export function compileSvg({
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
-    const stringifyDeclaration = getFormDataStringifier(intl, locations)
-    const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
-    let resolvedDeclaration: Record<string, unknown> = stringifyDeclaration(
-      fieldConfigs,
-      $declaration
-    )
-
-    /*
-     * This enables a lookup like
-     * $lookup $declaration "applicant.name.firstname"
-     * where applicant.name is really the field id but the value of it is an object
-     */
-    for (const [key, value] of Object.entries($declaration)) {
-      if (isRecord(value)) {
-        resolvedDeclaration = {
-          ...resolvedDeclaration,
-          ...flattenObject({
-            [key]: value
-          })
-        }
-      }
-    }
-
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
       intl,
@@ -343,7 +292,31 @@ export function compileSvg({
     if (isEqual($metadata, obj)) {
       return getMixedPath(resolvedMetadata, propertyPath)
     }
-    return getMixedPath(resolvedDeclaration, propertyPath)
+
+    /*
+     * This enables a lookup like
+     * $lookup $declaration "applicant.name.firstname"
+     * where applicant.name is really the field id but the value of it is an object
+     */
+    const nestedFieldsOfDeclarationValues = Object.entries($declaration).reduce(
+      (fields, [key, value]) => {
+        if (isRecord(value)) {
+          return {
+            ...fields,
+            ...flattenObject({
+              [key]: value
+            })
+          }
+        }
+        return fields
+      },
+      {}
+    )
+
+    return getMixedPath(
+      { ...resolvedDeclaration, ...nestedFieldsOfDeclarationValues },
+      propertyPath
+    )
   }
 
   Handlebars.registerHelper('$lookup', $lookup)
@@ -513,10 +486,9 @@ export function compileSvg({
   )
 
   const template = Handlebars.compile(templateString)
-  $declaration = formatAllNonStringValues($declaration, intl)
 
   const data = {
-    $declaration,
+    $declaration: resolvedDeclaration,
     $metadata,
     $references: {
       locations,
