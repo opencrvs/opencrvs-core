@@ -21,6 +21,7 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
+import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
   id: TENNIS_CLUB_MEMBERSHIP,
@@ -71,6 +72,20 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
+      },
+      deduplication: {
+        id: 'tennis-club-membership-deduplication',
+        label: {
+          defaultMessage: 'Tennis club membership deduplication',
+          description:
+            'This is shown as the label for the deduplication configuration',
+          id: 'event.tennis-club-membership.deduplication.label'
+        },
+        query: and(
+          dedupField('applicant.name').fuzzyMatches(),
+          dedupField('applicant.email').strictMatches(),
+          dedupField('applicant.dob').dateRangeMatches({ days: 3 * 365 })
+        )
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },

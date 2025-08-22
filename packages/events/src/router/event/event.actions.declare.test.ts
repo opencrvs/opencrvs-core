@@ -13,12 +13,22 @@ import { TRPCError } from '@trpc/server'
 import {
   ActionType,
   AddressType,
+  createPrng,
+  eventQueryDataGenerator,
   generateActionDeclarationInput,
   getAcceptedActions,
-  SCOPES
+  getCurrentEventState,
+  getUUID,
+  SCOPES,
+  TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
 import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
+import {
+  getEventIndexName,
+  getOrCreateClient
+} from '@events/storage/elasticsearch'
+import { encodeEventIndex } from '@events/service/indexing/utils'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -293,4 +303,42 @@ test(`${ActionType.DECLARE} is idempotent`, async () => {
   const secondResponse = await client.event.actions.declare.request(data)
 
   expect(firstResponse).toEqual(secondResponse)
+})
+
+test.only('deduplication check is performed after declaration', async () => {
+  const esClient = getOrCreateClient()
+  const prng = createPrng(73)
+  const { user, generator } = await setupTestCase()
+  const client = createTestClient(user)
+
+  const newEvent = await client.event.create(generator.event.create())
+  const existingEventId = getUUID()
+  const declaration = generateActionDeclarationInput(
+    tennisClubMembershipEvent,
+    ActionType.DECLARE,
+    prng
+  )
+  const existingEventIndex = eventQueryDataGenerator({
+    id: existingEventId,
+    declaration
+  })
+
+  await esClient.update({
+    index: getEventIndexName(TENNIS_CLUB_MEMBERSHIP),
+    id: existingEventId,
+    body: {
+      doc: encodeEventIndex(existingEventIndex, tennisClubMembershipEvent),
+      doc_as_upsert: true
+    },
+    refresh: 'wait_for'
+  })
+
+  const declaredEvent = await client.event.actions.declare.request(
+    generator.event.actions.declare(newEvent.id, {
+      declaration: existingEventIndex.declaration
+    })
+  )
+  expect(
+    getCurrentEventState(declaredEvent, tennisClubMembershipEvent).duplicates
+  ).toEqual([existingEventId])
 })
