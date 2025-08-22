@@ -18,7 +18,8 @@ import {
   tennisClubMembershipEvent,
   generateEventDocument,
   getCurrentEventState,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
@@ -38,13 +39,18 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   ],
   transformer: { input: superjson, output: superjson }
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
-const eventDocument = generateEventDocument({
+
+const validatedEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE]
+  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
 })
 
-const eventId = eventDocument.id
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  validatedEventDocument
+)
+
+const eventId = validatedEventDocument.id
 
 const meta: Meta<typeof Review> = {
   title: 'Register/Review/Interaction/Local Registrar',
@@ -53,7 +59,7 @@ const meta: Meta<typeof Review> = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(eventDocument.id, eventDocument)
+    setEventData(eventId, validatedEventDocument)
   },
   loaders: [
     () => {
@@ -87,19 +93,15 @@ const mockUser = {
   ],
   role: 'SOCIAL_WORKER',
   signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
-
-const validateEventDocument = generateEventDocument({
-  configuration: tennisClubMembershipEvent,
-  actions: [ActionType.CREATE, ActionType.DECLARE, ActionType.VALIDATE]
-})
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(
-        validateEventDocument,
+        validatedEventDocument,
         tennisClubMembershipEvent
       ).declaration
     })
@@ -191,7 +193,7 @@ export const ReviewForLocalRegistrarArchiveInteraction: Story = {
        * and this test case assumes a scenario where user had previously
        * downloaded the event document.
        */
-      events: [declarationTrpcMsw.eventDocument]
+      events: [validatedEventDocument]
     },
     msw: {
       handlers: {

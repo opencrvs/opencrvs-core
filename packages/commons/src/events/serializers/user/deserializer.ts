@@ -9,18 +9,12 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import { z } from 'zod'
 import { QueryExpression, QueryType, User } from '../../../events'
 import {
   CountryConfigQueryType,
   SerializedQueryExpression
 } from '../../../events/CountryConfigQueryInput'
 import { SerializedUserField } from './serializer'
-
-export const UserWithPrimaryOffice = User.extend({
-  primaryOfficeId: z.string()
-})
-export type UserWithPrimaryOffice = z.infer<typeof UserWithPrimaryOffice>
 
 /**
  * Deserializes a user field from a serialized representation or a string.
@@ -49,7 +43,7 @@ export type UserWithPrimaryOffice = z.infer<typeof UserWithPrimaryOffice>
  */
 function userDeserializer(
   serializedUserField: SerializedUserField | string,
-  user: UserWithPrimaryOffice
+  user: User
 ): string {
   if (typeof serializedUserField === 'string') {
     return serializedUserField
@@ -68,7 +62,7 @@ function userDeserializer(
 
 function deserializeQueryExpression(
   expression: SerializedQueryExpression,
-  user: UserWithPrimaryOffice
+  user: User
 ): QueryExpression {
   return {
     ...expression,
@@ -118,7 +112,7 @@ function deserializeQueryExpression(
 
 export function deserializeQuery(
   query: CountryConfigQueryType,
-  user: UserWithPrimaryOffice
+  user: User
 ): QueryType {
   return {
     ...query,
