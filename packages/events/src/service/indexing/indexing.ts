@@ -110,6 +110,7 @@ function mapFieldTypeToElasticsearch(
     case FieldType.FACILITY:
     case FieldType.OFFICE:
     case FieldType.DATA:
+    case FieldType.BUTTON:
     case FieldType.ID:
     case FieldType.PHONE:
       return { type: 'keyword' }
@@ -168,6 +169,15 @@ function mapFieldTypeToElasticsearch(
           type: { type: 'keyword' },
           option: { type: 'keyword' }
         }
+      }
+    case FieldType.HTTP:
+      /**
+       * HTTP values are redirected to other fields via `value: field('http').get('data.my-data')`, so we currently don't need to enable exhaustive indexing.
+       * The field still lands in `_source`.
+       */
+      return {
+        type: 'object',
+        enabled: false
       }
     case FieldType.DATE_RANGE:
     case FieldType.SELECT_DATE_RANGE:
@@ -291,6 +301,20 @@ type _Combine<
 
 type Combine<T> = { [K in keyof _Combine<T>]: _Combine<T>[K] }
 type AllFieldsUnion = Combine<AddressFieldValue>
+
+export async function indexEventsInBulk(
+  batch: EventDocument[],
+  configs: EventConfig[]
+) {
+  const esClient = getOrCreateClient()
+
+  const body = batch.flatMap((doc) => [
+    { index: { _index: getEventIndexName(doc.type), _id: doc.id } },
+    eventToEventIndex(doc, getEventConfigById(configs, doc.type))
+  ])
+
+  return esClient.bulk({ refresh: false, body })
+}
 
 export async function indexEvent(event: EventDocument, config: EventConfig) {
   const esClient = getOrCreateClient()

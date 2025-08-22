@@ -14,7 +14,8 @@
       "esnext.asynciterable",
       "es2015",
       "es6",
-      "es2019"
+      "es2019",
+      "DOM"
     ],
     "forceConsistentCasingInFileNames": true,
     "noImplicitReturns": true,

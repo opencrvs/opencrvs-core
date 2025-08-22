@@ -129,7 +129,6 @@ describe('event.actions.notify', () => {
       }
     }
 
-    // @TODO:  the error seems quite verbose. Check what causes it and if we can improve it
     await expect(
       // @ts-expect-error -- Intentionally passing incorrect type
       client.event.actions.notify.request(payload)
