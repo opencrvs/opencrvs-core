@@ -194,10 +194,19 @@ function useViewableActionConfigurations(
     ACTION_ALLOWED_SCOPES[ActionType.VALIDATE]
   )
   const isRejected = event.flags.includes(InherentFlags.REJECTED)
+  const isDeclaredState = event.status === EventStatus.enum.DECLARED
   const isNotifiedState = event.status === EventStatus.enum.NOTIFIED
   // What reads on the button is important but secondary. We need to perform the actions in certain order for them to succeed.
-  const shouldShowDeclareAsReview =
+  // "If you receive incomplete declartion, we want you to review it, regardless of the action you take."
+  const canReviewNotification =
     hasScopeForValidate && !isRejected && isNotifiedState
+
+  const isDeclarationRejectedBeforeValidate =
+    isRejected && (isNotifiedState || isDeclaredState)
+
+  // "If your declaration is rejected, we want you to review it, regardless of the action you take."
+  const shouldShowDeclareAsReview =
+    canReviewNotification || isDeclarationRejectedBeforeValidate
 
   // By default, field agent has both scopes for incomplete (notify) and complete (declare) actions.
   // As a business rule, for notified event, client hides the declare action if the user has no scope for validate.
