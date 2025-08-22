@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: 2e49d89e-337d-40dc-b40e-e6162fa9a8a9
+                transactionId: f1850a70-a1d1-4a2c-98c9-e1be690f70be
                 type: v2.birth
       responses:
         "200":
@@ -486,7 +486,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: ae414b69-06bb-49fb-ab34-00e34833ce8d
+                transactionId: 27d89385-0fa7-4a8d-84ad-77a4692b52aa
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -2004,6 +2004,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.BAD_REQUEST"
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/reindex:
+    post:
+      operationId: event-reindex
+      summary: Triggers reindexing of search, workqueues and notifies country config
+      tags:
+        - events
+      security:
+        - Authorization: []
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema: {}
         "401":
           description: Authorization not provided
           content:
