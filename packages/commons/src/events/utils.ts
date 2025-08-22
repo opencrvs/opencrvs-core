@@ -498,20 +498,22 @@ export function getPendingAction(actions: Action[]): ActionDocument {
   return pendingActions[0]
 }
 
-export function aggregateActionDeclarations(
-  actions: Array<ActionDocument>
-): EventState {
-  /** Types that are not taken into the aggregate values (e.g. while printing certificate)
+export function aggregateActionDeclarations(event: EventDocument): EventState {
+  /*
+   * Types that are not taken into the aggregate values (e.g. while printing certificate)
    * stop auto filling collector form with previous print action data)
    */
-
   const excludedActions = [
     ActionType.REQUEST_CORRECTION,
     ActionType.PRINT_CERTIFICATE,
     ActionType.REJECT_CORRECTION
   ]
 
-  return actions.reduce((declaration, action) => {
+  const acceptedActions = getAcceptedActions(event).sort((a, b) =>
+    a.createdAt.localeCompare(b.createdAt)
+  )
+
+  return acceptedActions.reduce((declaration, action) => {
     if (
       excludedActions.some((excludedAction) => excludedAction === action.type)
     ) {
@@ -525,11 +527,38 @@ export function aggregateActionDeclarations(
      */
 
     if (action.type === ActionType.APPROVE_CORRECTION) {
-      const requestAction = actions.find(({ id }) => id === action.requestId)
+      const requestAction = acceptedActions.find(
+        ({ id }) => id === action.requestId
+      )
       if (!requestAction) {
         return declaration
       }
       return deepMerge(declaration, requestAction.declaration)
+    }
+
+    /*
+     * When an action has an `originalActionId`, it means this action is linked
+     * to another one (the "original" action).
+     *
+     * - The original action, with status `Requested`, was created by core.
+     * - The linked action (with status `Accepted`) comes from
+     *   the country configuration in response to that request.
+     *
+     * If we find the original action, we merge its declaration into the current one
+     * so that the current action includes the original details.
+     */
+    if (action.originalActionId) {
+      const originalAction = event.actions.find(
+        ({ id }) => id === action.originalActionId
+      )
+      if (originalAction?.status !== ActionStatus.Requested) {
+        return declaration
+      }
+
+      return deepMerge(
+        deepMerge(declaration, originalAction.declaration),
+        action.declaration
+      )
     }
 
     return deepMerge(declaration, action.declaration)

@@ -29,7 +29,8 @@ import {
   ACTION_ALLOWED_CONFIGURABLE_SCOPES,
   RequestCorrectionActionInput,
   ApproveCorrectionActionInput,
-  RejectCorrectionActionInput
+  RejectCorrectionActionInput,
+  getPendingAction
 } from '@opencrvs/commons/events'
 import { TokenUserType } from '@opencrvs/commons/authentication'
 import * as middleware from '@events/router/middleware'
@@ -269,8 +270,19 @@ export function getDefaultActionProcedures(
           }
         }
 
+        const { declaration, annotation, ...strippedInput } = input
+
+        const requestedAction = getPendingAction(
+          eventWithRequestedAction.actions
+        )
+
         return addAction(
-          { ...input, ...parsedBody },
+          {
+            ...strippedInput,
+            declaration: {},
+            originalActionId: requestedAction.id,
+            ...parsedBody
+          },
           {
             eventId,
             user,
