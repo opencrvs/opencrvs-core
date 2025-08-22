@@ -36,7 +36,8 @@ import {
   EventMetadata,
   EventStatus,
   DEFAULT_DATE_OF_EVENT_PROPERTY,
-  ActionDocument
+  ActionDocument,
+  ActionStatus
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -202,17 +203,6 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 
 const cache = createIntlCache()
 
-function isActionDocument(obj: unknown): obj is ActionDocument {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'type' in obj &&
-    'createdAt' in obj &&
-    'status' in obj
-  )
-}
-
 export function compileSvg({
   templateString,
   $metadata,
@@ -272,7 +262,9 @@ export function compileSvg({
    * @example {{ $actions "PRINT_CERTIFICATE" }}
    */
   function $actionsFn(actionType: string) {
-    return $actions.filter((a) => a.type === actionType)
+    return $actions
+      .filter((a) => a.status === ActionStatus.Accepted)
+      .filter((a) => a.type === actionType)
   }
 
   Handlebars.registerHelper('$actions', $actionsFn)
@@ -289,7 +281,9 @@ export function compileSvg({
    */
 
   function $action(actionType: string) {
-    return $actions.findLast((a) => a.type === actionType)
+    return $actions
+      .filter((a) => a.status === ActionStatus.Accepted)
+      .findLast((a) => a.type === actionType)
   }
 
   Handlebars.registerHelper('$action', $action)
@@ -327,20 +321,21 @@ export function compileSvg({
       return getMixedPath(resolvedDeclaration, propertyPath)
     }
 
-    if (isActionDocument(obj)) {
+    const action = ActionDocument.safeParse(obj)
+    if (action.success) {
       const resolvedAction = {
-        id: obj.id,
-        type: obj.type,
-        createdAt: DateField.stringify(intl, obj.createdAt),
-        createdBy: users.find((user) => user.id === obj.createdBy),
-        createdByUserType: obj.createdByUserType,
-        createdBySignature: obj.createdBySignature,
+        id: action.data.id,
+        type: action.data.type,
+        createdAt: DateField.stringify(intl, action.data.createdAt),
+        createdBy: users.find((user) => user.id === action.data.createdBy),
+        createdByUserType: action.data.createdByUserType,
+        createdBySignature: action.data.createdBySignature,
         createdAtLocation: LocationSearch.stringify(
           intl,
           locations,
-          obj.createdAtLocation
+          action.data.createdAtLocation
         ),
-        createdByRole: obj.createdByRole
+        createdByRole: action.data.createdByRole
       }
 
       return getMixedPath(resolvedAction, propertyPath)

@@ -12,6 +12,7 @@
 import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
 import {
+  ActionDocument,
   ActionType,
   CertificateTemplateConfig,
   EventConfig,
@@ -142,7 +143,7 @@ export const usePrintableCertificate = ({
     templateString: certificateConfig.svg,
     $metadata: modifiedMetadata,
     $declaration: declaration,
-    $actions: actionsWithAnOptimisticPrintAction,
+    $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
     locations,
     users,
     language,
@@ -176,7 +177,7 @@ export const usePrintableCertificate = ({
         copiesPrintedForTemplate
       },
       $declaration: declarationWithResolvedImages,
-      $actions: actionsWithAnOptimisticPrintAction,
+      $actions: actionsWithAnOptimisticPrintAction as ActionDocument[],
       locations,
       users,
       language,
