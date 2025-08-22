@@ -159,7 +159,9 @@ export function mapFieldTypeToMockValue(
     case FieldType.ADDRESS:
       return {
         country: 'FAR',
-        addressType: AddressType.DOMESTIC
+        addressType: AddressType.DOMESTIC,
+        administrativeArea: '123e4567-e89b-12d3-a456-426614174000',
+        streetLevelDetails: {}
       }
     case FieldType.DATE:
       return '2021-01-01'

@@ -499,30 +499,7 @@ const Address = BaseField.extend({
   configuration: z
     .object({
       lineSeparator: z.string().optional(),
-      fields: z
-        .array(
-          z.enum([
-            'number',
-            'country',
-            'province',
-            'addressType',
-            'district',
-            'urbanOrRural',
-            'town',
-            'residentialArea',
-            'street',
-            'zipCode',
-            'village',
-            'state',
-            'district2',
-            'cityOrTown',
-            'addressLine1',
-            'addressLine2',
-            'addressLine3',
-            'postcodeOrZip'
-          ])
-        )
-        .optional(),
+      fields: z.array(z.enum(['country', 'administrativeArea'])).optional(),
       administrativeLevels: z.array(z.string()).optional(),
       streetAddressForm: z
         .array(

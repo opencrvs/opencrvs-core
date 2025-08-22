@@ -51,6 +51,7 @@ const config = {
     REGISTRATION_TARGET: 45,
     PRINT_IN_ADVANCE: true
   },
+  ADMIN_STRUCTURE: ['adminLevel1', 'adminLevel2'],
   FEATURES: {
     DEATH_REGISTRATION: true,
     MARRIAGE_REGISTRATION: true,

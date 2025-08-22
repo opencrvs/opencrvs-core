@@ -155,13 +155,13 @@ export function ValueOutput(
         searchMode === true
           ? [
               'country',
-              'province',
-              'district',
-              'state',
-              'district2',
-              'urbanOrRural',
-              'town',
-              'village'
+              'addressType',
+              'adminLevel1',
+              'adminLevel2',
+              'adminLevel3',
+              'adminLevel4',
+              'adminLevel5',
+              'adminLevel6'
             ]
           : undefined,
       lineSeparator: searchMode === true ? ', ' : undefined

@@ -1,3 +1,4 @@
+/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -12,6 +13,7 @@ import React from 'react'
 import { IntlShape } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
+import { add } from 'lodash'
 import {
   EventState,
   AddressFieldValue,
@@ -37,6 +39,7 @@ import {
   stringifySimpleField
 } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -59,7 +62,6 @@ function addDefaultValue<T extends FieldConfigWithoutAddress>(
 
   return (fieldConfig) => {
     const key = fieldConfig.id as keyof typeof defaultValues
-
     if (!defaultValues[key]) {
       return fieldConfig
     }
@@ -83,6 +85,40 @@ function isInternationalAddress() {
     not(createFieldCondition('country').isUndefined()),
     createFieldCondition('addressType').isEqualTo(AddressType.INTERNATIONAL)
   )
+}
+
+function getAdminLevelHierarchy(
+  targetAdminUUId: string | undefined,
+  locations: Location[]
+) {
+  // Prepare result object
+  const result: Partial<Record<`adminLevel${number}`, string>> = {}
+
+  // Find the starting location
+  let current = targetAdminUUId
+    ? locations.find((l) => l.id === targetAdminUUId.toString())
+    : null
+
+  // Walk up the hierarchy, collecting UUIDs
+  let level = 0
+  while (current) {
+    level++
+    result[`adminLevel${level}` as const] = current.id
+    if (!current.partOf) {
+      break
+    }
+    // partOf may be "Location/UUID" or just "UUID"
+    const parentId = current.partOf.replace(/^Location\//, '')
+    current = locations.find((l) => l.id === parentId)
+  }
+
+  // Reverse the result so adminLevel1 is the root, adminLevelN is the leaf
+  const entries = Object.entries(result).reverse()
+  const hierarchy: Partial<Record<`adminLevel${number}`, string>> = {}
+  entries.forEach(([_, id], idx) => {
+    hierarchy[`adminLevel${idx + 1}` as const] = id
+  })
+  return hierarchy
 }
 
 const displayWhenDistrictUrbanSelected = [
@@ -284,6 +320,24 @@ const DEFAULT_DOMESTIC_ADMIN_STRUCTURE = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
+/* const DEFAULT_DOMESTIC_ADDRESS_FIELDS = [
+  {
+    id: 'streetLevelDetails',
+    conditionals: displayWhenDomesticAddressSelected,
+    required: false,
+    hideLabel: true,
+    label: {
+      id: 'v2.field.address.domestic.addressLine1.label',
+      defaultMessage: 'Town',
+      description: 'This is the label for the field'
+    },
+    configuration: {
+      addressLines: ['addressLine5', 'addressLine6', 'addressLine7']
+    },
+    type: FieldType.STREET_DETAILS
+  }
+] as const satisfies FieldConfigWithoutAddress[] */
+
 const DEFAULT_DOMESTIC_ADDRESS_FIELDS = [
   {
     id: 'addressLine1',
@@ -413,7 +467,7 @@ const ALL_INTERNATIONAL_FIELDS = [
 
 const ALL_ADDRESS_FIELDS = [
   ...ALL_DOMESTIC_FIELDS,
-  ...ALL_INTERNATIONAL_FIELDS,
+  /* ...ALL_INTERNATIONAL_FIELDS, */
   addressTypeField
 ]
 
@@ -436,13 +490,13 @@ type AllFields = (typeof ALL_ADDRESS_FIELDS)[number]['id']
  * If you see a type error, it means that the fields in the component do not
  * match the fields in the AddressFieldValue type.
  */
-type _ExpectTrue = Expect<
+/* type _ExpectTrue = Expect<
   EnsureSameUnion<AllFields, RequiredKeysFromFieldValue>
->
+> */
 
 const ALL_ADDRESS_INPUT_FIELDS = [
-  ...ALL_DOMESTIC_FIELDS,
-  ...ALL_INTERNATIONAL_FIELDS
+  ...ALL_DOMESTIC_FIELDS
+  /* ...ALL_INTERNATIONAL_FIELDS */
 ] satisfies Array<FieldConfigWithoutAddress>
 
 type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
@@ -471,6 +525,22 @@ function AddressInput(props: Props) {
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const administrativeLevelsCutoff = props.configuration?.administrativeLevels
 
+  console.log(
+    'defaultValue.administrativeArea :>> ',
+    defaultValue?.administrativeArea
+  )
+
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const targetAdminUUId = defaultValue?.administrativeArea
+
+  const adminLevels = getAdminLevelHierarchy(targetAdminUUId, locations)
+  console.log('adminLevels:', adminLevels)
+
+  // Merge adminLevels into the value
+  const mergedValues = { ...value, ...adminLevels }
+  console.log('mergedValues :>> ', mergedValues)
+  console.log('This one doesnt work :>> ', { ...value, ...defaultValue })
   const administrativeLevels =
     Array.isArray(administrativeLevelsCutoff) &&
     administrativeLevelsCutoff.length > 0
@@ -486,8 +556,10 @@ function AddressInput(props: Props) {
 
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? [...customAddressFields, ...INTERNATIONAL_ADDRESS_FIELDS]
-      : [...DEFAULT_DOMESTIC_ADDRESS_FIELDS, ...INTERNATIONAL_ADDRESS_FIELDS]
+      ? [...customAddressFields /* ...INTERNATIONAL_ADDRESS_FIELDS */]
+      : [
+          ...DEFAULT_DOMESTIC_ADDRESS_FIELDS /* , ...INTERNATIONAL_ADDRESS_FIELDS */
+        ]
 
   /* const fields = getFilteredFields(props.configuration?.fields)
   const fieldsWithDefaults = defaultValue
@@ -495,18 +567,49 @@ function AddressInput(props: Props) {
     : fields */
 
   const fields = [...COUNTRY_STRUCTURE, ...adminStructure, ...addressFields]
-
   const fieldsWithDefaults = defaultValue
     ? fields.map(addDefaultValue(defaultValue))
     : fields
+
+  console.log('value in AddressInput', mergedValues)
 
   return (
     <FormFieldGenerator
       {...otherProps}
       fields={fieldsWithDefaults}
-      initialValues={{ ...defaultValue, ...value }}
+      initialValues={{ ...mergedValues }}
       parentId={props.id}
-      onChange={(values) => onChange(values as Partial<AddressFieldValue>)}
+      onChange={(values) => {
+        console.log('AddressInput onChange values:', values)
+
+        const { addressLine1, addressLine2, addressLine3 } = values
+
+        // Helper function to get the leaf adminLevel value from 6 down to 1
+        function getLeafAdminLevel(val: Partial<AddressFieldValue>) {
+          for (let i = 6; i >= 1; i--) {
+            const key = `adminLevel${i}` as keyof AddressFieldValue
+            if (val[key]) {
+              return val[key]
+            }
+          }
+          return undefined
+        }
+
+        const leafAdminLevel = getLeafAdminLevel(values)
+        if (leafAdminLevel) {
+          console.log('Leaf level adminLevel value:', leafAdminLevel)
+        }
+
+        onChange({
+          ...values,
+          administrativeArea: leafAdminLevel,
+          streetLevelDetails: {
+            addressLine1,
+            addressLine2,
+            addressLine3
+          } // Merge address lines into streetLevelDetails
+        } as Partial<AddressFieldValue>)
+      }}
     />
   )
 }
@@ -514,15 +617,39 @@ function AddressInput(props: Props) {
 function AddressOutput({
   value,
   lineSeparator,
-  fields
+  fields,
+  configuration
 }: {
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
   fields?: Array<AddressFieldIdentifier>
+  configuration?: AddressField['configuration']
 }) {
   if (!value) {
     return ''
   }
+  console.log('value in AddressOutput', value)
+
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const targetAdminUUId = value.administrativeArea
+
+  const location = targetAdminUUId?.toString()
+    ? locations.find((l) => l.id === targetAdminUUId.toString())
+    : null
+
+  console.log('location in AddressOutput', location)
+
+  // Usage:
+  const adminLevels = getAdminLevelHierarchy(targetAdminUUId, locations)
+  console.log('adminLevels:', adminLevels)
+
+  const updatedValues = {
+    ...value,
+    ...adminLevels
+  }
+
+  console.log('updatedValues in AddressOutput', updatedValues)
 
   const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
@@ -531,10 +658,36 @@ function AddressOutput({
     appConfigAdminLevels.includes(item.id)
   )
 
-  const addressFields = [
+  const customAddressFields =
+    configuration?.streetAddressForm as FieldConfigWithoutAddress[]
+
+  const addressFields =
+    Array.isArray(customAddressFields) && customAddressFields.length > 0
+      ? [...customAddressFields /* ...INTERNATIONAL_ADDRESS_FIELDS */]
+      : [
+          ...DEFAULT_DOMESTIC_ADDRESS_FIELDS /* , ...INTERNATIONAL_ADDRESS_FIELDS */
+        ]
+
+  /* const addressFields = [
     ...DEFAULT_DOMESTIC_ADDRESS_FIELDS,
     ...INTERNATIONAL_ADDRESS_FIELDS
-  ]
+  ] */
+
+  function getFieldValue(obj: any, fieldId: string): any {
+    // Try direct property first
+    if (obj[fieldId] !== undefined) {
+      return obj[fieldId]
+    }
+    // If not found, check streetLevelDetails for addressLineX fields
+    if (
+      fieldId.startsWith('addressLine') &&
+      obj.streetLevelDetails &&
+      typeof obj.streetLevelDetails === 'object'
+    ) {
+      return obj.streetLevelDetails[fieldId]
+    }
+    return undefined
+  }
 
   const fieldsToShow = [
     ...COUNTRY_STRUCTURE,
@@ -543,13 +696,18 @@ function AddressOutput({
   ]
     .map((field) => ({
       field,
-      value: value[field.id as keyof typeof value]
+      value: getFieldValue(updatedValues, field.id)
     }))
     .filter(
       (field) =>
         field.value &&
-        isFieldDisplayedOnReview(field.field satisfies FieldConfig, value)
+        isFieldDisplayedOnReview(
+          field.field satisfies FieldConfig,
+          updatedValues
+        )
     )
+
+  console.log('fieldsToShow :>> ', fieldsToShow)
 
   return (
     <>

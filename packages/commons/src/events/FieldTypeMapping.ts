@@ -197,17 +197,8 @@ export function mapFieldTypeToEmptyValue(field: FieldConfig) {
       return {
         country: '',
         addressType: AddressType.DOMESTIC,
-        adminLevel1: '',
-        adminLevel2: '',
-        adminLevel3: '',
-        adminLevel4: '',
-        adminLevel5: '',
-        adminLevel6: '',
-        addressLine1: '',
-        addressLine2: '',
-        addressLine3: '',
-        addressLine4: '',
-        addressLine5: ''
+        administrativeArea: '',
+        streetLevelDetails: {}
       } satisfies AddressFieldValue
     case FieldType.SIGNATURE:
     case FieldType.FILE:

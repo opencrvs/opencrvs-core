@@ -147,34 +147,9 @@ export function generateQueryForAddressField(
     mustMatches.push({ match: { [`${fieldId}.country`]: country } })
   }
   if (addressType === 'DOMESTIC') {
-    if (value.adminLevel1) {
+    if (value.administrativeArea) {
       mustMatches.push({
-        match: { [`${fieldId}.adminLevel1`]: value.adminLevel1 }
-      })
-    }
-    if (value.adminLevel2) {
-      mustMatches.push({
-        match: { [`${fieldId}.adminLevel2`]: value.adminLevel2 }
-      })
-    }
-    if (value.addressLine1) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.addressLine1`]: {
-            query: value.addressLine1,
-            fuzziness: 'AUTO'
-          }
-        }
-      })
-    }
-    if (value.addressLine2) {
-      mustMatches.push({
-        match: {
-          [`${fieldId}.addressLine2`]: {
-            query: value.addressLine2,
-            fuzziness: 'AUTO'
-          }
-        }
+        match: { [`${fieldId}.administrativeArea`]: value.administrativeArea }
       })
     }
   }
