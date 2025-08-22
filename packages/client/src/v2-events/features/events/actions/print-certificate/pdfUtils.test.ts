@@ -12,8 +12,22 @@
 import { createIntl } from 'react-intl'
 import createFetchMock from 'vitest-fetch-mock'
 import { ContentSvg } from 'pdfmake/interfaces'
-import { eventQueryDataGenerator, User, UUID } from '@opencrvs/commons/client'
-import { svgToPdfTemplate, stringifyEventMetadata } from './pdfUtils'
+import {
+  ActionDocument,
+  eventQueryDataGenerator,
+  tennisClubMembershipEvent,
+  User,
+  UUID
+} from '@opencrvs/commons/client'
+import {
+  tennisClubMembershipEventDocument,
+  tennisClubMembershipEventIndex
+} from '../../fixtures'
+import {
+  svgToPdfTemplate,
+  stringifyEventMetadata,
+  compileSvg
+} from './pdfUtils'
 
 const fetch = createFetchMock(vi)
 fetch.enableMocks()
@@ -128,5 +142,53 @@ describe('svgToPdfTemplate', () => {
       </svg>
       `.trim()
     )
+  })
+})
+
+function expectRenderOutput(template: string, output: string) {
+  const { declaration, ...metadata } = tennisClubMembershipEventIndex
+  const result = compileSvg({
+    templateString: template,
+    $metadata: {
+      ...metadata,
+      modifiedAt: new Date().toISOString(),
+      copiesPrintedForTemplate: 2
+    },
+    $actions: tennisClubMembershipEventDocument.actions as ActionDocument[],
+    $declaration: {
+      'applicant.name': {
+        firstname: 'John',
+        surname: 'Doe'
+      }
+    },
+    locations: [],
+    users: [],
+    language: { lang: 'en', messages: {} },
+    config: tennisClubMembershipEvent
+  })
+
+  expect(result).toBe(output)
+}
+
+describe('SVG compiler', () => {
+  describe('$actions', () => {
+    it('allows you to access full list of actions', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($actions "DECLARE") "length" }}</text></svg>',
+        '<svg><text>1</text></svg>'
+      )
+    })
+  })
+  describe('$action', () => {
+    it('can be used to get full action details of the event', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $action "DECLARE" }}</text></svg>',
+        '<svg><text>[object Object]</text></svg>'
+      )
+      expectRenderOutput(
+        '<svg><text>{{ $lookup ($action "DECLARE") "createdAt" }}</text></svg>',
+        '<svg><text>23 January 2025</text></svg>'
+      )
+    })
   })
 })

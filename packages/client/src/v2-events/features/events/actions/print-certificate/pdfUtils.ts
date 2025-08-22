@@ -35,7 +35,8 @@ import {
   getMixedPath,
   EventMetadata,
   EventStatus,
-  DEFAULT_DATE_OF_EVENT_PROPERTY
+  DEFAULT_DATE_OF_EVENT_PROPERTY,
+  ActionDocument
 } from '@opencrvs/commons/client'
 import { DateField } from '@client/v2-events/features/events/registered-fields'
 import { getHandlebarHelpers } from '@client/forms/handlebarHelpers'
@@ -201,10 +202,22 @@ function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
 
 const cache = createIntlCache()
 
+function isActionDocument(obj: unknown): obj is ActionDocument {
+  return (
+    typeof obj === 'object' &&
+    obj !== null &&
+    'id' in obj &&
+    'type' in obj &&
+    'createdAt' in obj &&
+    'status' in obj
+  )
+}
+
 export function compileSvg({
   templateString,
   $metadata,
   $declaration,
+  $actions,
   locations,
   users,
   language,
@@ -215,6 +228,7 @@ export function compileSvg({
     modifiedAt: string
     copiesPrintedForTemplate: number | undefined
   }
+  $actions: ActionDocument[]
   $declaration: EventState
   locations: Location[]
   users: User[]
@@ -248,6 +262,39 @@ export function compileSvg({
   }
 
   /**
+   * Handlebars helper: $actions
+   *
+   * Resolves all actions for a specific action type
+   *
+   * @param actionType - The type of action to look up (e.g., "PRINT_CERTIFICATE")
+   * @returns The resolved list of actions
+   *
+   * @example {{ $actions "PRINT_CERTIFICATE" }}
+   */
+  function $actionsFn(actionType: string) {
+    return $actions.filter((a) => a.type === actionType)
+  }
+
+  Handlebars.registerHelper('$actions', $actionsFn)
+
+  /**
+   * Handlebars helper: $action
+   *
+   * Finds the latest action data for a specific action type and property path.
+   *
+   * @param actionType - The type of action to look up (e.g., "PRINT_CERTIFICATE")
+   * @returns The resolved value from the action data
+   *
+   * @example {{ $action "PRINT_CERTIFICATE" }}
+   */
+
+  function $action(actionType: string) {
+    return $actions.findLast((a) => a.type === actionType)
+  }
+
+  Handlebars.registerHelper('$action', $action)
+
+  /**
    * Handlebars helper: $lookup
    *
    * Resolves a value from the given property path within the combined $state and $declaration objects. useful for extracting specific properties from complex structures like `child.address.other`
@@ -261,7 +308,10 @@ export function compileSvg({
    * @example {'foo': {'bar': {'baz': 'quix'}} } // $lookup 'foo.bar.baz' => 'quix'
    * @example { 'informant.address': { 'other': { 'district': 'quix' } } } // $lookup 'informant.address.other.district' => 'quix'
    */
-  function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
+  function $lookup(
+    obj: EventMetadata | EventState | ActionDocument,
+    propertyPath: string
+  ) {
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
       intl,
@@ -272,10 +322,50 @@ export function compileSvg({
     if (isEqual($metadata, obj)) {
       return getMixedPath(resolvedMetadata, propertyPath)
     }
-    return getMixedPath(resolvedDeclaration, propertyPath)
+
+    if (isEqual(resolvedDeclaration, obj)) {
+      return getMixedPath(resolvedDeclaration, propertyPath)
+    }
+
+    if (isActionDocument(obj)) {
+      const resolvedAction = {
+        id: obj.id,
+        type: obj.type,
+        createdAt: DateField.stringify(intl, obj.createdAt),
+        createdBy: users.find((user) => user.id === obj.createdBy),
+        createdByUserType: obj.createdByUserType,
+        createdBySignature: obj.createdBySignature,
+        createdAtLocation: LocationSearch.stringify(
+          intl,
+          locations,
+          obj.createdAtLocation
+        ),
+        createdByRole: obj.createdByRole
+      }
+
+      return getMixedPath(resolvedAction, propertyPath)
+    }
+
+    return obj[propertyPath as keyof typeof obj] ?? ''
   }
 
   Handlebars.registerHelper('$lookup', $lookup)
+
+  /**
+   * Handlebars helper: $json
+   *
+   * Converts any value to its JSON string representation.
+   *
+   * @param value - The value to stringify
+   * @returns The JSON string representation of the value
+   *
+   * @example {{ $json someObject }}
+   */
+  function $json(value: unknown) {
+    return JSON.stringify(value)
+  }
+
+  Handlebars.registerHelper('$json', $json)
 
   /**
    * Handlebars helper: $intl

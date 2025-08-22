@@ -26,6 +26,7 @@ import {
   isDateFieldType,
   isHttpFieldType
 } from '@opencrvs/commons/client'
+import { ActionDocument } from '@opencrvs/commons'
 import {
   Address,
   AdministrativeArea,
@@ -38,7 +39,6 @@ import {
   Http
 } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
-
 interface RecursiveStringRecord {
   [key: string]: string | undefined | RecursiveStringRecord
 }
