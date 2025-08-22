@@ -233,6 +233,26 @@ function formatAllNonStringValues(
 
 const cache = createIntlCache()
 
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+function flattenObject(
+  obj: Record<string, unknown>,
+  prefix = '',
+  res: Record<string, unknown> = {}
+): Record<string, unknown> {
+  for (const [key, value] of Object.entries(obj)) {
+    const newKey = prefix ? `${prefix}.${key}` : key
+
+    if (isRecord(value)) {
+      flattenObject(value, newKey, res)
+    } else {
+      res[newKey] = value
+    }
+  }
+  return res
+}
+
 export function compileSvg({
   templateString,
   $metadata,
@@ -292,7 +312,26 @@ export function compileSvg({
   function $lookup(obj: EventMetadata | EventState, propertyPath: string) {
     const stringifyDeclaration = getFormDataStringifier(intl, locations)
     const fieldConfigs = config.declaration.pages.flatMap((x) => x.fields)
-    const resolvedDeclaration = stringifyDeclaration(fieldConfigs, $declaration)
+    let resolvedDeclaration: Record<string, unknown> = stringifyDeclaration(
+      fieldConfigs,
+      $declaration
+    )
+
+    /*
+     * This enables a lookup like
+     * $lookup $declaration "applicant.name.firstname"
+     * where applicant.name is really the field id but the value of it is an object
+     */
+    for (const [key, value] of Object.entries($declaration)) {
+      if (isRecord(value)) {
+        resolvedDeclaration = {
+          ...resolvedDeclaration,
+          ...flattenObject({
+            [key]: value
+          })
+        }
+      }
+    }
 
     const resolvedMetadata = stringifyEventMetadata({
       metadata: $metadata,
