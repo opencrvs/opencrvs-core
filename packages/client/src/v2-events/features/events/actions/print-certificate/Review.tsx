@@ -327,6 +327,7 @@ export function Review() {
           )}
 
           <Content
+            showTitleOnMobile
             bottomActionButtons={[
               <ProtectedComponent
                 key="edit-record"
