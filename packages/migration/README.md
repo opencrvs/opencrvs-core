@@ -29,9 +29,3 @@ With **Postgres**, it's similar but the migrations are written in SQL instead of
 e.g. `yarn status:user-mgnt`
 
 This will show status for the migration scripts defined in the migrations/<package> folder.
-
-# SQL Style Guide
-
-- Use `snake_case` for naming
-- Use plural nouns for table names (e.g. `events`, `locations`)
-- Use named constraints for clarity and traceability (e.g. event_actions_check)
