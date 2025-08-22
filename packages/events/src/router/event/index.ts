@@ -55,6 +55,7 @@ import {
   findRecordsByQuery,
   getIndexedEvents
 } from '@events/service/indexing/indexing'
+import { declareActionProcedures } from '@events/service/events/actions/declare'
 import { UserContext } from '../../context'
 import { getDefaultActionProcedures } from './actions'
 
@@ -210,7 +211,7 @@ export const eventRouter = router({
   }),
   actions: router({
     notify: router(getDefaultActionProcedures(ActionType.NOTIFY)),
-    declare: router(getDefaultActionProcedures(ActionType.DECLARE)),
+    declare: router(declareActionProcedures()),
     validate: router(getDefaultActionProcedures(ActionType.VALIDATE)),
     reject: router(getDefaultActionProcedures(ActionType.REJECT)),
     archive: router(getDefaultActionProcedures(ActionType.ARCHIVE)),
