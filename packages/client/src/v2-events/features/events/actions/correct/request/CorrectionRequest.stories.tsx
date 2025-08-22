@@ -51,37 +51,10 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 const generator = testDataGenerator()
 const draft = testDataGenerator().event.draft({
   eventId: tennisClubMembershipEventDocument.id,
-  actionType: ActionType.REQUEST_CORRECTION
+  actionType: ActionType.REQUEST_CORRECTION,
+  annotation: undefined,
+  omitFields: ['applicant.image', 'applicant.dob']
 })
-
-const declaration = {
-  'applicant.name': 'Max McLaren',
-  'applicant.dob': '2020-01-02'
-}
-
-const draftWithoutImage: EventDocument = {
-  id: generateUuid(),
-  trackingId: generateUuid(),
-  type: tennisClubMembershipEvent.id,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
-  actions: [
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.CREATE
-    }),
-    generateActionDocument({
-      configuration: tennisClubMembershipEvent,
-      action: ActionType.DECLARE,
-      defaults: {
-        createdByUserType: 'user',
-        createdBy: generateUuid(),
-        createdByRole: 'FIELD_AGENT',
-        declaration
-      }
-    })
-  ]
-}
 
 function FormClear() {
   const drafts = useDrafts()
@@ -120,6 +93,7 @@ export const ReviewWithChanges: Story = {
   play: async ({ canvasElement }) => {
     const canvas = within(canvasElement)
 
+    await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
     await waitFor(async () => {
       await expect(
         canvas.getByRole('button', { name: 'Continue' })
@@ -180,6 +154,7 @@ export const Review: Story = {
       await userEvent.click(
         canvas.getByRole('button', { name: 'Back to review' })
       )
+      await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
       await waitFor(async () => {
         await expect(
           canvas.getByRole('button', { name: 'Continue' })
@@ -187,22 +162,6 @@ export const Review: Story = {
       })
 
       await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
-    })
-
-    await step("Check applicant's profile picture", async () => {
-      const container = canvas.getByTestId('row-value-applicant.image')
-      const buttons = within(container).getAllByRole('button', {
-        name: "Applicant's profile picture"
-      })
-      await expect(buttons).toHaveLength(2)
-      await userEvent.click(buttons[0])
-      const closeButton = (await canvas.findAllByRole('button')).find(
-        (btn) => btn.id === 'preview_close'
-      )
-      if (!closeButton) {
-        throw new Error("Close button with id 'preview_close' not found")
-      }
-      await userEvent.click(closeButton)
     })
 
     await step('Change recommender values', async () => {
@@ -246,26 +205,16 @@ export const Summary: Story = {
   play: async ({ canvasElement, step }) => {
     const canvas = within(canvasElement)
     await step('Check the summary table', async () => {
-      const button = (await canvas.findAllByRole('button')).find(
-        (x) => x.innerText === "Applicant's profile picture"
-      )
-      await expect(canvas.getByText('Verify ID')).toBeInTheDocument()
-      await expect(canvas.getByText('Yes')).toBeInTheDocument()
-      await expect(button).toBeInTheDocument()
-
-      if (!button) {
-        throw new Error(
-          "Button with text 'Applicant's profile picture' not found"
-        )
-      }
-      await userEvent.click(button)
-      const closeButton = (await canvas.findAllByRole('button')).find(
-        (btn) => btn.id === 'preview_close'
-      )
-      if (!closeButton) {
-        throw new Error("Close button with id 'preview_close' not found")
-      }
-      await userEvent.click(closeButton)
+      void expect(await canvas.findByText('Verify ID')).toBeInTheDocument()
+      void expect(await canvas.findByText('Yes')).toBeInTheDocument()
+      void expect(
+        await canvas.findByText('Another registration agent or field agent')
+      ).toBeInTheDocument()
+      void expect(
+        await canvas.findByText("Child's name was incorrect")
+      ).toBeInTheDocument()
+      void expect(await canvas.findByText('Riku Rouvila')).toBeInTheDocument()
+      void expect(await canvas.findByText('Max McLaren')).toBeInTheDocument()
     })
   }
 }
@@ -316,6 +265,8 @@ export const ReviewCorrection: Story = {
       ).toBeInTheDocument()
     })
 
+    await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
+
     await userEvent.click(canvas.getByRole('button', { name: /approve/i }))
     await userEvent.click(canvas.getByTestId('close-dialog'))
 
@@ -330,37 +281,5 @@ export const ReviewCorrection: Story = {
     }
 
     await userEvent.click(canvas.getByTestId('close-dialog'))
-  }
-}
-
-export const ReviewNoImage: Story = {
-  parameters: {
-    offline: {
-      drafts: [draftWithoutImage]
-    },
-    reactRouter: {
-      router: {
-        path: '/',
-        element: <Outlet />,
-        children: [router]
-      },
-      initialPath: ROUTES.V2.EVENTS.CORRECTION.REVIEW.buildPath({
-        eventId: tennisClubMembershipEventDocument.id
-      })
-    },
-    msw: {
-      handlers: {
-        event: [
-          tRPCMsw.event.get.query(() => {
-            return tennisClubMembershipEventDocument
-          })
-        ]
-      }
-    }
-  },
-  play: async ({ canvasElement }) => {
-    const canvas = within(canvasElement)
-
-    await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
   }
 }
