@@ -109,7 +109,10 @@ export const usePrintableCertificate = ({
     annotation: null,
     originalActionId: null,
     createdBySignature: userFromUsersList.signature,
-    createdAtLocation: userDetails.primaryOffice.id as UUID
+    createdAtLocation: userDetails.primaryOffice.id as UUID,
+    content: {
+      templateId: certificateConfig?.id
+    }
   } satisfies PrintCertificateAction)
 
   const copiesPrintedForTemplate = actionsWithAnOptimisticPrintAction.filter(

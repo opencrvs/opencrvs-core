@@ -26,7 +26,6 @@ import {
   isDateFieldType,
   isHttpFieldType
 } from '@opencrvs/commons/client'
-import { ActionDocument } from '@opencrvs/commons'
 import {
   Address,
   AdministrativeArea,
