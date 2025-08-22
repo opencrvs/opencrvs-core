@@ -270,6 +270,7 @@ export function getDefaultActionProcedures(
           }
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { declaration, annotation, ...strippedInput } = input
 
         const requestedAction = getPendingAction(
