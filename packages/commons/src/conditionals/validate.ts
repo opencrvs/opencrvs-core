@@ -99,13 +99,22 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return result
 }
 
+export function isOnline() {
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    return navigator.onLine
+  }
+  // Server-side: assume always online
+  return true
+}
+
 export function isConditionMet(
   conditional: JSONSchema,
   values: Record<string, unknown>
 ) {
   return validate(conditional, {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline()
   })
 }
 
@@ -147,7 +156,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
-    })
+    }),
+    $online: isOnline()
   })
 
   return validConditionals.includes(conditionalType)
@@ -384,7 +394,8 @@ export function runFieldValidations({
 
   const conditionalParameters = {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline()
   }
 
   const fieldValidationResult = validateFieldInput({

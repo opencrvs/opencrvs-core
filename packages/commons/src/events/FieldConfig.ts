@@ -22,12 +22,14 @@ import {
   DateRangeFieldValue,
   SignatureFieldValue,
   SelectDateRangeValue,
-  TimeValue
+  TimeValue,
+  ButtonFieldValue
 } from './FieldValue'
 import {
   AddressFieldValue,
   FileFieldValue,
-  FileFieldWithOptionValue
+  FileFieldWithOptionValue,
+  HttpFieldValue
 } from './CompositeFieldValue'
 import { extendZodWithOpenApi } from 'zod-openapi'
 extendZodWithOpenApi(z)
@@ -36,9 +38,17 @@ const FieldId = z.string().describe('Unique identifier for the field')
 
 export const FieldReference = z
   .object({
-    $$field: FieldId
+    $$field: FieldId,
+    $$subfield: z
+      .array(z.string())
+      .optional()
+      .describe(
+        'If the FieldValue is an object, subfield can be used to refer to e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+      )
   })
   .describe('Reference to a field by its ID')
+
+export type FieldReference = z.infer<typeof FieldReference>
 
 export const ValidationConfig = z.object({
   validator: Conditional,
@@ -66,7 +76,12 @@ const BaseField = z.object({
     .optional()
     .describe(
       'Indicates if the field can be changed during a record correction.'
-    )
+    ),
+  value: FieldReference.optional().describe(
+    'Reference to a parent field. If field has a value, the value will be copied when the parent field is changed.'
+    // @TODO: When Zod is upgraded to v4, remove this any to fix error TS7056
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ) as any
 })
 
 export type BaseField = z.infer<typeof BaseField>
@@ -549,7 +564,54 @@ const DataField = BaseField.extend({
 
 export type DataField = z.infer<typeof DataField>
 
-export type FieldConfig =
+const ButtonField = BaseField.extend({
+  type: z.literal(FieldType.BUTTON),
+  defaultValue: ButtonFieldValue.optional(),
+  configuration: z.object({
+    icon: z
+      .string()
+      .optional()
+      .describe(
+        'Icon for the button. You can find icons from OpenCRVS UI-Kit.'
+      ),
+    loading: z
+      .boolean()
+      .optional()
+      .describe('Whether the button is in a loading state and shows a spinner'),
+    text: TranslationConfig.describe('Text to display on the button')
+  })
+}).describe('Generic button without any built-in functionality')
+
+export type ButtonField = z.infer<typeof ButtonField>
+
+const HttpField = BaseField.extend({
+  type: z.literal(FieldType.HTTP),
+  defaultValue: HttpFieldValue.optional(),
+  configuration: z.object({
+    trigger: FieldReference,
+    url: z.string().describe('URL to send the HTTP request to'),
+    method: z.enum(['GET', 'POST', 'PUT', 'DELETE']),
+    headers: z.record(z.string()).optional(),
+    body: z.record(z.string()).optional(),
+    params: z.record(z.string()).optional(),
+    timeout: z
+      .number()
+      .default(15000)
+      .describe('Request timeout in milliseconds')
+  })
+}).describe('HTTP request function triggered by a button click')
+
+export type HttpField = z.infer<typeof HttpField>
+
+/*
+ * This needs to be exported so that Typescript can refer to the type in
+ * the declaration output type. If it can't do that, you might start encountering
+ * "The inferred type of this node exceeds the maximum length the compiler will serialize. An explicit type annotation is needed"
+ * errors when compiling
+ */
+
+/** @knipignore */
+export type Inferred =
   | z.infer<typeof Address>
   | z.infer<typeof TextField>
   | z.infer<typeof NumberField>
@@ -578,7 +640,41 @@ export type FieldConfig =
   | z.infer<typeof SignatureField>
   | z.infer<typeof EmailField>
   | z.infer<typeof DataField>
+  | z.infer<typeof ButtonField>
+  | z.infer<typeof HttpField>
 
+/** @knipignore */
+/**
+ * This is the type that should be used for the input of the FieldConfig. Useful when config uses zod defaults.
+ */
+export type InferredInput =
+  | z.input<typeof Address>
+  | z.input<typeof TextField>
+  | z.input<typeof NumberField>
+  | z.input<typeof TextAreaField>
+  | z.input<typeof DateField>
+  | z.input<typeof DateRangeField>
+  | z.input<typeof Paragraph>
+  | z.input<typeof RadioGroup>
+  | z.input<typeof BulletList>
+  | z.input<typeof PageHeader>
+  | z.input<typeof Select>
+  | z.input<typeof NameField>
+  | z.input<typeof PhoneField>
+  | z.input<typeof IdField>
+  | z.input<typeof Checkbox>
+  | z.input<typeof File>
+  | z.input<typeof FileUploadWithOptions>
+  | z.input<typeof Country>
+  | z.input<typeof AdministrativeArea>
+  | z.input<typeof Divider>
+  | z.input<typeof Location>
+  | z.input<typeof Facility>
+  | z.input<typeof Office>
+  | z.input<typeof SignatureField>
+  | z.input<typeof EmailField>
+  | z.input<typeof DataField>
+  | z.input<typeof HttpField>
 export const FieldConfig = z
   .discriminatedUnion('type', [
     Address,
@@ -608,7 +704,9 @@ export const FieldConfig = z
     SignatureField,
     EmailField,
     FileUploadWithOptions,
-    DataField
+    DataField,
+    ButtonField,
+    HttpField
   ])
   .openapi({
     description: 'Form field configuration',
@@ -623,7 +721,7 @@ export type LocationField = z.infer<typeof Location>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
-
+export type FieldConfig = Inferred
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
 export type SelectOption = z.infer<typeof SelectOption>
 
