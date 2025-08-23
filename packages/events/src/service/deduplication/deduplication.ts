@@ -22,7 +22,7 @@ import {
   DateValue,
   FieldType
 } from '@opencrvs/commons/events'
-import { joinValues, logger } from '@opencrvs/commons'
+import { logger } from '@opencrvs/commons'
 import {
   getOrCreateClient,
   getEventIndexName
@@ -32,7 +32,8 @@ import {
   decodeEventIndex,
   EncodedEventIndex,
   encodeEventIndex,
-  encodeFieldId
+  encodeFieldId,
+  nameQueryKey
 } from '@events/service/indexing/utils'
 
 export function generateElasticsearchQuery(
@@ -71,7 +72,7 @@ export function generateElasticsearchQuery(
   const encodedFieldId = encodeFieldId(rawFieldId)
   const valuePath =
     fieldConfig.type === FieldType.NAME
-      ? joinValues([encodedFieldId, '__fullname'], '.')
+      ? nameQueryKey(encodedFieldId)
       : encodedFieldId
 
   const queryKey = declarationReference(valuePath)
