@@ -13,7 +13,6 @@ import React from 'react'
 import { IntlShape } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
-import { add } from 'lodash'
 import {
   EventState,
   AddressFieldValue,
@@ -28,7 +27,6 @@ import {
   AdministrativeAreas,
   alwaysTrue,
   AddressType,
-  never,
   isFieldDisplayedOnReview,
   AddressField
 } from '@opencrvs/commons/client'

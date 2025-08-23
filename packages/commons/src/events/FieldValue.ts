@@ -75,6 +75,7 @@ export const SignatureFieldValue = z.string()
 export type SignatureFieldValue = z.infer<typeof SignatureFieldValue>
 
 export const FieldValue = z.union([
+  z.record(z.string(), z.string()).optional(),
   TextValue,
   DateValue,
   TimeValue,
@@ -93,6 +94,7 @@ export const FieldValue = z.union([
 export type FieldValue = z.infer<typeof FieldValue>
 
 export const FieldUpdateValue = z.union([
+  z.record(z.string(), z.string()).nullish(),
   TextValue,
   DateValue,
   TimeValue,
