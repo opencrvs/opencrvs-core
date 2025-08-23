@@ -155,13 +155,13 @@ export const GeneratedInputField = React.memo(
     }
 
     const handleFileChange = useCallback(
-      (val: FileFieldValue | undefined) =>
+      (val: FileFieldValue | null) =>
         onFieldValueChange(fieldDefinition.id, val),
       [fieldDefinition.id, onFieldValueChange]
     )
 
     const handleFileWithOptionChange = useCallback(
-      (val: FileFieldWithOptionValue | undefined) =>
+      (val: FileFieldWithOptionValue) =>
         onFieldValueChange(fieldDefinition.id, val),
       [fieldDefinition.id, onFieldValueChange]
     )

@@ -278,5 +278,6 @@ export async function refetchDraftsList() {
 
 export async function cleanUpOnUnassign(updatedEvent: EventDocument) {
   await deleteEventData(updatedEvent)
+  updateLocalEventIndex(updatedEvent.id, updatedEvent)
   await invalidateWorkqueues()
 }

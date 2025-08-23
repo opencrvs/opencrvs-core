@@ -100,7 +100,7 @@ export const usePrintableCertificate = ({
     copiesPrintedForTemplate
   }
 
-  if (!language || !certificateConfig) {
+  if (!language || !certificateConfig?.svg) {
     return { svgCode: null }
   }
 

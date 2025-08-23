@@ -8,6 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable max-lines */
 import type { Meta, StoryObj } from '@storybook/react'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import superjson from 'superjson'
@@ -19,11 +20,12 @@ import {
   generateEventDocument,
   generateEventDraftDocument,
   getCurrentEventState,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
-import { AppRouter, trpcOptionsProxy } from '@client/v2-events/trpc'
+import { AppRouter } from '@client/v2-events/trpc'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { createDeclarationTrpcMsw } from '@client/tests/v2-events/declaration.utils'
 import { setEventData, addLocalEventConfig } from '../../useEvents/api'
@@ -39,23 +41,31 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const declareEventDocument = generateEventDocument({
+const createdEventDocument = generateEventDocument({
+  configuration: tennisClubMembershipEvent,
+  actions: [ActionType.CREATE]
+})
+const declarationTrpcMsw = createDeclarationTrpcMsw(
+  tRPCMsw,
+  createdEventDocument
+)
+
+const declaredEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE, ActionType.DECLARE]
 })
-const declarationTrpcMsw = createDeclarationTrpcMsw(tRPCMsw)
 
 const meta: Meta<typeof ReviewIndex> = {
   title: 'Declare/Interaction',
   parameters: {
     offline: {
-      events: [declareEventDocument]
+      events: [createdEventDocument]
     }
   },
   beforeEach: () => {
     useEventFormData.setState({
       formValues: getCurrentEventState(
-        declareEventDocument,
+        declaredEventDocument,
         tennisClubMembershipEvent
       ).declaration
     })
@@ -77,7 +87,8 @@ const mockUser = {
   ],
   role: 'SOCIAL_WORKER',
   signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
 
 export const ReviewForLocalRegistrarCompleteInteraction: Story = {
@@ -111,7 +122,12 @@ export const ReviewForLocalRegistrarCompleteInteraction: Story = {
     chromatic: { disableSnapshot: true },
     offline: {
       events: [declarationTrpcMsw.eventDocument],
-      drafts: [declarationTrpcMsw.draft]
+      drafts: [
+        generateEventDraftDocument({
+          eventId: declarationTrpcMsw.eventDocument.id,
+          actionType: ActionType.DECLARE
+        })
+      ]
     },
     msw: {
       handlers: {
@@ -254,7 +270,7 @@ export const ReviewForRegistrationAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -311,7 +327,7 @@ export const ReviewForFieldAgentCompleteInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -468,10 +484,6 @@ export const ReviewForFieldAgentIncompleteInteraction: Story = {
 
 export const ReviewForIncompleteNameInteraction: Story = {
   name: 'Declaration shows as incomplete when surname is left out',
-  beforeEach: () => {
-    // For this test, we want to have empty form values in zustand state
-    useEventFormData.setState({ formValues: {} })
-  },
   loaders: [
     () => {
       declarationTrpcMsw.events.reset()
@@ -488,7 +500,7 @@ export const ReviewForIncompleteNameInteraction: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -527,13 +539,13 @@ export const ChangeFieldInReview: Story = {
      * Ensure record is "downloaded offline" in the user's browser
      */
     addLocalEventConfig(tennisClubMembershipEvent)
-    setEventData(declareEventDocument.id, declareEventDocument)
+    setEventData(createdEventDocument.id, createdEventDocument)
   },
   parameters: {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
@@ -544,7 +556,7 @@ export const ChangeFieldInReview: Story = {
             return [
               generateEventDraftDocument({
                 eventId,
-                actionType: ActionType.REGISTER
+                actionType: ActionType.DECLARE
               })
             ]
           })
@@ -583,8 +595,10 @@ export const ChangeFieldInReview: Story = {
       const backToReviewButton = await canvas.findByText('Back to review')
       await userEvent.click(backToReviewButton)
 
-      await canvas.findByText("Applicant's name")
-      await canvas.findByText('John Nileem-Rowa')
+      await waitFor(async () => {
+        await expect(canvas.getByText("Applicant's name")).toBeInTheDocument()
+        await expect(canvas.getByText('John Nileem-Rowa')).toBeInTheDocument()
+      })
     })
   }
 }

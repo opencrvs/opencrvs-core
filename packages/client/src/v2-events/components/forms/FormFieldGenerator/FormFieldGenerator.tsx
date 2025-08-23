@@ -123,11 +123,11 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
     const formikOnChange = (values: EventState) =>
       onChange(makeFormikFieldIdsOpenCRVSCompatible(values))
 
-    const variables = useSystemVariables()
+    const systemVariables = useSystemVariables()
 
     const formikCompatibleInitialValues =
       makeFormFieldIdsFormikCompatible<FieldValue>({
-        ...mapFieldsToValues(fields, variables),
+        ...mapFieldsToValues(fields, systemVariables),
         ...initialValues
       })
 
@@ -179,6 +179,7 @@ export const FormFieldGenerator: React.FC<FormFieldGeneratorProps> = React.memo(
               setFieldValue={formikProps.setFieldValue}
               setTouched={formikProps.setTouched}
               setValues={formikProps.setValues}
+              systemVariables={systemVariables}
               touched={{ ...formikProps.touched, ...initialTouchedFields }}
               validateAllFields={validateAllFields}
               values={formikProps.values}
