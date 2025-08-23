@@ -10,7 +10,7 @@
  */
 import { defineConditional } from '../conditionals/conditionals'
 import { defineConfig } from '../events/defineConfig'
-import { ActionType } from '../events/ActionType'
+import { ActionType, DeclarationActionType } from '../events/ActionType'
 import { PageTypes } from '../events/PageConfig'
 import { FieldType } from '../events/FieldType'
 import { field } from '../events/field'
@@ -21,6 +21,7 @@ import {
   TENNIS_CLUB_DECLARATION_FORM,
   TENNIS_CLUB_DECLARATION_REVIEW
 } from './forms'
+import { Clause, EventConfig } from '../events'
 import { and, field as dedupField } from '../events/deduplication'
 
 export const tennisClubMembershipEvent = defineConfig({
@@ -72,20 +73,6 @@ export const tennisClubMembershipEvent = defineConfig({
         description:
           'This is shown as the action name anywhere the user can trigger the action from',
         id: 'event.tennis-club-membership.action.declare.label'
-      },
-      deduplication: {
-        id: 'tennis-club-membership-deduplication',
-        label: {
-          defaultMessage: 'Tennis club membership deduplication',
-          description:
-            'This is shown as the label for the deduplication configuration',
-          id: 'event.tennis-club-membership.deduplication.label'
-        },
-        query: and(
-          dedupField('applicant.name').fuzzyMatches(),
-          dedupField('applicant.email').strictMatches(),
-          dedupField('applicant.dob').dateRangeMatches({ days: 3 * 365 })
-        )
       },
       review: TENNIS_CLUB_DECLARATION_REVIEW
     },
@@ -438,3 +425,37 @@ export const tennisClubMembershipEvent = defineConfig({
   ],
   declaration: TENNIS_CLUB_DECLARATION_FORM
 })
+
+export function tennisClubMembershipEventWithDedupCheck(
+  ...actionsToCheck: DeclarationActionType[]
+): EventConfig {
+  return {
+    ...tennisClubMembershipEvent,
+    actions: tennisClubMembershipEvent.actions.map((action) => {
+      if (!actionsToCheck.includes(action.type as DeclarationActionType)) {
+        return action
+      }
+      return {
+        ...action,
+        deduplication: {
+          id: 'tennis-club-membership-deduplication',
+          label: {
+            defaultMessage: 'Tennis club membership deduplication',
+            description:
+              'This is shown as the label for the deduplication configuration',
+            id: 'event.tennis-club-membership.deduplication.label'
+          },
+          query: Clause.parse(
+            and(
+              dedupField('applicant.name').fuzzyMatches(),
+              dedupField('applicant.email').strictMatches(),
+              dedupField('applicant.dob').dateRangeMatches({
+                days: 3 * 365
+              })
+            )
+          )
+        }
+      }
+    })
+  }
+}

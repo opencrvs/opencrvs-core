@@ -8,8 +8,8 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-
 import { TRPCError } from '@trpc/server'
+import { http, HttpResponse } from 'msw'
 import {
   ActionType,
   AddressType,
@@ -22,13 +22,18 @@ import {
   SCOPES,
   TENNIS_CLUB_MEMBERSHIP
 } from '@opencrvs/commons'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/fixtures'
+import {
+  tennisClubMembershipEvent,
+  tennisClubMembershipEventWithDedupCheck
+} from '@opencrvs/commons/fixtures'
 import { createTestClient, setupTestCase } from '@events/tests/utils'
 import {
   getEventIndexName,
   getOrCreateClient
 } from '@events/storage/elasticsearch'
 import { encodeEventIndex } from '@events/service/indexing/utils'
+import { mswServer } from '@events/tests/msw'
+import { env } from '@events/environment'
 
 test(`prevents forbidden access if missing required scope`, async () => {
   const { user, generator } = await setupTestCase()
@@ -305,7 +310,15 @@ test(`${ActionType.DECLARE} is idempotent`, async () => {
   expect(firstResponse).toEqual(secondResponse)
 })
 
-test.only('deduplication check is performed after declaration', async () => {
+test('deduplication check is performed after declaration', async () => {
+  mswServer.use(
+    http.get(`${env.COUNTRY_CONFIG_URL}/events`, () => {
+      return HttpResponse.json([
+        tennisClubMembershipEventWithDedupCheck(ActionType.DECLARE),
+        { ...tennisClubMembershipEvent, id: 'tennis-club-membership_premium' }
+      ])
+    })
+  )
   const esClient = getOrCreateClient()
   const prng = createPrng(73)
   const { user, generator } = await setupTestCase()
