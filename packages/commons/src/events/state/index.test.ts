@@ -484,6 +484,52 @@ describe('getCurrentEventState()', () => {
       getCurrentEventState(event3, tennisClubMembershipEvent).flags.length
     ).toEqual(0)
   })
+
+  test('Filter hidden fields while getting current event state', () => {
+    // case 1: dobUnknown = false → keep dob, drop age
+    const event1 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.REQUEST_CORRECTION
+      ],
+      eventState: {
+        'applicant.dobUnknown': false,
+        'applicant.age': 20,
+        'applicant.dob': '2000-01-01'
+      }
+    })
+
+    const eventState1 = getCurrentEventState(event1, tennisClubMembershipEvent)
+
+    expect(eventState1.declaration['applicant.dobUnknown']).toBe(false)
+    expect(eventState1.declaration['applicant.dob']).toBe('2000-01-01')
+    expect(eventState1.declaration['applicant.age']).toBe(undefined)
+
+    // case 2: dobUnknown = true → keep age, drop dob
+    const event2 = generateEventDocument({
+      configuration: tennisClubMembershipEvent,
+      actions: [
+        ActionType.CREATE,
+        ActionType.DECLARE,
+        ActionType.REGISTER,
+        ActionType.REQUEST_CORRECTION
+      ],
+      eventState: {
+        'applicant.dobUnknown': true,
+        'applicant.age': 20,
+        'applicant.dob': '2000-01-01'
+      }
+    })
+
+    const eventState2 = getCurrentEventState(event2, tennisClubMembershipEvent)
+
+    expect(eventState2.declaration['applicant.dobUnknown']).toBe(true)
+    expect(eventState2.declaration['applicant.dob']).toBe(undefined)
+    expect(eventState2.declaration['applicant.age']).toBe(20)
+  })
 })
 
 describe('correction requests', () => {
