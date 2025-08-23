@@ -42,7 +42,6 @@ import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
 import { CoreWorkqueues } from '@client/v2-events/utils'
 import RetryButton from '@client/v2-events/components/RetryButton'
-import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import { deserializeSearchParams, serializeSearchParams } from './utils'
 import { ActionComponent } from './ActionComponent'
@@ -252,8 +251,6 @@ export const SearchResultComponent = ({
   const { getAllRemoteDrafts } = useDrafts()
   const outbox = getOutbox()
   const drafts = getAllRemoteDrafts()
-
-  const { archiveModal, onArchive } = useArchiveModal()
 
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
