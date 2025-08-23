@@ -33,6 +33,7 @@ import { useAuthentication } from '@client/utils/userUtils'
 import { useEvents } from '../features/events/useEvents/useEvents'
 import { useUsers } from '../hooks/useUsers'
 import { useActionMenuItems } from '../features/workqueues/EventOverview/components/useActionMenuItems'
+import { useArchiveModal } from '../hooks/useArchiveModal'
 
 interface DownloadButtonProps {
   id?: string
@@ -118,6 +119,7 @@ export function DownloadButton({
   const isOnline = useOnlineStatus()
 
   const [modal, openModal] = useModal()
+  const { archiveModal, onArchive } = useArchiveModal()
   const authentication = useAuthentication()
   const { getEvent, actions } = useEvents()
   const users = useUsers()
@@ -125,7 +127,7 @@ export function DownloadButton({
     enabled: !!event.assignedTo
   }).data
 
-  const actionMenuItems = useActionMenuItems(event)
+  const actionMenuItems = useActionMenuItems({ event, onArchive })
   const assignmentStatus = getAssignmentStatus(event, authentication?.sub)
 
   const eventDocument = getEvent.findFromCache(event.id)
@@ -237,6 +239,7 @@ export function DownloadButton({
         )}
       </DownloadAction>
       {modal}
+      {archiveModal}
     </>
   )
 }

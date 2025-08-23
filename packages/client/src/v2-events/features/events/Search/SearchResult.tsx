@@ -43,6 +43,7 @@ import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useOnlineStatus } from '@client/utils'
 import { CoreWorkqueues } from '@client/v2-events/utils'
 import RetryButton from '@client/v2-events/components/RetryButton'
+import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import {
   useAction,
@@ -203,15 +204,17 @@ const ExtendedEventStatuses = {
 
 function ActionComponent({
   event,
-  actionType
+  actionType,
+  onArchive
 }: {
   event: EventIndex
   actionType: WorkqueueActionsWithDefault
+  onArchive: (eventId: string) => Promise<void>
 }) {
   const { slug } = useTypedParams(ROUTES.V2.WORKQUEUES.WORKQUEUE)
 
-  const { config: configs } = useAction(event)
-  const actionMenuItems = useActionMenuItems(event)
+  const { config: configs } = useAction({ event, onArchive })
+  const actionMenuItems = useActionMenuItems({ event, onArchive })
 
   const intl = useIntl()
 
@@ -289,6 +292,8 @@ export const SearchResultComponent = ({
   const outbox = getOutbox()
   const drafts = getAllRemoteDrafts()
 
+  const { archiveModal, onArchive } = useArchiveModal()
+
   const [sortedCol, setSortedCol] = useState<
     (typeof COLUMNS)[keyof typeof COLUMNS]
   >(COLUMNS.LAST_UPDATED)
@@ -326,7 +331,14 @@ export const SearchResultComponent = ({
       const actionConfigs = actions
         .map((actionType) => ({
           actionComponent: (
-            <ActionComponent actionType={actionType} event={event} />
+            <div>
+              <ActionComponent
+                actionType={actionType}
+                event={event}
+                onArchive={onArchive}
+              />
+              {archiveModal}
+            </div>
           )
         }))
         .concat(

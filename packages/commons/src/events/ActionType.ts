@@ -125,7 +125,6 @@ export const workqueueActions = ActionTypes.exclude([
   ActionType.DETECT_DUPLICATE,
   ActionType.REJECT,
   ActionType.MARKED_AS_DUPLICATE,
-  ActionType.ARCHIVE,
   ActionType.REJECT_CORRECTION,
   ActionType.APPROVE_CORRECTION
 ])

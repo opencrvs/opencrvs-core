@@ -106,6 +106,11 @@ export const actionLabels = {
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.validate.label'
   },
+  [ActionType.ARCHIVE]: {
+    defaultMessage: 'Archive',
+    description: 'Label for archive record button in dropdown menu',
+    id: 'v2.event.birth.action.archive.label'
+  },
   [ActionType.REGISTER]: {
     defaultMessage: 'Review',
     description: 'Label for review record button in dropdown menu',
@@ -134,7 +139,13 @@ export const actionLabels = {
   }
 } as const
 
-export function useAction(event: EventIndex) {
+export function useAction({
+  event,
+  onArchive
+}: {
+  event: EventIndex
+  onArchive: (eventId: string) => Promise<void>
+}) {
   const scopes = useSelector(getScope) ?? []
   const events = useEvents()
   const navigate = useNavigate()
@@ -240,6 +251,14 @@ export function useAction(event: EventIndex) {
         },
         disabled: !eventIsAssignedToSelf
       },
+      [ActionType.ARCHIVE]: {
+        label: actionLabels[ActionType.ARCHIVE],
+        icon: 'Archive',
+        onClick: async () => {
+          await onArchive(event.id)
+        },
+        disabled: !eventIsAssignedToSelf
+      },
       [ActionType.REGISTER]: {
         label: actionLabels[ActionType.REGISTER],
         icon: 'PencilLine',
@@ -334,16 +353,26 @@ const ACTION_MENU_ACTIONS_BY_EVENT_STATUS = {
     ActionType.READ,
     ActionType.VALIDATE,
     ActionType.ARCHIVE,
-    ActionType.REJECT
+    ActionType.REJECT,
+    ActionType.ARCHIVE
   ]
 } satisfies Partial<Record<EventStatus, ActionType[]>>
 
 /**
  * @returns a list of action menu items based on the event state and scopes provided.
  */
-export function useActionMenuItems(event: EventIndex) {
+export function useActionMenuItems({
+  event,
+  onArchive
+}: {
+  event: EventIndex
+  onArchive: (eventId: string) => Promise<void>
+}) {
   const scopes = useSelector(getScope) ?? []
-  const { config, authentication } = useAction(event)
+  const { config, authentication } = useAction({
+    event,
+    onArchive
+  })
 
   const availableAssignmentActions = getAvailableAssignmentActions(
     event.status,

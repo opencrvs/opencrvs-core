@@ -18,6 +18,7 @@ import { PrimaryButton } from '@opencrvs/components/lib/buttons'
 import { DropdownMenu } from '@opencrvs/components/lib/Dropdown'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { messages } from '@client/i18n/messages/views/action'
+import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
 import { useActionMenuItems } from './useActionMenuItems'
 
 export function ActionMenu({
@@ -30,6 +31,8 @@ export function ActionMenu({
   const intl = useIntl()
   const { searchEventById } = useEvents()
 
+  const { archiveModal, onArchive } = useArchiveModal()
+
   const getEventQuery = searchEventById.useSuspenseQuery(eventId)
 
   const eventResults = getEventQuery
@@ -41,7 +44,7 @@ export function ActionMenu({
 
   const eventState = eventIndex
 
-  const actionMenuItems = useActionMenuItems(eventState)
+  const actionMenuItems = useActionMenuItems({ event: eventState, onArchive })
 
   return (
     <>
@@ -72,6 +75,7 @@ export function ActionMenu({
           })}
         </DropdownMenu.Content>
       </DropdownMenu>
+      {archiveModal}
     </>
   )
 }
