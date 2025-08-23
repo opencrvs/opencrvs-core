@@ -49,6 +49,7 @@ export function Outbox() {
       eventConfigs={eventConfigs}
       queryData={outbox}
       title={intl.formatMessage(WORKQUEUE_OUTBOX.name)}
+      totalResults={outbox.length}
       {...searchParams}
     />
   )

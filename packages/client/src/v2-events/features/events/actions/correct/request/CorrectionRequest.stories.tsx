@@ -26,8 +26,18 @@ import { AppRouter } from '@client/v2-events/trpc'
 import { router } from './router'
 import * as Request from './index'
 
+const generator = testDataGenerator()
+
 const meta: Meta<typeof Request.Pages> = {
-  title: 'CorrectionRequest'
+  title: 'CorrectionRequest',
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ]
 }
 
 export default meta
@@ -42,7 +52,6 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
   transformer: { input: superjson, output: superjson }
 })
 
-const generator = testDataGenerator()
 const draft = testDataGenerator().event.draft({
   eventId: tennisClubMembershipEventDocument.id,
   actionType: ActionType.REQUEST_CORRECTION

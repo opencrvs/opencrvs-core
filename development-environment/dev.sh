@@ -52,7 +52,6 @@ if $dependencies; then
   concurrently "yarn run compose:deps"
   exit 0
 elif $services; then
-  yarn dev:secrets:gen
   yarn run start
   exit 0
 fi

@@ -36,8 +36,6 @@ type IndexedNameFieldValue = NameFieldValue & {
   [NAME_QUERY_KEY]?: string
 }
 
-export const DEFAULT_SIZE = 10000
-
 function addIndexFieldsToValue(
   eventConfig: EventConfig,
   fieldId: string,

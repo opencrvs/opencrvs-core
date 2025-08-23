@@ -18,7 +18,8 @@ import {
   ActionDocument,
   ActionStatus,
   EventState,
-  PrintCertificateAction
+  PrintCertificateAction,
+  ActionUpdate
 } from './ActionDocument'
 import {
   ApproveCorrectionActionInput,
@@ -55,7 +56,11 @@ import { EventStatus } from './EventMetadata'
 import { defineWorkqueues, WorkqueueConfig } from './WorkqueueConfig'
 import { TENNIS_CLUB_MEMBERSHIP } from './Constants'
 import { FieldType } from './FieldType'
-import { AddressType, FileFieldValue } from './CompositeFieldValue'
+import {
+  AddressType,
+  FileFieldValue,
+  HttpFieldValue
+} from './CompositeFieldValue'
 import { FieldValue } from './FieldValue'
 import { TokenUserType } from '../authentication'
 import { z } from 'zod'
@@ -154,6 +159,8 @@ export function mapFieldTypeToMockValue(
       return generateRandomName(rng)
     case FieldType.NUMBER:
       return 19
+    case FieldType.BUTTON:
+      return 1
     case FieldType.EMAIL:
       return 'test@opencrvs.org'
     case FieldType.ADDRESS:
@@ -187,6 +194,12 @@ export function mapFieldTypeToMockValue(
         originalFilename: 'abcd.png',
         type: 'image/png'
       } satisfies FileFieldValue
+    case FieldType.HTTP:
+      return {
+        error: null,
+        data: { nid: '1234567890' },
+        loading: false
+      } satisfies HttpFieldValue
     case FieldType.FILE_WITH_OPTIONS:
     case FieldType.DATA:
       return undefined
@@ -631,7 +644,8 @@ export function generateActionDocument({
   action,
   rng = () => 0.1,
   defaults = {},
-  user = {}
+  user = {},
+  annotation
 }: {
   configuration: EventConfig
   action: ActionType
@@ -643,6 +657,7 @@ export function generateActionDocument({
     role: TestUserRole
     id: string
   }>
+  annotation?: ActionUpdate
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -655,7 +670,7 @@ export function generateActionDocument({
     createdAtLocation:
       user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
     declaration: generateActionDeclarationInput(configuration, action, rng),
-    annotation: {},
+    annotation: annotation ?? {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
     ...defaults
@@ -892,7 +907,7 @@ export const eventQueryDataGenerator = (
     assignedTo: overrides.assignedTo ?? null,
     updatedBy: overrides.updatedBy ?? generateUuid(rng),
     updatedByUserRole: overrides.updatedByUserRole ?? 'FIELD_AGENT',
-    flags: [],
+    flags: overrides.flags ?? [],
     legalStatuses: overrides.legalStatuses ?? {},
     declaration: overrides.declaration ?? generateRandomApplicant(rng),
     trackingId: overrides.trackingId ?? generateTrackingId(rng)

@@ -27,9 +27,9 @@ import {
   EventDocument,
   EventIndex,
   EventInput,
+  SearchQuery,
   UnassignActionInput,
-  ACTION_ALLOWED_CONFIGURABLE_SCOPES,
-  QueryType
+  ACTION_ALLOWED_CONFIGURABLE_SCOPES
 } from '@opencrvs/commons/events'
 import * as middleware from '@events/router/middleware'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
@@ -55,6 +55,7 @@ import {
   findRecordsByQuery,
   getIndexedEvents
 } from '@events/service/indexing/indexing'
+import { reindex } from '@events/service/events/reindex'
 import { UserContext } from '../../context'
 import { getDefaultActionProcedures } from './actions'
 
@@ -257,6 +258,7 @@ export const eventRouter = router({
     .query(async ({ ctx }) => {
       const userId = ctx.user.id
       const eventConfigs = await getEventConfigurations(ctx.token)
+
       return getIndexedEvents(userId, eventConfigs)
     }),
   search: publicProcedure
@@ -270,8 +272,13 @@ export const eventRouter = router({
     })
     // @todo: remove legacy scopes once all users are configured with new search scopes
     .use(requiresAnyOfScopes([], ['search']))
-    .input(QueryType)
-    .output(z.array(EventIndex))
+    .input(SearchQuery)
+    .output(
+      z.object({
+        results: z.array(EventIndex),
+        total: z.number()
+      })
+    )
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
@@ -302,5 +309,21 @@ export const eventRouter = router({
     })
     .input(EventDocument)
     .output(EventDocument)
-    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token))
+    .mutation(async ({ input, ctx }) => importEvent(input, ctx.token)),
+  reindex: systemProcedure
+    .input(z.void())
+    .use(requiresAnyOfScopes([SCOPES.REINDEX]))
+    .output(z.void())
+    .meta({
+      openapi: {
+        summary:
+          'Triggers reindexing of search, workqueues and notifies country config',
+        method: 'POST',
+        path: '/events/reindex',
+        tags: ['events']
+      }
+    })
+    .mutation(async ({ ctx }) => {
+      await reindex(ctx.token)
+    })
 })
