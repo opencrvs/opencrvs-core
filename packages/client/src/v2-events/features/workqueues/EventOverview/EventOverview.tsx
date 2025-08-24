@@ -33,6 +33,7 @@ import { flattenEventIndex, getUsersFullName } from '@client/v2-events/utils'
 import { useEventTitle } from '@client/v2-events/features/events/useEvents/useEventTitle'
 import { DownloadButton } from '@client/v2-events/components/DownloadButton'
 import { useDrafts } from '../../drafts/useDrafts'
+import { DuplicateWarning } from '../../events/dedup/DuplicateWarning'
 import { EventHistory, EventHistorySkeleton } from './components/EventHistory'
 import { EventSummary } from './components/EventSummary'
 import { ActionMenu } from './components/ActionMenu'
@@ -199,7 +200,7 @@ function EventOverviewContainer() {
 
   // Suspense query is not used here because we want to refetch when an event action is performed
   const getEventQuery = searchEventById.useQuery(params.eventId)
-  const eventIndex = getEventQuery.data?.[0]
+  const eventIndex = getEventQuery.data[0]
 
   const fullEvent = getEvent.findFromCache(params.eventId).data
 
@@ -209,6 +210,11 @@ function EventOverviewContainer() {
 
   return (
     <EventOverviewProvider locations={locations} users={users}>
+      <DuplicateWarning
+        duplicateTrackingIds={eventIndex.duplicates.map(
+          ({ trackingId }) => trackingId
+        )}
+      />
       {fullEvent ? (
         <EventOverviewFull event={fullEvent} onAction={getEventQuery.refetch} />
       ) : (
