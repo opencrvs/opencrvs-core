@@ -111,6 +111,11 @@ export const actionLabels = {
     description: 'Label for review record button in dropdown menu',
     id: 'v2.event.birth.action.register.label'
   },
+  [ActionType.MARK_AS_DUPLICATE]: {
+    defaultMessage: 'Review',
+    description: 'Label for review potential duplicate button in dropdown menu',
+    id: 'v2.event.birth.action.mark-as-duplicate.label'
+  },
   [ActionType.PRINT_CERTIFICATE]: {
     defaultMessage: 'Print',
     description:
@@ -254,6 +259,20 @@ export function useAction(event: EventIndex) {
         },
         disabled: !eventIsAssignedToSelf
       },
+      [ActionType.MARK_AS_DUPLICATE]: {
+        label: actionLabels[ActionType.MARK_AS_DUPLICATE],
+        icon: 'PencilLine',
+        onClick: (workqueue?: string) => {
+          clearEphemeralFormState()
+          return navigate(
+            ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE.buildPath(
+              { eventId },
+              { workqueue }
+            )
+          )
+        },
+        disabled: !eventIsAssignedToSelf
+      },
       [ActionType.PRINT_CERTIFICATE]: {
         label: actionLabels[ActionType.PRINT_CERTIFICATE],
         icon: 'Printer',
@@ -352,13 +371,20 @@ export function useActionMenuItems(event: EventIndex) {
   )
 
   // Find actions available based on the event status
-  const availableActions =
+  let availableActions: DisplayableAction[] = []
+  if (
     !event.flags.includes(InherentFlags.REJECTED) &&
     event.status in ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-      ? ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
-          event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
-        ]
-      : getAvailableActionsForEvent(event)
+  ) {
+    availableActions =
+      ACTION_MENU_ACTIONS_BY_EVENT_STATUS[
+        event.status as keyof typeof ACTION_MENU_ACTIONS_BY_EVENT_STATUS
+      ]
+  } else if (event.flags.includes(InherentFlags.POTENTIAL_DUPLICATE)) {
+    availableActions = [ActionType.READ, ActionType.MARK_AS_DUPLICATE]
+  } else {
+    availableActions = getAvailableActionsForEvent(event)
+  }
 
   const drafts = useDrafts()
 

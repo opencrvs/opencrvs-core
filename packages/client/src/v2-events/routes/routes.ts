@@ -145,6 +145,12 @@ export const ROUTES = {
               })
             }
           ),
+          REVIEW_POTENTIAL_DUPLICATE: route('review-duplicate/:eventId', {
+            params: { eventId: uuid().defined() },
+            searchParams: {
+              workqueue: string()
+            }
+          }),
           CORRECTION: correctionRoutes
         }
       ),

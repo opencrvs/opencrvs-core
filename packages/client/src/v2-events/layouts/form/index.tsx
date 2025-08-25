@@ -11,6 +11,7 @@
 
 import React from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
+import { useIntl } from 'react-intl'
 import { Frame, Spinner } from '@opencrvs/components'
 import { DeclarationIcon } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
@@ -33,6 +34,7 @@ export function FormLayout({
   onSaveAndExit?: () => void | Promise<void>
   appbarIcon?: React.ReactNode
 }) {
+  const intl = useIntl()
   const { eventId } = useTypedParams(route)
   const events = useEvents()
   const event = events.getEvent.getFromCache(eventId)
@@ -45,7 +47,7 @@ export function FormLayout({
       header={
         <FormHeader
           appbarIcon={appbarIcon}
-          label={configuration.label}
+          label={intl.formatMessage(configuration.label)}
           route={route}
           onSaveAndExit={onSaveAndExit}
         />

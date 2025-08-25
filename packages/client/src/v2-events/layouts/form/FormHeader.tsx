@@ -39,7 +39,7 @@ export function FormHeader({
   route,
   appbarIcon
 }: {
-  label: TranslationConfig
+  label: string
   onSaveAndExit?: () => void
   route: AllowedRouteWithEventId
   appbarIcon?: React.ReactNode
@@ -133,7 +133,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      desktopTitle={intl.formatMessage(label)}
+      desktopTitle={label}
       mobileLeft={appbarIcon}
       mobileRight={
         <>
@@ -177,7 +177,7 @@ export function FormHeader({
           {modal}
         </>
       }
-      mobileTitle={intl.formatMessage(label)}
+      mobileTitle={label}
     />
   )
 }
