@@ -9,18 +9,18 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import React, { useMemo } from 'react'
+import React, { useState } from 'react'
 import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import { noop } from 'lodash'
 import { useIntl } from 'react-intl'
+import styled from 'styled-components'
 import {
   ActionType,
   getActionReview,
   getCurrentEventState,
-  applyDraftToEventIndex,
   getDeclaration
 } from '@opencrvs/commons/client'
-import { Frame, Spinner } from '@opencrvs/components'
+import { FormTabs, Frame, Icon, IFormTabs, Spinner } from '@opencrvs/components'
 import { Duplicate } from '@opencrvs/components/lib/icons'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
@@ -28,10 +28,10 @@ import { ROUTES } from '@client/v2-events/routes'
 import { Review as ReviewComponent } from '@client/v2-events/features/events/components/Review'
 import { useIntlFormatMessageWithFlattenedParams } from '@client/v2-events/messages/utils'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
-import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import { FormHeader } from '@client/v2-events/layouts/form/FormHeader'
+import { DuplicateForm } from './DuplicateForm'
 
-const DuplicateMessages = {
+export const duplicateMessages = {
   duplicateDeclarationDetails: {
     id: 'v2.duplicates.content.header',
     defaultMessage: 'Declaration Details',
@@ -95,6 +95,20 @@ const DuplicateMessages = {
   }
 }
 
+const TopBar = styled.div`
+  padding: 0 ${({ theme }) => theme.grid.margin}px;
+  height: 56px;
+  background: ${({ theme }) => theme.colors.white};
+  border-bottom: 1px solid ${({ theme }) => theme.colors.grey300};
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  top: 0;
+  width: 100%;
+  position: sticky;
+  z-index: 1;
+`
+
 function ReviewDuplicate() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
 
@@ -103,19 +117,26 @@ function ReviewDuplicate() {
   const events = useEvents()
   const event = events.getEvent.viewEvent(eventId)
 
-  const { getRemoteDraftByEventId } = useDrafts()
-  const draft = getRemoteDraftByEventId(event.id)
+  const [selectedTab, selectTab] = useState<string>(event.trackingId)
+
   const { eventConfiguration: configuration } = useEventConfiguration(
     event.type
   )
 
-  const eventStateWithDraft = useMemo(() => {
-    const eventState = getCurrentEventState(event, configuration)
+  const eventState = getCurrentEventState(event, configuration)
 
-    return draft
-      ? applyDraftToEventIndex(eventState, draft, configuration)
-      : eventState
-  }, [draft, event, configuration])
+  const tabs: IFormTabs[] = [
+    {
+      id: event.trackingId,
+      title: event.trackingId,
+      color: 'red',
+      icon: <Icon color="red" name="WarningCircle" size="medium" />
+    },
+    ...eventState.duplicates.map(({ trackingId }) => ({
+      id: trackingId,
+      title: trackingId
+    }))
+  ]
 
   const { title, fields } = getActionReview(configuration, ActionType.READ)
   const { formatMessage } = useIntlFormatMessageWithFlattenedParams()
@@ -127,7 +148,7 @@ function ReviewDuplicate() {
       header={
         <FormHeader
           appbarIcon={<Duplicate />}
-          label={intl.formatMessage(DuplicateMessages.duplicateReviewHeader, {
+          label={intl.formatMessage(duplicateMessages.duplicateReviewHeader, {
             event: intl.formatMessage(configuration.label)
           })}
           route={ROUTES.V2.EVENTS.REVIEW_POTENTIAL_DUPLICATE}
@@ -135,18 +156,35 @@ function ReviewDuplicate() {
       }
       skipToContentText="Skip to form"
     >
-      <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
-        <ReviewComponent.Body
-          readonlyMode
-          form={eventStateWithDraft.declaration}
-          formConfig={formConfig}
-          reviewFields={fields}
-          title={formatMessage(title, eventStateWithDraft.declaration)}
-          onEdit={noop}
-        >
-          <></>
-        </ReviewComponent.Body>
-      </React.Suspense>
+      <TopBar>
+        <FormTabs
+          activeTabId={selectedTab}
+          sections={tabs}
+          onTabClick={(id: string) => selectTab(id)}
+        />
+      </TopBar>
+      {selectedTab === event.trackingId ? (
+        <React.Suspense fallback={<Spinner id="event-form-spinner" />}>
+          <ReviewComponent.Body
+            readonlyMode
+            form={eventState.declaration}
+            formConfig={formConfig}
+            reviewDuplicate={<DuplicateForm eventIndex={eventState} />}
+            reviewFields={fields}
+            title={formatMessage(title, eventState.declaration)}
+            onEdit={noop}
+          >
+            {null}
+          </ReviewComponent.Body>
+        </React.Suspense>
+      ) : (
+        <span>
+          {intl.formatMessage(duplicateMessages.duplicateComparePageTitle, {
+            actualTrackingId: event.trackingId,
+            duplicateTrackingId: selectedTab
+          })}
+        </span>
+      )}
     </Frame>
   )
 }

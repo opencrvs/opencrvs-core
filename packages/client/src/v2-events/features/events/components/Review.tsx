@@ -459,7 +459,8 @@ function ReviewComponent({
   readonlyMode,
   reviewFields,
   isCorrection = false,
-  isReviewCorrection = false
+  isReviewCorrection = false,
+  reviewDuplicate
 }: {
   children: React.ReactNode
   formConfig: FormConfig
@@ -481,6 +482,7 @@ function ReviewComponent({
   readonlyMode?: boolean
   isCorrection?: boolean
   isReviewCorrection?: boolean
+  reviewDuplicate?: React.ReactNode
 }) {
   const scopes = useSelector(getScope)
   const showPreviouslyMissingValuesAsChanged = previousFormValues !== undefined
@@ -501,6 +503,7 @@ function ReviewComponent({
   return (
     <Row>
       <LeftColumn>
+        {reviewDuplicate}
         {isReviewCorrection && <ReviewCorrection form={form} />}
         <Card>
           <ReviewHeader title={title} />
