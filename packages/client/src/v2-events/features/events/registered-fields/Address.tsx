@@ -50,26 +50,6 @@ type Props = FieldProps<typeof FieldType.ADDRESS> & {
   configuration?: AddressField['configuration']
 }
 
-function addDefaultValue<T extends FieldConfigWithoutAddress>(
-  defaultValues?: AddressFieldValue
-): (fieldConfig: T) => T {
-  if (!defaultValues) {
-    return (fieldConfig) => fieldConfig
-  }
-
-  return (fieldConfig) => {
-    const key = fieldConfig.id as keyof typeof defaultValues
-    if (!defaultValues[key]) {
-      return fieldConfig
-    }
-
-    return {
-      ...fieldConfig,
-      defaultValue: defaultValues[key]
-    }
-  }
-}
-
 function isDomesticAddress() {
   return and(
     not(createFieldCondition('country').isUndefined()),
@@ -477,23 +457,6 @@ function AddressInput(props: Props) {
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
   const administrativeLevelsCutoff = props.configuration?.administrativeLevels
 
-  console.log(
-    'defaultValue.administrativeArea :>> ',
-    defaultValue?.administrativeArea
-  )
-
-  const { getLocations } = useLocations()
-  const [locations] = getLocations.useSuspenseQuery()
-  const targetAdminUUId =
-    value?.administrativeArea || defaultValue?.administrativeArea
-
-  const adminLevels = getAdminLevelHierarchy(targetAdminUUId, locations)
-  console.log('adminLevels:', adminLevels)
-
-  // Merge adminLevels into the value
-  const mergedValues = { ...value, ...adminLevels }
-  console.log('mergedValues :>> ', mergedValues)
-  console.log('This one doesnt work :>> ', { ...value, ...defaultValue })
   const administrativeLevels =
     Array.isArray(administrativeLevelsCutoff) &&
     administrativeLevelsCutoff.length > 0
@@ -512,34 +475,47 @@ function AddressInput(props: Props) {
       ? [...customAddressFields /* ...INTERNATIONAL_ADDRESS_FIELDS */]
       : STREET_ADDRESS_FIELDS
 
-  /* const fields = getFilteredFields(props.configuration?.fields)
-  const fieldsWithDefaults = defaultValue
-    ? fields.map(addDefaultValue(defaultValue))
-    : fields */
+  console.log(
+    'defaultValue.administrativeArea :>> ',
+    defaultValue?.administrativeArea
+  )
+
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const administrativeAreaUUID =
+    value?.administrativeArea || defaultValue?.administrativeArea
+
+  const derivedAdminLevels = getAdminLevelHierarchy(
+    administrativeAreaUUID,
+    locations
+  )
+  console.log('adminLevels:', derivedAdminLevels)
 
   const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
-  const fieldsWithDefaults = defaultValue
-    ? fields.map(addDefaultValue(defaultValue))
-    : fields
 
-  console.log('value in AddressInput', mergedValues)
+  console.log('value in AddressInput', { ...value, ...derivedAdminLevels })
 
   return (
     <FormFieldGenerator
       {...otherProps}
-      fields={fieldsWithDefaults}
-      initialValues={{ ...mergedValues }}
+      fields={fields}
+      initialValues={{ ...value, ...derivedAdminLevels }}
       parentId={props.id}
       onChange={(values) => {
+        // Extract all functionality for streeLevelDetails
         console.log('AddressInput onChange values:', values)
 
         const knownKeys = [
           'country',
-          'adminLevel1',
-          'adminLevel2',
           'addressType',
           'administrativeArea',
-          'streetLevelDetails'
+          'streetLevelDetails',
+          'adminLevel1',
+          'adminLevel2',
+          'adminLevel3',
+          'adminLevel4',
+          'adminLevel5',
+          'adminLevel6'
         ]
 
         function extractAddressLines(obj, knownKeys) {
@@ -552,8 +528,8 @@ function AddressInput(props: Props) {
 
         const addressLines = extractAddressLines(values, knownKeys)
 
-        // Helper function to get the leaf adminLevel value from 6 down to 1
-        function getLeafAdminLevel(val: Partial<AddressFieldValue>) {
+        // Helper function to get the leaf adminLevel value
+        function getLeafAdministrativeLevel(val: Partial<AddressFieldValue>) {
           for (let i = 6; i >= 1; i--) {
             const key = `adminLevel${i}` as keyof AddressFieldValue
             if (val[key]) {
@@ -563,7 +539,7 @@ function AddressInput(props: Props) {
           return undefined
         }
 
-        const leafAdminLevel = getLeafAdminLevel(values)
+        const leafAdminLevel = getLeafAdministrativeLevel(values)
         if (leafAdminLevel) {
           console.log('Leaf level adminLevel value:', leafAdminLevel)
         }
@@ -574,7 +550,7 @@ function AddressInput(props: Props) {
             value?.addressType === AddressType.DOMESTIC
               ? leafAdminLevel
               : undefined,
-          streetLevelDetails: addressLines // Merge address lines into streetLevelDetails
+          streetLevelDetails: addressLines
         } as Partial<AddressFieldValue>)
       }}
     />
@@ -607,7 +583,6 @@ function AddressOutput({
 
   console.log('location in AddressOutput', location)
 
-  // Usage:
   const adminLevels = getAdminLevelHierarchy(targetAdminUUId, locations)
   console.log('adminLevels:', adminLevels)
 
