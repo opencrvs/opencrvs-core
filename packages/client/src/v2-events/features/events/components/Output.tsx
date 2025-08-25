@@ -164,7 +164,8 @@ export function ValueOutput(
               'adminLevel6'
             ]
           : undefined,
-      lineSeparator: searchMode === true ? ', ' : undefined
+      lineSeparator: searchMode === true ? ', ' : undefined,
+      configuration: field.config
     })
   }
 

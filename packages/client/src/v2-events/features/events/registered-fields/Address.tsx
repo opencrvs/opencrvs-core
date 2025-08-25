@@ -1,4 +1,3 @@
-/* eslint-disable max-lines */
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -287,148 +286,15 @@ const ADMIN_STRUCTURE_FIELDS = [
   }
 ] as const satisfies FieldConfigWithoutAddress[]
 
-const DOMESTIC_STREET_ADDRESS_FIELDS = [
-  {
-    id: 'addressLine1',
-    conditionals: displayWhenDomesticAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.domestic.addressLine1.label',
-      defaultMessage: 'Town',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'addressLine2',
-    conditionals: displayWhenDomesticAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.domestic.addressLine2.label',
-      defaultMessage: 'Residential Area',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'addressLine3',
-    conditionals: displayWhenDomesticAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.domestic.addressLine3.label',
-      defaultMessage: 'Street',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'addressLine4',
-    conditionals: displayWhenDomesticAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.domestic.addressLine4.label',
-      defaultMessage: 'Number',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'addressLine5',
-    conditionals: displayWhenDomesticAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.domestic.addressLine5.label',
-      defaultMessage: 'Postcode / Zip',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  }
-] as const satisfies FieldConfigWithoutAddress[]
-
-const INTERNATIONAL_STREET_ADDRESS_FIELDS = [
-  {
-    id: 'internationalAddressLine1',
-    conditionals: displayWhenInternationalAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.addressLine1.label',
-      defaultMessage: 'Address Line 1',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'internationalAddressLine2',
-    conditionals: displayWhenInternationalAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.addressLine2.label',
-      defaultMessage: 'Address Line 2',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'internationalAddressLine3',
-    conditionals: displayWhenInternationalAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.addressLine3.label',
-      defaultMessage: 'Address Line 3',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'internationalAddressLine4',
-    conditionals: displayWhenInternationalAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.addressLine4.label',
-      defaultMessage: 'Address Line 4',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  },
-  {
-    id: 'internationalAddressLine5',
-    conditionals: displayWhenInternationalAddressSelected,
-    required: false,
-    parent: createFieldCondition('country'),
-    label: {
-      id: 'v2.field.address.addressLine5.label',
-      defaultMessage: 'Address Line 5',
-      description: 'This is the label for the field'
-    },
-    type: FieldType.TEXT
-  }
-] as const satisfies FieldConfigWithoutAddress[]
-
-const STREET_ADDRESS_FIELDS = [
-  ...DOMESTIC_STREET_ADDRESS_FIELDS,
-  ...INTERNATIONAL_STREET_ADDRESS_FIELDS
-] as const satisfies FieldConfigWithoutAddress[]
-
 const ALL_ADDRESS_FIELDS = [
   COUNTRY_FIELD,
   ADDRESS_TYPE_FIELD,
-  ...ADMIN_STRUCTURE_FIELDS,
-  ...STREET_ADDRESS_FIELDS
+  ...ADMIN_STRUCTURE_FIELDS
 ]
 
 const ALL_ADDRESS_INPUT_FIELDS = [
   COUNTRY_FIELD,
-  ...ADMIN_STRUCTURE_FIELDS,
-  ...STREET_ADDRESS_FIELDS
+  ...ADMIN_STRUCTURE_FIELDS
 ] satisfies Array<FieldConfigWithoutAddress>
 
 type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
@@ -503,7 +369,7 @@ function AddressInput(props: Props) {
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
       ? customAddressFields
-      : STREET_ADDRESS_FIELDS
+      : []
 
   console.log(
     'defaultValue.administrativeArea :>> ',
@@ -564,7 +430,7 @@ function AddressOutput({
   value?: AddressFieldValue
   lineSeparator?: React.ReactNode
   fields?: Array<AddressFieldIdentifier>
-  configuration?: AddressField['configuration']
+  configuration?: AddressField
 }) {
   if (!value) {
     return ''
@@ -598,13 +464,15 @@ function AddressOutput({
     appConfigAdminLevels.includes(item.id)
   )
 
-  const customAddressFields =
-    configuration?.streetAddressForm as FieldConfigWithoutAddress[]
+  const customAddressFields = configuration?.configuration
+    ?.streetAddressForm as FieldConfigWithoutAddress[]
+
+  console.log('customAddressFields :>> ', customAddressFields)
 
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? [...customAddressFields /* ...INTERNATIONAL_ADDRESS_FIELDS */]
-      : STREET_ADDRESS_FIELDS
+      ? customAddressFields
+      : []
 
   function flattenAddressObject(obj: AddressFieldValue): Record<string, any> {
     if (!obj) {
