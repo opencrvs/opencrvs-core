@@ -272,7 +272,7 @@ function useViewableActionConfigurations(
         label: actionLabels[ActionType.UNASSIGN],
         icon: 'ArrowCircleDown' as const,
         onClick: async () => {
-          const unassign = await openModal<boolean>((close) => (
+          const unassign = await openAssignModal<boolean>((close) => (
             <UnassignModal
               assignedSelf={isDownloadedAndAssignedToUser}
               close={close}
