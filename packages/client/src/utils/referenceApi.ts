@@ -20,6 +20,7 @@ import {
 } from '@client/offline/reducer'
 import { getToken } from '@client/utils/authUtils'
 import { EventType, System } from '@client/utils/gateway'
+import { TranslationConfig } from '@opencrvs/commons/client'
 import { IntlShape } from 'react-intl'
 
 export interface ILocationDataResponse {
@@ -105,6 +106,11 @@ export interface ICurrency {
   languagesAndCountry: string[]
 }
 
+export interface IAdminStructureItem {
+  id: string
+  label: TranslationConfig
+}
+
 export interface IApplicationConfigAnonymous {
   APPLICATION_NAME: string
   COUNTRY_LOGO: ICountryLogo
@@ -119,7 +125,7 @@ export interface IApplicationConfig {
     LATE_REGISTRATION_TARGET: number
     PRINT_IN_ADVANCE: boolean
   }
-  ADMIN_STRUCTURE: string[]
+  ADMIN_STRUCTURE: IAdminStructureItem[]
   COUNTRY_LOGO: ICountryLogo
   CURRENCY: ICurrency
   DEATH: {

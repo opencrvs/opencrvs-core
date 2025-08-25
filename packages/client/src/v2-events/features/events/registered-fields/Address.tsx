@@ -26,7 +26,8 @@ import {
   alwaysTrue,
   AddressType,
   isFieldDisplayedOnReview,
-  AddressField
+  AddressField,
+  AdministrativeArea
 } from '@opencrvs/commons/client'
 import { FormFieldGenerator } from '@client/v2-events/components/forms/FormFieldGenerator'
 import { Output } from '@client/v2-events/features/events/components/Output'
@@ -36,6 +37,7 @@ import {
 } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
 import { useLocations } from '@client/v2-events/hooks/useLocations'
+import { IAdminStructureItem } from '@client/utils/referenceApi'
 
 // ADDRESS field may not contain another ADDRESS field
 type FieldConfigWithoutAddress = Exclude<
@@ -97,18 +99,49 @@ function getAdminLevelHierarchy(
   return hierarchy
 }
 
-const displayWhenDomesticAddressSelected = [
-  {
-    type: ConditionalType.SHOW,
-    conditional: isDomesticAddress()
-  }
-]
-const displayWhenInternationalAddressSelected = [
-  {
-    type: ConditionalType.SHOW,
-    conditional: isInternationalAddress()
-  }
-]
+function transformKeyArray(
+  inputArray: IAdminStructureItem[]
+): AdministrativeArea[] {
+  return inputArray.map((item, index) => {
+    const { id, label } = item
+    const isFirst = index === 0
+
+    const prevItem = index > 0 ? inputArray[index - 1] : null
+    const parentId = isFirst ? 'country' : (prevItem?.id ?? '')
+
+    const conditionals = [
+      {
+        type: ConditionalType.SHOW,
+        conditional: isFirst
+          ? isDomesticAddress()
+          : and(
+              isDomesticAddress(),
+              not(createFieldCondition(parentId).isUndefined())
+            )
+      }
+    ]
+
+    const configuration: AdministrativeArea['configuration'] = {
+      type: AdministrativeAreas.enum.ADMIN_STRUCTURE
+    }
+
+    if (!isFirst && prevItem?.id) {
+      configuration.partOf = { $declaration: prevItem.id }
+    }
+
+    const field: AdministrativeArea = {
+      id,
+      type: FieldType.ADMINISTRATIVE_AREA,
+      required: true,
+      label,
+      parent: createFieldCondition(parentId),
+      conditionals,
+      configuration
+    }
+
+    return field
+  })
+}
 
 const COUNTRY_FIELD = {
   id: 'country',
@@ -138,163 +171,10 @@ const ADDRESS_TYPE_FIELD = {
   type: FieldType.TEXT
 } as const satisfies FieldConfigWithoutAddress
 
-const ADMIN_STRUCTURE_FIELDS = [
-  {
-    id: 'adminLevel1',
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: isDomesticAddress()
-      }
-    ],
-    parent: createFieldCondition('country'),
-    required: true,
-    label: {
-      id: 'v2.field.address.adminLevel1.label',
-      defaultMessage: 'Administrative Level 1',
-      description: 'Label for adminLevel1 in address component'
-    },
-    type: FieldType.ADMINISTRATIVE_AREA,
-    configuration: { type: AdministrativeAreas.enum.ADMIN_STRUCTURE }
-  },
-  {
-    id: 'adminLevel2',
-    type: FieldType.ADMINISTRATIVE_AREA,
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: and(
-          isDomesticAddress(),
-          not(createFieldCondition('adminLevel1').isUndefined())
-        )
-      }
-    ],
-    parent: createFieldCondition('adminLevel1'),
-    required: true,
-    label: {
-      id: 'v2.field.address.adminLevel2.label',
-      defaultMessage: 'Administrative Level 2',
-      description: 'Label for adminLevel2 in address component'
-    },
-    configuration: {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      partOf: {
-        $declaration: 'adminLevel1'
-      }
-    }
-  },
-  {
-    id: 'adminLevel3',
-    type: FieldType.ADMINISTRATIVE_AREA,
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: and(
-          isDomesticAddress(),
-          not(createFieldCondition('adminLevel2').isUndefined())
-        )
-      }
-    ],
-    parent: createFieldCondition('adminLevel2'),
-    required: true,
-    label: {
-      id: 'v2.field.address.adminLevel3.label',
-      defaultMessage: 'Administrative Level 3',
-      description: 'Label for adminLevel3 in address component'
-    },
-    configuration: {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      partOf: {
-        $declaration: 'adminLevel2'
-      }
-    }
-  },
-  {
-    id: 'adminLevel4',
-    type: FieldType.ADMINISTRATIVE_AREA,
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: and(
-          isDomesticAddress(),
-          not(createFieldCondition('adminLevel3').isUndefined())
-        )
-      }
-    ],
-    required: true,
-    label: {
-      id: 'v2.field.address.adminLevel4.label',
-      defaultMessage: 'Administrative Level 4',
-      description: 'Label for adminLevel4 in address component'
-    },
-    configuration: {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      partOf: {
-        $declaration: 'adminLevel3'
-      }
-    }
-  },
-  {
-    id: 'adminLevel5',
-    type: FieldType.ADMINISTRATIVE_AREA,
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: and(
-          isDomesticAddress(),
-          not(createFieldCondition('adminLevel4').isUndefined())
-        )
-      }
-    ],
-    required: true,
-    label: {
-      id: 'v2.field.address.adminLevel5.label',
-      defaultMessage: 'Administrative Level 5',
-      description: 'Label for adminLevel5 in address component'
-    },
-    configuration: {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      partOf: {
-        $declaration: 'adminLevel4'
-      }
-    }
-  },
-  {
-    id: 'adminLevel6',
-    type: FieldType.ADMINISTRATIVE_AREA,
-    conditionals: [
-      {
-        type: ConditionalType.SHOW,
-        conditional: and(
-          isDomesticAddress(),
-          not(createFieldCondition('adminLevel5').isUndefined())
-        )
-      }
-    ],
-    required: true,
-    label: {
-      id: 'v2.field.address.adminLevel6.label',
-      defaultMessage: 'Administrative Level 6',
-      description: 'Label for adminLevel6 in address component'
-    },
-    configuration: {
-      type: AdministrativeAreas.enum.ADMIN_STRUCTURE,
-      partOf: {
-        $declaration: 'adminLevel5'
-      }
-    }
-  }
-] as const satisfies FieldConfigWithoutAddress[]
-
-const ALL_ADDRESS_FIELDS = [
-  COUNTRY_FIELD,
-  ADDRESS_TYPE_FIELD,
-  ...ADMIN_STRUCTURE_FIELDS
-]
+const ALL_ADDRESS_FIELDS = [COUNTRY_FIELD, ADDRESS_TYPE_FIELD]
 
 const ALL_ADDRESS_INPUT_FIELDS = [
-  COUNTRY_FIELD,
-  ...ADMIN_STRUCTURE_FIELDS
+  COUNTRY_FIELD
 ] satisfies Array<FieldConfigWithoutAddress>
 
 type AddressFieldIdentifier = (typeof ALL_ADDRESS_FIELDS)[number]['id']
@@ -359,9 +239,11 @@ function AddressInput(props: Props) {
       ? administrativeLevelsCutoff
       : appConfigAdminLevels
 
-  const adminStructure = ADMIN_STRUCTURE_FIELDS.filter((item) =>
+  const adminStructure = transformKeyArray(appConfigAdminLevels)
+
+  /* const adminStructure = myAdminStructure.filter((item) =>
     administrativeLevels.includes(item.id)
-  )
+  ) */
 
   const customAddressFields = props.configuration
     ?.streetAddressForm as FieldConfigWithoutAddress[]
@@ -460,9 +342,11 @@ function AddressOutput({
   const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
 
-  const adminStructure = ADMIN_STRUCTURE_FIELDS.filter((item) =>
+  const adminStructure = transformKeyArray(appConfigAdminLevels)
+
+  /* const adminStructure = ADMIN_STRUCTURE_FIELDS.filter((item) =>
     appConfigAdminLevels.includes(item.id)
-  )
+  ) */
 
   const customAddressFields = configuration?.configuration
     ?.streetAddressForm as FieldConfigWithoutAddress[]

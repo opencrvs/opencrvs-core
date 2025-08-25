@@ -151,19 +151,7 @@ export function ValueOutput(
   if (isAddressFieldType(field)) {
     return Address.Output({
       value: field.value,
-      fields:
-        searchMode === true
-          ? [
-              'country',
-              'addressType',
-              'adminLevel1',
-              'adminLevel2',
-              'adminLevel3',
-              'adminLevel4',
-              'adminLevel5',
-              'adminLevel6'
-            ]
-          : undefined,
+      fields: searchMode === true ? ['country', 'addressType'] : undefined,
       lineSeparator: searchMode === true ? ', ' : undefined,
       configuration: field.config
     })
