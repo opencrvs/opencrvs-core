@@ -556,7 +556,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'John Doe' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'John',
+                surname: 'Doe'
+              }
+            },
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
@@ -582,7 +587,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'Doe John' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'Doe',
+                surname: 'John'
+              }
+            },
             type: 'REQUEST_CORRECTION',
             createdByUserType: TokenUserType.Enum.user,
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
@@ -599,7 +609,13 @@ describe('correction requests', () => {
       tennisClubMembershipEvent
     )
 
-    expect(state.declaration.name).toBe('John Doe')
+    const applicantName = state.declaration['applicant.name'] as {
+      firstname: string
+      surname: string
+    }
+
+    expect(applicantName.firstname).toBe('John')
+    expect(applicantName.surname).toBe('Doe')
   })
   test('proposed correction data is applied after the correction request is approved', () => {
     const state = getCurrentEventState(
@@ -624,7 +640,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'John Doe' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'John',
+                surname: 'Doe'
+              }
+            },
             type: 'DECLARE',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
@@ -650,7 +671,12 @@ describe('correction requests', () => {
             transactionId: getUUID()
           },
           {
-            declaration: { name: 'Doe John' },
+            declaration: {
+              'applicant.name': {
+                firstname: 'Doe',
+                surname: 'John'
+              }
+            },
             type: 'REQUEST_CORRECTION',
             createdBy: '6791a7b2d7f8663e9f9dcbf0',
             createdByRole: 'some-role',
@@ -681,7 +707,13 @@ describe('correction requests', () => {
       tennisClubMembershipEvent
     )
 
-    expect(state.declaration.name).toBe('Doe John')
+    const applicantName = state.declaration['applicant.name'] as {
+      firstname: string
+      surname: string
+    }
+
+    expect(applicantName.firstname).toBe('Doe')
+    expect(applicantName.surname).toBe('John')
   })
 })
 
