@@ -68,15 +68,20 @@ export const getAvailableActionsForEvent = (
       EventStatus.enum.CREATED
     ].filter((action) => action !== ActionType.DELETE)
 
+    const rejectedBeforeValidated = [
+      ...createdWithoutDelete,
+      ActionType.ARCHIVE
+    ]
+
     switch (event.status) {
       case EventStatus.Enum.ARCHIVED:
         return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
       case EventStatus.Enum.CREATED:
         return AVAILABLE_ACTIONS_BY_EVENT_STATUS[event.status]
       case EventStatus.Enum.NOTIFIED:
-        return createdWithoutDelete
+        return rejectedBeforeValidated
       case EventStatus.Enum.DECLARED:
-        return createdWithoutDelete
+        return rejectedBeforeValidated
       case EventStatus.Enum.VALIDATED:
         return AVAILABLE_ACTIONS_BY_EVENT_STATUS[EventStatus.Enum.DECLARED]
       case EventStatus.Enum.REGISTERED:
