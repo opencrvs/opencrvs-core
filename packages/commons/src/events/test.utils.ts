@@ -220,7 +220,7 @@ export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
   rng: () => number,
-  eventState?: Partial<EventState>
+  overrides?: Partial<EventState>
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
@@ -234,7 +234,7 @@ export function generateActionDeclarationInput(
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
     return {
       ...omitHiddenPaginatedFields(declarationConfig, declaration),
-      ...eventState
+      ...overrides
     }
   }
 
@@ -650,7 +650,7 @@ export function generateActionDocument({
   defaults = {},
   user = {},
   annotation,
-  eventState
+  declarationOverrides
 }: {
   configuration: EventConfig
   action: ActionType
@@ -663,7 +663,7 @@ export function generateActionDocument({
     id: string
   }>
   annotation?: ActionUpdate
-  eventState?: Partial<EventState>
+  declarationOverrides?: Partial<EventState>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -679,7 +679,7 @@ export function generateActionDocument({
       configuration,
       action,
       rng,
-      eventState
+      declarationOverrides
     ),
     annotation: annotation ?? {},
     status: ActionStatus.Accepted,
@@ -743,7 +743,7 @@ export function generateEventDocument({
   actions,
   rng = () => 0.1,
   user,
-  eventState
+  declarationOverrides
 }: {
   configuration: EventConfig
   actions: ActionType[]
@@ -754,13 +754,22 @@ export function generateEventDocument({
     role: TestUserRole
     id: string
   }>
-  eventState?: Partial<EventState>
+  /**
+   * Overrides for default event state
+   */
+  declarationOverrides?: Partial<EventState>
 }): EventDocument {
   return {
     trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
-      generateActionDocument({ configuration, action, rng, user, eventState })
+      generateActionDocument({
+        configuration,
+        action,
+        rng,
+        user,
+        declarationOverrides
+      })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.

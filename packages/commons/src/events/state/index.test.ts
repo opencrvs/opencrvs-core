@@ -495,7 +495,7 @@ describe('getCurrentEventState()', () => {
         ActionType.REGISTER,
         ActionType.REQUEST_CORRECTION
       ],
-      eventState: {
+      declarationOverrides: {
         'applicant.dobUnknown': false,
         'applicant.age': 20,
         'applicant.dob': '2000-01-01'
@@ -517,7 +517,7 @@ describe('getCurrentEventState()', () => {
         ActionType.REGISTER,
         ActionType.REQUEST_CORRECTION
       ],
-      eventState: {
+      declarationOverrides: {
         'applicant.dobUnknown': true,
         'applicant.age': 20,
         'applicant.dob': '2000-01-01'
