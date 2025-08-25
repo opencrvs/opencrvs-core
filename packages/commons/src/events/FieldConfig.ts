@@ -727,6 +727,10 @@ export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>
 export type FieldProps<T extends FieldType> = Extract<FieldConfig, { type: T }>
+export type FieldPropsWithoutReferenceValue<T extends FieldType> = Omit<
+  Extract<FieldConfig, { type: T }>,
+  'value'
+>
 export type SelectOption = z.infer<typeof SelectOption>
 
 export type AdministrativeAreaConfiguration = z.infer<
