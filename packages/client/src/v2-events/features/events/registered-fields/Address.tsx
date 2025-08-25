@@ -442,6 +442,36 @@ function getFilteredFields(fieldsToShow?: Array<string>) {
   )
 }
 
+function extractAddressLines(obj: Partial<AddressFieldValue>) {
+  const keysToIgnore = [
+    'country',
+    'addressType',
+    'administrativeArea',
+    'streetLevelDetails',
+    'adminLevel1',
+    'adminLevel2',
+    'adminLevel3',
+    'adminLevel4',
+    'adminLevel5',
+    'adminLevel6'
+  ]
+  return Object.fromEntries(
+    Object.entries(obj).filter(
+      ([key, value]) => !keysToIgnore.includes(key) && value !== undefined
+    )
+  )
+}
+
+function getLeafAdministrativeLevel(val: Partial<AddressFieldValue>) {
+  for (let i = 6; i >= 1; i--) {
+    const key = `adminLevel${i}` as keyof AddressFieldValue
+    if (val[key]) {
+      return val[key]
+    }
+  }
+  return undefined
+}
+
 /**
  * AddressInput is a form component for capturing address details based on administrative structure.
  *
@@ -472,7 +502,7 @@ function AddressInput(props: Props) {
 
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
-      ? [...customAddressFields /* ...INTERNATIONAL_ADDRESS_FIELDS */]
+      ? customAddressFields
       : STREET_ADDRESS_FIELDS
 
   console.log(
@@ -502,44 +532,12 @@ function AddressInput(props: Props) {
       initialValues={{ ...value, ...derivedAdminLevels }}
       parentId={props.id}
       onChange={(values) => {
-        // Extract all functionality for streeLevelDetails
         console.log('AddressInput onChange values:', values)
 
-        const knownKeys = [
-          'country',
-          'addressType',
-          'administrativeArea',
-          'streetLevelDetails',
-          'adminLevel1',
-          'adminLevel2',
-          'adminLevel3',
-          'adminLevel4',
-          'adminLevel5',
-          'adminLevel6'
-        ]
-
-        function extractAddressLines(obj, knownKeys) {
-          return Object.fromEntries(
-            Object.entries(obj).filter(
-              ([key, value]) => !knownKeys.includes(key) && value !== undefined
-            )
-          )
-        }
-
-        const addressLines = extractAddressLines(values, knownKeys)
-
-        // Helper function to get the leaf adminLevel value
-        function getLeafAdministrativeLevel(val: Partial<AddressFieldValue>) {
-          for (let i = 6; i >= 1; i--) {
-            const key = `adminLevel${i}` as keyof AddressFieldValue
-            if (val[key]) {
-              return val[key]
-            }
-          }
-          return undefined
-        }
+        const addressLines = extractAddressLines(values)
 
         const leafAdminLevel = getLeafAdministrativeLevel(values)
+
         if (leafAdminLevel) {
           console.log('Leaf level adminLevel value:', leafAdminLevel)
         }
