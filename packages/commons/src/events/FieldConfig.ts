@@ -670,6 +670,12 @@ export type FieldConfigInput =
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
 
+/*
+ *  Using explicit type for the FieldConfig schema intentionally as it's
+ *  referenced quite extensively througout various other schemas. Leaving the
+ *  type to be inferred causes typescript compiler to fail with "inferred type
+ *  exeeds max lenght"
+ */
 export const FieldConfig: z.ZodType<
   FieldConfig,
   z.ZodTypeDef,
