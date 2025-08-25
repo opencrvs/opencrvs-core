@@ -10,7 +10,7 @@
  */
 
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query'
-import { FullDocumentUrl, User } from '@opencrvs/commons/client'
+import { FullDocumentUrl, ResolvedUser, User } from '@opencrvs/commons/client'
 import { queryClient, trpcOptionsProxy, useTRPC } from '@client/v2-events/trpc'
 import { getUnsignedFileUrl } from '@client/v2-events/cache'
 import { setQueryDefaults } from '../features/events/useEvents/procedures/utils'
@@ -123,7 +123,7 @@ export function useUsers() {
             queryKey: trpc.user.get.queryKey()
           })
           .flatMap(([, data]) => data)
-          .filter((user): user is User => Boolean(user))
+          .filter((user): user is ResolvedUser => Boolean(user))
       }
     },
     getUsers: {

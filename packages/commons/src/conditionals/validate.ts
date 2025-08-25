@@ -99,13 +99,22 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
   return result
 }
 
+export function isOnline() {
+  if (typeof window !== 'undefined' && typeof navigator !== 'undefined') {
+    return navigator.onLine
+  }
+  // Server-side: assume always online
+  return true
+}
+
 export function isConditionMet(
   conditional: JSONSchema,
   values: Record<string, unknown>
 ) {
   return validate(conditional, {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline()
   })
 }
 
@@ -147,7 +156,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
-    })
+    }),
+    $online: isOnline()
   })
 
   return validConditionals.includes(conditionalType)
@@ -254,7 +264,10 @@ function zodToIntlErrorMap(issue: ZodIssueOptionalMessage, _ctx: ErrorMapCtx) {
     }
 
     case 'invalid_type': {
-      if (issue.expected !== issue.received && issue.received === 'undefined') {
+      if (
+        issue.expected !== issue.received &&
+        (issue.received === 'undefined' || issue.received === 'null')
+      ) {
         return createIntlError(errorMessages.requiredField)
       }
 
@@ -384,7 +397,8 @@ export function runFieldValidations({
 
   const conditionalParameters = {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $online: isOnline()
   }
 
   const fieldValidationResult = validateFieldInput({

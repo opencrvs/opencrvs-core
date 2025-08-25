@@ -40,7 +40,8 @@ import {
   isIdFieldType,
   isPhoneFieldType,
   isSelectDateRangeFieldType,
-  isLocationFieldType
+  isLocationFieldType,
+  FileFieldWithOptionValue
 } from '@opencrvs/commons/client'
 import {
   Address,
@@ -207,8 +208,8 @@ export function Output({
   previousValue?: FieldValue
   showPreviouslyMissingValuesAsChanged?: boolean
 }) {
-  // Explicitly check for undefined, so that e.g. number 0 is considered a value
-  const hasValue = value !== undefined
+  // Explicitly check for nil, so that e.g. number 0 is considered a value
+  const hasValue = !_.isNil(value)
 
   if (!hasValue) {
     if (previousValue) {
