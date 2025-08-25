@@ -40,6 +40,7 @@ import { ITokenPayload } from '@client/utils/authUtils'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'
+import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
   EventStatus.enum.NOTIFIED,
@@ -116,6 +117,11 @@ export const actionLabels = {
       'This is shown as the action name anywhere the user can trigger the action from',
     id: 'v2.event.birth.action.validate.label'
   },
+  [ActionType.ARCHIVE]: {
+    defaultMessage: 'Archive',
+    description: 'Label for archive record button in dropdown menu',
+    id: 'v2.event.birth.action.archive.label'
+  },
   [ActionType.REGISTER]: {
     defaultMessage: 'Review',
     description: 'Label for review record button in dropdown menu',
@@ -167,7 +173,9 @@ function useViewableActionConfigurations(
 
   const { findFromCache } = useEvents().getEvent
   const isDownloaded = Boolean(findFromCache(event.id).data)
-  const [modal, openModal] = useModal()
+
+  const [assignModal, openAssignModal] = useModal()
+  const { archiveModal, onArchive } = useArchiveModal()
 
   /**
    * Refer to https://tanstack.com/query/latest/docs/framework/react/guides/dependent-queries
@@ -209,7 +217,7 @@ function useViewableActionConfigurations(
    * If you need to extend the functionality, consider whether it can be done elsewhere.
    */
   return {
-    modal,
+    modals: [assignModal, archiveModal],
     config: {
       [ActionType.READ]: {
         label: actionLabels[ActionType.READ],
@@ -220,7 +228,7 @@ function useViewableActionConfigurations(
         label: actionLabels[ActionType.ASSIGN],
         icon: 'PushPin' as const,
         onClick: async (workqueue?: string) => {
-          const assign = await openModal<boolean>((close) => (
+          const assign = await openAssignModal<boolean>((close) => (
             <AssignModal close={close} />
           ))
           if (!assign) {
@@ -280,6 +288,14 @@ function useViewableActionConfigurations(
               { workqueue }
             )
           )
+        },
+        disabled: !isDownloadedAndAssignedToUser
+      },
+      [ActionType.ARCHIVE]: {
+        label: actionLabels[ActionType.ARCHIVE],
+        icon: 'Archive' as const,
+        onClick: async () => {
+          await onArchive(event.id)
         },
         disabled: !isDownloadedAndAssignedToUser
       },
@@ -394,7 +410,7 @@ export function useAllowedActionConfigurations(
     .getAllRemoteDrafts()
     .find((draft) => draft.eventId === event.id)
 
-  const { config, modal } = useViewableActionConfigurations(
+  const { config, modals } = useViewableActionConfigurations(
     event,
     authentication,
     openDraft
@@ -440,7 +456,7 @@ export function useAllowedActionConfigurations(
   // This is to prevent users from assigning or unassigning themselves to events which they cannot do anything with.
   if (hasOnlyMetaActions) {
     return [
-      modal,
+      modals,
       [
         {
           ...config[ActionType.READ],
@@ -450,7 +466,7 @@ export function useAllowedActionConfigurations(
     ] satisfies [React.ReactNode, ActionMenuItem[]]
   }
 
-  return [modal, allowedWorkqueueConfigs] satisfies [
+  return [modals, allowedWorkqueueConfigs] satisfies [
     React.ReactNode,
     ActionMenuItem[]
   ]
