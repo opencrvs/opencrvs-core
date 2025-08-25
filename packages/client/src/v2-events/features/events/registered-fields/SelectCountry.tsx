@@ -10,7 +10,10 @@
  */
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
-import { FieldProps, SelectOption } from '@opencrvs/commons/client'
+import {
+  FieldPropsWithoutReferenceValue,
+  SelectOption
+} from '@opencrvs/commons/client'
 import { countries } from '@client/utils/countries'
 import { Select } from './Select'
 
@@ -18,7 +21,7 @@ function SelectCountryInput({
   value,
   onChange,
   ...props
-}: FieldProps<'COUNTRY'> & {
+}: FieldPropsWithoutReferenceValue<'COUNTRY'> & {
   onChange: (val: string | undefined) => void
   value?: string
 }) {

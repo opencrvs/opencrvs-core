@@ -18,7 +18,7 @@ import {
   ConditionalType,
   field as createFieldCondition,
   FieldConfig,
-  FieldProps,
+  FieldPropsWithoutReferenceValue,
   FieldType,
   not,
   GeographicalArea,
@@ -42,7 +42,7 @@ type FieldConfigWithoutAddress = Exclude<
   { type: typeof FieldType.ADDRESS }
 >
 
-type Props = FieldProps<typeof FieldType.ADDRESS> & {
+type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
