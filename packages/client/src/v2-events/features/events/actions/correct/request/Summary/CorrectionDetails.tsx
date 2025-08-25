@@ -23,6 +23,7 @@ import {
   EventState,
   getCurrentEventState,
   getDeclaration,
+  isFieldDisplayedOnReview,
   isFieldVisible,
   isPageVisible,
   PageConfig,
@@ -298,6 +299,7 @@ export function CorrectionDetails({
 
       {formConfig.pages.map((page) => {
         const changedFields = page.fields
+          .filter((field) => isFieldDisplayedOnReview(field, form))
           .filter((f) => hasFieldChanged(f, form, previousFormValues))
           .map((f) => {
             const originalOutput = Output({
