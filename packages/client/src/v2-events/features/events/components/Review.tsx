@@ -536,7 +536,7 @@ function ReviewComponent({
       {pageIdsWithFile.length > 0 && (
         <RightColumn>
           <DocumentViewer
-            disabled={readonlyMode}
+            disabled={readonlyMode || isCorrection || isReviewCorrection}
             form={form}
             formConfig={formConfig}
             // @todo: ask about this rule
