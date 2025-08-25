@@ -219,7 +219,8 @@ function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
-  rng: () => number
+  rng: () => number,
+  overrides?: Partial<EventState>
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
@@ -231,7 +232,10 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return omitHiddenPaginatedFields(declarationConfig, declaration)
+    return {
+      ...omitHiddenPaginatedFields(declarationConfig, declaration),
+      ...overrides
+    }
   }
 
   // eslint-disable-next-line no-console
@@ -648,7 +652,8 @@ export function generateActionDocument({
   rng = () => 0.1,
   defaults = {},
   user = {},
-  annotation
+  annotation,
+  declarationOverrides
 }: {
   configuration: EventConfig
   action: ActionType
@@ -661,6 +666,7 @@ export function generateActionDocument({
     id: string
   }>
   annotation?: ActionUpdate
+  declarationOverrides?: Partial<EventState>
 }): ActionDocument {
   const actionBase = {
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
@@ -672,7 +678,12 @@ export function generateActionDocument({
     id: getUUID(),
     createdAtLocation:
       user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
-    declaration: generateActionDeclarationInput(configuration, action, rng),
+    declaration: generateActionDeclarationInput(
+      configuration,
+      action,
+      rng,
+      declarationOverrides
+    ),
     annotation: annotation ?? {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),
@@ -734,7 +745,8 @@ export function generateEventDocument({
   configuration,
   actions,
   rng = () => 0.1,
-  user
+  user,
+  declarationOverrides
 }: {
   configuration: EventConfig
   actions: ActionType[]
@@ -745,12 +757,22 @@ export function generateEventDocument({
     role: TestUserRole
     id: string
   }>
+  /**
+   * Overrides for default event state
+   */
+  declarationOverrides?: Partial<EventState>
 }): EventDocument {
   return {
     trackingId: getUUID(),
     type: configuration.id,
     actions: actions.map((action) =>
-      generateActionDocument({ configuration, action, rng, user })
+      generateActionDocument({
+        configuration,
+        action,
+        rng,
+        user,
+        declarationOverrides
+      })
     ),
     // Offset is needed so the createdAt timestamps for events, actions and drafts make logical sense in storybook tests.
     // @TODO: This should be fixed in the future.
