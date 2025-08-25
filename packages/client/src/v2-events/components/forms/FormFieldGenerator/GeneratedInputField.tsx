@@ -403,6 +403,7 @@ export const GeneratedInputField = React.memo(
           <File.Input
             {...inputProps}
             acceptedFileTypes={field.config.configuration.acceptedFileTypes}
+            disabled={disabled}
             error={inputFieldProps.error}
             label={uploadedFileNameLabel}
             maxFileSize={field.config.configuration.maxFileSize}
