@@ -144,6 +144,14 @@ export const ReviewWithParentFieldChanges: Story = {
         canvas.getByTestId('change-button-applicant.address')
       )
 
+      // make senior-pass page available meeting conditional with applicant dob
+      await userEvent.clear(canvas.getByTestId('applicant____dob-dd'))
+      await userEvent.type(canvas.getByTestId('applicant____dob-dd'), '10')
+      await userEvent.clear(canvas.getByTestId('applicant____dob-mm'))
+      await userEvent.type(canvas.getByTestId('applicant____dob-mm'), '10')
+      await userEvent.clear(canvas.getByTestId('applicant____dob-yyyy'))
+      await userEvent.type(canvas.getByTestId('applicant____dob-yyyy'), '1945')
+
       await userEvent.click(canvas.getByTestId('location__country'))
       await userEvent.type(canvas.getByTestId('location__country'), 'Far')
       await userEvent.click(canvas.getByText('Farajaland', { exact: true }))
