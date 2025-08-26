@@ -162,12 +162,15 @@ export function resolveDateOfEvent(
   return parsedDate.success ? parsedDate.data : undefined
 }
 
-function extractDuplicatesFromActions(actions: Action[]) {
+function extractPotentialDuplicatesFromActions(actions: Action[]) {
   return actions.reduce<UUID[]>((duplicates, action) => {
     if (action.type === ActionType.DUPLICATE_DETECTED) {
       duplicates = action.content.duplicates
     }
-    if (action.type === ActionType.MARK_NOT_DUPLICATE) {
+    if (
+      action.type === ActionType.MARK_NOT_DUPLICATE ||
+      action.type === ActionType.MARK_AS_DUPLICATE
+    ) {
       duplicates = []
     }
     return duplicates
@@ -221,7 +224,7 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
-    potentialDuplicates: extractDuplicatesFromActions(event.actions),
+    potentialDuplicates: extractPotentialDuplicatesFromActions(event.actions),
     flags: getFlagsFromActions(event.actions)
   })
 }
