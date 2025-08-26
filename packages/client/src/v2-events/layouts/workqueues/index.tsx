@@ -21,6 +21,7 @@ import { useWorkqueueConfigurations } from '@client/v2-events/features/events/us
 import { advancedSearchMessages } from '@client/v2-events/features/events/Search/AdvancedSearch'
 import { SearchToolbar } from '@client/v2-events/features/events/components/SearchToolbar'
 import { useEventFormNavigation } from '@client/v2-events/features/events/useEventFormNavigation'
+import { WORKQUEUE_OUTBOX, WORKQUEUE_DRAFT } from '@client/v2-events/utils'
 import { Hamburger } from '../sidebar/Hamburger'
 import { Sidebar } from '../sidebar/Sidebar'
 
@@ -50,8 +51,11 @@ export function WorkqueueLayout({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const intl = useIntl()
   const workqueues = useWorkqueueConfigurations()
+  const coreWorkqueues = [WORKQUEUE_OUTBOX, WORKQUEUE_DRAFT]
 
-  const workqueueConfig = workqueues.find(({ slug }) => slug === workqueueSlug)
+  const workqueueConfig = [...workqueues, ...coreWorkqueues].find(
+    ({ slug }) => slug === workqueueSlug
+  )
 
   return (
     <Frame
