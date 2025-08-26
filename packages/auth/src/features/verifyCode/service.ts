@@ -8,13 +8,12 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import fetch from 'node-fetch'
 import { redis } from '@auth/database'
 import { JWT_ISSUER } from '@auth/constants'
 import { env } from '@auth/environment'
 import * as crypto from 'crypto'
-import { resolve } from 'url'
 import { IUserName, createToken } from '@auth/features/authenticate/service'
+import { triggerUserEventNotification } from '@opencrvs/commons'
 
 interface ICodeDetails {
   code: string
@@ -68,18 +67,21 @@ export async function sendVerificationCode(
   mobile?: string,
   email?: string
 ): Promise<void> {
-  const params = {
-    msisdn: mobile,
-    email,
-    code: verificationCode,
-    notificationEvent,
-    userFullName
-  }
-  await fetch(resolve(env.NOTIFICATION_SERVICE_URL, 'authenticationCode'), {
-    method: 'POST',
-    body: JSON.stringify(params),
-    headers: {
-      'Content-Type': 'application/json',
+  await triggerUserEventNotification({
+    event:
+      notificationEvent === NotificationEvent.TWO_FACTOR_AUTHENTICATION
+        ? '2fa'
+        : 'reset-password',
+    payload: {
+      code: verificationCode,
+      recipient: {
+        name: userFullName,
+        mobile,
+        email
+      }
+    },
+    countryConfigUrl: env.COUNTRY_CONFIG_URL_INTERNAL,
+    authHeader: {
       Authorization: `Bearer ${await createToken(
         'auth',
         ['service'],
@@ -89,7 +91,6 @@ export async function sendVerificationCode(
       )}`
     }
   })
-
   return undefined
 }
 

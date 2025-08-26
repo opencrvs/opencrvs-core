@@ -44,6 +44,7 @@ const FrameNavigation = styled.nav`
 `
 const FrameHeader = styled.header`
   grid-area: header;
+  min-width: 0;
 `
 const FrameMainContent = styled.main`
   grid-area: content;

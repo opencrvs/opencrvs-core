@@ -22,7 +22,7 @@ import { EventDocument } from '../EventDocument'
 import { EventIndex } from '../EventIndex'
 import { EventStatus, ZodDate } from '../EventMetadata'
 import { Draft } from '../Draft'
-import { deepMerge } from '../utils'
+import { deepMerge, omitHiddenPaginatedFields } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
 import { getFlagsFromActions } from './flags'
@@ -254,7 +254,7 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration,
+    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),

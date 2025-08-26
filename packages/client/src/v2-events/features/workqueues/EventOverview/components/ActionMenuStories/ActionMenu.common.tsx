@@ -29,7 +29,7 @@ import {
   TranslationConfig,
   UUID,
   DisplayableAction,
-  ExclusiveActions
+  ClientSpecificAction
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
 import { AssignmentStatus } from '@client/v2-events/utils'
@@ -39,7 +39,7 @@ import {
   addLocalEventConfig
 } from '@client/v2-events/features/events/useEvents/api'
 import { ActionMenu } from '../ActionMenu'
-import { actionLabels } from '../useActionMenuItems'
+import { actionLabels } from '../useAllowedActionConfigurations'
 
 const generator = testDataGenerator()
 
@@ -83,7 +83,7 @@ const mockActions: Record<
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },
-  [ExclusiveActions.REVIEW_CORRECTION_REQUEST]: {
+  [ClientSpecificAction.REVIEW_CORRECTION_REQUEST]: {
     ...actionProps,
     type: ActionType.REQUEST_CORRECTION
   },
@@ -275,9 +275,12 @@ export function createStoriesFromScenarios(
           msw: {
             handlers: {
               event: [
-                tRPCMsw.event.search.query(() => [
-                  getCurrentEventState(event, tennisClubMembershipEvent)
-                ])
+                tRPCMsw.event.search.query(() => ({
+                  total: 1,
+                  results: [
+                    getCurrentEventState(event, tennisClubMembershipEvent)
+                  ]
+                }))
               ]
             }
           }

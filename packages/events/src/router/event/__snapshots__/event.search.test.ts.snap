@@ -209,6 +209,7 @@ exports[`Throws when date field is invalid 1`] = `
     "validation": "date",
     "message": "Invalid date",
     "path": [
+      "query",
       "clauses",
       0,
       "updatedAt",
@@ -225,6 +226,7 @@ exports[`Throws when one of the date range fields has invalid date 1`] = `
     "validation": "date",
     "message": "Invalid date",
     "path": [
+      "query",
       "clauses",
       0,
       "updatedAt",
@@ -240,6 +242,7 @@ exports[`Throws when searching by unrelated properties 1`] = `
     "code": "custom",
     "message": "At least one query field must be specified.",
     "path": [
+      "query",
       "clauses",
       0
     ]
@@ -257,6 +260,7 @@ exports[`Throws when searching with empty clauses 1`] = `
     "exact": false,
     "message": "At least one clause is required.",
     "path": [
+      "query",
       "clauses"
     ]
   }
@@ -267,47 +271,12 @@ exports[`Throws when searching without payload 1`] = `
 [TRPCError: [
   {
     "code": "invalid_type",
-    "expected": "array",
+    "expected": "object",
     "received": "undefined",
     "path": [
-      "clauses"
+      "query"
     ],
     "message": "Required"
-  },
-  {
-    "code": "invalid_union",
-    "unionErrors": [
-      {
-        "issues": [
-          {
-            "code": "invalid_literal",
-            "expected": "and",
-            "path": [
-              "type"
-            ],
-            "message": "Invalid literal value, expected \\"and\\""
-          }
-        ],
-        "name": "ZodError"
-      },
-      {
-        "issues": [
-          {
-            "code": "invalid_literal",
-            "expected": "or",
-            "path": [
-              "type"
-            ],
-            "message": "Invalid literal value, expected \\"or\\""
-          }
-        ],
-        "name": "ZodError"
-      }
-    ],
-    "path": [
-      "type"
-    ],
-    "message": "Invalid input"
   }
 ]]
 `;

@@ -8,11 +8,10 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import { on } from 'events'
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import {
-  FieldProps,
+  FieldPropsWithoutReferenceValue,
   RadioGroup as RadioGroupField,
   SelectOption
 } from '@opencrvs/commons/client'
@@ -28,7 +27,7 @@ function RadioGroupInput({
   options,
   configuration,
   ...props
-}: FieldProps<'RADIO_GROUP'> & {
+}: FieldPropsWithoutReferenceValue<'RADIO_GROUP'> & {
   onChange: (val: string | undefined) => void
   value?: string
 }) {

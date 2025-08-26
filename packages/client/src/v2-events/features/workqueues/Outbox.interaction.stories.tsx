@@ -19,7 +19,8 @@ import {
   generateEventDocument,
   getCurrentEventState,
   footballClubMembershipEvent,
-  FullDocumentPath
+  FullDocumentPath,
+  UUID
 } from '@opencrvs/commons/client'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { useEventFormData } from '@client/v2-events/features/events/useEventFormData'
@@ -52,7 +53,7 @@ export default meta
 
 const OUTBOX_FREEZE_TIME = 5 * 1000 // 5 seconds
 
-const eventDocument = generateEventDocument({
+const createdEventDocument = generateEventDocument({
   configuration: tennisClubMembershipEvent,
   actions: [ActionType.CREATE]
 })
@@ -77,7 +78,7 @@ const declarationTrpcMsw = {
     {
       name: 'event.create',
       procedure: tRPCMsw.event.create.mutation,
-      handler: () => eventDocument
+      handler: () => createdEventDocument
     },
     {
       name: 'event.actions.declare.request',
@@ -101,7 +102,8 @@ const mockUser = {
   ],
   role: 'SOCIAL_WORKER',
   signature: 'signature.png' as FullDocumentPath,
-  avatar: undefined
+  avatar: undefined,
+  primaryOfficeId: '028d2c85-ca31-426d-b5d1-2cef545a4902' as UUID
 }
 
 export const Outbox: Story = {
@@ -117,12 +119,12 @@ export const Outbox: Story = {
     reactRouter: {
       router: routesConfig,
       initialPath: ROUTES.V2.EVENTS.DECLARE.REVIEW.buildPath({
-        eventId: declareEventDocument.id
+        eventId: createdEventDocument.id
       })
     },
     chromatic: { disableSnapshot: true },
     offline: {
-      events: [eventDocument, declareEventDocument],
+      events: [createdEventDocument],
       configs: [tennisClubMembershipEvent, footballClubMembershipEvent]
     },
     msw: {

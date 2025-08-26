@@ -49,7 +49,7 @@ import { useReviewActionConfig } from './useReviewActionConfig'
 export function Review() {
   const { eventId } = useTypedParams(ROUTES.V2.EVENTS.DECLARE.REVIEW)
   const [{ workqueue: slug }] = useTypedSearchParams(
-    ROUTES.V2.EVENTS.VALIDATE.REVIEW
+    ROUTES.V2.EVENTS.DECLARE.REVIEW
   )
   const events = useEvents()
   const drafts = useDrafts()
