@@ -13,7 +13,7 @@ import { useSelector } from 'react-redux'
 import { IntlShape, useIntl } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { LocationSearch as LocationSearchComponent } from '@opencrvs/components'
-import { FieldProps } from '@opencrvs/commons/client'
+import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
 import { getOfflineData } from '@client/offline/selectors'
 import { getListOfLocations } from '@client/utils/validate'
 import { generateLocations } from '@client/utils/locationUtils'
@@ -50,7 +50,7 @@ function LocationSearchInput({
   searchableResource,
   onBlur,
   ...props
-}: FieldProps<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
+}: FieldPropsWithoutReferenceValue<'LOCATION' | 'OFFICE' | 'FACILITY'> & {
   onChange: (val: string | undefined) => void
   searchableResource: ('locations' | 'facilities' | 'offices')[]
   value?: string

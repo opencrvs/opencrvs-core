@@ -135,7 +135,7 @@ const reviewMessages = defineMessages({
     id: 'review.documents.zeroDocumentsTextForAnySection'
   },
   editDocuments: {
-    defaultMessage: 'Add attachement',
+    defaultMessage: 'Add attachment',
     description: 'Edit documents text',
     id: 'review.documents.editDocuments'
   }
