@@ -35,7 +35,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M309.793 475.396L505.999 476.321" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="366.248" y="489.656">
-       Registrar {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.name.fullname'}}
+       Registrar {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.name'}}
       </tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
