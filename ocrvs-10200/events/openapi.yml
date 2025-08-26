@@ -63,7 +63,7 @@ paths:
                 - transactionId
                 - type
               default:
-                transactionId: c49f15c2-dba3-4ecd-b763-83b940292434
+                transactionId: c9bbba21-045d-445c-8a66-523f251be1ae
                 type: v2.birth
       responses:
         "200":
@@ -295,6 +295,27 @@ paths:
                                   - firstname
                                   - surname
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: &a2 {}
                 annotation:
                   type: object
@@ -471,6 +492,27 @@ paths:
                                   - firstname
                                   - surname
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                 originalActionId:
                   type: string
                   format: uuid
@@ -486,7 +528,7 @@ paths:
                 - transactionId
               default:
                 eventId: <event-id-here>
-                transactionId: a765c684-e1fb-4a54-9f5f-f2fc4c7a2010
+                transactionId: de9e95c7-02ba-42ff-8daf-8b29e2e874e0
                 declaration: {}
                 annotation: {}
                 type: NOTIFY
@@ -716,6 +758,27 @@ paths:
                                   - firstname
                                   - surname
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: *a2
                 annotation:
                   type: object
@@ -891,6 +954,27 @@ paths:
                                 required:
                                   - firstname
                                   - surname
+                              - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
                               - type: "null"
                 originalActionId:
                   type: string
@@ -1131,6 +1215,27 @@ paths:
                                   - firstname
                                   - surname
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: *a2
                 annotation:
                   type: object
@@ -1306,6 +1411,27 @@ paths:
                                 required:
                                   - firstname
                                   - surname
+                              - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
                               - type: "null"
                 originalActionId:
                   type: string
@@ -1549,6 +1675,27 @@ paths:
                                   - firstname
                                   - surname
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                   default: *a2
                 annotation:
                   type: object
@@ -1725,6 +1872,27 @@ paths:
                                   - firstname
                                   - surname
                               - type: "null"
+                      - anyOf:
+                          - anyOf:
+                              - type: object
+                                properties:
+                                  loading:
+                                    type: boolean
+                                    nullable: true
+                                  error:
+                                    type: object
+                                    nullable: true
+                                    properties:
+                                      statusCode:
+                                        type: number
+                                      message:
+                                        type: string
+                                    required:
+                                      - statusCode
+                                      - message
+                                  data:
+                                    nullable: true
+                              - type: "null"
                 originalActionId:
                   type: string
                   format: uuid
@@ -1795,50 +1963,73 @@ paths:
         - Authorization: []
       parameters:
         - in: query
-          name: type
+          name: query
           schema:
-            anyOf:
-              - type: string
-                enum:
-                  - and
-              - type: string
-                enum:
-                  - or
-            default: and
+            allOf:
+              - $ref: "#/components/schemas/QueryType"
+            default:
+              type: and
+              clauses:
+                - eventType: tennis-club-membership
+                  status:
+                    type: anyOf
+                    terms: &a15
+                      - CREATED
+                      - NOTIFIED
+                      - DECLARED
+                      - VALIDATED
+                      - REGISTERED
+                      - ARCHIVED
+                  updatedAt:
+                    type: range
+                    gte: 2025-05-22
+                    lte: 2025-05-29
+                  data: {}
           required: true
         - in: query
-          name: clauses
+          name: limit
+          schema:
+            type: number
+            default: 100
+        - in: query
+          name: offset
+          schema:
+            type: number
+            default: 0
+        - in: query
+          name: sort
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/QueryExpression"
-            minItems: 1
-            default:
-              - eventType: tennis-club-membership
-                status:
-                  type: anyOf
-                  terms: &a15
-                    - CREATED
-                    - NOTIFIED
-                    - DECLARED
-                    - VALIDATED
-                    - REGISTERED
-                    - ARCHIVED
-                updatedAt:
-                  type: range
-                  gte: 2025-05-22
-                  lte: 2025-05-29
-                data: {}
-          required: true
+              type: object
+              properties:
+                field:
+                  type: string
+                direction:
+                  type: string
+                  enum:
+                    - asc
+                    - desc
+                  default: asc
+              required:
+                - field
       responses:
         "200":
           description: Successful response
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/EventIndex"
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/EventIndex"
+                  total:
+                    type: number
+                required:
+                  - results
+                  - total
         "400":
           description: Invalid input data
           content:
@@ -1999,6 +2190,38 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
+  /events/reindex:
+    post:
+      operationId: event-reindex
+      summary: Triggers reindexing of search, workqueues and notifies country config
+      tags:
+        - events
+      security:
+        - Authorization: []
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema: {}
+        "401":
+          description: Authorization not provided
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.UNAUTHORIZED"
+        "403":
+          description: Insufficient access
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.FORBIDDEN"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/error.INTERNAL_SERVER_ERROR"
 components:
   securitySchemes:
     Authorization:
@@ -2017,6 +2240,12 @@ components:
             $$field:
               type: string
               description: Unique identifier for the field
+            $$subfield:
+              type: array
+              items:
+                type: string
+              description: 'If the FieldValue is an object, subfield can be used to refer to
+                e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
           required:
             - $$field
           description: Reference to a field by its ID
@@ -2691,6 +2920,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2730,6 +2965,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -2866,6 +3117,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2905,6 +3162,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -2947,6 +3220,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -2986,6 +3265,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3023,6 +3318,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3062,6 +3363,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3105,6 +3422,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3144,6 +3467,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3177,6 +3516,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3216,6 +3561,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3248,6 +3609,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3287,6 +3654,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3336,6 +3719,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3375,6 +3764,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3418,6 +3823,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3457,6 +3868,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3505,6 +3932,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3544,6 +3977,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3596,6 +4045,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3635,6 +4090,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3676,6 +4147,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3715,6 +4192,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3740,6 +4233,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3779,6 +4278,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3820,6 +4335,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3859,6 +4380,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -3952,6 +4489,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -3991,6 +4534,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             defaultValue:
               type: string
               minLength: 1
@@ -4016,6 +4575,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4055,6 +4620,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             defaultValue:
               type: string
               minLength: 1
@@ -4080,6 +4661,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4119,6 +4706,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4143,6 +4746,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4182,6 +4791,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4253,6 +4878,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4292,6 +4923,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4317,6 +4964,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4356,6 +5009,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4402,6 +5071,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4441,6 +5116,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4462,6 +5153,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4501,6 +5198,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4537,6 +5250,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4576,6 +5295,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4601,6 +5336,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4640,6 +5381,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4665,6 +5422,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4704,6 +5467,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4751,6 +5530,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4790,6 +5575,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4822,6 +5623,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4861,6 +5668,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -4937,6 +5760,12 @@ components:
                 $$field:
                   type: string
                   description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
               required:
                 - $$field
               description: Reference to a parent field. If a field has a parent, it will be
@@ -4976,6 +5805,22 @@ components:
               type: boolean
               default: false
               description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
             type:
               type: string
               enum:
@@ -5014,6 +5859,259 @@ components:
             - type
             - configuration
           description: Data field for displaying read-only data
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a7
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a8
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            type:
+              type: string
+              enum:
+                - BUTTON
+            defaultValue:
+              type: number
+            configuration:
+              type: object
+              properties:
+                icon:
+                  type: string
+                  description: Icon for the button. You can find icons from OpenCRVS UI-Kit.
+                loading:
+                  type: boolean
+                  description: Whether the button is in a loading state and shows a spinner
+                text:
+                  description: Text to display on the button
+                  allOf:
+                    - $ref: "#/components/schemas/TranslationConfig"
+              required:
+                - text
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: Generic button without any built-in functionality
+        - type: object
+          properties:
+            id:
+              type: string
+              description: Unique identifier for the field
+            label:
+              $ref: "#/components/schemas/TranslationConfig"
+            parent:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If a field has a parent, it will be
+                reset when the parent field is changed.
+            required:
+              type: boolean
+              default: false
+            conditionals:
+              type: array
+              items:
+                $ref: "#/components/schemas/FieldConditional"
+              default: *a7
+            secured:
+              type: boolean
+              default: false
+            placeholder:
+              $ref: "#/components/schemas/TranslationConfig"
+            validation:
+              type: array
+              items:
+                type: object
+                properties:
+                  validator:
+                    $ref: "#/components/schemas/Conditional"
+                  message:
+                    $ref: "#/components/schemas/TranslationConfig"
+                required:
+                  - validator
+                  - message
+              default: *a8
+            helperText:
+              $ref: "#/components/schemas/TranslationConfig"
+            hideLabel:
+              type: boolean
+              default: false
+            uncorrectable:
+              type: boolean
+              default: false
+              description: Indicates if the field can be changed during a record correction.
+            value:
+              type: object
+              properties:
+                $$field:
+                  type: string
+                  description: Unique identifier for the field
+                $$subfield:
+                  type: array
+                  items:
+                    type: string
+                  description: 'If the FieldValue is an object, subfield can be used to refer to
+                    e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+              required:
+                - $$field
+              description: Reference to a parent field. If field has a value, the value will
+                be copied when the parent field is changed.
+            type:
+              type: string
+              enum:
+                - HTTP
+            defaultValue:
+              type: object
+              properties:
+                loading:
+                  type: boolean
+                error:
+                  type: object
+                  nullable: true
+                  properties:
+                    statusCode:
+                      type: number
+                    message:
+                      type: string
+                  required:
+                    - statusCode
+                    - message
+                data: {}
+              required:
+                - loading
+            configuration:
+              type: object
+              properties:
+                trigger:
+                  type: object
+                  properties:
+                    $$field:
+                      type: string
+                      description: Unique identifier for the field
+                    $$subfield:
+                      type: array
+                      items:
+                        type: string
+                      description: 'If the FieldValue is an object, subfield can be used to refer to
+                        e.g. `["foo", "bar"]` in `{ foo: { bar: 3 } }`'
+                  required:
+                    - $$field
+                  description: Reference to a field by its ID
+                url:
+                  type: string
+                  description: URL to send the HTTP request to
+                method:
+                  type: string
+                  enum:
+                    - GET
+                    - POST
+                    - PUT
+                    - DELETE
+                headers:
+                  type: object
+                  additionalProperties:
+                    type: string
+                body:
+                  type: object
+                  additionalProperties:
+                    type: string
+                params:
+                  type: object
+                  additionalProperties:
+                    type: string
+                timeout:
+                  type: number
+                  default: 15000
+                  description: Request timeout in milliseconds
+              required:
+                - trigger
+                - url
+                - method
+                - timeout
+          required:
+            - id
+            - label
+            - type
+            - configuration
+          description: HTTP request function triggered by a button click
       description: Form field configuration
     FieldConditional:
       oneOf:
@@ -6295,6 +7393,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -6470,6 +7589,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -6698,6 +7838,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -6873,6 +8034,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -7098,6 +8280,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -7273,6 +8476,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -7511,6 +8735,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -7686,6 +8931,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -7911,6 +9177,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8086,6 +9373,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -8324,6 +9632,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8499,6 +9828,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -8724,6 +10074,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -8899,6 +10270,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -9126,6 +10518,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -9301,6 +10714,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -9526,6 +10960,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -9701,6 +11156,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -9929,6 +11405,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -10104,6 +11601,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -10329,6 +11847,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -10504,6 +12043,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -10732,6 +12292,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -10907,6 +12488,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -11148,6 +12750,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -11323,6 +12946,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -11548,6 +13192,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -11723,6 +13388,27 @@ components:
                         required:
                           - firstname
                           - surname
+                      - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
                       - type: "null"
         status:
           type: string
@@ -11954,6 +13640,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         annotation:
           type: object
           nullable: true
@@ -12130,6 +13837,27 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - anyOf:
+                  - anyOf:
+                      - type: object
+                        properties:
+                          loading:
+                            type: boolean
+                            nullable: true
+                          error:
+                            type: object
+                            nullable: true
+                            properties:
+                              statusCode:
+                                type: number
+                              message:
+                                type: string
+                            required:
+                              - statusCode
+                              - message
+                          data:
+                            nullable: true
+                      - type: "null"
         status:
           type: string
           enum: *a14
@@ -12184,6 +13912,36 @@ components:
         code: BAD_REQUEST
         message: Invalid input data
         issues: []
+    QueryType:
+      type: object
+      properties:
+        type:
+          anyOf:
+            - type: string
+              enum:
+                - and
+            - type: string
+              enum:
+                - or
+          default: and
+        clauses:
+          type: array
+          items:
+            $ref: "#/components/schemas/QueryExpression"
+          minItems: 1
+          default:
+            - eventType: tennis-club-membership
+              status:
+                type: anyOf
+                terms: *a15
+              updatedAt:
+                type: range
+                gte: 2025-05-22
+                lte: 2025-05-29
+              data: {}
+      required:
+        - type
+        - clauses
     QueryExpression:
       type: object
       properties:
@@ -12784,6 +14542,25 @@ components:
                           - firstname
                           - surname
                       - type: "null"
+              - type: number
+              - type: object
+                properties:
+                  loading:
+                    type: boolean
+                  error:
+                    type: object
+                    nullable: true
+                    properties:
+                      statusCode:
+                        type: number
+                      message:
+                        type: string
+                    required:
+                      - statusCode
+                      - message
+                  data: {}
+                required:
+                  - loading
       required:
         - id
         - type
