@@ -163,7 +163,7 @@ export const EventMetadata = z.object({
     .describe(
       'System-generated tracking ID used by informants or registrars to look up the event.'
     ),
-  duplicates: z
+  potentialDuplicates: z
     .array(UUID)
     .describe('List of event IDs that this event could be a duplicate of.'),
   flags: z.array(Flag)

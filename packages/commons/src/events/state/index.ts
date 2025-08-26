@@ -221,7 +221,7 @@ export function getCurrentEventState(
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),
-    duplicates: extractDuplicatesFromActions(event.actions),
+    potentialDuplicates: extractDuplicatesFromActions(event.actions),
     flags: getFlagsFromActions(event.actions)
   })
 }

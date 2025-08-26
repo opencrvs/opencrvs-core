@@ -271,7 +271,7 @@ export async function createIndex(
             }
           },
           flags: { type: 'keyword' },
-          duplicates: { type: 'keyword' }
+          potentialDuplicates: { type: 'keyword' }
         } satisfies EventIndexMapping
       }
     }
