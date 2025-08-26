@@ -79,12 +79,9 @@ export const FormWizard = ({
             >
               {continueButtonText}
             </Button>
-
-            {showReviewButton && (
-              <Button size="large" type="secondary" onClick={onSubmit}>
-                {intl.formatMessage(messages.backToReview)}
-              </Button>
-            )}
+            <Button size="large" type="secondary" onClick={onSubmit}>
+              {intl.formatMessage(messages.backToReview)}
+            </Button>
           </Stack>
         </Content>
       </Frame.Section>
