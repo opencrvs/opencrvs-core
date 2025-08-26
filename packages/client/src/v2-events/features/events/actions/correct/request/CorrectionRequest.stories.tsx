@@ -14,13 +14,7 @@ import React, { useEffect } from 'react'
 import { Outlet } from 'react-router-dom'
 import superjson from 'superjson'
 import { expect, waitFor, within, userEvent } from '@storybook/test'
-import {
-  ActionType,
-  EventDocument,
-  generateUuid,
-  tennisClubMembershipEvent,
-  generateActionDocument
-} from '@opencrvs/commons/client'
+import { ActionType } from '@opencrvs/commons/client'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
 import {
@@ -111,7 +105,7 @@ export const ReviewWithChanges: Story = {
   }
 }
 
-export const Review: Story = {
+export const ReviewWithParentFieldChanges: Story = {
   parameters: {
     offline: {
       drafts: [draft]
@@ -159,10 +153,68 @@ export const Review: Story = {
       await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
     })
 
-    await step('Go back to review', async () => {
+    await step('Change senior pass values', async () => {
       await userEvent.click(
         canvas.getByRole('button', { name: 'Back to review' })
       )
+      await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
+      await userEvent.type(
+        canvas.getByTestId('text__senior-pass____id'),
+        '123456'
+      )
+
+      const checkbox = canvasElement.querySelector(
+        '#senior-pass____recommneder'
+      ) as HTMLInputElement
+
+      await userEvent.click(checkbox)
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+    })
+
+    await step('Select recommender none option', async () => {
+      const recommenderCheckbox = canvasElement.querySelector(
+        '#recommender____none'
+      ) as HTMLInputElement
+
+      await userEvent.click(recommenderCheckbox)
+    })
+
+    await step('Go back to review page', async () => {
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+    })
+
+    await step('Verify senior pass is initially unchecked', async () => {
+      await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
+      const seniorPassCheckbox = canvasElement.querySelector(
+        '#senior-pass____recommneder'
+      ) as HTMLInputElement
+
+      void expect(seniorPassCheckbox.checked).toBe(false)
+    })
+
+    await step('Check senior pass box', async () => {
+      const seniorPassCheckbox = canvasElement.querySelector(
+        '#senior-pass____recommneder'
+      ) as HTMLInputElement
+
+      await userEvent.click(seniorPassCheckbox)
+
+      void expect(seniorPassCheckbox.checked).toBe(true)
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+    })
+
+    await step('Re-select recommender none option', async () => {
+      const recommenderCheckbox = canvasElement.querySelector(
+        '#recommender____none'
+      ) as HTMLInputElement
+
+      await userEvent.click(recommenderCheckbox)
+      await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
+    })
+
+    await step('Go back to review', async () => {
       await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
       await waitFor(async () => {
         await expect(
@@ -185,6 +237,23 @@ export const Review: Story = {
       await userEvent.click(
         canvas.getByRole('button', { name: 'Back to review' })
       )
+    })
+
+    await step('Re-check senior pass box', async () => {
+      await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
+      const seniorPassCheckbox = canvasElement.querySelector(
+        '#senior-pass____recommneder'
+      ) as HTMLInputElement
+
+      await userEvent.click(seniorPassCheckbox)
+
+      void expect(seniorPassCheckbox.checked).toBe(true)
+      await userEvent.click(
+        canvas.getByRole('button', { name: 'Back to review' })
+      )
+    })
+
+    await step('Continue button is enabled', async () => {
       await waitFor(async () => {
         await expect(
           canvas.getByRole('button', { name: 'Continue' })
@@ -215,7 +284,7 @@ export const Summary: Story = {
     const canvas = within(canvasElement)
     await step('Check the summary table', async () => {
       void expect(await canvas.findByText('Verify ID')).toBeInTheDocument()
-      void expect(await canvas.findByText('Yes')).toBeInTheDocument()
+      await expect(canvas.getByText(/^Yes$/)).toBeInTheDocument()
       void expect(
         await canvas.findByText('Another registration agent or field agent')
       ).toBeInTheDocument()

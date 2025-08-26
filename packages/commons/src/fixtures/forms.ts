@@ -864,7 +864,10 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
     },
     {
       id: 'senior-pass',
-      conditional: field('applicant.dob').isBefore().date('1950-01-01'),
+      conditional: field('applicant.dob')
+        .isBefore()
+        .days(365 * 60 + 15)
+        .inPast(),
       title: {
         id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.title',
         defaultMessage: 'Assign senior pass for applicant',
@@ -879,6 +882,18 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
             defaultMessage: 'Senior pass ID',
             description: 'This is the label for the field',
             id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.id.label'
+          }
+        },
+        {
+          id: 'senior-pass.recommneder',
+          type: 'CHECKBOX',
+          required: true,
+          parent: field('recommender.none'),
+          conditionals: [],
+          label: {
+            defaultMessage: 'Does recommender have senior pass?',
+            description: 'This is the label for the field',
+            id: 'v2.event.tennis-club-membership.action.declare.form.section.senior-pass.field.recommender'
           }
         }
       ]
