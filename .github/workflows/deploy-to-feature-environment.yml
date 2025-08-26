@@ -170,6 +170,7 @@ jobs:
             echo "Trigger build job failed"
             exit 1
           fi
+
       - name: Parse the branch name and set it as environment variable
         run: |
           BRANCH_NAME=${{ needs.generate_stack_name_and_branch.outputs.branch_name }}
