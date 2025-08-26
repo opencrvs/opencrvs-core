@@ -25,7 +25,8 @@ import { Draft } from '../Draft'
 import {
   aggregateActionDeclarations,
   deepMerge,
-  getAcceptedActions
+  getAcceptedActions,
+  omitHiddenPaginatedFields
 } from '../utils'
 import { getActionUpdateMetadata, getLegalStatuses } from './utils'
 import { EventConfig } from '../EventConfig'
@@ -201,7 +202,7 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration,
+    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),

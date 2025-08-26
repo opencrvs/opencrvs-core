@@ -11,14 +11,17 @@
 import React from 'react'
 import { IntlShape, useIntl } from 'react-intl'
 import {
-  FieldProps,
+  FieldPropsWithoutReferenceValue,
   SelectField,
   SelectOption,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
 
-export type SelectInputProps = Omit<FieldProps<'SELECT'>, 'label'> & {
+export type SelectInputProps = Omit<
+  FieldPropsWithoutReferenceValue<'SELECT'>,
+  'label'
+> & {
   onChange: (newValue: string) => void
   value?: string
   label?: TranslationConfig

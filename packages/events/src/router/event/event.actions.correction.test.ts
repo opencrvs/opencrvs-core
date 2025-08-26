@@ -323,7 +323,7 @@ describe('when a correction request exists', () => {
         }
       },
       // Omit applicant.email, since it is configured as not correctable
-      ['applicant.email']
+      ['applicant.email', 'applicant.image']
     )
 
     withCorrectionRequest =

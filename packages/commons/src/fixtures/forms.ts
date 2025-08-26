@@ -841,6 +841,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           id: 'applicant.image',
           type: FieldType.FILE,
           required: false,
+          uncorrectable: true,
           label: {
             defaultMessage: "Applicant's profile picture",
             description: 'This is the label for the field',
