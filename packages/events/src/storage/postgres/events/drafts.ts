@@ -45,18 +45,6 @@ export async function createDraft(draft: NewEventActionDrafts) {
   const result = await db
     .insertInto('eventActionDrafts')
     .values(draft)
-    // @TODO
-    // Do this similarly as in events:
-    //
-    // use .onConflict((oc) => oc.columns(['transactionId', 'eventType']).doNothing())
-    // &
-    // const { id: newId } = await trx
-    // .selectFrom('eventActionDrafts')
-    // .select('id')
-    // .where('transactionId', '=', input.transactionId)
-    // .where('eventType', '=', input.eventType)
-    // .executeTakeFirstOrThrow()
-
     .onConflict((oc) =>
       oc.columns(['eventId', 'createdBy']).doUpdateSet({
         declaration: sql`EXCLUDED.declaration`,
