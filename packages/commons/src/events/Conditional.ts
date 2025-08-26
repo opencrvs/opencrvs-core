@@ -21,7 +21,8 @@ export const Conditional = z
   .custom<JSONSchema>((val) => typeof val === 'object' && val !== null)
   .meta({
     description: 'JSON schema conditional configuration',
-    id: 'Conditional'
+    id: 'Conditional',
+    override: {}
   })
 
 /**

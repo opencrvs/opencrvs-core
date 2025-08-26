@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as z from 'zod/v4'
+import * as z from 'zod'
 import { Action } from './ActionDocument'
 
 import { UUID } from '../uuid'
@@ -18,8 +18,8 @@ export const EventDocument = z
   .object({
     id: UUID,
     type: z.string(),
-    createdAt: z.string().datetime(),
-    updatedAt: z.string().datetime(),
+    createdAt: z.iso.datetime(),
+    updatedAt: z.iso.datetime(),
     actions: z.array(Action),
     trackingId: z.string()
   })

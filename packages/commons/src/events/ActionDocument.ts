@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as z from 'zod/v4'
+import * as z from 'zod'
 import { FieldValue, FieldUpdateValue } from './FieldValue'
 import { ActionType, ConfirmableActions } from './ActionType'
 
@@ -41,7 +41,7 @@ export const ActionBase = z.object({
   id: UUID,
   transactionId: z.string(),
   createdByUserType: TokenUserType,
-  createdAt: z.string().datetime(),
+  createdAt: z.iso.datetime(),
   createdBy: z.string(),
   createdByRole: z.string(),
   createdBySignature: z
@@ -66,39 +66,29 @@ export const ActionBase = z.object({
 
 export type ActionBase = z.infer<typeof ActionBase>
 
-const AssignedAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.ASSIGN),
-    assignedTo: z.string()
-  })
-)
+const AssignedAction = ActionBase.extend({
+  type: z.literal(ActionType.ASSIGN),
+  assignedTo: z.string()
+})
 
-const UnassignedAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.UNASSIGN)
-  })
-)
+const UnassignedAction = ActionBase.extend({
+  type: z.literal(ActionType.UNASSIGN)
+})
 
-export const RegisterAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.REGISTER),
-    registrationNumber: z.string().optional()
-  })
-)
+export const RegisterAction = ActionBase.extend({
+  type: z.literal(ActionType.REGISTER),
+  registrationNumber: z.string().optional()
+})
 
 export type RegisterAction = z.infer<typeof RegisterAction>
 
-const DeclareAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.DECLARE)
-  })
-)
+const DeclareAction = ActionBase.extend({
+  type: z.literal(ActionType.DECLARE)
+})
 
-const ValidateAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.VALIDATE)
-  })
-)
+const ValidateAction = ActionBase.extend({
+  type: z.literal(ActionType.VALIDATE)
+})
 
 export const RejectionReason = z.object({
   message: z
@@ -108,69 +98,49 @@ export const RejectionReason = z.object({
   isDuplicate: z.boolean().optional().describe('If a declaration is duplicated')
 })
 
-const RejectAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.REJECT),
-    reason: RejectionReason
-  })
-)
+const RejectAction = ActionBase.extend({
+  type: z.literal(ActionType.REJECT),
+  reason: RejectionReason
+})
 
-const MarkAsDuplicateAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.MARKED_AS_DUPLICATE)
-  })
-)
+const MarkAsDuplicateAction = ActionBase.extend({
+  type: z.literal(ActionType.MARKED_AS_DUPLICATE)
+})
 
-const ArchiveAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.ARCHIVE),
-    reason: RejectionReason
-  })
-)
+const ArchiveAction = ActionBase.extend({
+  type: z.literal(ActionType.ARCHIVE),
+  reason: RejectionReason
+})
 
-const CreatedAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.CREATE)
-  })
-)
+const CreatedAction = ActionBase.extend({
+  type: z.literal(ActionType.CREATE)
+})
 
-const NotifiedAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.NOTIFY)
-  })
-)
+const NotifiedAction = ActionBase.extend({
+  type: z.literal(ActionType.NOTIFY)
+})
 
-const PrintCertificateAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.PRINT_CERTIFICATE)
-  })
-)
+const PrintCertificateAction = ActionBase.extend({
+  type: z.literal(ActionType.PRINT_CERTIFICATE)
+})
 
-const RequestedCorrectionAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.REQUEST_CORRECTION)
-  })
-)
+const RequestedCorrectionAction = ActionBase.extend({
+  type: z.literal(ActionType.REQUEST_CORRECTION)
+})
 
-const ApprovedCorrectionAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.APPROVE_CORRECTION),
-    requestId: z.string()
-  })
-)
+const ApprovedCorrectionAction = ActionBase.extend({
+  type: z.literal(ActionType.APPROVE_CORRECTION),
+  requestId: z.string()
+})
 
-const RejectedCorrectionAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.REJECT_CORRECTION),
-    requestId: z.string()
-  })
-)
+const RejectedCorrectionAction = ActionBase.extend({
+  type: z.literal(ActionType.REJECT_CORRECTION),
+  requestId: z.string()
+})
 
-const ReadAction = ActionBase.merge(
-  z.object({
-    type: z.literal(ActionType.READ)
-  })
-)
+const ReadAction = ActionBase.extend({
+  type: z.literal(ActionType.READ)
+})
 
 export const ActionDocument = z
   .discriminatedUnion('type', [
@@ -199,12 +169,10 @@ export type ActionDocument = z.infer<typeof ActionDocument>
 export const AsyncRejectActionDocument = ActionBase.omit({
   declaration: true,
   annotation: true
-}).merge(
-  z.object({
-    type: z.enum(ConfirmableActions),
-    status: z.literal(ActionStatus.Rejected)
-  })
-)
+}).extend({
+  type: z.enum(ConfirmableActions),
+  status: z.literal(ActionStatus.Rejected)
+})
 
 export type AsyncRejectActionDocument = z.infer<
   typeof AsyncRejectActionDocument

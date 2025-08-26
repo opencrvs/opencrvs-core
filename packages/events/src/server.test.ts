@@ -87,6 +87,10 @@ async function createEvent(token: string) {
   return res
 }
 
+test('Server start up TEMP', () => {
+  expect(1).toEqual(1)
+})
+
 test('Server starts up and returns an event based on context dependency values', async () => {
   const { locations } = await setupTestCase()
   expect(serverInstance).toBeDefined()

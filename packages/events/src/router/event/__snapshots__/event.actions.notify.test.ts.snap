@@ -194,14 +194,6 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
       ],
       [
         {
-          "expected": "undefined",
-          "code": "invalid_type",
-          "path": [],
-          "message": "Invalid input: expected undefined, received object"
-        }
-      ],
-      [
-        {
           "expected": "string",
           "code": "invalid_type",
           "path": [
@@ -234,6 +226,14 @@ exports[`event.actions.notify > NOTIFY action fails if payload includes field wi
             "district2"
           ],
           "message": "Invalid input: expected string, received undefined"
+        }
+      ],
+      [
+        {
+          "expected": "undefined",
+          "code": "invalid_type",
+          "path": [],
+          "message": "Invalid input: expected undefined, received object"
         }
       ],
       [

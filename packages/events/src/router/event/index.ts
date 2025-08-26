@@ -11,8 +11,6 @@
 
 import * as z from 'zod/v4'
 
-import { QueryProcedure } from '@trpc/server/unstable-core-do-not-import'
-import { OpenApiMeta } from 'trpc-to-openapi'
 import { getScopes, getUUID, SCOPES, UUID, findScope } from '@opencrvs/commons'
 import {
   ACTION_ALLOWED_SCOPES,
@@ -57,35 +55,22 @@ import { importEvent } from '@events/service/events/import'
 import { getIndex, getIndexedEvents } from '@events/service/indexing/indexing'
 import { getDefaultActionProcedures } from './actions'
 
-/*
- * Explicitely type the procedure to reduce the inference
- * thus avoiding "The inferred type of this node exceeds the maximum length the
- * compiler will serialize" error
- */
-const eventConfigGetProcedure: QueryProcedure<{
-  meta: OpenApiMeta
-  input: void
-  output: EventConfig[]
-}> = publicProcedure
-  .meta({
-    openapi: {
-      summary: 'List event configurations',
-      method: 'GET',
-      path: '/config',
-      tags: ['events'],
-      protect: true
-    }
-  })
-  .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
-  .input(z.void())
-  .output(z.array(EventConfig))
-  .query(async (options) => {
-    return getEventConfigurations(options.ctx.token)
-  })
-
 export const eventRouter = router({
   config: router({
-    get: eventConfigGetProcedure
+    get: publicProcedure
+      .meta({
+        openapi: {
+          summary: 'List event configurations',
+          method: 'GET',
+          path: '/config',
+          tags: ['events'],
+          protect: true
+        }
+      })
+      .use(requiresAnyOfScopes(CONFIG_GET_ALLOWED_SCOPES))
+      .input(z.void())
+      .output(z.array(EventConfig))
+      .query(async (options) => getEventConfigurations(options.ctx.token))
   }),
   create: systemProcedure
     .meta({
@@ -111,7 +96,6 @@ export const eventRouter = router({
         token: ctx.token,
         eventType: input.type
       })
-
       return createEvent({
         transactionId: input.transactionId,
         eventInput: input,
@@ -138,7 +122,6 @@ export const eventRouter = router({
           status: ActionStatus.Accepted
         }
       )
-
       return updatedEvent
     }),
   delete: publicProcedure
@@ -159,7 +142,6 @@ export const eventRouter = router({
       .mutation(async ({ input, ctx }) => {
         const { eventId } = input
         await getEventById(eventId)
-
         return createDraft(input, {
           eventId,
           user: ctx.user,
@@ -213,7 +195,6 @@ export const eventRouter = router({
           if (ctx.isDuplicateAction) {
             return ctx.event
           }
-
           return addAction(input, {
             eventId: input.eventId,
             user: ctx.user,
@@ -253,7 +234,6 @@ export const eventRouter = router({
           if (ctx.isDuplicateAction) {
             return ctx.event
           }
-
           return rejectCorrection(input, {
             eventId: input.eventId,
             user: ctx.user,
@@ -286,9 +266,7 @@ export const eventRouter = router({
     .query(async ({ input, ctx }) => {
       const eventConfigs = await getEventConfigurations(ctx.token)
       const scopes = getScopes({ Authorization: ctx.token })
-
       const searchScope = findScope(scopes, 'search')
-
       // Only to satisfy type checking, as findScope will return undefined if no scope is found
       if (!searchScope) {
         throw new Error('No search scope provided')

@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 /**
  * Composite field value consists of multiple field values.

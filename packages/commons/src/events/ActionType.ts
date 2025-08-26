@@ -9,7 +9,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 
-import * as z from 'zod/v4'
+import * as z from 'zod'
 
 /**
  * Actions recognized by the system

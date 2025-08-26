@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import * as z from 'zod/v4'
+import * as z from 'zod'
 import {
   AddressFieldValue,
   AddressFieldUpdateValue,
@@ -44,17 +44,19 @@ export const DateValue = z
   .date()
   .describe('Date in the format YYYY-MM-DD')
 
-export const DatetimeValue = z.string().datetime()
+export const DatetimeValue = z.iso.datetime()
 
 export const DateRangeFieldValue = DateValue.or(z.tuple([DateValue, DateValue]))
 export type DateRangeFieldValue = z.infer<typeof DateRangeFieldValue>
 
+// TODO CIHAN: fix this?
 export const EmailValue = z.string().email()
 
 export const CheckboxFieldValue = z.boolean()
 export type CheckboxFieldValue = z.infer<typeof CheckboxFieldValue>
 export const NumberFieldValue = z.number()
 export type NumberFieldValue = z.infer<typeof NumberFieldValue>
+
 export const DataFieldValue = z.undefined()
 export type DataFieldValue = z.infer<typeof DataFieldValue>
 
@@ -89,8 +91,8 @@ export const FieldUpdateValue = z.union([
   FileFieldWithOptionValue,
   UrbanAddressUpdateValue,
   RuralAddressUpdateValue,
-  DataFieldValue,
   GenericAddressUpdateValue,
+  DataFieldValue,
   NameFieldUpdateValue
 ])
 
