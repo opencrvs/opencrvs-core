@@ -16,7 +16,7 @@ import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler
 import {
   logger,
   triggerUserEventNotification,
-  v1ToV2Name
+  personNameFromV1ToV2
 } from '@opencrvs/commons'
 import { getUserId } from '@user-mgnt/utils/userUtils'
 import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
@@ -46,7 +46,7 @@ export default async function usernameReminderHandler(
       event: 'username-reminder',
       payload: {
         recipient: {
-          name: v1ToV2Name(user.name),
+          name: personNameFromV1ToV2(user.name),
           email: user.emailForNotification,
           mobile: user.mobile
         },

@@ -44,7 +44,7 @@ export const FullNameV1 = z.array(
 
 export type FullNameV1 = z.infer<typeof FullNameV1>
 
-export function v1ToV2Name([name]: FullNameV1): NameFieldValue {
+export function personNameFromV1ToV2([name]: FullNameV1): NameFieldValue {
   return {
     firstname: name.given[0],
     middlename: name.given.slice(1).join(' '),

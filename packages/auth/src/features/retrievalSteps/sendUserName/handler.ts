@@ -21,7 +21,7 @@ import {
 import {
   logger,
   triggerUserEventNotification,
-  v1ToV2Name
+  personNameFromV1ToV2
 } from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@auth/metrics'
 import { env } from '@auth/environment'
@@ -54,7 +54,7 @@ export default async function sendUserNameHandler(
     event: 'username-reminder',
     payload: {
       recipient: {
-        name: v1ToV2Name(retrievalStepInformation.userFullName),
+        name: personNameFromV1ToV2(retrievalStepInformation.userFullName),
         mobile: retrievalStepInformation.mobile,
         email: retrievalStepInformation.email
       },

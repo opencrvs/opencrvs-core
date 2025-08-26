@@ -11,7 +11,7 @@
 import {
   triggerUserEventNotification,
   logger,
-  v1ToV2Name
+  personNameFromV1ToV2
 } from '@opencrvs/commons'
 import {
   Extension,
@@ -285,7 +285,7 @@ export async function sendCredentialsNotification(
       event: 'user-created',
       payload: {
         recipient: {
-          name: v1ToV2Name(userFullName),
+          name: personNameFromV1ToV2(userFullName),
           email,
           mobile: msisdn
         },

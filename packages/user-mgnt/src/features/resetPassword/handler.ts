@@ -21,7 +21,7 @@ import { COUNTRY_CONFIG_URL } from '@user-mgnt/constants'
 import {
   logger,
   triggerUserEventNotification,
-  v1ToV2Name
+  personNameFromV1ToV2
 } from '@opencrvs/commons'
 import { postUserActionToMetrics } from '@user-mgnt/features/changePhone/handler'
 
@@ -83,12 +83,12 @@ export default async function resetPasswordInviteHandler(
       payload: {
         temporaryPassword: randomPassword,
         recipient: {
-          name: v1ToV2Name(user.name),
+          name: personNameFromV1ToV2(user.name),
           email: user.emailForNotification,
           mobile: user.mobile
         },
         admin: {
-          name: v1ToV2Name(systemAdminUser.name),
+          name: personNameFromV1ToV2(systemAdminUser.name),
           id: systemAdminUser.id,
           role: systemAdminUser.role
         }
