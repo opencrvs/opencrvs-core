@@ -23,6 +23,7 @@ type ImageUploaderProps = Omit<
 > & {
   onChange?: (file: File) => void
   disabled?: boolean
+  accept?: string
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
@@ -30,6 +31,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
   onChange,
   onClick,
   disabled,
+  accept,
   ...props
 }) => {
   const fileUploader = useRef<HTMLInputElement>(null)
@@ -63,7 +65,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
         data-testid={props.name}
         ref={fileUploader}
         type="file"
-        accept="image/*"
+        accept={accept ?? 'image/*'}
         onChange={handleFileChange}
       />
     </Button>

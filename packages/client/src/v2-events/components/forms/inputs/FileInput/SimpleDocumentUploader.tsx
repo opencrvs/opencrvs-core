@@ -103,6 +103,8 @@ export function SimpleDocumentUploader({
   }
 
   const errorMessage = error || errorProps || ''
+  const acceptAttr =
+    acceptedFileTypes.length > 0 ? acceptedFileTypes.join(',') : undefined
 
   return (
     <>
@@ -126,6 +128,7 @@ export function SimpleDocumentUploader({
         />
       )}
       <DocumentUploader
+        accept={acceptAttr}
         data-testid={name}
         disabled={disabled}
         fullWidth={width === 'full'}

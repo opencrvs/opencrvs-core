@@ -27,12 +27,19 @@ interface PrintButtonProps {
   template: string
   buttonLabel?: { id: string; defaultMessage: string }
   disabled?: boolean
+  onChange?: (value: boolean) => void
 }
 
 const addedButtonLabel = { id: 'print.certificate', defaultMessage: 'Print' }
 
 export const PrintButton = {
-  Input: ({ id, template, buttonLabel, disabled }: PrintButtonProps) => {
+  Input: ({
+    id,
+    template,
+    buttonLabel,
+    disabled,
+    onChange
+  }: PrintButtonProps) => {
     const intl = useIntl()
     const { eventId } = useParams()
     const { getEvent } = useEvents()
@@ -81,6 +88,12 @@ export const PrintButton = {
     })
 
     const handlePrint = async () => {
+      // Emit a form value to allow conditionals to react to the click
+      try {
+        onChange?.(true)
+      } catch {
+        // no-op: do not break printing if form callback throws
+      }
       if (!certificateConfig || !language) {
         return
       }
