@@ -204,6 +204,10 @@ export function FormSectionComponent({
     id: makeFormFieldIdFormikCompatible(field.id)
   }))
 
+  // fieldsWithDotSeparator may fallback to pageFieldsWithDotIds when eventConfig
+  // isn’t loaded yet. This guarantees we always have a usable set of fields.
+  // Once eventConfig is available, we derive all fields (with dot-separated IDs)
+  // so parent → child relationships can be resolved consistently across pages.
   const allFieldsWithDotSeparator: FieldConfig[] = useMemo(() => {
     if (eventConfig) {
       const allConfigFields = getAllUniqueFields(eventConfig)
@@ -212,14 +216,11 @@ export function FormSectionComponent({
         id: makeFormFieldIdFormikCompatible(field.id)
       }))
     }
-    return []
-  }, [eventConfig])
+    return fieldsWithDotSeparator
+  }, [eventConfig, fieldsWithDotSeparator])
 
   // Create a reference map of parent fields and their their children for quick access.
   // This is used to reset the values of child fields when a parent field changes.
-  //
-  // Note: We use allFieldsWithDotSeparator here (instead of fieldsWithDotSeparator)
-  // so that parent → child relationships work consistently across all pages.
   const fieldsByParentId: IndexMap<FieldConfig[]> = useMemo(
     () => groupBy(allFieldsWithDotSeparator, (field) => field.parent?.$$field),
     [allFieldsWithDotSeparator]
