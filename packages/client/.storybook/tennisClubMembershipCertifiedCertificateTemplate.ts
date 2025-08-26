@@ -35,7 +35,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     <path d="M309.793 475.396L505.999 476.321" stroke="#CCCCCC" stroke-width="0.782258" stroke-dasharray="3.13 1.56" />
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
       <tspan x="366.248" y="489.656">
-       Registrar {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.name'}}
+       Registrar {{ $lookup $metadata 'legalStatuses.REGISTERED.createdBy.name.fullname'}}
       </tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
@@ -68,7 +68,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask0_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="247.708">{{ $lookup $declaration "applicant.name" }}</tspan>
+        <tspan x="312" y="247.708">{{ $lookup $declaration "applicant.name.fullname" }}</tspan>
       </text>
     </g>
     <path d="M70 253.5H514" stroke="#ECECEC" />
@@ -99,7 +99,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
     </mask>
     <g mask="url(#mask2_5_2)">
       <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-        <tspan x="312" y="287.708">{{ $lookup $declaration "recommender.name"  }}</tspan>
+        <tspan x="312" y="287.708">{{ $lookup $declaration "recommender.name.fullname"  }}</tspan>
       </text>
     </g>
     <path d="M70 293.5H514" stroke="#ECECEC" />
