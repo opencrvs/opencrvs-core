@@ -1,6 +1,7 @@
 import {
   Country,
   DateField as DateFieldType,
+  FieldConfig,
   FieldType,
   FieldTypeToFieldConfig,
   RadioField,
@@ -58,11 +59,12 @@ export * from './Name'
 export * from './SelectDateRangeField'
 export * from './Http'
 
-export function getFieldByType<T extends FieldType>(
+export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
-): RegisteredFieldModule<FieldTypeToFieldConfig<T>> | undefined {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+): RegisteredFieldModule<any> | undefined {
   // eslint-disable-next-line @typescript-eslint/switch-exhaustiveness-check
-  switch (type) {
+  switch (type.type) {
     case FieldType.ADDRESS:
       return Address
     case FieldType.BULLET_LIST:
@@ -72,8 +74,7 @@ export function getFieldByType<T extends FieldType>(
     case FieldType.CHECKBOX:
       return Checkbox
     case FieldType.DATE:
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return DateField as any
+      return DateField
     case FieldType.TIME:
       return TimeField
     case FieldType.ADMINISTRATIVE_AREA:
@@ -81,14 +82,11 @@ export function getFieldByType<T extends FieldType>(
     case FieldType.LOCATION:
       return LocationSearch
     case FieldType.RADIO_GROUP:
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return RadioGroup as any
+      return RadioGroup
     case FieldType.SELECT:
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return Select as any
+      return Select
     case FieldType.COUNTRY:
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      return SelectCountry as any
+      return SelectCountry
     case FieldType.TEXT:
       return Text
     case FieldType.NUMBER:

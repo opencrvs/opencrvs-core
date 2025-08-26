@@ -9,9 +9,10 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { useIntl } from 'react-intl'
+import { IntlShape, useIntl } from 'react-intl'
 import {
   FieldPropsWithoutReferenceValue,
+  FieldTypeToFieldConfig,
   RadioGroup as RadioGroupField,
   SelectOption
 } from '@opencrvs/commons/client'

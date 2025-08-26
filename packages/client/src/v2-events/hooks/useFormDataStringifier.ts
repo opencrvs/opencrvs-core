@@ -27,7 +27,7 @@ import {
   RadioGroup,
   SelectCountry as Country,
   Select,
-  getFieldByType
+  getRegisteredFieldByFieldConfig
 } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
 
@@ -108,7 +108,7 @@ export const getFormDataStringifier = (
   const simpleFieldStringifier = stringifySimpleField(intl, locations)
 
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
-    const field = getFieldByType(fieldConfig.type)
+    const field = getRegisteredFieldByFieldConfig(fieldConfig)
     if (!field) {
       return simpleFieldStringifier(fieldConfig, value)
     }
