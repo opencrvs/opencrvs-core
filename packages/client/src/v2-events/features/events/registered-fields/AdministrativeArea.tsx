@@ -11,7 +11,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Location } from '@events/service/locations/locations'
-import { FieldProps } from '@opencrvs/commons/client'
+import { FieldPropsWithoutReferenceValue } from '@opencrvs/commons/client'
 import { getAdminStructureLocations } from '@client/offline/selectors'
 import { Stringifiable } from '@client/v2-events/components/forms/utils'
 import { EMPTY_TOKEN } from '@client/v2-events/messages/utils'
@@ -42,7 +42,7 @@ function AdministrativeAreaInput({
   value,
   partOf,
   ...props
-}: FieldProps<'ADMINISTRATIVE_AREA'> & {
+}: FieldPropsWithoutReferenceValue<'ADMINISTRATIVE_AREA'> & {
   onChange: (val: string | undefined) => void
   partOf: string | null
   value?: string

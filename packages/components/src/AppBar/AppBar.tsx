@@ -70,6 +70,7 @@ const Title = styled(Text)`
   overflow: hidden;
   text-overflow: ellipsis;
   height: 25px;
+  min-width: 0;
 `
 
 type IProps = {
