@@ -10,12 +10,7 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 /* eslint-disable no-console */
-import {
-  IntlShape,
-  MessageDescriptor,
-  createIntl,
-  createIntlCache
-} from 'react-intl'
+import { IntlShape, createIntl, createIntlCache } from 'react-intl'
 import Handlebars from 'handlebars'
 import htmlToPdfmake from 'html-to-pdfmake'
 import type {
@@ -207,38 +202,7 @@ const certificateBaseTemplate = {
   fonts: {}
 }
 
-function isMessageDescriptor(obj: unknown): obj is MessageDescriptor {
-  return (
-    typeof obj === 'object' &&
-    obj !== null &&
-    'id' in obj &&
-    'defaultMessage' in obj &&
-    typeof (obj as MessageDescriptor).id === 'string' &&
-    typeof (obj as MessageDescriptor).defaultMessage === 'string'
-  )
-}
-
 const cache = createIntlCache()
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-function flattenObject(
-  obj: Record<string, unknown>,
-  prefix = '',
-  res: Record<string, unknown> = {}
-): Record<string, unknown> {
-  for (const [key, value] of Object.entries(obj)) {
-    const newKey = prefix ? `${prefix}.${key}` : key
-
-    if (isRecord(value)) {
-      flattenObject(value, newKey, res)
-    } else {
-      res[newKey] = value
-    }
-  }
-  return res
-}
 
 export function compileSvg({
   templateString,
