@@ -313,29 +313,7 @@ export function compileSvg({
         return getMixedPath(resolvedMetadata, propertyPath)
       }
 
-      /*
-       * This enables a lookup like
-       * $lookup $declaration "applicant.name.firstname"
-       * where applicant.name is really the field id but the value of it is an object
-       */
-      const nestedFieldsOfDeclarationValues = Object.entries(
-        $declaration
-      ).reduce((fields, [key, value]) => {
-        if (isRecord(value)) {
-          return {
-            ...fields,
-            ...flattenObject({
-              [key]: value
-            })
-          }
-        }
-        return fields
-      }, {})
-
-      return getMixedPath(
-        { ...resolvedDeclaration, ...nestedFieldsOfDeclarationValues },
-        propertyPath
-      )
+      return getMixedPath(resolvedDeclaration, propertyPath)
     }
     const result = doLookup()
     if (typeof result === 'object') {
