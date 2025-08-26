@@ -33,7 +33,8 @@ function FileInput({
   maxFileSize,
   label,
   error,
-  touched
+  touched,
+  disabled
 }: {
   width?: 'full' | 'auto'
   acceptedFileTypes?: MimeType[]
@@ -45,6 +46,7 @@ function FileInput({
   error?: string
   label: string
   touched?: boolean
+  disabled?: boolean
 }) {
   const [file, setFile] = React.useState(value)
 
@@ -68,6 +70,7 @@ function FileInput({
     <SimpleDocumentUploader
       acceptedFileTypes={acceptedFileTypes}
       description={description}
+      disabled={disabled}
       error={error}
       file={file}
       label={label}

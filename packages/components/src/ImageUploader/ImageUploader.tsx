@@ -22,12 +22,14 @@ type ImageUploaderProps = Omit<
   'onChange' | 'type'
 > & {
   onChange?: (file: File) => void
+  disabled?: boolean
 }
 
 export const ImageUploader: React.FC<ImageUploaderProps> = ({
   children,
   onChange,
   onClick,
+  disabled,
   ...props
 }) => {
   const fileUploader = useRef<HTMLInputElement>(null)
@@ -46,6 +48,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({
       {...props}
       type="secondary"
       size="medium"
+      disabled={disabled}
       onClick={(event) => {
         if (onClick) {
           onClick(event)
