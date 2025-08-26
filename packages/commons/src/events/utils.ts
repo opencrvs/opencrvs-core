@@ -472,7 +472,7 @@ export function getAcceptedActions(event: EventDocument): ActionDocument[] {
   return event.actions.filter(isAcceptedAction)
 }
 
-export function getPendingActions(actions: Action[]): ActionDocument[] {
+function getPendingActions(actions: Action[]): ActionDocument[] {
   const actionGroups: Record<string, Action[]> = groupBy(
     actions,
     ({ transactionId, type }: Action) => `${transactionId}::${type}`
