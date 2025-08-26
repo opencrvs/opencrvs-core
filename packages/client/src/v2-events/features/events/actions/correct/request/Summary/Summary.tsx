@@ -131,7 +131,10 @@ export function Summary() {
       fullEvent: event
     }
     if (scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)) {
-      events.customActions.makeCorrectionOnRequest.mutate(mutationPayload)
+      events.customActions.makeCorrectionOnRequest.mutate({
+        ...mutationPayload,
+        eventConfiguration
+      })
     } else {
       events.actions.correction.request.mutate(mutationPayload)
     }
@@ -140,6 +143,7 @@ export function Summary() {
   }, [
     form,
     fields,
+    eventConfiguration,
     event,
     scopes,
     events.customActions.makeCorrectionOnRequest,

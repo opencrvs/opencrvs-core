@@ -72,6 +72,10 @@ function errorToastOnConflict(error: TRPCClientError<AppRouter>) {
   }
 }
 
+// Merge actionUpdate with the existing declaration to avoid losing dependent fields.
+// For example: if the correction payload contains only `informant.name`, but not `informant.relation`,
+// running omitHiddenPaginatedFields on the payload alone would remove `informant.name` (since its parent `informant.relation` is missing).
+// By merging first, we preserve such dependencies, and then run a diff to keep only the valid correction fields.
 function getCleanedDeclarationDiff(
   eventConfiguration: EventConfig,
   originalDeclaration?: EventState,
