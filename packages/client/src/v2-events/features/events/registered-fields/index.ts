@@ -72,6 +72,7 @@ export function getFieldByType<T extends FieldType>(
     case FieldType.CHECKBOX:
       return Checkbox
     case FieldType.DATE:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return DateField as any
     case FieldType.TIME:
       return TimeField
@@ -80,10 +81,13 @@ export function getFieldByType<T extends FieldType>(
     case FieldType.LOCATION:
       return LocationSearch
     case FieldType.RADIO_GROUP:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return RadioGroup as any
     case FieldType.SELECT:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return Select as any
     case FieldType.COUNTRY:
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       return SelectCountry as any
     case FieldType.TEXT:
       return Text
