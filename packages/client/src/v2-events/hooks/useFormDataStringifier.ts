@@ -14,28 +14,20 @@ import {
   EventState,
   FieldConfig,
   FieldValue,
-  isAddressFieldType,
   isCountryFieldType,
   isAdministrativeAreaFieldType,
   isFacilityFieldType,
   isOfficeFieldType,
   isLocationFieldType,
   isRadioGroupFieldType,
-  isSelectFieldType,
-  isNameFieldType,
-  isDateFieldType,
-  isHttpFieldType
+  isSelectFieldType
 } from '@opencrvs/commons/client'
 import {
-  Address,
   AdministrativeArea,
   RadioGroup,
   SelectCountry as Country,
   Select,
-  LocationSearch,
-  Name,
-  DateField,
-  Http
+  getFieldByType
 } from '@client/v2-events/features/events/registered-fields'
 import { useLocations } from './useLocations'
 
@@ -58,19 +50,31 @@ export function stringifySimpleField(intl: IntlShape, locations: Location[]) {
       isOfficeFieldType(field)
     ) {
       // Since all of the above field types are actually locations
-      return AdministrativeArea.stringify(locations, field.value)
+      return AdministrativeArea.stringify(field.value, { locations })
     }
 
     if (isRadioGroupFieldType(field)) {
-      return RadioGroup.stringify(intl, field.value, field.config)
+      return RadioGroup.stringify(field.value, {
+        locations,
+        intl,
+        config: field.config
+      })
     }
 
     if (isCountryFieldType(field)) {
-      return Country.stringify(intl, field.value)
+      return Country.stringify(field.value, {
+        locations,
+        intl,
+        config: field.config
+      })
     }
 
     if (isSelectFieldType(field)) {
-      return Select.stringify(intl, field.value, field.config)
+      return Select.stringify(field.value, {
+        locations,
+        intl,
+        config: field.config
+      })
     }
 
     return !value ? '' : value.toString()
@@ -104,27 +108,25 @@ export const getFormDataStringifier = (
   const simpleFieldStringifier = stringifySimpleField(intl, locations)
 
   const stringifier = (fieldConfig: FieldConfig, value: FieldValue) => {
-    const field = { config: fieldConfig, value }
-    if (isAddressFieldType(field)) {
-      return Address.stringify(intl, locations, field.value)
+    const field = getFieldByType(fieldConfig.type)
+    if (!field) {
+      return simpleFieldStringifier(fieldConfig, value)
     }
 
-    if (isFacilityFieldType(field)) {
-      return LocationSearch.stringify(intl, locations, field.value)
+    if (field.toCertificateVariables) {
+      return field.toCertificateVariables(value, {
+        intl,
+        locations,
+        config: fieldConfig
+      })
     }
-
-    if (isNameFieldType(field)) {
-      return Name.stringify(field.value)
+    if (field.stringify) {
+      return field.stringify(value, {
+        intl,
+        locations,
+        config: fieldConfig
+      })
     }
-
-    if (isDateFieldType(field)) {
-      return DateField.stringify(intl, field.value)
-    }
-
-    if (isHttpFieldType(field)) {
-      return Http.stringify()
-    }
-
     return simpleFieldStringifier(fieldConfig, value)
   }
 

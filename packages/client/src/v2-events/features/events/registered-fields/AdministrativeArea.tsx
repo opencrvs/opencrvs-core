@@ -72,8 +72,8 @@ function AdministrativeAreaOutput({ value }: { value: Stringifiable }) {
   return location ? location.name : ''
 }
 
-function stringify(locations: Location[], value: string) {
-  const location = locations.find((l) => l.id === value)
+function stringify(value: string, context: { locations: Location[] }) {
+  const location = context.locations.find((l) => l.id === value)
 
   const name = location?.name
   return name ?? EMPTY_TOKEN

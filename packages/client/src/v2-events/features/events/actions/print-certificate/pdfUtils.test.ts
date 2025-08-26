@@ -169,7 +169,7 @@ describe('SVG compiler', () => {
   describe('$lookup', () => {
     it('stringifies complex form field values using the stringifier of said form input', () => {
       expectRenderOutput(
-        '<svg><text>{{ $lookup $declaration "applicant.name" }}</text></svg>',
+        '<svg><text>{{ $lookup $declaration "applicant.name.fullname" }}</text></svg>',
         '<svg><text>John Doe</text></svg>'
       )
     })
@@ -177,6 +177,12 @@ describe('SVG compiler', () => {
       expectRenderOutput(
         '<svg><text>{{ $lookup $declaration "applicant.name.firstname" }}</text></svg>',
         '<svg><text>John</text></svg>'
+      )
+    })
+    it('as a debugging helper, renders a json object as JSON instead of [object Object]', () => {
+      expectRenderOutput(
+        '<svg><text>{{ $lookup $declaration "applicant.name" }}</text></svg>',
+        '<svg><text>{&quot;fullname&quot;:&quot;John Doe&quot;,&quot;firstname&quot;:&quot;John&quot;,&quot;surname&quot;:&quot;Doe&quot;}</text></svg>'
       )
     })
   })

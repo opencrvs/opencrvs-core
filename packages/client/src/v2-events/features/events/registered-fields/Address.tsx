@@ -533,12 +533,14 @@ function AddressOutput({
   )
 }
 
-function stringify(
-  intl: IntlShape,
-  locations: Location[],
-  value: AddressFieldValue
+function toCertificateVariables(
+  value: AddressFieldValue,
+  context: {
+    intl: IntlShape
+    locations: Location[]
+  }
 ) {
-  const fieldStringifier = stringifySimpleField(intl, locations)
+  const fieldStringifier = stringifySimpleField(context.intl, context.locations)
 
   /*
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
@@ -551,5 +553,9 @@ function stringify(
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  stringify
+  stringify: () => {
+    // @todo
+    return ''
+  },
+  toCertificateVariables: toCertificateVariables
 }

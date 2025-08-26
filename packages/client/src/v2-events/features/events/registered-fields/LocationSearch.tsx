@@ -86,10 +86,12 @@ function LocationSearchInput({
   )
 }
 
-function stringify(
-  intl: IntlShape,
-  locations: Location[],
-  value: Stringifiable | undefined | null
+function toCertificateVariables(
+  value: Stringifiable | undefined | null,
+  context: {
+    intl: IntlShape
+    locations: Location[]
+  }
 ) {
   if (!value) {
     return {
@@ -100,16 +102,16 @@ function stringify(
     }
   }
 
-  const country = intl.formatMessage({
+  const country = context.intl.formatMessage({
     id: `countries.${window.config.COUNTRY}`,
     defaultMessage: 'Farajaland',
     description: 'Country name'
   })
 
   const locationId = value.toString()
-  const location = locations.find((loc) => loc.id === locationId)
-  const district = locations.find((loc) => loc.id === location?.partOf)
-  const province = locations.find((loc) => loc.id === district?.partOf)
+  const location = context.locations.find((loc) => loc.id === locationId)
+  const district = context.locations.find((loc) => loc.id === location?.partOf)
+  const province = context.locations.find((loc) => loc.id === district?.partOf)
 
   return {
     location: location?.name || '',
@@ -123,10 +125,12 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
-  const { location, district, province, country } = stringify(
-    intl,
-    locations,
-    value
+  const { location, district, province, country } = toCertificateVariables(
+    value,
+    {
+      intl,
+      locations
+    }
   )
 
   return [location, district, province, country]
@@ -137,5 +141,5 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
 export const LocationSearch = {
   Input: LocationSearchInput,
   Output: LocationSearchOutput,
-  stringify
+  toCertificateVariables: toCertificateVariables
 }
