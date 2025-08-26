@@ -10,6 +10,7 @@
  */
 import { MiddlewareFunction } from '@trpc/server/unstable-core-do-not-import'
 import { OpenApiMeta } from 'trpc-to-openapi'
+import { isEqual } from 'lodash'
 import {
   ActionInputWithType,
   ActionStatus,
@@ -93,6 +94,8 @@ export const detectDuplicate: MiddlewareFunction<
     createdBySignature: user.signature
   }
 
+  const existingEventState = getCurrentEventState(storedEvent, config)
+
   const futureEventState = getCurrentEventState(
     {
       ...storedEvent,
@@ -109,6 +112,29 @@ export const detectDuplicate: MiddlewareFunction<
     },
     config
   )
+
+  const isMarkedAsNotDuplicate = storedEvent.actions.reduce((acc, action) => {
+    if (action.type === ActionType.MARK_NOT_DUPLICATE) {
+      return true
+    }
+    if (action.type === ActionType.DUPLICATE_DETECTED) {
+      return false
+    }
+    return acc
+  }, false)
+
+  if (
+    isMarkedAsNotDuplicate &&
+    isEqual(existingEventState.declaration, futureEventState.declaration)
+  ) {
+    return next({
+      ctx: {
+        duplicates: {
+          detected: false
+        }
+      }
+    })
+  }
 
   const duplicates = await searchForDuplicates(
     futureEventState,
