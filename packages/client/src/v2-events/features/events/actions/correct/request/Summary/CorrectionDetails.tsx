@@ -316,8 +316,8 @@ export function CorrectionDetails({
 
             return {
               fieldLabel: intl.formatMessage(f.label),
-              original: originalOutput ?? '-',
-              correction: correctionOutput ?? '-'
+              original: previousFormValues[f.id] ? originalOutput : '-',
+              correction: form[f.id] ? correctionOutput : '-'
             }
           })
 
