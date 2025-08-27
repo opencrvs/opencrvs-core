@@ -299,7 +299,7 @@ export function FormSectionComponent({
   const hasAnyValidationErrors = fieldsWithFormikSeparator.some((field) => {
     const fieldErrors = errors[field.id]?.errors
     const hasErrors = fieldErrors && fieldErrors.length > 0
-    return isFieldVisible(field, completeForm) && hasErrors
+    return isFieldVisible(field, completeForm, { locations: [] }) && hasErrors
   })
 
   useEffect(() => {
@@ -314,12 +314,12 @@ export function FormSectionComponent({
   return (
     <section className={className}>
       {fieldsWithFormikSeparator.map((field) => {
-        if (!isFieldVisible(field, completeForm)) {
+        if (!isFieldVisible(field, completeForm, { locations: [] })) {
           return null
         }
 
         const isDisabled =
-          !isFieldEnabled(field, completeForm) ||
+          !isFieldEnabled(field, completeForm, { locations: [] }) ||
           (isCorrection && field.uncorrectable)
 
         const visibleError = errors[field.id]?.errors[0]?.message

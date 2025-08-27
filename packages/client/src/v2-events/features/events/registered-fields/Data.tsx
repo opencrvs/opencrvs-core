@@ -133,7 +133,10 @@ function DataInput({
       <dl>
         {fields
           // We don't want to display fields that are conditionally hidden in the original form configuration
-          .filter(({ config }) => config && isFieldVisible(config, formData))
+          .filter(
+            ({ config }) =>
+              config && isFieldVisible(config, formData, { locations: [] })
+          )
           .map(({ config, value }) => {
             if (!config) {
               return null

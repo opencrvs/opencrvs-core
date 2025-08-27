@@ -84,7 +84,7 @@ export function CorrectionDetails({
     )?.correctionForm.pages || []
 
   const correctionDetails = correctionFormPages
-    .filter((page) => isPageVisible(page, annotation))
+    .filter((page) => isPageVisible(page, annotation, { locations: [] }))
     .flatMap((page) => {
       // For VERIFICATION pages, the recorded value is stored directly under the pageId in `annotation`
       // instead of being tied to individual field IDs. We pull it directly from `annotation[page.id]`.
@@ -105,7 +105,9 @@ export function CorrectionDetails({
 
       // Default handling for other pages: values keyed by field.id
       const pageFields = page.fields
-        .filter((f) => isFieldVisible(f, { ...form, ...annotation }))
+        .filter((f) =>
+          isFieldVisible(f, { ...form, ...annotation }, { locations: [] })
+        )
         .map((field) => {
           const valueDisplay = Output({
             field,

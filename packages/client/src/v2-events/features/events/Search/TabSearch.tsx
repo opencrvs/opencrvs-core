@@ -179,7 +179,7 @@ export function TabSearch({
     const updatedValues = Object.entries(nonEmptyValues).reduce(
       (result, [fieldId, value]) => {
         const field = fields.find((f) => f.id === fieldId)
-        if (!field || !isFieldVisible(field, formValues)) {
+        if (!field || !isFieldVisible(field, formValues, { locations: [] })) {
           return result
         }
         if (field.type === FieldType.NAME && typeof value === 'object') {
@@ -219,7 +219,7 @@ export function TabSearch({
         if (!field) {
           return count
         }
-        if (!isFieldVisible(field, formValues)) {
+        if (!isFieldVisible(field, formValues, { locations: [] })) {
           return count
         }
         return count + countFilledFieldsForInputType(field, val)

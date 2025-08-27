@@ -199,7 +199,8 @@ export async function makeCorrectionOnRequest(variables: {
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          declarationMixedUpAnnotation
+          declarationMixedUpAnnotation,
+          { locations: [] }
         )
       : {}
   const response =

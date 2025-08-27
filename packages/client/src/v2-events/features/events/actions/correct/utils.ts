@@ -23,7 +23,7 @@ export function hasFieldChanged(
   form: EventState,
   previousFormValues: EventState
 ) {
-  const isVisible = isFieldVisible(f, form)
+  const isVisible = isFieldVisible(f, form, { locations: [] })
   const valueHasChanged = !isEqual(previousFormValues[f.id], form[f.id])
 
   return isVisible && valueHasChanged

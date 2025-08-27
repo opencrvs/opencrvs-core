@@ -353,7 +353,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ? omitHiddenAnnotationFields(
           actionConfiguration,
           originalDeclaration,
-          params.annotation
+          params.annotation,
+          { locations: [] }
         )
       : {}
 
@@ -361,7 +362,8 @@ export function useEventAction<P extends DecorateMutationProcedure<any>>(
       ...params,
       declaration: omitHiddenPaginatedFields(
         eventConfiguration.declaration,
-        params.declaration
+        params.declaration,
+        { locations: [] }
       ),
       annotation
     }
@@ -398,7 +400,8 @@ export function useEventCustomAction(mutationKey: MutationKey) {
         ...params,
         declaration: omitHiddenPaginatedFields(
           eventConfiguration.declaration,
-          params.declaration
+          params.declaration,
+          { locations: [] }
         )
       })
     }

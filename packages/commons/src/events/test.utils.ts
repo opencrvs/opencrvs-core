@@ -13,6 +13,7 @@ import { merge, omitBy, isString, omit } from 'lodash'
 import { addDays } from 'date-fns'
 import { tennisClubMembershipEvent } from '../fixtures'
 import { getUUID, UUID } from '../uuid'
+import { Location } from './locations'
 import {
   ActionBase,
   ActionDocument,
@@ -200,7 +201,8 @@ function fieldConfigsToActionPayload(fields: FieldConfig[], rng: () => number) {
 export function generateActionDeclarationInput(
   configuration: EventConfig,
   action: ActionType,
-  rng: () => number
+  rng: () => number,
+  context: { locations: Array<Location> }
 ): EventState {
   const parsed = DeclarationUpdateActions.safeParse(action)
   if (parsed.success) {
@@ -212,7 +214,7 @@ export function generateActionDeclarationInput(
 
     // Strip away hidden or disabled fields from mock action declaration
     // If this is not done, the mock data might contain hidden or disabled fields, which will cause validation errors
-    return omitHiddenPaginatedFields(declarationConfig, declaration)
+    return omitHiddenPaginatedFields(declarationConfig, declaration, context)
   }
 
   // eslint-disable-next-line no-console
@@ -238,7 +240,8 @@ export function generateActionAnnotationInput(
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     findRecordActionPages(configuration, action),
-    annotation
+    annotation,
+    { locations: [] }
   )
 
   const visiblePageVerificationMap = visibleVerificationPageIds.reduce(
@@ -249,7 +252,9 @@ export function generateActionAnnotationInput(
     {}
   )
 
-  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation)
+  const fieldBasedPayload = omitHiddenFields(annotationFields, annotation, {
+    locations: []
+  })
 
   return {
     ...fieldBasedPayload,
@@ -335,7 +340,8 @@ export function eventPayloadGenerator(rng: () => number) {
           generateActionDeclarationInput(
             tennisClubMembershipEvent,
             ActionType.DECLARE,
-            rng
+            rng,
+            { locations: [] }
           ),
         annotation:
           input.annotation ??
@@ -366,7 +372,8 @@ export function eventPayloadGenerator(rng: () => number) {
             generateActionDeclarationInput(
               tennisClubMembershipEvent,
               ActionType.DECLARE,
-              rng
+              rng,
+              { locations: [] }
             ),
             isString
           )
@@ -399,7 +406,8 @@ export function eventPayloadGenerator(rng: () => number) {
           generateActionDeclarationInput(
             tennisClubMembershipEvent,
             ActionType.VALIDATE,
-            rng
+            rng,
+            { locations: [] }
           ),
         annotation:
           input.annotation ??
@@ -500,7 +508,8 @@ export function eventPayloadGenerator(rng: () => number) {
           generateActionDeclarationInput(
             tennisClubMembershipEvent,
             ActionType.REGISTER,
-            rng
+            rng,
+            { locations: [] }
           ),
         annotation:
           input.annotation ??
@@ -552,7 +561,8 @@ export function eventPayloadGenerator(rng: () => number) {
               generateActionDeclarationInput(
                 tennisClubMembershipEvent,
                 ActionType.REQUEST_CORRECTION,
-                rng
+                rng,
+                { locations: [] }
               ),
               ['applicant.email']
             ),
@@ -648,7 +658,9 @@ export function generateActionDocument({
     id: getUUID(),
     createdAtLocation:
       user.primaryOfficeId ?? ('a45b982a-5c7b-4bd9-8fd8-a42d0994054c' as UUID),
-    declaration: generateActionDeclarationInput(configuration, action, rng),
+    declaration: generateActionDeclarationInput(configuration, action, rng, {
+      locations: []
+    }),
     annotation: {},
     status: ActionStatus.Accepted,
     transactionId: getUUID(),

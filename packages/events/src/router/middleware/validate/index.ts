@@ -39,7 +39,8 @@ import {
   ActionInputWithType,
   ApproveCorrectionActionInput,
   RejectCorrectionActionInput,
-  runStructuralValidations
+  runStructuralValidations,
+  Location
 } from '@opencrvs/commons/events'
 import { getEventConfigurationById } from '@events/service/config/config'
 import { getEventById } from '@events/service/events/events'
@@ -54,10 +55,11 @@ import {
 export function getFieldErrors(
   fields: FieldConfig[],
   data: ActionUpdate,
+  context: { locations: Array<Location> },
   declaration: EventState = {}
 ) {
   const visibleFields = fields.filter((field) =>
-    isFieldVisible(field, { ...data, ...declaration })
+    isFieldVisible(field, { ...data, ...declaration }, context)
   )
 
   const visibleFieldIds = visibleFields.map((field) => field.id)
@@ -67,7 +69,8 @@ export function getFieldErrors(
       (field) =>
         // If field is not visible and not in the visible fields list, it is a hidden field
         // We need to check against the visible fields list because there might be fields with same ids, one of which is visible and others are hidden
-        !isFieldVisible(field, data) && !visibleFieldIds.includes(field.id)
+        !isFieldVisible(field, data, context) &&
+        !visibleFieldIds.includes(field.id)
     )
     .map((field) => field.id)
 
@@ -88,7 +91,8 @@ export function getFieldErrors(
   const visibleFieldErrors = visibleFields.flatMap((field) => {
     const fieldErrors = runFieldValidations({
       field,
-      values: data
+      values: data,
+      context
     })
 
     return fieldErrors.errors.map((error) => ({
@@ -106,7 +110,8 @@ function validateDeclarationUpdateAction({
   event,
   actionType,
   declarationUpdate,
-  annotation
+  annotation,
+  context
 }: {
   eventConfig: EventConfig
   event: EventDocument
@@ -114,6 +119,7 @@ function validateDeclarationUpdateAction({
   declarationUpdate: ActionUpdate
   // @TODO: annotation is always specific to action. Is there ever a need for null?
   annotation?: ActionUpdate
+  context: { locations: Array<Location> }
 }) {
   /*
    * Declaration allows partial updates. Updates are validated against primitive types (zod) and field based custom validators (JSON schema).
@@ -134,7 +140,8 @@ function validateDeclarationUpdateAction({
   // (e.g. when dob is unknown anduser has send the age previously.Now they only send dob, without setting dob unknown to false).
   const cleanedDeclaration = omitHiddenPaginatedFields(
     declarationConfig,
-    completeDeclaration
+    completeDeclaration,
+    context
   )
 
   // 3. When declaration update has fields that are not in the cleaned declaration, payload is invalid.
@@ -150,12 +157,13 @@ function validateDeclarationUpdateAction({
 
   // 4. Validate declaration update against conditional rules, taking into account conditional pages.
   const allVisiblePageFields = declarationConfig.pages
-    .filter((page) => isPageVisible(page, cleanedDeclaration))
+    .filter((page) => isPageVisible(page, cleanedDeclaration, context))
     .flatMap((page) => page.fields)
 
   const declarationErrors = getFieldErrors(
     allVisiblePageFields,
-    cleanedDeclaration
+    cleanedDeclaration,
+    context
   )
 
   const declarationActionParse = DeclarationActions.safeParse(actionType)
@@ -167,10 +175,15 @@ function validateDeclarationUpdateAction({
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
-    deepDropNulls(annotation ?? {})
+    deepDropNulls(annotation ?? {}),
+    context
   )
 
-  const annotationErrors = getFieldErrors(reviewFields, visibleAnnotationFields)
+  const annotationErrors = getFieldErrors(
+    reviewFields,
+    visibleAnnotationFields,
+    context
+  )
 
   return [...declarationErrors, ...annotationErrors]
 }
@@ -179,18 +192,21 @@ function validateActionAnnotation({
   eventConfig,
   actionType,
   annotation = {},
-  declaration = {}
+  declaration = {},
+  context
 }: {
   eventConfig: EventConfig
   actionType: AnnotationActionType
   annotation?: ActionUpdate
   declaration: EventState
+  context: { locations: Array<Location> }
 }) {
   const pages = findRecordActionPages(eventConfig, actionType)
 
   const visibleVerificationPageIds = getVisibleVerificationPageIds(
     pages,
-    annotation
+    annotation,
+    context
   )
 
   const formFields = pages.flatMap(({ fields }) =>
@@ -198,7 +214,7 @@ function validateActionAnnotation({
   )
 
   const errors = [
-    ...getFieldErrors(formFields, annotation, declaration),
+    ...getFieldErrors(formFields, annotation, context, declaration),
     ...getVerificationPageErrors(visibleVerificationPageIds, annotation)
   ]
 
@@ -208,11 +224,13 @@ function validateActionAnnotation({
 function validateNotifyAction({
   eventConfig,
   annotation = {},
-  declaration = {}
+  declaration = {},
+  context
 }: {
   eventConfig: EventConfig
   annotation?: ActionUpdate
   declaration: ActionUpdate
+  context: { locations: Array<Location> }
 }) {
   const declarationConfig = getDeclaration(eventConfig)
 
@@ -236,7 +254,8 @@ function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field,
-        values: annotation
+        values: annotation,
+        context
       })
 
       return fieldErrors.errors.map((error) => ({
@@ -261,7 +280,8 @@ function validateNotifyAction({
 
       const fieldErrors = runStructuralValidations({
         field: { ...field, required: false },
-        values: declaration
+        values: declaration,
+        context
       })
 
       return fieldErrors.errors.map((error) => ({
@@ -328,6 +348,7 @@ export const validateAction: MiddlewareFunction<
   ActionInputWithType
 > = async ({ input, next, ctx }) => {
   const actionType = input.type
+
   const event = await getEventById(input.eventId)
   const eventConfig = await getEventConfigurationById({
     token: ctx.token,
@@ -340,7 +361,8 @@ export const validateAction: MiddlewareFunction<
     const errors = validateNotifyAction({
       eventConfig,
       annotation: input.annotation,
-      declaration: input.declaration
+      declaration: input.declaration,
+      context: { locations: [] }
     })
 
     throwWhenNotEmpty(errors)
@@ -371,7 +393,8 @@ export const validateAction: MiddlewareFunction<
       event,
       declarationUpdate: input.declaration,
       annotation: input.annotation,
-      actionType: declarationUpdateAction.data
+      actionType: declarationUpdateAction.data,
+      context: { locations: [] }
     })
 
     throwWhenNotEmpty(errors)
@@ -385,7 +408,8 @@ export const validateAction: MiddlewareFunction<
       eventConfig,
       annotation: input.annotation,
       actionType: annotationActionParse.data,
-      declaration
+      declaration,
+      context: { locations: [] }
     })
 
     throwWhenNotEmpty(errors)

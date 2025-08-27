@@ -45,7 +45,11 @@ export function getValidationErrorsForForm(
 
     return {
       ...errorsForAllFields,
-      [field.id]: runFieldValidations({ field, values })
+      [field.id]: runFieldValidations({
+        field,
+        values,
+        context: { locations: [] }
+      })
     }
   }, {})
 }
@@ -65,7 +69,11 @@ export function getStructuralValidationErrorsForForm(
 
     return {
       ...errorsForAllFields,
-      [field.id]: runStructuralValidations({ field, values })
+      [field.id]: runStructuralValidations({
+        field,
+        values,
+        context: { locations: [] }
+      })
     }
   }, {})
 }
@@ -82,15 +90,18 @@ export function validationErrorsInActionFormExist({
   reviewFields?: FieldConfig[]
 }): boolean {
   // We don't want to validate hidden fields
-  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form)
+  const formWithoutHiddenFields = omitHiddenPaginatedFields(formConfig, form, {
+    locations: []
+  })
 
   const visibleAnnotationFields = omitHiddenFields(
     reviewFields,
-    annotation ?? {}
+    annotation ?? {},
+    { locations: [] }
   )
 
   const hasValidationErrors = formConfig.pages
-    .filter((page) => isPageVisible(page, form))
+    .filter((page) => isPageVisible(page, form, { locations: [] }))
     .some((page) => {
       const fieldErrors = getValidationErrorsForForm(
         page.fields,
