@@ -26,6 +26,8 @@ import {
   ArchiveActionInput,
   AssignActionInput,
   DeclareActionInput,
+  MarkAsDuplicateActionInput,
+  MarkNotDuplicateActionInput,
   NotifyActionInput,
   RegisterActionInput,
   RejectCorrectionActionInput,
@@ -637,6 +639,64 @@ export function eventPayloadGenerator(rng: () => number) {
           requestId,
           keepAssignment: input.keepAssignment,
           content: input.content ?? { reason: '' }
+        })
+      },
+      duplicate: {
+        markAsDuplicate: (
+          eventId: string,
+          input: Partial<
+            Pick<
+              MarkAsDuplicateActionInput,
+              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            >
+          > = {}
+        ) => ({
+          type: ActionType.MARK_AS_DUPLICATE,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration:
+            input.declaration ??
+            generateActionDeclarationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          annotation:
+            input.annotation ??
+            generateActionAnnotationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          eventId,
+          keepAssignment: input.keepAssignment
+        }),
+        markNotDuplicate: (
+          eventId: string,
+          input: Partial<
+            Pick<
+              MarkNotDuplicateActionInput,
+              'transactionId' | 'declaration' | 'annotation' | 'keepAssignment'
+            >
+          > = {}
+        ) => ({
+          type: ActionType.MARK_NOT_DUPLICATE,
+          transactionId: input.transactionId ?? getUUID(),
+          declaration:
+            input.declaration ??
+            generateActionDeclarationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          annotation:
+            input.annotation ??
+            generateActionAnnotationInput(
+              tennisClubMembershipEvent,
+              ActionType.REGISTER,
+              rng
+            ),
+          eventId,
+          keepAssignment: input.keepAssignment
         })
       }
     }
