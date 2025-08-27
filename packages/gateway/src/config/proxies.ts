@@ -149,12 +149,7 @@ export const catchAllProxy = {
           {
             id: req.params.id,
             name: body.name,
-            deletedAt:
-              body.status === 'inactive'
-                ? new Date().toISOString()
-                : body.status === 'active'
-                  ? null
-                  : undefined
+            status: body.status
           }
         ],
         {

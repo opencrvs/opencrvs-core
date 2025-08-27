@@ -53,8 +53,7 @@ export async function updateLocations(locations: LocationUpdate[]) {
       .set((eb) => ({
         name: loc.name !== undefined ? loc.name : eb.ref('name'),
         updatedAt: sql`now()`,
-        deletedAt:
-          loc.deletedAt !== undefined ? loc.deletedAt : eb.ref('deletedAt')
+        status: loc.status !== undefined ? loc.status : eb.ref('status')
       }))
       .where('id', '=', loc.id)
       .execute()

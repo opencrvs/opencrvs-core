@@ -27,7 +27,7 @@ export const NewLocation = z.object({
 export const LocationUpdate = z.object({
   id: UUID,
   name: z.string().optional(),
-  deletedAt: z.string().datetime().nullable().optional()
+  status: z.enum(['active', 'inactive']).optional()
 })
 
 export type Location = z.infer<typeof Location>
