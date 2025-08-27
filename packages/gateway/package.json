@@ -20,6 +20,7 @@
     "lint": "eslint -c eslint.config.js --fix --max-warnings=0"
   },
   "dependencies": {
+    "zod": "^3.23.8",
     "@apollo/datasource-rest": "^6.3.0",
     "@apollo/server": "^4.11.2",
     "@as-integrations/hapi": "^2.0.1",

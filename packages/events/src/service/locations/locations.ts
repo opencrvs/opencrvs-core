@@ -12,14 +12,26 @@
 import { z } from 'zod'
 import { UUID } from '@opencrvs/commons'
 import * as locationsRepo from '@events/storage/postgres/events/locations'
+import { NewLocations } from '@events/storage/postgres/events/schema/app/Locations'
 
 export const Location = z.object({
   id: UUID,
   name: z.string(),
   partOf: UUID.nullable()
 })
+export const NewLocation = z.object({
+  id: UUID,
+  name: z.string(),
+  parentId: UUID.nullable()
+})
+export const LocationUpdate = z.object({
+  id: UUID,
+  name: z.string().optional(),
+  deletedAt: z.string().datetime().nullable().optional()
+})
 
 export type Location = z.infer<typeof Location>
+export type LocationUpdate = z.infer<typeof LocationUpdate>
 
 /**
  * Sets incoming locations in the database for events. Should be only run as part of the initial seeding.
@@ -44,6 +56,18 @@ export const getLocations = async () => {
     name,
     partOf: parentId
   }))
+}
+
+export const deleteLocations = async (locationIds: UUID[]) => {
+  await locationsRepo.deleteLocations(locationIds)
+}
+
+export const addLocations = async (locations: Array<NewLocations>) => {
+  await locationsRepo.addLocations(locations)
+}
+
+export const updateLocations = async (locations: Array<LocationUpdate>) => {
+  await locationsRepo.updateLocations(locations)
 }
 
 export const getChildLocations = async (parentIdToSearch: string) => {

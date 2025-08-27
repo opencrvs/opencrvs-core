@@ -8,9 +8,50 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+/* eslint-disable import/no-named-as-default-member */
 import { APPLICATION_CONFIG_URL, AUTH_URL } from '@gateway/constants'
+import fetch from '@gateway/fetch'
 import { rateLimitedRoute } from '@gateway/rate-limit'
+import { api } from '@gateway/v2-events/events/service'
+import z from 'zod'
 import { ServerRoute } from '@hapi/hapi'
+
+const LegacyLocation = z.object({
+  statisticalID: z.string(),
+  name: z.string(),
+  alias: z.string(),
+  partOf: z.string(),
+  code: z.string(),
+  jurisdictionType: z.string(),
+  statistics: z
+    .array(
+      z.object({
+        year: z.number(),
+        male_population: z.number(),
+        female_population: z.number(),
+        population: z.number(),
+        crude_birth_rate: z.number()
+      })
+    )
+    .optional()
+})
+
+const LegacyLocationUpdate = z.object({
+  name: z.string(),
+  alias: z.string().optional(),
+  status: z.enum(['active', 'inactive']).optional(),
+  statistics: z
+    .array(
+      z.object({
+        year: z.number(),
+        male_population: z.number(),
+        female_population: z.number(),
+        population: z.number(),
+        crude_birth_rate: z.number()
+      })
+    )
+    .optional()
+})
 
 export const catchAllProxy = {
   auth: {
@@ -63,9 +104,8 @@ export const catchAllProxy = {
       }
     }
   },
-  /** Proper REST naming practice */
-  locations: {
-    method: '*',
+  getLocations: {
+    method: 'GET',
     path: '/locations',
     handler: (req, h) =>
       h.proxy({
@@ -73,11 +113,113 @@ export const catchAllProxy = {
         passThrough: true
       }),
     options: {
-      auth: false,
-      payload: {
-        output: 'data',
-        parse: false
+      auth: false
+    }
+  },
+  updateLocations: {
+    method: 'PUT',
+    path: '/locations/{id}',
+    handler: async (req, h) => {
+      const parseResult = LegacyLocationUpdate.safeParse(req.payload)
+
+      if (!parseResult.success) {
+        return h.response().code(400)
       }
+
+      const body = parseResult.data
+
+      const response = await fetch(
+        `${APPLICATION_CONFIG_URL}locations/${req.params.id}`,
+        {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: req.headers.authorization || ''
+          },
+          body: JSON.stringify(body)
+        }
+      )
+
+      if (!response.ok) {
+        return h.response().code(response.status)
+      }
+
+      await api.locations.update.mutate(
+        [
+          {
+            id: req.params.id,
+            name: body.name,
+            deletedAt:
+              body.status === 'inactive'
+                ? new Date().toISOString()
+                : body.status === 'active'
+                  ? null
+                  : undefined
+          }
+        ],
+        {
+          context: {
+            headers: {
+              Authorization: req.headers.authorization || ''
+            }
+          }
+        }
+      )
+
+      return h.response(response.body).code(response.status)
+    },
+    options: {
+      auth: false
+    }
+  },
+  createLocations: {
+    method: 'POST',
+    path: '/locations',
+    handler: async (req, h) => {
+      const parseResult = LegacyLocation.safeParse(req.payload)
+
+      if (!parseResult.success) {
+        return h.response().code(400)
+      }
+
+      const body = parseResult.data
+
+      const response = await fetch(`${APPLICATION_CONFIG_URL}locations`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: req.headers.authorization || ''
+        },
+        body: JSON.stringify(body)
+      })
+
+      if (!response.ok) {
+        return h.response().code(response.status)
+      }
+
+      const json = await response.json()
+
+      await api.locations.add.mutate(
+        [
+          {
+            id: json.id,
+            name: body.name,
+            parentId: body.partOf.replace('Location/', '')
+          }
+        ],
+        {
+          context: {
+            headers: {
+              Authorization: req.headers.authorization || ''
+            }
+          }
+        }
+      )
+
+      return h.response(json).code(response.status)
+    },
+    options: {
+      auth: false
     }
   },
   locationsSuffix: {

@@ -10,13 +10,18 @@
  */
 
 import { z } from 'zod'
-import { SCOPES } from '@opencrvs/commons'
+import { SCOPES, UUID } from '@opencrvs/commons'
 import { router, publicProcedure, systemProcedure } from '@events/router/trpc'
 import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
 import {
+  addLocations,
+  deleteLocations,
   getLocations,
   Location,
-  setLocations
+  LocationUpdate,
+  NewLocation,
+  setLocations,
+  updateLocations
 } from '@events/service/locations/locations'
 
 export const locationRouter = router({
@@ -25,6 +30,24 @@ export const locationRouter = router({
     .input(z.array(Location).min(1))
     .mutation(async (options) => {
       await setLocations(options.input)
+    }),
+  add: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.CONFIG_UPDATE_ALL]))
+    .input(z.array(NewLocation).min(1))
+    .mutation(async (options) => {
+      await addLocations(options.input)
+    }),
+  update: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.CONFIG_UPDATE_ALL]))
+    .input(z.array(LocationUpdate).min(1))
+    .mutation(async (options) => {
+      await updateLocations(options.input)
+    }),
+  delete: systemProcedure
+    .use(requiresAnyOfScopes([SCOPES.CONFIG_UPDATE_ALL]))
+    .input(z.array(UUID))
+    .mutation(async (options) => {
+      await deleteLocations(options.input)
     }),
   get: publicProcedure.output(z.array(Location)).query(getLocations)
 })
