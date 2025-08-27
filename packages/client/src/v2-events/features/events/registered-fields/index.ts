@@ -1,13 +1,3 @@
-import {
-  Country,
-  DateField as DateFieldType,
-  FieldConfig,
-  FieldType,
-  FieldTypeToFieldConfig,
-  RadioField,
-  SelectField
-} from '@opencrvs/commons/client'
-
 /*
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
@@ -18,46 +8,48 @@ import {
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
+import { FieldConfig, FieldType } from '@opencrvs/commons/client'
+
 import { Address } from './Address'
+import { AdministrativeArea } from './AdministrativeArea'
 import { BulletList } from './BulletList'
 import { Button } from './Button'
 import { Checkbox } from './Checkbox'
 import { DateField } from './DateField'
-import { TimeField } from './TimeField'
-import { AdministrativeArea } from './AdministrativeArea'
-import { LocationSearch } from './LocationSearch'
-import { RadioGroup } from './RadioGroup'
-import { Select } from './Select'
-import { SelectCountry } from './SelectCountry'
-import { Text } from './Text'
-import { Number } from './Number'
 import { Divider } from './Divider'
+import { Http } from './Http'
+import { LocationSearch } from './LocationSearch'
+import { Name } from './Name'
+import { Number } from './Number'
 import { PageHeader } from './PageHeader'
 import { Paragraph } from './Paragraph'
-import { Name } from './Name'
-import { SelectDateRangeField } from './SelectDateRangeField'
-import { Http } from './Http'
+import { RadioGroup } from './RadioGroup'
 import { RegisteredFieldModule } from './RegisteredField'
+import { Select } from './Select'
+import { SelectCountry } from './SelectCountry'
+import { SelectDateRangeField } from './SelectDateRangeField'
+import { Text } from './Text'
+import { TimeField } from './TimeField'
 
 export * from './Address'
+export * from './AdministrativeArea'
 export * from './BulletList'
 export * from './Button'
 export * from './Checkbox'
 export * from './DateField'
-export * from './TimeField'
-export * from './AdministrativeArea'
+export * from './Divider'
+export * from './Http'
 export * from './LocationSearch'
+export * from './Name'
+export * from './Number'
+export * from './PageHeader'
+export * from './Paragraph'
 export * from './RadioGroup'
 export * from './Select'
 export * from './SelectCountry'
-export * from './Text'
-export * from './Number'
-export * from './Divider'
-export * from './PageHeader'
-export * from './Paragraph'
-export * from './Name'
 export * from './SelectDateRangeField'
-export * from './Http'
+export * from './Text'
+export * from './TimeField'
 
 export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
   type: T
@@ -78,6 +70,8 @@ export function getRegisteredFieldByFieldConfig<T extends FieldConfig>(
     case FieldType.TIME:
       return TimeField
     case FieldType.ADMINISTRATIVE_AREA:
+    case FieldType.FACILITY:
+    case FieldType.OFFICE:
       return AdministrativeArea
     case FieldType.LOCATION:
       return LocationSearch

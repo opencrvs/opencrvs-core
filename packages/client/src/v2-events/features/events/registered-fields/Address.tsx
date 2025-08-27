@@ -540,14 +540,16 @@ function toCertificateVariables(
     locations: Location[]
   }
 ) {
-  const fieldStringifier = stringifySimpleField(context.intl, context.locations)
-
   /*
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
-  const formStringifier = formDataStringifierFactory(fieldStringifier)
-  return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
+  const formStringifier = formDataStringifierFactory((_config, val) =>
+    stringifySimpleField(val)
+  )
+  const result = formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
+
+  return result
 }
 
 export const Address = {
