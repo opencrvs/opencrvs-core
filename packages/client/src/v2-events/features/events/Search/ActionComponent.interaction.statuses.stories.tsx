@@ -24,11 +24,11 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { addLocalEventConfig, setEventData } from '../useEvents/api'
-import { ActionComponent } from './ActionComponent'
+import { ActionCta } from './ActionCta'
 
-const meta: Meta<typeof ActionComponent> = {
+const meta: Meta<typeof ActionCta> = {
   title: 'Components/ActionComponent/Interaction/Statuses',
-  component: ActionComponent,
+  component: ActionCta,
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -39,7 +39,7 @@ const meta: Meta<typeof ActionComponent> = {
 }
 export default meta
 
-type Story = StoryObj<typeof ActionComponent>
+type Story = StoryObj<typeof ActionCta>
 
 function createEventByStatus(status: EventStatus) {
   const user = testDataGenerator().user
@@ -90,7 +90,7 @@ export const DirectsCreatedToDeclare: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={createdEvent.eventQueryData}
                   />
@@ -161,7 +161,7 @@ export const DirectsNotifiedToDeclare: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={notifiedEvent.eventQueryData}
                   />
@@ -233,7 +233,7 @@ export const DirectsDeclaredToValidate: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={declaredEvent.eventQueryData}
                   />
@@ -305,7 +305,7 @@ export const directsValidatedToRegister: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={validatedEvent.eventQueryData}
                   />
@@ -377,7 +377,7 @@ export const directsRegisteredToPrint: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={registeredEvent.eventQueryData}
                   />
