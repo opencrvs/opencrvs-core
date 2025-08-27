@@ -33,6 +33,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { Output } from '@client/v2-events/features/events/components/Output'
 import {
   formDataStringifierFactory,
+  getFormDataStringifier,
   stringifySimpleField
 } from '@client/v2-events/hooks/useFormDataStringifier'
 
@@ -544,10 +545,9 @@ function toCertificateVariables(
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
-  const formStringifier = formDataStringifierFactory((_config, val) =>
-    stringifySimpleField(val)
-  )
-  const result = formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
+
+  const stringifier = getFormDataStringifier(context.intl, context.locations)
+  const result = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
 
   return result
 }
