@@ -240,7 +240,9 @@ export function getCurrentEventState(
     assignedToSignature: getAssignedUserSignatureFromActions(acceptedActions),
     updatedBy: requestActionMetadata.createdBy,
     updatedAtLocation: requestActionMetadata.createdAtLocation,
-    declaration: omitHiddenPaginatedFields(config.declaration, declaration),
+    declaration: omitHiddenPaginatedFields(config.declaration, declaration, {
+      locations: []
+    }),
     trackingId: event.trackingId,
     updatedByUserRole: requestActionMetadata.createdByRole,
     dateOfEvent: resolveDateOfEvent(event, declaration, config),

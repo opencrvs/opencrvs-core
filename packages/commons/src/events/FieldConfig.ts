@@ -652,7 +652,7 @@ export type FieldConfigInput =
   | z.input<typeof Country>
   | z.input<typeof AdministrativeArea>
   | z.input<typeof Divider>
-  | z.input<typeof Location>
+  | z.input<typeof LocationInput>
   | z.input<typeof Facility>
   | z.input<typeof Office>
   | z.input<typeof SignatureField>
