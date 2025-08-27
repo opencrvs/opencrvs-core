@@ -28,8 +28,9 @@ const MISSING_USER = {
       family: 'user'
     }
   ],
-  role: '-'
-}
+  role: '-',
+  primaryOfficeId: 'ID_MISSING'
+} satisfies ResolvedUser
 
 /**
  * Provides methods for resolving users and locations within the event.

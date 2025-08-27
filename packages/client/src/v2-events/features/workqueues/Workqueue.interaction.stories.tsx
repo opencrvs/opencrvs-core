@@ -15,8 +15,11 @@ import superjson from 'superjson'
 import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
 import { userEvent, within, expect } from '@storybook/test'
 import {
+  EventIndex,
   eventQueryDataGenerator,
+  EventStatus,
   generateWorkqueues,
+  InherentFlags,
   NameFieldValue
 } from '@opencrvs/commons/client'
 import { AppRouter, TRPCProvider } from '@client/v2-events/trpc'
@@ -54,7 +57,7 @@ const tRPCMsw = createTRPCMsw<AppRouter>({
 })
 
 const queryData = Array.from(
-  { length: 15 },
+  { length: 10 },
   (_, i) => eventQueryDataGenerator(undefined, i * 52) // quite literally a magic number. It gives a sample where the test workqueues are not empty
 )
 
@@ -85,7 +88,10 @@ export const SortWorkqueue: Story = {
             return [tennisClubMembershipEventIndex]
           }),
           tRPCMsw.event.search.query((input) => {
-            return queryData
+            return {
+              results: queryData.slice(input.offset, input.limit),
+              total: queryData.length + 5
+            }
           })
         ]
       }
@@ -207,5 +213,105 @@ export const SortWorkqueue: Story = {
       )
       await expect(updatedAtCell).toStrictEqual(updatedAtInFirstPage)
     })
+  }
+}
+
+const eventsWithDifferentStatuses = EventStatus.options.map((status, i) =>
+  eventQueryDataGenerator(
+    {
+      status,
+      declaration: {
+        'recommender.none': true,
+        'applicant.name': {
+          firstname: status,
+          surname: i.toString()
+        },
+        'applicant.dob': '2000-01-01'
+      }
+    },
+    i * 123
+  )
+) satisfies EventIndex[]
+
+export const WorkqueueCtaByStatus: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: eventsWithDifferentStatuses.length,
+              results: eventsWithDifferentStatuses
+            }
+          })
+        ]
+      }
+    }
+  }
+}
+
+const rejectedEventsWithDifferentStatuses = eventsWithDifferentStatuses.map(
+  (event) => ({
+    ...event,
+    flags: [InherentFlags.REJECTED]
+  })
+)
+
+export const WorkqueueCtaByStatusRejected: Story = {
+  parameters: {
+    reactRouter: {
+      router: routesConfig,
+      initialPath: ROUTES.V2.WORKQUEUES.WORKQUEUE.buildPath({ slug: 'recent' })
+    },
+    chromatic: { disableSnapshot: true },
+    msw: {
+      handlers: {
+        workqueues: [
+          tRPCMsw.workqueue.config.list.query(() => {
+            return generateWorkqueues('recent')
+          }),
+          tRPCMsw.workqueue.count.query((input) => {
+            return input.reduce((acc, { slug }) => {
+              return { ...acc, [slug]: queryData.length }
+            }, {})
+          })
+        ],
+        event: [
+          tRPCMsw.event.get.query(() => {
+            return tennisClubMembershipEventDocument
+          }),
+          tRPCMsw.event.list.query(() => {
+            return [tennisClubMembershipEventIndex]
+          }),
+          tRPCMsw.event.search.query(() => {
+            return {
+              total: rejectedEventsWithDifferentStatuses.length,
+              results: rejectedEventsWithDifferentStatuses
+            }
+          })
+        ]
+      }
+    }
   }
 }

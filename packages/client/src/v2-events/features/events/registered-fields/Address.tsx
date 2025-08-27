@@ -19,7 +19,7 @@ import {
   ConditionalType,
   field as createFieldCondition,
   FieldConfig,
-  FieldProps,
+  FieldPropsWithoutReferenceValue,
   FieldType,
   not,
   AdministrativeAreas,
@@ -33,6 +33,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { Output } from '@client/v2-events/features/events/components/Output'
 import {
   formDataStringifierFactory,
+  getFormDataStringifier,
   stringifySimpleField
 } from '@client/v2-events/hooks/useFormDataStringifier'
 import { getOfflineData } from '@client/offline/selectors'
@@ -45,7 +46,7 @@ type FieldConfigWithoutAddress = Exclude<
   { type: typeof FieldType.ADDRESS }
 >
 
-type Props = FieldProps<typeof FieldType.ADDRESS> & {
+type Props = FieldPropsWithoutReferenceValue<typeof FieldType.ADDRESS> & {
   onChange: (newValue: Partial<AddressFieldValue>) => void
   value?: AddressFieldValue
   configuration?: AddressField['configuration']
@@ -436,23 +437,30 @@ function AddressOutput({
   )
 }
 
-function stringify(
-  intl: IntlShape,
-  locations: Location[],
-  value: AddressFieldValue
+function toCertificateVariables(
+  value: AddressFieldValue,
+  context: {
+    intl: IntlShape
+    locations: Location[]
+  }
 ) {
-  const fieldStringifier = stringifySimpleField(intl, locations)
-
   /*
    * As address is just a collection of other form fields, its string formatter just redirects the data back to
    * form data stringifier so location and other form fields can handle stringifying their own data
    */
-  const formStringifier = formDataStringifierFactory(fieldStringifier)
-  return formStringifier(ALL_ADDRESS_FIELDS, value as EventState)
+
+  const stringifier = getFormDataStringifier(context.intl, context.locations)
+  const result = stringifier(ALL_ADDRESS_FIELDS, value as EventState)
+
+  return result
 }
 
 export const Address = {
   Input: AddressInput,
   Output: AddressOutput,
-  stringify
+  stringify: () => {
+    // @todo
+    return ''
+  },
+  toCertificateVariables: toCertificateVariables
 }

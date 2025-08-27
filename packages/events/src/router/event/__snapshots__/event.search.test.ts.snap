@@ -18,8 +18,8 @@ exports[`Returns events based on the updatedAt column 1`] = `
       "type": "image/png",
     },
     "applicant.name": {
-      "firstname": "Sara",
-      "surname": "Sarajanen",
+      "firstname": "Sarachella",
+      "surname": "Smith",
     },
     "recommender.none": true,
   },
@@ -64,8 +64,8 @@ exports[`Returns events based on the updatedAt column 2`] = `
       "type": "image/png",
     },
     "applicant.name": {
-      "firstname": "Sarachella",
-      "surname": "Smith",
+      "firstname": "Sara",
+      "surname": "Sarajanen",
     },
     "recommender.none": true,
   },
@@ -205,6 +205,7 @@ exports[`Throws when date field is invalid 1`] = `
     "validation": "date",
     "message": "Invalid date",
     "path": [
+      "query",
       "clauses",
       0,
       "updatedAt",
@@ -221,6 +222,7 @@ exports[`Throws when one of the date range fields has invalid date 1`] = `
     "validation": "date",
     "message": "Invalid date",
     "path": [
+      "query",
       "clauses",
       0,
       "updatedAt",
@@ -236,6 +238,7 @@ exports[`Throws when searching by unrelated properties 1`] = `
     "code": "custom",
     "message": "At least one query field must be specified.",
     "path": [
+      "query",
       "clauses",
       0
     ]
@@ -253,6 +256,7 @@ exports[`Throws when searching with empty clauses 1`] = `
     "exact": false,
     "message": "At least one clause is required.",
     "path": [
+      "query",
       "clauses"
     ]
   }
@@ -263,47 +267,12 @@ exports[`Throws when searching without payload 1`] = `
 [TRPCError: [
   {
     "code": "invalid_type",
-    "expected": "array",
+    "expected": "object",
     "received": "undefined",
     "path": [
-      "clauses"
+      "query"
     ],
     "message": "Required"
-  },
-  {
-    "code": "invalid_union",
-    "unionErrors": [
-      {
-        "issues": [
-          {
-            "code": "invalid_literal",
-            "expected": "and",
-            "path": [
-              "type"
-            ],
-            "message": "Invalid literal value, expected \\"and\\""
-          }
-        ],
-        "name": "ZodError"
-      },
-      {
-        "issues": [
-          {
-            "code": "invalid_literal",
-            "expected": "or",
-            "path": [
-              "type"
-            ],
-            "message": "Invalid literal value, expected \\"or\\""
-          }
-        ],
-        "name": "ZodError"
-      }
-    ],
-    "path": [
-      "type"
-    ],
-    "message": "Invalid input"
   }
 ]]
 `;
@@ -328,8 +297,8 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "type": "image/png",
       },
       "applicant.name": {
-        "firstname": "Sarah",
-        "surname": "Tsarakovski",
+        "firstname": "Emily",
+        "surname": "Garcia",
       },
       "recommender.none": true,
     },
@@ -372,8 +341,8 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "type": "image/png",
       },
       "applicant.name": {
-        "firstname": "Emily",
-        "surname": "Garcia",
+        "firstname": "Sarah",
+        "surname": "Tsarakovski",
       },
       "recommender.none": true,
     },
@@ -421,8 +390,8 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "type": "image/png",
       },
       "applicant.name": {
-        "firstname": "Sarah",
-        "surname": "Tsarakovski",
+        "firstname": "Emily",
+        "surname": "Williams",
       },
       "recommender.none": true,
     },
@@ -509,8 +478,8 @@ exports[`User only sees tennis club membership events within their jurisdiction 
         "type": "image/png",
       },
       "applicant.name": {
-        "firstname": "Emily",
-        "surname": "Williams",
+        "firstname": "Sarah",
+        "surname": "Tsarakovski",
       },
       "recommender.none": true,
     },

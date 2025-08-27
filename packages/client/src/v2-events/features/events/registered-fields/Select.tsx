@@ -9,16 +9,20 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import React from 'react'
-import { IntlShape, useIntl } from 'react-intl'
+import { useIntl } from 'react-intl'
 import {
-  FieldProps,
+  FieldPropsWithoutReferenceValue,
   SelectField,
   SelectOption,
   TranslationConfig
 } from '@opencrvs/commons/client'
 import { Select as SelectComponent } from '@opencrvs/components'
+import { StringifierContext } from './RegisteredField'
 
-export type SelectInputProps = Omit<FieldProps<'SELECT'>, 'label'> & {
+export type SelectInputProps = Omit<
+  FieldPropsWithoutReferenceValue<'SELECT'>,
+  'label'
+> & {
   onChange: (newValue: string) => void
   value?: string
   label?: TranslationConfig
@@ -59,18 +63,22 @@ function SelectOutput({
   return selectedOption ? intl.formatMessage(selectedOption.label) : ''
 }
 
-function stringify(intl: IntlShape, value: string, fieldConfig: SelectField) {
-  const option = fieldConfig.options.find((opt) => opt.value === value)
+function stringify(value: string, context: StringifierContext<SelectField>) {
+  if (!context.config) {
+    return value
+  }
+
+  const option = context.config.options.find((opt) => opt.value === value)
 
   if (!option) {
     // eslint-disable-next-line no-console
     console.error(
-      `Could not find option with value ${value} for field ${fieldConfig.id}`
+      `Could not find option with value ${value} for field ${context.config.id}`
     )
     return value
   }
 
-  return intl.formatMessage(option.label)
+  return context.intl.formatMessage(option.label)
 }
 
 export const Select = {

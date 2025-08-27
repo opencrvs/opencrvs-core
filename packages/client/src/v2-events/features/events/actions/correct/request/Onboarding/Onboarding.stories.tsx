@@ -9,33 +9,30 @@
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import { createTRPCMsw, httpLink } from '@vafanassieff/msw-trpc'
-import superjson from 'superjson'
-import { tennisClubMembershipEvent } from '@opencrvs/commons/client'
+import { waitFor, within, userEvent, expect } from '@storybook/test'
 import { Onboarding as OnboardingIndex } from '@client/v2-events/features/events/actions/correct/request/index'
 import { tennisClubMembershipEventDocument } from '@client/v2-events/features/events/fixtures'
 import { ROUTES, routesConfig } from '@client/v2-events/routes'
 import { AppRouter } from '@client/v2-events/trpc'
-import {
-  setEventData,
-  addLocalEventConfig
-} from '@client/v2-events/features/events/useEvents/api'
+import { testDataGenerator } from '@client/tests/test-data-generators'
+
+const generator = testDataGenerator()
 
 const meta: Meta<typeof Onboarding> = {
-  title: 'CorrectionRequest'
+  title: 'CorrectionRequest',
+  loaders: [
+    () => {
+      window.localStorage.setItem(
+        'opencrvs',
+        generator.user.token.registrationAgent
+      )
+    }
+  ]
 }
 
 export default meta
 
 type Story = StoryObj<typeof OnboardingIndex>
-const tRPCMsw = createTRPCMsw<AppRouter>({
-  links: [
-    httpLink({
-      url: '/api/events'
-    })
-  ],
-  transformer: { input: superjson, output: superjson }
-})
 
 export const Onboarding: Story = {
   parameters: {
@@ -46,5 +43,25 @@ export const Onboarding: Story = {
         pageId: 'corrector'
       })
     }
+  },
+
+  play: async ({ canvasElement, step }) => {
+    const canvas = within(canvasElement)
+
+    await waitFor(async () => {
+      await expect(
+        canvas.getByRole('button', { name: 'Continue' })
+      ).toBeEnabled()
+    })
+
+    await step('Continue through correction form', async () => {
+      await userEvent.click(canvas.getByText('Continue', { exact: true }))
+      await userEvent.click(canvas.getByText('Verified', { exact: true }))
+      await userEvent.click(canvas.getByText('Continue', { exact: true }))
+      await userEvent.click(canvas.getByTestId('crcl-btn'))
+      await expect(
+        await canvas.findByTestId('navigation_workqueue_outbox')
+      ).toBeInTheDocument()
+    })
   }
 }

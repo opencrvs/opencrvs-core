@@ -18,6 +18,14 @@ import * as fetchAny from 'jest-fetch-mock'
 const fetch = fetchAny as fetchAny.FetchMock
 import { AuthenticateResponse } from '@auth/features/authenticate/handler'
 
+jest.mock('@opencrvs/commons', () => {
+  const actual = jest.requireActual('@opencrvs/commons')
+  return {
+    ...actual,
+    triggerUserEventNotification: jest.fn()
+  }
+})
+
 describe('authenticate handler receives a request', () => {
   let server: AuthServer
 

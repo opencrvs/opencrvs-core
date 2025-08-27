@@ -308,6 +308,7 @@ export function ReviewCorrection({ form }: { form: EventState }) {
     >
       <CorrectionDetails
         annotation={annotation}
+        correctionRequestAction={lastWriteAction}
         event={event}
         form={form}
         requesting={!scopes?.includes(SCOPES.RECORD_REGISTRATION_CORRECT)}
