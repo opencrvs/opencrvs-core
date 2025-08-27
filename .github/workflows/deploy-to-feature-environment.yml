@@ -98,12 +98,12 @@ jobs:
           echo "BRANCH_NAME=$(echo ${{ github.head_ref }})" >> $GITHUB_ENV
       - name: Get e2e branch
         id: get_e2e_branch
+        # ls-remote should provide list of branches. When none are found, it should be empty string.
         run: |
           e2e_repo_url="https://github.com/opencrvs/e2e.git"
-
-          if git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.head_ref }}" >/dev/null; then
+          if [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.head_ref }}")" ]; then
             e2e_branch=${{ github.head_ref }}
-          elif git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.base_ref }}" >/dev/null; then
+          elif [ -n "$(git ls-remote --heads "$e2e_repo_url" "refs/heads/${{ github.base_ref }}")" ]; then
             e2e_branch="${{ github.base_ref }}"
           else
             e2e_branch="develop"
