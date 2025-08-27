@@ -11,6 +11,7 @@
 import { useNavigate } from 'react-router-dom'
 import { useSelector } from 'react-redux'
 import React from 'react'
+import { useIntl } from 'react-intl'
 import {
   ActionType,
   EventIndex,
@@ -31,7 +32,11 @@ import {
 import { IconProps } from '@opencrvs/components/src/Icon'
 import { useEvents } from '@client/v2-events/features/events/useEvents/useEvents'
 import { ROUTES } from '@client/v2-events/routes'
-import { AssignmentStatus, getAssignmentStatus } from '@client/v2-events/utils'
+import {
+  AssignmentStatus,
+  getAssignmentStatus,
+  getUsersFullName
+} from '@client/v2-events/utils'
 import { useEventConfiguration } from '@client/v2-events/features/events/useEventConfiguration'
 import { getScope } from '@client/profile/profileSelectors'
 import { useDrafts } from '@client/v2-events/features/drafts/useDrafts'
@@ -40,6 +45,9 @@ import { ITokenPayload } from '@client/utils/authUtils'
 import { useModal } from '@client/hooks/useModal'
 import { AssignModal } from '@client/v2-events/components/AssignModal'
 import { useOnlineStatus } from '@client/utils'
+import { UnassignModal } from '@client/v2-events/components/UnassignModal'
+import { useUsers } from '@client/v2-events/hooks/useUsers'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { useArchiveModal } from '@client/v2-events/hooks/useArchiveModal'
 
 const STATUSES_THAT_CAN_BE_ASSIGNED: EventStatus[] = [
@@ -175,6 +183,19 @@ function useViewableActionConfigurations(
   const isDownloaded = Boolean(findFromCache(event.id).data)
 
   const [assignModal, openAssignModal] = useModal()
+  const intl = useIntl()
+  const { getUser } = useUsers()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
+  const assignedToUser = getUser.useQuery(event.assignedTo || '', {
+    enabled: !!event.assignedTo
+  })
+  const assignedUserFullName = assignedToUser.data
+    ? getUsersFullName(assignedToUser.data.name, intl.locale)
+    : null
+  const assignedOffice = assignedToUser.data?.primaryOfficeId || ''
+  const assignedOfficeName =
+    locations.find((l) => l.id === assignedOffice)?.name || ''
   const { archiveModal, onArchive } = useArchiveModal()
 
   /**
@@ -260,6 +281,17 @@ function useViewableActionConfigurations(
         label: actionLabels[ActionType.UNASSIGN],
         icon: 'ArrowCircleDown' as const,
         onClick: async () => {
+          const unassign = await openAssignModal<boolean>((close) => (
+            <UnassignModal
+              assignedSelf={isDownloadedAndAssignedToUser}
+              close={close}
+              name={assignedUserFullName}
+              officeName={assignedOfficeName}
+            />
+          ))
+          if (!unassign) {
+            return
+          }
           await events.actions.assignment.unassign.mutateAsync({
             eventId,
             transactionId: getUUID(),
