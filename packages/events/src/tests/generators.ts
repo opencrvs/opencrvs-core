@@ -55,14 +55,16 @@ export function payloadGenerator(rng: () => number) {
         return Array.from({ length: input }).map((_, i) => ({
           id: getUUID(),
           name: `Location name ${i}`,
-          partOf: null
+          partOf: null,
+          locationType: 'ADMIN_STRUCTURE'
         }))
       }
 
       return input.map((location, i) => ({
         id: location.id ?? getUUID(),
         name: location.name ?? `Location name ${i}`,
-        partOf: null
+        partOf: null,
+        locationType: 'ADMIN_STRUCTURE'
       }))
     }
   }

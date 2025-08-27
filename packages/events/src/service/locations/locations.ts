@@ -16,7 +16,10 @@ import * as locationsRepo from '@events/storage/postgres/events/locations'
 export const Location = z.object({
   id: UUID,
   name: z.string(),
-  partOf: UUID.nullable()
+  partOf: UUID.nullable(),
+  locationType: z
+    .enum(['HEALTH_FACILITY', 'CRVS_OFFICE', 'ADMIN_STRUCTURE'])
+    .nullable()
 })
 
 export type Location = z.infer<typeof Location>
@@ -28,10 +31,11 @@ export type Location = z.infer<typeof Location>
 
 export async function setLocations(incomingLocations: Array<Location>) {
   return locationsRepo.setLocations(
-    incomingLocations.map(({ id, name, partOf }) => ({
+    incomingLocations.map(({ id, name, partOf, locationType }) => ({
       id,
       name,
-      parentId: partOf
+      parentId: partOf,
+      locationType
     }))
   )
 }
@@ -39,10 +43,11 @@ export async function setLocations(incomingLocations: Array<Location>) {
 export const getLocations = async () => {
   const locations = await locationsRepo.getLocations()
 
-  return locations.map(({ id, name, parentId }) => ({
+  return locations.map(({ id, name, parentId, locationType }) => ({
     id,
     name,
-    partOf: parentId
+    partOf: parentId,
+    locationType
   }))
 }
 

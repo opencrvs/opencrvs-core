@@ -24,6 +24,7 @@ export async function setLocations(locations: NewLocations[]) {
       oc.column('id').doUpdateSet({
         name: (eb) => eb.ref('excluded.name'),
         parentId: (eb) => eb.ref('excluded.parentId'),
+        locationType: (eb) => eb.ref('excluded.locationType'),
         updatedAt: () => sql`now()`,
         deletedAt: null
       })

@@ -265,6 +265,9 @@ export async function seedLocationsForV2Events(token: string) {
               name: location.name,
               partOf: location?.partOf?.reference
                 ? updateLocationPartOf(location?.partOf?.reference)
+                : null,
+              locationType: location?.type?.coding
+                ? location?.type?.coding[0]?.code
                 : null
             }))
           )
