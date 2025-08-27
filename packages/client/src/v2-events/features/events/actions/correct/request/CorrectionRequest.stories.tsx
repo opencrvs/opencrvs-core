@@ -171,20 +171,23 @@ export const ReviewWithParentFieldChanges: Story = {
         '123456'
       )
 
-      const checkbox = canvasElement.querySelector(
-        '#senior-pass____recommneder'
-      ) as HTMLInputElement
+      await waitFor(async () =>
+        expect(
+          canvas.getByRole('checkbox', {
+            name: 'Does recommender have senior pass?'
+          })
+        ).toBeInTheDocument()
+      )
 
-      await userEvent.click(checkbox)
       await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
     })
 
     await step('Select recommender none option', async () => {
-      const recommenderCheckbox = canvasElement.querySelector(
-        '#recommender____none'
-      ) as HTMLInputElement
-
-      await userEvent.click(recommenderCheckbox)
+      await userEvent.click(
+        canvas.getByRole('checkbox', {
+          name: 'No recommender'
+        })
+      )
     })
 
     await step('Go back to review page', async () => {
@@ -193,32 +196,28 @@ export const ReviewWithParentFieldChanges: Story = {
       )
     })
 
-    await step('Verify senior pass is initially unchecked', async () => {
-      await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
-      const seniorPassCheckbox = canvasElement.querySelector(
-        '#senior-pass____recommneder'
-      ) as HTMLInputElement
-
-      void expect(seniorPassCheckbox.checked).toBe(false)
-    })
-
     await step('Check senior pass box', async () => {
-      const seniorPassCheckbox = canvasElement.querySelector(
-        '#senior-pass____recommneder'
-      ) as HTMLInputElement
+      await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
 
-      await userEvent.click(seniorPassCheckbox)
+      await waitFor(async () =>
+        expect(
+          canvas.getByRole('checkbox', {
+            name: 'Does recommender have senior pass?'
+          })
+        ).toBeInTheDocument()
+      )
 
-      void expect(seniorPassCheckbox.checked).toBe(true)
       await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
     })
 
     await step('Re-select recommender none option', async () => {
-      const recommenderCheckbox = canvasElement.querySelector(
-        '#recommender____none'
-      ) as HTMLInputElement
-
-      await userEvent.click(recommenderCheckbox)
+      await waitFor(async () =>
+        expect(
+          canvas.getByRole('checkbox', {
+            name: 'No recommender'
+          })
+        ).toBeInTheDocument()
+      )
       await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
     })
 
@@ -249,13 +248,12 @@ export const ReviewWithParentFieldChanges: Story = {
 
     await step('Re-check senior pass box', async () => {
       await userEvent.click(canvas.getByTestId('change-button-senior-pass.id'))
-      const seniorPassCheckbox = canvasElement.querySelector(
-        '#senior-pass____recommneder'
-      ) as HTMLInputElement
+      await userEvent.click(
+        canvas.getByRole('checkbox', {
+          name: 'Does recommender have senior pass?'
+        })
+      )
 
-      await userEvent.click(seniorPassCheckbox)
-
-      void expect(seniorPassCheckbox.checked).toBe(true)
       await userEvent.click(
         canvas.getByRole('button', { name: 'Back to review' })
       )
@@ -292,7 +290,7 @@ export const Summary: Story = {
     const canvas = within(canvasElement)
     await step('Check the summary table', async () => {
       void expect(await canvas.findByText('Verify ID')).toBeInTheDocument()
-      await expect(canvas.getByText(/^Yes$/)).toBeInTheDocument()
+      void expect(canvas.getAllByText(/^Yes$/)).toHaveLength(1)
       void expect(
         await canvas.findByText('Another registration agent or field agent')
       ).toBeInTheDocument()

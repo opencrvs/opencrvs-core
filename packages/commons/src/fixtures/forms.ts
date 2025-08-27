@@ -882,7 +882,7 @@ export const TENNIS_CLUB_DECLARATION_FORM = defineDeclarationForm({
           }
         },
         {
-          id: 'senior-pass.recommneder',
+          id: 'senior-pass.recommender',
           type: 'CHECKBOX',
           required: true,
           parent: field('recommender.none'),
