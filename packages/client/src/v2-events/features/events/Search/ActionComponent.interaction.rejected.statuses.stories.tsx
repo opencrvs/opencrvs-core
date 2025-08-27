@@ -25,11 +25,11 @@ import { TRPCProvider } from '@client/v2-events/trpc'
 import { ROUTES } from '@client/v2-events/routes'
 import { testDataGenerator } from '@client/tests/test-data-generators'
 import { addLocalEventConfig, setEventData } from '../useEvents/api'
-import { ActionComponent } from './ActionComponent'
+import { ActionCta } from './ActionCta'
 
-const meta: Meta<typeof ActionComponent> = {
+const meta: Meta<typeof ActionCta> = {
   title: 'Components/ActionComponent/Interaction/RejectedStatuses',
-  component: ActionComponent,
+  component: ActionCta,
   decorators: [
     (Story) => (
       <TRPCProvider>
@@ -40,7 +40,7 @@ const meta: Meta<typeof ActionComponent> = {
 }
 export default meta
 
-type Story = StoryObj<typeof ActionComponent>
+type Story = StoryObj<typeof ActionCta>
 
 function createRejectedEventByStatus(status: EventStatus) {
   const user = testDataGenerator().user
@@ -94,7 +94,7 @@ export const DirectsRejectedNotifiedToDeclare: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={rejectedNotifiedEvent.eventQueryData}
                   />
@@ -168,7 +168,7 @@ export const DirectsRejectedDeclaredToDeclared: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={rejectedDeclaredEvent.eventQueryData}
                   />
@@ -242,7 +242,7 @@ export const directsRejectedValidatedToValidated: Story = {
             Component: () => {
               return (
                 <div>
-                  <ActionComponent
+                  <ActionCta
                     actionType={'DEFAULT'}
                     event={rejectedValidatedEvent.eventQueryData}
                   />
