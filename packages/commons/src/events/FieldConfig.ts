@@ -445,7 +445,7 @@ const AdministrativeArea = BaseField.extend({
 
 export type AdministrativeArea = z.infer<typeof AdministrativeArea>
 
-const Location = BaseField.extend({
+const LocationInput = BaseField.extend({
   type: z.literal(FieldType.LOCATION),
   defaultValue: NonEmptyTextValue.optional(),
   configuration: z
@@ -457,7 +457,7 @@ const Location = BaseField.extend({
     .optional()
 }).describe('Input field for a location')
 
-export type Location = z.infer<typeof Location>
+export type LocationInput = z.infer<typeof LocationInput>
 
 const FileUploadWithOptions = BaseField.extend({
   type: z.literal(FieldType.FILE_WITH_OPTIONS),
@@ -561,7 +561,7 @@ export type FieldConfig =
   | z.infer<typeof Country>
   | z.infer<typeof AdministrativeArea>
   | z.infer<typeof Divider>
-  | z.infer<typeof Location>
+  | z.infer<typeof LocationInput>
   | z.infer<typeof Facility>
   | z.infer<typeof Office>
   | z.infer<typeof SignatureField>
@@ -591,7 +591,7 @@ export const FieldConfig = z
     Country,
     AdministrativeArea,
     Divider,
-    Location,
+    LocationInput,
     Facility,
     Office,
     SignatureField,
@@ -608,7 +608,7 @@ export type SelectField = z.infer<typeof Select>
 export type NameField = z.infer<typeof NameField>
 export type PhoneField = z.infer<typeof PhoneField>
 export type IdField = z.infer<typeof IdField>
-export type LocationField = z.infer<typeof Location>
+export type LocationField = z.infer<typeof LocationInput>
 export type RadioField = z.infer<typeof RadioGroup>
 export type AddressField = z.infer<typeof Address>
 export type NumberField = z.infer<typeof NumberField>

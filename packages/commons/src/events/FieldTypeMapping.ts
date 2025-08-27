@@ -23,7 +23,7 @@ import {
   FieldConfig,
   File,
   FileUploadWithOptions,
-  Location,
+  LocationInput,
   Office,
   PageHeader,
   Paragraph,
@@ -375,7 +375,7 @@ export const isRadioGroupFieldType = (field: {
 export const isLocationFieldType = (field: {
   config: FieldConfig
   value: FieldValue
-}): field is { value: string; config: Location } => {
+}): field is { value: string; config: LocationInput } => {
   return field.config.type === FieldType.LOCATION
 }
 
