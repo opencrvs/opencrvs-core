@@ -17,6 +17,7 @@ import {
   AddressType,
   createPrng,
   EventStatus,
+  EventIndex,
   generateActionDeclarationInput,
   getCurrentEventState,
   getUUID,
@@ -398,8 +399,8 @@ test('deduplication check is performed before validation when configured', async
     getCurrentEventState(stillDeclaredEvent, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'DECLARED',
-    duplicates: [existingEvent.id]
-  })
+    potentialDuplicates: [existingEvent.id]
+  } satisfies Partial<EventIndex>)
 })
 
 test('Event status changes after validation action is accepted', async () => {

@@ -17,6 +17,7 @@ import {
   ActionType,
   AddressType,
   createPrng,
+  EventIndex,
   generateActionDeclarationInput,
   generateRegistrationNumber,
   getCurrentEventState,
@@ -892,6 +893,6 @@ test('deduplication check is performed before register when configured', async (
     getCurrentEventState(stillValidated, tennisClubMembershipEvent)
   ).toMatchObject({
     status: 'VALIDATED',
-    duplicates: [existingEvent.id]
-  })
+    potentialDuplicates: [existingEvent.id]
+  } satisfies Partial<EventIndex>)
 })
