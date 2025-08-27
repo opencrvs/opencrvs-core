@@ -432,6 +432,9 @@ export async function findRecordsByQuery(
     })) || {
       _score: {
         order: 'desc'
+      },
+      updatedAt: {
+        order: 'desc'
       }
     }
   })
