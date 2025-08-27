@@ -508,7 +508,8 @@ const Address = BaseField.extend({
             required: z.boolean(),
             label: TranslationConfig,
             type: z.literal(FieldType.TEXT),
-            conditionals: z.array(FieldConditional).default([]).optional()
+            conditionals: z.array(FieldConditional).default([]).optional(),
+            parent: FieldReference.optional()
           })
         )
         .optional()

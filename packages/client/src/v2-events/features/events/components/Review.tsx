@@ -42,6 +42,7 @@ import { FormFieldGenerator } from '@client/v2-events/components/forms/FormField
 import { getCountryLogoFile } from '@client/offline/selectors'
 import { withSuspense } from '@client/v2-events/components/withSuspense'
 import { getScope } from '@client/profile/profileSelectors'
+import { useLocations } from '@client/v2-events/hooks/useLocations'
 import { ReviewCorrection } from '../actions/correct/request/ReviewCorrection'
 import { Output } from './Output'
 import { DocumentViewer } from './DocumentViewer'
@@ -294,8 +295,14 @@ function FormReview({
   isReviewCorrection?: boolean
 }) {
   const intl = useIntl()
+  const { getLocations } = useLocations()
+  const [locations] = getLocations.useSuspenseQuery()
   const visiblePages = formConfig.pages.filter((page) =>
-    isPageVisible(page, form)
+    isPageVisible(page, form, { locations })
+  )
+
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
   )
 
   return (
@@ -303,7 +310,11 @@ function FormReview({
       <ReviewContainter>
         {visiblePages.map((page) => {
           const fields = page.fields
-            .filter((field) => isFieldDisplayedOnReview(field, form))
+            .filter((field) =>
+              isFieldDisplayedOnReview(field, form, {
+                locations: adminStructureLocations
+              })
+            )
             .map((field) => {
               const value = form[field.id]
               const previousValue = previousForm[field.id]
@@ -317,7 +328,8 @@ function FormReview({
 
               const error = runFieldValidations({
                 field,
-                values: form
+                values: form,
+                context: { locations: adminStructureLocations }
               })
 
               const errorDisplay =

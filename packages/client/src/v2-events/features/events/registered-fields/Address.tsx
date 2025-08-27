@@ -8,7 +8,7 @@
  *
  * Copyright (C) The OpenCRVS Authors located at https://github.com/opencrvs/opencrvs-core/blob/master/AUTHORS.
  */
-import React from 'react'
+import React, { useMemo } from 'react'
 import { IntlShape } from 'react-intl'
 import { Location } from '@events/service/locations/locations'
 import { useSelector } from 'react-redux'
@@ -58,48 +58,40 @@ function isDomesticAddress() {
   )
 }
 
-function isInternationalAddress() {
-  return and(
-    not(createFieldCondition('country').isUndefined()),
-    createFieldCondition('addressType').isEqualTo(AddressType.INTERNATIONAL)
-  )
-}
-
 function getAdminLevelHierarchy(
-  targetAdminUUId: string | undefined,
-  locations: Location[]
+  locationUUID: string | undefined,
+  locations: Location[],
+  adminStructure: string[]
 ) {
-  // Prepare result object
-  const result: Partial<Record<`adminLevel${number}`, string>> = {}
+  // Collect the chain of location IDs from leaf to root
+  const collectedIds: string[] = []
 
-  // Find the starting location
-  let current = targetAdminUUId
-    ? locations.find((l) => l.id === targetAdminUUId.toString())
+  let current = locationUUID
+    ? locations.find((l) => l.id === locationUUID.toString())
     : null
 
-  // Walk up the hierarchy, collecting UUIDs
-  let level = 0
   while (current) {
-    level++
-    result[`adminLevel${level}` as const] = current.id
+    collectedIds.push(current.id)
     if (!current.partOf) {
       break
     }
-    // partOf may be "Location/UUID" or just "UUID"
-    const parentId = current.partOf.replace(/^Location\//, '')
+    const parentId = current.partOf
     current = locations.find((l) => l.id === parentId)
   }
 
-  // Reverse the result so adminLevel1 is the root, adminLevelN is the leaf
-  const entries = Object.entries(result).reverse()
-  const hierarchy: Partial<Record<`adminLevel${number}`, string>> = {}
-  entries.forEach(([_, id], idx) => {
-    hierarchy[`adminLevel${idx + 1}` as const] = id
-  })
+  // Reverse so root is first, leaf is last
+  collectedIds.reverse()
+
+  // Map collected IDs to the provided key order
+  const hierarchy: Partial<Record<string, string>> = {}
+  for (let i = 0; i < adminStructure.length && i < collectedIds.length; i++) {
+    hierarchy[adminStructure[i]] = collectedIds[i]
+  }
+
   return hierarchy
 }
 
-function transformKeyArray(
+function generateAdminStructureFields(
   inputArray: IAdminStructureItem[]
 ): AdministrativeArea[] {
   return inputArray.map((item, index) => {
@@ -132,10 +124,10 @@ function transformKeyArray(
     const field: AdministrativeArea = {
       id,
       type: FieldType.ADMINISTRATIVE_AREA,
+      conditionals,
+      parent: createFieldCondition(parentId),
       required: true,
       label,
-      parent: createFieldCondition(parentId),
-      conditionals,
       configuration
     }
 
@@ -171,7 +163,44 @@ const ADDRESS_TYPE_FIELD = {
   type: FieldType.TEXT
 } as const satisfies FieldConfigWithoutAddress
 
-const ALL_ADDRESS_FIELDS = [COUNTRY_FIELD, ADDRESS_TYPE_FIELD]
+const ADMINISTRATIVE_AREA_FIELD = {
+  id: 'administrativeArea',
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(alwaysTrue())
+    }
+  ],
+  label: {
+    defaultMessage: '',
+    description: 'empty string',
+    id: 'v2.messages.emptyString'
+  },
+  type: FieldType.TEXT
+} as const satisfies FieldConfigWithoutAddress
+
+const STREET_LEVEL_DETAILS_FIELD = {
+  id: 'streetLevelDetails',
+  conditionals: [
+    {
+      type: ConditionalType.SHOW,
+      conditional: not(alwaysTrue())
+    }
+  ],
+  label: {
+    defaultMessage: '',
+    description: 'empty string',
+    id: 'v2.messages.emptyString'
+  },
+  type: FieldType.TEXT
+} as const satisfies FieldConfigWithoutAddress
+
+const ALL_ADDRESS_FIELDS = [
+  COUNTRY_FIELD,
+  ADDRESS_TYPE_FIELD,
+  ADMINISTRATIVE_AREA_FIELD,
+  STREET_LEVEL_DETAILS_FIELD
+]
 
 const ALL_ADDRESS_INPUT_FIELDS = [
   COUNTRY_FIELD
@@ -188,18 +217,16 @@ function getFilteredFields(fieldsToShow?: Array<string>) {
   )
 }
 
-function extractAddressLines(obj: Partial<AddressFieldValue>) {
+function extractAddressLines(
+  obj: Partial<AddressFieldValue>,
+  adminLevelIds: string[]
+) {
   const keysToIgnore = [
     'country',
     'addressType',
     'administrativeArea',
     'streetLevelDetails',
-    'adminLevel1',
-    'adminLevel2',
-    'adminLevel3',
-    'adminLevel4',
-    'adminLevel5',
-    'adminLevel6'
+    ...adminLevelIds
   ]
   return Object.fromEntries(
     Object.entries(obj).filter(
@@ -208,9 +235,16 @@ function extractAddressLines(obj: Partial<AddressFieldValue>) {
   )
 }
 
-function getLeafAdministrativeLevel(val: Partial<AddressFieldValue>) {
-  for (let i = 6; i >= 1; i--) {
-    const key = `adminLevel${i}` as keyof AddressFieldValue
+function getLeafAdministrativeLevel(
+  val: Partial<AddressFieldValue>,
+  keys: string[]
+) {
+  if (val.addressType === AddressType.INTERNATIONAL) {
+    return undefined
+  }
+  // Start from the last key and move backwards
+  for (let i = keys.length - 1; i >= 0; i--) {
+    const key = keys[i] as keyof AddressFieldValue
     if (val[key]) {
       return val[key]
     }
@@ -231,74 +265,75 @@ function AddressInput(props: Props) {
   const { onChange, defaultValue, value, ...otherProps } = props
   const { config } = useSelector(getOfflineData)
   const appConfigAdminLevels = config.ADMIN_STRUCTURE
-  const administrativeLevelsCutoff = props.configuration?.administrativeLevels
 
-  const administrativeLevels =
-    Array.isArray(administrativeLevelsCutoff) &&
-    administrativeLevelsCutoff.length > 0
-      ? administrativeLevelsCutoff
-      : appConfigAdminLevels
+  const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
 
-  const adminStructure = transformKeyArray(appConfigAdminLevels)
+  const normalizedValue = {
+    ...value,
+    administrativeArea: value?.administrativeArea ?? undefined,
+    streetLevelDetails: value?.streetLevelDetails ?? {}
+  }
 
-  /* const adminStructure = myAdminStructure.filter((item) =>
-    administrativeLevels.includes(item.id)
-  ) */
+  const adminStructure = useMemo(
+    () => generateAdminStructureFields(appConfigAdminLevels),
+    [appConfigAdminLevels]
+  )
 
-  const customAddressFields = props.configuration
-    ?.streetAddressForm as FieldConfigWithoutAddress[]
+  const customAddressFields = props.configuration?.streetAddressForm
 
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
       ? customAddressFields
       : []
 
-  console.log(
-    'defaultValue.administrativeArea :>> ',
-    defaultValue?.administrativeArea
-  )
-
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
-  const administrativeAreaUUID =
-    value?.administrativeArea || defaultValue?.administrativeArea
 
-  const derivedAdminLevels = getAdminLevelHierarchy(
-    administrativeAreaUUID,
-    locations
+  const adminStructureLocations = useMemo(
+    () =>
+      locations.filter(
+        (location) => location.locationType === 'ADMIN_STRUCTURE'
+      ),
+    [locations]
   )
-  console.log('adminLevels:', derivedAdminLevels)
+
+  const administrativeAreaUUID =
+    normalizedValue.administrativeArea || defaultValue?.administrativeArea
+
+  const derivedAdminLevels = useMemo(() => {
+    return getAdminLevelHierarchy(
+      administrativeAreaUUID,
+      adminStructureLocations,
+      adminLevelIds
+    )
+  }, [administrativeAreaUUID, adminStructureLocations, adminLevelIds])
 
   const fields = [COUNTRY_FIELD, ...adminStructure, ...addressFields]
 
-  console.log('value in AddressInput', { ...value, ...derivedAdminLevels })
+  const handleChange = (values: EventState) => {
+    const addressLines = extractAddressLines(values, adminLevelIds)
+    const leafAdminLevelValue = getLeafAdministrativeLevel(
+      values,
+      adminLevelIds
+    )
+
+    onChange({
+      ...values,
+      administrativeArea:
+        values.addressType === AddressType.DOMESTIC
+          ? leafAdminLevelValue
+          : undefined,
+      streetLevelDetails: addressLines
+    } as AddressFieldValue)
+  }
 
   return (
     <FormFieldGenerator
       {...otherProps}
       fields={fields}
-      initialValues={{ ...value, ...derivedAdminLevels }}
+      initialValues={{ ...normalizedValue, ...derivedAdminLevels }}
       parentId={props.id}
-      onChange={(values) => {
-        console.log('AddressInput onChange values:', values)
-
-        const addressLines = extractAddressLines(values)
-
-        const leafAdminLevel = getLeafAdministrativeLevel(values)
-
-        if (leafAdminLevel) {
-          console.log('Leaf level adminLevel value:', leafAdminLevel)
-        }
-
-        onChange({
-          ...values,
-          administrativeArea:
-            value?.addressType === AddressType.DOMESTIC
-              ? leafAdminLevel
-              : undefined,
-          streetLevelDetails: addressLines
-        } as Partial<AddressFieldValue>)
-      }}
+      onChange={handleChange}
     />
   )
 }
@@ -317,41 +352,38 @@ function AddressOutput({
   if (!value) {
     return ''
   }
-  console.log('value in AddressOutput', value)
 
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
+  const adminStructureLocations = locations.filter(
+    (location) => location.locationType === 'ADMIN_STRUCTURE'
+  )
+
   const targetAdminUUId = value.administrativeArea
 
+  const { config } = useSelector(getOfflineData)
+  const appConfigAdminLevels = config.ADMIN_STRUCTURE
+  const adminLevelIds = appConfigAdminLevels.map((level) => level.id)
+
   const location = targetAdminUUId?.toString()
-    ? locations.find((l) => l.id === targetAdminUUId.toString())
+    ? adminStructureLocations.find((l) => l.id === targetAdminUUId.toString())
     : null
 
-  console.log('location in AddressOutput', location)
-
-  const adminLevels = getAdminLevelHierarchy(targetAdminUUId, locations)
-  console.log('adminLevels:', adminLevels)
+  const adminLevels = getAdminLevelHierarchy(
+    targetAdminUUId,
+    adminStructureLocations,
+    adminLevelIds
+  )
 
   const updatedValues = {
     ...value,
     ...adminLevels
   }
 
-  console.log('updatedValues in AddressOutput', updatedValues)
-
-  const { config } = useSelector(getOfflineData)
-  const appConfigAdminLevels = config.ADMIN_STRUCTURE
-
-  const adminStructure = transformKeyArray(appConfigAdminLevels)
-
-  /* const adminStructure = ADMIN_STRUCTURE_FIELDS.filter((item) =>
-    appConfigAdminLevels.includes(item.id)
-  ) */
+  const adminStructure = generateAdminStructureFields(appConfigAdminLevels)
 
   const customAddressFields = configuration?.configuration
     ?.streetAddressForm as FieldConfigWithoutAddress[]
-
-  console.log('customAddressFields :>> ', customAddressFields)
 
   const addressFields =
     Array.isArray(customAddressFields) && customAddressFields.length > 0
@@ -383,11 +415,10 @@ function AddressOutput({
         field.value &&
         isFieldDisplayedOnReview(
           field.field satisfies FieldConfig,
-          updatedValues
+          updatedValues,
+          { locations: adminStructureLocations }
         )
     )
-
-  console.log('fieldsToShow :>> ', fieldsToShow)
 
   return (
     <>
