@@ -24,7 +24,7 @@ import { withSuspense } from '../../../components/withSuspense'
 /**
  * @returns next available action cta based on the given event.
  */
-export function ActionCtaComponent({
+function ActionCtaComponent({
   event,
   actionType,
   redirectParam
