@@ -20,7 +20,7 @@ export const tennisClubMembershipCertifiedCertificateTemplate = `
       <tspan x="62" y="413.552">Date of certification&#10;</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" letter-spacing="0em">
-      <tspan x="62" y="460.352">{{$lookup $metadata "createdAtLocation.location"}}, {{$lookup $metadata "createdAtLocation.country"}}</tspan>
+      <tspan x="62" y="460.352">{{$lookup $metadata "createdAtLocation.name"}}, {{$lookup $metadata "createdAtLocation.country"}}</tspan>
     </text>
     <text fill="#222222" xml:space="preserve" style="white-space: pre" font-family="Noto Sans" font-size="8" font-weight="bold" letter-spacing="0em">
       <tspan x="62" y="447.552">Place of certification&#10;</tspan>
