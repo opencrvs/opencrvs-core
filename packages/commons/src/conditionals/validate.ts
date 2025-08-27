@@ -13,7 +13,7 @@ import Ajv from 'ajv/dist/2019'
 import addFormats from 'ajv-formats'
 import { ConditionalParameters, JSONSchema } from './conditionals'
 import { formatISO, isAfter, isBefore } from 'date-fns'
-import { ErrorMapCtx, ZodIssueOptionalMessage } from 'zod'
+import { ErrorMapCtx, z, ZodIssueOptionalMessage } from 'zod'
 import { ActionUpdate, EventState } from '../events/ActionDocument'
 import { ConditionalType, FieldConditional } from '../events/Conditional'
 import { FieldConfig } from '../events/FieldConfig'
@@ -21,10 +21,18 @@ import { mapFieldTypeToZod } from '../events/FieldTypeMapping'
 import { FieldUpdateValue } from '../events/FieldValue'
 import { TranslationConfig } from '../events/TranslationConfig'
 
+import { Location } from '../events/locations'
+
 const ajv = new Ajv({
   $data: true,
   allowUnionTypes: true,
   strict: false // Allow minContains and other newer features
+})
+
+const DataContext = z.object({
+  rootData: z.object({
+    $locations: z.array(Location)
+  })
 })
 
 // https://ajv.js.org/packages/ajv-formats.html
@@ -91,6 +99,28 @@ ajv.addKeyword({
   }
 })
 
+ajv.addKeyword({
+  keyword: 'isLeafLevelLocation',
+  type: 'string',
+  schemaType: 'boolean',
+  $data: true,
+  errors: true,
+  validate(
+    schema: {},
+    data: string,
+    _: unknown,
+    dataContext?: { rootData: unknown }
+  ) {
+    const context = DataContext.parse(dataContext)
+
+    const locationToValidate = data
+
+    const locations = context.rootData.$locations
+
+    return !locations.some((location) => location.partOf === locationToValidate)
+  }
+})
+
 export function validate(schema: JSONSchema, data: ConditionalParameters) {
   const validator = ajv.getSchema(schema.$id) || ajv.compile(schema)
 
@@ -101,11 +131,13 @@ export function validate(schema: JSONSchema, data: ConditionalParameters) {
 
 export function isConditionMet(
   conditional: JSONSchema,
-  values: Record<string, unknown>
+  values: Record<string, unknown>,
+  context: { locations: Array<Location> }
 ) {
   return validate(conditional, {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $locations: context.locations
   })
 }
 
@@ -123,17 +155,19 @@ function getConditionalActionsForField(
 
 export function areConditionsMet(
   conditions: FieldConditional[],
-  values: Record<string, unknown>
+  values: Record<string, unknown>,
+  context: { locations: Array<Location> }
 ) {
   return conditions.every((condition) =>
-    isConditionMet(condition.conditional, values)
+    isConditionMet(condition.conditional, values, context)
   )
 }
 
 function isFieldConditionMet(
   field: FieldConfig,
   form: ActionUpdate | EventState,
-  conditionalType: ConditionalType
+  conditionalType: ConditionalType,
+  context: { locations: Array<Location> }
 ) {
   const hasRule = (field.conditionals ?? []).some(
     (conditional) => conditional.type === conditionalType
@@ -147,7 +181,8 @@ function isFieldConditionMet(
     $form: form,
     $now: formatISO(new Date(), {
       representation: 'date'
-    })
+    }),
+    $locations: context.locations
   })
 
   return validConditionals.includes(conditionalType)
@@ -155,9 +190,10 @@ function isFieldConditionMet(
 
 export function isFieldVisible(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: { locations: Array<Location> }
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.SHOW)
+  return isFieldConditionMet(field, form, ConditionalType.SHOW, context)
 }
 
 function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
@@ -167,19 +203,21 @@ function isFieldEmptyAndNotRequired(field: FieldConfig, form: ActionUpdate) {
 
 export function isFieldEnabled(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: { locations: Array<Location> }
 ) {
-  return isFieldConditionMet(field, form, ConditionalType.ENABLE)
+  return isFieldConditionMet(field, form, ConditionalType.ENABLE, context)
 }
 
 // Fields are displayed on review if both the 'ConditionalType.SHOW' and 'ConditionalType.DISPLAY_ON_REVIEW' conditions are met
 export function isFieldDisplayedOnReview(
   field: FieldConfig,
-  form: ActionUpdate | EventState
+  form: ActionUpdate | EventState,
+  context: { locations: Array<Location> }
 ) {
   return (
-    isFieldVisible(field, form) &&
-    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW)
+    isFieldVisible(field, form, context) &&
+    isFieldConditionMet(field, form, ConditionalType.DISPLAY_ON_REVIEW, context)
   )
 }
 
@@ -342,13 +380,15 @@ export function validateFieldInput({
 
 export function runStructuralValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context: { locations: Array<Location> }
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -368,13 +408,15 @@ export function runStructuralValidations({
 
 export function runFieldValidations({
   field,
-  values
+  values,
+  context
 }: {
   field: FieldConfig
   values: ActionUpdate
+  context: { locations: Array<Location> }
 }) {
   if (
-    !isFieldVisible(field, values) ||
+    !isFieldVisible(field, values, context) ||
     isFieldEmptyAndNotRequired(field, values)
   ) {
     return {
@@ -384,7 +426,8 @@ export function runFieldValidations({
 
   const conditionalParameters = {
     $form: values,
-    $now: formatISO(new Date(), { representation: 'date' })
+    $now: formatISO(new Date(), { representation: 'date' }),
+    $locations: context.locations
   }
 
   const fieldValidationResult = validateFieldInput({
