@@ -102,6 +102,7 @@ export const ReviewWithChanges: Story = {
         canvas.getByRole('button', { name: 'Continue' })
       ).toBeDisabled()
     })
+    await userEvent.click(canvas.getByTestId('exit-button'))
   }
 }
 
@@ -188,9 +189,6 @@ export const ReviewWithParentFieldChanges: Story = {
           name: 'No recommender'
         })
       )
-    })
-
-    await step('Go back to review page', async () => {
       await userEvent.click(
         canvas.getByRole('button', { name: 'Back to review' })
       )
@@ -219,21 +217,21 @@ export const ReviewWithParentFieldChanges: Story = {
         ).toBeInTheDocument()
       )
       await userEvent.click(canvas.getByRole('button', { name: 'Continue' }))
-    })
-
-    await step('Go back to review', async () => {
       await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
-      await waitFor(async () => {
-        await expect(
-          canvas.getByRole('button', { name: 'Continue' })
-        ).toBeDisabled()
-      })
 
       await expect(canvas.queryByText('Add attachment')).not.toBeInTheDocument()
     })
 
     await step('Change recommender values', async () => {
-      await userEvent.click(canvas.getByTestId('change-button-recommender.id'))
+      await userEvent.click(
+        canvas.getByTestId('change-button-recommender.none')
+      )
+      await userEvent.click(
+        canvas.getByRole('checkbox', {
+          name: 'No recommender'
+        })
+      )
+
       await userEvent.type(
         canvas.getByTestId('text__recommender____id'),
         '1234567890'
@@ -265,6 +263,8 @@ export const ReviewWithParentFieldChanges: Story = {
           canvas.getByRole('button', { name: 'Continue' })
         ).toBeEnabled()
       })
+
+      await userEvent.click(canvas.getByTestId('exit-button'))
     })
   }
 }
