@@ -10,7 +10,6 @@
  */
 import React from 'react'
 import { useIntl } from 'react-intl'
-import { useTypedParams } from 'react-router-typesafe-routes/dom'
 import {
   EventIndex,
   WorkqueueActionsWithDefault,
@@ -20,8 +19,12 @@ import {
 import { Button } from '@opencrvs/components'
 import { useAuthentication } from '@client/utils/userUtils'
 import { useAllowedActionConfigurations } from '../../workqueues/EventOverview/components/useAllowedActionConfigurations'
+import { withSuspense } from '../../../components/withSuspense'
 
-export function ActionComponent({
+/**
+ * @returns next available action cta based on the given event.
+ */
+export function ActionCtaComponent({
   event,
   actionType,
   redirectParam
@@ -59,3 +62,5 @@ export function ActionComponent({
     </Button>
   )
 }
+
+export const ActionCta = withSuspense(ActionCtaComponent)
