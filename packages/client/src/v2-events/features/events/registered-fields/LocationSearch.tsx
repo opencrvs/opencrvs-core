@@ -95,7 +95,7 @@ function toCertificateVariables(
 ) {
   if (!value) {
     return {
-      location: '',
+      name: '',
       district: '',
       province: '',
       country: ''
@@ -126,15 +126,12 @@ function LocationSearchOutput({ value }: { value: Stringifiable }) {
   const intl = useIntl()
   const { getLocations } = useLocations()
   const [locations] = getLocations.useSuspenseQuery()
-  const { location, district, province, country } = toCertificateVariables(
-    value,
-    {
-      intl,
-      locations
-    }
-  )
+  const { name, district, province, country } = toCertificateVariables(value, {
+    intl,
+    locations
+  })
 
-  return [location, district, province, country]
+  return [name, district, province, country]
     .filter((loc) => loc !== '')
     .join(', ')
 }
