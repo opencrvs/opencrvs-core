@@ -16,26 +16,6 @@ import { api } from '@gateway/v2-events/events/service'
 import z from 'zod'
 import { ServerRoute } from '@hapi/hapi'
 
-const LegacyLocation = z.object({
-  statisticalID: z.string(),
-  name: z.string(),
-  alias: z.string(),
-  partOf: z.string(),
-  code: z.string(),
-  jurisdictionType: z.string(),
-  statistics: z
-    .array(
-      z.object({
-        year: z.number(),
-        male_population: z.number(),
-        female_population: z.number(),
-        population: z.number(),
-        crude_birth_rate: z.number()
-      })
-    )
-    .optional()
-})
-
 const LegacyLocationUpdate = z.object({
   name: z.string(),
   alias: z.string().optional(),
@@ -144,22 +124,13 @@ export const catchAllProxy = {
         return h.response().code(response.status)
       }
 
-      await api.locations.update.mutate(
-        [
-          {
-            id: req.params.id,
-            name: body.name,
-            status: body.status
-          }
-        ],
-        {
-          context: {
-            headers: {
-              Authorization: req.headers.authorization || ''
-            }
+      await api.locations.sync.mutate(undefined, {
+        context: {
+          headers: {
+            Authorization: req.headers.authorization
           }
         }
-      )
+      })
 
       return h.response(response.body).code(response.status)
     },
@@ -171,13 +142,7 @@ export const catchAllProxy = {
     method: 'POST',
     path: '/locations',
     handler: async (req, h) => {
-      const parseResult = LegacyLocation.safeParse(req.payload)
-
-      if (!parseResult.success) {
-        return h.response().code(400)
-      }
-
-      const body = parseResult.data
+      const body = req.payload
 
       const response = await fetch(`${APPLICATION_CONFIG_URL}locations`, {
         method: 'POST',
@@ -189,29 +154,18 @@ export const catchAllProxy = {
       })
 
       if (!response.ok) {
-        return h.response().code(response.status)
+        return h.response({}).code(response.status)
       }
 
-      const json = await response.json()
-
-      await api.locations.add.mutate(
-        [
-          {
-            id: json.id,
-            name: body.name,
-            parentId: body.partOf.replace('Location/', '')
-          }
-        ],
-        {
-          context: {
-            headers: {
-              Authorization: req.headers.authorization || ''
-            }
+      await api.locations.sync.mutate(undefined, {
+        context: {
+          headers: {
+            Authorization: req.headers.authorization
           }
         }
-      )
+      })
 
-      return h.response(json).code(response.status)
+      return h.response({}).code(response.status)
     },
     options: {
       auth: false

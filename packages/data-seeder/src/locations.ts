@@ -215,7 +215,7 @@ export async function seedLocations(token: string) {
   })
 
   if (!res.ok) {
-    raise(await res.json())
+    raise(await res.text())
   }
 
   const response: fhir3.Bundle<fhir3.BundleEntryResponse> = await res.json()

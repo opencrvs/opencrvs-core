@@ -10,44 +10,34 @@
  */
 
 import { z } from 'zod'
-import { SCOPES, UUID } from '@opencrvs/commons'
-import { router, publicProcedure, systemProcedure } from '@events/router/trpc'
-import { requiresAnyOfScopes } from '@events/router/middleware/authorization'
+
+import { SCOPES } from '@opencrvs/commons'
+import { publicProcedure, router, systemProcedure } from '@events/router/trpc'
 import {
-  addLocations,
-  deleteLocations,
   getLocations,
   Location,
-  LocationUpdate,
-  NewLocation,
-  setLocations,
-  updateLocations
+  syncLocations
 } from '@events/service/locations/locations'
+import { requiresAnyOfScopes } from '../middleware'
 
 export const locationRouter = router({
-  set: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING]))
-    .input(z.array(Location).min(1))
-    .mutation(async (options) => {
-      await setLocations(options.input)
-    }),
-  add: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.CONFIG_UPDATE_ALL]))
-    .input(z.array(NewLocation).min(1))
-    .mutation(async (options) => {
-      await addLocations(options.input)
-    }),
-  update: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.CONFIG_UPDATE_ALL]))
-    .input(z.array(LocationUpdate).min(1))
-    .mutation(async (options) => {
-      await updateLocations(options.input)
-    }),
-  delete: systemProcedure
-    .use(requiresAnyOfScopes([SCOPES.CONFIG_UPDATE_ALL]))
-    .input(z.array(UUID))
-    .mutation(async (options) => {
-      await deleteLocations(options.input)
+  sync: systemProcedure
+    .use(
+      requiresAnyOfScopes([SCOPES.USER_DATA_SEEDING, SCOPES.CONFIG_UPDATE_ALL])
+    )
+    .input(z.void())
+    .output(z.void())
+    .meta({
+      openapi: {
+        summary: 'Sync locations between V1 and V2',
+        method: 'POST',
+        path: '/sync-locations',
+        tags: ['events'],
+        protect: true
+      }
+    })
+    .mutation(async () => {
+      await syncLocations()
     }),
   get: publicProcedure.output(z.array(Location)).query(getLocations)
 })
