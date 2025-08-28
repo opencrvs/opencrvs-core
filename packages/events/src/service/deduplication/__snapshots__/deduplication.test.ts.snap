@@ -17,7 +17,7 @@ exports[`deduplication query input conversion > should convert childDobWithin5Da
       {
         "distance_feature": {
           "field": "declaration.child____dob",
-          "origin": 2011-11-11T00:00:00.000Z,
+          "origin": "2011-11-11",
           "pivot": "3d",
         },
       },
@@ -71,7 +71,7 @@ exports[`deduplication query input conversion > should convert similarAgedMother
       {
         "distance_feature": {
           "field": "declaration.mother____dob",
-          "origin": 1999-11-11T00:00:00.000Z,
+          "origin": "1999-11-11",
           "pivot": "243d",
         },
       },

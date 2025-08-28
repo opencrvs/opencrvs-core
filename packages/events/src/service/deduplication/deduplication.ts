@@ -145,10 +145,10 @@ export function generateElasticsearchQuery(
             {
               range: {
                 [queryKey]: {
-                  gte: DateTime.fromJSDate(new Date(dateValue.data))
+                  gte: DateTime.fromISO(dateValue.data)
                     .minus({ days: queryInput.options.days })
                     .toISO(),
-                  lte: DateTime.fromJSDate(new Date(dateValue.data))
+                  lte: DateTime.fromISO(dateValue.data)
                     .plus({ days: queryInput.options.days })
                     .toISO()
                 }
@@ -160,7 +160,7 @@ export function generateElasticsearchQuery(
               distance_feature: {
                 field: queryKey,
                 pivot: `${pivot}d`,
-                origin: new Date(dateValue.data)
+                origin: dateValue.data
               }
             }
           ]

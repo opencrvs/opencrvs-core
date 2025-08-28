@@ -669,7 +669,6 @@ export type FieldConfigInput =
   | z.input<typeof EmailField>
   | z.input<typeof DataField>
   | z.input<typeof HttpField>
-
 /*
  *  Using explicit type for the FieldConfig schema intentionally as it's
  *  referenced quite extensively througout various other schemas. Leaving the
@@ -747,3 +746,8 @@ export const AnyFileField = z.discriminatedUnion('type', [
 ])
 
 export type AnyFileField = z.infer<typeof AnyFileField>
+
+export type FieldTypeToFieldConfig<T extends FieldType> = Extract<
+  FieldConfigInput,
+  { type: T }
+>

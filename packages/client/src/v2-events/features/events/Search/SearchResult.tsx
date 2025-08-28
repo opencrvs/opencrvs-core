@@ -44,7 +44,7 @@ import { CoreWorkqueues } from '@client/v2-events/utils'
 import RetryButton from '@client/v2-events/components/RetryButton'
 import { useEventTitle } from '../useEvents/useEventTitle'
 import { deserializeSearchParams, serializeSearchParams } from './utils'
-import { ActionComponent } from './ActionComponent'
+import { ActionCta } from './ActionCta'
 import { SearchResultItemTitle } from './SearchResultItemTitle'
 
 const WithTestId = styled.div.attrs({
@@ -289,7 +289,7 @@ export const SearchResultComponent = ({
       const actionConfigs = actions
         .map((actionType) => ({
           actionComponent: (
-            <ActionComponent
+            <ActionCta
               actionType={actionType}
               event={event}
               redirectParam={slug}
