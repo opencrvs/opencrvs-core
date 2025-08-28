@@ -17,7 +17,6 @@ import { userEvent, waitFor } from '@storybook/test'
 import {
   ActionType,
   createPrng,
-  FullDocumentPath,
   generateEventDocument,
   generateEventDraftDocument,
   generateWorkqueues,
