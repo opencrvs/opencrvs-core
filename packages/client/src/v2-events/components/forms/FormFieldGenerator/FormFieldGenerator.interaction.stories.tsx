@@ -65,6 +65,7 @@ const fields = [
     id: 'tennis-member.dobUnknown',
     type: FieldType.CHECKBOX,
     required: false,
+    defaultValue: false,
     label: {
       defaultMessage: 'Exact date of birth unknown',
       description: 'This is the label for the field',
