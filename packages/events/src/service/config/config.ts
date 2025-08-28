@@ -24,10 +24,10 @@ import { env } from '@events/environment'
  * There shouldn't be a situation where countryconfig changes and events do not restart.
  */
 
-let inmemoryEventConfigurations: EventConfig[] | null = null
-let inmemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
+let inMemoryEventConfigurations: EventConfig[] | null = null
+let inMemoryWorkqueueConfigurations: WorkqueueConfig[] | null = null
 
-export async function getEventConfigurations(token: string) {
+async function getEventConfigurations(token: string) {
   const res = await fetch(new URL('/events', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
@@ -46,21 +46,21 @@ export async function getEventConfigurations(token: string) {
  * @returns in-memory event configurations when running in production-like environment.
  */
 export async function getInmemoryEventConfigurations(token: string) {
-  if (process.env.NODE_ENV !== 'production') {
+  if (!env.isProduction) {
     logger.info(
       `Running in ${process.env.NODE_ENV} mode. Fetching event configurations from API`
     )
-    // In production, we should always fetch the latest configurations
+    // In development, we should always fetch the latest configurations
     return getEventConfigurations(token)
   }
 
-  if (inmemoryEventConfigurations) {
+  if (inMemoryEventConfigurations) {
     logger.info('Returning in-memory event configurations')
-    return inmemoryEventConfigurations
+    return inMemoryEventConfigurations
   }
 
-  inmemoryEventConfigurations = await getEventConfigurations(token)
-  return inmemoryEventConfigurations
+  inMemoryEventConfigurations = await getEventConfigurations(token)
+  return inMemoryEventConfigurations
 }
 
 async function findEventConfigurationById({
@@ -90,7 +90,7 @@ export async function getEventConfigurationById({
   )
 }
 
-export async function getWorkqueueConfigurations(token: string) {
+async function getWorkqueueConfigurations(token: string) {
   const res = await fetch(new URL('/workqueue', env.COUNTRY_CONFIG_URL), {
     headers: {
       'Content-Type': 'application/json',
@@ -108,8 +108,8 @@ export async function getWorkqueueConfigurations(token: string) {
 /**
  * @returns in-memory workqueue configurations when running in production-like environment.
  */
-export async function getInmemoryWorkqueueConfigurations(token: string) {
-  if (process.env.NODE_ENV !== 'production') {
+export async function getIMemoryWorkqueueConfigurations(token: string) {
+  if (!env.isProduction) {
     logger.info(
       `Running in ${process.env.NODE_ENV} mode. Fetching workqueue configurations from API`
     )
@@ -117,11 +117,11 @@ export async function getInmemoryWorkqueueConfigurations(token: string) {
     return getWorkqueueConfigurations(token)
   }
 
-  if (inmemoryWorkqueueConfigurations) {
+  if (inMemoryWorkqueueConfigurations) {
     logger.info('Returning in-memory workqueue configurations')
-    return inmemoryWorkqueueConfigurations
+    return inMemoryWorkqueueConfigurations
   }
 
-  inmemoryWorkqueueConfigurations = await getWorkqueueConfigurations(token)
-  return inmemoryWorkqueueConfigurations
+  inMemoryWorkqueueConfigurations = await getWorkqueueConfigurations(token)
+  return inMemoryWorkqueueConfigurations
 }

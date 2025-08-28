@@ -22,7 +22,7 @@ import {
 import { router, publicProcedure } from '@events/router/trpc'
 import {
   getInmemoryEventConfigurations,
-  getInmemoryWorkqueueConfigurations
+  getIMemoryWorkqueueConfigurations
 } from '@events/service/config/config'
 import { getEventCount } from '@events/service/indexing/indexing'
 import { requireScopeForWorkqueues } from '@events/router/middleware'
@@ -33,7 +33,7 @@ export const workqueueRouter = router({
       .input(z.void())
       .output(z.array(WorkqueueConfig))
       .query(async (options) => {
-        return getInmemoryWorkqueueConfigurations(options.ctx.token)
+        return getIMemoryWorkqueueConfigurations(options.ctx.token)
       })
   }),
   count: publicProcedure
