@@ -242,7 +242,6 @@ describe('event.actions.notify', () => {
       ).rejects.toMatchSnapshot()
 
       const locations = await getLocations()
-      console.log(locations)
 
       // should succeed, since it is a valid location id
       await expect(
